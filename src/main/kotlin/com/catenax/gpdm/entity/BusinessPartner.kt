@@ -19,7 +19,9 @@ class BusinessPartner(
     val identifiers: Set<Identifier>,
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    val status: BusinessPartnerStatus?
+    val status: BusinessPartnerStatus?,
+    @OneToMany(mappedBy = "partner")
+    val addresses: Set<Address>
 ) : BaseEntity()
 
 enum class BusinessPartnerStatus(val description: String){
