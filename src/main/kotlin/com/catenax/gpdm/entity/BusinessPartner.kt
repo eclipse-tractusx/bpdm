@@ -33,6 +33,11 @@ class BusinessPartner(
     val startNodeRelations: Set<Relation>,
     @OneToMany(mappedBy = "endNode")
     val endNodeRelations: Set<Relation>,
+    @ElementCollection(targetClass = BusinessPartnerTypes::class)
+    @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")])
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val types: Set<BusinessPartnerTypes>
 ) : BaseEntity()
 
 enum class BusinessPartnerStatus(val description: String){
@@ -41,4 +46,12 @@ enum class BusinessPartnerStatus(val description: String){
     IN_LIQUIDATION("Liquidation is the process by which a company is brought to an end. The assets and property of the company are redistributed."),
     INACTIVE("Generic status that indicates that a business partner existed in the past, but is as of today not operational."),
     INSOLVENCY("Status is assigned if a business partner is in the state of being unable to pay the money owed on time.")
+}
+
+enum class BusinessPartnerTypes(val description: String){
+    BRAND("A business partner that has no legal standing in the eyes of law by its own, but is a brand of a legal entity."),
+    LEGAL_ENTITY("A business partner that has legal standing in the eyes of law."),
+    ORGANIZATIONAL_UNIT("A business partner that has no legal standing in the eyes of law by its own, but is an organizational unit, division or subsidiary of a legal entity."),
+    SITE("A business partner that encodes a geographic location with one or more address to access the site."),
+    UNKNOWN("This type is assigned if no specific type is known.")
 }
