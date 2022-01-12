@@ -39,7 +39,11 @@ class BusinessPartner(
     @Enumerated(EnumType.STRING)
     val types: Set<BusinessPartnerTypes>,
     @OneToMany(mappedBy = "partner")
-    val bankAccounts: Set<BankAccount>
+    val bankAccounts: Set<BankAccount>,
+    @ElementCollection(targetClass = String::class)
+    @JoinTable(name = "business_partner_roles", joinColumns = [JoinColumn(name = "partner_id")])
+    @Column(name = "role", nullable = false)
+    val roles: Set<String>
 ) : BaseEntity()
 
 enum class BusinessPartnerStatus(val description: String){
