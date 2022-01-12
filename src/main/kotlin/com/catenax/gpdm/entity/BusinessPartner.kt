@@ -28,7 +28,11 @@ class BusinessPartner(
         joinColumns = [ JoinColumn(name = "partner_id") ],
         inverseJoinColumns = [JoinColumn(name = "classification_id")]
     )
-    val classification: Set<Classification>
+    val classification: Set<Classification>,
+    @OneToMany(mappedBy = "startNode")
+    val startNodeRelations: Set<Relation>,
+    @OneToMany(mappedBy = "endNode")
+    val endNodeRelations: Set<Relation>,
 ) : BaseEntity()
 
 enum class BusinessPartnerStatus(val description: String){
