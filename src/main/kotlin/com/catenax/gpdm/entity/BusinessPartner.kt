@@ -21,7 +21,14 @@ class BusinessPartner(
     @Enumerated(EnumType.STRING)
     val status: BusinessPartnerStatus?,
     @OneToMany(mappedBy = "partner")
-    val addresses: Set<Address>
+    val addresses: Set<Address>,
+    @ManyToMany(cascade = [ CascadeType.ALL ])
+    @JoinTable(
+        name = "business_partners_classifications",
+        joinColumns = [ JoinColumn(name = "partner_id") ],
+        inverseJoinColumns = [JoinColumn(name = "classification_id")]
+    )
+    val classification: Set<Classification>
 ) : BaseEntity()
 
 enum class BusinessPartnerStatus(val description: String){
