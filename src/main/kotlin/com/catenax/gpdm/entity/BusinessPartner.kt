@@ -5,6 +5,8 @@ import javax.persistence.*
 @Entity
 @Table(name = "business_partners")
 class BusinessPartner(
+    @Column(name="bpn", nullable = false, unique = true)
+    val bpn: String,
     @OneToMany(mappedBy = "partner")
     val names: Set<Name>,
     @ManyToOne

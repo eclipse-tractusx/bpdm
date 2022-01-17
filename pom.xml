@@ -22,6 +22,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <kotlin.version>1.6.10</kotlin.version>
         <h2.version>2.0.202</h2.version>
+        <springdoc.version>1.6.4</springdoc.version>
     </properties>
 
     <dependencies>
@@ -54,6 +55,18 @@
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-i18n</artifactId>
             <version>1.29</version>
+        </dependency>
+        <!-- OpenAPI 3 auto API documentation library for Spring Boot -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+        <!-- Better support for Kotlin with OpenAPI generation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-kotlin</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
     </dependencies>
 
