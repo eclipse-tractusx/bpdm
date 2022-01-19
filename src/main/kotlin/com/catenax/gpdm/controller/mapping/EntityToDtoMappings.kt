@@ -18,7 +18,7 @@ fun BusinessPartner.toDto() : BusinessPartnerDto{
 fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
                           names: Collection<NameDto>,
                           legalForm: LegalFormDto) : BusinessPartnerDto{
-    return BusinessPartnerDto(this.bpn, identifiers, names, legalForm)
+    return BusinessPartnerDto(this.bpn, identifiers, names, legalForm, this.status)
 }
 
 fun Identifier.toDto(): IdentifierDto{
