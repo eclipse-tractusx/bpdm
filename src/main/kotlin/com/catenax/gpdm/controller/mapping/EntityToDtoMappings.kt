@@ -40,7 +40,8 @@ fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
         profile,
         relations,
         types,
-        bankAccounts
+        bankAccounts,
+        roles
     )
 }
 

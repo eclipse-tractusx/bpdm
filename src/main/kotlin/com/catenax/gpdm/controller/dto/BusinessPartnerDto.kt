@@ -13,5 +13,6 @@ data class BusinessPartnerDto (
     val profile: ProfileDto?,
     val relations: Collection<RelationDto>,
     val types: Collection<BusinessPartnerTypes>,
-    val bankAccounts: Collection<BankAccountDto>
+    val bankAccounts: Collection<BankAccountDto>,
+    val roles: Collection<String>
 )
