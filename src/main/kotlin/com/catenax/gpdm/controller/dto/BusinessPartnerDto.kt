@@ -1,6 +1,7 @@
 package com.catenax.gpdm.controller.dto
 
 import com.catenax.gpdm.entity.BusinessPartnerStatus
+import com.catenax.gpdm.entity.BusinessPartnerTypes
 
 data class BusinessPartnerDto (
     val bpn: String,
@@ -10,5 +11,6 @@ data class BusinessPartnerDto (
     val status: BusinessPartnerStatus?,
     val addresses: Collection<AddressDto>,
     val profile: ProfileDto?,
-    val relations: Collection<RelationDto>
+    val relations: Collection<RelationDto>,
+    val types: Collection<BusinessPartnerTypes>
 )

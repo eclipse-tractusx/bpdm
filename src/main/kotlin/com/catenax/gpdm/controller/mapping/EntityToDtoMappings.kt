@@ -36,7 +36,8 @@ fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
         status,
         addresses,
         profile,
-        relations
+        relations,
+        types
     )
 }
 
