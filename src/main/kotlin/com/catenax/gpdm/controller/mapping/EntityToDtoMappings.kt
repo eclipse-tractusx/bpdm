@@ -11,15 +11,30 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T>{
 }
 
 fun BusinessPartner.toDto() : BusinessPartnerDto{
-    return this.toDto(this.identifiers.map { it.toDto() },
-        this.names.map { it.toDto() },
-        this.legalForm.toDto())
+    return this.toDto(
+        identifiers.map { it.toDto() },
+        names.map { it.toDto() },
+        legalForm.toDto(),
+        addresses.map { it.toDto() },
+        if(classification.isNotEmpty()) ProfileDto(classification.map { it.toDto() }) else null
+    )
 }
 
 fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
                           names: Collection<NameDto>,
-                          legalForm: LegalFormDto) : BusinessPartnerDto{
-    return BusinessPartnerDto(bpn, identifiers, names, legalForm, status, addresses.map { it.toDto() })
+                          legalForm: LegalFormDto,
+                          addresses: Collection<AddressDto>,
+                          profile: ProfileDto?
+) : BusinessPartnerDto{
+    return BusinessPartnerDto(
+        bpn,
+        identifiers,
+        names,
+        legalForm,
+        status,
+        addresses,
+        profile
+    )
 }
 
 fun Identifier.toDto(): IdentifierDto{
@@ -136,6 +151,14 @@ fun PostalDeliveryPoint.toDto(nameComponent: BaseNamedDto): PostalDeliveryPointD
 
 fun AddressVersion.toDto(): AddressVersionDto{
     return AddressVersionDto(this.characterSet, this.languageCode)
+}
+
+fun Classification.toDto(): ClassificationDto{
+    return toDto(toNamedDto())
+}
+
+fun Classification.toDto(nameComponent: BaseNamedDto): ClassificationDto{
+    return ClassificationDto(nameComponent, this.type)
 }
 
 fun BaseNamedEntity.toNamedDto(): BaseNamedDto{
