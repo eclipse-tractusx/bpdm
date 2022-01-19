@@ -7,5 +7,6 @@ data class BusinessPartnerDto (
     val identifiers: Collection<IdentifierDto>,
     val names: Collection<NameDto>,
     val legalForm: LegalFormDto,
-    val status: BusinessPartnerStatus?
+    val status: BusinessPartnerStatus?,
+    val addresses: Collection<AddressDto>
 )
