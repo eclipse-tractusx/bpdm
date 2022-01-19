@@ -10,12 +10,15 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T>{
 }
 
 fun BusinessPartner.toDto() : BusinessPartnerDto{
-    return this.toDto(this.identifiers.map { it.toDto() }, this.names.map { it.toDto() })
+    return this.toDto(this.identifiers.map { it.toDto() },
+        this.names.map { it.toDto() },
+        this.legalForm.toDto())
 }
 
 fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
-                          names: Collection<NameDto>) : BusinessPartnerDto{
-    return BusinessPartnerDto(this.bpn, identifiers, names)
+                          names: Collection<NameDto>,
+                          legalForm: LegalFormDto) : BusinessPartnerDto{
+    return BusinessPartnerDto(this.bpn, identifiers, names, legalForm)
 }
 
 fun Identifier.toDto(): IdentifierDto{
@@ -39,6 +42,14 @@ fun Name.toDto(): NameDto{
 
 fun Name.toDto(nameComponent: BaseNamedDto): NameDto{
     return NameDto(nameComponent, this.type)
+}
+
+fun LegalForm.toDto(): LegalFormDto{
+    return this.toDto(this.toNamedDto())
+}
+
+fun LegalForm.toDto(nameComponent: BaseNamedDto): LegalFormDto{
+    return LegalFormDto(nameComponent, this.type)
 }
 
 
