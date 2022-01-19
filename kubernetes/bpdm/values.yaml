@@ -8,7 +8,7 @@ image:
   repository: cxtsiacr.azurecr.io/catena-x/bpdm
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 imagePullSecrets:
   - name: bpdm-pull-secret
