@@ -1,10 +1,7 @@
 package com.catenax.gpdm.controller.mapping
 
 import com.catenax.gpdm.controller.dto.*
-import com.catenax.gpdm.entity.BaseNamedEntity
-import com.catenax.gpdm.entity.BusinessPartner
-import com.catenax.gpdm.entity.Identifier
-import com.catenax.gpdm.entity.Registration
+import com.catenax.gpdm.entity.*
 import org.springframework.data.domain.Page
 
 
@@ -13,11 +10,12 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T>{
 }
 
 fun BusinessPartner.toDto() : BusinessPartnerDto{
-    return this.toDto(this.identifiers.map { it.toDto() })
+    return this.toDto(this.identifiers.map { it.toDto() }, this.names.map { it.toDto() })
 }
 
-fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>) : BusinessPartnerDto{
-    return BusinessPartnerDto(this.bpn, identifiers)
+fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
+                          names: Collection<NameDto>) : BusinessPartnerDto{
+    return BusinessPartnerDto(this.bpn, identifiers, names)
 }
 
 fun Identifier.toDto(): IdentifierDto{
@@ -34,6 +32,16 @@ fun Registration.toDto(): RegistrationDto {
 fun Registration.toDto(issuingAgency: BaseNamedDto): RegistrationDto{
     return RegistrationDto(this.hardeningGrade, issuingAgency, this.status, this.initialRegistration, this.lastUpdate)
 }
+
+fun Name.toDto(): NameDto{
+    return this.toDto(this.toNamedDto())
+}
+
+fun Name.toDto(nameComponent: BaseNamedDto): NameDto{
+    return NameDto(nameComponent, this.type)
+}
+
+
 
 fun BaseNamedEntity.toNamedDto(): BaseNamedDto{
     return BaseNamedDto(this.value, this.shortName, this.number)
