@@ -9,5 +9,6 @@ data class BusinessPartnerDto (
     val legalForm: LegalFormDto,
     val status: BusinessPartnerStatus?,
     val addresses: Collection<AddressDto>,
-    val profile: ProfileDto?
+    val profile: ProfileDto?,
+    val relations: Collection<RelationDto>
 )
