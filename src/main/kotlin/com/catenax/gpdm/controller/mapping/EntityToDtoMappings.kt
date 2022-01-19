@@ -17,7 +17,8 @@ fun BusinessPartner.toDto() : BusinessPartnerDto{
         legalForm.toDto(),
         addresses.map { it.toDto() },
         if(classification.isNotEmpty()) ProfileDto(classification.map { it.toDto() }) else null,
-        startNodeRelations.map { it.toDto() } + endNodeRelations.map { it.toDto() }
+        startNodeRelations.map { it.toDto() } + endNodeRelations.map { it.toDto() },
+        bankAccounts.map { it.toDto() }
     )
 }
 
@@ -26,7 +27,8 @@ fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
                           legalForm: LegalFormDto,
                           addresses: Collection<AddressDto>,
                           profile: ProfileDto?,
-                          relations: Collection<RelationDto>
+                          relations: Collection<RelationDto>,
+                          bankAccounts: Collection<BankAccountDto>
 ) : BusinessPartnerDto{
     return BusinessPartnerDto(
         bpn,
@@ -37,7 +39,8 @@ fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
         addresses,
         profile,
         relations,
-        types
+        types,
+        bankAccounts
     )
 }
 
@@ -167,6 +170,11 @@ fun Classification.toDto(nameComponent: BaseNamedDto): ClassificationDto{
 
 fun Relation.toDto(): RelationDto{
     return RelationDto(relationClass, type, startNode.bpn, endNode.bpn, startedAt, endedAt)
+}
+
+fun BankAccount.toDto(): BankAccountDto{
+    return BankAccountDto(trustScores, currency, internationalBankAccountIdentifier, internationalBankIdentifier,
+        nationalBankAccountIdentifier, nationalBankIdentifier)
 }
 
 fun BaseNamedEntity.toNamedDto(): BaseNamedDto{
