@@ -11,7 +11,7 @@ class PostCode (
     value: String,
     shortName: String?,
     number: Int?,
-    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "BINARY(36)")
+    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "UUID")
     val uuid: UUID,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)

@@ -9,7 +9,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "address_versions")
 class AddressVersion (
-    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "BINARY(36)")
+    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "UUID")
     val uuid: UUID,
     @Column(name = "character_set", nullable = false)
     val characterSet: CharacterSet,

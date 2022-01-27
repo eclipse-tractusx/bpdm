@@ -7,7 +7,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "administrative_areas")
 class AdministrativeArea(
-    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "BINARY(36)")
+    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "UUID")
     val uuid: UUID,
     @Column(name = "`value`", nullable = false)
     val value: String,
