@@ -1,8 +1,7 @@
-package com.catenax.gpdm.controller.mapping
+package com.catenax.gpdm.service
 
 import com.catenax.gpdm.controller.dto.*
 import com.catenax.gpdm.entity.*
-import com.neovisionaries.i18n.CountryCode
 import org.springframework.data.domain.Page
 
 
@@ -12,37 +11,42 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T>{
 
 fun BusinessPartner.toDto() : BusinessPartnerDto{
     return this.toDto(
+        toBaseDto(),
+        startNodeRelations.map { it.toDto() } + endNodeRelations.map { it.toDto() }
+    )
+}
+
+fun BusinessPartner.toDto(baseDto: BusinessPartnerBaseDto,
+                          relations: Collection<RelationDto>
+) : BusinessPartnerDto{
+    return BusinessPartnerDto(
+        bpn,
+        baseDto,
+        relations
+    )
+}
+
+
+fun BusinessPartner.toBaseDto(): BusinessPartnerBaseDto{
+    return toBaseDto(
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
         legalForm.toDto(),
         addresses.map { it.toDto() },
         if(classification.isNotEmpty()) ProfileDto(classification.map { it.toDto() }) else null,
-        startNodeRelations.map { it.toDto() } + endNodeRelations.map { it.toDto() },
         bankAccounts.map { it.toDto() }
     )
 }
 
-fun BusinessPartner.toDto(identifiers: Collection<IdentifierDto>,
-                          names: Collection<NameDto>,
-                          legalForm: LegalFormDto,
-                          addresses: Collection<AddressDto>,
-                          profile: ProfileDto?,
-                          relations: Collection<RelationDto>,
-                          bankAccounts: Collection<BankAccountDto>
-) : BusinessPartnerDto{
-    return BusinessPartnerDto(
-        bpn,
-        identifiers,
-        names,
-        legalForm,
-        status,
-        addresses,
-        profile,
-        relations,
-        types,
-        bankAccounts,
-        roles
-    )
+fun BusinessPartner.toBaseDto(
+    identifiers: Collection<IdentifierDto>,
+    names: Collection<NameDto>,
+    legalForm: LegalFormDto,
+    addresses: Collection<AddressDto>,
+    profile: ProfileDto?,
+    bankAccounts: Collection<BankAccountDto>
+): BusinessPartnerBaseDto{
+    return BusinessPartnerBaseDto(identifiers, names, legalForm, status, addresses, profile, types, bankAccounts, roles)
 }
 
 fun Identifier.toDto(): IdentifierDto{
@@ -101,16 +105,16 @@ fun Address.toDto(
     postalDeliveryPoints: Collection<PostalDeliveryPointDto>,
     versions: Collection<AddressVersionDto>
 ): AddressDto{
-    return AddressDto(identifiers, careOf, country, administrativeAreas, postCodes, localities,
+    return AddressDto(bpn, identifiers, careOf, country, administrativeAreas, postCodes, localities,
         thoroughfares, premises, postalDeliveryPoints, type, versions)
 }
 
 fun AdministrativeArea.toDto(): AdministrativeAreaDto{
-    return AdministrativeAreaDto(this.name, this.codes.map { it.toDto() }, this.type)
+    return toDto(codes.map { it.toDto() })
 }
 
 fun AdministrativeArea.toDto(codes: Collection<AdministrativeAreaCodeDto>): AdministrativeAreaDto{
-    return AdministrativeAreaDto(this.name, codes, this.type)
+    return AdministrativeAreaDto(this.value, codes, this.type)
 }
 
 fun AdministrativeAreaCode.toDto(): AdministrativeAreaCodeDto{

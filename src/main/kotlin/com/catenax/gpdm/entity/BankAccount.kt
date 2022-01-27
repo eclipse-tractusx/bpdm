@@ -6,11 +6,10 @@ import javax.persistence.*
 @Entity
 @Table(name = "bank_accounts")
 class BankAccount (
-    @ElementCollection(targetClass = Int::class)
+    @ElementCollection(targetClass = Float::class)
     @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")])
     @Column(name = "score", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val trustScores: Set<Int>,
+    val trustScores: Set<Float>,
     @Column(name = "currency", nullable = false)
     @Enumerated(EnumType.STRING)
     val currency: CurrencyCode,

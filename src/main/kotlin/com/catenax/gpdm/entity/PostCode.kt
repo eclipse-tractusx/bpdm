@@ -1,5 +1,8 @@
 package com.catenax.gpdm.entity
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.neovisionaries.i18n.CountryCode
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -8,9 +11,14 @@ class PostCode (
     value: String,
     shortName: String?,
     number: Int?,
+    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "BINARY(36)")
+    val uuid: UUID,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: PostCodeType
+    val type: PostCodeType,
+    @Column(name = "country", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val countryCode: CountryCode
         ) : BaseNamedEntity(value, shortName, number)
 
 enum class PostCodeType(val description: String){

@@ -10,7 +10,7 @@ class Registration(
     @Column(name = "hardening_grade", nullable = false)
     @Enumerated(EnumType.STRING)
     val hardeningGrade: HardeningGrade,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "agency_id", nullable = false)
     val issuingAgency: IssuingAgency,
     @Column(name = "status", nullable = false)

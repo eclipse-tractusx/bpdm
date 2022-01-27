@@ -10,7 +10,10 @@ class Classification (
     number: Int?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: ClassificationType
+    val type: ClassificationType,
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    val partner: BusinessPartner
         ): BaseNamedEntity(value, shortName, number)
 
 enum class ClassificationType(val description: String){

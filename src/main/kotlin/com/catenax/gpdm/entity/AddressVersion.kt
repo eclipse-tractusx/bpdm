@@ -1,6 +1,7 @@
 package com.catenax.gpdm.entity
 
 import com.neovisionaries.i18n.LanguageCode
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.Table
@@ -8,6 +9,8 @@ import javax.persistence.Table
 @Entity
 @Table(name = "address_versions")
 class AddressVersion (
+    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "BINARY(36)")
+    val uuid: UUID,
     @Column(name = "character_set", nullable = false)
     val characterSet: CharacterSet,
     @Column(name = "language", nullable = false)

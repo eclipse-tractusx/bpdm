@@ -9,7 +9,5 @@ import javax.persistence.Table
 class CareOf (
     value: String,
     shortName: String?,
-    number: Int?,
-    @OneToOne(mappedBy = "careOf")
-    val address: Address
+    number: Int?
         ): BaseNamedEntity(value, shortName, number)

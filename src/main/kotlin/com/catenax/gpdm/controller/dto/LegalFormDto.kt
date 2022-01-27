@@ -1,9 +1,16 @@
 package com.catenax.gpdm.controller.dto
 
+import com.catenax.gpdm.entity.ClassificationType
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 
-data class LegalFormDto (
+class LegalFormDto (
+    var type: String
+        ){
     @JsonUnwrapped
-    val nameComponent: BaseNamedDto,
-    val type: String
-        )
+    lateinit var nameComponent: BaseNamedDto
+
+    constructor(nameComponent: BaseNamedDto, type: String): this(type){
+        this.nameComponent=nameComponent
+    }
+}

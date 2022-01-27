@@ -7,46 +7,37 @@ import javax.persistence.*
 class BusinessPartner(
     @Column(name="bpn", nullable = false, unique = true)
     val bpn: String,
-    @OneToMany(mappedBy = "partner")
-    val names: Set<Name>,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name="legal_form_id", nullable=false)
     val legalForm: LegalForm,
-    @ManyToMany(cascade = [ CascadeType.ALL ])
-    @JoinTable(
-        name = "business_partners_identifiers",
-        joinColumns = [ JoinColumn(name = "partner_id") ],
-        inverseJoinColumns = [JoinColumn(name = "identifier_id")]
-    )
-    val identifiers: Set<Identifier>,
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     val status: BusinessPartnerStatus?,
-    @OneToMany(mappedBy = "partner")
-    val addresses: Set<Address>,
-    @ManyToMany(cascade = [ CascadeType.ALL ])
-    @JoinTable(
-        name = "business_partners_classifications",
-        joinColumns = [ JoinColumn(name = "partner_id") ],
-        inverseJoinColumns = [JoinColumn(name = "classification_id")]
-    )
-    val classification: Set<Classification>,
-    @OneToMany(mappedBy = "startNode")
-    val startNodeRelations: Set<Relation>,
-    @OneToMany(mappedBy = "endNode")
-    val endNodeRelations: Set<Relation>,
     @ElementCollection(targetClass = BusinessPartnerTypes::class)
     @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val types: Set<BusinessPartnerTypes>,
-    @OneToMany(mappedBy = "partner")
-    val bankAccounts: Set<BankAccount>,
     @ElementCollection(targetClass = String::class)
     @JoinTable(name = "business_partner_roles", joinColumns = [JoinColumn(name = "partner_id")])
     @Column(name = "role", nullable = false)
     val roles: Set<String>
-) : BaseEntity()
+): BaseEntity(){
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    lateinit var identifiers: Set<IdentifierPartner>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    lateinit var names: Set<Name>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    lateinit var addresses: Set<Address>
+    @OneToMany(mappedBy = "partner",cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    lateinit var classification: Set<Classification>
+    @OneToMany(mappedBy = "partner",cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    lateinit var bankAccounts: Set<BankAccount>
+    @OneToMany(mappedBy = "startNode")
+    lateinit var startNodeRelations: Set<Relation>
+    @OneToMany(mappedBy = "endNode")
+    lateinit var endNodeRelations: Set<Relation>
+}
 
 enum class BusinessPartnerStatus(val description: String){
     ACTIVE("The business partner is active."),

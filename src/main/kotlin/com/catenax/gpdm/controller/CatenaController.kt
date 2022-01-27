@@ -1,35 +1,30 @@
 package com.catenax.gpdm.controller
 
-import com.catenax.gpdm.controller.dto.BusinessPartnerDto
-import com.catenax.gpdm.controller.dto.PageResponse
-import com.catenax.gpdm.controller.dto.PaginationRequest
-import com.catenax.gpdm.controller.mapping.toDto
-import com.catenax.gpdm.entity.BusinessPartner
-import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.BusinessPartnerRepository
+import com.catenax.gpdm.controller.dto.*
+import com.catenax.gpdm.service.BusinessPartnerService
 import org.springframework.data.domain.PageRequest
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("catena")
 class CatenaController(
-    val businessPartnerRepository: BusinessPartnerRepository
+    val businessPartnerService: BusinessPartnerService
 ) {
 
     @GetMapping("/businesspartners")
     fun getBusinessPartners(@Valid paginationRequest: PaginationRequest): PageResponse<BusinessPartnerDto> {
-        val page = businessPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
-        return page.toDto( page.content.map { it.toDto() } )
+        return businessPartnerService.findPartners(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
     @GetMapping("/businesspartners/{bpn}")
     fun getBusinessPartner(@RequestParam("bpn") bpn: String): BusinessPartnerDto {
-        val bp =  businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-        return bp.toDto()
+        return businessPartnerService.findPartner(bpn)
+    }
+
+    @PostMapping("/businesspartners")
+    fun createBusinessPartners(@RequestBody businessPartners: Collection<BusinessPartnerBaseDto>) : Collection<BusinessPartnerDto>{
+        return businessPartnerService.createPartners(businessPartners)
     }
 
 }

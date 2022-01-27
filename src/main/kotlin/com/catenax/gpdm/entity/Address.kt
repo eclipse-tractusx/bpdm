@@ -7,14 +7,9 @@ import javax.persistence.*
 @Entity
 @Table(name = "addresses")
 class Address (
-    @ManyToMany(cascade = [ CascadeType.ALL ])
-    @JoinTable(
-        name = "addresses_identifiers",
-        joinColumns = [ JoinColumn(name = "address_id") ],
-        inverseJoinColumns = [JoinColumn(name = "identifier_id")]
-    )
-    val identifiers: Set<Identifier>,
-    @OneToOne
+    @Column(name = "bpn", nullable = false)
+    val bpn: String,
+    @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "care_of_id")
     val careOf: CareOf?,
     @Column(name = "country", nullable = false)
@@ -34,19 +29,6 @@ class Address (
         inverseJoinColumns = [JoinColumn(name = "post_id")]
     )
     val postCodes: Set<PostCode>,
-    @ManyToMany(cascade = [ CascadeType.ALL ])
-    @JoinTable(
-        name = "addresses_localities",
-        joinColumns = [ JoinColumn(name = "address_id") ],
-        inverseJoinColumns = [JoinColumn(name = "locality_id")]
-    )
-    val localities: Set<Locality>,
-    @OneToMany(mappedBy = "address")
-    val thoroughfares: Set<Thoroughfare>,
-    @OneToMany(mappedBy = "address")
-    val premises: Set<Premise>,
-    @OneToMany(mappedBy = "address")
-    val postalDeliveryPoints: Set<PostalDeliveryPoint>,
     @Column(name = "type", nullable = false)
     val type: AddressType,
     @ManyToMany(cascade = [ CascadeType.ALL ])
@@ -60,7 +42,18 @@ class Address (
     @ManyToOne
     @JoinColumn(name="partner_id", nullable=false)
     val partner: BusinessPartner
-        ) : BaseEntity()
+        ) : BaseEntity(){
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    lateinit var identifiers: Set<IdentifierAddress>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    lateinit var thoroughfares: Set<Thoroughfare>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    lateinit var premises: Set<Premise>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    lateinit var postalDeliveryPoints: Set<PostalDeliveryPoint>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    lateinit var localities: Set<Locality>
+        }
 
 
 

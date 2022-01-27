@@ -12,6 +12,9 @@ class Locality (
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val localityType: LocalityType,
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    val address: Address
         ) : BaseNamedEntity(value, shortName, number)
 
 enum class LocalityType(val description: String){

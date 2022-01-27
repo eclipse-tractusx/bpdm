@@ -2,10 +2,16 @@ package com.catenax.gpdm.controller.dto
 
 import com.catenax.gpdm.entity.LocalityType
 import com.catenax.gpdm.entity.NameType
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 
-data class LocalityDto (
+class LocalityDto (
+    var type: LocalityType
+        ){
     @JsonUnwrapped
-    val nameComponent: BaseNamedDto,
-    val type: LocalityType
-        )
+    lateinit var nameComponent: BaseNamedDto
+
+    constructor(nameComponent: BaseNamedDto, type: LocalityType): this(type){
+        this.nameComponent=nameComponent
+    }
+}

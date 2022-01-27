@@ -1,10 +1,17 @@
 package com.catenax.gpdm.controller.dto
 
+import com.catenax.gpdm.entity.NameType
 import com.catenax.gpdm.entity.PostalDeliveryPointType
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 
-data class PostalDeliveryPointDto (
+class PostalDeliveryPointDto (
+        var type: PostalDeliveryPointType
+        ){
         @JsonUnwrapped
-        val nameComponent: BaseNamedDto,
-        val type: PostalDeliveryPointType
-        )
+        lateinit var nameComponent: BaseNamedDto
+
+        constructor(nameComponent: BaseNamedDto, type: PostalDeliveryPointType): this(type){
+                this.nameComponent=nameComponent
+        }
+}
