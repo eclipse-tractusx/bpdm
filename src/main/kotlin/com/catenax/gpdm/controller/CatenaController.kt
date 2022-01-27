@@ -18,7 +18,7 @@ class CatenaController(
     }
 
     @GetMapping("/businesspartners/{bpn}")
-    fun getBusinessPartner(@RequestParam("bpn") bpn: String): BusinessPartnerDto {
+    fun getBusinessPartner(@PathVariable bpn: String): BusinessPartnerDto {
         return businessPartnerService.findPartner(bpn)
     }
 
