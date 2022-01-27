@@ -32,6 +32,19 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: persist
+            - name: BPDM_DB_USER
+              valueFrom:
+                  secretKeyRef:
+                    name: bpdm-application-secrets
+                    key: db-user
+            - name: BPDM_DB_PASS
+              valueFrom:
+                  secretKeyRef:
+                    name: bpdm-application-secrets
+                    key: db-pass
           ports:
             - name: http
               containerPort: 8080
