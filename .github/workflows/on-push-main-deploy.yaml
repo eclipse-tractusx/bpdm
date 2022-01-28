@@ -1,0 +1,37 @@
+name: Deploy on push to main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-on-push-main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Package with Maven
+        run: ./mvnw --batch-mode --update-snapshots clean package
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Login to Azure Container Registry
+        run: az acr login --name cxtsiacr
+      - name: Kubernetes Login
+        uses: azure/aks-set-context@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+            resource-group: cxtsi-dev013-rg
+            cluster-name: cxtsi-dev013-aks-services
+        id: login
+      - name: Containerize
+        run: docker build -f kubernetes/Dockerfile -t cxtsiacr.azurecr.io/catena-x/bpdm:latest .
+      - name: Push to Registry
+        run:  docker push cxtsiacr.azurecr.io/catena-x/bpdm:latest
+      - name: Upgrade Helm Deployment
+        run: helm upgrade -n bpdm bpdm kubernetes/bpdm
