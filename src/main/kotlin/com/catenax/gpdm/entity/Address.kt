@@ -7,8 +7,6 @@ import javax.persistence.*
 @Entity
 @Table(name = "addresses")
 class Address (
-    @Column(name = "bpn", nullable = false)
-    val bpn: String,
     @OneToOne(cascade = [CascadeType.PERSIST])
     @JoinColumn(name = "care_of_id")
     val careOf: CareOf?,
@@ -43,8 +41,6 @@ class Address (
     @JoinColumn(name="partner_id", nullable=false)
     val partner: BusinessPartner
         ) : BaseEntity(){
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
-    lateinit var identifiers: Set<IdentifierAddress>
     @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
     lateinit var thoroughfares: Set<Thoroughfare>
     @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])

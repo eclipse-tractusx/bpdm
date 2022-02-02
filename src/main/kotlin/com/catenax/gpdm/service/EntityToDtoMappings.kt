@@ -82,7 +82,6 @@ fun LegalForm.toDto(nameComponent: BaseNamedDto): LegalFormDto{
 
 fun Address.toDto(): AddressDto{
     return this.toDto(
-        identifiers.map { it.toDto() },
         careOf?.toNamedDto(),
         administrativeAreas.map { it.toDto() },
         postCodes.map { it.toDto() },
@@ -95,7 +94,6 @@ fun Address.toDto(): AddressDto{
 }
 
 fun Address.toDto(
-    identifiers: Collection<IdentifierDto>,
     careOf: BaseNamedDto?,
     administrativeAreas: Collection<AdministrativeAreaDto>,
     postCodes: Collection<PostCodeDto>,
@@ -105,7 +103,7 @@ fun Address.toDto(
     postalDeliveryPoints: Collection<PostalDeliveryPointDto>,
     versions: Collection<AddressVersionDto>
 ): AddressDto{
-    return AddressDto(bpn, identifiers, careOf, country, administrativeAreas, postCodes, localities,
+    return AddressDto(careOf, country, administrativeAreas, postCodes, localities,
         thoroughfares, premises, postalDeliveryPoints, type, versions)
 }
 

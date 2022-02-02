@@ -10,7 +10,7 @@ import java.util.*
 
 @Service
 class DtoToEntityService(
-    val bpnIssuingService: BpdnIssuingService,
+    val bpnIssuingService: BpnIssuingService,
     val issuingAgencyRepository: IssuingAgencyRepository,
     val legalFormRepository: LegalFormRepository,
     val administrativeAreaRepository: AdministrativeAreaRepository,
@@ -23,8 +23,7 @@ class DtoToEntityService(
     @Transactional
     fun buildBusinessPartners(bpDtos: Collection<BusinessPartnerBaseDto>): Collection<BusinessPartner>{
         val bpAgencyDtos = bpDtos.flatMap { it.identifiers.mapNotNull { it.registration?.issuingAgency  } }
-        val addressAgencyDtos = bpDtos.flatMap { it.addresses.flatMap { it.identifiers.mapNotNull { it.registration?.issuingAgency  }  } }
-        val agencyMap = mapIssuingAgencies(bpAgencyDtos + addressAgencyDtos)
+        val agencyMap = mapIssuingAgencies(bpAgencyDtos)
 
         val areaDtos = bpDtos.flatMap {
             it.addresses.flatMap {
@@ -78,10 +77,9 @@ class DtoToEntityService(
         versionMap: Map<AddressVersionDto, AddressVersion>,
         agencyMap: Map<BaseNamedDto, IssuingAgency>
     ): Address{
-        val bpn = bpnIssuingService.issueAddress()
         val careOf = if(dto.careOf != null) toCareOfEntity(dto.careOf as BaseNamedDto) else null
 
-        val address = Address(bpn,
+        val address = Address(
             careOf,
             dto.countryCode,
             dto.administrativeAreas.map { areaMap[it]!! }.toSet(),
@@ -91,18 +89,12 @@ class DtoToEntityService(
             partner
         )
 
-        address.identifiers = dto.identifiers.map { buildIdentifier(it, address, agencyMap) }.plus(bpnIssuingService.createIdentifier(address)).toSet()
         address.thoroughfares = dto.thoroughfares.map { toEntity(it, address) }.toSet()
         address.localities = dto.localities.map { toEntity(it, address) }.toSet()
         address.premises = dto.premises.map { toEntity(it, address) }.toSet()
         address.postalDeliveryPoints = dto.postalDeliveryPoints.map { toEntity(it, address) }.toSet()
 
         return address
-    }
-
-    fun buildIdentifier(dto: IdentifierDto, address: Address, agencyMap: Map<BaseNamedDto, IssuingAgency>): IdentifierAddress{
-        val registration = if(dto.registration != null) toEntity(dto.registration as RegistrationDto, agencyMap) else null
-        return IdentifierAddress(dto.nameComponent.value, dto.nameComponent.shortName, dto.nameComponent.number, dto.type, registration, address)
     }
 
     fun toEntity(dto: BusinessPartnerBaseDto, bpn: String, legalForm: LegalForm): BusinessPartner {

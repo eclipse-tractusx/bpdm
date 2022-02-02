@@ -7,8 +7,6 @@ import com.catenax.gpdm.entity.PostalDeliveryPoint
 import com.neovisionaries.i18n.CountryCode
 
 data class AddressDto (
-    val bpn: String,
-    val identifiers: Collection<IdentifierDto>,
     val careOf: BaseNamedDto?,
     val countryCode: CountryCode,
     val administrativeAreas: Collection<AdministrativeAreaDto>,
