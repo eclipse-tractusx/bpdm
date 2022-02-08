@@ -5,20 +5,21 @@ import javax.persistence.*
 @Entity
 @Table(name = "classifications")
 class Classification (
-    value: String,
-    shortName: String?,
-    number: Int?,
+    @Column(name = "`value`", nullable = false)
+    val value: String,
+    @Column(name = "code")
+    val code: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val type: ClassificationType,
     @ManyToOne
     @JoinColumn(name = "partner_id")
     val partner: BusinessPartner
-        ): BaseNamedEntity(value, shortName, number)
+        ): BaseEntity()
 
-enum class ClassificationType(val description: String){
-    NACE("Industry standard classification system used in the European Union."),
-    NAF("French classification of economic activities. "),
-    NAICS("Classification of business establishments by type of economic activity. It has largely replaced SIC system."),
-    SIC("System for classifying industries by a four-digit code.")
+enum class ClassificationType(val url: String){
+    NACE(""),
+    NAF(""),
+    NAICS( ""),
+    SIC("")
 }

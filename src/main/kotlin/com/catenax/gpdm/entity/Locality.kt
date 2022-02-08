@@ -6,22 +6,34 @@ import javax.persistence.*
 @Entity
 @Table(name = "localities")
 class Locality (
-    value: String,
-    shortName: String?,
-    number: Int?,
+    @Column(name = "`value`", nullable = false)
+    val value: String,
+    @Column(name = "short_name")
+    val shortName: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val localityType: LocalityType,
+    @Column(name = "language", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
     val address: Address
-        ) : BaseNamedEntity(value, shortName, number)
+        ) : BaseEntity()
 
-enum class LocalityType(val description: String){
-    BLOCK("The smallest area in a locality that is surrounded by streets"),
-    CITY("A permanent human settlement"),
-    DISTRICT("Subdivision or own part of a city, or smaller settlements as part of a larger commune"),
-    OTHER("Any other alternative type"),
-    POST_OFFICE_CITY("The city of the post office of a certain recipient"),
-    QUARTER("A named section of a locality")
+enum class LocalityType(private val typeName: String, private val url: String): NamedUrlType{
+    BLOCK("Block", ""),
+    CITY("City", ""),
+    DISTRICT("District", ""),
+    OTHER("Other", ""),
+    POST_OFFICE_CITY("Post Office City", ""),
+    QUARTER("Quarter", "");
+
+    override fun getTypeName(): String {
+        return typeName
+    }
+
+    override fun getUrl(): String {
+        return url
+    }
 }

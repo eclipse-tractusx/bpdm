@@ -1,26 +1,44 @@
 package com.catenax.gpdm.entity
 
+import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
 @Table(name = "thoroughfares")
 class Thoroughfare (
-    value: String,
-    shortName: String?,
-    number: Int?,
+    @Column(name = "`value`", nullable = false)
+    val value: String,
+    @Column(name = "name")
+    val name: String?,
+    @Column(name = "short_name")
+    val shortName: String?,
+    @Column(name = "number")
+    val number: String?,
+    @Column(name = "direction")
+    val direction: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val type: ThoroughfareType,
-
+    @Column(name = "language", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="address_id", nullable=false)
     val address: Address
-        ) : BaseNamedEntity(value, shortName, number)
+        ) : BaseEntity()
 
-enum class ThoroughfareType(val description: String){
-    INDUSTRIAL_ZONE("An industrial zone (industrial park, industrial estate, trading estate)"),
-    OTHER("Any other alternative type"),
-    RIVER("A natural flowing watercourse"),
-    SQUARE("An (mostly urban) area in a locality"),
-    STREET("A public thoroughfare (usually paved) in a built environment"),
+enum class ThoroughfareType(private val typeName: String, private val url: String): NamedUrlType{
+    INDUSTRIAL_ZONE("An industrial zone", ""),
+    OTHER("Other type", ""),
+    RIVER("River", ""),
+    SQUARE("Square", ""),
+    STREET("Street", "");
+
+    override fun getTypeName(): String {
+        return typeName
+    }
+
+    override fun getUrl(): String {
+        return url
+    }
 }

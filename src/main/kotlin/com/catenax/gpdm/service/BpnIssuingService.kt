@@ -5,16 +5,16 @@ import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpnInvalidCounterValueException
 import com.catenax.gpdm.exception.BpnMaxNumberReachedException
 import com.catenax.gpdm.repository.ConfigurationEntryRepository
-import com.catenax.gpdm.repository.IssuingAgencyRepository
+import com.catenax.gpdm.repository.IdentifierTypeRepository
+import com.catenax.gpdm.repository.IssuingBodyRepository
 import org.springframework.stereotype.Service
-import java.lang.StringBuilder
-import java.time.LocalDateTime
 import kotlin.math.pow
 
 
 @Service
 class BpnIssuingService(
-    val issuingAgencyRepository: IssuingAgencyRepository,
+    val issuingBodyRepository: IssuingBodyRepository,
+    val identifierTypeRepository: IdentifierTypeRepository,
     val configurationEntryRepository: ConfigurationEntryRepository,
     val bpnConfigProperties: BpnConfigProperties
 ) {
@@ -30,9 +30,8 @@ class BpnIssuingService(
         return "${bpnConfigProperties.prefix}${bpnConfigProperties.legalEntityChar}$code$checksum"
     }
 
-    fun createIdentifier(bp: BusinessPartner): IdentifierPartner{
-        val registration = Registration(HardeningGrade.GOLD, getOrCreateAgency(), RegistrationStatus.ISSUED, LocalDateTime.now(), LocalDateTime.now())
-        return IdentifierPartner(bp.bpn, null, null, "BPN", registration, bp)
+    fun createIdentifier(bp: BusinessPartner): Identifier{
+        return Identifier(bp.bpn, getOrCreateIdentifierType(), IdentifierStatus.GOLD, getOrCreateAgency(), bp)
     }
 
     private fun getOrCreateCounter(): ConfigurationEntry {
@@ -42,10 +41,20 @@ class BpnIssuingService(
         }
     }
 
-    private fun getOrCreateAgency(): IssuingAgency{
-        val agencies = issuingAgencyRepository.findAllByValueIn(setOf(bpnConfigProperties.agency))
-        if (agencies.isEmpty()) return IssuingAgency(bpnConfigProperties.agency, null, null)
-        return agencies.first()
+    private fun getOrCreateAgency(): IssuingBody{
+        return issuingBodyRepository.findByTechnicalKey(bpnConfigProperties.agencyKey) ?: run {
+            val catenaIssuingBody = IssuingBody(bpnConfigProperties.agencyName, "", bpnConfigProperties.agencyKey)
+            issuingBodyRepository.save(catenaIssuingBody)
+        }
+
+    }
+
+    private fun getOrCreateIdentifierType(): IdentifierType{
+        return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.prefix) ?: run{
+            val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.prefix)
+            identifierTypeRepository.save(catenaIdentifierType)
+        }
+
     }
 
     private fun toBpnCode(count: Long): String{

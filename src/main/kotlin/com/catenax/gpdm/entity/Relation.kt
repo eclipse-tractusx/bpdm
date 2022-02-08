@@ -24,33 +24,41 @@ class Relation (
     val endedAt: LocalDateTime?
         ) : BaseEntity()
 
-enum class RelationClass{
-    CDQ_HIERARCHY,
-    CDQ_TRANSITION,
-    CX_HIERARCHY,
-    DNB_HIERARCHY,
-    LEI_HIERARCHY
+enum class RelationClass(private val typeName: String): NamedType{
+    CDQ_HIERARCHY("CDQ Hierarchy"),
+    CDQ_TRANSITION("CDQ Transition"),
+    CX_HIERARCHY("Catena-X"),
+    DNB_HIERARCHY("DNB"),
+    LEI_HIERARCHY("LEI");
+
+    override fun getTypeName(): String {
+        return typeName
+    }
 }
 
-enum class RelationType(val description: String){
-    CX_LEGAL_SUCCESSOR_OF("Describes the legal relationship between a legal entity (successor) that takes over all or parts of the rights and obligations from one or more legal entities (predecessor)."),
-    CX_LEGAL_PREDECESSOR_OF("Describes the legal relationship between a legal entity (predecessor) that transfers all or parts of its rights and obligations to one or more legal entities (successor)."),
-    CX_ADDRESS_OF("Describes the relationship either between an address and one or more legal entities that are legally registered at this address, or between an address and the site that is located at this address."),
-    CX_SITE_OF("Describes the relationship between a site and one or more legal entities that operate at this site."),
-    CX_OWNED_BY("Describes the legal relationship between a legal entity (child) that is legally owned (by majority) by another legal entity (parent)."),
-    DIRECT_LEGAL_RELATION("Describes the direct legal relationship in terms of a legal entity (parent) that owns the majority of another legal entity (child)."),
-    COMMERCIAL_ULTIMATE("The highest commercial organization in the corporate family hierarchy."),
-    DOMESTIC_BRANCH_RELATION("Domestic branches are units located in the same country as the headquarter."),
-    INTERNATIONAL_BRANCH_RELATION("International branches are units located in different countries than the headquarter."),
-    DOMESTIC_LEGAL_ULTIMATE_RELATION("Describes the relationship between the highest-level entity in the hierarchy tree, located in the same country as the entity with the lower position (direct or ultimate child)."),
-    GLOBAL_LEGAL_ULTIMATE_RELATION("Describes the relationship between top level entity in the organization hierarchy and entities below."),
-    LEGAL_PREDECESSOR("Describes the legal predecessor (end node) of a legal entity (start node) in terms of a backwards perspective on mergers, acquisitions, carve outs, etc."),
-    LEGAL_SUCCESSOR("Describes the legal successor (end node) of a legal entity (start node) in terms of a forward perspective on mergers, acquisitions, carve outs, etc."),
-    DNB_PARENT("Describes the direct legal relationship in terms of a legal entity (parent) that owns the majority of another legal entity (child)."),
-    DNB_HEADQUARTER("Describes the legal relationship between an entity (headquarter) and its branches."),
-    DNB_DOMESTIC_ULTIMATE("Describes the relationship between the highest-level entity in the hierarchy tree, located in the same country as the entity with the lower position (direct or ultimate child)."),
-    DNB_GLOBAL_ULTIMATE("Describes the relationship between top level entity in the organization hierarchy and entities below."),
-    LEI_DIRECT_PARENT("Describes the direct legal relationship in terms of a legal entity (parent) that owns the majority of another legal entity (child)."),
-    LEI_INTERNATIONAL_BRANCH("International branches are units that could be located in the same or in different countries than headquarter."),
-    LEI_ULTIMATE_PARENT("Describes the relationship between top-level company in the organization hierarchy and entities below."),
+enum class RelationType(private val typeName: String): NamedType{
+    CX_LEGAL_SUCCESSOR_OF("Start is legal successor of End"),
+    CX_LEGAL_PREDECESSOR_OF("Start is legal predecessor of End"),
+    CX_ADDRESS_OF("Start is legally registered at End"),
+    CX_SITE_OF("Start operates at site of End"),
+    CX_OWNED_BY("Start is legally owned by End"),
+    DIRECT_LEGAL_RELATION("Start is legally owned by End"),
+    COMMERCIAL_ULTIMATE("End is highest commercial organization in hierarchy of Start"),
+    DOMESTIC_BRANCH_RELATION("Start is domestic branch of End"),
+    INTERNATIONAL_BRANCH_RELATION("Start is international branch of End"),
+    DOMESTIC_LEGAL_ULTIMATE_RELATION("End is highest domestic organization in hierarchy of Start"),
+    GLOBAL_LEGAL_ULTIMATE_RELATION("End is globally highest organization in hierarchy of Start"),
+    LEGAL_PREDECESSOR("Start is legal predecessor of End"),
+    LEGAL_SUCCESSOR("Start is legal successor of End"),
+    DNB_PARENT( "Start legally owns End"),
+    DNB_HEADQUARTER("Start is legal headquarter of End"),
+    DNB_DOMESTIC_ULTIMATE("End is highest domestic organization in hierarchy of Start"),
+    DNB_GLOBAL_ULTIMATE("End is globally highest organization in hierarchy of Start"),
+    LEI_DIRECT_PARENT("Start legally owns End"),
+    LEI_INTERNATIONAL_BRANCH("Start is international branch of End"),
+    LEI_ULTIMATE_PARENT("End is globally highest organization in hierarchy of Start");
+
+    override fun getTypeName(): String {
+        return typeName
+    }
 }

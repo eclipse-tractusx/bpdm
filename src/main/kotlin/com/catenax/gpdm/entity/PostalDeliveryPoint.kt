@@ -6,22 +6,35 @@ import javax.persistence.*
 @Entity
 @Table(name = "postal_delivery_points")
 class PostalDeliveryPoint(
-    value: String,
-    shortName: String?,
-    number: Int?,
+    @Column(name = "`value`", nullable = false)
+    val value: String,
+    @Column(name = "short_name")
+    val shortName: String?,
+    @Column(name = "number")
+    val number: String?,
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     val type: PostalDeliveryPointType,
-
+    @Column(name = "language", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="address_id", nullable=false)
     val address: Address
-) : BaseNamedEntity(value, shortName, number)
+) : BaseEntity()
 
-enum class PostalDeliveryPointType(val description: String){
-    INTERURBAN_DELIVERY_POINT("A delivery point which is specified by a kilometre information along a road. In most cases there exist no house number for such locations."),
-    MAIL_STATION("A cluster box unit where the post is delivered to."),
-    MAILBOX("A location at an address where the post is delivered to."),
-    OTHER("Any other alternative type."),
-    POST_OFFICE_BOX("A uniquely addressable lockable box located on the premises of a post office station.")
+enum class PostalDeliveryPointType(private val typeName: String, private val url: String): NamedUrlType{
+    INTERURBAN_DELIVERY_POINT("Interurban Delivery Point", ""),
+    MAIL_STATION("Mail Station", ""),
+    MAILBOX("Mailbox", ""),
+    OTHER("Other Type", ""),
+    POST_OFFICE_BOX("Post Office Box", "");
+
+    override fun getTypeName(): String {
+        return typeName
+    }
+
+    override fun getUrl(): String {
+        return url
+    }
 }

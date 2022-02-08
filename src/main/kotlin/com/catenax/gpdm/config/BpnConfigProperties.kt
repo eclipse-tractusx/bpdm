@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties(prefix = "bpdm.bpn")
 data class BpnConfigProperties (
-    var agency: String = "Catena-X",
+    var agencyName: String = "Catena-X",
+    var agencyKey: String = "CATENAX",
+    var name: String = "Business Partner Number",
     var prefix: String = "BPN",
     var legalEntityChar: Char = 'L',
     var counterKey: String = "bpn-counter",

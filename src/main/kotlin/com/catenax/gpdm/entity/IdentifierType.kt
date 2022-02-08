@@ -9,8 +9,8 @@ import javax.persistence.Table
 class IdentifierType(
     @Column(name = "name", nullable = false)
     val name: String,
-    @Column(name = "url", nullable = false)
-    val url: String,
+    @Column(name = "url")
+    val url: String?,
     @Column(name = "technical_key", nullable = false)
     val technicalKey: String
 ) : BaseEntity()

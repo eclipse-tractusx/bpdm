@@ -1,29 +1,42 @@
 package com.catenax.gpdm.entity
 
 import com.neovisionaries.i18n.CountryCode
-import java.util.*
+import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
 @Table(name = "administrative_areas")
 class AdministrativeArea(
-    @Column(name = "uuid", nullable = false, length=36, columnDefinition = "UUID")
-    val uuid: UUID,
     @Column(name = "`value`", nullable = false)
     val value: String,
+    @Column(name = "short_name")
+    val shortName: String?,
+    @Column(name = "fips_code")
+    val fipsCode: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val type: AdministrativeAreaType,
+    @Column(name = "language", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val language: LanguageCode,
     @Column(name = "country", nullable = false)
     @Enumerated(EnumType.STRING)
-    val countryCode: CountryCode
-): BaseEntity(){
-    @OneToMany(mappedBy = "area")
-    lateinit var codes: Set<AdministrativeAreaCode>
-}
+    val countryCode: CountryCode,
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    val address: Address
+): BaseEntity()
 
-enum class AdministrativeAreaType(val description: String){
-    COUNTY("Level 2 subdivision of a country, subdivision of a region."),
-    REGION("Top level subdivision of a country."),
-    OTHER("Any other alternative type.")
+enum class AdministrativeAreaType(private val areaName: String, private val url: String): NamedUrlType{
+    COUNTY("County", ""),
+    REGION("Region", ""),
+    OTHER("Other", "");
+
+    override fun getTypeName(): String {
+        return areaName
+    }
+
+    override fun getUrl(): String {
+        return url
+    }
 }
