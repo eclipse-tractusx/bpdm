@@ -5,6 +5,7 @@ import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpnInvalidCounterValueException
 import com.catenax.gpdm.exception.BpnMaxNumberReachedException
 import com.catenax.gpdm.repository.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
 import com.catenax.gpdm.repository.IssuingBodyRepository
 import org.springframework.stereotype.Service
@@ -15,12 +16,13 @@ import kotlin.math.pow
 class BpnIssuingService(
     val issuingBodyRepository: IssuingBodyRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
+    val identifierStatusRepository: IdentifierStatusRepository,
     val configurationEntryRepository: ConfigurationEntryRepository,
     val bpnConfigProperties: BpnConfigProperties
 ) {
     fun issueLegalEntity(): String{
         val counterEntry = getOrCreateCounter()
-        val counterValue = counterEntry.value?.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
+        val counterValue = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
         val code = toBpnCode(counterValue)
         val checksum = calculateChecksum(code)
 
@@ -31,7 +33,7 @@ class BpnIssuingService(
     }
 
     fun createIdentifier(bp: BusinessPartner): Identifier{
-        return Identifier(bp.bpn, getOrCreateIdentifierType(), IdentifierStatus.GOLD, getOrCreateAgency(), bp)
+        return Identifier(bp.bpn, getOrCreateIdentifierType(), getOrCreateIdentifierStatus(), getOrCreateAgency(), bp)
     }
 
     private fun getOrCreateCounter(): ConfigurationEntry {
@@ -53,6 +55,14 @@ class BpnIssuingService(
         return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.prefix) ?: run{
             val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.prefix)
             identifierTypeRepository.save(catenaIdentifierType)
+        }
+
+    }
+
+    private fun getOrCreateIdentifierStatus(): IdentifierStatus{
+        return identifierStatusRepository.findByTechnicalKey("UNKNOWN") ?: run{
+            val catenaIdentifierStatus=  IdentifierStatus("Unknown", "UNKNOWN")
+            identifierStatusRepository.save(catenaIdentifierStatus)
         }
 
     }
@@ -99,6 +109,5 @@ class BpnIssuingService(
 
         return  bpnConfigProperties.alphabet[first].toString() + bpnConfigProperties.alphabet[second]
     }
-
 
 }

@@ -1,19 +1,20 @@
 package com.catenax.gpdm.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Configuration
 
-@Configuration
 @ConfigurationProperties(prefix = "bpdm.bpn")
+@ConstructorBinding
 data class BpnConfigProperties (
-    var agencyName: String = "Catena-X",
-    var agencyKey: String = "CATENAX",
+    val agencyName: String = "Catena-X",
+    val agencyKey: String = "CATENAX",
     var name: String = "Business Partner Number",
-    var prefix: String = "BPN",
-    var legalEntityChar: Char = 'L',
-    var counterKey: String = "bpn-counter",
-    var counterDigits: Int = 10,
-    var checksumModulus: Int = 1271,
-    var checksumRadix: Int = 36,
-    var alphabet: String =  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    val prefix: String = "BPN",
+    val legalEntityChar: Char = 'L',
+    val counterKey: String = "bpn-counter",
+    val counterDigits: Int = 10,
+    val checksumModulus: Int = 1271,
+    val checksumRadix: Int = 36,
+    val alphabet: String =  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         )

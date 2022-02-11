@@ -10,5 +10,5 @@ data class LegalFormResponse (
     val url: String?,
     val mainAbbreviation: String?,
     val language: TypeKeyNameDto<LanguageCode>,
-    val category: Collection<TypeNameUrlDto>
+    val categories: Collection<TypeNameUrlDto>
     )

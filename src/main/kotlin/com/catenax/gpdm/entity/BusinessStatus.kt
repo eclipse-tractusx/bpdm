@@ -6,8 +6,8 @@ import javax.persistence.*
 @Entity
 @Table(name = "business_stati")
 class BusinessStatus (
-    @Column(name="denotation")
-    val officialDenotation: String?,
+    @Column(name="denotation", nullable = false)
+    val officialDenotation: String,
     @Column(name="valid_from", nullable = false)
     val validFrom: LocalDateTime,
     @Column(name="valid_to")

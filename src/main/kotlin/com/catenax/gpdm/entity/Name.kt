@@ -21,7 +21,7 @@ class Name(
     val partner: BusinessPartner
 ) : BaseEntity()
 
-enum class NameType(private val typeName: String, private val url: String): NamedUrlType{
+enum class NameType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<NameType>{
     ACRONYM("An acronym commonly used for a business partner.", ""),
     DOING_BUSINESS_AS("Alternative names a company employs for doing business", ""),
     ESTABLISHMENT("Name that is used in conjunction with the registered name to name a specific organizational unit", ""),
@@ -38,5 +38,9 @@ enum class NameType(private val typeName: String, private val url: String): Name
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): NameType {
+        return OTHER
     }
 }

@@ -4,6 +4,7 @@ import com.catenax.gpdm.dto.request.LegalFormRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.LegalFormResponse
 import com.catenax.gpdm.dto.response.PageResponse
+import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.service.MetadataService
 import org.springframework.data.domain.PageRequest
@@ -23,6 +24,16 @@ class MetadataController (
         @GetMapping("/identifier-type")
         fun getIdentifierTypes(@Valid paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
                 return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        }
+
+        @PostMapping("/identifier-status")
+        fun createIdentifierStatus(@RequestBody status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
+            return metadataService.createIdentifierStatus(status)
+        }
+    
+        @GetMapping("/identifier-status")
+        fun getIdentifierStati(@Valid paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
+            return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
         }
 
         @PostMapping("/issuing-body")

@@ -6,5 +6,5 @@ data class AdministrativeAreaRequest (
     val value: String,
     val shortName: String?,
     val fipsCode: String?,
-    val type: AdministrativeAreaType
+    val type: AdministrativeAreaType = AdministrativeAreaType.OTHER
         )

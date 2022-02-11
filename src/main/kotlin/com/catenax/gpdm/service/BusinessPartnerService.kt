@@ -28,6 +28,11 @@ class BusinessPartnerService (
     }
 
     @Transactional
+    fun findPartnersByIdentifiers(identifierType: String, identifierValues: Collection<String>): Collection<BusinessPartnerResponse> {
+       return businessPartnerRepository.findByIdentifiersContains(identifierType, identifierValues).map { it.toDto() }
+    }
+
+    @Transactional
     fun createPartners(bpDtos: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse>{
         val bpEntities = requestConversionService.buildBusinessPartners(bpDtos)
         businessPartnerRepository.saveAll(bpEntities)

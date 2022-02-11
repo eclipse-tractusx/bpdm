@@ -21,7 +21,7 @@ class Locality (
     val address: Address
         ) : BaseEntity()
 
-enum class LocalityType(private val typeName: String, private val url: String): NamedUrlType{
+enum class LocalityType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<LocalityType>{
     BLOCK("Block", ""),
     CITY("City", ""),
     DISTRICT("District", ""),
@@ -35,5 +35,9 @@ enum class LocalityType(private val typeName: String, private val url: String): 
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): LocalityType {
+        return OTHER
     }
 }

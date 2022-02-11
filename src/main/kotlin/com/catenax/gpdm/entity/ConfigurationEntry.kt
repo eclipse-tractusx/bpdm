@@ -9,6 +9,6 @@ import javax.persistence.Table
 class ConfigurationEntry (
     @Column(name = "`key`", unique = true, nullable = false)
     var key: String,
-    @Column(name = "`value`")
-    var value: String?
+    @Column(name = "`value`", nullable = false)
+    var value: String
         ) : BaseEntity()

@@ -27,7 +27,7 @@ class Thoroughfare (
     val address: Address
         ) : BaseEntity()
 
-enum class ThoroughfareType(private val typeName: String, private val url: String): NamedUrlType{
+enum class ThoroughfareType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<ThoroughfareType>{
     INDUSTRIAL_ZONE("An industrial zone", ""),
     OTHER("Other type", ""),
     RIVER("River", ""),
@@ -40,5 +40,9 @@ enum class ThoroughfareType(private val typeName: String, private val url: Strin
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): ThoroughfareType {
+        return OTHER
     }
 }

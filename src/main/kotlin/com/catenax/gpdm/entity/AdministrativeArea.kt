@@ -27,7 +27,7 @@ class AdministrativeArea(
     val address: Address
 ): BaseEntity()
 
-enum class AdministrativeAreaType(private val areaName: String, private val url: String): NamedUrlType{
+enum class AdministrativeAreaType(private val areaName: String, private val url: String): NamedUrlType, HasDefaultValue<AdministrativeAreaType>{
     COUNTY("County", ""),
     REGION("Region", ""),
     OTHER("Other", "");
@@ -38,5 +38,9 @@ enum class AdministrativeAreaType(private val areaName: String, private val url:
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): AdministrativeAreaType {
+        return OTHER
     }
 }

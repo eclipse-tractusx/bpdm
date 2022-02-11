@@ -8,6 +8,6 @@ data class LegalFormRequest(
     val name: String,
     val url: String?,
     val mainAbbreviation: String?,
-    val language: LanguageCode,
-    val category: Collection<TypeNameUrlDto>
+    val language: LanguageCode = LanguageCode.undefined,
+    val category: Collection<TypeNameUrlDto> = emptyList()
 )

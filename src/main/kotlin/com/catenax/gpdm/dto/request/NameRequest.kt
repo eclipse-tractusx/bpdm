@@ -6,6 +6,6 @@ import com.neovisionaries.i18n.LanguageCode
 data class NameRequest (
         val value: String,
         val shortName: String?,
-        val type: NameType,
-        val language: LanguageCode
+        val type: NameType = NameType.OTHER,
+        val language: LanguageCode = LanguageCode.undefined
         )

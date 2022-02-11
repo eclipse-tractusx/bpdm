@@ -6,5 +6,5 @@ data class PostalDeliveryPointRequest (
     val value: String,
     val shortName: String?,
     val number: String?,
-    val type: PostalDeliveryPointType
+    val type: PostalDeliveryPointType = PostalDeliveryPointType.OTHER
         )

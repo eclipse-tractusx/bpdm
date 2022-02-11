@@ -14,7 +14,7 @@ class AddressVersion (
     val language: LanguageCode
         ) : BaseEntity()
 
-enum class CharacterSet(private val typeName: String): NamedType{
+enum class CharacterSet(private val typeName: String): NamedType, HasDefaultValue<CharacterSet>{
     ARABIC("Arabic"),
     CHINESE("Simplified Chinese"),
     CHINESE_TRADITIONAL("Traditional Chinese"),
@@ -27,9 +27,14 @@ enum class CharacterSet(private val typeName: String): NamedType{
     KATAKANA("Katakana"),
     LATIN("Latin"),
     THAI("Thai"),
-    WESTERN_LATIN_STANDARD("Western Latin Standard (ISO 8859-1; Latin-1)");
+    WESTERN_LATIN_STANDARD("Western Latin Standard (ISO 8859-1; Latin-1)"),
+    UNDEFINED("Undefined");
 
     override fun getTypeName(): String {
         return typeName
+    }
+
+    override fun getDefault(): CharacterSet {
+        return UNDEFINED
     }
 }

@@ -2,9 +2,11 @@ package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.GeoCoordinateDto
 import com.catenax.gpdm.dto.request.*
+import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmMultipleNotfound
+import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
 import com.catenax.gpdm.repository.IssuingBodyRepository
 import com.catenax.gpdm.repository.LegalFormRepository
@@ -16,7 +18,8 @@ class RequestConversionService(
     val bpnIssuingService: BpnIssuingService,
     val legalFormRepository: LegalFormRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
-    val issuingBodyRepository: IssuingBodyRepository
+    val issuingBodyRepository: IssuingBodyRepository,
+    val identifierStatusRepository: IdentifierStatusRepository
 ) {
 
 
@@ -24,26 +27,29 @@ class RequestConversionService(
     @Transactional
     fun buildBusinessPartners(bpDtos: Collection<BusinessPartnerRequest>): Collection<BusinessPartner>{
 
-        val idTypeMap = mapIdentifierTypes(bpDtos.flatMap { it.identifiers.map { it.type } }.toSet())
-        val issueBodyMap = mapIssuingBodies(bpDtos.flatMap { it.identifiers.map { it.issuingBody } }.toSet())
-        val legalFormMap = mapLegalForms(bpDtos.map { it.legalForm }.toSet())
+        val idTypeMap = mapIdentifierTypes(bpDtos.flatMap { it.identifiers.map { id -> id.type } }.toSet())
+        val idStatusMap = mapIdentifierStati(bpDtos.flatMap { it.identifiers.mapNotNull { id -> id.status } }.toSet())
+        val issueBodyMap = mapIssuingBodies(bpDtos.flatMap { it.identifiers.mapNotNull{  id -> id.issuingBody } }.toSet())
+        val legalFormMap = mapLegalForms(bpDtos.mapNotNull { it.legalForm }.toSet())
 
-       return bpDtos.map { buildBusinessPartner(it, idTypeMap, issueBodyMap, legalFormMap) }
+       return bpDtos.map { buildBusinessPartner(it, idTypeMap, idStatusMap, issueBodyMap, legalFormMap) }
     }
 
     fun buildBusinessPartner(
         dto: BusinessPartnerRequest,
         idTypeMap: Map<String, IdentifierType>,
+        idStatusMap: Map<String, IdentifierStatus>,
         issueBodyMap: Map<String, IssuingBody>,
         legalFormMap: Map<String, LegalForm>
     ): BusinessPartner{
         val bpn = bpnIssuingService.issueLegalEntity()
+        val legalForm = if(dto.legalForm != null) legalFormMap[dto.legalForm]!! else null
 
-        val partner = toEntity(dto, bpn, legalFormMap[dto.legalForm]!!)
+        val partner = toEntity(dto, bpn, legalForm)
 
-        partner.stati = setOf(toEntity(dto.status, partner))
+        partner.stati = if(dto.status != null) setOf(toEntity(dto.status, partner)) else setOf()
         partner.names = dto.names.map { toEntity(it, partner) }.toSet()
-        partner.identifiers = dto.identifiers.map { toEntity(it, idTypeMap, issueBodyMap, partner)}
+        partner.identifiers = dto.identifiers.map { toEntity(it, idTypeMap, idStatusMap, issueBodyMap, partner)}
             .plus(bpnIssuingService.createIdentifier(partner)).toSet()
         partner.addresses = dto.addresses.map { buildAddress(it, partner) }.toSet()
         partner.classification = dto.profileClassifications.map { toEntity(it, partner) }.toSet()
@@ -84,7 +90,7 @@ class RequestConversionService(
         return LegalForm(dto.name, dto.url, dto.language, dto.mainAbbreviation, categories, dto.technicalKey)
     }
 
-    fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm): BusinessPartner {
+    fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm?): BusinessPartner {
         return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet())
     }
 
@@ -114,16 +120,18 @@ class RequestConversionService(
     fun toEntity(
         dto: IdentifierRequest,
         idTypeMap: Map<String, IdentifierType>,
+        idStatusMap: Map<String, IdentifierStatus>,
         issueBodyMap: Map<String, IssuingBody>,
         partner: BusinessPartner): Identifier{
         return toEntity(dto,
             idTypeMap[dto.type]!!,
-            issueBodyMap[dto.issuingBody]!!,
+            if(dto.status != null) idStatusMap[dto.status]!! else null,
+            if(dto.issuingBody != null) issueBodyMap[dto.issuingBody]!! else null,
             partner)
     }
 
-    fun toEntity(dto: IdentifierRequest, type: IdentifierType, issuingBody: IssuingBody, partner: BusinessPartner): Identifier{
-        return Identifier(dto.value, type, dto.status, issuingBody, partner)
+    fun toEntity(dto: IdentifierRequest, type: IdentifierType, status: IdentifierStatus?,  issuingBody: IssuingBody?, partner: BusinessPartner): Identifier{
+        return Identifier(dto.value, type, status, issuingBody, partner)
     }
 
     private fun toEntity(dto: AddressVersionRequest): AddressVersion{
@@ -158,9 +166,14 @@ class RequestConversionService(
         return PostCode(dto.value, dto.type, address.country, address)
     }
 
-    fun toIdentifierEntity(dto: TypeKeyNameUrlDto<String>): IdentifierType{
+    fun toIdTypeEntity(dto: TypeKeyNameUrlDto<String>): IdentifierType{
         return IdentifierType(dto.name, dto.url, dto.technicalKey)
     }
+
+    fun toIdStatusEntity(dto: TypeKeyNameDto<String>): IdentifierStatus{
+        return IdentifierStatus(dto.name, dto.technicalKey)
+    }
+
 
     fun toIssuerEntity(dto: TypeKeyNameUrlDto<String>): IssuingBody{
         return IssuingBody(dto.name, dto.url, dto.technicalKey)
@@ -168,6 +181,12 @@ class RequestConversionService(
 
     private fun mapIdentifierTypes(keys: Set<String>): Map<String, IdentifierType>{
         val typeMap = identifierTypeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
+        assertKeysFound(keys, typeMap)
+        return typeMap
+    }
+
+    private fun mapIdentifierStati(keys: Set<String>): Map<String, IdentifierStatus>{
+        val typeMap = identifierStatusRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }

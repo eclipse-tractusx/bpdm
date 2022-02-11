@@ -6,5 +6,5 @@ data class PremiseRequest (
     val value: String,
     val shortName: String?,
     val number: String?,
-    val type: PremiseType
+    val type: PremiseType = PremiseType.OTHER
         )

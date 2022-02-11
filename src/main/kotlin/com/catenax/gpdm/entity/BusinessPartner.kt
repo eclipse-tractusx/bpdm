@@ -8,8 +8,8 @@ class BusinessPartner(
     @Column(name="bpn", nullable = false, unique = true)
     val bpn: String,
     @ManyToOne
-    @JoinColumn(name="legal_form_id", nullable=false)
-    val legalForm: LegalForm,
+    @JoinColumn(name="legal_form_id")
+    val legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
     @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")])
     @Column(name = "type", nullable = false)
@@ -43,7 +43,7 @@ class BusinessPartner(
 
 
 
-enum class BusinessPartnerType(private val typeName: String, private val url: String): NamedUrlType{
+enum class BusinessPartnerType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<BusinessPartnerType>{
     BRAND("Brand", ""),
     LEGAL_ENTITY("Legal Entity", ""),
     ORGANIZATIONAL_UNIT("Organizational Unit", ""),
@@ -56,5 +56,9 @@ enum class BusinessPartnerType(private val typeName: String, private val url: St
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): BusinessPartnerType {
+        return UNKNOWN
     }
 }

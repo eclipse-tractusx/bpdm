@@ -6,9 +6,9 @@ import javax.persistence.Embeddable
 @Embeddable
 data class GeographicCoordinate (
     @Column(name = "latitude")
-    val latitude: Double,
+    val latitude: Float,
     @Column(name = "longitude")
-    val longitude: Double,
+    val longitude: Float,
     @Column(name = "altitude")
-    val altitude: Double,
+    val altitude: Float?,
 )

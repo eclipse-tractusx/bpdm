@@ -23,7 +23,7 @@ class Premise(
     val address: Address
 ) : BaseEntity()
 
-enum class PremiseType(private val typeName: String, private val url: String): NamedUrlType{
+enum class PremiseType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<PremiseType>{
     BUILDING("Building", ""),
     OTHER("Other type", ""),
     LEVEL("Level", ""),
@@ -39,5 +39,9 @@ enum class PremiseType(private val typeName: String, private val url: String): N
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): PremiseType {
+        return OTHER
     }
 }

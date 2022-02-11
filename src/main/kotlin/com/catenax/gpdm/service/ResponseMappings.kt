@@ -37,11 +37,12 @@ fun CurrencyCode.toDto(): TypeKeyNameDto<CurrencyCode> {
 }
 
 fun BusinessPartner.toDto(): BusinessPartnerResponse {
-    return toDto(
+    return BusinessPartnerResponse(
+        bpn,
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
-        legalForm.toDto(),
-        stati.maxWithOrNull(compareBy{it.validFrom})!!.toDto(),
+        legalForm?.toDto(),
+        stati.maxWithOrNull(compareBy{it.validFrom})?.toDto(),
         addresses.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
@@ -51,31 +52,16 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
     )
 }
 
-fun BusinessPartner.toDto(
-    identifiers: Collection<IdentifierResponse>,
-    names: Collection<NameResponse>,
-    legalForm: LegalFormResponse,
-    status: BusinessStatusResponse,
-    addresses: Collection<AddressResponse>,
-    classifications: Collection<ClassificationResponse>,
-    types: Collection<TypeKeyNameUrlDto<BusinessPartnerType>>,
-    bankAccounts: Collection<BankAccountResponse>,
-    roles: Collection<TypeKeyNameDto<String>>,
-    relations: Collection<RelationResponse>
-): BusinessPartnerResponse {
-    return BusinessPartnerResponse(bpn, identifiers, names, legalForm, status, addresses, classifications, types, bankAccounts, roles, relations)
-}
-
 fun Identifier.toDto(): IdentifierResponse {
-    return toDto(type.toDto(), issuingBody.toDto(), status.toDto())
-}
-
-fun Identifier.toDto(type: TypeKeyNameUrlDto<String>, issuingBody: TypeKeyNameUrlDto<String>, status: TypeKeyNameDto<IdentifierStatus>): IdentifierResponse {
-    return IdentifierResponse(value, type, issuingBody, status)
+    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto(), status?.toDto())
 }
 
 fun IdentifierType.toDto(): TypeKeyNameUrlDto<String> {
     return TypeKeyNameUrlDto(technicalKey, name, url)
+}
+
+fun IdentifierStatus.toDto(): TypeKeyNameDto<String> {
+    return TypeKeyNameDto(technicalKey, name)
 }
 
 fun IssuingBody.toDto(): TypeKeyNameUrlDto<String> {
@@ -155,7 +141,7 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
 }
 
 fun Classification.toDto(): ClassificationResponse {
-    return ClassificationResponse(value, code, type.toDto())
+    return ClassificationResponse(value, code, type?.toDto())
 }
 
 fun ClassificationType.toDto(): TypeNameUrlDto{

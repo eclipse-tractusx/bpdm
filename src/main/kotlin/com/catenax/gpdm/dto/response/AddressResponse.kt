@@ -7,7 +7,7 @@ import com.catenax.gpdm.entity.AddressType
 import com.neovisionaries.i18n.CountryCode
 
 data class AddressResponse (
-    val versions: AddressVersionResponse,
+    val version: AddressVersionResponse,
     val careOf: String?,
     val contexts: Collection<String>,
     val country: TypeKeyNameDto<CountryCode>,

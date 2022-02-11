@@ -8,5 +8,5 @@ data class ThoroughfareRequest (
         val shortName: String?,
         val number: String?,
         val direction: String?,
-        var type: ThoroughfareType
+        var type: ThoroughfareType = ThoroughfareType.OTHER
         )

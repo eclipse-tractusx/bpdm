@@ -9,11 +9,11 @@ class Classification (
     val value: String,
     @Column(name = "code")
     val code: String?,
-    @Column(name = "type", nullable = false)
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    val type: ClassificationType,
+    val type: ClassificationType?,
     @ManyToOne
-    @JoinColumn(name = "partner_id")
+    @JoinColumn(name = "partner_id", nullable = false)
     val partner: BusinessPartner
         ): BaseEntity()
 

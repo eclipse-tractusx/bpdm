@@ -8,7 +8,7 @@ data class AddressRequest (
     val version: AddressVersionRequest,
     val careOf: String?,
     val contexts: Collection<String> = emptyList(),
-    val country: CountryCode,
+    val country: CountryCode = CountryCode.UNDEFINED,
     val administrativeAreas: Collection<AdministrativeAreaRequest> = emptyList(),
     val postCodes: Collection<PostCodeRequest> = emptyList(),
     val localities: Collection<LocalityRequest> = emptyList(),

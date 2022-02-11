@@ -45,7 +45,7 @@ class Address (
 
 
 
-enum class AddressType(private val typeName: String, private val url: String): NamedUrlType{
+enum class AddressType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<AddressType>{
     BRANCH_OFFICE("Branch Office", ""),
     CARE_OF("Care of (c/o) Address", ""),
     HEADQUARTER("Headquarter", ""),
@@ -64,5 +64,9 @@ enum class AddressType(private val typeName: String, private val url: String): N
 
     override fun getUrl(): String {
         return url
+    }
+
+    override fun getDefault(): AddressType {
+        return UNSPECIFIC
     }
 }
