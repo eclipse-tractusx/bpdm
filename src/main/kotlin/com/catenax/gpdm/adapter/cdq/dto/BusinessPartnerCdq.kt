@@ -11,7 +11,7 @@ data class BusinessPartnerCdq (
     val disclosed: Boolean = false,
     val updateMonitoring: Boolean = false,
     val metadata: BusinessPartnerMetadataCdq?,
-    val record: String,
+    val record: String?,
     val names: Collection<NameCdq> = emptyList(),
     val legalForm: LegalFormCdq?,
     val identifiers: Collection<IdentifierCdq> = emptyList(),

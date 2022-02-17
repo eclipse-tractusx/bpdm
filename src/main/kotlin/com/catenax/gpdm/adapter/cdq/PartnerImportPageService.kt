@@ -33,6 +33,7 @@ open class PartnerImportPageService(
                 .path("/businesspartners")
                 .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
                 .queryParam("limit", adapterProperties.importLimit)
+                .queryParam("datasource", adapterProperties.datasource)
                 if(startAfter != null) builder.queryParam("startAfter", startAfter)
                 builder.build()
             }
@@ -96,7 +97,7 @@ open class PartnerImportPageService(
             .filter { it.identifiers.none{ id -> id.type?.technicalKey == "BPN" } }
             .associateBy { it.id }
 
-        val knownCdqIds = businessPartnerService.findPartnersByIdentifiers(cdqIdConfigProperties.typeKey, partnerMap.keys)
+        val knownCdqIds = businessPartnerService.findPartnersByIdentifier(cdqIdConfigProperties.typeKey, partnerMap.keys)
             .mapNotNull {  it.identifiers.find { id -> id.type.technicalKey == cdqIdConfigProperties.typeKey}?.value }
             .toSet()
 

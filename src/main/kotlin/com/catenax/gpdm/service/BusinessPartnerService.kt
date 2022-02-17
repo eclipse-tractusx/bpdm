@@ -3,8 +3,12 @@ package com.catenax.gpdm.service
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.PageResponse
+import com.catenax.gpdm.entity.IdentifierStatus
+import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
+import com.catenax.gpdm.repository.IdentifierStatusRepository
+import com.catenax.gpdm.repository.IdentifierTypeRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BusinessPartnerService (
     val requestConversionService: RequestConversionService,
-    val businessPartnerRepository: BusinessPartnerRepository
+    val businessPartnerRepository: BusinessPartnerRepository,
+    val identifierTypeRepository: IdentifierTypeRepository,
+    val identifierStatusRepository: IdentifierStatusRepository
         ){
 
     @Transactional
@@ -28,8 +34,16 @@ class BusinessPartnerService (
     }
 
     @Transactional
-    fun findPartnersByIdentifiers(identifierType: String, identifierValues: Collection<String>): Collection<BusinessPartnerResponse> {
-       return businessPartnerRepository.findByIdentifiersContains(identifierType, identifierValues).map { it.toDto() }
+    fun findPartnersByIdentifier(identifierType: String, identifierValues: Collection<String>): Collection<BusinessPartnerResponse> {
+       return businessPartnerRepository.findByIdentifierTypeAndValues(identifierType, identifierValues).map { it.toDto() }
+    }
+
+    @Transactional
+    fun findPartnersByIdentifier(typeKey: String, statusKey: String) :Collection<BusinessPartnerResponse>{
+        val type = identifierTypeRepository.findByTechnicalKey(typeKey) ?: throw BpdmNotFoundException(IdentifierType::class, typeKey)
+        val status = identifierStatusRepository.findByTechnicalKey(statusKey) ?: throw BpdmNotFoundException(IdentifierStatus::class, statusKey)
+
+        return businessPartnerRepository.findByIdentifierTypeAndStatus(type, status).map { it.toDto() }
     }
 
     @Transactional

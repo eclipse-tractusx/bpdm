@@ -29,8 +29,4 @@ class BusinessPartnerController(
         return businessPartnerService.createPartners(businessPartners)
     }
 
-
-
-
-
 }

@@ -6,17 +6,17 @@ import javax.persistence.*
 @Table(name = "identifiers")
 class Identifier(
     @Column(name = "`value`", nullable = false)
-    val value: String,
+    var value: String,
     @ManyToOne
     @JoinColumn(name = "type_id", nullable = false)
-    val type: IdentifierType,
+    var type: IdentifierType,
     @ManyToOne
     @JoinColumn(name = "status")
-    val status: IdentifierStatus?,
+    var status: IdentifierStatus?,
     @ManyToOne
     @JoinColumn(name = "issuing_body_id")
-    val issuingBody: IssuingBody?,
+    var issuingBody: IssuingBody?,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
 ) : BaseEntity()

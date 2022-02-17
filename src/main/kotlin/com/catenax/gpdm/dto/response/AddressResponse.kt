@@ -5,8 +5,10 @@ import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.entity.AddressType
 import com.neovisionaries.i18n.CountryCode
+import java.util.*
 
 data class AddressResponse (
+    val uuid: UUID,
     val version: AddressVersionResponse,
     val careOf: String?,
     val contexts: Collection<String>,

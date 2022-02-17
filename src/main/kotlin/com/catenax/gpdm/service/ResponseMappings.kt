@@ -53,7 +53,7 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
 }
 
 fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto(), status?.toDto())
+    return IdentifierResponse(uuid, value, type.toDto(), issuingBody?.toDto(), status?.toDto())
 }
 
 fun IdentifierType.toDto(): TypeKeyNameUrlDto<String> {
@@ -69,7 +69,7 @@ fun IssuingBody.toDto(): TypeKeyNameUrlDto<String> {
 }
 
 fun Name.toDto(): NameResponse {
-    return NameResponse(value, shortName, type.toDto(), language.toDto())
+    return NameResponse(uuid, value, shortName, type.toDto(), language.toDto())
 }
 
 fun LegalForm.toDto(): LegalFormResponse {
@@ -81,7 +81,7 @@ fun LegalFormCategory.toDto(): TypeNameUrlDto {
 }
 
 fun BusinessStatus.toDto(): BusinessStatusResponse {
-    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type.toDto())
+    return BusinessStatusResponse(uuid, officialDenotation, validFrom, validUntil, type.toDto())
 }
 
 fun Role.toDto(): TypeKeyNameDto<String> {
@@ -90,6 +90,7 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 
 fun Address.toDto(): AddressResponse {
     return AddressResponse(
+        uuid,
         version.toDto(),
         careOf,
         contexts,
@@ -108,28 +109,28 @@ fun Address.toDto(): AddressResponse {
 
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
-    return AdministrativeAreaResponse(value, shortName, fipsCode, type.toDto(), language.toDto())
+    return AdministrativeAreaResponse(uuid, value, shortName, fipsCode, type.toDto(), language.toDto())
 }
 
 
 fun PostCode.toDto(): PostCodeResponse {
-    return PostCodeResponse(value, type.toDto())
+    return PostCodeResponse(uuid, value, type.toDto())
 }
 
 fun Locality.toDto(): LocalityResponse {
-    return LocalityResponse(value, shortName, localityType.toDto(), language.toDto())
+    return LocalityResponse(uuid, value, shortName, localityType.toDto(), language.toDto())
 }
 
 fun Thoroughfare.toDto(): ThoroughfareResponse {
-    return ThoroughfareResponse(value, name, shortName, number, direction, type.toDto(), language.toDto())
+    return ThoroughfareResponse(uuid, value, name, shortName, number, direction, type.toDto(), language.toDto())
 }
 
 fun Premise.toDto(): PremiseResponse {
-    return PremiseResponse(value, shortName, number, type.toDto(), language.toDto())
+    return PremiseResponse(uuid, value, shortName, number, type.toDto(), language.toDto())
 }
 
 fun PostalDeliveryPoint.toDto(): PostalDeliveryPointResponse {
-    return PostalDeliveryPointResponse(value, shortName, number, type.toDto(), language.toDto())
+    return PostalDeliveryPointResponse(uuid, value, shortName, number, type.toDto(), language.toDto())
 }
 
 fun AddressVersion.toDto(): AddressVersionResponse {
@@ -141,7 +142,7 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
 }
 
 fun Classification.toDto(): ClassificationResponse {
-    return ClassificationResponse(value, code, type?.toDto())
+    return ClassificationResponse(uuid, value, code, type?.toDto())
 }
 
 fun ClassificationType.toDto(): TypeNameUrlDto{
@@ -149,11 +150,11 @@ fun ClassificationType.toDto(): TypeNameUrlDto{
 }
 
 fun Relation.toDto(): RelationResponse {
-    return RelationResponse(relationClass.toDto(), type.toDto(), startNode.bpn, endNode.bpn, startedAt, endedAt)
+    return RelationResponse(uuid, relationClass.toDto(), type.toDto(), startNode.bpn, endNode.bpn, startedAt, endedAt)
 }
 
 fun BankAccount.toDto(): BankAccountResponse {
-    return BankAccountResponse(trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
+    return BankAccountResponse(uuid, trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
         nationalBankAccountIdentifier, nationalBankIdentifier)
 }
 

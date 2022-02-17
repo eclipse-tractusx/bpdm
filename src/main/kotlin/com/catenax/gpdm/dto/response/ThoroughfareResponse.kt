@@ -4,9 +4,11 @@ import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.entity.ThoroughfareType
 import com.neovisionaries.i18n.LanguageCode
+import java.util.*
 
 
 class ThoroughfareResponse (
+        val uuid: UUID,
         val value: String,
         val name: String?,
         val shortName: String?,
