@@ -1,14 +1,17 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
+import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.BusinessPartnerRepository
-import com.catenax.gpdm.repository.IdentifierStatusRepository
-import com.catenax.gpdm.repository.IdentifierTypeRepository
+import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
+import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
+import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
+import com.catenax.gpdm.repository.elastic.CustomSearchRepository
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +21,8 @@ class BusinessPartnerService (
     val requestConversionService: RequestConversionService,
     val businessPartnerRepository: BusinessPartnerRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
-    val identifierStatusRepository: IdentifierStatusRepository
+    val identifierStatusRepository: IdentifierStatusRepository,
+    val customSearchRepository: CustomSearchRepository
         ){
 
     @Transactional
@@ -28,9 +32,13 @@ class BusinessPartnerService (
     }
 
     @Transactional
-    fun findPartners(pageRequest: PageRequest): PageResponse<BusinessPartnerResponse> {
-        val page = businessPartnerRepository.findAll(pageRequest)
-        return page.toDto( page.content.map { it.toDto() } )
+    fun findPartners(searchRequest: BusinessPartnerSearchRequest, pageRequest: PageRequest): PageResponse<BusinessPartnerResponse> {
+        val searchResultPage = customSearchRepository.findBySearchRequest(searchRequest, pageRequest)
+        val bpPage = PageImpl(businessPartnerRepository.findDistinctByBpnIn(searchResultPage.content.map { it.bpn }).toList(),
+            searchResultPage.pageable,
+            searchResultPage.totalElements)
+
+        return bpPage.toDto( bpPage.content.map { it.toDto() } )
     }
 
     @Transactional

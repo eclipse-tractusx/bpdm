@@ -26,9 +26,12 @@ class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
+        http.headers().frameOptions().disable()
+
         http
             .csrf().disable()
             .authorizeRequests().anyRequest().permitAll()
+
     }
 
 }
@@ -67,8 +70,8 @@ class KeycloakSecurityConfig: KeycloakWebSecurityConfigurerAdapter() {
             .authorizeRequests()
                 .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/api/swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/**").hasRole("add_company_data")
-                .antMatchers("/api/**").authenticated()
+                .antMatchers(HttpMethod.GET,"/api/**").authenticated()
+                .antMatchers("/api/**").hasRole("add_company_data")
     }
 }
 

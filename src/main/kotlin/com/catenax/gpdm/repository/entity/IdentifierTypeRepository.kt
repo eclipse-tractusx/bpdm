@@ -1,4 +1,4 @@
-package com.catenax.gpdm.repository
+package com.catenax.gpdm.repository.entity
 
 import com.catenax.gpdm.entity.IdentifierType
 import org.springframework.data.repository.PagingAndSortingRepository

@@ -6,10 +6,10 @@ import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmMultipleNotfound
-import com.catenax.gpdm.repository.IdentifierStatusRepository
-import com.catenax.gpdm.repository.IdentifierTypeRepository
-import com.catenax.gpdm.repository.IssuingBodyRepository
-import com.catenax.gpdm.repository.LegalFormRepository
+import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
+import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
+import com.catenax.gpdm.repository.entity.IssuingBodyRepository
+import com.catenax.gpdm.repository.entity.LegalFormRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
