@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: persist
+              value: persist,auth
             - name: BPDM_DB_USER
               valueFrom:
                   secretKeyRef:
@@ -45,6 +45,16 @@ spec:
                   secretKeyRef:
                     name: bpdm-application-secrets
                     key: db-pass
+            - name: BPDM_KEYCLOAK_SECRET
+              valueFrom:
+                  secretKeyRef:
+                    name: bpdm-application-secrets
+                    key: keycloak-secret
+            - name: BPDM_CDQ_KEY
+              valueFrom:
+                  secretKeyRef:
+                    name: bpdm-application-secrets
+                    key: cdq-key
           ports:
             - name: http
               containerPort: 8080
