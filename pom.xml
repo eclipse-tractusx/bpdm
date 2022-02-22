@@ -24,6 +24,8 @@
         <h2.version>2.1.210</h2.version>
         <postgres.version>42.3.3</postgres.version>
         <springdoc.version>1.6.4</springdoc.version>
+        <neo.version>1.29</neo.version>
+        <keycloack.version>17.0.0</keycloack.version>
     </properties>
 
     <dependencies>
@@ -44,6 +46,15 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-boot-starter</artifactId>
+            <version>${keycloack.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -70,12 +81,18 @@
         <dependency>
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-i18n</artifactId>
-            <version>1.29</version>
+            <version>${neo.version}</version>
         </dependency>
         <!-- OpenAPI 3 auto API documentation library for Spring Boot -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+        <!-- OpenAPI 3 support for spring security features -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-security</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
         <!-- Better support for Kotlin with OpenAPI generation -->
@@ -86,9 +103,32 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.keycloak.bom</groupId>
+                <artifactId>keycloak-adapter-bom</artifactId>
+                <version>${keycloack.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <includes>
+                    <include>application.properties</include>
+                    <include>application-auth.properties</include>
+                    <include>application-persist.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -143,5 +183,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

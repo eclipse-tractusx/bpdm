@@ -7,6 +7,7 @@ import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.service.MetadataService
+import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -50,7 +51,10 @@ class MetadataController (
         fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormResponse {
                 return metadataService.createLegalForm(type)
         }
+
+
         @GetMapping("/legal-form")
+        @Operation(method = "getLegalForms")
         fun getLegalForms(@Valid paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
                 return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
         }
