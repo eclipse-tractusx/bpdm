@@ -86,7 +86,7 @@ class PartnerExportPageService(
     private fun addBpnIdentifier(partner: BusinessPartnerCdq, bpn: String): BusinessPartnerCdq{
         return partner.copy(record = null, identifiers = partner.identifiers.plus(
             IdentifierCdq(
-                TypeKeyNameUrlCdq(bpnProperties.prefix, bpnProperties.name, ""),
+                TypeKeyNameUrlCdq(bpnProperties.id, bpnProperties.name, ""),
                 bpn,
                 TypeKeyNameUrlCdq(bpnProperties.agencyKey, bpnProperties.agencyName, ""),
                 TypeKeyNameCdq(idProperties.statusSynchronizedKey, idProperties.statusSynchronizedName)

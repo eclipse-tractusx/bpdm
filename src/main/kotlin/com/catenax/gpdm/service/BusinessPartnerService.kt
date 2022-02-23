@@ -34,6 +34,13 @@ class BusinessPartnerService (
     }
 
     @Transactional
+    fun findPartnerByIdentifier(identifierType: String, identifierValue: String): BusinessPartnerResponse {
+        val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
+        return businessPartnerRepository.findByIdentifierTypeAndValue(type, identifierValue)?.toDto()
+            ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
+    }
+
+    @Transactional
     fun findPartnersByIdentifier(identifierType: String, identifierValues: Collection<String>): Collection<BusinessPartnerResponse> {
        return businessPartnerRepository.findByIdentifierTypeAndValues(identifierType, identifierValues).map { it.toDto() }
     }

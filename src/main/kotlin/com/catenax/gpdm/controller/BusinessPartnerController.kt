@@ -1,5 +1,6 @@
 package com.catenax.gpdm.controller
 
+import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
@@ -12,16 +13,21 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("catena/business-partner")
 class BusinessPartnerController(
-    val businessPartnerService: BusinessPartnerService
+    val businessPartnerService: BusinessPartnerService,
+    val bpnConfigProperties: BpnConfigProperties
 ) {
     @GetMapping("/")
     fun getBusinessPartners(@Valid paginationRequest: PaginationRequest): PageResponse<BusinessPartnerResponse> {
         return businessPartnerService.findPartners(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    @GetMapping("/{bpn}")
-    fun getBusinessPartner(@PathVariable bpn: String): BusinessPartnerResponse {
-        return businessPartnerService.findPartner(bpn)
+    @GetMapping("/{idValue}")
+    fun getBusinessPartner(@PathVariable idValue: String,
+                           @RequestParam idType: String?
+    ): BusinessPartnerResponse {
+        val actualType = idType ?: bpnConfigProperties.id
+        return if(actualType == bpnConfigProperties.id) businessPartnerService.findPartner(idValue)
+        else businessPartnerService.findPartnerByIdentifier(actualType, idValue)
     }
 
     @PostMapping("/")

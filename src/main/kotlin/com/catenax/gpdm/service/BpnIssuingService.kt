@@ -29,7 +29,7 @@ class BpnIssuingService(
         counterEntry.value = (counterValue+1).toString()
         configurationEntryRepository.save(counterEntry)
 
-        return "${bpnConfigProperties.prefix}${bpnConfigProperties.legalEntityChar}$code$checksum"
+        return "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}$code$checksum"
     }
 
     fun createIdentifier(bp: BusinessPartner): Identifier{
@@ -52,8 +52,8 @@ class BpnIssuingService(
     }
 
     private fun getOrCreateIdentifierType(): IdentifierType{
-        return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.prefix) ?: run{
-            val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.prefix)
+        return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.id) ?: run{
+            val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.id)
             identifierTypeRepository.save(catenaIdentifierType)
         }
 
