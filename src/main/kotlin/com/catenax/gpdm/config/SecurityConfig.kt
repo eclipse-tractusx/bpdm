@@ -66,9 +66,9 @@ class KeycloakSecurityConfig: KeycloakWebSecurityConfigurerAdapter() {
             .csrf().disable()
             .authorizeRequests()
                 .antMatchers("/v3/api-docs/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.POST).hasRole("add_company_data")
-                .anyRequest().authenticated()
+                .antMatchers("/api/swagger-ui/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/**").hasRole("add_company_data")
+                .antMatchers("/api/**").authenticated()
     }
 }
 

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("cdq")
+@RequestMapping("/api/cdq")
 class CdqController(
     val partnerImportService: PartnerImportService,
     val partnerExportPageService: PartnerExportPageService
