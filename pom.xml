@@ -123,9 +123,7 @@
                 <filtering>true</filtering>
                 <directory>${project.basedir}/src/main/resources</directory>
                 <includes>
-                    <include>application.properties</include>
-                    <include>application-auth.properties</include>
-                    <include>application-persist.properties</include>
+                    <include>*.properties</include>
                 </includes>
             </resource>
         </resources>
