@@ -60,3 +60,31 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the application secrets
+*/}}
+{{- define "bpdm.applicationSecretsName" -}}
+{{- printf "%s-%s" (include "bpdm.fullname" .) "application" }}
+{{- end }}
+
+{{/*
+Create the name of the pull image secrets
+*/}}
+{{- define "bpdm.imagePullSecretsName" -}}
+{{- printf "%s-%s" (include "bpdm.fullname" .) "image-pull" }}
+{{- end }}
+
+{{/*
+Create docker auth string
+*/}}
+{{- define "bpdm.dockerAuth" -}}
+{{- printf "%s:%s" .Values.imagePullSecrets.user .Values.imagePullSecrets.password | b64enc }}
+{{- end }}
+
+{{/*
+Create host name for this release
+*/}}
+{{- define "bpdm.host" -}}
+{{- printf "%s.%s" (index .Values.ingnginx.controller.service.annotations  "service.beta.kubernetes.io/azure-dns-label-name") .Values.ingress.hostSuffix }}
+{{- end }}

@@ -4,8 +4,6 @@ metadata:
   name: {{ include "bpdm.fullname" . }}
   labels:
     {{- include "bpdm.labels" . | nindent 4 }}
-  annotations:
-    service.beta.kubernetes.io/azure-dns-label-name: catenax-bpdm-dev
 spec:
   type: {{ .Values.service.type }}
   ports:

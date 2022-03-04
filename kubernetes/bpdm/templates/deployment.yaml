@@ -20,41 +20,27 @@ spec:
       labels:
         {{- include "bpdm.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: {{ include "bpdm.imagePullSecretsName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: persist,auth
-            - name: BPDM_DB_USER
+              value: {{ .Values.springProfiles | join ","  }}
+            {{- $appSecretsName := (include "bpdm.applicationSecretsName" .) }}
+            {{- range $key, $val := .Values.applicationSecrets }}
+            - name: {{ $val.envName }}
               valueFrom:
-                  secretKeyRef:
-                    name: bpdm-application-secrets
-                    key: db-user
-            - name: BPDM_DB_PASS
-              valueFrom:
-                  secretKeyRef:
-                    name: bpdm-application-secrets
-                    key: db-pass
-            - name: BPDM_KEYCLOAK_SECRET
-              valueFrom:
-                  secretKeyRef:
-                    name: bpdm-application-secrets
-                    key: keycloak-secret
-            - name: BPDM_CDQ_KEY
-              valueFrom:
-                  secretKeyRef:
-                    name: bpdm-application-secrets
-                    key: cdq-key
+                secretKeyRef:
+                  name: {{ $appSecretsName }}
+                  key: {{ $key }}
+            {{- end}}
           ports:
             - name: http
               containerPort: 8080

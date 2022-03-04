@@ -5,13 +5,35 @@
 replicaCount: 1
 
 image:
-  repository: cxtsiacr.azurecr.io/catena-x/bpdm
-  pullPolicy: Always
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  registry: cxtsiacr.azurecr.io
+  repository: catena-x/bpdm
+  pullPolicy: IfNotPresent
 
+#Spring profiles under which the application should run
+springProfiles: []
+
+# secrets should be set from outside, e.g. helm install -set applicationSecrets.db-user.secret=...
+applicationSecrets:
+  db-user:
+    envName: BPDM_DB_USER
+    secret:
+  db-pass:
+    envName: BPDM_DB_PASS
+    secret:
+  keycloak-secret:
+    envName: BPDM_KEYCLOAK_SECRET
+    secret:
+  cdq-key:
+    envName: BPDM_CDQ_KEY
+    secret:
+
+# secrets should be set from outside, e.g. helm install -set imagePullSecrets.user=...
 imagePullSecrets:
-  - name: bpdm-pull-secret
+  mail: nico.koprowski@mercedes-benz.com
+  user:
+  password:
+
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -29,7 +51,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 8080
 
 resources: {}
@@ -56,3 +78,21 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+ingress:
+  issuerName: letsencrypt-prod
+  hostSuffix: germanywestcentral.cloudapp.azure.com
+
+ingnginx:
+  controller:
+    ingressClassResource:
+      name: release-bpdm
+    replicaCount: 1
+    nodeSelector:
+      kubernetes.io/os: linux
+    service:
+      loadBalancerIP: #Custom IP under which the loadBalancer should be available
+      annotations:
+        service.beta.kubernetes.io/azure-dns-label-name: catenax-bpdm-release
+
+
