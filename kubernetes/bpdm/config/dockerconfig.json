@@ -1,0 +1,10 @@
+{
+	"auths":{
+		"%s":{
+			"username":	"%s",
+			"password":	"%s",
+			"email":	"%s",
+			"auth":		"%s"
+		}
+	}
+}

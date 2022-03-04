@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "bpdm.fullname" . }}
+  labels:
+      {{- include "bpdm.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.issuerName }}
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: {{ include "bpdm.fullname" . }}
+  tls:
+  - hosts:
+    - {{ include "bpdm.host" . }}
+    secretName: tls-secret
+  rules:
+  - host: {{ include "bpdm.host" . }}
+    http:
+      paths:
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "bpdm.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
