@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("catena")
+@RequestMapping("/api/catena")
 class MetadataController (
        val metadataService: MetadataService
         ){
