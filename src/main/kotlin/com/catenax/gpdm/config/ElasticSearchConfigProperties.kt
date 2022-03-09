@@ -7,8 +7,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 data class ElasticSearchConfigProperties(
     val enabled: Boolean = false,
-    val host: String = "localhost",
-    val port: Int = 9200,
     val exportTimeKey: String = "elastic-last-export",
     val exportPageSize: Int = 100
 )

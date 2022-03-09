@@ -1,7 +1,7 @@
-package com.catenax.gpdm.controller
+package com.catenax.gpdm.component.elastic.impl.controller
 
 import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
-import com.catenax.gpdm.service.ElasticSyncService
+import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
