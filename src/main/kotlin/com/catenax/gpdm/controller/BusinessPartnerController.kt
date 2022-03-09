@@ -1,11 +1,14 @@
 package com.catenax.gpdm.controller
 
 import com.catenax.gpdm.config.BpnConfigProperties
+import com.catenax.gpdm.dto.request.AddressSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
+import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.service.BusinessPartnerService
+import org.springdoc.api.annotations.ParameterObject
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -17,8 +20,10 @@ class BusinessPartnerController(
     val bpnConfigProperties: BpnConfigProperties
 ) {
     @GetMapping
-    fun getBusinessPartners(@Valid paginationRequest: PaginationRequest): PageResponse<BusinessPartnerResponse> {
-        return businessPartnerService.findPartners(PageRequest.of(paginationRequest.page, paginationRequest.size))
+    fun getBusinessPartners(@ParameterObject searchRequest: BusinessPartnerSearchRequest,
+                            @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<BusinessPartnerResponse> {
+        return businessPartnerService.findPartners(searchRequest, PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
     @GetMapping("/{idValue}")

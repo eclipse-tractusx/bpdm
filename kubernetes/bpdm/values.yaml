@@ -10,7 +10,8 @@ image:
   pullPolicy: IfNotPresent
 
 #Spring profiles under which the application should run
-springProfiles: []
+springProfiles:
+  - dev
 
 # secrets should be set from outside, e.g. helm install -set applicationSecrets.db-user.secret=...
 applicationSecrets:
@@ -85,6 +86,8 @@ ingress:
 
 ingnginx:
   controller:
+    admissionWebhooks:
+      enabled: false
     ingressClassResource:
       name: release-bpdm
     replicaCount: 1
@@ -94,5 +97,6 @@ ingnginx:
       loadBalancerIP: #Custom IP under which the loadBalancer should be available
       annotations:
         service.beta.kubernetes.io/azure-dns-label-name: catenax-bpdm-release
+
 
 

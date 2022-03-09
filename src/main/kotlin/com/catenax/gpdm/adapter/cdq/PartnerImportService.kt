@@ -3,7 +3,7 @@ package com.catenax.gpdm.adapter.cdq
 import com.catenax.gpdm.adapter.cdq.config.CdqAdapterConfigProperties
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.entity.ConfigurationEntry
-import com.catenax.gpdm.repository.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.Month

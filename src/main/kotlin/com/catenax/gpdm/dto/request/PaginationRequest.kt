@@ -9,5 +9,5 @@ data class PaginationRequest (
     val page: Int=0,
     @Positive
     @Max(100)
-    val size: Int=1
+    val size: Int=10
         )

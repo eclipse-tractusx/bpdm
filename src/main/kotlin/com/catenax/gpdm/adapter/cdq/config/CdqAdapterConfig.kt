@@ -4,7 +4,7 @@ import com.catenax.gpdm.adapter.cdq.CdqRequestMappingService
 import com.catenax.gpdm.adapter.cdq.PartnerImportPageService
 import com.catenax.gpdm.adapter.cdq.dto.TypeKeyNameCdq
 import com.catenax.gpdm.adapter.cdq.dto.TypeKeyNameUrlCdq
-import com.catenax.gpdm.repository.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.MetadataService
 import org.springframework.context.annotation.Bean

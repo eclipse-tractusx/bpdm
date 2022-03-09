@@ -10,7 +10,7 @@ import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.entity.IssuingBody
 import com.catenax.gpdm.entity.LegalForm
 import com.catenax.gpdm.exception.BpdmAlreadyExists
-import com.catenax.gpdm.repository.*
+import com.catenax.gpdm.repository.entity.*
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
