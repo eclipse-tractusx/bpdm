@@ -7,10 +7,11 @@ import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
+import com.catenax.gpdm.repository.elastic.CustomSearchRepository
 import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
 import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
 import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
-import com.catenax.gpdm.repository.elastic.CustomSearchRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service

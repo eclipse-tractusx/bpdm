@@ -1,4 +1,4 @@
-package com.catenax.gpdm.service
+package com.catenax.gpdm.component.elastic.impl.service
 
 import com.catenax.gpdm.config.ElasticSearchConfigProperties
 import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
@@ -7,7 +7,7 @@ import com.catenax.gpdm.entity.ConfigurationEntry
 import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
 import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
 import com.catenax.gpdm.repository.elastic.BusinessPartnerDocRepository
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import com.catenax.gpdm.service.DocumentMappingService
 import org.springframework.data.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,10 +16,6 @@ import java.time.*
 import java.util.*
 
 @Service
-@ConditionalOnProperty(
-    value = ["bpdm.elastic.enabled"],
-    havingValue = "true",
-    matchIfMissing = false)
 class ElasticSyncService(
     val businessPartnerRepository: BusinessPartnerRepository,
     val businessPartnerDocRepository: BusinessPartnerDocRepository,
