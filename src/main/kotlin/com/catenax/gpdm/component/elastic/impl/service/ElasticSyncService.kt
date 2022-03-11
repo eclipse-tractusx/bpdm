@@ -1,11 +1,11 @@
 package com.catenax.gpdm.component.elastic.impl.service
 
+import com.catenax.gpdm.component.elastic.impl.repository.BusinessPartnerDocRepository
 import com.catenax.gpdm.config.ElasticSearchConfigProperties
 import com.catenax.gpdm.dto.elastic.ExportResponse
 import com.catenax.gpdm.entity.BaseEntity
 import com.catenax.gpdm.entity.ConfigurationEntry
-import com.catenax.gpdm.repository.elastic.BusinessPartnerDocRepository
-import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.ConfigurationEntryRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service

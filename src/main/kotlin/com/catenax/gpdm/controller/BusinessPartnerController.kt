@@ -1,11 +1,15 @@
 package com.catenax.gpdm.controller
 
+import com.catenax.gpdm.component.elastic.SearchService
+import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
+import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
+import com.catenax.gpdm.dto.response.SuggestionResponse
 import com.catenax.gpdm.service.BusinessPartnerService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -14,13 +18,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springdoc.api.annotations.ParameterObject
-import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/business-partner")
 class BusinessPartnerController(
     val businessPartnerService: BusinessPartnerService,
+    val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties
 ) {
 
@@ -38,8 +42,8 @@ class BusinessPartnerController(
         searchRequest: BusinessPartnerSearchRequest,
         @ParameterObject
         paginationRequest: PaginationRequest
-    ): PageResponse<BusinessPartnerResponse> {
-        return businessPartnerService.findPartners(searchRequest, PageRequest.of(paginationRequest.page, paginationRequest.size))
+    ): PageResponse<BusinessPartnerSearchResponse> {
+        return searchService.searchBusinessPartners(searchRequest, paginationRequest)
     }
 
     @Operation(summary = "Get business partner by identifier",
@@ -79,6 +83,56 @@ class BusinessPartnerController(
         @RequestBody
         businessPartners: Collection<BusinessPartnerRequest>) : Collection<BusinessPartnerResponse>{
         return businessPartnerService.createPartners(businessPartners)
+    }
+
+    @GetMapping("/name")
+    fun getNameSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.NAME, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/legal-form")
+    fun getLegalFormSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.LEGAL_FORM, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/status")
+    fun getStatusSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.STATUS, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/classification")
+    fun getClassificationSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.CLASSIFICATION, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/address/administrative-area")
+    fun getAdminAreaSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.ADMIN_AREA, text, searchRequest,pageRequest)
+    }
+
+    @GetMapping("/address/postcode")
+    fun getPostcodeSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.POSTCODE, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/address/locality")
+    fun getLocalitySuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.LOCALITY, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/address/thoroughfare")
+    fun getThoroughfareSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.THOROUGHFARE, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/address/premise")
+    fun getPremiseSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.PREMISE, text, searchRequest, pageRequest)
+    }
+
+    @GetMapping("/address/postal-delivery-point")
+    fun getPostalDeliverPointSuggestion(text: String? , @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
+        return searchService.getSuggestion(SuggestionType.POSTAL_DELIVERY_POINT, text, searchRequest, pageRequest)
     }
 
 }

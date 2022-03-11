@@ -6,7 +6,7 @@ import com.catenax.gpdm.component.cdq.dto.TypeKeyNameCdq
 import com.catenax.gpdm.component.cdq.dto.TypeKeyNameUrlCdq
 import com.catenax.gpdm.component.cdq.service.CdqRequestMappingService
 import com.catenax.gpdm.component.cdq.service.PartnerImportPageService
-import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.ConfigurationEntryRepository
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.MetadataService
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
