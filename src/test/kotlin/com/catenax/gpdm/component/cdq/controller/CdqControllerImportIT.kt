@@ -20,7 +20,7 @@ private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class CdqControllerIT(@Autowired val webTestClient: WebTestClient) {
+class CdqControllerImportIT(@Autowired val webTestClient: WebTestClient) {
 
     companion object {
         @RegisterExtension
@@ -69,8 +69,9 @@ class CdqControllerIT(@Autowired val webTestClient: WebTestClient) {
     @Disabled
     fun `import business partners with pagination`() {
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).atPriority(1)
+            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
+                .withQueryParam("startAfter", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -79,7 +80,7 @@ class CdqControllerIT(@Autowired val webTestClient: WebTestClient) {
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).atPriority(2)
+            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
                 .withQueryParam("startAfter", equalTo("fooNextStartAfterId1"))
                 .willReturn(
@@ -90,7 +91,7 @@ class CdqControllerIT(@Autowired val webTestClient: WebTestClient) {
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).atPriority(2)
+            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
                 .withQueryParam("startAfter", equalTo("fooNextStartAfterId2"))
                 .willReturn(
@@ -116,5 +117,5 @@ class CdqControllerIT(@Autowired val webTestClient: WebTestClient) {
     }
 
     private fun readTestResource(testResourcePath: String) =
-        CdqControllerIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
+        CdqControllerImportIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
 }
