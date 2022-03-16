@@ -1,0 +1,18 @@
+{
+  "limit": 1,
+  "total": 2,
+  "startAfter": "fooNextStartAfterId1",
+  "nextStartAfter": "fooNextStartAfterId2",
+  "values": [
+    {
+      "id": "fooId2",
+      "createdAt": "2021-12-20T12:00:00.000Z",
+      "lastModifiedAt": "2022-02-25T15:00:00.000Z",
+      "externalId": "fooExternalId2",
+      "dataSource": "fooDataSource",
+      "names": [],
+      "identifiers": [],
+      "addresses": []
+    }
+  ]
+}
