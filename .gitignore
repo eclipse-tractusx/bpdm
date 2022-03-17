@@ -4,4 +4,4 @@ gpdm.iml
 #created artifacts
 target
 #local database data
-db
+/db

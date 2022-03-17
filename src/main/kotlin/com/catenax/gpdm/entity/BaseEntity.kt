@@ -6,8 +6,8 @@ import javax.persistence.*
 @MappedSuperclass
 abstract class BaseEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gpdm_sequence")
-    @SequenceGenerator(name = "gpdm_sequence", sequenceName = "gpdm_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bpdm_sequence")
+    @SequenceGenerator(name = "bpdm_sequence", sequenceName = "bpdm_sequence", allocationSize = 1)
     @Column(name = "id", nullable = false, updatable = false, insertable = false)
     val id: Long = 0,
 
