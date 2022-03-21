@@ -33,7 +33,7 @@ The project offers a variety of different Spring profiles for configuration purp
 These profiles enable and configure additional project components which rely on external services and systems.
 Profiles are categorized by component and the stage they belong to. 
 Currently, we distinguish between the local and dev stage. 
-The local profile expects all enabled to components to be locally available on the host machine. 
+The local profile expects all enabled components to be locally available on the host machine. 
 On the other hand, the dev stage configures external dependencies for the remote dev environment.
 In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
 Single profiles are named via pattern `stage_component` but can also be called as a bundle by their stage name.
@@ -66,8 +66,8 @@ specified in the property `springdoc.swagger-ui.oauth.client-id`.
 #### Cdq
 
 A cdq profile configures the connection to a remote [CDQ API](https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started) with which the application can exchange business partner information.
-On activation the profile enables new endpoints to import records from and export Business Partner Numbers to CDQ. 
-Among others, the profile determines the storage and datasource to which connect to.
+On activation the profile enables new endpoints to import records from and to export Business Partner Numbers to CDQ. 
+Among others, the profile determines the storage and datasource to use.
 For this the profile requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges.
 
 #### Elastic
@@ -80,7 +80,7 @@ Additionally, suggestions for autocompletion can be obtained for each business p
 With the activation of the Elasticsearch component the application also features new endpoints for exporting
 business partner records to the Elasticsearch instance as well as clearing the current Elasticsearch index.
 
-Without the Elasticsearch component enabled the suggestions are always be empty and search requests will not filter any business partners.
+Without the Elasticsearch component enabled the suggestions are always empty and search requests do not filter any business partners.
 
 ## Project Structure
 
@@ -97,13 +97,13 @@ data transfer objects (DTOs) which are needed for communication with outside sys
 objects which describe the model of the application's API.
 
 Repositories describe the interface with the persistence layer and should be used by the services to gather and save records
-from the database. Where possible repositories should be defined as interfaces and auto-implemented by JPA. In cases when that is not
-feasible custom repositories can be defined.
+from the database. Where possible repositories should be defined as interfaces and auto-implemented by Spring Data JPA. 
+In cases when that is not feasible custom repositories can be defined.
 
 Configuration classes configure the services and components in the application. Such configuration classes enable or disable
 component logic on startup. They are supplemented by the configuration properties.
 These property classes contain values obtained from the application.properties files and are available via dependency injection.
-When possible configuration classes, services and components should use configuration properties instead of accesses property values
+When possible, configuration classes services and components should use configuration properties instead of accessing property values
 from the application.properties directly. However, in some cases such as conditional activation on configurations by annotation
 such an approach is not possible and direct access is permissible.
 
@@ -130,7 +130,7 @@ image to a container registry and deploy a Helm release on the prepared cluster.
 
 The kubernetes deployment expects a kubernetes environment which already has an Ingress Controller installed in order to
 be available over ingress routing. Additionally, the ingress works over SSH and expects a Certmanager and Cluster Issuer to be present for
-obtaining a trustworthy certificate. When the Kubernetes cluster configured with these components, the application can be 
+obtaining a trustworthy certificate. When the Kubernetes cluster is configured with these components, the application can be 
 deployed with the following steps:
 
 1. Specify your container registry in the Helm values.yaml: 
@@ -148,7 +148,7 @@ update the Helm release you need the Helm upgrade command: `helm upgrade release
 
 ### Deployment with Profiles
 
-The instructions above deploy an application with the default Spring profile enabled.
+The instructions above deploys an application with the default Spring profile enabled.
 You can set the active profiles in the `springProfiles` value. Like so:
 
 ```yaml
@@ -173,7 +173,7 @@ over command line when deploying a helm release via the set flag like `--set app
 
 ### Pull Secrets
  
-Private container registries my require authentication in order to be accessed. In this case the Helm deployment needs to
+Private container registries may require authentication in order to be accessed. In this case the Helm deployment needs to
 be given pull secrets to pull the image from such a registry. Pull secrets are specified in the values.yaml like so:
 
 ```yaml
@@ -184,14 +184,14 @@ imagePullSecrets:
 ``` 
 
 As with application secrets instead of writing your credentials directly into a value.yaml you better pass them via
-command line when deploying the helm release: `--set imagePullSecret`.user=your_user`
+command line when deploying the helm release: `--set imagePullSecret.user=your_user`
 
 
 ### Dev Deployment
 
 In order to deploy the application
 with the dev environment profile you can use the provided dev-values.yaml which starts the application with the Spring dev profile.
-Taking in all the previous points, for a full dev deployment in it's own dev namespace you would need to use the following the command:
+Taking in all the previous points, for a full dev deployment in it's own dev namespace you would need to use the following command:
 
 ```bash
 helm install release_name ./kubernetes/bpdm -f ./kubernetes/dev-values.yaml \
