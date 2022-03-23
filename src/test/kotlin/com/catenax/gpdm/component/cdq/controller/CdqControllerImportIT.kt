@@ -1,14 +1,18 @@
 package com.catenax.gpdm.component.cdq.controller
 
+import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
+import com.catenax.gpdm.dto.response.PageResponse
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -20,7 +24,7 @@ private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class CdqControllerImportIT(@Autowired val webTestClient: WebTestClient) {
+class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestClient, val cdqIdProperties: CdqIdentifierConfigProperties) {
 
     companion object {
         @RegisterExtension
@@ -38,6 +42,32 @@ class CdqControllerImportIT(@Autowired val webTestClient: WebTestClient) {
     @Test
     @DirtiesContext
     fun `import business partners`() {
+        wireMockServer.stubFor(
+            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(readTestResource("cdq/business-partners.json"))
+            )
+        )
+
+        val createdBusinessPartners = webTestClient.post().uri("/api/cdq/business-partners/import")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).returnResult().responseBody
+
+        assertThat(createdBusinessPartners!!.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
+
+        val savedBusinessPartners =
+            webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
+                ParameterizedTypeReference<PageResponse<BusinessPartnerResponse>>() {})
+                .returnResult().responseBody
+
+        assertThat(savedBusinessPartners!!.content.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
+    }
+
+    @Test
+    @DirtiesContext
+    fun `import business partners multiple times`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).willReturn(
                 aResponse()
@@ -113,9 +143,11 @@ class CdqControllerImportIT(@Autowired val webTestClient: WebTestClient) {
             .expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
 
-        verify(3, getRequestedFor(urlPathMatching("$CDQ_MOCK_URL/businesspartners")))
+        wireMockServer.verify(3, getRequestedFor(urlPathMatching("$CDQ_MOCK_URL/businesspartners")))
     }
 
     private fun readTestResource(testResourcePath: String) =
         CdqControllerImportIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
+
+    private fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdProperties.typeKey }!!.value
 }
