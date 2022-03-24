@@ -4,8 +4,8 @@
   "values": [
     {
       "id": "fooId1",
-      "createdAt": "2021-12-20T14:43:40.241Z",
-      "lastModifiedAt": "2022-02-25T15:44:55.039Z",
+      "createdAt": "2021-12-20T12:00:00.000Z",
+      "lastModifiedAt": "2022-02-25T15:00:00.000Z",
       "externalId": "fooExternalId1",
       "dataSource": "fooDataSource",
       "disclosed": false,
@@ -78,8 +78,8 @@
     },
     {
       "id": "fooId2",
-      "createdAt": "2021-12-20T14:43:40.241Z",
-      "lastModifiedAt": "2022-02-25T15:44:55.039Z",
+      "createdAt": "2021-12-20T12:00:00.000Z",
+      "lastModifiedAt": "2022-02-25T15:00:00.000Z",
       "externalId": "fooExternalId2",
       "dataSource": "fooDataSource",
       "disclosed": false,
