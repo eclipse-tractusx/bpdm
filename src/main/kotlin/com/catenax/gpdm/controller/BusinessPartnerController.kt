@@ -3,9 +3,7 @@ package com.catenax.gpdm.controller
 import com.catenax.gpdm.component.elastic.SearchService
 import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.config.BpnConfigProperties
-import com.catenax.gpdm.dto.request.BusinessPartnerRequest
-import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
-import com.catenax.gpdm.dto.request.PaginationRequest
+import com.catenax.gpdm.dto.request.*
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
@@ -38,12 +36,14 @@ class BusinessPartnerController(
     ])
     @GetMapping
     fun getBusinessPartners(
-        @ParameterObject
-        searchRequest: BusinessPartnerSearchRequest,
-        @ParameterObject
-        paginationRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerSearchResponse> {
-        return searchService.searchBusinessPartners(searchRequest, paginationRequest)
+        return searchService.searchBusinessPartners(
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            paginationRequest
+        )
     }
 
     @Operation(summary = "Get business partner by identifier",
@@ -59,15 +59,13 @@ class BusinessPartnerController(
     ])
     @GetMapping("/{idValue}")
     fun getBusinessPartner(
-        @Parameter(description = "Identifier value")
-        @PathVariable
-        idValue: String,
+        @Parameter(description = "Identifier value")@PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam
         idType: String?
     ): BusinessPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if(actualType == bpnConfigProperties.id) businessPartnerService.findPartner(idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerService.findPartner(idValue)
         else businessPartnerService.findPartnerByIdentifier(actualType, idValue)
     }
 
@@ -81,58 +79,158 @@ class BusinessPartnerController(
     @PostMapping
     fun createBusinessPartners(
         @RequestBody
-        businessPartners: Collection<BusinessPartnerRequest>) : Collection<BusinessPartnerResponse>{
+        businessPartners: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse> {
         return businessPartnerService.createPartners(businessPartners)
     }
 
     @GetMapping("/name")
-    fun getNameSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.NAME, text, searchRequest, pageRequest)
+    fun getNameSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.NAME,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/legal-form")
-    fun getLegalFormSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.LEGAL_FORM, text, searchRequest, pageRequest)
+    fun getLegalFormSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.LEGAL_FORM,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/status")
-    fun getStatusSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.STATUS, text, searchRequest, pageRequest)
+    fun getStatusSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.STATUS,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/classification")
-    fun getClassificationSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.CLASSIFICATION, text, searchRequest, pageRequest)
+    fun getClassificationSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.CLASSIFICATION,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/administrative-area")
-    fun getAdminAreaSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.ADMIN_AREA, text, searchRequest,pageRequest)
+    fun getAdminAreaSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.ADMIN_AREA,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/postcode")
-    fun getPostcodeSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.POSTCODE, text, searchRequest, pageRequest)
+    fun getPostcodeSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.POSTCODE,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/locality")
-    fun getLocalitySuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.LOCALITY, text, searchRequest, pageRequest)
+    fun getLocalitySuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.LOCALITY,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/thoroughfare")
-    fun getThoroughfareSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.THOROUGHFARE, text, searchRequest, pageRequest)
+    fun getThoroughfareSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.THOROUGHFARE,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/premise")
-    fun getPremiseSuggestion(text: String?, @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.PREMISE, text, searchRequest, pageRequest)
+    fun getPremiseSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.PREMISE,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
     @GetMapping("/address/postal-delivery-point")
-    fun getPostalDeliverPointSuggestion(text: String? , @ParameterObject searchRequest: BusinessPartnerSearchRequest, @ParameterObject pageRequest: PaginationRequest): PageResponse<SuggestionResponse>{
-        return searchService.getSuggestion(SuggestionType.POSTAL_DELIVERY_POINT, text, searchRequest, pageRequest)
+    fun getPostalDeliverPointSuggestion(
+        text: String?,
+        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<SuggestionResponse> {
+        return searchService.getSuggestion(
+            SuggestionType.POSTAL_DELIVERY_POINT,
+            text,
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            pageRequest
+        )
     }
 
 }

@@ -2,7 +2,8 @@ package com.catenax.gpdm.component.elastic.impl.util
 
 import com.catenax.gpdm.component.elastic.impl.doc.AddressDoc
 import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
-import com.catenax.gpdm.dto.request.AddressSearchRequest
+import com.catenax.gpdm.dto.request.AddressPropertiesSearchRequest
+import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import org.apache.lucene.search.join.ScoreMode
 import org.elasticsearch.common.unit.Fuzziness
@@ -35,7 +36,11 @@ class BpdmQueryBuilder {
         return boolQuery
     }
 
-    fun toFieldTextPairs(bpSearch: BusinessPartnerSearchRequest): Collection<Pair<String, String>>{
+    fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
+        return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties)
+    }
+
+    fun toFieldTextPairs(bpSearch: BusinessPartnerPropertiesSearchRequest): Collection<Pair<String, String>>{
         val bpParamPairs = mutableListOf(
             Pair(BusinessPartnerDoc::names.name, bpSearch.name),
             Pair(BusinessPartnerDoc::legalForm.name, bpSearch.legalForm),
@@ -43,16 +48,13 @@ class BpdmQueryBuilder {
             Pair(BusinessPartnerDoc::status.name, bpSearch.status)
         )
 
-        if(bpSearch.address != null)
-            bpParamPairs += toFieldTextPairs(bpSearch.address!!)
-
         return bpParamPairs
             .filter { (_, query) -> query != null }
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
-    fun toFieldTextPairs(addressSearch: AddressSearchRequest): Collection<Pair<String, String?>>{
-        return listOf(
+    fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>>{
+        val addressParamPairs = listOf(
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::administrativeAreas.name}", addressSearch.administrativeArea),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postCodes.name}", addressSearch.postCode),
@@ -60,20 +62,29 @@ class BpdmQueryBuilder {
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}", addressSearch.postalDeliveryPoint),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::thoroughfares.name}", addressSearch.thoroughfare),
         )
+
+        return addressParamPairs.filter { (_, query) -> query != null }
+            .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest{
         return BusinessPartnerSearchRequest(
+            toLowerCaseSearchRequest(searchRequest.partnerProperties),
+            toLowerCaseSearchRequest(searchRequest.addressProperties)
+        )
+    }
+
+    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerPropertiesSearchRequest): BusinessPartnerPropertiesSearchRequest{
+        return BusinessPartnerPropertiesSearchRequest(
             searchRequest.name?.lowercase(),
             searchRequest.legalForm?.lowercase(),
             searchRequest.status?.lowercase(),
-            if(searchRequest.address != null) toLowerCaseSearchRequest(searchRequest.address!!) else null,
             searchRequest.classification?.lowercase()
         )
     }
 
-    fun toLowerCaseSearchRequest(searchRequest: AddressSearchRequest): AddressSearchRequest{
-        return AddressSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchRequest): AddressPropertiesSearchRequest{
+        return AddressPropertiesSearchRequest(
             searchRequest.administrativeArea?.lowercase(),
             searchRequest.postCode?.lowercase(),
             searchRequest.locality?.lowercase(),

@@ -2,6 +2,7 @@ package com.catenax.gpdm.component.elastic.impl.repository
 
 import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
 import com.catenax.gpdm.component.elastic.impl.util.BpdmQueryBuilder
+import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import org.elasticsearch.index.query.QueryBuilders
 import org.springframework.data.domain.Pageable

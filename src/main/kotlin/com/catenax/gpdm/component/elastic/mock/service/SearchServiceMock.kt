@@ -2,6 +2,7 @@ package com.catenax.gpdm.component.elastic.mock.service
 
 import com.catenax.gpdm.component.elastic.SearchService
 import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
+import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse

@@ -4,6 +4,7 @@ import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
 import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.component.elastic.impl.doc.TextDoc
 import com.catenax.gpdm.component.elastic.impl.util.BpdmQueryBuilder
+import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.exception.BpdmConversionException
 import org.elasticsearch.index.query.QueryBuilders

@@ -4,6 +4,7 @@ import com.catenax.gpdm.component.elastic.SearchService
 import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.component.elastic.impl.repository.BusinessPartnerDocSearchRepository
 import com.catenax.gpdm.component.elastic.impl.repository.TextDocSearchRepository
+import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
@@ -25,7 +26,7 @@ class SearchServiceImpl(
 
 
     override fun searchBusinessPartners(searchRequest: BusinessPartnerSearchRequest,
-                               paginationRequest: PaginationRequest): PageResponse<BusinessPartnerSearchResponse>{
+                                        paginationRequest: PaginationRequest): PageResponse<BusinessPartnerSearchResponse>{
         val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(searchRequest, PageRequest.of(paginationRequest.page, paginationRequest.size))
         val bpnHitMap = searchResult.associateBy { it.content.bpn }
 
