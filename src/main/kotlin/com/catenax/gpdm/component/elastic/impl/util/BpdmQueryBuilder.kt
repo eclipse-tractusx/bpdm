@@ -17,11 +17,14 @@ import org.springframework.stereotype.Component
 class BpdmQueryBuilder {
 
     fun buildNestedQuery(fieldName: String, queryText: String?, withHitInfo: Boolean): NestedQueryBuilder {
-        val innerQuery = if(queryText == null) QueryBuilders.matchAllQuery() else buildInnerShouldQuery("$fieldName.text", queryText)
+        val innerQuery = if (queryText == null) QueryBuilders.matchAllQuery() else buildInnerShouldQuery(
+            "$fieldName.text",
+            queryText
+        )
 
-        val nestedQuery =  QueryBuilders.nestedQuery(fieldName, innerQuery, ScoreMode.Avg)
+        val nestedQuery = QueryBuilders.nestedQuery(fieldName, innerQuery, ScoreMode.Avg)
 
-        if(withHitInfo)
+        if (withHitInfo)
             nestedQuery.innerHit(InnerHitBuilder())
 
         return nestedQuery
@@ -31,7 +34,9 @@ class BpdmQueryBuilder {
         val boolQuery = QueryBuilders.boolQuery()
         val shouldQuery = boolQuery.should()
         shouldQuery.add(QueryBuilders.matchPhraseQuery(fieldName, queryText).boost(5f))
-        shouldQuery.add(QueryBuilders.matchQuery(fieldName, queryText).boost(3f).fuzziness(Fuzziness.ONE))
+        shouldQuery.add(
+            QueryBuilders.matchQuery(fieldName, queryText).boost(3f).fuzziness(Fuzziness.ONE).prefixLength(3)
+        )
         shouldQuery.addAll(queryText.split(" ").map { QueryBuilders.prefixQuery(fieldName, it) })
         return boolQuery
     }
@@ -40,7 +45,7 @@ class BpdmQueryBuilder {
         return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties)
     }
 
-    fun toFieldTextPairs(bpSearch: BusinessPartnerPropertiesSearchRequest): Collection<Pair<String, String>>{
+    fun toFieldTextPairs(bpSearch: BusinessPartnerPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
             Pair(BusinessPartnerDoc::names.name, bpSearch.name),
             Pair(BusinessPartnerDoc::legalForm.name, bpSearch.legalForm),
@@ -53,13 +58,19 @@ class BpdmQueryBuilder {
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
-    fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>>{
+    fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::administrativeAreas.name}", addressSearch.administrativeArea),
+            Pair(
+                "${BusinessPartnerDoc::addresses.name}.${AddressDoc::administrativeAreas.name}",
+                addressSearch.administrativeArea
+            ),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postCodes.name}", addressSearch.postCode),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::premises.name}", addressSearch.premise),
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}", addressSearch.postalDeliveryPoint),
+            Pair(
+                "${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}",
+                addressSearch.postalDeliveryPoint
+            ),
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::thoroughfares.name}", addressSearch.thoroughfare),
         )
 
@@ -67,14 +78,14 @@ class BpdmQueryBuilder {
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
-    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest{
+    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
         return BusinessPartnerSearchRequest(
             toLowerCaseSearchRequest(searchRequest.partnerProperties),
             toLowerCaseSearchRequest(searchRequest.addressProperties)
         )
     }
 
-    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerPropertiesSearchRequest): BusinessPartnerPropertiesSearchRequest{
+    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerPropertiesSearchRequest): BusinessPartnerPropertiesSearchRequest {
         return BusinessPartnerPropertiesSearchRequest(
             searchRequest.name?.lowercase(),
             searchRequest.legalForm?.lowercase(),
@@ -83,7 +94,7 @@ class BpdmQueryBuilder {
         )
     }
 
-    fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchRequest): AddressPropertiesSearchRequest{
+    fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchRequest): AddressPropertiesSearchRequest {
         return AddressPropertiesSearchRequest(
             searchRequest.administrativeArea?.lowercase(),
             searchRequest.postCode?.lowercase(),
