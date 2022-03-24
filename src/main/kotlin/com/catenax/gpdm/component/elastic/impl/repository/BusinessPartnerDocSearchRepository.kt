@@ -18,10 +18,12 @@ class BusinessPartnerDocSearchRepository(
 ){
 
     fun findBySearchRequest(searchRequest: BusinessPartnerSearchRequest, pageable: Pageable): SearchHits<BusinessPartnerDoc>{
+        val lowerCaseSearchRequest = bpdmQueryBuilder.toLowerCaseSearchRequest(searchRequest)
+
         val boolQuery = QueryBuilders.boolQuery()
         val mustQuery = boolQuery.must()
 
-        bpdmQueryBuilder.toFieldTextPairs(searchRequest)
+        bpdmQueryBuilder.toFieldTextPairs(lowerCaseSearchRequest)
             .map { (fieldName, queryText) -> bpdmQueryBuilder.buildNestedQuery(fieldName, queryText, false) }
             .forEach{ mustQuery.add(it) }
 

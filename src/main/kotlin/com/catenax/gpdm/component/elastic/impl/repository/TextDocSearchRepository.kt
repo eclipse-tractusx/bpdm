@@ -27,20 +27,21 @@ class TextDocSearchRepository(
                                      filters: BusinessPartnerSearchRequest,
                                      pageable: Pageable): SearchHits<TextDoc>{
 
+
+        val lowerCaseQueryText = queryText?.lowercase()
+        val lowerCaseFilters = bpdmQueryBuilder.toLowerCaseSearchRequest(filters)
+
         val boolQuery = QueryBuilders.boolQuery()
 
         boolQuery
-            .must(bpdmQueryBuilder.buildNestedQuery(field.docName, queryText, true))
-            .filter().addAll(bpdmQueryBuilder.toFieldTextPairs(filters).map {(fieldName, queryText) -> bpdmQueryBuilder.buildNestedQuery(fieldName, queryText, false) })
+            .must(bpdmQueryBuilder.buildNestedQuery(field.docName, lowerCaseQueryText, true))
+            .filter().addAll(bpdmQueryBuilder.toFieldTextPairs(lowerCaseFilters).map {(fieldName, queryText) -> bpdmQueryBuilder.buildNestedQuery(fieldName, queryText, false) })
 
         val query = NativeSearchQueryBuilder()
             .withQuery(boolQuery)
             .withPageable(pageable)
             .withHighlightFields(HighlightBuilder.Field(field.docName))
             .build()
-
-
-
 
         val result = template.search(query, BusinessPartnerDoc::class.java)
 

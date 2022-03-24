@@ -62,4 +62,25 @@ class BpdmQueryBuilder {
         )
     }
 
+    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest{
+        return BusinessPartnerSearchRequest(
+            searchRequest.name?.lowercase(),
+            searchRequest.legalForm?.lowercase(),
+            searchRequest.status?.lowercase(),
+            if(searchRequest.address != null) toLowerCaseSearchRequest(searchRequest.address!!) else null,
+            searchRequest.classification?.lowercase()
+        )
+    }
+
+    fun toLowerCaseSearchRequest(searchRequest: AddressSearchRequest): AddressSearchRequest{
+        return AddressSearchRequest(
+            searchRequest.administrativeArea?.lowercase(),
+            searchRequest.postCode?.lowercase(),
+            searchRequest.locality?.lowercase(),
+            searchRequest.thoroughfare?.lowercase(),
+            searchRequest.premise?.lowercase(),
+            searchRequest.postalDeliveryPoint?.lowercase()
+        )
+    }
+
 }
