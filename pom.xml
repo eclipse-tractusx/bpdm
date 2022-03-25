@@ -27,6 +27,9 @@
         <neo.version>1.29</neo.version>
         <keycloack.version>17.0.0</keycloack.version>
         <flyway.version>8.5.3</flyway.version>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>catenax</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <dependencies>
