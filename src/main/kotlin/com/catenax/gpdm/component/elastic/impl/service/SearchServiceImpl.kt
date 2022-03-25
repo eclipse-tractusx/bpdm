@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
+/**
+ * Implements search functionality by using Elasticsearch repositories
+ */
 @Service
 @Primary
 class SearchServiceImpl(
@@ -24,6 +27,14 @@ class SearchServiceImpl(
 ) : SearchService {
 
 
+    /**
+     * Uses the [searchRequest] to perform an Elasticsearch query for business partners.
+     * The BPNs of found partners are used to query the whole business partner records from the database.
+     * The records are supplied with relevancy scores of the search hits and returned as a paginated result.
+     * In case BPNs found by Elasticsearch can not be found in the database, the [PageResponse] properties are
+     * adapted accordingly from the Elasticsearch page information
+     *
+     */
     override fun searchBusinessPartners(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
@@ -48,17 +59,22 @@ class SearchServiceImpl(
     }
 
 
+    /**
+     * Query Elasticsearch for [field] values by [text] and [filters]
+     *
+     * The found values and their hit scores are converted to [SuggestionResponse] and returned as a paginated result.
+     */
     override fun getSuggestion(
         field: SuggestionType,
         text: String?,
-        searchRequest: BusinessPartnerSearchRequest,
+        filters: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
 
         val hits = textDocSearchRepository.findByFieldAndTextAndFilters(
             field,
             text,
-            searchRequest,
+            filters,
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
 

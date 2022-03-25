@@ -15,6 +15,9 @@ import java.time.Instant
 import java.util.*
 import javax.persistence.EntityManager
 
+/**
+ * Provides functionality for managing the Elasticsearch index
+ */
 @Service
 class ElasticSyncService(
     val elasticSyncPageService: ElasticSyncPageService,
@@ -25,6 +28,12 @@ class ElasticSyncService(
 ) {
     val formatter = SimpleDateFormat("d-MMM-yyyy,HH:mm:ss")
 
+    /**
+     * Export new changes of the business partner records to the Elasticsearch index
+     *
+     * A new change is discovered by comparing the updated timestamp of the business partner record with the time of the last export
+     */
+    @Transactional
     fun exportPartnersToElastic(): ExportResponse {
         val exportedBpns: MutableSet<String> = mutableSetOf()
         val fromTime = getOrCreateTimestamp()
@@ -45,6 +54,9 @@ class ElasticSyncService(
         return ExportResponse(exportedBpns.size, exportedBpns)
     }
 
+    /**
+     * Clears the whole index and resets the time of the last update
+     */
     @Transactional
     fun clearElastic(){
         businessPartnerDocRepository.deleteAll()

@@ -13,9 +13,18 @@ import org.elasticsearch.index.query.NestedQueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.springframework.stereotype.Component
 
+/**
+ * Offers utility methods for building Elasticsearch queries
+ */
 @Component
 class BpdmQueryBuilder {
 
+    /**
+     * Returns an Elasticsearch nested query object model for searching a [queryText] in the [BusinessPartnerDoc] [fieldName].
+     * In case [queryText] is not null it is matched by phrase, word or prefix with the [fieldName] values.
+     * Otherwise, the query just returns possible values for [fieldName].
+     * [withHitInfo] the query result not only contains the hit [BusinessPartnerDoc] but also the exact [fieldName] values hit.
+     */
     fun buildNestedQuery(fieldName: String, queryText: String?, withHitInfo: Boolean): NestedQueryBuilder {
         val innerQuery = if (queryText == null) QueryBuilders.matchAllQuery() else buildInnerShouldQuery(
             "$fieldName.text",
@@ -30,6 +39,10 @@ class BpdmQueryBuilder {
         return nestedQuery
     }
 
+    /**
+     * Returns an Elasticsearch boolean should query object model for searching a [queryText] in the [BusinessPartnerDoc] [fieldName].
+     * [queryText] is not null it is matched by phrase, word or prefix with the [fieldName] values.
+     */
     fun buildInnerShouldQuery(fieldName: String, queryText: String): BoolQueryBuilder {
         val boolQuery = QueryBuilders.boolQuery()
         val shouldQuery = boolQuery.should()
@@ -41,10 +54,18 @@ class BpdmQueryBuilder {
         return boolQuery
     }
 
+    /**
+     * Converts a [searchRequest] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * Fields with no query text are omitted.
+     */
     fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
         return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties)
     }
 
+    /**
+     * Converts a [bpSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * @see toFieldTextPairs
+     */
     fun toFieldTextPairs(bpSearch: BusinessPartnerPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
             Pair(BusinessPartnerDoc::names.name, bpSearch.name),
@@ -58,6 +79,10 @@ class BpdmQueryBuilder {
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
+    /**
+     * Converts a [addressSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * @see toFieldTextPairs
+     */
     fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
             Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
@@ -78,6 +103,9 @@ class BpdmQueryBuilder {
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
 
+    /**
+     * Returns a lowercase representation of [searchRequest]
+     */
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
         return BusinessPartnerSearchRequest(
             toLowerCaseSearchRequest(searchRequest.partnerProperties),
@@ -85,6 +113,9 @@ class BpdmQueryBuilder {
         )
     }
 
+    /**
+     * Returns a lowercase representation of [searchRequest]
+     */
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerPropertiesSearchRequest): BusinessPartnerPropertiesSearchRequest {
         return BusinessPartnerPropertiesSearchRequest(
             searchRequest.name?.lowercase(),
@@ -94,6 +125,9 @@ class BpdmQueryBuilder {
         )
     }
 
+    /**
+     * Returns a lowercase representation of [searchRequest]
+     */
     fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchRequest): AddressPropertiesSearchRequest {
         return AddressPropertiesSearchRequest(
             searchRequest.administrativeArea?.lowercase(),

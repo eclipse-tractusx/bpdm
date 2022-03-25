@@ -7,9 +7,15 @@ import com.catenax.gpdm.entity.Address
 import com.catenax.gpdm.entity.BusinessPartner
 import org.springframework.stereotype.Service
 
+/**
+ * Responsible for mapping entities to their Elasticsearch document representations
+ */
 @Service
 class DocumentMappingService{
 
+    /**
+     * Maps [partner] to [BusinessPartnerDoc] representation
+     */
     fun toDocument(partner: BusinessPartner): BusinessPartnerDoc {
         val partnerStatus = partner.stati.maxWithOrNull(compareBy{it.validFrom})
         return BusinessPartnerDoc(
@@ -22,6 +28,9 @@ class DocumentMappingService{
         )
     }
 
+    /**
+     * Maps [address] to [AddressDoc] representation
+     */
     fun toDocument(address: Address): AddressDoc {
         return  AddressDoc(
          address.administrativeAreas.map { TextDoc(it.value) },
