@@ -16,6 +16,10 @@ import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
 import org.springframework.security.core.session.SessionRegistryImpl
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+
 
 @EnableWebSecurity
 @ConditionalOnProperty(
@@ -41,7 +45,9 @@ class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
 @ConditionalOnProperty(
     value = ["bpdm.security.enabled"],
     havingValue = "true")
-class KeycloakSecurityConfig: KeycloakWebSecurityConfigurerAdapter() {
+class KeycloakSecurityConfig(
+    val configProperties: SecurityConfigProperties
+): KeycloakWebSecurityConfigurerAdapter() {
 
     @Autowired
     @Throws(Exception::class)
@@ -66,12 +72,25 @@ class KeycloakSecurityConfig: KeycloakWebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         super.configure(http)
         http
+            .cors().and()
             .csrf().disable()
             .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()
                 .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/api/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/**").authenticated()
                 .antMatchers("/api/**").hasRole("add_company_data")
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins =  configProperties.corsOrigins.toList()
+        configuration.allowedMethods = listOf("HEAD", "OPTIONS", "GET", "POST", "PUT", "DELETE")
+        configuration.allowedHeaders = listOf("*")
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }
 
