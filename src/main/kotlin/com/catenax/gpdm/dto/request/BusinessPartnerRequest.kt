@@ -1,7 +1,6 @@
 package com.catenax.gpdm.dto.request
 
 import com.catenax.gpdm.entity.BusinessPartnerType
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.validation.constraints.NotEmpty

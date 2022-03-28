@@ -1,7 +1,6 @@
 package com.catenax.gpdm.controller
 
 import com.catenax.gpdm.config.BpnConfigProperties
-import com.catenax.gpdm.dto.request.AddressSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.request.PaginationRequest
@@ -10,7 +9,6 @@ import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.service.BusinessPartnerService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -18,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena/business-partner")

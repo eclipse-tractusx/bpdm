@@ -8,17 +8,12 @@ import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.service.MetadataService
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.Parameters
 import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
-import javax.validation.constraints.PositiveOrZero
 
 @RestController
 @RequestMapping("/api/catena")
