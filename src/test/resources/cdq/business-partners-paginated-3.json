@@ -1,0 +1,6 @@
+{
+  "limit": 1,
+  "total": 2,
+  "startAfter": "fooNextStartAfterId2",
+  "values": []
+}

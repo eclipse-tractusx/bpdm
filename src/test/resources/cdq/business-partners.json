@@ -1,0 +1,154 @@
+{
+  "limit": 2,
+  "total": 2,
+  "values": [
+    {
+      "id": "fooId1",
+      "createdAt": "2021-12-20T12:00:00.000Z",
+      "lastModifiedAt": "2022-02-25T15:00:00.000Z",
+      "externalId": "fooExternalId1",
+      "dataSource": "fooDataSource",
+      "disclosed": false,
+      "updateMonitoring": true,
+      "record": "fooRecord1",
+      "names": [
+        {
+          "type": {
+            "url": "https://meta.cdq.com/Business_partner/name/type/local",
+            "name": "Local Name",
+            "technicalKey": "LOCAL"
+          },
+          "value": "fooName1",
+          "language": {}
+        }
+      ],
+      "identifiers": [
+        {
+          "type": {
+            "url": "https://meta.cdq.com/European_value_added_tax_identifier_(Germany)",
+            "name": "Umsatzsteuer-Identifikationsnummer",
+            "technicalKey": "EU_VAT_ID_DE"
+          },
+          "value": "fooUmsatzsteuerId1",
+          "issuingBody": {}
+        },
+        {
+          "type": {
+            "url": "https://meta.cdq.com/D-U-N-S",
+            "name": "DUNS Number",
+            "technicalKey": "DUNS_ID"
+          },
+          "value": "fooDuns1",
+          "issuingBody": {}
+        }
+      ],
+      "addresses": [
+        {
+          "id": "0",
+          "version": {
+            "language": {
+              "name": "en",
+              "technicalKey": "en"
+            },
+            "characterSet": {
+              "name": "Latin",
+              "technicalKey": "LATIN"
+            }
+          },
+          "country": {
+            "shortName": "DE"
+          },
+          "postCodes": [
+            {
+              "value": "11111"
+            }
+          ],
+          "localities": [
+            {
+              "value": "fooLocality"
+            }
+          ],
+          "thoroughfares": [
+            {
+              "value": "fooThoroughfare"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fooId2",
+      "createdAt": "2021-12-20T12:00:00.000Z",
+      "lastModifiedAt": "2022-02-25T15:00:00.000Z",
+      "externalId": "fooExternalId2",
+      "dataSource": "fooDataSource",
+      "disclosed": false,
+      "updateMonitoring": true,
+      "record": "fooRecord2",
+      "names": [
+        {
+          "type": {
+            "url": "https://meta.cdq.com/Business_partner/name/type/local",
+            "name": "Local Name",
+            "technicalKey": "LOCAL"
+          },
+          "value": "fooName2",
+          "language": {}
+        }
+      ],
+      "identifiers": [
+        {
+          "type": {
+            "url": "https://meta.cdq.com/European_value_added_tax_identifier_(Germany)",
+            "name": "Umsatzsteuer-Identifikationsnummer",
+            "technicalKey": "EU_VAT_ID_DE"
+          },
+          "value": "fooUmsatzsteuerId2",
+          "issuingBody": {}
+        },
+        {
+          "type": {
+            "url": "https://meta.cdq.com/D-U-N-S",
+            "name": "DUNS Number",
+            "technicalKey": "DUNS_ID"
+          },
+          "value": "fooDuns2",
+          "issuingBody": {}
+        }
+      ],
+      "addresses": [
+        {
+          "id": "0",
+          "version": {
+            "language": {
+              "name": "en",
+              "technicalKey": "en"
+            },
+            "characterSet": {
+              "name": "Latin",
+              "technicalKey": "LATIN"
+            }
+          },
+          "country": {
+            "shortName": "DE"
+          },
+          "postCodes": [
+            {
+              "value": "11111"
+            }
+          ],
+          "localities": [
+            {
+              "value": "fooLocality"
+            }
+          ],
+          "thoroughfares": [
+            {
+              "value": "fooThoroughfare"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

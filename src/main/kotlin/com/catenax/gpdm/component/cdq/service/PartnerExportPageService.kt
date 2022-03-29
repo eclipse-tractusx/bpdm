@@ -51,10 +51,10 @@ class PartnerExportPageService(
         val (known, unknown) = cdqPartners.partition { it.identifiers.any { id -> id.type?.technicalKey == "BPN" } }
 
         if(known.isNotEmpty()) updateKnownPartners(partnersToSynch, known)
-        return if(unknown.isNotEmpty()) synchronizeUknownPartners(partnersToSynch, unknown) else emptyList()
+        return if(unknown.isNotEmpty()) synchronizeUnknownPartners(partnersToSynch, unknown) else emptyList()
     }
 
-    private fun synchronizeUknownPartners(partnerMap: Map<String, BusinessPartnerResponse>, unknownPartners: Collection<BusinessPartnerCdq>)
+    private fun synchronizeUnknownPartners(partnerMap: Map<String, BusinessPartnerResponse>, unknownPartners: Collection<BusinessPartnerCdq>)
     : Collection<BusinessPartnerCdq>{
         val bpnCdqPairs =  unknownPartners.map {  it to partnerMap[it.id]!!.bpn  }
         val partnersWithBpn = bpnCdqPairs.map { addBpnIdentifier(it.first, it.second) }
