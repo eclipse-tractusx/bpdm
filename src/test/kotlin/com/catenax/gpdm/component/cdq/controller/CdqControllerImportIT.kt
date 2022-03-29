@@ -7,7 +7,6 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -96,7 +95,6 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
     @Test
     @DirtiesContext
-    @Disabled
     fun `given new partners in cdq, when import partners with pagination, then partners imported`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
@@ -136,12 +134,12 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
             .expectStatus()
             .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
 
-        webTestClient.get().uri("/api/catena/business-partner")
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBody()
-            .jsonPath("$.totalElements").isEqualTo(2)
+        val savedBusinessPartners =
+            webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
+                ParameterizedTypeReference<PageResponse<BusinessPartnerResponse>>() {})
+                .returnResult().responseBody
+
+        assertThat(savedBusinessPartners!!.content.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
 
         wireMockServer.verify(3, getRequestedFor(urlPathMatching("$CDQ_MOCK_URL/businesspartners")))
     }

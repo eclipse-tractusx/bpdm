@@ -280,7 +280,13 @@ class CdqControllerExportIT @Autowired constructor(
             )
         }
 
-        return BusinessPartnerCollectionCdq(limit = businessPartners.size, startAfter = null, total = businessPartners.size, values = businessPartners)
+        return BusinessPartnerCollectionCdq(
+            limit = businessPartners.size,
+            startAfter = null,
+            nextStartAfter = null,
+            total = businessPartners.size,
+            values = businessPartners
+        )
     }
 
     private fun readTestResource(testResourcePath: String) =

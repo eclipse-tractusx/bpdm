@@ -34,6 +34,7 @@ open class PartnerImportPageService(
                 .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
                 .queryParam("limit", adapterProperties.importLimit)
                 .queryParam("datasource", adapterProperties.datasource)
+                .queryParam("featuresOn", "USE_NEXT_START_AFTER")
                 if(startAfter != null) builder.queryParam("startAfter", startAfter)
                 builder.build()
             }
@@ -45,7 +46,7 @@ open class PartnerImportPageService(
         val unknownPartners = filterUnknownPartners(partners)
 
         addNewMetadata(unknownPartners)
-        return ImportResponse(partnerCollection.startAfter, addNewPartners(unknownPartners))
+        return ImportResponse(partnerCollection.nextStartAfter, addNewPartners(unknownPartners))
     }
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerCdq>){

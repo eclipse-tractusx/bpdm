@@ -25,11 +25,11 @@ class PartnerImportService (
         var startAfter: String? = null
         var totalCollection: Collection<BusinessPartnerResponse> = emptyList()
 
-        do{
+        do {
             val response = partnerImportPageService.import(modifiedAfterDate, startAfter)
             totalCollection = totalCollection.plus(response.partners)
-            startAfter = response.startAfter
-        }while(startAfter != null)
+            startAfter = response.nextStartAfter
+        } while (startAfter != null)
 
         saveLastUpdateEntry(lastUpdateEntry)
 
