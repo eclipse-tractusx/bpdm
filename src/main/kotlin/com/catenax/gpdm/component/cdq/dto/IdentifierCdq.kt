@@ -1,8 +1,8 @@
 package com.catenax.gpdm.component.cdq.dto
 
 data class IdentifierCdq(
-    val type: TypeKeyNameUrlCdq?,
+    val type: TypeKeyNameUrlCdq? = null,
     val value: String,
-    val issuingBody:  TypeKeyNameUrlCdq?,
-    val status: TypeKeyNameCdq?
+    val issuingBody: TypeKeyNameUrlCdq? = null,
+    val status: TypeKeyNameCdq? = null
 )

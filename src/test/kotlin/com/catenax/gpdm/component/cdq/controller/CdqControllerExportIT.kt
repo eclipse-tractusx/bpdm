@@ -258,9 +258,7 @@ class CdqControllerExportIT @Autowired constructor(
             var bpnIdentifier: IdentifierCdq? = null
             if (bpn != null) {
                 bpnIdentifier = IdentifierCdq(
-                    type = TypeKeyNameUrlCdq(technicalKey = bpnConfigProperties.id, name = bpnConfigProperties.name, url = null),
-                    issuingBody = null,
-                    status = null,
+                    type = TypeKeyNameUrlCdq(technicalKey = bpnConfigProperties.id, name = bpnConfigProperties.name),
                     value = bpn
                 )
             }
@@ -270,17 +268,11 @@ class CdqControllerExportIT @Autowired constructor(
                 lastModifiedAt = LocalDateTime.of(2020, 1, 1, 0, 0),
                 dataSource = "fooDataSource",
                 id = cdqId,
-                externalId = null,
-                legalForm = null,
-                metadata = null,
-                profile = null,
-                record = null,
-                status = null,
                 identifiers = if (bpnIdentifier != null) listOf(bpnIdentifier) else emptyList()
             )
         }
 
-        return BusinessPartnerCollectionCdq(limit = businessPartners.size, startAfter = null, total = businessPartners.size, values = businessPartners)
+        return BusinessPartnerCollectionCdq(limit = businessPartners.size, total = businessPartners.size, values = businessPartners)
     }
 
     private fun readTestResource(testResourcePath: String) =
