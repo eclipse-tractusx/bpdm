@@ -41,7 +41,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
     @Test
     @DirtiesContext
-    fun `import business partners`() {
+    fun `given new partners in cdq, when import partners from cdq, then partners imported`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).willReturn(
                 aResponse()
@@ -67,7 +67,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
     @Test
     @DirtiesContext
-    fun `import business partners multiple times`() {
+    fun `given new partners in cdq, when import partners multiple times, then no duplicate partners`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners")).willReturn(
                 aResponse()
@@ -97,7 +97,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
     @Test
     @DirtiesContext
     @Disabled
-    fun `import business partners with pagination`() {
+    fun `given new partners in cdq, when import partners with pagination, then partners imported`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))

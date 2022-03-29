@@ -59,7 +59,7 @@ class CdqControllerExportIT @Autowired constructor(
 
     @Test
     @DirtiesContext
-    fun `import, then export business partners`() {
+    fun `given partners unsynchronized, when export, then partners synchronized`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .willReturn(
@@ -113,7 +113,7 @@ class CdqControllerExportIT @Autowired constructor(
 
     @Test
     @DirtiesContext
-    fun `cdq returns error on export`() {
+    fun `given partners unsynchronized, when cdq error on export, then partners still unsynchronized`() {
         wireMockServer.stubFor(
             get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
                 .willReturn(
@@ -162,7 +162,7 @@ class CdqControllerExportIT @Autowired constructor(
 
     @Test
     @DirtiesContext
-    fun `error saving synchronized state after export`() {
+    fun `given partners unsynchronized, when error saving synchronized state after export and triggering another export, then partners synchronized`() {
         // mock error while saving synchronized state on first export
         // second export should work though, so call real method
         every { identifierService.updateIdentifiers(any(), any()) } throws RuntimeException() andThenAnswer { callOriginal() }
