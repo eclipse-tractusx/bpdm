@@ -1,0 +1,29 @@
+# Can be used to start required services in order to run bpdm in "local" profile for development purposes
+services:
+  postgres:
+    image: postgres:13.2
+    container_name: postgres-bpdm
+    environment:
+      POSTGRES_USER: bpdm
+      POSTGRES_PASSWORD: bpdm
+      POSTGRES_DB: bpdm
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U bpdm' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  elasticsearch:
+    image: elasticsearch:7.17.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
