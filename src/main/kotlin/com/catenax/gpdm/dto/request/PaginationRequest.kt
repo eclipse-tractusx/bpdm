@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
-import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
 
 @Schema(name = "Pagination Request", description = "Defines pagination information for requesting collection results")

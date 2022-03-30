@@ -21,18 +21,26 @@ class MetadataController (
        val metadataService: MetadataService
         ){
 
-    @Operation(summary = "Create new identifier type",
-    description = "Create a new identifier type which can be referenced by business partner records. " +
-            "Identifier types such as BPN or VAT determine with which kind of values a business partner can be identified with. " +
+    companion object DescriptionObject {
+        const val technicalKeyDisclaimer =
             "The technical key can be freely chosen but needs to be unique as it is used as reference by the business partner records. " +
-            "A recommendation for technical keys: They should be short, descriptive and " +
-            "use a restricted common character set in order to ensure compatibility with older systems." +
-            "The actual name of the identifier type is free to choose and doesn't need to be unique.")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "New identifier type successfully created"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ApiResponse(responseCode = "409", description = "Identifier type with specified technical key already exists", content = [Content()])
-    ])
+                    "A recommendation for technical keys: They should be short, descriptive and " +
+                    "use a restricted common character set in order to ensure compatibility with older systems."
+    }
+
+    @Operation(
+        summary = "Create new identifier type",
+        description = "Create a new identifier type which can be referenced by business partner records. " +
+                "Identifier types such as BPN or VAT determine with which kind of values a business partner can be identified with. " +
+                "The actual name of the identifier type is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New identifier type successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "409", description = "Identifier type with specified technical key already exists", content = [Content()])
+        ]
+    )
     @PostMapping("/identifier-type")
     fun createIdentifierType(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
             return metadataService.createIdentifierType(type)
@@ -49,13 +57,12 @@ class MetadataController (
             return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    @Operation(summary = "Create new identifier status",
+    @Operation(
+        summary = "Create new identifier status",
         description = "Create a new identifier status which can be referenced by business partner records. " +
                 "A status further distinguishes an identifier by adding current status information such as active or revoked." +
-                "The technical key can be freely chosen but needs to be unique as it is used as reference by the business partner records. " +
-                "A recommendation for technical keys: They should be short, descriptive and " +
-                "use a restricted common character set in order to ensure compatibility with older systems." +
-                "The actual name of the identifier status is free to choose and doesn't need to be unique.")
+                "The actual name of the identifier status is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "New identifier status successfully created"),
         ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
@@ -77,13 +84,12 @@ class MetadataController (
         return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    @Operation(summary = "Create new issuing body",
+    @Operation(
+        summary = "Create new issuing body",
         description = "Create a new issuing body which can be referenced by business partner records. " +
                 "An issuing body should be an entity which the Catena organisation trusts to issue identifiers." +
-                "The technical key can be freely chosen but needs to be unique as it is used as reference by the business partner records. " +
-                "A recommendation for technical keys: They should be short, descriptive and " +
-                "use a restricted common character set in order to ensure compatibility with older systems." +
-                "The actual name of the issuing body is free to choose and doesn't need to be unique.")
+                "The actual name of the issuing body is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "New issuing body successfully created"),
         ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
@@ -105,12 +111,11 @@ class MetadataController (
             return metadataService.getIssuingBodies(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    @Operation(summary = "Create new legal form",
+    @Operation(
+        summary = "Create new legal form",
         description = "Create a new legal form which can be referenced by business partner records. " +
-                "The technical key can be freely chosen but needs to be unique as it is used as reference by the business partner records. " +
-                "A recommendation for technical keys: They should be short, descriptive and " +
-                "use a restricted common character set in order to ensure compatibility with older systems." +
-                "The actual name of the legal form is free to choose and doesn't need to be unique.")
+                "The actual name of the legal form is free to choose and doesn't need to be unique. " + technicalKeyDisclaimer
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "New legal form successfully created"),
         ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
