@@ -15,7 +15,11 @@ The project can be run with the following command:`mvn clean spring-boot:run`
 
 On default configuration the project initializes and starts an in-memory H2 database. 
 After the project has finished initializing you can access the database on `http://localhost:8080/h2-console/` 
-as per default configuration. You can find the standard user and password as well as further database configurations 
+as per default configuration.
+
+The REST API documentation can be accessed at `http://localhost:8080/api/swagger-ui`.
+
+You can find the standard user and password as well as further database configurations 
 int the `application.properties` file in the resource folder.
 
 #### Prerequisites
