@@ -8,8 +8,11 @@ import io.swagger.v3.oas.models.security.OAuthFlows
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.servers.Server
+import org.springdoc.core.customizers.OpenApiCustomiser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component
+
 
 @Configuration
 class OpenApiConfig(
@@ -39,3 +42,12 @@ class OpenApiConfig(
     }
 
 }
+
+@Component
+class SortSchemasCustomiser : OpenApiCustomiser {
+    override fun customise(openApi: OpenAPI) {
+        val sortedSchemas = openApi.components.schemas.values.sortedBy { it.name }
+        openApi.components.schemas = sortedSchemas.associateBy { it.name }
+    }
+}
+

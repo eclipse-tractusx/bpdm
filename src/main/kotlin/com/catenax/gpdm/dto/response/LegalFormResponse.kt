@@ -3,12 +3,20 @@ package com.catenax.gpdm.dto.response
 import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeNameUrlDto
 import com.neovisionaries.i18n.LanguageCode
+import io.swagger.v3.oas.annotations.media.Schema
 
+@Schema(name = "Legal Form Response", description = "Legal form a business partner can have")
 data class LegalFormResponse (
+    @Schema(description = "Unique key to be used for reference")
     val technicalKey: String,
+    @Schema(description = "Full name of the legal form")
     val name: String,
+    @Schema(description = "Link for further information on the legal form")
     val url: String?,
+    @Schema(description = "Abbreviation of the legal form name")
     val mainAbbreviation: String?,
+    @Schema(description = "Language in which the legal form is specified")
     val language: TypeKeyNameDto<LanguageCode>,
+    @Schema(description = "Categories in which this legal form falls under")
     val categories: Collection<TypeNameUrlDto>
     )
