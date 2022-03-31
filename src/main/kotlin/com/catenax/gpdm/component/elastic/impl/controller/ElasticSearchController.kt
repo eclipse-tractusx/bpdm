@@ -1,7 +1,7 @@
 package com.catenax.gpdm.component.elastic.impl.controller
 
-import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
 import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncService
+import com.catenax.gpdm.dto.elastic.ExportResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -22,15 +22,19 @@ class ElasticSearchController(
     val elasticSyncService: ElasticSyncService
 ) {
 
-    @Operation(summary = "Index new business partner records on Elasticsearch",
+    @Operation(
+        summary = "Index new business partner records on Elasticsearch",
         description = "Triggers an export of business partner records from BPDM to Elasticsearch. " +
-                "Only exports records which have been updated since the last export. ")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Export of records successfully"),
-        ApiResponse(responseCode = "500", description = "Export failed (no connection to Elasticsearch or database)", content = [Content()])
-    ])
+                "Only exports records which have been updated since the last export. "
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Export of records successfully"),
+            ApiResponse(responseCode = "500", description = "Export failed (no connection to Elasticsearch or database)", content = [Content()])
+        ]
+    )
     @PostMapping("/business-partners")
-    fun export(): Collection<BusinessPartnerDoc> {
+    fun export(): ExportResponse {
         return elasticSyncService.exportPartnersToElastic()
     }
 
