@@ -89,7 +89,7 @@ class CdqRequestMappingService(
     }
 
     fun toRequest(idType: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<String>{
-        return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name!!, idType.url)
+        return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name ?: "", idType.url)
     }
 
     fun toRequest(idStatus: TypeKeyNameCdq): TypeKeyNameDto<String>{
@@ -163,12 +163,14 @@ class CdqRequestMappingService(
     }
 
     fun toRequest(thoroughfare: ThoroughfareCdq): ThoroughfareRequest {
-        return ThoroughfareRequest(thoroughfare.value,
+        return ThoroughfareRequest(
+            thoroughfare.value ?: "",
             thoroughfare.name,
             thoroughfare.shortName,
             thoroughfare.number,
             thoroughfare.direction,
-            toTypeOrDefault(thoroughfare.type))
+            toTypeOrDefault(thoroughfare.type)
+        )
     }
 
     fun toRequest(premise: PremiseCdq): PremiseRequest {

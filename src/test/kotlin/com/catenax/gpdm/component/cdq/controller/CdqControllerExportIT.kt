@@ -6,7 +6,6 @@ import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.component.cdq.dto.IdentifierCdq
 import com.catenax.gpdm.component.cdq.dto.TypeKeyNameUrlCdq
 import com.catenax.gpdm.config.BpnConfigProperties
-import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.IdentifierService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -72,7 +71,7 @@ class CdqControllerExportIT @Autowired constructor(
         webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
+            .is2xxSuccessful
 
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
@@ -133,7 +132,7 @@ class CdqControllerExportIT @Autowired constructor(
         webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
+            .is2xxSuccessful
 
         val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
 
@@ -208,7 +207,7 @@ class CdqControllerExportIT @Autowired constructor(
         webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
+            .is2xxSuccessful
 
         // mocked error should occur when trying to save synchronized state
         webTestClient.post().uri("/api/cdq/business-partners/export")

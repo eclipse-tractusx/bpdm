@@ -23,20 +23,27 @@ class BusinessPartner(
     )
     val roles: Set<Role>
 ): BaseEntity(){
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+    @OneToMany(mappedBy = "partner")
     lateinit var identifiers: Set<Identifier>
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+
+    @OneToMany(mappedBy = "partner")
     lateinit var names: Set<Name>
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+
+    @OneToMany(mappedBy = "partner")
     lateinit var stati: Set<BusinessStatus>
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.PERSIST], orphanRemoval = true)
+
+    @OneToMany(mappedBy = "partner")
     lateinit var addresses: Set<Address>
-    @OneToMany(mappedBy = "partner",cascade = [CascadeType.PERSIST], orphanRemoval = true)
+
+    @OneToMany(mappedBy = "partner")
     lateinit var classification: Set<Classification>
-    @OneToMany(mappedBy = "partner",cascade = [CascadeType.PERSIST], orphanRemoval = true)
+
+    @OneToMany(mappedBy = "partner")
     lateinit var bankAccounts: Set<BankAccount>
+
     @OneToMany(mappedBy = "startNode")
     lateinit var startNodeRelations: Set<Relation>
+
     @OneToMany(mappedBy = "endNode")
     lateinit var endNodeRelations: Set<Relation>
 }

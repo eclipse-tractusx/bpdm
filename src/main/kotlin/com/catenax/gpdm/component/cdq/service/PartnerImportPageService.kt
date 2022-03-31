@@ -22,31 +22,37 @@ open class PartnerImportPageService(
     private val businessPartnerService: BusinessPartnerService,
     private val cdqIdentifierType: TypeKeyNameUrlCdq,
     private val cdqIdentifierImportedStatus: TypeKeyNameCdq,
-    private val cdqIssuer: TypeKeyNameUrlCdq,
+    private val cdqIssuer: TypeKeyNameUrlCdq
 ) {
 
     @Transactional
-    open fun import(modifiedAfter: OffsetDateTime, startAfter: String?): ImportResponse {
+    open fun import(modifiedAfter: OffsetDateTime, startAfter: String?): ImportResponsePage {
         val partnerCollection = webClient
             .get()
-            .uri{ builder -> builder
-                .path("/businesspartners")
-                .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
-                .queryParam("limit", adapterProperties.importLimit)
-                .queryParam("datasource", adapterProperties.datasource)
-                .queryParam("featuresOn", "USE_NEXT_START_AFTER")
-                if(startAfter != null) builder.queryParam("startAfter", startAfter)
+            .uri { builder ->
+                builder
+                    .path("/businesspartners")
+                    .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
+                    .queryParam("limit", adapterProperties.importLimit)
+                    .queryParam("datasource", adapterProperties.datasource)
+                    .queryParam("featuresOn", "USE_NEXT_START_AFTER")
+                if (startAfter != null) builder.queryParam("startAfter", startAfter)
                 builder.build()
             }
             .retrieve()
             .bodyToMono<BusinessPartnerCollectionCdq>()
             .block()!!
 
-        val partners = partnerCollection.values
-        val unknownPartners = filterUnknownPartners(partners)
+        val unknownPartners = filterUnknownPartners(partnerCollection.values)
 
         addNewMetadata(unknownPartners)
-        return ImportResponse(partnerCollection.nextStartAfter, addNewPartners(unknownPartners))
+        val addedPartners = addNewPartners(unknownPartners)
+
+        return ImportResponsePage(
+            partnerCollection.total,
+            partnerCollection.nextStartAfter,
+            addedPartners
+        )
     }
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerCdq>){
@@ -106,12 +112,9 @@ open class PartnerImportPageService(
     }
 
 
-
-
     private fun toModifiedAfterFormat(dateTime: OffsetDateTime): String{
         return DateTimeFormatter.ISO_INSTANT.format(dateTime)
     }
-
 
 
 }
