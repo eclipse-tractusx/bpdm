@@ -50,7 +50,7 @@ class BpdmQueryBuilder {
         shouldQuery.add(
             QueryBuilders.matchQuery(fieldName, queryText).boost(3f).fuzziness(Fuzziness.ONE).prefixLength(3)
         )
-        shouldQuery.addAll(queryText.split(" ").map { QueryBuilders.prefixQuery(fieldName, it) })
+        shouldQuery.addAll(queryText.split(" ").filter { it.isNotBlank() }.map { QueryBuilders.prefixQuery(fieldName, it) })
         return boolQuery
     }
 
