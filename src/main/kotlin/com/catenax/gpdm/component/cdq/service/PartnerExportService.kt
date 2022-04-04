@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Service
-class PartnerExportPageService(
+class PartnerExportService(
     private val webClient: WebClient,
     private val businessPartnerService: BusinessPartnerService,
     private val identifierService: IdentifierService,
