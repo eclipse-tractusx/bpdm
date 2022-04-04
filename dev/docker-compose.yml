@@ -2,7 +2,7 @@
 services:
   postgres:
     image: postgres:13.2
-    container_name: postgres-bpdm
+    container_name: bpdm-postgres
     environment:
       POSTGRES_USER: bpdm
       POSTGRES_PASSWORD: bpdm
@@ -14,10 +14,12 @@ services:
       retries: 5
     ports:
       - "5432:5432"
+    volumes:
+      - bpdm-postgres-data:/var/lib/postgresql/data
 
   elasticsearch:
     image: elasticsearch:7.17.1
-    container_name: elasticsearch
+    container_name: bpdm-elasticsearch
     environment:
       - discovery.type=single-node
     ports:
@@ -27,3 +29,11 @@ services:
       resources:
         limits:
           memory: 2g
+    volumes:
+      - bpdm-elasticsearch-data:/usr/share/elasticsearch/data
+
+volumes:
+  bpdm-postgres-data:
+    name: bpdm-postgres-data
+  bpdm-elasticsearch-data:
+    name: bpdm-elasticsearch-data
