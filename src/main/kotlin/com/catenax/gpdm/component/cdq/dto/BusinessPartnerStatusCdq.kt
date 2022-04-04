@@ -6,6 +6,6 @@ data class BusinessPartnerStatusCdq(
     val type: TypeKeyNameUrlCdq,
     val officialDenotation: String,
     val validFrom: LocalDateTime,
-    val validUntil: LocalDateTime?,
+    val validUntil: LocalDateTime? = null,
 
     )
