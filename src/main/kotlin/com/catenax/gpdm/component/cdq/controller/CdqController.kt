@@ -1,8 +1,8 @@
 package com.catenax.gpdm.component.cdq.controller
 
-import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
+import com.catenax.gpdm.component.cdq.dto.ExportResponse
 import com.catenax.gpdm.component.cdq.dto.ImportResponse
-import com.catenax.gpdm.component.cdq.service.PartnerExportPageService
+import com.catenax.gpdm.component.cdq.service.PartnerExportService
 import com.catenax.gpdm.component.cdq.service.PartnerImportService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/cdq")
 class CdqController(
     val partnerImportService: PartnerImportService,
-    val partnerExportPageService: PartnerExportPageService
+    val partnerExportService: PartnerExportService
 ) {
     @Operation(
         summary = "Import new business partner records from CDQ",
@@ -35,16 +35,20 @@ class CdqController(
         return partnerImportService.import()
     }
 
-    @Operation(summary = "Export of BPNs to CDQ records",
+    @Operation(
+        summary = "Export of BPNs to CDQ records",
         description = "Triggers an export of BPNs from BPDM to CDQ. " +
                 "Regards business partner records in the BPDM system without a synchronized CDQ identifier status. " +
-                "Only exports BPNs and keeps other properties of the CDQ record untouched.")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Export of BPNs performed successfully"),
-        ApiResponse(responseCode = "500", description = "Export failed (no connection to CDQ or database)", content = [Content()])
-    ])
+                "Only exports BPNs and keeps other properties of the CDQ record untouched."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Export of BPNs performed successfully"),
+            ApiResponse(responseCode = "500", description = "Export failed (no connection to CDQ or database)", content = [Content()])
+        ]
+    )
     @PostMapping("/business-partners/export")
-    fun getBusinessPartners(): Collection<BusinessPartnerCdq> {
-        return partnerExportPageService.export()
+    fun exportBusinessPartners(): ExportResponse {
+        return partnerExportService.export()
     }
 }
