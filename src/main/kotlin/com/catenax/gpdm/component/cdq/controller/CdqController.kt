@@ -1,9 +1,9 @@
 package com.catenax.gpdm.component.cdq.controller
 
+import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
+import com.catenax.gpdm.component.cdq.dto.ImportResponse
 import com.catenax.gpdm.component.cdq.service.PartnerExportPageService
 import com.catenax.gpdm.component.cdq.service.PartnerImportService
-import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
-import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -18,16 +18,20 @@ class CdqController(
     val partnerImportService: PartnerImportService,
     val partnerExportPageService: PartnerExportPageService
 ) {
-    @Operation(summary = "Import new business partner records from CDQ",
+    @Operation(
+        summary = "Import new business partner records from CDQ",
         description = "Triggers an import of new business partner records from CDQ. " +
                 "A CDQ record counts as new when it does not have a BPN and the BPDM service does not already have a record with the same CDQ ID. " +
-                "This import only regards records with a modifiedAfter timestamp since the last import.")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Import performed successfully"),
-        ApiResponse(responseCode = "500", description = "Import failed (no connection to CDQ or database)", content = [Content()])
-    ])
+                "This import only regards records with a modifiedAfter timestamp since the last import."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Import performed successfully"),
+            ApiResponse(responseCode = "500", description = "Import failed (no connection to CDQ or database)", content = [Content()])
+        ]
+    )
     @PostMapping("/business-partners/import")
-    fun importBusinessPartners(): Collection<BusinessPartnerResponse> {
+    fun importBusinessPartners(): ImportResponse {
         return partnerImportService.import()
     }
 

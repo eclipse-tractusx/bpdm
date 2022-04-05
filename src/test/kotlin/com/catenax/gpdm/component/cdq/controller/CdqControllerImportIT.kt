@@ -1,6 +1,7 @@
 package com.catenax.gpdm.component.cdq.controller
 
 import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
+import com.catenax.gpdm.component.cdq.dto.ImportResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -49,12 +50,10 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
             )
         )
 
-        val createdBusinessPartners = webTestClient.post().uri("/api/cdq/business-partners/import")
+        webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).returnResult().responseBody
-
-        assertThat(createdBusinessPartners!!.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
+            .is2xxSuccessful.expectBodyList(ImportResponse::class.java).returnResult().responseBody
 
         val savedBusinessPartners =
             webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
@@ -75,10 +74,16 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
             )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
+        val importResult = webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
+            .is2xxSuccessful
+            .expectBody(ImportResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        assertThat(importResult.importedSize == 2)
+        assertThat(importResult.partnerBpns.size == 2)
 
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
@@ -87,7 +92,12 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
         webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(0)
+            .is2xxSuccessful.expectBodyList(ImportResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        assertThat(importResult.importedSize == 0)
+        assertThat(importResult.partnerBpns.isEmpty())
 
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
@@ -129,10 +139,15 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
                 )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
+        val importResult = webTestClient.post().uri("/api/cdq/business-partners/import")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerResponse::class.java).hasSize(2)
+            .is2xxSuccessful.expectBody(ImportResponse::class.java)
+            .returnResult()
+            .responseBody!!
+
+        assertThat(importResult.importedSize == 2)
+        assertThat(importResult.partnerBpns.size == 2)
 
         val savedBusinessPartners =
             webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :

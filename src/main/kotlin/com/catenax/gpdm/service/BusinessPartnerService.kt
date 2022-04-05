@@ -11,20 +11,20 @@ import com.catenax.gpdm.repository.elastic.CustomSearchRepository
 import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
 import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
 import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class BusinessPartnerService (
+class BusinessPartnerService(
     val requestConversionService: RequestConversionService,
+    val persistenceService: PersistenceService,
     val businessPartnerRepository: BusinessPartnerRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
     val identifierStatusRepository: IdentifierStatusRepository,
     val customSearchRepository: CustomSearchRepository
-        ){
+) {
 
     @Transactional
     fun findPartner(bpn: String): BusinessPartnerResponse {
@@ -65,7 +65,7 @@ class BusinessPartnerService (
     @Transactional
     fun createPartners(bpDtos: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse>{
         val bpEntities = requestConversionService.buildBusinessPartners(bpDtos)
-        businessPartnerRepository.saveAll(bpEntities)
+        persistenceService.saveAll(bpEntities)
         return bpEntities.map { it.toDto() }
     }
 

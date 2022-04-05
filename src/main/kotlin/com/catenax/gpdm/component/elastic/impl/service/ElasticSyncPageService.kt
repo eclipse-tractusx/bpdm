@@ -1,0 +1,28 @@
+package com.catenax.gpdm.component.elastic.impl.service
+
+import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
+import com.catenax.gpdm.repository.elastic.BusinessPartnerDocRepository
+import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
+import com.catenax.gpdm.service.DocumentMappingService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
+
+@Service
+class ElasticSyncPageService(
+    val businessPartnerRepository: BusinessPartnerRepository,
+    val businessPartnerDocRepository: BusinessPartnerDocRepository,
+    val documentMappingService: DocumentMappingService
+) {
+
+
+    @Transactional
+    fun exportPartnersToElastic(fromTime: Date, pageRequest: PageRequest): Page<BusinessPartnerDoc> {
+        val partnersToExport = businessPartnerRepository.findByUpdatedAtAfter(fromTime, pageRequest)
+        val createdDocs = businessPartnerDocRepository.saveAll(partnersToExport.map { documentMappingService.toDocument(it) }).toList()
+        return PageImpl(createdDocs, partnersToExport.pageable, partnersToExport.totalElements)
+    }
+}

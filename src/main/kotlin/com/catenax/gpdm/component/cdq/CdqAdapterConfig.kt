@@ -41,7 +41,7 @@ class CdqAdapterConfig(
         cdqIdConfigProperties: CdqIdentifierConfigProperties,
         metadataService: MetadataService,
         mappingService: CdqRequestMappingService,
-        businessPartnerService: BusinessPartnerService,
+        businessPartnerService: BusinessPartnerService
     ): PartnerImportPageService {
         return PartnerImportPageService(
             webClient,
@@ -52,7 +52,7 @@ class CdqAdapterConfig(
             businessPartnerService,
             createCdqIdentifierType(),
             createCdqImportedStatus(),
-            createCdqIdentifierIssuer(),
+            createCdqIdentifierIssuer()
         )
     }
 

@@ -29,19 +29,24 @@ class Address (
     @JoinColumn(name="partner_id", nullable=false)
     val partner: BusinessPartner
         ) : BaseEntity(){
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "address")
     lateinit var administrativeAreas: Set<AdministrativeArea>
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+
+    @OneToMany(mappedBy = "address")
     lateinit var postCodes: Set<PostCode>
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+
+    @OneToMany(mappedBy = "address")
     lateinit var thoroughfares: Set<Thoroughfare>
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+
+    @OneToMany(mappedBy = "address")
     lateinit var premises: Set<Premise>
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+
+    @OneToMany(mappedBy = "address")
     lateinit var postalDeliveryPoints: Set<PostalDeliveryPoint>
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.PERSIST])
+
+    @OneToMany(mappedBy = "address")
     lateinit var localities: Set<Locality>
-        }
+}
 
 
 

@@ -1,48 +1,48 @@
 package com.catenax.gpdm.component.elastic.impl.service
 
 import com.catenax.gpdm.config.ElasticSearchConfigProperties
-import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
+import com.catenax.gpdm.dto.elastic.ExportResponse
 import com.catenax.gpdm.entity.BaseEntity
 import com.catenax.gpdm.entity.ConfigurationEntry
-import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
-import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
 import com.catenax.gpdm.repository.elastic.BusinessPartnerDocRepository
-import com.catenax.gpdm.service.DocumentMappingService
-import org.springframework.data.domain.*
+import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.text.SimpleDateFormat
-import java.time.*
+import java.time.Instant
 import java.util.*
+import javax.persistence.EntityManager
 
 @Service
 class ElasticSyncService(
-    val businessPartnerRepository: BusinessPartnerRepository,
+    val elasticSyncPageService: ElasticSyncPageService,
     val businessPartnerDocRepository: BusinessPartnerDocRepository,
-    val documentMappingService: DocumentMappingService,
     val configurationEntryRepository: ConfigurationEntryRepository,
-    val configProperties: ElasticSearchConfigProperties
+    val configProperties: ElasticSearchConfigProperties,
+    val entityManager: EntityManager
 ) {
     val formatter = SimpleDateFormat("d-MMM-yyyy,HH:mm:ss")
 
-    @Transactional
-    fun exportPartnersToElastic(): Set<BusinessPartnerDoc>{
-        val allDocs: MutableSet<BusinessPartnerDoc> = mutableSetOf()
+    fun exportPartnersToElastic(): ExportResponse {
+        val exportedBpns: MutableSet<String> = mutableSetOf()
         val fromTime = getOrCreateTimestamp()
         var page = 0
 
-        do{
-            val pageRequest =  PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
-            val partnersToExport = businessPartnerRepository.findByUpdatedAtAfter(fromTime, pageRequest)
-            val createdDocs = businessPartnerDocRepository.saveAll(partnersToExport.map { documentMappingService.toDocument(it) }).toSet()
-
+        do {
+            val pageRequest = PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
+            val docsPage = elasticSyncPageService.exportPartnersToElastic(fromTime, pageRequest)
             page++
-            allDocs += createdDocs
-        }while(partnersToExport.totalPages > page)
+            exportedBpns += docsPage.map { it.bpn }
+
+            //Clear session after each page import to improve JPA performance
+            entityManager.clear()
+        } while (docsPage.totalPages > page)
 
         setTimestamp(Date.from(Instant.now()))
 
-        return allDocs
+        return ExportResponse(exportedBpns.size, exportedBpns)
     }
 
     @Transactional
