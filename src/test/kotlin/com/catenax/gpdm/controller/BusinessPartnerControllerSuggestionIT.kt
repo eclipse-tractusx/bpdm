@@ -8,6 +8,7 @@ import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
 import com.catenax.gpdm.util.CdqTestValues
+import com.catenax.gpdm.util.EndpointValues
 import com.catenax.gpdm.util.TestHelpers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -101,8 +102,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
-
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
@@ -110,21 +109,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
         }
-
-        const val queryTextParameterName = "text"
-        const val businessPartnerPath = "/api/catena/business-partner"
-        const val namePath = "$businessPartnerPath/name"
-        const val legalFormPath = "$businessPartnerPath/legal-form"
-        const val statusPath = "$businessPartnerPath/status"
-        const val classificationPath = "$businessPartnerPath/classification"
-
-        const val addressPath = "$businessPartnerPath/address"
-        const val adminAreaPath = "$addressPath/administrative-area"
-        const val postCodePath = "$addressPath/postcode"
-        const val localityPath = "$addressPath/locality"
-        const val thoroughfarePath = "$addressPath/thoroughfare"
-        const val premisePath = "$addressPath/premise"
-        const val postalDeliveryPointPath = "$addressPath/postal-delivery-point"
     }
 
 
@@ -145,7 +129,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching("$CDQ_MOCK_URL/businesspartners")).willReturn(
+            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withBody(objectMapper.writeValueAsString(importCollection))
@@ -167,7 +151,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `name__Suggest property values`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
 
-        val page = webTestClient.get().uri(namePath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_NAME_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -183,8 +167,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, expectedName)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .build()
             }
             .exchange()
@@ -202,8 +186,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, expectedName.substring(0, 1))
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -222,8 +206,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -242,8 +226,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -262,7 +246,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::legalForm.name, filterLegalForm)
                     .build()
             }
@@ -282,8 +266,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, expectedName)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::legalForm.name, filterLegalForm)
                     .build()
             }
@@ -303,8 +287,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, expectedName)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::legalForm.name, filterLegalForm)
                     .build()
             }
@@ -323,8 +307,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(namePath)
-                    .queryParam(queryTextParameterName, expectedName)
+                builder.path(EndpointValues.CATENA_NAME_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .build()
             }
             .exchange()
@@ -340,7 +324,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `legalForm__Suggest property values`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
 
-        val page = webTestClient.get().uri(legalFormPath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_LEGAL_FORM_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -356,8 +340,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, expectedLegalForm)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLegalForm)
                     .build()
             }
             .exchange()
@@ -375,8 +359,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, expectedLegalForm.substring(0, 1))
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLegalForm.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -395,8 +379,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -415,8 +399,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -435,7 +419,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::legalForm.name, filterLegalForm)
                     .build()
             }
@@ -455,8 +439,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, expectedLegalForm)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLegalForm)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -476,8 +460,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, expectedLegalForm)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLegalForm)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -496,8 +480,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(legalFormPath)
-                    .queryParam(queryTextParameterName, expectedLegalForm)
+                builder.path(EndpointValues.CATENA_LEGAL_FORM_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLegalForm)
                     .build()
             }
             .exchange()
@@ -515,8 +499,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, expectedStatus)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedStatus)
                     .build()
             }
             .exchange()
@@ -534,8 +518,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, expectedStatus.substring(0, 1))
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedStatus.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -554,8 +538,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -574,8 +558,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -594,7 +578,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -614,8 +598,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, expectedStatus)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedStatus)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -635,8 +619,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, expectedStatus)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedStatus)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -655,8 +639,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(statusPath)
-                    .queryParam(queryTextParameterName, expectedStatus)
+                builder.path(EndpointValues.CATENA_STATUS_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedStatus)
                     .build()
             }
             .exchange()
@@ -672,7 +656,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `classification__Suggest property values`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
 
-        val page = webTestClient.get().uri(classificationPath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_CLASSIFICATION_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -688,8 +672,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, expectedClassification)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedClassification)
                     .build()
             }
             .exchange()
@@ -707,8 +691,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, expectedClassification.substring(0, 1))
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedClassification.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -727,8 +711,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -747,8 +731,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -767,7 +751,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -787,8 +771,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, expectedClassification)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedClassification)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -808,8 +792,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, expectedClassification)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedClassification)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -828,8 +812,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(classificationPath)
-                    .queryParam(queryTextParameterName, expectedClassification)
+                builder.path(EndpointValues.CATENA_CLASSIFICATION_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedClassification)
                     .build()
             }
             .exchange()
@@ -845,7 +829,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `adminArea__Suggest property values`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
 
-        val page = webTestClient.get().uri(adminAreaPath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_ADMIN_AREA_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -861,8 +845,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, expectedAdminArea)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedAdminArea)
                     .build()
             }
             .exchange()
@@ -880,8 +864,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, expectedAdminArea.substring(0, 1))
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedAdminArea.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -900,8 +884,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -920,8 +904,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -940,7 +924,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -960,8 +944,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, expectedAdminArea)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedAdminArea)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -981,8 +965,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, expectedAdminArea)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedAdminArea)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1001,8 +985,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(adminAreaPath)
-                    .queryParam(queryTextParameterName, expectedAdminArea)
+                builder.path(EndpointValues.CATENA_ADMIN_AREA_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedAdminArea)
                     .build()
             }
             .exchange()
@@ -1018,7 +1002,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `postCode__Suggest property values`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
 
-        val page = webTestClient.get().uri(postCodePath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_POST_CODE_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -1034,8 +1018,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, expectedPostCode)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostCode)
                     .build()
             }
             .exchange()
@@ -1053,8 +1037,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, expectedPostCode.substring(0, 1))
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostCode.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -1073,8 +1057,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1093,8 +1077,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1113,7 +1097,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1133,8 +1117,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, expectedPostCode)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostCode)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1154,8 +1138,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, expectedPostCode)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostCode)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1174,8 +1158,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postCodePath)
-                    .queryParam(queryTextParameterName, expectedPostCode)
+                builder.path(EndpointValues.CATENA_POST_CODE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostCode)
                     .build()
             }
             .exchange()
@@ -1191,7 +1175,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `locality__Suggest property values`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
 
-        val page = webTestClient.get().uri(localityPath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_LOCALITY_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -1207,8 +1191,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, expectedLocality)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLocality)
                     .build()
             }
             .exchange()
@@ -1226,8 +1210,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, expectedLocality.substring(0, 1))
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLocality.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -1246,8 +1230,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1266,8 +1250,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1286,7 +1270,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1306,8 +1290,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, expectedLocality)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLocality)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1327,8 +1311,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, expectedLocality)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLocality)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1347,8 +1331,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(localityPath)
-                    .queryParam(queryTextParameterName, expectedLocality)
+                builder.path(EndpointValues.CATENA_LOCALITY_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedLocality)
                     .build()
             }
             .exchange()
@@ -1364,7 +1348,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `thoroughfare__Suggest property values`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
 
-        val page = webTestClient.get().uri(thoroughfarePath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_THOROUGHFARE_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -1380,8 +1364,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, expectedThoroughfare)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedThoroughfare)
                     .build()
             }
             .exchange()
@@ -1395,12 +1379,12 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     @Test
     fun `thoroughfare__Suggest by prefix`() {
-        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
+        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, expectedThoroughfare.substring(0, 1))
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedThoroughfare.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -1414,13 +1398,13 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     @Test
     fun `thoroughfare__Suggest by word`() {
-        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
+        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
         val queryText = expectedThoroughfare.split("\\s".toRegex()).first()
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1434,13 +1418,13 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     @Test
     fun `thoroughfare__Don't suggest by different`() {
-        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
+        val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
         val queryText = "xxxxxxDoesntMatchxxxxxx"
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1459,7 +1443,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1479,8 +1463,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, expectedThoroughfare)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedThoroughfare)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1500,8 +1484,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, expectedThoroughfare)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedThoroughfare)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1520,8 +1504,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(thoroughfarePath)
-                    .queryParam(queryTextParameterName, expectedThoroughfare)
+                builder.path(EndpointValues.CATENA_THOROUGHFARE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedThoroughfare)
                     .build()
             }
             .exchange()
@@ -1537,7 +1521,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     fun `premise__Suggest property values`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
 
-        val page = webTestClient.get().uri(premisePath)
+        val page = webTestClient.get().uri(EndpointValues.CATENA_PREMISE_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
             .returnResult<PageResponse<SuggestionResponse>>()
@@ -1553,8 +1537,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, expectedPremise)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPremise)
                     .build()
             }
             .exchange()
@@ -1572,8 +1556,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, expectedPremise.substring(0, 1))
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPremise.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -1592,8 +1576,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1612,8 +1596,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1632,7 +1616,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1652,8 +1636,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, expectedPremise)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPremise)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1673,8 +1657,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, expectedPremise)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPremise)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1693,8 +1677,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(premisePath)
-                    .queryParam(queryTextParameterName, expectedPremise)
+                builder.path(EndpointValues.CATENA_PREMISE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPremise)
                     .build()
             }
             .exchange()
@@ -1712,8 +1696,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, expectedPostalDeliveryPoint)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostalDeliveryPoint)
                     .build()
             }
             .exchange()
@@ -1731,8 +1715,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, expectedPostalDeliveryPoint.substring(0, 1))
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostalDeliveryPoint.substring(0, 1))
                     .build()
             }
             .exchange()
@@ -1751,8 +1735,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1771,8 +1755,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, queryText)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
                     .build()
             }
             .exchange()
@@ -1791,7 +1775,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1811,8 +1795,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, expectedPostalDeliveryPoint)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostalDeliveryPoint)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1832,8 +1816,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, expectedPostalDeliveryPoint)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostalDeliveryPoint)
                     .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
@@ -1852,8 +1836,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(postalDeliveryPointPath)
-                    .queryParam(queryTextParameterName, expectedPostalDeliveryPoint)
+                builder.path(EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedPostalDeliveryPoint)
                     .build()
             }
             .exchange()
