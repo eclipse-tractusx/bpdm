@@ -9,8 +9,11 @@ import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.MetadataService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import javax.persistence.EntityManager
 
 @Service
 class PartnerExportService(
@@ -19,21 +22,30 @@ class PartnerExportService(
     private val idProperties: CdqIdentifierConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties,
     private val adapterProperties: CdqAdapterConfigProperties,
-    private val metadataService: MetadataService
+    private val metadataService: MetadataService,
+    private val entityManager: EntityManager
 ) {
 
     fun export(): ExportResponse {
         createSynchronizedStatusIfNotExists()
 
-        val partnersToSync: Collection<BusinessPartnerResponse> =
-            businessPartnerService.findPartnersByIdentifier(idProperties.typeKey, idProperties.statusImportedKey)
-        val partnerChunks = partnersToSync.chunked(adapterProperties.exportPageSize)
-
         var exportedBpns: Collection<String> = emptyList()
-        for (partnerChunk: Collection<BusinessPartnerResponse> in partnerChunks) {
-            val exported: Collection<BusinessPartnerCdq> = partnerExportPageService.export(partnerChunk)
+        do {
+            // Always request first page of "unsynchronized partners".
+            // Since the export logic itself changes the state of the exported partners to "synchronized", the first page always contains the next chunk for the export.
+            val partnersToSync: Page<BusinessPartnerResponse> =
+                businessPartnerService.findPartnersByIdentifier(
+                    idProperties.typeKey,
+                    idProperties.statusImportedKey,
+                    PageRequest.of(0, adapterProperties.exportPageSize)
+                )
+            val exported: Collection<BusinessPartnerCdq> = partnerExportPageService.export(partnersToSync.toList())
             exportedBpns = exportedBpns.plus(exported.map { extractBpn(it)!! })
-        }
+
+            // Clear session after each page to improve JPA performance
+            entityManager.clear()
+        } while (!partnersToSync.isLast)
+
         return ExportResponse(exportedBpns.size, exportedBpns)
     }
 

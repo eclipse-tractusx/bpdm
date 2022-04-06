@@ -8,6 +8,8 @@ import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,11 +41,11 @@ class BusinessPartnerService(
     }
 
     @Transactional
-    fun findPartnersByIdentifier(typeKey: String, statusKey: String) :Collection<BusinessPartnerResponse>{
+    fun findPartnersByIdentifier(typeKey: String, statusKey: String, pageable: Pageable = Pageable.unpaged()): Page<BusinessPartnerResponse> {
         val type = identifierTypeRepository.findByTechnicalKey(typeKey) ?: throw BpdmNotFoundException(IdentifierType::class, typeKey)
         val status = identifierStatusRepository.findByTechnicalKey(statusKey) ?: throw BpdmNotFoundException(IdentifierStatus::class, statusKey)
 
-        return businessPartnerRepository.findByIdentifierTypeAndStatus(type, status).map { it.toDto() }
+        return businessPartnerRepository.findByIdentifierTypeAndStatus(type, status, pageable).map { it.toDto() }
     }
 
 

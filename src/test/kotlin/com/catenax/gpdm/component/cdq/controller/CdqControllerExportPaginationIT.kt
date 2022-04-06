@@ -75,7 +75,7 @@ class CdqControllerExportPaginationIT @Autowired constructor(
 
         importService.import()
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // business partners in cdq should be updated with newly created bpns
         wireMockServer.stubFor(

@@ -73,7 +73,7 @@ class CdqControllerExportIT @Autowired constructor(
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // business partners in cdq should be updated with newly created bpns
         wireMockServer.stubFor(
@@ -132,7 +132,7 @@ class CdqControllerExportIT @Autowired constructor(
             .expectStatus()
             .is2xxSuccessful
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // try export, cdq returns error
         webTestClient.post().uri("/api/cdq/business-partners/export")
@@ -213,7 +213,7 @@ class CdqControllerExportIT @Autowired constructor(
             .expectStatus()
             .is5xxServerError
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // since cdq should have received bpns, mock that bpns are now included when business partners are retrieved from cdq
         wireMockServer.stubFor(
