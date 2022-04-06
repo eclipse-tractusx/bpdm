@@ -11,6 +11,8 @@ object CdqTestValues {
 
     val datasource1 = "datasource-1"
 
+    val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
+
     val name1 = NameCdq("Business Partner Name")
     val name2 = NameCdq("Company ABC AG")
     val name3 = NameCdq("Another Organisation Corp")
@@ -25,9 +27,13 @@ object CdqTestValues {
     val statusType2 = TypeKeyNameUrlCdq("DISSOLVED")
     val statusType3 = TypeKeyNameUrlCdq("INSOLVENCY")
 
-    val status1 = BusinessPartnerStatusCdq(statusType1, "Active", LocalDateTime.now())
-    val status2 = BusinessPartnerStatusCdq(statusType2, "Dissolved", LocalDateTime.now())
-    val status3 = BusinessPartnerStatusCdq(statusType3, "Insolvent", LocalDateTime.now())
+    val statusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
+    val statusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
+    val statusValidFrom3 = LocalDateTime.of(2018, 1, 1, 0, 0)
+
+    val status1 = BusinessPartnerStatusCdq(statusType1, "Active", statusValidFrom1)
+    val status2 = BusinessPartnerStatusCdq(statusType2, "Dissolved", statusValidFrom2)
+    val status3 = BusinessPartnerStatusCdq(statusType3, "Insolvent", statusValidFrom3)
 
     val classificationType = TypeKeyNameUrlCdq("NACE")
 
@@ -120,8 +126,8 @@ object CdqTestValues {
 
     val businessPartner1 = BusinessPartnerCdq(
         id = partnerId1,
-        createdAt = LocalDateTime.now(),
-        lastModifiedAt = LocalDateTime.now(),
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
         externalId = partnerId1,
         dataSource = datasource1,
         names = listOf(name1, name2),
@@ -133,8 +139,8 @@ object CdqTestValues {
 
     val businessPartner2 = BusinessPartnerCdq(
         id = partnerId2,
-        createdAt = LocalDateTime.now(),
-        lastModifiedAt = LocalDateTime.now(),
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
         externalId = partnerId2,
         dataSource = datasource1,
         names = listOf(name3, name4),
@@ -146,8 +152,8 @@ object CdqTestValues {
 
     val businessPartner3 = BusinessPartnerCdq(
         id = partnerId3,
-        createdAt = LocalDateTime.now(),
-        lastModifiedAt = LocalDateTime.now(),
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
         externalId = partnerId3,
         dataSource = datasource1,
         names = listOf(name5),
