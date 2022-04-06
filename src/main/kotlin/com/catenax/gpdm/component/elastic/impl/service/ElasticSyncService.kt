@@ -26,18 +26,19 @@ class ElasticSyncService(
     val configProperties: ElasticSearchConfigProperties,
     val entityManager: EntityManager
 ) {
-    val formatter = SimpleDateFormat("d-MMM-yyyy,HH:mm:ss")
+    val formatter = SimpleDateFormat("d-MMM-yyyy,HH:mm:ss:SSS")
 
     /**
      * Export new changes of the business partner records to the Elasticsearch index
      *
      * A new change is discovered by comparing the updated timestamp of the business partner record with the time of the last export
      */
-    @Transactional
     fun exportPartnersToElastic(): ExportResponse {
         val exportedBpns: MutableSet<String> = mutableSetOf()
         val fromTime = getOrCreateTimestamp()
         var page = 0
+
+        val importTime = Instant.now()
 
         do {
             val pageRequest = PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
@@ -49,7 +50,7 @@ class ElasticSyncService(
             entityManager.clear()
         } while (docsPage.totalPages > page)
 
-        setTimestamp(Date.from(Instant.now()))
+        setTimestamp(Date.from(importTime))
 
         return ExportResponse(exportedBpns.size, exportedBpns)
     }
