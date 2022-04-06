@@ -18,6 +18,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -34,31 +35,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 /**
  * Integration tests for the data synch endpoints in the ElasticSearchController
- *
- * The tests implement the following acceptance criteria:
- *
- * Can search exported partners
- * Given new partners in database
- * When export
- * Then new partners can be searched
- *
- * Export only new partners
- * Given partners in database already exported
- * When export
- * Then partners are not exported to Elasticsearch
- *
- *
- * Empty index
- * Given partners in Elasticsearch
- * When delete index
- * Then partners can't be searched anymore
- *
- * Export all partners after empty index
- * Given partners in Elasticsearch
- * When delete index and export
- * Then partners again in Elasticsearch
- *
- *
  */
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
@@ -72,10 +48,17 @@ class ElasticSearchControllerIT @Autowired constructor(
 ) {
 
     companion object Container {
-        @org.testcontainers.junit.jupiter.Container
+        @JvmStatic
         val elasticsearchContainer: ElasticsearchContainer =
             ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
                 .withEnv("discovery.type", "single-node")
+                .withReuse(true)
+
+        @JvmStatic
+        @BeforeAll
+        fun beforeAll() {
+            elasticsearchContainer.start()
+        }
 
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -126,12 +109,13 @@ class ElasticSearchControllerIT @Autowired constructor(
     }
 
 
+    /**
+     * Given partners in database already exported
+     * When export
+     * Then partners are not exported to Elasticsearch
+     */
     @Test
     fun `export only new partners`() {
-
-        //for updatetAfter condition to work
-        Thread.sleep(1000)
-
         //export once to get partners into elasticsearch for given system state
         val fullExport = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
             .exchange()
@@ -157,6 +141,11 @@ class ElasticSearchControllerIT @Autowired constructor(
         assertThat(emptyExport.exportedBpns.size).isEqualTo(0)
     }
 
+    /**
+     * Given new partners in database
+     * When export
+     * Then new partners can be searched
+     */
     @Test
     fun `can search exported partners`() {
         val exportResponse = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
@@ -176,6 +165,11 @@ class ElasticSearchControllerIT @Autowired constructor(
 
     }
 
+    /**
+     * Given partners in Elasticsearch
+     * When delete index
+     * Then partners can't be searched anymore
+     */
     @Test
     fun `empty index`() {
 
@@ -200,6 +194,11 @@ class ElasticSearchControllerIT @Autowired constructor(
         names.forEach { assertThat(searchBusinessPartnerByName(it)).matches { it.contentSize == 0 } }
     }
 
+    /**
+     * Given partners in Elasticsearch
+     * When delete index and export
+     * Then partners again in Elasticsearch
+     */
     @Test
     fun `export all partners after empty index`() {
 

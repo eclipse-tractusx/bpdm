@@ -16,6 +16,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -92,10 +93,18 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 ) {
 
     companion object Container {
-        @org.testcontainers.junit.jupiter.Container
+
+        @JvmStatic
         val elasticsearchContainer: ElasticsearchContainer =
             ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
                 .withEnv("discovery.type", "single-node")
+                .withReuse(true)
+
+        @JvmStatic
+        @BeforeAll
+        fun beforeAll() {
+            elasticsearchContainer.start()
+        }
 
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -147,6 +156,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     }
 
 
+    /**
+     * Given partner with name value
+     * When ask suggestion for name
+     * Then show name value
+     */
     @Test
     fun `name__Suggest property values`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -161,6 +175,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `name__Suggest by phrase`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -180,6 +199,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `name__Suggest by prefix`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -199,6 +223,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `name__Suggest by word`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -219,6 +248,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `name__Don't suggest by different`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -239,6 +273,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value and legal form value
+     * When ask suggestion name with filter by legal form value
+     * Then show name value
+     */
     @Test
     fun `name__Suggest filtered suggestions`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -259,6 +298,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value and legal form value
+     * When ask suggestion for a word in name value with filter by legal form value
+     * Then show name value
+     */
     @Test
     fun `name__Suggest by word in filtered suggestions`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -280,6 +324,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value and legal form value
+     * When ask suggestion for a word in name value with filter by other than legal form value
+     * Then don't show name value
+     */
     @Test
     fun `name__Don't suggest by word when filtered out`() {
         val expectedName = CdqTestValues.businessPartner1.names.first().value
@@ -301,6 +350,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedName }
     }
 
+    /**
+     * Given partner with name value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `name__Suggest by non-latin characters`() {
         val expectedName = CdqTestValues.businessPartner3.names.first().value
@@ -320,6 +374,12 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedName }
     }
 
+
+    /**
+     * Given partner with legal form value
+     * When ask suggestion for legal form
+     * Then show legal form value
+     */
     @Test
     fun `legalForm__Suggest property values`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -334,6 +394,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `legalForm__Suggest by phrase`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -353,6 +418,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `legalForm__Suggest by prefix`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -372,6 +442,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `legalForm__Suggest by word`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -392,6 +467,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `legalForm__Don't suggest by different`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -412,6 +492,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value and name value
+     * When ask suggestion legal form with filter by name value
+     * Then show legal form value
+     */
     @Test
     fun `legalForm__Suggest filtered suggestions`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -432,6 +517,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value and name value
+     * When ask suggestion for a word in legal form value with filter by name value
+     * Then show legal form value
+     */
     @Test
     fun `legalForm__Suggest by word in filtered suggestions`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -453,6 +543,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value and name value
+     * When ask suggestion for a word in legal form value with filter by other than name value
+     * Then don't show legal form value
+     */
     @Test
     fun `legalForm__Don't suggest by word when filtered out`() {
         val expectedLegalForm = CdqTestValues.businessPartner1.legalForm!!.name
@@ -474,6 +569,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with legal form value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `legalForm__Suggest by non-latin characters`() {
         val expectedLegalForm = CdqTestValues.businessPartner3.legalForm!!.name
@@ -493,6 +593,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLegalForm }
     }
 
+    /**
+     * Given partner with status value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `status__Suggest by phrase`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -512,6 +617,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `status__Suggest by prefix`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -531,6 +641,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `status__Suggest by word`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -551,6 +666,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `status__Don't suggest by different`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -571,6 +691,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value and name value
+     * When ask suggestion status with filter by name value
+     * Then show status value
+     */
     @Test
     fun `status__Suggest filtered suggestions`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -591,6 +716,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value and name value
+     * When ask suggestion for a word in status value with filter by name value
+     * Then show status value
+     */
     @Test
     fun `status__Suggest by word in filtered suggestions`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -612,6 +742,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value and name value
+     * When ask suggestion for a word in status value with filter by other than name value
+     * Then don't show status value
+     */
     @Test
     fun `status__Don't suggest by word when filtered out`() {
         val expectedStatus = CdqTestValues.businessPartner1.status!!.officialDenotation
@@ -633,6 +768,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with status value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `status__Suggest by non-latin characters`() {
         val expectedStatus = CdqTestValues.businessPartner3.status!!.officialDenotation
@@ -652,6 +792,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedStatus }
     }
 
+    /**
+     * Given partner with classification value
+     * When ask suggestion for classification
+     * Then show classification value
+     */
     @Test
     fun `classification__Suggest property values`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -666,6 +811,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `classification__Suggest by phrase`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -685,6 +835,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `classification__Suggest by prefix`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -704,6 +859,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `classification__Suggest by word`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -724,6 +884,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `classification__Don't suggest by different`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -744,6 +909,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value and name value
+     * When ask suggestion classification with filter by name value
+     * Then show classification value
+     */
     @Test
     fun `classification__Suggest filtered suggestions`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -764,6 +934,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value and name value
+     * When ask suggestion for a word in classification value with filter by name value
+     * Then show classification value
+     */
     @Test
     fun `classification__Suggest by word in filtered suggestions`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -785,6 +960,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value and name value
+     * When ask suggestion for a word in classification value with filter by other than name value
+     * Then don't show classification value
+     */
     @Test
     fun `classification__Don't suggest by word when filtered out`() {
         val expectedClassification = CdqTestValues.businessPartner1.profile!!.classifications.first().value
@@ -806,6 +986,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with classification value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `classification__Suggest by non-latin characters`() {
         val expectedClassification = CdqTestValues.businessPartner3.profile!!.classifications.first().value
@@ -825,6 +1010,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
     }
 
+    /**
+     * Given partner with administrative area value
+     * When ask suggestion for administrative area
+     * Then show administrative area value
+     */
     @Test
     fun `adminArea__Suggest property values`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -839,6 +1029,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `adminArea__Suggest by phrase`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -858,6 +1053,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `adminArea__Suggest by prefix`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -877,6 +1077,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `adminArea__Suggest by word`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -897,6 +1102,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `adminArea__Don't suggest by different`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -917,6 +1127,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value and name value
+     * When ask suggestion administrative area with filter by name value
+     * Then show administrative area value
+     */
     @Test
     fun `adminArea__Suggest filtered suggestions`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -937,6 +1152,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value and name value
+     * When ask suggestion for a word in administrative area value with filter by name value
+     * Then show administrative area value
+     */
     @Test
     fun `adminArea__Suggest by word in filtered suggestions`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -958,6 +1178,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value and name value
+     * When ask suggestion for a word in administrative area value with filter by other than name value
+     * Then don't show administrative area value
+     */
     @Test
     fun `adminArea__Don't suggest by word when filtered out`() {
         val expectedAdminArea = CdqTestValues.businessPartner1.addresses.first().administrativeAreas.first().value
@@ -979,6 +1204,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with administrative area value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `adminArea__Suggest by non-latin characters`() {
         val expectedAdminArea = CdqTestValues.businessPartner3.addresses.first().administrativeAreas.first().value
@@ -998,6 +1228,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedAdminArea }
     }
 
+    /**
+     * Given partner with post code value
+     * When ask suggestion for post code
+     * Then show post code value
+     */
     @Test
     fun `postCode__Suggest property values`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1012,6 +1247,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `postCode__Suggest by phrase`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1031,6 +1271,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `postCode__Suggest by prefix`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1050,6 +1295,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `postCode__Suggest by word`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1070,6 +1320,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `postCode__Don't suggest by different`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1090,6 +1345,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value and name value
+     * When ask suggestion post code with filter by name value
+     * Then show post code value
+     */
     @Test
     fun `postCode__Suggest filtered suggestions`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1110,6 +1370,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value and name value
+     * When ask suggestion for a word in post code value with filter by name value
+     * Then show post code value
+     */
     @Test
     fun `postCode__Suggest by word in filtered suggestions`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1131,6 +1396,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value and name value
+     * When ask suggestion for a word in post code value with filter by other than name value
+     * Then don't show post code value
+     */
     @Test
     fun `postCode__Don't suggest by word when filtered out`() {
         val expectedPostCode = CdqTestValues.businessPartner1.addresses.first().postCodes.first().value
@@ -1152,6 +1422,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with post code value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `postCode__Suggest by non-latin characters`() {
         val expectedPostCode = CdqTestValues.businessPartner3.addresses.first().postCodes.first().value
@@ -1171,6 +1446,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostCode }
     }
 
+    /**
+     * Given partner with locality value
+     * When ask suggestion for locality
+     * Then show locality value
+     */
     @Test
     fun `locality__Suggest property values`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1185,6 +1465,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `locality__Suggest by phrase`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1204,6 +1489,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `locality__Suggest by prefix`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1223,6 +1513,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `locality__Suggest by word`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1243,6 +1538,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `locality__Don't suggest by different`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1263,6 +1563,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value and name value
+     * When ask suggestion locality with filter by name value
+     * Then show locality value
+     */
     @Test
     fun `locality__Suggest filtered suggestions`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1283,6 +1588,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value and name value
+     * When ask suggestion for a word in locality value with filter by name value
+     * Then show locality value
+     */
     @Test
     fun `locality__Suggest by word in filtered suggestions`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1304,6 +1614,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value and name value
+     * When ask suggestion for a word in locality value with filter by other than name value
+     * Then don't show locality value
+     */
     @Test
     fun `locality__Don't suggest by word when filtered out`() {
         val expectedLocality = CdqTestValues.businessPartner1.addresses.first().localities.first().value
@@ -1325,6 +1640,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with locality value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `locality__Suggest by non-latin characters`() {
         val expectedLocality = CdqTestValues.businessPartner3.addresses.first().localities.first().value
@@ -1344,6 +1664,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedLocality }
     }
 
+    /**
+     * Given partner with thoroughfare value
+     * When ask suggestion for thoroughfare
+     * Then show thoroughfare value
+     */
     @Test
     fun `thoroughfare__Suggest property values`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
@@ -1358,6 +1683,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `thoroughfare__Suggest by phrase`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
@@ -1377,6 +1707,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `thoroughfare__Suggest by prefix`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
@@ -1396,6 +1731,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `thoroughfare__Suggest by word`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
@@ -1416,6 +1756,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `thoroughfare__Don't suggest by different`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value!!
@@ -1436,6 +1781,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value and name value
+     * When ask suggestion thoroughfare with filter by name value
+     * Then show thoroughfare value
+     */
     @Test
     fun `thoroughfare__Suggest filtered suggestions`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
@@ -1456,6 +1806,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value and name value
+     * When ask suggestion for a word in thoroughfare value with filter by name value
+     * Then show thoroughfare value
+     */
     @Test
     fun `thoroughfare__Suggest by word in filtered suggestions`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
@@ -1477,6 +1832,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value and name value
+     * When ask suggestion for a word in thoroughfare value with filter by other than name value
+     * Then don't show thoroughfare value
+     */
     @Test
     fun `thoroughfare__Don't suggest by word when filtered out`() {
         val expectedThoroughfare = CdqTestValues.businessPartner1.addresses.first().thoroughfares.first().value
@@ -1498,6 +1858,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with thoroughfare value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `thoroughfare__Suggest by non-latin characters`() {
         val expectedThoroughfare = CdqTestValues.businessPartner3.addresses.first().thoroughfares.first().value
@@ -1517,6 +1882,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedThoroughfare }
     }
 
+    /**
+     * Given partner with premise value
+     * When ask suggestion for premise
+     * Then show premise value
+     */
     @Test
     fun `premise__Suggest property values`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1531,6 +1901,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `premise__Suggest by phrase`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1550,6 +1925,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `premise__Suggest by prefix`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1569,6 +1949,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `premise__Suggest by word`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1589,6 +1974,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `premise__Don't suggest by different`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1609,6 +1999,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value and name value
+     * When ask suggestion premise with filter by name value
+     * Then show premise value
+     */
     @Test
     fun `premise__Suggest filtered suggestions`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1629,6 +2024,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value and name value
+     * When ask suggestion for a word in premise value with filter by name value
+     * Then show premise value
+     */
     @Test
     fun `premise__Suggest by word in filtered suggestions`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1650,6 +2050,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value and name value
+     * When ask suggestion for a word in premise value with filter by other than name value
+     * Then don't show premise value
+     */
     @Test
     fun `premise__Don't suggest by word when filtered out`() {
         val expectedPremise = CdqTestValues.businessPartner1.addresses.first().premises.first().value
@@ -1671,6 +2076,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with premise value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `premise__Suggest by non-latin characters`() {
         val expectedPremise = CdqTestValues.businessPartner3.addresses.first().premises.first().value
@@ -1690,6 +2100,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPremise }
     }
 
+    /**
+     * Given partner with postal delivery pointvalue
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest by phrase`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1709,6 +2124,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery pointvalue
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest by prefix`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1728,6 +2148,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery pointvalue that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest by word`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1748,6 +2173,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery pointvalue
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
     @Test
     fun `postalDeliveryPoint__Don't suggest by different`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1768,6 +2198,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery point value and name value
+     * When ask suggestion postal delivery point with filter by name value
+     * Then show postal delivery point value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest filtered suggestions`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1788,6 +2223,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery point value and name value
+     * When ask suggestion for a word in postal delivery point value with filter by name value
+     * Then show postal delivery point value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest by word in filtered suggestions`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1809,6 +2249,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).anyMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery point value and name value
+     * When ask suggestion for a word in postal delivery point value with filter by other than name value
+     * Then don't show postal delivery point value
+     */
     @Test
     fun `postalDeliveryPoint__Don't suggest by word when filtered out`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value
@@ -1830,6 +2275,11 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         assertThat(page.content).noneMatch { it.suggestion == expectedPostalDeliveryPoint }
     }
 
+    /**
+     * Given partner with postal delivery point value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
     @Test
     fun `postalDeliveryPoint__Suggest by non-latin characters`() {
         val expectedPostalDeliveryPoint = CdqTestValues.businessPartner3.addresses.first().postalDeliveryPoints.first().value
