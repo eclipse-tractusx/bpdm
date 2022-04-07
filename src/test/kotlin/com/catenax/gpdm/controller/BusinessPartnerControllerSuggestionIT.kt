@@ -8,6 +8,7 @@ import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
 import com.catenax.gpdm.util.CdqTestValues
+import com.catenax.gpdm.util.ElasticsearchContainer
 import com.catenax.gpdm.util.EndpointValues
 import com.catenax.gpdm.util.TestHelpers
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -16,7 +17,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -27,7 +27,6 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 
 /**
@@ -82,8 +81,11 @@ import org.testcontainers.junit.jupiter.Testcontainers
  *
  */
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
-@ActiveProfiles("test")
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
+    properties = ["bpdm.elastic.enabled=true"]
+)
+@ActiveProfiles(value = ["test"])
 class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: PartnerImportService,
@@ -92,19 +94,9 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val testHelpers: TestHelpers
 ) {
 
-    companion object Container {
+    companion object {
 
-        @JvmStatic
-        val elasticsearchContainer: ElasticsearchContainer =
-            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
-                .withEnv("discovery.type", "single-node")
-                .withReuse(true)
-
-        @JvmStatic
-        @BeforeAll
-        fun beforeAll() {
-            elasticsearchContainer.start()
-        }
+        private val elasticsearchContainer = ElasticsearchContainer.instance
 
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -114,9 +106,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.elastic.enabled") { true }
-            registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
         }
     }
 
