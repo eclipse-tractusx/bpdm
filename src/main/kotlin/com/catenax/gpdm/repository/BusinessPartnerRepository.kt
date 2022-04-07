@@ -23,7 +23,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     fun findByIdentifierTypeAndValues(type: String, values: Collection<String>) : Set<BusinessPartner>
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.status = ?2")
-    fun findByIdentifierTypeAndStatus(type: IdentifierType, status: IdentifierStatus) : Set<BusinessPartner>
+    fun findByIdentifierTypeAndStatus(type: IdentifierType, status: IdentifierStatus, pageable: Pageable): Page<BusinessPartner>
 
 
 }

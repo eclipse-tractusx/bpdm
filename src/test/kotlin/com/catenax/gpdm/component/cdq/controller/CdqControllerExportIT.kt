@@ -1,10 +1,7 @@
 package com.catenax.gpdm.component.cdq.controller
 
 import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
-import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
-import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
-import com.catenax.gpdm.component.cdq.dto.IdentifierCdq
-import com.catenax.gpdm.component.cdq.dto.TypeKeyNameUrlCdq
+import com.catenax.gpdm.component.cdq.dto.*
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.IdentifierService
@@ -76,7 +73,7 @@ class CdqControllerExportIT @Autowired constructor(
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // business partners in cdq should be updated with newly created bpns
         wireMockServer.stubFor(
@@ -99,13 +96,14 @@ class CdqControllerExportIT @Autowired constructor(
                 )
         )
 
-        val exportedBusinessPartners = webTestClient.post().uri("/api/cdq/business-partners/export")
+        val exportResponse = webTestClient.post().uri("/api/cdq/business-partners/export")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerCdq::class.java).returnResult().responseBody
+            .is2xxSuccessful.expectBody(ExportResponse::class.java).returnResult().responseBody!!
 
-        assertThat(exportedBusinessPartners).hasSize(2)
-        assertThat(exportedBusinessPartners!!.map(::extractBpn)).containsExactlyInAnyOrderElementsOf(importedBusinessPartners.map { it.bpn })
+        assertThat(exportResponse.exportedSize).isEqualTo(2)
+        assertThat(exportResponse.partnerBpns.size).isEqualTo(2)
+        assertThat(exportResponse.partnerBpns).containsExactlyInAnyOrderElementsOf(importedBusinessPartners.map { it.bpn })
         assertThat(businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)).isEmpty()
         assertThat(businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusSynchronizedKey)).hasSize(2)
     }
@@ -134,7 +132,7 @@ class CdqControllerExportIT @Autowired constructor(
             .expectStatus()
             .is2xxSuccessful
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // try export, cdq returns error
         webTestClient.post().uri("/api/cdq/business-partners/export")
@@ -215,7 +213,7 @@ class CdqControllerExportIT @Autowired constructor(
             .expectStatus()
             .is5xxServerError
 
-        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)
+        val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
         // since cdq should have received bpns, mock that bpns are now included when business partners are retrieved from cdq
         wireMockServer.stubFor(
@@ -237,12 +235,13 @@ class CdqControllerExportIT @Autowired constructor(
         )
 
         // now nothing should be exported to cdq since business partners from cdq already contain bpns
-        val exportedBusinessPartners = webTestClient.post().uri("/api/cdq/business-partners/export")
+        val exportResponse = webTestClient.post().uri("/api/cdq/business-partners/export")
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(BusinessPartnerCdq::class.java).returnResult().responseBody
+            .is2xxSuccessful.expectBody(ExportResponse::class.java).returnResult().responseBody!!
 
-        assertThat(exportedBusinessPartners).isEmpty()
+        assertThat(exportResponse.exportedSize).isEqualTo(0)
+        assertThat(exportResponse.partnerBpns).isEmpty()
 
         // business partners should be in state "synchronized" now since cdq api returned them with bpns
         assertThat(businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey)).hasSize(0)
@@ -276,6 +275,4 @@ class CdqControllerExportIT @Autowired constructor(
 
     private fun readTestResource(testResourcePath: String) =
         CdqControllerExportIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
-
-    private fun extractBpn(it: BusinessPartnerCdq) = it.identifiers.find { id -> id.type?.technicalKey == bpnConfigProperties.id }?.value
 }

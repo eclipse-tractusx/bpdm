@@ -13,5 +13,6 @@ class CdqAdapterConfigProperties (
     val datasource: String = "61c096613b4b824755a62641",
     val apiKey: String = "",
     val timestampKey: String = "last-import",
-    val importLimit: Int = 100
-        )
+    val importLimit: Int = 100,
+    val exportPageSize: Int = 100
+)
