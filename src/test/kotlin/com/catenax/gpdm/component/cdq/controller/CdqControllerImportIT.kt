@@ -3,6 +3,7 @@ package com.catenax.gpdm.component.cdq.controller
 import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
 import com.catenax.gpdm.component.cdq.dto.ImportResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
+import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -57,7 +58,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
         val savedBusinessPartners =
             webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
-                ParameterizedTypeReference<PageResponse<BusinessPartnerResponse>>() {})
+                ParameterizedTypeReference<PageResponse<BusinessPartnerSearchResponse>>() {})
                 .returnResult().responseBody
 
         assertThat(savedBusinessPartners!!.content.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
@@ -151,7 +152,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
         val savedBusinessPartners =
             webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
-                ParameterizedTypeReference<PageResponse<BusinessPartnerResponse>>() {})
+                ParameterizedTypeReference<PageResponse<BusinessPartnerSearchResponse>>() {})
                 .returnResult().responseBody
 
         assertThat(savedBusinessPartners!!.content.map(::extractCdqId)).containsExactlyInAnyOrder("fooId1", "fooId2")
@@ -162,5 +163,7 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
     private fun readTestResource(testResourcePath: String) =
         CdqControllerImportIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
 
+
+    private fun extractCdqId(it: BusinessPartnerSearchResponse) = extractCdqId(it.businessPartner)
     private fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdProperties.typeKey }!!.value
 }

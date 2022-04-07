@@ -1,6 +1,8 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.entity.BusinessPartner
+import com.catenax.gpdm.repository.BusinessPartnerRepository
+import com.catenax.gpdm.repository.IdentifierRepository
 import com.catenax.gpdm.repository.entity.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,18 +1,13 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
-import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.elastic.CustomSearchRepository
-import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
-import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
-import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
+import com.catenax.gpdm.repository.BusinessPartnerRepository
+import com.catenax.gpdm.repository.IdentifierStatusRepository
+import com.catenax.gpdm.repository.IdentifierTypeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,23 +18,12 @@ class BusinessPartnerService(
     val businessPartnerRepository: BusinessPartnerRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
     val identifierStatusRepository: IdentifierStatusRepository,
-    val customSearchRepository: CustomSearchRepository
-) {
+        ){
 
     @Transactional
     fun findPartner(bpn: String): BusinessPartnerResponse {
         val bp = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
         return bp.toDto()
-    }
-
-    @Transactional
-    fun findPartners(searchRequest: BusinessPartnerSearchRequest, pageRequest: PageRequest): PageResponse<BusinessPartnerResponse> {
-        val searchResultPage = customSearchRepository.findBySearchRequest(searchRequest, pageRequest)
-        val bpPage = PageImpl(businessPartnerRepository.findDistinctByBpnIn(searchResultPage.content.map { it.bpn }).toList(),
-            searchResultPage.pageable,
-            searchResultPage.totalElements)
-
-        return bpPage.toDto( bpPage.content.map { it.toDto() } )
     }
 
     @Transactional
@@ -61,6 +45,8 @@ class BusinessPartnerService(
 
         return businessPartnerRepository.findByIdentifierTypeAndStatus(type, status).map { it.toDto() }
     }
+
+
 
     @Transactional
     fun createPartners(bpDtos: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse>{

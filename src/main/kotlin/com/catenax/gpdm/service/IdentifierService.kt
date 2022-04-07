@@ -3,8 +3,8 @@ package com.catenax.gpdm.service
 import com.catenax.gpdm.dto.response.IdentifierResponse
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.entity.IdentifierRepository
-import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
+import com.catenax.gpdm.repository.IdentifierRepository
+import com.catenax.gpdm.repository.IdentifierStatusRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*

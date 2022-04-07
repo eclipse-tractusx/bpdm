@@ -1,9 +1,8 @@
 package com.catenax.gpdm.component.elastic.impl.service
 
-import com.catenax.gpdm.dto.elastic.BusinessPartnerDoc
-import com.catenax.gpdm.repository.elastic.BusinessPartnerDocRepository
-import com.catenax.gpdm.repository.entity.BusinessPartnerRepository
-import com.catenax.gpdm.service.DocumentMappingService
+import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
+import com.catenax.gpdm.component.elastic.impl.repository.BusinessPartnerDocRepository
+import com.catenax.gpdm.repository.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest

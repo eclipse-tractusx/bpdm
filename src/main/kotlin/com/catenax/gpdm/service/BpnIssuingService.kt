@@ -4,10 +4,10 @@ import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpnInvalidCounterValueException
 import com.catenax.gpdm.exception.BpnMaxNumberReachedException
-import com.catenax.gpdm.repository.entity.ConfigurationEntryRepository
-import com.catenax.gpdm.repository.entity.IdentifierStatusRepository
-import com.catenax.gpdm.repository.entity.IdentifierTypeRepository
-import com.catenax.gpdm.repository.entity.IssuingBodyRepository
+import com.catenax.gpdm.repository.ConfigurationEntryRepository
+import com.catenax.gpdm.repository.IdentifierStatusRepository
+import com.catenax.gpdm.repository.IdentifierTypeRepository
+import com.catenax.gpdm.repository.IssuingBodyRepository
 import org.springframework.stereotype.Service
 import kotlin.math.pow
 
