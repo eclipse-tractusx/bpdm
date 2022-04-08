@@ -5,6 +5,9 @@ import com.catenax.gpdm.component.cdq.dto.ImportResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
+import com.catenax.gpdm.dto.response.SyncResponse
+import com.catenax.gpdm.entity.SyncStatus
+import com.catenax.gpdm.util.EndpointValues
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -19,6 +22,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 
 
 private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
@@ -51,10 +55,23 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
             )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
+        webTestClient.post().uri(EndpointValues.CDQ_SYNCH_PATH)
             .exchange()
             .expectStatus()
-            .is2xxSuccessful.expectBodyList(ImportResponse::class.java).returnResult().responseBody
+            .is2xxSuccessful
+
+        //Wait for the async import to finish
+        Thread.sleep(1000)
+
+        val syncResponse =webTestClient.get().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .returnResult<SyncResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
 
         val savedBusinessPartners =
             webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
@@ -75,32 +92,18 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
             )
         )
 
-        val importResult = webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
-            .expectBody(ImportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        //First import
+        importAndAssertSuccess()
 
-        assertThat(importResult.importedSize == 2)
-        assertThat(importResult.partnerBpns.size == 2)
-
-        webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
+        //Check partners created
+        webTestClient.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH).exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
 
-        // importing same data again does not create new business partners
-        webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful.expectBodyList(ImportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        //Second import
+        importAndAssertSuccess()
 
-        assertThat(importResult.importedSize == 0)
-        assertThat(importResult.partnerBpns.isEmpty())
-
-        webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
+        //Check no new partners created
+        webTestClient.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH).exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
     }
 
@@ -140,18 +143,10 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
                 )
         )
 
-        val importResult = webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful.expectBody(ImportResponse::class.java)
-            .returnResult()
-            .responseBody!!
-
-        assertThat(importResult.importedSize == 2)
-        assertThat(importResult.partnerBpns.size == 2)
+        importAndAssertSuccess()
 
         val savedBusinessPartners =
-            webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody(object :
+            webTestClient.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH).exchange().expectStatus().isOk.expectBody(object :
                 ParameterizedTypeReference<PageResponse<BusinessPartnerSearchResponse>>() {})
                 .returnResult().responseBody
 
@@ -166,4 +161,24 @@ class CdqControllerImportIT @Autowired constructor(val webTestClient: WebTestCli
 
     private fun extractCdqId(it: BusinessPartnerSearchResponse) = extractCdqId(it.businessPartner)
     private fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdProperties.typeKey }!!.value
+
+    private fun importAndAssertSuccess(){
+        webTestClient.post().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+
+        //Wait for the async import to finish
+        Thread.sleep(1000)
+
+        val syncResponse = webTestClient.get().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .returnResult<SyncResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
+    }
 }

@@ -1,57 +1,108 @@
 package com.catenax.gpdm.component.cdq.service
 
-import com.catenax.gpdm.component.cdq.config.CdqAdapterConfigProperties
-import com.catenax.gpdm.component.cdq.dto.ImportResponse
-import com.catenax.gpdm.entity.ConfigurationEntry
-import com.catenax.gpdm.repository.ConfigurationEntryRepository
+import com.catenax.gpdm.dto.response.SyncResponse
+import com.catenax.gpdm.entity.SyncType
+import com.catenax.gpdm.service.SyncRecordService
+import com.catenax.gpdm.service.toDto
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
-import java.time.Month
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import javax.persistence.EntityManager
 
+/**
+ * Imports business partner entries from CDQ
+ */
 @Service
 class PartnerImportService(
-    val adapterProperties: CdqAdapterConfigProperties,
-    val partnerImportPageService: PartnerImportPageService,
-    val configurationEntryRepository: ConfigurationEntryRepository,
-    val entityManager: EntityManager
+    private val syncRecordService: SyncRecordService,
+    partnerImportPageService: PartnerImportPageService,
+    entityManager: EntityManager
 ) {
+    private val starter = ImportStarter(partnerImportPageService, entityManager, syncRecordService)
 
-    fun import(): ImportResponse {
-        val lastUpdateEntry = getLastUpdateEntry()
-        val modifiedAfterDate = OffsetDateTime.parse(lastUpdateEntry.value)
-
-        var startAfter: String? = null
-        var totalCollection: Collection<String> = emptyList()
-
-        do {
-            val response = partnerImportPageService.import(modifiedAfterDate, startAfter)
-            totalCollection = totalCollection.plus(response.partners.map { it.bpn })
-            startAfter = response.nextStartAfter
-
-            //Clear session after each page import to improve JPA performance
-            entityManager.clear()
-        } while (startAfter != null)
-
-        saveLastUpdateEntry(lastUpdateEntry)
-
-        return ImportResponse(totalCollection.size, totalCollection)
+    /**
+     * Import records synchronously and return a [SyncResponse] about the import result information
+     */
+    fun import(): SyncResponse{
+       return importWithStarter{ a, b -> starter.import(a, b) }
     }
 
-    private fun saveLastUpdateEntry(entry: ConfigurationEntry){
-        entry.value = DateTimeFormatter.ISO_INSTANT.format(OffsetDateTime.now(ZoneOffset.UTC))
-        configurationEntryRepository.save(entry)
+    /**
+     * Import records asynchronously and return a [SyncResponse] with information about the started import
+     */
+    fun importAsync(): SyncResponse{
+        return importWithStarter { a, b -> starter.importAsync(a, b) }
     }
 
-    private fun getLastUpdateEntry(): ConfigurationEntry{
-        return configurationEntryRepository.findByKey(adapterProperties.timestampKey)?: run {
-            val newEntry = ConfigurationEntry(adapterProperties.timestampKey,
-                DateTimeFormatter.ISO_INSTANT.format( OffsetDateTime.of(LocalDateTime.of(2000, Month.JANUARY,1, 0, 0), ZoneOffset.UTC)))
-            configurationEntryRepository.save(newEntry)
+    /**
+     * Fetch a [SyncResponse] about the state of the current import
+     */
+    fun getImportStatus(): SyncResponse{
+        return syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT).toDto()
+    }
+
+    private fun importWithStarter(starterFunction: (OffsetDateTime, String?) -> Unit): SyncResponse{
+        val syncRecord = syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT)
+
+        val startedAt = syncRecord.startedAt ?: SyncRecordService.syncStartTime
+        val startAfter =  syncRecord.errorSave
+
+        val response = syncRecordService.setSynchronizationStart(syncRecord).toDto()
+
+        starterFunction(startedAt, startAfter)
+
+        return response
+    }
+
+    /**
+     * Private starter class to work with the main import service
+     *
+     * Needed for Async annotation to work
+     */
+    private open class ImportStarter(
+        private val partnerImportPageService: PartnerImportPageService,
+        private val entityManager: EntityManager,
+        private val syncRecordService: SyncRecordService
+    ){
+
+        /**
+         * Start paginated [import] asynchronously
+         */
+        @Async
+        open fun importAsync(importFrom: OffsetDateTime, startAfterRecord: String?) {
+            import(importFrom, startAfterRecord)
         }
-    }
 
+        /**
+         * Import CDQ partner records last modified after [importFrom] and with CDQ internal ID greater than [startAfterRecord]
+         *
+         * Data is imported in a paginated way. On an error during a page import the latest [startAfterRecord] ID is saved so that the import can later be resumed
+         */
+        fun import(importFrom: OffsetDateTime, startAfterRecord: String?){
+            var startAfter: String? = startAfterRecord
+            var importedCount = 0
+
+            do{
+                try{
+                    val response = partnerImportPageService.import(importFrom, startAfter)
+                    startAfter = response.nextStartAfter
+                    importedCount += response.partners.size
+                    val progress = importedCount / response.totalElements.toFloat()
+                    syncRecordService.setProgress(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), progress)
+
+                }catch (exception: RuntimeException){
+                    syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), exception.message!!, startAfter)
+                    throw exception
+                }
+
+                //Clear session after each page import to improve JPA performance
+                entityManager.clear()
+            } while (startAfter != null)
+
+            syncRecordService.setSynchronizationSuccess(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT))
+        }
+
+
+
+    }
 }

@@ -136,7 +136,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             )
         )
 
-        importService.import()
+        importService.importAsync()
         elasticSyncService.exportPartnersToElastic()
     }
 

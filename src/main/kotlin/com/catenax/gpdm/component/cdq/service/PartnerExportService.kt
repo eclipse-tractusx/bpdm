@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.time.OffsetDateTime
 import javax.persistence.EntityManager
 
 @Service
@@ -47,6 +48,16 @@ class PartnerExportService(
         } while (!partnersToSync.isLast)
 
         return ExportResponse(exportedBpns.size, exportedBpns)
+    }
+
+    fun clearBpns() {
+
+        var startAfter: String? = null
+
+        do {
+            startAfter = partnerExportPageService.clearBpns(startAfter)
+        } while (startAfter != null)
+
     }
 
     private fun createSynchronizedStatusIfNotExists() {
