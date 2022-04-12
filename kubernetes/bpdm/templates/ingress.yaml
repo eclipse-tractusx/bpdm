@@ -4,8 +4,14 @@ metadata:
   name: {{ include "bpdm.fullname" . }}
   labels:
       {{- include "bpdm.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - catenax-bpdm-dev.demo.catena-x.net
+      secretName: {{ include "bpdm.fullname" . }}-tls
   rules:
   - host: catenax-bpdm-dev.demo.catena-x.net
     http:
