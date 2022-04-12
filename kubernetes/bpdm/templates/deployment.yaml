@@ -20,8 +20,6 @@ spec:
       labels:
         {{- include "bpdm.selectorLabels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ include "bpdm.imagePullSecretsName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

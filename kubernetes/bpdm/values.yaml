@@ -84,7 +84,11 @@ ingress:
   issuerName: letsencrypt-prod
   hostSuffix: germanywestcentral.cloudapp.azure.com
 
+elastic:
+  enabled: false
+
 ingnginx:
+  enabled: false
   controller:
     admissionWebhooks:
       enabled: false

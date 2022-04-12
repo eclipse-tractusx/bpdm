@@ -28,8 +28,10 @@ dependencies:
     version: "4.0.13"
     repository: "https://kubernetes.github.io/ingress-nginx"
     alias: ingnginx
+    condition: ingnginx.enabled
   - name: bpdm-elastic
     version: 0.1.0
     repository: file://charts/bpdm-elastic
     alias: elastic
+    condition: elastic.enabled
 

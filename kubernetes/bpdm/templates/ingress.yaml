@@ -5,17 +5,12 @@ metadata:
   labels:
       {{- include "bpdm.labels" . | nindent 4 }}
   annotations:
-    cert-manager.io/cluster-issuer: {{ .Values.ingress.issuerName }}
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-  ingressClassName: {{ include "bpdm.fullname" . }}
-  tls:
-  - hosts:
-    - {{ include "bpdm.host" . }}
-    secretName: tls-secret
+  ingressClassName: nginx
   rules:
-  - host: {{ include "bpdm.host" . }}
+  - host: catenax-bpdm-dev.demo.catena-x.net
     http:
       paths:
       - path: /(.*)
