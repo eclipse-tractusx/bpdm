@@ -10,30 +10,10 @@ image:
   pullPolicy: IfNotPresent
 
 #Spring profiles under which the application should run
-springProfiles:
-  - dev
+springProfiles: []
 
-# secrets should be set from outside, e.g. helm install -set applicationSecrets.db-user.secret=...
-applicationSecrets:
-  db-user:
-    envName: BPDM_DB_USER
-    secret:
-  db-pass:
-    envName: BPDM_DB_PASS
-    secret:
-  keycloak-secret:
-    envName: BPDM_KEYCLOAK_SECRET
-    secret:
-  cdq-key:
-    envName: BPDM_CDQ_KEY
-    secret:
 
-# secrets should be set from outside, e.g. helm install -set imagePullSecrets.user=...
-imagePullSecrets:
-  mail: nico.koprowski@mercedes-benz.com
-  user:
-  password:
-
+applicationSecrets: {}
 
 nameOverride: ""
 fullnameOverride: ""
@@ -55,52 +35,15 @@ service:
   type: ClusterIP
   port: 8080
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
 ingress:
   issuerName: letsencrypt-prod
-  hostSuffix: germanywestcentral.cloudapp.azure.com
+  hostSuffix: demo.catena-x.net
 
 elastic:
   enabled: false
 
-ingnginx:
+postgres:
   enabled: false
-  controller:
-    admissionWebhooks:
-      enabled: false
-    ingressClassResource:
-      name: release-bpdm
-    replicaCount: 1
-    nodeSelector:
-      kubernetes.io/os: linux
-    service:
-      loadBalancerIP: #Custom IP under which the loadBalancer should be available
-      annotations:
-        service.beta.kubernetes.io/azure-dns-label-name: catenax-bpdm-release
 
 
 

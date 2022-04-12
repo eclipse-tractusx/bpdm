@@ -1,9 +1,0 @@
-replicaCount: 1
-
-image:
-  pullPolicy: Always
-  tag: "latest"
-
-#Spring profiles under which the application should run
-springProfiles:
-  - dev

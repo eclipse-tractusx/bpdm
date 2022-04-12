@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "bpdm.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "bpdm.selectorLabels" . | nindent 6 }}
@@ -31,9 +29,14 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfiles | join ","  }}
-            {{- $appSecretsName := (include "bpdm.applicationSecretsName" .) }}
+
+            - name: BPDM_DB_HOST
+              value: {{ printf "%s-%s" .Release.Name "postgres" }}
+            - name: BPDM_ELASTIC_HOST
+              value: {{ printf "%s-%s" .Release.Name "elastic" }}
+            {{- $appSecretsName := "dev-bpdm-application" }}
             {{- range $key, $val := .Values.applicationSecrets }}
-            - name: {{ $val.envName }}
+            - name: {{ $val }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $appSecretsName }}
@@ -43,17 +46,3 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}

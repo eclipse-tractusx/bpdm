@@ -4,16 +4,13 @@ metadata:
   name: {{ include "bpdm.fullname" . }}
   labels:
       {{- include "bpdm.labels" . | nindent 4 }}
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
   - host: catenax-bpdm-dev.demo.catena-x.net
     http:
       paths:
-      - path: /(.*)
+      - path: /
         pathType: Prefix
         backend:
           service:

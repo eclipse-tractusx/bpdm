@@ -5,18 +5,12 @@ metadata:
   labels:
     {{- include "bpdm-elastic.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "bpdm-elastic.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "bpdm-elastic.selectorLabels" . | nindent 8 }}
     spec:
@@ -39,17 +33,11 @@ spec:
             - name: http
               containerPort: 9200
               protocol: TCP
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: {{ include "bpdm-elastic.fullname" . }}
+              subPath: elastic
+      volumes:
+        - name: {{ include "bpdm-elastic.fullname" . }}
+          persistentVolumeClaim:
+            claimName: {{ include "bpdm-elastic.fullname" . }}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bpdm-postgres.fullname" . }}
+  labels:
+    {{- include "bpdm-postgres.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    {{- include "bpdm-postgres.selectorLabels" . | nindent 4 }}
