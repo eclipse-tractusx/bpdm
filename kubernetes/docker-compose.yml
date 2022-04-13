@@ -5,8 +5,9 @@ services:
     container_name: bpdm-postgres
     environment:
       POSTGRES_USER: bpdm
-      POSTGRES_PASSWORD: bpdm
+      POSTGRES_PASSWORD:
       POSTGRES_DB: bpdm
+      POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U bpdm' ]
       interval: 10s
