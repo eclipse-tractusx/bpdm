@@ -3,8 +3,11 @@ package com.catenax.gpdm.component.cdq.controller
 import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
 import com.catenax.gpdm.component.cdq.dto.*
 import com.catenax.gpdm.config.BpnConfigProperties
+import com.catenax.gpdm.dto.response.SyncResponse
+import com.catenax.gpdm.entity.SyncStatus
 import com.catenax.gpdm.service.BusinessPartnerService
 import com.catenax.gpdm.service.IdentifierService
+import com.catenax.gpdm.util.EndpointValues
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -21,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import java.time.LocalDateTime
 
 
@@ -65,10 +69,7 @@ class CdqControllerExportIT @Autowired constructor(
                 )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
+      importAndAssertSuccess()
 
         webTestClient.get().uri("/api/catena/business-partner").exchange().expectStatus().isOk.expectBody()
             .jsonPath("$.totalElements").isEqualTo(2)
@@ -127,10 +128,7 @@ class CdqControllerExportIT @Autowired constructor(
                 )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
+        importAndAssertSuccess()
 
         val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
@@ -202,10 +200,7 @@ class CdqControllerExportIT @Autowired constructor(
                 )
         )
 
-        webTestClient.post().uri("/api/cdq/business-partners/import")
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
+        importAndAssertSuccess()
 
         // mocked error should occur when trying to save synchronized state
         webTestClient.post().uri("/api/cdq/business-partners/export")
@@ -275,4 +270,24 @@ class CdqControllerExportIT @Autowired constructor(
 
     private fun readTestResource(testResourcePath: String) =
         CdqControllerExportIT::class.java.classLoader.getResource(testResourcePath)!!.readText()
+
+    private fun importAndAssertSuccess(){
+        webTestClient.post().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+
+        //Wait for the async import to finish
+        Thread.sleep(1000)
+
+        val syncResponse = webTestClient.get().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .returnResult<SyncResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
+    }
 }

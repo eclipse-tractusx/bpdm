@@ -49,6 +49,16 @@ class PartnerExportService(
         return ExportResponse(exportedBpns.size, exportedBpns)
     }
 
+    fun clearBpns() {
+
+        var startAfter: String? = null
+
+        do {
+            startAfter = partnerExportPageService.clearBpns(startAfter)
+        } while (startAfter != null)
+
+    }
+
     private fun createSynchronizedStatusIfNotExists() {
         metadataService.getIdentifierStati(Pageable.unpaged()).content.find { it.technicalKey == idProperties.statusSynchronizedKey }
             ?: metadataService.createIdentifierStatus(TypeKeyNameDto(idProperties.statusSynchronizedKey, idProperties.statusSynchronizedName))

@@ -162,3 +162,6 @@ fun BankAccount.toDto(): BankAccountResponse {
         nationalBankAccountIdentifier, nationalBankIdentifier)
 }
 
+fun SyncRecord.toDto(): SyncResponse{
+    return SyncResponse(type, status, progress, errorDetails, startedAt, finishedAt)
+}

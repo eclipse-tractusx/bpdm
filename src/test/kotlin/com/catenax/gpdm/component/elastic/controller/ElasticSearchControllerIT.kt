@@ -172,9 +172,16 @@ class ElasticSearchControllerIT @Autowired constructor(
         )
 
         // fill the elasticsearch index
-        webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
+        val response = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
+            .returnResult<ExportResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        //Check entries searchable
+        findBusinessPartnersByBpn(response.exportedBpns)
+            .forEach { assertThatCanSearchBusinessPartnerByName(it.names.first().value, it.bpn) }
 
 
         //clear the index

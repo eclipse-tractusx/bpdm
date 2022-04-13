@@ -21,24 +21,16 @@ class PartnerExportPageService(
     private val adapterProperties: CdqAdapterConfigProperties,
     private val objectMapper: ObjectMapper
 ) {
+    companion object{
+        const val BUSINESS_PARTNER_PATH = "/businesspartners"
+    }
+
 
     @Transactional
     fun export(partnersToSync: Collection<BusinessPartnerResponse>): Collection<BusinessPartnerCdq> {
         val partnersToSyncByCdqId = partnersToSync.associateBy { it.identifiers.find { id -> id.type.technicalKey == idProperties.typeKey }!!.value }
 
-        val partnerCollection = webClient
-            .get()
-            .uri { builder ->
-                builder
-                    .path("/businesspartners")
-                    .queryParam("businessPartnerId", partnersToSyncByCdqId.keys.joinToString())
-                builder.build()
-            }
-            .retrieve()
-            .bodyToMono<BusinessPartnerCollectionCdq>()
-            .block()!!
-
-        val cdqPartners = partnerCollection.values
+        val cdqPartners = fetchPartnersCdqByIds(partnersToSyncByCdqId.keys)
 
         val (known, unknown) = cdqPartners.partition { it.identifiers.any { id -> id.type?.technicalKey == "BPN" } }
 
@@ -46,23 +38,70 @@ class PartnerExportPageService(
         return if (unknown.isNotEmpty()) synchronizeUnknownPartners(partnersToSyncByCdqId, unknown) else emptyList()
     }
 
+    fun clearBpns(startAfter: String?): String?{
+        val partnerCollection = webClient
+            .get()
+            .uri { builder ->
+                builder
+                    .path(BUSINESS_PARTNER_PATH)
+                    .queryParam("limit", adapterProperties.importLimit)
+                    .queryParam("datasource", adapterProperties.datasource)
+                    .queryParam("featuresOn", "USE_NEXT_START_AFTER")
+                if (startAfter != null) builder.queryParam("startAfter", startAfter)
+                builder.build()
+            }
+            .retrieve()
+            .bodyToMono<BusinessPartnerCollectionCdq>()
+            .block()!!
+
+        val partners = partnerCollection.values
+        val partnersWithoutBpn = partners.map { it.copy(
+            identifiers = it.identifiers.filter { id -> id.type?.technicalKey != "BPN"  })
+        }
+
+        upsertPartners(partnersWithoutBpn)
+
+        return partnerCollection.nextStartAfter
+    }
+
+    private fun fetchPartnersCdqByIds(cdqIds: Collection<String>): Collection<BusinessPartnerCdq>{
+        val partnerCollection = webClient
+            .get()
+            .uri { builder ->
+                builder
+                    .path(BUSINESS_PARTNER_PATH)
+                    .queryParam("businessPartnerId", cdqIds.joinToString())
+                builder.build()
+            }
+            .retrieve()
+            .bodyToMono<BusinessPartnerCollectionCdq>()
+            .block()!!
+
+       return partnerCollection.values
+    }
+
     private fun synchronizeUnknownPartners(partnerMap: Map<String, BusinessPartnerResponse>, unknownPartners: Collection<BusinessPartnerCdq>)
             : Collection<BusinessPartnerCdq> {
         val bpnCdqPairs = unknownPartners.map { it to partnerMap[it.id]!!.bpn }
         val partnersWithBpn = bpnCdqPairs.map { addBpnIdentifier(it.first, it.second) }
-        val requestBody = UpsertRequest(adapterProperties.datasource, partnersWithBpn)
 
-        webClient
-            .put()
-            .uri("/businesspartners")
-            .bodyValue(objectMapper.writeValueAsString(requestBody))
-            .retrieve()
-            .bodyToMono<UpsertResponse>()
-            .block()!!
+        upsertPartners(partnersWithBpn)
 
         updateKnownPartners(partnerMap, partnersWithBpn)
 
         return partnersWithBpn
+    }
+
+    private fun upsertPartners(partners: Collection<BusinessPartnerCdq>){
+        val requestBody = UpsertRequest(adapterProperties.datasource, partners)
+
+        webClient
+            .put()
+            .uri(BUSINESS_PARTNER_PATH)
+            .bodyValue(objectMapper.writeValueAsString(requestBody))
+            .retrieve()
+            .bodyToMono<UpsertResponse>()
+            .block()!!
     }
 
 

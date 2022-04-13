@@ -5,7 +5,10 @@ import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.component.cdq.dto.ExportResponse
 import com.catenax.gpdm.component.cdq.service.PartnerImportService
+import com.catenax.gpdm.dto.response.SyncResponse
+import com.catenax.gpdm.entity.SyncStatus
 import com.catenax.gpdm.service.BusinessPartnerService
+import com.catenax.gpdm.util.EndpointValues
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -20,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import java.time.LocalDateTime
 
 
@@ -73,7 +77,7 @@ class CdqControllerExportPaginationIT @Autowired constructor(
                 )
         )
 
-        importService.import()
+       importAndAssertSuccess()
 
         val importedBusinessPartners = businessPartnerService.findPartnersByIdentifier(cdqIdProperties.typeKey, cdqIdProperties.statusImportedKey).toList()
 
@@ -135,5 +139,25 @@ class CdqControllerExportPaginationIT @Autowired constructor(
         val datasource1 = "datasource"
         val timestamp = LocalDateTime.of(2022, 1, 1, 0, 0)
         return BusinessPartnerCdq(id = cdqId, createdAt = timestamp, lastModifiedAt = timestamp, dataSource = datasource1)
+    }
+
+    private fun importAndAssertSuccess(){
+        webTestClient.post().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+
+        //Wait for the async import to finish
+        Thread.sleep(1000)
+
+        val syncResponse = webTestClient.get().uri(EndpointValues.CDQ_SYNCH_PATH)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .returnResult<SyncResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
     }
 }
