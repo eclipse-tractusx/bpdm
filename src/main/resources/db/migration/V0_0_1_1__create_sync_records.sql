@@ -7,6 +7,7 @@ CREATE TABLE sync_records
     type           VARCHAR(255)                NOT NULL,
     status         VARCHAR(255)                NOT NULL,
     progress       FLOAT                       NOT NULL,
+    count          INTEGER                     NOT NULL,
     status_details VARCHAR(255),
     save_state     VARCHAR(255),
     started_at     TIMESTAMP with time zone,

@@ -2,11 +2,9 @@ package com.catenax.gpdm.component.elastic.controller
 
 import com.catenax.gpdm.Application
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
-import com.catenax.gpdm.component.cdq.service.PartnerImportService
-import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncService
-import com.catenax.gpdm.dto.elastic.ExportResponse
+import com.catenax.gpdm.component.cdq.service.ImportStarterService
+import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
-import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.util.CdqTestValues
@@ -43,8 +41,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ActiveProfiles("test")
 class ElasticSearchControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val importService: PartnerImportService,
-    val elasticSyncService: ElasticSyncService,
+    val importService: ImportStarterService,
+    val elasticSyncService: ElasticSyncStarterService,
     val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers
 ) {
@@ -66,14 +64,14 @@ class ElasticSearchControllerIT @Autowired constructor(
         }
     }
 
+    val partnerDocs = listOf(
+        CdqTestValues.businessPartner1,
+        CdqTestValues.businessPartner2,
+        CdqTestValues.businessPartner3
+    )
+
     @BeforeEach
     fun beforeEach() {
-        val partnerDocs = listOf(
-            CdqTestValues.businessPartner1,
-            CdqTestValues.businessPartner2,
-            CdqTestValues.businessPartner3
-        )
-
         val importCollection = BusinessPartnerCollectionCdq(
             partnerDocs.size,
             null,
@@ -109,28 +107,15 @@ class ElasticSearchControllerIT @Autowired constructor(
     @Test
     fun `export only new partners`() {
         //export once to get partners into elasticsearch for given system state
-        val fullExport = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .expectBody(ExportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
-
-        assertThat(fullExport.exportedSize).isEqualTo(3)
-        assertThat(fullExport.exportedBpns.size).isEqualTo(3)
+        assertThat(exportResponse.count).isEqualTo(3)
+        assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
         //export now to check behaviour
-        val emptyExport = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .expectBody(ExportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
-
-        assertThat(emptyExport.exportedSize).isEqualTo(0)
-        assertThat(emptyExport.exportedBpns.size).isEqualTo(0)
+        assertThat(exportResponse.count).isEqualTo(0)
     }
 
     /**
@@ -140,21 +125,10 @@ class ElasticSearchControllerIT @Autowired constructor(
      */
     @Test
     fun `can search exported partners`() {
-        val exportResponse = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .expectBody(ExportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
-
-        assertThat(exportResponse.exportedSize).isEqualTo(3)
-        assertThat(exportResponse.exportedBpns.size).isEqualTo(3)
-        assertThat(exportResponse.exportedBpns).doesNotHaveDuplicates()
-
-        findBusinessPartnersByBpn(exportResponse.exportedBpns)
-            .forEach { assertThatCanSearchBusinessPartnerByName(it.names.first().value, it.bpn) }
-
+        assertThat(exportResponse.count).isEqualTo(3)
+        assertSearchableByNames(partnerDocs.map { it.names.first().value })
     }
 
     /**
@@ -164,25 +138,13 @@ class ElasticSearchControllerIT @Autowired constructor(
      */
     @Test
     fun `empty index`() {
-
-        val names = listOf(
-            CdqTestValues.businessPartner1.names.first().value,
-            CdqTestValues.businessPartner2.names.first().value,
-            CdqTestValues.businessPartner3.names.first().value,
-        )
+        val names = partnerDocs.map { it.names.first().value }
 
         // fill the elasticsearch index
-        val response = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .returnResult<ExportResponse>()
-            .responseBody
-            .blockFirst()!!
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
-        //Check entries searchable
-        findBusinessPartnersByBpn(response.exportedBpns)
-            .forEach { assertThatCanSearchBusinessPartnerByName(it.names.first().value, it.bpn) }
-
+        assertThat(exportResponse.count).isEqualTo(3)
+        assertSearchableByNames(names)
 
         //clear the index
         webTestClient.delete().uri(EndpointValues.ELASTIC_EXPORT_PATH)
@@ -202,9 +164,7 @@ class ElasticSearchControllerIT @Autowired constructor(
     fun `export all partners after empty index`() {
 
         // fill the elasticsearch index
-        webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
 
         //clear the index
@@ -213,41 +173,11 @@ class ElasticSearchControllerIT @Autowired constructor(
             .expectStatus().is2xxSuccessful
 
         //export partners again
-        val exportResponse = webTestClient.post().uri(EndpointValues.ELASTIC_EXPORT_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .expectBody(ExportResponse::class.java)
-            .returnResult()
-            .responseBody!!
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
 
-        assertThat(exportResponse.exportedSize).isEqualTo(3)
-        assertThat(exportResponse.exportedBpns.size).isEqualTo(3)
-        assertThat(exportResponse.exportedBpns).doesNotHaveDuplicates()
+        assertThat(exportResponse.count).isEqualTo(3)
+        assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
-        //check that exported partners are now indeed searchable
-        findBusinessPartnersByBpn(exportResponse.exportedBpns)
-            .forEach { bp ->
-                assertThat(searchBusinessPartnerByName(bp.names.first().value).content)
-                    .anyMatch { it.businessPartner.bpn == bp.bpn }
-            }
-
-    }
-
-
-    private fun findBusinessPartnersByBpn(bpns: Collection<String>): Collection<BusinessPartnerResponse> {
-        return bpns.map { bpn ->
-            webTestClient.get().uri("${EndpointValues.CATENA_BUSINESS_PARTNER_PATH}/$bpn")
-                .exchange()
-                .expectStatus().is2xxSuccessful
-                .expectBody(BusinessPartnerResponse::class.java)
-                .returnResult()
-                .responseBody!!
-        }
-    }
-
-
-    private fun assertThatCanSearchBusinessPartnerByName(name: String, bpn: String) {
-        assertThat(searchBusinessPartnerByName(name).content).anyMatch { it.businessPartner.bpn == bpn }
     }
 
     private fun searchBusinessPartnerByName(name: String): PageResponse<BusinessPartnerSearchResponse> {
@@ -261,6 +191,15 @@ class ElasticSearchControllerIT @Autowired constructor(
             .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
             .responseBody
             .blockFirst()!!
+    }
+
+    private fun assertSearchableByNames(names: Collection<String>) {
+        names.forEach { name ->
+            val pageResult = searchBusinessPartnerByName(name)
+
+            assertThat(pageResult.content).isNotEmpty
+            assertThat(pageResult.content.first()).matches { it.businessPartner.names.any { n -> n.value == name } }
+        }
     }
 
 

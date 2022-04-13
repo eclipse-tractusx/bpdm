@@ -2,8 +2,8 @@ package com.catenax.gpdm.controller
 
 import com.catenax.gpdm.Application
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
-import com.catenax.gpdm.component.cdq.service.PartnerImportService
-import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncService
+import com.catenax.gpdm.component.cdq.service.ImportStarterService
+import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
@@ -88,8 +88,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @ActiveProfiles(value = ["test"])
 class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val importService: PartnerImportService,
-    val elasticSyncService: ElasticSyncService,
+    val importService: ImportStarterService,
+    val elasticSyncService: ElasticSyncStarterService,
     val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers
 ) {
@@ -136,8 +136,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             )
         )
 
-        importService.importAsync()
-        elasticSyncService.exportPartnersToElastic()
+        importService.import()
+        elasticSyncService.export()
     }
 
     @AfterEach

@@ -14,6 +14,8 @@ class SyncRecord(
     var status: SyncStatus,
     @Column(name = "progress", nullable = false)
     var progress: Float = 0f,
+    @Column(name = "count", nullable = false)
+    var count: Int = 0,
     @Column(name = "status_details")
     var errorDetails: String? = null,
     @Column(name = "save_state")
@@ -28,12 +30,11 @@ class SyncRecord(
 
 enum class SyncType{
     ELASTIC,
-    CDQ_IMPORT,
-    CDQ_EXPORT
+    CDQ_IMPORT
 }
 
 enum class SyncStatus{
-    NOT_SYNCHED,
+    NOT_SYNCED,
     RUNNING,
     SUCCESS,
     ERROR

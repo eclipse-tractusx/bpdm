@@ -24,20 +24,22 @@ class SyncRecordService(
         return syncRecordRepository.findByType(type)?: run {
             val newEntry = SyncRecord(
                 type,
-                SyncStatus.NOT_SYNCHED
+                SyncStatus.NOT_SYNCED
             )
             syncRecordRepository.save(newEntry)
         }
     }
 
-    fun setSynchronizationStart(record: SyncRecord): SyncRecord{
-        if(record.status == SyncStatus.RUNNING)
+    fun setSynchronizationStart(record: SyncRecord): SyncRecord {
+        if (record.status == SyncStatus.RUNNING)
             throw BpdmSyncConflictException(SyncType.CDQ_IMPORT)
 
-        record.progress = if(record.status == SyncStatus.ERROR) record.progress else 0f
+        record.progress = if (record.status == SyncStatus.ERROR) record.progress else 0f
+        record.count = if (record.status == SyncStatus.ERROR) record.count else 0
         record.startedAt = Instant.now().atOffset(ZoneOffset.UTC)
         record.status = SyncStatus.RUNNING
         record.errorDetails = null
+
 
         return syncRecordRepository.save(record)
     }
@@ -55,7 +57,7 @@ class SyncRecordService(
         return syncRecordRepository.save(record)
     }
 
-    fun setSynchronizationError(record: SyncRecord, errorMessage: String, saveState: String?): SyncRecord{
+    fun setSynchronizationError(record: SyncRecord, errorMessage: String, saveState: String?): SyncRecord {
         record.finishedAt = Instant.now().atOffset(ZoneOffset.UTC)
         record.status = SyncStatus.ERROR
         record.errorDetails = errorMessage
@@ -64,16 +66,26 @@ class SyncRecordService(
         return syncRecordRepository.save(record)
     }
 
-    fun setProgress(record: SyncRecord, progress: Float): SyncRecord{
-        if(record.status != SyncStatus.RUNNING)
+    fun setProgress(record: SyncRecord, count: Int, progress: Float): SyncRecord {
+        if (record.status != SyncStatus.RUNNING)
             throw BpdmSyncStateException("Synchronization of type ${record.type} can't change progress when not running.")
 
+        record.count = count
         record.progress = progress
 
         return syncRecordRepository.save(record)
     }
 
+    fun reset(record: SyncRecord): SyncRecord {
+        record.status = SyncStatus.NOT_SYNCED
+        record.errorDetails = null
+        record.errorSave = null
+        record.startedAt = null
+        record.finishedAt = null
+        record.count = 0
+        record.progress = 0f
 
-
+        return syncRecordRepository.save(record)
+    }
 
 }
