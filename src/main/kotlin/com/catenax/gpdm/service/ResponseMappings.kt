@@ -163,5 +163,5 @@ fun BankAccount.toDto(): BankAccountResponse {
 }
 
 fun SyncRecord.toDto(): SyncResponse{
-    return SyncResponse(type, status, progress, errorDetails, startedAt, finishedAt)
+    return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
 }

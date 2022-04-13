@@ -1,6 +1,11 @@
 package com.catenax.gpdm.util
 
+import com.catenax.gpdm.dto.response.SyncResponse
+import com.catenax.gpdm.entity.SyncStatus
+import org.assertj.core.api.Assertions
 import org.springframework.stereotype.Component
+import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 
@@ -48,7 +53,27 @@ class TestHelpers(
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate()
 
         em.transaction.commit()
+    }
 
+    fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncResponse {
+        client.post().uri(syncPath)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
 
+        //Wait for the async import to finish
+        Thread.sleep(1000)
+
+        val syncResponse = client.get().uri(syncPath)
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful
+            .returnResult<SyncResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        Assertions.assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
+
+        return syncResponse
     }
 }

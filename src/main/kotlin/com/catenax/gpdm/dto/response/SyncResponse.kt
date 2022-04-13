@@ -7,8 +7,9 @@ import java.time.OffsetDateTime
 data class SyncResponse (
     val type: SyncType,
     val status: SyncStatus,
+    val count: Int = 0,
     val progress: Float = 0f,
     val errorDetails: String? = null,
     val startedAt: OffsetDateTime? = null,
     val finishedAt: OffsetDateTime? = null
-        )
+)

@@ -1,6 +1,6 @@
 package com.catenax.gpdm.component.cdq.controller
 
-import com.catenax.gpdm.component.cdq.service.PartnerImportService
+import com.catenax.gpdm.component.cdq.service.ImportStarterService
 import com.catenax.gpdm.dto.response.SyncResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/cdq")
 class CdqController(
-    val partnerImportService: PartnerImportService
+    val partnerImportService: ImportStarterService
 ) {
     @Operation(
         summary = "Import new business partner records from CDQ",
