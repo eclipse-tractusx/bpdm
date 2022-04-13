@@ -1,7 +1,6 @@
 package com.catenax.gpdm.entity
 
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import javax.persistence.*
 
 @Entity

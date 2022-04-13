@@ -8,7 +8,6 @@ import com.catenax.gpdm.entity.ConfigurationEntry
 import com.catenax.gpdm.repository.ConfigurationEntryRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.text.SimpleDateFormat

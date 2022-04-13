@@ -7,8 +7,9 @@ import com.catenax.gpdm.exception.BpdmSyncConflictException
 import com.catenax.gpdm.exception.BpdmSyncStateException
 import com.catenax.gpdm.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
-import java.time.*
-import java.time.format.DateTimeFormatter
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @Service
 class SyncRecordService(

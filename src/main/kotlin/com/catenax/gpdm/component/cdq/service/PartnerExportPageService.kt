@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import java.time.OffsetDateTime
 
 @Service
 class PartnerExportPageService(
@@ -22,6 +21,10 @@ class PartnerExportPageService(
     private val adapterProperties: CdqAdapterConfigProperties,
     private val objectMapper: ObjectMapper
 ) {
+    companion object{
+        const val BUSINESS_PARTNER_PATH = "/businesspartners"
+    }
+
 
     @Transactional
     fun export(partnersToSync: Collection<BusinessPartnerResponse>): Collection<BusinessPartnerCdq> {
@@ -40,7 +43,7 @@ class PartnerExportPageService(
             .get()
             .uri { builder ->
                 builder
-                    .path("/businesspartners")
+                    .path(BUSINESS_PARTNER_PATH)
                     .queryParam("limit", adapterProperties.importLimit)
                     .queryParam("datasource", adapterProperties.datasource)
                     .queryParam("featuresOn", "USE_NEXT_START_AFTER")
@@ -66,7 +69,7 @@ class PartnerExportPageService(
             .get()
             .uri { builder ->
                 builder
-                    .path("/businesspartners")
+                    .path(BUSINESS_PARTNER_PATH)
                     .queryParam("businessPartnerId", cdqIds.joinToString())
                 builder.build()
             }
@@ -94,7 +97,7 @@ class PartnerExportPageService(
 
         webClient
             .put()
-            .uri("/businesspartners")
+            .uri(BUSINESS_PARTNER_PATH)
             .bodyValue(objectMapper.writeValueAsString(requestBody))
             .retrieve()
             .bodyToMono<UpsertResponse>()
