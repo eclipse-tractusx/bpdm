@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
@@ -29,15 +30,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
-    override fun configure(http: HttpSecurity) {
-        http.headers().frameOptions().disable()
-
-        http
-            .csrf().disable()
-            .authorizeRequests().anyRequest().permitAll()
-
+    override fun configure(web: WebSecurity) {
+        web
+            .ignoring().antMatchers("**")
     }
-
 }
 
 @EnableWebSecurity
@@ -73,7 +69,6 @@ class KeycloakSecurityConfig(
         super.configure(http)
         http
             .cors().and()
-            .csrf().disable()
             .authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()
                 .antMatchers("/v3/api-docs/**").permitAll()
