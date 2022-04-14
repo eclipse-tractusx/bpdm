@@ -13,12 +13,9 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
-securityContext:
-  allowPrivilegeEscalation: false
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 3000
-  fsGroup: 2000
+podSecurityContext: {}
+
+securityContext: {}
 
 applicationSecrets: dev-bpdm-application
 

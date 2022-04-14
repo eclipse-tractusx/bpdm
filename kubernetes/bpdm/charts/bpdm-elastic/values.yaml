@@ -17,12 +17,14 @@ nameOverride: ""
 fullnameOverride: ""
 
 
-securityContext:
-  allowPrivilegeEscalation: false
+podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 3000
   fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
 
 resources:
   limits:

@@ -19,11 +19,14 @@ applicationSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
-securityContext:
-  allowPrivilegeEscalation: false
+podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 3000
+  fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
 
 service:
   type: ClusterIP
@@ -41,13 +44,13 @@ postgres:
 
 livenessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 30
+  initialDelaySeconds: 60
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 1
 readinessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 30
+  initialDelaySeconds: 20
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 1
