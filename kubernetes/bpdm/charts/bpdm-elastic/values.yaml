@@ -13,15 +13,20 @@ image:
 
 discoveryType: single-node
 
-imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 
-podSecurityContext:
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 3000
-  fsGroup: 2000
 
-
-securityContext: {}
+resources:
+  limits:
+    cpu: 500m
+    memory: 8Gi
+  requests:
+    cpu: 100m
+    memory: 4Gi

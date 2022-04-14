@@ -12,24 +12,18 @@ image:
 #Spring profiles under which the application should run
 springProfiles: []
 
-
-applicationSecrets: {}
+applicationSecrets:
+  name: dev-bpdm-application
+  mappings: { }
 
 nameOverride: ""
 fullnameOverride: ""
 
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 3000
 
 service:
   type: ClusterIP
@@ -37,7 +31,7 @@ service:
 
 ingress:
   issuerName: letsencrypt-prod
-  hostSuffix: demo.catena-x.net
+  host: catenax-bpdm-dev.demo.catena-x.net
 
 elastic:
   enabled: false
@@ -45,5 +39,24 @@ elastic:
 postgres:
   enabled: false
 
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
 
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 500Mi
 

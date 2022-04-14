@@ -14,12 +14,6 @@ spec:
       labels:
         {{- include "bpdm-postgres.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -32,12 +26,12 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: dev-bpdm-application
+                  name: {{ .Values.applicationSecrets  }}
                   key: db-user
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: dev-bpdm-application
+                  name: {{ .Values.applicationSecrets  }}
                   key: db-pass
           ports:
             - containerPort: 5432
@@ -45,6 +39,8 @@ spec:
             - mountPath: /var/lib/postgresql/data
               name: {{ include "bpdm-postgres.fullname" . }}
               subPath: postgres
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: {{ include "bpdm-postgres.fullname" . }}
           persistentVolumeClaim:

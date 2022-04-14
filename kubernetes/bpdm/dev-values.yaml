@@ -9,10 +9,12 @@ springProfiles:
   - dev
 
 applicationSecrets:
-  db-user: BPDM_DB_USER
-  db-pass: BPDM_DB_PASS
-  keycloak-secret: BPDM_KEYCLOAK_SECRET
-  cdq-key: BPDM_CDQ_KEY
+  name: dev-bpdm-application
+  mappings:
+    db-user: BPDM_DB_USER
+    db-pass: BPDM_DB_PASS
+    keycloak-secret: BPDM_KEYCLOAK_SECRET
+    cdq-key: BPDM_CDQ_KEY
 
 elastic:
   enabled: true

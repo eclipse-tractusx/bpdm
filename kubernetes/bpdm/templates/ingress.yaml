@@ -5,21 +5,21 @@ metadata:
   labels:
       {{- include "bpdm.labels" . | nindent 4 }}
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.issuerName }}
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - catenax-bpdm-dev.demo.catena-x.net
+        - {{ .Values.ingress.host }}
       secretName: {{ include "bpdm.fullname" . }}-tls
   rules:
-  - host: catenax-bpdm-dev.demo.catena-x.net
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ include "bpdm.fullname" . }}
-            port:
-              number: {{ .Values.service.port }}
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "bpdm.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
