@@ -1,35 +1,28 @@
-# Default values for bpdm-elastic.
+# Default values for bpdm-postgres.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  registry: docker.elastic.co
-  repository: elasticsearch/elasticsearch
+  repository: postgres
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
-discoveryType: single-node
-
 nameOverride: ""
 fullnameOverride: ""
 
+podSecurityContext: {}
 
-podSecurityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 3000
-  fsGroup: 2000
+securityContext: {}
 
-securityContext:
-  allowPrivilegeEscalation: false
+applicationSecrets: dev-bpdm-application
 
 resources:
   limits:
     cpu: 500m
-    memory: 8Gi
+    memory: 2Gi
   requests:
     cpu: 100m
-    memory: 4Gi
+    memory: 1Gi

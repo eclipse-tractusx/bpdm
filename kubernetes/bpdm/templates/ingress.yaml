@@ -6,22 +6,20 @@ metadata:
       {{- include "bpdm.labels" . | nindent 4 }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.issuerName }}
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
-  ingressClassName: {{ include "bpdm.fullname" . }}
+  ingressClassName: nginx
   tls:
-  - hosts:
-    - {{ include "bpdm.host" . }}
-    secretName: tls-secret
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ include "bpdm.fullname" . }}-tls
   rules:
-  - host: {{ include "bpdm.host" . }}
-    http:
-      paths:
-      - path: /(.*)
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ include "bpdm.fullname" . }}
-            port:
-              number: {{ .Values.service.port }}
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "bpdm.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}

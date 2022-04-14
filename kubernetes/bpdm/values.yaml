@@ -10,93 +10,56 @@ image:
   pullPolicy: IfNotPresent
 
 #Spring profiles under which the application should run
-springProfiles:
-  - dev
+springProfiles: []
 
-# secrets should be set from outside, e.g. helm install -set applicationSecrets.db-user.secret=...
 applicationSecrets:
-  db-user:
-    envName: BPDM_DB_USER
-    secret:
-  db-pass:
-    envName: BPDM_DB_PASS
-    secret:
-  keycloak-secret:
-    envName: BPDM_KEYCLOAK_SECRET
-    secret:
-  cdq-key:
-    envName: BPDM_CDQ_KEY
-    secret:
-
-# secrets should be set from outside, e.g. helm install -set imagePullSecrets.user=...
-imagePullSecrets:
-  mail: nico.koprowski@mercedes-benz.com
-  user:
-  password:
-
+  name: dev-bpdm-application
+  mappings: { }
 
 nameOverride: ""
 fullnameOverride: ""
 
-podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
 
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  allowPrivilegeEscalation: false
 
 service:
   type: ClusterIP
   port: 8080
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
 ingress:
   issuerName: letsencrypt-prod
-  hostSuffix: germanywestcentral.cloudapp.azure.com
+  host: catenax-bpdm-dev.demo.catena-x.net
 
-ingnginx:
-  controller:
-    admissionWebhooks:
-      enabled: false
-    ingressClassResource:
-      name: release-bpdm
-    replicaCount: 1
-    nodeSelector:
-      kubernetes.io/os: linux
-    service:
-      loadBalancerIP: #Custom IP under which the loadBalancer should be available
-      annotations:
-        service.beta.kubernetes.io/azure-dns-label-name: catenax-bpdm-release
+elastic:
+  enabled: false
 
+postgres:
+  enabled: false
 
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 1
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 500Mi
 

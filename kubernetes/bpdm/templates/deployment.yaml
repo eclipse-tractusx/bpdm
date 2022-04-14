@@ -5,25 +5,17 @@ metadata:
   labels:
     {{- include "bpdm.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "bpdm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "bpdm.selectorLabels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ include "bpdm.imagePullSecretsName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+             {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -33,9 +25,13 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfiles | join ","  }}
-            {{- $appSecretsName := (include "bpdm.applicationSecretsName" .) }}
-            {{- range $key, $val := .Values.applicationSecrets }}
-            - name: {{ $val.envName }}
+            - name: BPDM_DB_HOST
+              value: {{ printf "%s-%s" .Release.Name "postgres" }}
+            - name: BPDM_ELASTIC_HOST
+              value: {{ printf "%s-%s" .Release.Name "elastic" }}
+            {{- $appSecretsName := .Values.applicationSecrets.name }}
+            {{- range $key, $val := .Values.applicationSecrets.mappings }}
+            - name: {{ $val }}
               valueFrom:
                 secretKeyRef:
                   name: {{ $appSecretsName }}
@@ -45,17 +41,37 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "actuator/health/liveness"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: "/actuator/health/readiness"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ include "bpdm.name" . }}
+                topologyKey: "kubernetes.io/hostname"
