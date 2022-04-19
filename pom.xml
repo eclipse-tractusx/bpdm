@@ -267,6 +267,20 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/main/kotlin</source>
+                                <source>target/generated-sources/kapt/compile</source>
+                                <source>target/generated-sources/kaptKotlin</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Manage database migrations -->
