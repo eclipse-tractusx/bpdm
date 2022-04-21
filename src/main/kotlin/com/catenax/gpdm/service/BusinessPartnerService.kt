@@ -1,7 +1,9 @@
 package com.catenax.gpdm.service
 
+import com.catenax.gpdm.dto.ChangelogEntryDto
 import com.catenax.gpdm.dto.request.BusinessPartnerRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
+import com.catenax.gpdm.entity.ChangelogType
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
@@ -20,6 +22,7 @@ class BusinessPartnerService(
     val businessPartnerRepository: BusinessPartnerRepository,
     val identifierTypeRepository: IdentifierTypeRepository,
     val identifierStatusRepository: IdentifierStatusRepository,
+    val partnerChangelogService: PartnerChangelogService
         ){
 
     @Transactional
@@ -54,6 +57,7 @@ class BusinessPartnerService(
     fun createPartners(bpDtos: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse>{
         val bpEntities = requestConversionService.buildBusinessPartners(bpDtos)
         persistenceService.saveAll(bpEntities)
+        partnerChangelogService.createChangelogEntries(bpEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
         return bpEntities.map { it.toDto() }
     }
 
