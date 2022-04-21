@@ -49,6 +49,8 @@ class TestHelpers(
         em.createNativeQuery("truncate table business_partners_roles").executeUpdate()
         em.createNativeQuery("truncate table business_partners").executeUpdate()
         em.createNativeQuery("truncate table configuration_entries").executeUpdate()
+        em.createNativeQuery("truncate table sync_records").executeUpdate()
+        em.createNativeQuery("truncate table partner_changelog_entries").executeUpdate()
 
         em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate()
 
