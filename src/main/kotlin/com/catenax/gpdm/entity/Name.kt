@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "names")
+@Table(name = "names",
+    indexes = [
+        Index(columnList = "partner_id")
+    ])
 class Name(
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -18,7 +21,7 @@ class Name(
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="partner_id", nullable=false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
 ) : BaseEntity()
 
 enum class NameType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<NameType>{

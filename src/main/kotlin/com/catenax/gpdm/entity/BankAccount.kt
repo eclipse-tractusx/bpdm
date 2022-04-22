@@ -4,9 +4,13 @@ import com.neovisionaries.i18n.CurrencyCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "bank_accounts")
+@Table(
+    name = "bank_accounts",
+    indexes = [
+        Index(columnList = "partner_id")
+    ])
 class BankAccount (
-    @ElementCollection(targetClass = Float::class)
+    @ElementCollection(targetClass = Float::class,  fetch = FetchType.EAGER)
     @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")])
     @Column(name = "score", nullable = false)
     val trustScores: Set<Float>,
@@ -24,5 +28,5 @@ class BankAccount (
 
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
         ):BaseEntity()

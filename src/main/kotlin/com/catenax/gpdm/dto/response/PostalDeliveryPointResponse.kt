@@ -14,9 +14,9 @@ data class PostalDeliveryPointResponse (
         @Schema(description = "Full denotation of the delivery point")
         val value: String,
         @Schema(description = "Abbreviation or shorthand of the locality's name")
-        val shortName: String?,
+        val shortName: String? = null,
         @Schema(description = "Number/code of the delivery point")
-        val number: String?,
+        val number: String? = null,
         @Schema(description = "Type of the specified delivery point")
         val type: TypeKeyNameUrlDto<PostalDeliveryPointType>,
         @Schema(description = "Language the delivery point is specified in")

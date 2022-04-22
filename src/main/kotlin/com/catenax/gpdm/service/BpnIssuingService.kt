@@ -9,6 +9,7 @@ import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
 import com.catenax.gpdm.repository.IssuingBodyRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
 
 
@@ -20,20 +21,43 @@ class BpnIssuingService(
     val configurationEntryRepository: ConfigurationEntryRepository,
     val bpnConfigProperties: BpnConfigProperties
 ) {
-    fun issueLegalEntity(): String{
-        val counterEntry = getOrCreateCounter()
-        val counterValue = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
-        val code = toBpnCode(counterValue)
-        val checksum = calculateChecksum(code)
 
-        counterEntry.value = (counterValue+1).toString()
+
+    @Transactional
+    fun issueLegalEntities(count: Int): Collection<String>{
+        val counterEntry = getOrCreateCounter()
+        val startCounter =  counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
+
+        val createdBpns = (0 .. count)
+            .map {
+                createLegalEntityNumber(startCounter + it)
+            }
+
+        counterEntry.value = (startCounter+count).toString()
         configurationEntryRepository.save(counterEntry)
 
-        return "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}$code$checksum"
+        return createdBpns
     }
+
+
+    fun addIdentifiers(partners: Collection<BusinessPartner>){
+        val type = getOrCreateIdentifierType()
+        val status = getOrCreateIdentifierStatus()
+        val agency = getOrCreateAgency()
+
+       partners.forEach{ it.identifiers.add(Identifier(it.bpn, type, status, agency, it)) }
+    }
+
 
     fun createIdentifier(bp: BusinessPartner): Identifier{
         return Identifier(bp.bpn, getOrCreateIdentifierType(), getOrCreateIdentifierStatus(), getOrCreateAgency(), bp)
+    }
+
+    private fun createLegalEntityNumber(number: Long): String{
+        val code = toBpnCode(number)
+        val checksum = calculateChecksum(code)
+
+        return "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}$code$checksum"
     }
 
     private fun getOrCreateCounter(): ConfigurationEntry {

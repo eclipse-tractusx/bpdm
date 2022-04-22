@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.CountryCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "post_codes")
+@Table(name = "post_codes",
+    indexes = [
+        Index(columnList = "address_id")
+    ])
 class PostCode (
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -16,7 +19,7 @@ class PostCode (
     val countryCode: CountryCode,
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    val address: Address
+    var address: Address
         ) : BaseEntity()
 
 enum class PostCodeType(private val codeName: String, private val url: String): NamedUrlType, HasDefaultValue<PostCodeType>{

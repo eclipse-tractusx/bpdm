@@ -14,9 +14,9 @@ data class AdministrativeAreaResponse (
     @Schema(description = "Full name of the area")
     val value: String,
     @Schema(description = "Abbreviation or shorthand of the area")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "FIPS code if applicable")
-    val fipsCode: String?,
+    val fipsCode: String? = null,
     @Schema(description = "Type of specified area")
     val type: TypeKeyNameUrlDto<AdministrativeAreaType>,
     @Schema(description = "Language the area is specified in")

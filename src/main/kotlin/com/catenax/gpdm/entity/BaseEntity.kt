@@ -1,5 +1,8 @@
 package com.catenax.gpdm.entity
 
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+import java.time.OffsetDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -15,8 +18,10 @@ abstract class BaseEntity(
     val uuid: UUID = UUID.randomUUID(),
 
     @Column(updatable = false, nullable = false, name = "CREATED_AT")
-    val createdAt: Date = Date(),
+    @CreationTimestamp
+    val createdAt: OffsetDateTime = OffsetDateTime.now(),
 
     @Column(nullable = false, name = "UPDATED_AT")
-    val updatedAt: Date = Date()
+    @UpdateTimestamp
+    val updatedAt: OffsetDateTime = OffsetDateTime.now()
 )

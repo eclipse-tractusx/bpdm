@@ -20,7 +20,7 @@ data class RelationResponse (
     @Schema(description = "BPN of partner which is the target of the relation")
     val endNode: String,
     @Schema(description = "Time when the relation started")
-    val startedAt: LocalDateTime?,
+    val startedAt: LocalDateTime? = null,
     @Schema(description = "Time when the relation ended")
-    val endedAt: LocalDateTime?
+    val endedAt: LocalDateTime? = null
         )

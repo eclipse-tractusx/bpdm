@@ -7,7 +7,7 @@ import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
-import com.catenax.gpdm.util.CdqTestValues
+import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.ElasticsearchContainer
 import com.catenax.gpdm.util.EndpointValues
 import com.catenax.gpdm.util.TestHelpers
@@ -65,9 +65,9 @@ class ElasticSearchControllerIT @Autowired constructor(
     }
 
     val partnerDocs = listOf(
-        CdqTestValues.businessPartner1,
-        CdqTestValues.businessPartner2,
-        CdqTestValues.businessPartner3
+        CdqValues.businessPartner1,
+        CdqValues.businessPartner2,
+        CdqValues.businessPartner3
     )
 
     @BeforeEach

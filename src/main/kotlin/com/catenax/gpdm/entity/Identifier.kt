@@ -3,7 +3,10 @@ package com.catenax.gpdm.entity
 import javax.persistence.*
 
 @Entity
-@Table(name = "identifiers")
+@Table(name = "identifiers",
+    indexes = [
+        Index(columnList = "partner_id")
+    ])
 class Identifier(
     @Column(name = "`value`", nullable = false)
     var value: String,

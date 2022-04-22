@@ -14,7 +14,7 @@ data class NameResponse (
     @Schema(description = "Full name")
     val value: String,
     @Schema(description = "Abbreviated name or shorthand")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Type of name")
     val type: TypeKeyNameUrlDto<NameType>,
     @Schema(description = "Language in which the name is specified")

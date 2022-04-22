@@ -2,19 +2,20 @@ package com.catenax.gpdm.entity
 
 import javax.persistence.*
 
+
 @Entity
 @Table(name = "business_partners")
 class BusinessPartner(
     @Column(name="bpn", nullable = false, unique = true)
-    val bpn: String,
+    var bpn: String,
     @ManyToOne
     @JoinColumn(name="legal_form_id")
-    val legalForm: LegalForm?,
+    var legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
     @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val types: Set<BusinessPartnerType>,
+    var types: Set<BusinessPartnerType>,
     @ManyToMany(cascade = [ CascadeType.ALL ])
     @JoinTable(
         name = "business_partners_roles",
@@ -23,29 +24,29 @@ class BusinessPartner(
     )
     val roles: Set<Role>
 ): BaseEntity(){
-    @OneToMany(mappedBy = "partner")
-    lateinit var identifiers: Set<Identifier>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val identifiers: MutableSet<Identifier> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner")
-    lateinit var names: Set<Name>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val names: MutableSet<Name> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner")
-    lateinit var stati: Set<BusinessStatus>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner")
-    lateinit var addresses: Set<Address>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+   val addresses: MutableSet<Address> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner")
-    lateinit var classification: Set<Classification>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+   val classification: MutableSet<Classification> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner")
-    lateinit var bankAccounts: Set<BankAccount>
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
 
-    @OneToMany(mappedBy = "startNode")
-    lateinit var startNodeRelations: Set<Relation>
+    @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val startNodeRelations: MutableSet<Relation> = mutableSetOf()
 
-    @OneToMany(mappedBy = "endNode")
-    lateinit var endNodeRelations: Set<Relation>
+    @OneToMany(mappedBy = "endNode", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val endNodeRelations: MutableSet<Relation> = mutableSetOf()
 }
 
 

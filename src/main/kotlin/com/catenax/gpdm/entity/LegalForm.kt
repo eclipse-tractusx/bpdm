@@ -14,7 +14,7 @@ class LegalForm(
     val language: LanguageCode,
     @Column(name = "abbreviation")
     val mainAbbreviation: String?,
-    @ManyToMany(cascade = [ CascadeType.ALL ])
+    @ManyToMany(cascade = [ CascadeType.ALL ],  fetch = FetchType.EAGER)
     @JoinTable(
         name = "legal_forms_legal_categories",
         joinColumns = [ JoinColumn(name = "form_id") ],

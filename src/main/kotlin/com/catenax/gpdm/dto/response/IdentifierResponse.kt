@@ -14,7 +14,7 @@ data class IdentifierResponse (
         @Schema(description = "Type of the identifier")
         val type: TypeKeyNameUrlDto<String>,
         @Schema(description = "Body which issued the identifier")
-        val issuingBody:  TypeKeyNameUrlDto<String>?,
+        val issuingBody:  TypeKeyNameUrlDto<String>? = null,
         @Schema(description = "Status of the identifier")
-        val status: TypeKeyNameDto<String>?
+        val status: TypeKeyNameDto<String>? = null
         )

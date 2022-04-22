@@ -1,6 +1,5 @@
 package com.catenax.gpdm
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
 import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration
@@ -18,7 +17,6 @@ import org.springframework.boot.runApplication
         ReactiveElasticsearchRestClientAutoConfiguration::class],
     scanBasePackages = [
         "com.catenax.gpdm.config",
-        "com.catenax.gpdm.adapter",
         "com.catenax.gpdm.controller",
         "com.catenax.gpdm.repository",
         "com.catenax.gpdm.service"])

@@ -7,7 +7,8 @@ import com.catenax.gpdm.component.cdq.dto.TypeKeyNameUrlCdq
 import com.catenax.gpdm.component.cdq.service.CdqRequestMappingService
 import com.catenax.gpdm.component.cdq.service.PartnerImportPageService
 import com.catenax.gpdm.repository.ConfigurationEntryRepository
-import com.catenax.gpdm.service.BusinessPartnerService
+import com.catenax.gpdm.service.BusinessPartnerBuildService
+import com.catenax.gpdm.service.BusinessPartnerFetchService
 import com.catenax.gpdm.service.MetadataService
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.context.annotation.Bean
@@ -54,7 +55,8 @@ class CdqAdapterConfig(
         cdqIdConfigProperties: CdqIdentifierConfigProperties,
         metadataService: MetadataService,
         mappingService: CdqRequestMappingService,
-        businessPartnerService: BusinessPartnerService
+        businessPartnerFetchService: BusinessPartnerFetchService,
+        businessPartnerBuildService: BusinessPartnerBuildService,
     ): PartnerImportPageService {
         return PartnerImportPageService(
             webClient,
@@ -62,10 +64,11 @@ class CdqAdapterConfig(
             cdqIdConfigProperties,
             metadataService,
             mappingService,
-            businessPartnerService,
+            businessPartnerFetchService,
             createCdqIdentifierType(),
             createCdqImportedStatus(),
-            createCdqIdentifierIssuer()
+            createCdqIdentifierIssuer(),
+            businessPartnerBuildService
         )
     }
 
