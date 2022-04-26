@@ -10,27 +10,32 @@ import com.catenax.gpdm.service.BusinessPartnerFetchService
 import com.catenax.gpdm.service.MetadataService
 import com.catenax.gpdm.service.toDto
 import org.springframework.data.domain.Pageable
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-open class PartnerImportPageService(
+@Service
+class PartnerImportPageService(
     private val webClient: WebClient,
     private val adapterProperties: CdqAdapterConfigProperties,
     private val cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: CdqRequestMappingService,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    private val cdqIdentifierType: TypeKeyNameUrlCdq,
-    private val cdqIdentifierImportedStatus: TypeKeyNameCdq,
-    private val cdqIssuer: TypeKeyNameUrlCdq,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
 ) {
 
+
+    private val cdqIdentifierType = TypeKeyNameUrlCdq(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
+    private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
+    private val cdqIssuer = TypeKeyNameUrlCdq(cdqIdConfigProperties.issuerKey, cdqIdConfigProperties.issuerName, "")
+
+
     @Transactional
-    open fun import(modifiedAfter: OffsetDateTime, startAfter: String?): ImportResponsePage {
+    fun import(modifiedAfter: OffsetDateTime, startAfter: String?): ImportResponsePage {
         val partnerCollection = webClient
             .get()
             .uri { builder ->
@@ -61,8 +66,8 @@ open class PartnerImportPageService(
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerCdq>){
         partners
-            .flatMap { it.identifiers.mapNotNull { id -> if(id.status?.technicalKey == null) null else id.status } }
-            .plus(cdqIdentifierImportedStatus)
+            .flatMap { it.identifiers.mapNotNull { id -> if (id.status?.technicalKey == null) null else id.status } }
+            .plus(cdqIdentifierStatus)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
