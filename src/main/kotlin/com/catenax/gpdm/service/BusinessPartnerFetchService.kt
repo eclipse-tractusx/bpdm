@@ -1,15 +1,15 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.entity.*
+import com.catenax.gpdm.entity.Address
+import com.catenax.gpdm.entity.BusinessPartner
+import com.catenax.gpdm.entity.Identifier
+import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.repository.IdentifierRepository
-import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
 import com.catenax.gpdm.repository.entity.AddressRepository
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

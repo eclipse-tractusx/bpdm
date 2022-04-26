@@ -128,11 +128,6 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun createLegalForm(dto: LegalFormRequest): LegalForm{
-        val categories = dto.category.map { LegalFormCategory(it.name, it.url) }.toSet()
-        return LegalForm(dto.name, dto.url, dto.language, dto.mainAbbreviation, categories, dto.technicalKey)
-    }
-
     private fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm?): BusinessPartner {
         return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet())
     }
