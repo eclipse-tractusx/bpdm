@@ -27,7 +27,6 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import java.time.LocalDateTime
 
 
 private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
@@ -224,14 +223,13 @@ class CdqControllerImportIT @Autowired constructor(
 
 
         //Prepare modified partners to import
-        val nowTime = LocalDateTime.now()
         val modifiedName1 = CdqValues.name1.copy(value = "${CdqValues.name1.value}_mod")
         val modifiedName2 = CdqValues.name2.copy(value = "${CdqValues.name2.value}_mod")
         val modifiedName3 = CdqValues.name3.copy(value = "${CdqValues.name3.value}_mod")
 
-        val updatedBusinessPartner1 =  CdqValues.businessPartner1.copy(lastModifiedAt = nowTime, names = listOf(modifiedName1))
-        val updatedBusinessPartner2 =  CdqValues.businessPartner2.copy(lastModifiedAt = nowTime, names = listOf(modifiedName2))
-        val updatedBusinessPartner3 =  CdqValues.businessPartner3.copy(lastModifiedAt = nowTime, names = listOf(modifiedName3))
+        val updatedBusinessPartner1 = CdqValues.businessPartner1.copy(names = listOf(modifiedName1))
+        val updatedBusinessPartner2 = CdqValues.businessPartner2.copy(names = listOf(modifiedName2))
+        val updatedBusinessPartner3 = CdqValues.businessPartner3.copy(names = listOf(modifiedName3))
 
         val modifiedNameResponse1 = ResponseValues.name1.copy(value = modifiedName1.value)
         val modifiedNameResponse2 = ResponseValues.name2.copy(value = modifiedName2.value)

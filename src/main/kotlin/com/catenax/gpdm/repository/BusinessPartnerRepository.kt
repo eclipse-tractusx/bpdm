@@ -35,7 +35,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     fun joinIdentifiers(partners: Set<BusinessPartner>): Set<BusinessPartner>
 
     @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.stati WHERE p IN :partners")
-    fun joinSatuses(partners: Set<BusinessPartner>): Set<BusinessPartner>
+    fun joinStatuses(partners: Set<BusinessPartner>): Set<BusinessPartner>
 
     @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.addresses WHERE p IN :partners")
     fun joinAddresses(partners: Set<BusinessPartner>): Set<BusinessPartner>

@@ -10,8 +10,8 @@ import javax.persistence.*
         Index(columnList = "partner_id")
     ])
 class BankAccount (
-    @ElementCollection(targetClass = Float::class,  fetch = FetchType.EAGER)
-    @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")])
+    @ElementCollection(targetClass = Float::class)
+    @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")], indexes = [Index(columnList = "account_id")])
     @Column(name = "score", nullable = false)
     val trustScores: Set<Float>,
     @Column(name = "currency", nullable = false)

@@ -9,7 +9,9 @@ import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.repository.IdentifierRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
+import com.catenax.gpdm.repository.LegalFormRepository
 import com.catenax.gpdm.repository.entity.AddressRepository
+import com.catenax.gpdm.repository.entity.BankAccountRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -21,8 +23,10 @@ class BusinessPartnerFetchService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val addressRepository: AddressRepository,
-    private val identifierRepository: IdentifierRepository
-        ){
+    private val identifierRepository: IdentifierRepository,
+    private val legalFormRepository: LegalFormRepository,
+    private val bankAccountRepository: BankAccountRepository
+) {
 
     /**
      * Fetch a business partner by [bpn] and return as [BusinessPartnerResponse]
@@ -56,7 +60,7 @@ class BusinessPartnerFetchService(
         businessPartnerRepository.joinIdentifiers(partners)
         businessPartnerRepository.joinNames(partners)
         businessPartnerRepository.joinAddresses(partners)
-        businessPartnerRepository.joinSatuses(partners)
+        businessPartnerRepository.joinStatuses(partners)
         businessPartnerRepository.joinClassifications(partners)
         businessPartnerRepository.joinBankAccounts(partners)
         businessPartnerRepository.joinRelations(partners)
@@ -67,13 +71,22 @@ class BusinessPartnerFetchService(
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
 
+        val legalForms = partners.mapNotNull { it.legalForm }.toSet()
+        legalFormRepository.joinCategories(legalForms)
+
         val addresses = partners.flatMap { it.addresses }.toSet()
         fetchAddressDependencies(addresses)
+
+        val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
+        bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
     }
 
-    private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address>{
+    private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {
+        addressRepository.joinContexts(addresses)
+        addressRepository.joinTypes(addresses)
+        addressRepository.joinVersions(addresses)
         addressRepository.joinAdminAreas(addresses)
         addressRepository.joinPostCodes(addresses)
         addressRepository.joinLocalities(addresses)

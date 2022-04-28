@@ -1,8 +1,14 @@
+CREATE INDEX idx_0640fc16905367702847f4e50 ON business_partners (legal_form_id);
+
 CREATE INDEX idx_27a3d3e2dc744e624f86c42ac ON thoroughfares (address_id);
 
 CREATE INDEX idx_27e28cee3b3c196d04d92dd16 ON localities (address_id);
 
 CREATE INDEX idx_40c1cd3586bff0d8838b5a42f ON classifications (partner_id);
+
+CREATE INDEX idx_4e7e988fa6c498489ca428ebe ON identifiers (type_id);
+
+CREATE INDEX idx_532f0f3cd0fcc87a073133ebe ON addresses (version_id);
 
 CREATE INDEX idx_68d0ddefca3d78782f306205a ON names (partner_id);
 
@@ -22,6 +28,20 @@ CREATE INDEX idx_9de08b456309ac30a77546592 ON identifiers (partner_id);
 
 CREATE INDEX idx_a91204c0e84c71629e3639ba7 ON relations (end_node_id);
 
+CREATE INDEX idx_aec173db9d054e39c515f547d ON identifiers (issuing_body_id);
+
+CREATE INDEX idx_d5b8f6e8e692c8f2a9f5fec48 ON identifiers (status);
+
 CREATE INDEX idx_e645e8b157b7bbaed58397144 ON business_stati (partner_id);
 
 CREATE INDEX idx_f8a9c5185fbb7e54bdd96edb8 ON postal_delivery_points (address_id);
+
+CREATE INDEX idx_address_contexts_fk ON address_contexts (address_id);
+
+CREATE INDEX idx_address_types_fk ON address_types (address_id);
+
+CREATE INDEX idx_bank_account_trust_scores_fk ON bank_account_trust_scores (account_id);
+
+CREATE INDEX idx_business_partner_types ON bank_account_trust_scores (account_id);
+
+CREATE INDEX idx_legal_forms_legal_categories_fk ON legal_forms_legal_categories (form_id);

@@ -14,11 +14,12 @@ class LegalForm(
     val language: LanguageCode,
     @Column(name = "abbreviation")
     val mainAbbreviation: String?,
-    @ManyToMany(cascade = [ CascadeType.ALL ],  fetch = FetchType.EAGER)
+    @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "legal_forms_legal_categories",
-        joinColumns = [ JoinColumn(name = "form_id") ],
-        inverseJoinColumns = [JoinColumn(name = "category_id")]
+        joinColumns = [JoinColumn(name = "form_id")],
+        inverseJoinColumns = [JoinColumn(name = "category_id")],
+        indexes = [Index(columnList = "form_id"), Index(columnList = "category_id")]
     )
     val categories: Set<LegalFormCategory>,
     @Column(name = "technical_key", nullable = false)

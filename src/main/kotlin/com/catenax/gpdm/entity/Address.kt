@@ -7,14 +7,19 @@ import javax.persistence.*
 @Table(
     name = "addresses",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "partner_id"),
+        Index(columnList = "version_id")
     ]
 )
 class Address (
     @Column(name="care_of")
     var careOf: String?,
     @ElementCollection(targetClass = String::class)
-    @JoinTable(name = "address_contexts", joinColumns = [JoinColumn(name = "address_id")])
+    @JoinTable(
+        name = "address_contexts",
+        joinColumns = [JoinColumn(name = "address_id")],
+        indexes = [Index(columnList = "address_id")]
+    )
     @Column(name = "context", nullable = false)
     val contexts: MutableSet<String> = mutableSetOf(),
     @Column(name = "country", nullable = false)
@@ -22,7 +27,11 @@ class Address (
     var country: CountryCode,
     @ElementCollection(targetClass = AddressType::class)
     @Enumerated(EnumType.STRING)
-    @JoinTable(name = "address_types", joinColumns = [JoinColumn(name = "address_id")])
+    @JoinTable(
+        name = "address_types",
+        joinColumns = [JoinColumn(name = "address_id")],
+        indexes = [Index(columnList = "address_id")]
+    )
     @Column(name = "type", nullable = false)
     val types: MutableSet<AddressType> = mutableSetOf(),
     @ManyToOne(cascade = [CascadeType.ALL])

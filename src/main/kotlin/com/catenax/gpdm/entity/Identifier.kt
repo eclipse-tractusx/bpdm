@@ -5,7 +5,10 @@ import javax.persistence.*
 @Entity
 @Table(name = "identifiers",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "partner_id"),
+        Index(columnList = "type_id"),
+        Index(columnList = "status"),
+        Index(columnList = "issuing_body_id")
     ])
 class Identifier(
     @Column(name = "`value`", nullable = false)
