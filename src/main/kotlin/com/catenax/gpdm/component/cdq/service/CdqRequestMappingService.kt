@@ -63,6 +63,7 @@ class CdqRequestMappingService(
 
     fun toRequest(partner: BusinessPartnerCdq): BusinessPartnerRequest {
         return BusinessPartnerRequest(
+            partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id)),
             partner.names.map { toRequest(it) },
             toOptionalReference(partner.legalForm),

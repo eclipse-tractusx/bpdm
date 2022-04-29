@@ -9,5 +9,5 @@ data class GeoCoordinateDto (
     @Schema(description = "Latitude coordinate")
     val latitude: Float,
     @Schema(description = "Altitude, if applicable")
-    val altitude: Float?
+    val altitude: Float? = null
         )

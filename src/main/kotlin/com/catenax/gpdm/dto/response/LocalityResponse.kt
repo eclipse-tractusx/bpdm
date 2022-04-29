@@ -14,7 +14,7 @@ data class LocalityResponse (
     @Schema(description = "Full name of the locality")
     val value: String,
     @Schema(description = "Abbreviation or shorthand of the locality's name")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Type of locality")
     val type: TypeKeyNameUrlDto<LocalityType>,
     @Schema(description = "Language the locality is specified in")

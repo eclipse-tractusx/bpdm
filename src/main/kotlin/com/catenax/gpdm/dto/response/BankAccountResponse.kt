@@ -10,7 +10,7 @@ data class BankAccountResponse (
     @Schema(description = "Unique identifier for reference purposes")
     val uuid: UUID,
     @Schema(description = "Trust scores for the account", defaultValue = "[]")
-    val trustScores: Collection<Float>,
+    val trustScores: Collection<Float> = emptyList(),
     @Schema(description = "Used currency in the account", defaultValue = "UNDEFINED")
     val currency: TypeKeyNameDto<CurrencyCode>,
     @Schema(description = "ID used to identify this account internationally")

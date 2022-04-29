@@ -3,7 +3,10 @@ package com.catenax.gpdm.entity
 import javax.persistence.*
 
 @Entity
-@Table(name = "classifications")
+@Table(name = "classifications",
+    indexes = [
+        Index(columnList = "partner_id")
+    ])
 class Classification (
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -14,7 +17,7 @@ class Classification (
     val type: ClassificationType?,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
         ): BaseEntity()
 
 enum class ClassificationType(val url: String){

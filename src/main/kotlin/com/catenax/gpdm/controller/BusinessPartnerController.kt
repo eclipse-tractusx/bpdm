@@ -8,7 +8,8 @@ import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
-import com.catenax.gpdm.service.BusinessPartnerService
+import com.catenax.gpdm.service.BusinessPartnerBuildService
+import com.catenax.gpdm.service.BusinessPartnerFetchService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/catena/business-partner")
 class BusinessPartnerController(
-    val businessPartnerService: BusinessPartnerService,
+    val businessPartnerFetchService: BusinessPartnerFetchService,
+    val businssPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties
 ) {
@@ -65,8 +67,8 @@ class BusinessPartnerController(
         idType: String?
     ): BusinessPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerService.findPartner(idValue)
-        else businessPartnerService.findPartnerByIdentifier(actualType, idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findPartner(idValue)
+        else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
     }
 
     @Operation(summary = "Create new business partner record",
@@ -80,7 +82,7 @@ class BusinessPartnerController(
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse> {
-        return businessPartnerService.createPartners(businessPartners)
+        return businssPartnerBuildService.upsertBusinessPartners(businessPartners)
     }
 
     @Operation(

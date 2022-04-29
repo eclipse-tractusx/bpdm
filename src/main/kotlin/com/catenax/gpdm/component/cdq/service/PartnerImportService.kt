@@ -42,7 +42,7 @@ class PartnerImportService(
                 syncRecordService.setProgress(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), importedCount, progress)
 
             } catch (exception: RuntimeException) {
-                syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), exception.message!!, startAfter)
+                syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), exception.message?: "No Message", startAfter)
                 throw exception
             }
 

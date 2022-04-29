@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "thoroughfares")
+@Table(name = "thoroughfares",
+    indexes = [
+        Index(columnList = "address_id")
+    ])
 class Thoroughfare (
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -24,7 +27,7 @@ class Thoroughfare (
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="address_id", nullable=false)
-    val address: Address
+    var address: Address
         ) : BaseEntity()
 
 enum class ThoroughfareType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<ThoroughfareType>{

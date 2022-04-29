@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "postal_delivery_points")
+@Table(name = "postal_delivery_points",
+    indexes = [
+        Index(columnList = "address_id")
+    ])
 class PostalDeliveryPoint(
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -20,7 +23,7 @@ class PostalDeliveryPoint(
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="address_id", nullable=false)
-    val address: Address
+    var address: Address
 ) : BaseEntity()
 
 enum class PostalDeliveryPointType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<PostalDeliveryPointType>{

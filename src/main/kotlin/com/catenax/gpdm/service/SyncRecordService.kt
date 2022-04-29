@@ -37,6 +37,7 @@ class SyncRecordService(
         record.progress = if (record.status == SyncStatus.ERROR) record.progress else 0f
         record.count = if (record.status == SyncStatus.ERROR) record.count else 0
         record.startedAt = Instant.now().atOffset(ZoneOffset.UTC)
+        record.finishedAt = null
         record.status = SyncStatus.RUNNING
         record.errorDetails = null
 
@@ -60,7 +61,7 @@ class SyncRecordService(
     fun setSynchronizationError(record: SyncRecord, errorMessage: String, saveState: String?): SyncRecord {
         record.finishedAt = Instant.now().atOffset(ZoneOffset.UTC)
         record.status = SyncStatus.ERROR
-        record.errorDetails = errorMessage
+        record.errorDetails = errorMessage.take(255)
         record.errorSave = saveState
 
         return syncRecordRepository.save(record)

@@ -14,9 +14,9 @@ data class PremiseResponse (
     @Schema(description = "Full denotation of the premise")
     val value: String,
     @Schema(description = "Abbreviation or shorthand")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Premise number")
-    val number: String?,
+    val number: String? = null,
     @Schema(description = "Type of premise")
     val type: TypeKeyNameUrlDto<PremiseType>,
     @Schema(description = "Language the premise is specified in")

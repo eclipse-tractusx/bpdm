@@ -4,48 +4,62 @@ import com.neovisionaries.i18n.CountryCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "addresses")
+@Table(
+    name = "addresses",
+    indexes = [
+        Index(columnList = "partner_id"),
+        Index(columnList = "version_id")
+    ]
+)
 class Address (
     @Column(name="care_of")
-    val careOf: String?,
+    var careOf: String?,
     @ElementCollection(targetClass = String::class)
-    @JoinTable(name = "address_contexts", joinColumns = [JoinColumn(name = "address_id")])
+    @JoinTable(
+        name = "address_contexts",
+        joinColumns = [JoinColumn(name = "address_id")],
+        indexes = [Index(columnList = "address_id")]
+    )
     @Column(name = "context", nullable = false)
-    val contexts: Set<String>,
+    val contexts: MutableSet<String> = mutableSetOf(),
     @Column(name = "country", nullable = false)
     @Enumerated(EnumType.STRING)
-    val country: CountryCode,
+    var country: CountryCode,
     @ElementCollection(targetClass = AddressType::class)
     @Enumerated(EnumType.STRING)
-    @JoinTable(name = "address_types", joinColumns = [JoinColumn(name = "address_id")])
+    @JoinTable(
+        name = "address_types",
+        joinColumns = [JoinColumn(name = "address_id")],
+        indexes = [Index(columnList = "address_id")]
+    )
     @Column(name = "type", nullable = false)
-    val types: Set<AddressType>,
-    @ManyToOne(cascade = [CascadeType.PERSIST])
+    val types: MutableSet<AddressType> = mutableSetOf(),
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "version_id", nullable = false)
-    val version: AddressVersion,
+    var version: AddressVersion,
     @Embedded
-    val geoCoordinates: GeographicCoordinate?,
+    var geoCoordinates: GeographicCoordinate?,
     @ManyToOne
     @JoinColumn(name="partner_id", nullable=false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
         ) : BaseEntity(){
-    @OneToMany(mappedBy = "address")
-    lateinit var administrativeAreas: Set<AdministrativeArea>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+   val administrativeAreas: MutableSet<AdministrativeArea> = mutableSetOf()
 
-    @OneToMany(mappedBy = "address")
-    lateinit var postCodes: Set<PostCode>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val postCodes: MutableSet<PostCode> = mutableSetOf()
 
-    @OneToMany(mappedBy = "address")
-    lateinit var thoroughfares: Set<Thoroughfare>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val thoroughfares: MutableSet<Thoroughfare> = mutableSetOf()
 
-    @OneToMany(mappedBy = "address")
-    lateinit var premises: Set<Premise>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+   val premises: MutableSet<Premise> = mutableSetOf()
 
-    @OneToMany(mappedBy = "address")
-    lateinit var postalDeliveryPoints: Set<PostalDeliveryPoint>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val postalDeliveryPoints: MutableSet<PostalDeliveryPoint> = mutableSetOf()
 
-    @OneToMany(mappedBy = "address")
-    lateinit var localities: Set<Locality>
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+   val localities: MutableSet<Locality> = mutableSetOf()
 }
 
 

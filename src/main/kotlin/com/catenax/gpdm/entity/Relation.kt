@@ -4,7 +4,11 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "relations")
+@Table(name = "relations",
+    indexes = [
+        Index(columnList = "start_node_id"),
+        Index(columnList = "end_node_id")
+    ])
 class Relation (
     @Column(name = "class", nullable = false)
     @Enumerated(EnumType.STRING)

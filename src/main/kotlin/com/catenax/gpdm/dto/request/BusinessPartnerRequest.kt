@@ -7,6 +7,7 @@ import javax.validation.constraints.NotEmpty
 
 @Schema(name = "Business Partner Request", description = "New business partner record")
 data class BusinessPartnerRequest (
+    val bpn: String?,
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<IdentifierRequest> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)

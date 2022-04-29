@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "premises")
+@Table(name = "premises",
+    indexes = [
+        Index(columnList = "address_id")
+    ])
 class Premise(
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -20,7 +23,7 @@ class Premise(
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name="address_id", nullable=false)
-    val address: Address
+    var address: Address
 ) : BaseEntity()
 
 enum class PremiseType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<PremiseType>{

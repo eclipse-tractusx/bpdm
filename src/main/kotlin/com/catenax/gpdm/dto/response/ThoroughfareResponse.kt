@@ -14,13 +14,13 @@ class ThoroughfareResponse (
         @Schema(description = "Full denotation of the thoroughfare")
         val value: String,
         @Schema(description = "Full name of the thoroughfare")
-        val name: String?,
+        val name: String? = null,
         @Schema(description = "Abbreviation or shorthand")
-        val shortName: String?,
+        val shortName: String? = null,
         @Schema(description = "Thoroughfare number")
-        val number: String?,
+        val number: String? = null,
         @Schema(description = "Direction information on the thoroughfare")
-        val direction: String?,
+        val direction: String? = null,
         @Schema(description = "Type of thoroughfare", defaultValue = "OTHER")
         var type: TypeKeyNameUrlDto<ThoroughfareType>,
         @Schema(description = "Language the thoroughfare is specified in")

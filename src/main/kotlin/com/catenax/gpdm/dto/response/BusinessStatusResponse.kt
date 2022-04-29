@@ -15,7 +15,7 @@ data class BusinessStatusResponse (
         @Schema(description = "Since when the status is/was valid")
         val validFrom: LocalDateTime,
         @Schema(description = "Until the status was valid, if applicable")
-        val validUntil: LocalDateTime?,
+        val validUntil: LocalDateTime? = null,
         @Schema(description = "The type of this status")
         val type: TypeKeyNameUrlDto<BusinessStatusType>
         )

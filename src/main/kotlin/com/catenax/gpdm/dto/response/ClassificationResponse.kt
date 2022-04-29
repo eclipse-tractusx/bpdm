@@ -8,6 +8,6 @@ import java.util.*
 data class ClassificationResponse (
         val uuid: UUID,
         val value: String,
-        val code: String?,
-        val type: TypeNameUrlDto?
+        val code: String? = null,
+        val type: TypeNameUrlDto? = null
         )

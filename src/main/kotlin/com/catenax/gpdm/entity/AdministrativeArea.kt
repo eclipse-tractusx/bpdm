@@ -5,7 +5,11 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "administrative_areas")
+@Table(name = "administrative_areas",
+    indexes = [
+        Index(columnList = "address_id")
+    ]
+)
 class AdministrativeArea(
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -24,7 +28,7 @@ class AdministrativeArea(
     val countryCode: CountryCode,
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    val address: Address
+    var address: Address
 ): BaseEntity()
 
 enum class AdministrativeAreaType(private val areaName: String, private val url: String): NamedUrlType, HasDefaultValue<AdministrativeAreaType>{

@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
-import java.util.*
 import javax.persistence.EntityManager
 
 /**
@@ -40,13 +39,12 @@ class ElasticSyncService(
      */
     fun exportPaginated(fromTime: OffsetDateTime, saveState: String?) {
         var page = saveState?.toIntOrNull() ?: 0
-        val fromTimeDate = Date.from(fromTime.toInstant())
         var docsPage: Page<BusinessPartnerDoc>
 
         do {
             try {
                 val pageRequest = PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
-                docsPage = elasticSyncPageService.exportPartnersToElastic(fromTimeDate, pageRequest)
+                docsPage = elasticSyncPageService.exportPartnersToElastic(fromTime, pageRequest)
                 page++
                 val record = syncRecordService.getOrCreateRecord(SyncType.ELASTIC)
                 val newCount = record.count + docsPage.content.size

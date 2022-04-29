@@ -15,6 +15,11 @@ class TestHelpers(
     entityManagerFactory: EntityManagerFactory
 ) {
 
+    companion object{
+        val RETRY_IMPORT_TIMES: Int = 5
+        val RETRY_IMPORT_BACKOFF: Long = 200
+    }
+
     val em: EntityManager = entityManagerFactory.createEntityManager()
 
     fun truncateH2() {
@@ -63,16 +68,25 @@ class TestHelpers(
             .expectStatus()
             .is2xxSuccessful
 
-        //Wait for the async import to finish
-        Thread.sleep(1000)
+        //check for async import to finish several times
+        var i = 1
+        var syncResponse: SyncResponse
+        do{
+            Thread.sleep(RETRY_IMPORT_BACKOFF)
 
-        val syncResponse = client.get().uri(syncPath)
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
-            .returnResult<SyncResponse>()
-            .responseBody
-            .blockFirst()!!
+            syncResponse = client.get().uri(syncPath)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful
+                .returnResult<SyncResponse>()
+                .responseBody
+                .blockFirst()!!
+
+            if(syncResponse.status == SyncStatus.SUCCESS)
+                break
+
+            i++
+        }while (i < RETRY_IMPORT_TIMES)
 
         Assertions.assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
 
