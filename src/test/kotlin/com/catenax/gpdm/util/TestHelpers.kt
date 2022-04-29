@@ -16,7 +16,7 @@ class TestHelpers(
 ) {
 
     companion object{
-        val RETRY_IMPORT_TIMES: Int = 5
+        val RETRY_IMPORT_TIMES: Int = 10
         val RETRY_IMPORT_BACKOFF: Long = 200
     }
 
