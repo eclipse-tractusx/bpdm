@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/catena/business-partner")
 class BusinessPartnerController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
-    val businssPartnerBuildService: BusinessPartnerBuildService,
+    val businessPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties
 ) {
@@ -82,7 +82,7 @@ class BusinessPartnerController(
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse> {
-        return businssPartnerBuildService.upsertBusinessPartners(businessPartners)
+        return businessPartnerBuildService.upsertBusinessPartners(businessPartners)
     }
 
     @Operation(
