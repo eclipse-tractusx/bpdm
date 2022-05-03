@@ -6,7 +6,7 @@ RUN mvn -B -U clean package
 
 FROM openjdk:11-jre-slim
 RUN apt-get update
-COPY --from=build /home/app/target/*.jar /usr/local/lib/bpdm/bpdm.jar
+COPY --from=build /home/app/target/bpdm.jar /usr/local/lib/bpdm/bpdm.jar
 RUN adduser bpdm
 USER bpdm
 WORKDIR /usr/local/lib/bpdm

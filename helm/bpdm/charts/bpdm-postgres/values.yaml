@@ -21,8 +21,8 @@ applicationSecrets: dev-bpdm-application
 
 resources:
   limits:
-    cpu: 500m
-    memory: 2Gi
+    cpu: 1000m
+    memory: 3Gi
   requests:
-    cpu: 100m
+    cpu: 500m
     memory: 1Gi
