@@ -16,4 +16,7 @@ interface IdentifierRepository : CrudRepository<Identifier, Long> {
 
     @Query("SELECT DISTINCT i FROM Identifier i LEFT JOIN FETCH i.issuingBody WHERE i IN :identifiers")
     fun joinIssuingBody(identifiers: Set<Identifier>): Set<Identifier>
+
+    @Query("SELECT DISTINCT i FROM Identifier i WHERE i.type.technicalKey = ?1 AND i.value in ?2")
+    fun findByIdentifierTypeAndValues(type: String, values: Collection<String>): Set<Identifier>
 }
