@@ -4,7 +4,10 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 @Entity
-@Table(name = "business_stati")
+@Table(name = "business_stati",
+    indexes = [
+        Index(columnList = "partner_id")
+    ])
 class BusinessStatus (
     @Column(name="denotation", nullable = false)
     val officialDenotation: String,
@@ -16,7 +19,7 @@ class BusinessStatus (
     val type: BusinessStatusType,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    val partner: BusinessPartner
+    var partner: BusinessPartner
         ): BaseEntity()
 
 enum class BusinessStatusType(private val statusName: String, private val url: String): NamedUrlType{

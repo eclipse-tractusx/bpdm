@@ -3,11 +3,18 @@ package com.catenax.gpdm.repository
 import com.catenax.gpdm.entity.BusinessPartner
 import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
+import java.time.OffsetDateTime
 
 interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner, Long>{
     fun findByBpn(bpn: String) : BusinessPartner?
+
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<BusinessPartner>
+
+    fun findByUpdatedAtAfter(updatedAt: OffsetDateTime, pageable: Pageable): Page<BusinessPartner>
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.value = ?2")
     fun findByIdentifierTypeAndValue(type: IdentifierType, idValue: String) : BusinessPartner?
@@ -16,7 +23,35 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
     fun findByIdentifierTypeAndValues(type: String, values: Collection<String>) : Set<BusinessPartner>
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.status = ?2")
-    fun findByIdentifierTypeAndStatus(type: IdentifierType, status: IdentifierStatus) : Set<BusinessPartner>
+    fun findByIdentifierTypeAndStatus(type: IdentifierType, status: IdentifierStatus, pageable: Pageable): Page<BusinessPartner>
 
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
+    fun joinLegalForm(partners: Set<BusinessPartner>): Set<BusinessPartner>
 
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.names WHERE p IN :partners")
+    fun joinNames(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
+    fun joinIdentifiers(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.stati WHERE p IN :partners")
+    fun joinStatuses(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.addresses WHERE p IN :partners")
+    fun joinAddresses(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.classification WHERE p IN :partners")
+    fun joinClassifications(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.bankAccounts WHERE p IN :partners")
+    fun joinBankAccounts(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.endNodeRelations WHERE p IN :partners")
+    fun joinRelations(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.types WHERE p IN :partners")
+    fun joinTypes(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.roles WHERE p IN :partners")
+    fun joinRoles(partners: Set<BusinessPartner>): Set<BusinessPartner>
 }

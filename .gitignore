@@ -1,7 +1,16 @@
-#IDE specific
-.idea
-gpdm.iml
+# IntelliJ specific
+/.idea/*
+# keep code styles
+!/.idea/codeStyles
+/.idea/codeStyles/*
+!/.idea/codeStyles/Project.xml
+!/.idea/codeStyles/codeStyleConfig.xml
+# keep inspection levels
+!/.idea/inspectionProfiles
+/.idea/inspectionProfiles/*
+!/.idea/inspectionProfiles/Project_Default.xml
+*.iml
 #created artifacts
 target
 #local database data
-db
+/db

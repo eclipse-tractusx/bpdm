@@ -36,6 +36,10 @@ fun CurrencyCode.toDto(): TypeKeyNameDto<CurrencyCode> {
     return TypeKeyNameDto(this, getName())
 }
 
+fun BusinessPartner.toSearchDto(score: Float): BusinessPartnerSearchResponse{
+    return BusinessPartnerSearchResponse(score, this.toDto())
+}
+
 fun BusinessPartner.toDto(): BusinessPartnerResponse {
     return BusinessPartnerResponse(
         bpn,
@@ -158,3 +162,6 @@ fun BankAccount.toDto(): BankAccountResponse {
         nationalBankAccountIdentifier, nationalBankIdentifier)
 }
 
+fun SyncRecord.toDto(): SyncResponse{
+    return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
+}

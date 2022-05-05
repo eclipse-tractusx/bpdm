@@ -9,5 +9,6 @@ data class SecurityConfigProperties(
     val enabled: Boolean = false,
     val authUrl: String = "",
     val tokenUrl:String = "",
-    val refreshUrl: String = ""
+    val refreshUrl: String = "",
+    val corsOrigins: Collection<String> = emptyList()
 )

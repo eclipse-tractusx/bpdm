@@ -4,7 +4,10 @@ import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.*
 
 @Entity
-@Table(name = "localities")
+@Table(name = "localities",
+    indexes = [
+        Index(columnList = "address_id")
+    ])
 class Locality (
     @Column(name = "`value`", nullable = false)
     val value: String,
@@ -18,7 +21,7 @@ class Locality (
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    val address: Address
+    var address: Address
         ) : BaseEntity()
 
 enum class LocalityType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<LocalityType>{

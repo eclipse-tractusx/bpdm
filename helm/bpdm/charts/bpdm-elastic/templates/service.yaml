@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "bpdm-elastic.fullname" . }}
+  labels:
+    {{- include "bpdm-elastic.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9200
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "bpdm-elastic.selectorLabels" . | nindent 4 }}
