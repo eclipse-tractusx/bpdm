@@ -51,7 +51,7 @@ class BpnControllerIT @Autowired constructor(
         }
     }
 
-    val partnerDocs = listOf(
+    private val partnerDocs = listOf(
         CdqValues.businessPartner1,
         CdqValues.businessPartner2,
         CdqValues.businessPartner3
@@ -84,8 +84,13 @@ class BpnControllerIT @Autowired constructor(
         testHelpers.truncateH2()
     }
 
+    /**
+     * Given some business partners imported
+     * When requesting bpn to CDQ id mappings and all the requested CDQ ids exist in the db
+     * Then all the requested mappings are returned
+     */
     @Test
-    fun `find bpns by identifiers, success`() {
+    fun `find bpns by identifiers, all found`() {
         val identifiersSearchRequest =
             IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id))
 
@@ -102,6 +107,34 @@ class BpnControllerIT @Autowired constructor(
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id)
     }
 
+    /**
+     * Given some business partners imported
+     * When requesting bpn to CDQ id mappings and only some of the requested CDQ ids exist in the db
+     * Then only the requested mappings that exist in the db are returned
+     */
+    @Test
+    fun `find bpns by identifiers, only some found`() {
+        val identifiersSearchRequest =
+            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, "someNonexistentCdqId"))
+
+        val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBodyList(BpnIdentifierMappingResponse::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id)
+    }
+
+    /**
+     * Given some business partners imported
+     * When requesting too many bpn to CDQ id mappings in a single request, so that the requested number exceeds the configured limit
+     * Then a "bad request" response is sent
+     */
     @Test
     fun `find bpns by identifiers, bpn request limit exceeded`() {
         val identifiersSearchRequest =

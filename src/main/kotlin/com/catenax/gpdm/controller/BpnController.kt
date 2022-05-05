@@ -25,6 +25,7 @@ class BpnController(
     @Operation(
         summary = "Find business partner numbers by identifiers",
         description = "Find business partner numbers by identifiers. " +
+                "The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. " +
                 "For a single request, the maximum number of identifier values to search for is limited to \${bpdm.bpn.search-request-limit} entries."
     )
     @ApiResponses(
