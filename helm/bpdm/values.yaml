@@ -49,11 +49,9 @@ ingress:
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/session-cookie-name: stickounet
-    nginx.ingress.kubernetes.io/session-cookie-expires: 172800
-    nginx.ingress.kubernetes.io/session-cookie-max-age: 172800
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
   host: catenax-bpdm-dev.demo.catena-x.net
 
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
@@ -61,10 +59,10 @@ ingress:
 resources:
   limits:
     cpu: 800m
-    memory: 1Gi
+    memory: 2Gi
   requests:
     cpu: 300m
-    memory: 500Gi
+    memory: 1Gi
 
 nodeSelector: { }
 
