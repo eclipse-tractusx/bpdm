@@ -26,7 +26,10 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
+    properties = ["bpdm.bpn.search-request-limit=2"]
+)
 @ActiveProfiles("test")
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
@@ -82,7 +85,7 @@ class BpnControllerIT @Autowired constructor(
     }
 
     @Test
-    fun findBpnsByIdentifiers() {
+    fun `find bpns by identifiers, success`() {
         val identifiersSearchRequest =
             IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id))
 
@@ -97,5 +100,21 @@ class BpnControllerIT @Autowired constructor(
             .responseBody
 
         assertThat(bpnSearchResponses!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id)
+    }
+
+    @Test
+    fun `find bpns by identifiers, bpn request limit exceeded`() {
+        val identifiersSearchRequest =
+            IdentifiersSearchRequest(
+                cdqIdentifierConfigProperties.typeKey,
+                listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id, CdqValues.businessPartner3.id)
+            )
+
+        webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 }
