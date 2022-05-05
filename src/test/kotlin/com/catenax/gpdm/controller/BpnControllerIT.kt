@@ -5,7 +5,7 @@ import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.component.cdq.service.ImportStarterService
 import com.catenax.gpdm.dto.request.IdentifiersSearchRequest
-import com.catenax.gpdm.dto.response.BpnSearchResponse
+import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.EndpointValues
 import com.catenax.gpdm.util.TestHelpers
@@ -89,17 +89,17 @@ class BpnControllerIT @Autowired constructor(
         val identifiersSearchRequest =
             IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id))
 
-        val bpnSearchResponses = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
+        val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
             .exchange()
             .expectStatus()
             .isOk
-            .expectBodyList(BpnSearchResponse::class.java)
+            .expectBodyList(BpnIdentifierMappingResponse::class.java)
             .returnResult()
             .responseBody
 
-        assertThat(bpnSearchResponses!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id)
+        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id)
     }
 
     @Test

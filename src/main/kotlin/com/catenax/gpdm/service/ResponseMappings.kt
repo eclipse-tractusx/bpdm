@@ -60,10 +60,6 @@ fun Identifier.toDto(): IdentifierResponse {
     return IdentifierResponse(uuid, value, type.toDto(), issuingBody?.toDto(), status?.toDto())
 }
 
-fun Identifier.toBpnSearchResponse(): BpnSearchResponse {
-    return BpnSearchResponse(idValue = this.value, bpn = this.partner.bpn)
-}
-
 fun IdentifierType.toDto(): TypeKeyNameUrlDto<String> {
     return TypeKeyNameUrlDto(technicalKey, name, url)
 }

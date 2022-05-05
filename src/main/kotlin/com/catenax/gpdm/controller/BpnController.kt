@@ -2,8 +2,12 @@ package com.catenax.gpdm.controller
 
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.request.IdentifiersSearchRequest
-import com.catenax.gpdm.dto.response.BpnSearchResponse
+import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.service.BusinessPartnerFetchService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -18,8 +22,23 @@ class BpnController(
     val bpnConfigProperties: BpnConfigProperties
 ) {
 
+    @Operation(
+        summary = "Find business partner numbers by identifiers",
+        description = "Find business partner numbers by identifiers. " +
+                "For a single request, the maximum number of identifier values to search for is limited to \${bpdm.bpn.search-request-limit} entries."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found bpn to identifier value mappings"),
+            ApiResponse(
+                responseCode = "400",
+                description = "On malformed request parameters or if number of requested bpns exceeds limit",
+                content = [Content()]
+            ),
+        ]
+    )
     @PostMapping("/search")
-    fun findBpnsByIdentifiers(@RequestBody identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnSearchResponse>> {
+    fun findBpnsByIdentifiers(@RequestBody identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>> {
         if (identifiersSearchRequest.idValues.size > bpnConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
