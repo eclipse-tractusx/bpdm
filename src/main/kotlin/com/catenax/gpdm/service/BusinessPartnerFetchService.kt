@@ -58,8 +58,7 @@ class BusinessPartnerFetchService(
 
     @Transactional
     fun findBpnsByIdentifiers(idType: String, idValues: Collection<String>): Set<BpnSearchResponse> {
-        val identifiers = identifierRepository.findByIdentifierTypeAndValues(idType, idValues)
-        return identifiers.map { it.toBpnSearchResponse() }.toSet()
+        return identifierRepository.findBpnsByIdentifierTypeAndValues(idType, idValues)
     }
 
     private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner> {
