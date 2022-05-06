@@ -4,10 +4,9 @@ COPY pom.xml /home/app
 WORKDIR /home/app
 RUN mvn -B -U clean package
 
-FROM openjdk:11-jre-slim
-RUN apt-get update
+FROM amazoncorretto:11-alpine-jdk
 COPY --from=build /home/app/target/bpdm.jar /usr/local/lib/bpdm/bpdm.jar
-RUN adduser bpdm
+RUN addgroup -S bpdm && adduser -S bpdm -G bpdm
 USER bpdm
 WORKDIR /usr/local/lib/bpdm
 EXPOSE 8080
