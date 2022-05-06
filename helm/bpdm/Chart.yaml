@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.0.0
+version: 2.0.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -24,14 +24,14 @@ version: 1.0.0
 appVersion: "1.0.0"
 
 dependencies:
-  - name: bpdm-elastic
-    version: 1.0.0
-    repository: file://charts/bpdm-elastic
+  - name: elasticsearch
+    version: 17.*.*
+    repository: https://charts.bitnami.com/bitnami
     alias: elastic
     condition: elastic.enabled
-  - name: bpdm-postgres
-    version: 1.0.0
-    repository: file://charts/bpdm-postgres
+  - name: postgresql
+    version:  11.*.*
+    repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
 

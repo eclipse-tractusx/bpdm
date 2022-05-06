@@ -22,21 +22,16 @@ podSecurityContext:
 springProfiles:
   - dev
 
-applicationSecrets:
-  name: dev-bpdm-application
-  mappings:
-    db-user: BPDM_DB_USER
-    db-pass: BPDM_DB_PASS
-    keycloak-secret: BPDM_KEYCLOAK_SECRET
-    cdq-key: BPDM_CDQ_KEY
-
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
 # @url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
-  runAsUser: 1000
+  runAsUser: 10001
   runAsGroup: 3000
+  capabilities:
+    drop:
+      - ALL
 
 service:
   type: ClusterIP
@@ -96,9 +91,22 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
+applicationSecret:
+  enabled: true
+  keycloak: <path:bpdm/data/dev/keycloak#credentials-secret>
+  cdq: <path:bpdm/data/dev/cdq#api-key>
 
 elastic:
   enabled: true
+  security:
+    tls:
+      restEncryption: false
+
 
 postgres:
   enabled: true
+  auth:
+    database: bpdm
+    postgresPassword: <path:bpdm/data/dev/postgresql#postgres-password>
+    username: bpdm
+    password: <path:bpdm/data/dev/postgresql#password>
