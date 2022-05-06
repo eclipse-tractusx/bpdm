@@ -1,0 +1,8 @@
+image:
+  tag: "main"
+
+springProfiles:
+  - int
+
+ingress:
+  host: catenax-bpdm-int.demo.catena-x.net
