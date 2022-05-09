@@ -61,7 +61,8 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun findBpnsByIdentifiers(identifierType: String, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
-        return identifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
+        val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
+        return identifierRepository.findBpnsByIdentifierTypeAndValues(type, idValues)
     }
 
     private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner> {

@@ -36,6 +36,7 @@ class BpnController(
                 description = "On malformed request parameters or if number of requested bpns exceeds limit",
                 content = [Content()]
             ),
+            ApiResponse(responseCode = "404", description = "Specified identifier type not found", content = [Content()])
         ]
     )
     @PostMapping("/search")

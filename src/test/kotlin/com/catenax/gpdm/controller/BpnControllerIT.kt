@@ -150,4 +150,22 @@ class BpnControllerIT @Autowired constructor(
             .expectStatus()
             .isBadRequest
     }
+
+    /**
+     * Given some business partners imported
+     * When requested identifier type not found
+     * Then a "not found" response is sent
+     */
+    @Test
+    fun `find bpns by nonexistent identifier type`() {
+        val identifiersSearchRequest =
+            IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(CdqValues.businessPartner1.id))
+
+        webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
+            .exchange()
+            .expectStatus()
+            .isNotFound
+    }
 }
