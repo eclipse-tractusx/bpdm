@@ -1,7 +1,6 @@
 package com.catenax.gpdm.repository
 
 import com.catenax.gpdm.entity.BusinessPartner
-import com.catenax.gpdm.entity.IdentifierStatus
 import com.catenax.gpdm.entity.IdentifierType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -21,9 +20,6 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type.technicalKey = ?1 AND i.value in ?2")
     fun findByIdentifierTypeAndValues(type: String, values: Collection<String>) : Set<BusinessPartner>
-
-    @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.status = ?2")
-    fun findByIdentifierTypeAndStatus(type: IdentifierType, status: IdentifierStatus, pageable: Pageable): Page<BusinessPartner>
 
     @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
     fun joinLegalForm(partners: Set<BusinessPartner>): Set<BusinessPartner>

@@ -21,6 +21,8 @@ object EndpointValues {
     const val CATENA_PREMISE_PATH = "$CATENA_ADDRESS_PATH/premise"
     const val CATENA_POSTAL_DELIVERY_POINT_PATH = "$CATENA_ADDRESS_PATH/postal-delivery-point"
 
+    const val CATENA_BPN_SEARCH_PATH = "/api/catena/bpn/search"
+
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
     const val ELASTIC_EXPORT_PATH = "api/elastic/business-partner"

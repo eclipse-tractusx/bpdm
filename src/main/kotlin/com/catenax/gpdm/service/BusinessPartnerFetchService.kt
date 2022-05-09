@@ -1,5 +1,6 @@
 package com.catenax.gpdm.service
 
+import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.entity.Address
 import com.catenax.gpdm.entity.BusinessPartner
@@ -51,11 +52,20 @@ class BusinessPartnerFetchService(
      * Fetch business partners by [values] of [identifierType]
      */
     @Transactional
-    fun fetchByIdentifierValues(identifierType: String, values: Collection<String>): Set<BusinessPartner>{
+    fun fetchByIdentifierValues(identifierType: String, values: Collection<String>): Set<BusinessPartner> {
         return fetchBusinessPartnerDependencies(businessPartnerRepository.findByIdentifierTypeAndValues(identifierType, values))
     }
 
-    private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner>{
+    /**
+     * Find bpn to identifier value mappings by [idValues] of [identifierType]
+     */
+    @Transactional
+    fun findBpnsByIdentifiers(identifierType: String, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
+        val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
+        return identifierRepository.findBpnsByIdentifierTypeAndValues(type, idValues)
+    }
+
+    private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner> {
 
         businessPartnerRepository.joinIdentifiers(partners)
         businessPartnerRepository.joinNames(partners)
