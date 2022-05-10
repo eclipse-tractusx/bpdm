@@ -9,55 +9,34 @@ import org.springframework.test.web.reactive.server.returnResult
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 
+private const val RETRY_IMPORT_TIMES: Int = 10
+private const val RETRY_IMPORT_BACKOFF: Long = 200
+private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 
 @Component
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory
 ) {
 
-    companion object{
-        val RETRY_IMPORT_TIMES: Int = 10
-        val RETRY_IMPORT_BACKOFF: Long = 200
-    }
-
     val em: EntityManager = entityManagerFactory.createEntityManager()
 
-    fun truncateH2() {
+    fun truncateDbTables() {
         em.transaction.begin()
 
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate()
-
-        em.createNativeQuery("truncate table localities").executeUpdate()
-        em.createNativeQuery("truncate table postal_delivery_points").executeUpdate()
-        em.createNativeQuery("truncate table premises").executeUpdate()
-        em.createNativeQuery("truncate table thoroughfares").executeUpdate()
-        em.createNativeQuery("truncate table post_codes").executeUpdate()
-        em.createNativeQuery("truncate table administrative_areas").executeUpdate()
-        em.createNativeQuery("truncate table address_contexts").executeUpdate()
-        em.createNativeQuery("truncate table address_versions").executeUpdate()
-        em.createNativeQuery("truncate table care_ofs").executeUpdate()
-        em.createNativeQuery("truncate table addresses").executeUpdate()
-        em.createNativeQuery("truncate table relations").executeUpdate()
-        em.createNativeQuery("truncate table bank_account_trust_scores").executeUpdate()
-        em.createNativeQuery("truncate table bank_accounts").executeUpdate()
-        em.createNativeQuery("truncate table classifications").executeUpdate()
-        em.createNativeQuery("truncate table business_stati").executeUpdate()
-        em.createNativeQuery("truncate table names").executeUpdate()
-        em.createNativeQuery("truncate table identifier_status").executeUpdate()
-        em.createNativeQuery("truncate table identifier_types").executeUpdate()
-        em.createNativeQuery("truncate table issuing_bodies").executeUpdate()
-        em.createNativeQuery("truncate table identifiers").executeUpdate()
-        em.createNativeQuery("truncate table legal_forms_legal_categories").executeUpdate()
-        em.createNativeQuery("truncate table legal_form_categories").executeUpdate()
-        em.createNativeQuery("truncate table legal_forms").executeUpdate()
-        em.createNativeQuery("truncate table business_partner_types").executeUpdate()
-        em.createNativeQuery("truncate table business_partners_roles").executeUpdate()
-        em.createNativeQuery("truncate table business_partners").executeUpdate()
-        em.createNativeQuery("truncate table configuration_entries").executeUpdate()
-        em.createNativeQuery("truncate table sync_records").executeUpdate()
-        em.createNativeQuery("truncate table partner_changelog_entries").executeUpdate()
-
-        em.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate()
+        em.createNativeQuery(
+            """
+            DO $$ DECLARE table_names RECORD;
+            BEGIN
+                FOR table_names IN SELECT table_name
+                    FROM information_schema.tables
+                    WHERE table_schema='${BPDM_DB_SCHEMA_NAME}'
+                    AND table_name NOT IN ('flyway_schema_history') 
+                LOOP 
+                    EXECUTE format('TRUNCATE TABLE ${BPDM_DB_SCHEMA_NAME}.%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
+                END LOOP;
+            END $$;
+        """.trimIndent()
+        ).executeUpdate()
 
         em.transaction.commit()
     }

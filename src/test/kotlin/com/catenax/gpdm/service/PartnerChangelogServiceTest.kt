@@ -4,6 +4,7 @@ import com.catenax.gpdm.Application
 import com.catenax.gpdm.dto.ChangelogEntryDto
 import com.catenax.gpdm.entity.ChangelogType
 import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
+import com.catenax.gpdm.util.PostgreSQLSingletonContainer
 import com.catenax.gpdm.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
@@ -21,9 +24,19 @@ class PartnerChangelogServiceTest @Autowired constructor(
     val testHelpers: TestHelpers
 ) {
 
+    companion object {
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
+            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
+            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
+        }
+    }
+
     @AfterEach
     fun afterEach() {
-        testHelpers.truncateH2()
+        testHelpers.truncateDbTables()
     }
 
     /**

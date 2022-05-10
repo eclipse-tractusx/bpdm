@@ -8,10 +8,7 @@ import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
-import com.catenax.gpdm.util.CdqValues
-import com.catenax.gpdm.util.EndpointValues
-import com.catenax.gpdm.util.ResponseValues
-import com.catenax.gpdm.util.TestHelpers
+import com.catenax.gpdm.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -51,12 +48,15 @@ class CdqControllerImportIT @Autowired constructor(
         @DynamicPropertySource
         fun configureProperties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
+            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
+            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 
     @AfterEach
     fun afterEach() {
-        testHelpers.truncateH2()
+        testHelpers.truncateDbTables()
     }
 
     /**

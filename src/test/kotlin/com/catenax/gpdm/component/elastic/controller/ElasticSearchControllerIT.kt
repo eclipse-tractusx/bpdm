@@ -7,10 +7,7 @@ import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
-import com.catenax.gpdm.util.CdqValues
-import com.catenax.gpdm.util.ElasticsearchContainer
-import com.catenax.gpdm.util.EndpointValues
-import com.catenax.gpdm.util.TestHelpers
+import com.catenax.gpdm.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -49,7 +46,7 @@ class ElasticSearchControllerIT @Autowired constructor(
 
     companion object {
 
-        private val elasticsearchContainer = ElasticsearchContainer.instance
+        private val elasticsearchContainer = ElasticsearchSingletonContainer.instance
 
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -61,6 +58,9 @@ class ElasticSearchControllerIT @Autowired constructor(
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
             registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
+            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
+            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
+            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 
@@ -94,7 +94,7 @@ class ElasticSearchControllerIT @Autowired constructor(
 
     @AfterEach
     fun afterEach() {
-        testHelpers.truncateH2()
+        testHelpers.truncateDbTables()
         elasticSyncService.clearElastic()
     }
 

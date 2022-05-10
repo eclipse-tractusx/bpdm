@@ -8,6 +8,7 @@ import com.catenax.gpdm.dto.request.IdentifiersSearchRequest
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.EndpointValues
+import com.catenax.gpdm.util.PostgreSQLSingletonContainer
 import com.catenax.gpdm.util.TestHelpers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -40,7 +41,7 @@ class BpnControllerIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
@@ -48,6 +49,9 @@ class BpnControllerIT @Autowired constructor(
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
+            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
+            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 
@@ -81,7 +85,7 @@ class BpnControllerIT @Autowired constructor(
 
     @AfterEach
     fun afterEach() {
-        testHelpers.truncateH2()
+        testHelpers.truncateDbTables()
     }
 
     /**
