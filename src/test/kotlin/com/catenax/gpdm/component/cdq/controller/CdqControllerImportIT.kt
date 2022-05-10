@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -30,6 +31,7 @@ private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class CdqControllerImportIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val cdqIdProperties: CdqIdentifierConfigProperties,
@@ -48,9 +50,6 @@ class CdqControllerImportIT @Autowired constructor(
         @DynamicPropertySource
         fun configureProperties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
-            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
-            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
-            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 

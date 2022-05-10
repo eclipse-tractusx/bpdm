@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -36,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
     properties = ["bpdm.elastic.enabled=true"]
 )
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class ElasticSearchControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: ImportStarterService,
@@ -58,9 +60,6 @@ class ElasticSearchControllerIT @Autowired constructor(
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
             registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
-            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
-            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
-            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 

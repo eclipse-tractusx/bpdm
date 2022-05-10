@@ -8,7 +8,7 @@ import com.catenax.gpdm.dto.request.IdentifiersSearchRequest
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.EndpointValues
-import com.catenax.gpdm.util.PostgreSQLSingletonContainer
+import com.catenax.gpdm.util.PostgreSQLContextInitializer
 import com.catenax.gpdm.util.TestHelpers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -32,6 +33,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     properties = ["bpdm.bpn.search-request-limit=2"]
 )
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val importService: ImportStarterService,
@@ -49,9 +51,6 @@ class BpnControllerIT @Autowired constructor(
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
-            registry.add("spring.datasource.url", PostgreSQLSingletonContainer.instance::getJdbcUrl)
-            registry.add("spring.datasource.username", PostgreSQLSingletonContainer.instance::getUsername)
-            registry.add("spring.datasource.password", PostgreSQLSingletonContainer.instance::getPassword)
         }
     }
 
