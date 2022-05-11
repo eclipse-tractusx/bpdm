@@ -8,21 +8,19 @@ import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
-import com.catenax.gpdm.util.CdqValues
-import com.catenax.gpdm.util.EndpointValues
-import com.catenax.gpdm.util.ResponseValues
-import com.catenax.gpdm.util.TestHelpers
+import com.catenax.gpdm.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -33,6 +31,7 @@ private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class CdqControllerImportIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val cdqIdProperties: CdqIdentifierConfigProperties,
@@ -54,9 +53,9 @@ class CdqControllerImportIT @Autowired constructor(
         }
     }
 
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateH2()
+    @BeforeEach
+    fun beforeEach() {
+        testHelpers.truncateDbTables()
     }
 
     /**

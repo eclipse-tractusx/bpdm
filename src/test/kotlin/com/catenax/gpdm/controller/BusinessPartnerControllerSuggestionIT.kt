@@ -7,22 +7,19 @@ import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
-import com.catenax.gpdm.util.CdqValues
-import com.catenax.gpdm.util.ElasticsearchContainer
-import com.catenax.gpdm.util.EndpointValues
-import com.catenax.gpdm.util.TestHelpers
+import com.catenax.gpdm.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -86,6 +83,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
     properties = ["bpdm.elastic.enabled=true"]
 )
 @ActiveProfiles(value = ["test"])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: ImportStarterService,
@@ -96,7 +94,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     companion object {
 
-        private val elasticsearchContainer = ElasticsearchContainer.instance
+        private val elasticsearchContainer = ElasticsearchSingletonContainer.instance
 
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -114,6 +112,9 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
+        testHelpers.truncateDbTables()
+        elasticSyncService.clearElastic()
+
         val partnerDocs = listOf(
             CdqValues.businessPartner1,
             CdqValues.businessPartner2,
@@ -139,13 +140,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         importService.import()
         elasticSyncService.export()
     }
-
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateH2()
-        elasticSyncService.clearElastic()
-    }
-
 
     /**
      * Given partner with name value

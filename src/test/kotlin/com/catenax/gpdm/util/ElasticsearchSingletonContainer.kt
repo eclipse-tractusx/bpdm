@@ -2,7 +2,7 @@ package com.catenax.gpdm.util
 
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 
-object ElasticsearchContainer {
+object ElasticsearchSingletonContainer {
 
     private const val memoryInBytes = 1024L * 1024L * 1024L  //1 gb
     private const val memorySwapInBytes = 4L * 1024L * 1024L * 1024L * 1024L //4 gb

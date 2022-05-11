@@ -8,13 +8,13 @@ import com.catenax.gpdm.dto.request.IdentifiersSearchRequest
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.EndpointValues
+import com.catenax.gpdm.util.PostgreSQLContextInitializer
 import com.catenax.gpdm.util.TestHelpers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -31,6 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     properties = ["bpdm.bpn.search-request-limit=2"]
 )
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val importService: ImportStarterService,
@@ -40,7 +42,7 @@ class BpnControllerIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
@@ -59,6 +61,8 @@ class BpnControllerIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
+        testHelpers.truncateDbTables()
+
         val importCollection = BusinessPartnerCollectionCdq(
             partnerDocs.size,
             null,
@@ -77,11 +81,6 @@ class BpnControllerIT @Autowired constructor(
         )
 
         importService.import()
-    }
-
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateH2()
     }
 
     /**

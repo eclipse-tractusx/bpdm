@@ -4,26 +4,28 @@ import com.catenax.gpdm.Application
 import com.catenax.gpdm.dto.ChangelogEntryDto
 import com.catenax.gpdm.entity.ChangelogType
 import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
+import com.catenax.gpdm.util.PostgreSQLContextInitializer
 import com.catenax.gpdm.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
-class PartnerChangelogServiceTest @Autowired constructor(
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+class PartnerChangelogServiceIT @Autowired constructor(
     val partnerChangelogService: PartnerChangelogService,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val testHelpers: TestHelpers
 ) {
 
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateH2()
+    @BeforeEach
+    fun beforeEach() {
+        testHelpers.truncateDbTables()
     }
 
     /**
