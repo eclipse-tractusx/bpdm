@@ -6,19 +6,19 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.PostgreSQLContainer
 
 /**
- * When used on a spring boot test, starts a singleton postgres db that is shared between all integration tests.
+ * When used on a spring boot test, starts a singleton postgres db container that is shared between all integration tests.
  */
 class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-    override fun initialize(context: ConfigurableApplicationContext) {
-        postgres.start()
-        TestPropertyValues.of(
-            "spring.datasource.url=${postgres.jdbcUrl}",
-            "spring.datasource.username=${postgres.username}",
-            "spring.datasource.password=${postgres.password}"
-        ).applyTo(context.environment)
+    companion object {
+        val postgreSQLContainer = PostgreSQLContainer("postgres:13.2")
     }
 
-    companion object {
-        val postgres = PostgreSQLContainer("postgres:13.2")
+    override fun initialize(applicationContext: ConfigurableApplicationContext) {
+        postgreSQLContainer.start()
+        TestPropertyValues.of(
+            "spring.datasource.url=${postgreSQLContainer.jdbcUrl}",
+            "spring.datasource.username=${postgreSQLContainer.username}",
+            "spring.datasource.password=${postgreSQLContainer.password}"
+        ).applyTo(applicationContext.environment)
     }
 }
