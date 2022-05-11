@@ -7,7 +7,7 @@ import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
 import com.catenax.gpdm.util.PostgreSQLContextInitializer
 import com.catenax.gpdm.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -23,8 +23,8 @@ class PartnerChangelogServiceTest @Autowired constructor(
     val testHelpers: TestHelpers
 ) {
 
-    @AfterEach
-    fun afterEach() {
+    @BeforeEach
+    fun beforeEach() {
         testHelpers.truncateDbTables()
     }
 

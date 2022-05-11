@@ -14,7 +14,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,8 +53,8 @@ class CdqControllerImportIT @Autowired constructor(
         }
     }
 
-    @AfterEach
-    fun afterEach() {
+    @BeforeEach
+    fun beforeEach() {
         testHelpers.truncateDbTables()
     }
 

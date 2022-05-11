@@ -13,7 +13,6 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -113,6 +112,9 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
+        testHelpers.truncateDbTables()
+        elasticSyncService.clearElastic()
+
         val partnerDocs = listOf(
             CdqValues.businessPartner1,
             CdqValues.businessPartner2,
@@ -138,13 +140,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         importService.import()
         elasticSyncService.export()
     }
-
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateDbTables()
-        elasticSyncService.clearElastic()
-    }
-
 
     /**
      * Given partner with name value

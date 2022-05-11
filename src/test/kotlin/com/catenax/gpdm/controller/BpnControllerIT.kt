@@ -15,7 +15,6 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -62,6 +61,8 @@ class BpnControllerIT @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
+        testHelpers.truncateDbTables()
+
         val importCollection = BusinessPartnerCollectionCdq(
             partnerDocs.size,
             null,
@@ -80,11 +81,6 @@ class BpnControllerIT @Autowired constructor(
         )
 
         importService.import()
-    }
-
-    @AfterEach
-    fun afterEach() {
-        testHelpers.truncateDbTables()
     }
 
     /**
