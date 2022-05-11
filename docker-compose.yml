@@ -1,4 +1,4 @@
-# Can be used to start required services in order to run bpdm in "local" profile for development purposes
+# Can be used to start required services in order to run bpdm with profile `local` for development purposes
 services:
   postgres:
     image: postgres:13.2

@@ -20,6 +20,7 @@ podSecurityContext:
 
 #Spring profiles under which the application should run
 springProfiles:
+  - all
   - dev
 
 applicationSecrets:

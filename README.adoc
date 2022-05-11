@@ -16,75 +16,121 @@ GPDM is a SpringBoot Kotlin software project managed by Maven.
 
 The project can be run with the following command: `mvn clean spring-boot:run`
 
-On default configuration the project initializes and starts an in-memory H2 database.
-After the project has finished initializing you can access the database on `+http://localhost:8080/h2-console/+`  as per default configuration.
+When running, the project requires a postgresql database to be available to connect to.
+Per default configuration the application expects postgres to run on `localhost` on port `5432`.
+
+You can find the standard credentials as well as further database configurations int the `application-persist.properties` file in the resource folder.
 
 The REST API documentation can be accessed at `+http://localhost:8080/api/swagger-ui+`.
-
-You can find the standard user and password as well as further database configurations int the `application.properties` file in the resource folder.
 
 === Prerequisites
 
 . Maven
 . JDK11
-. PostgreSQL 13.2 (on persist profile)
-. Keycloak 17.0.0 (on auth profile)
-. Connection to CDQ API v4.0 (on cdq profile)
-. Elasticsearch 7.17.0 (on elastic profile)
+. PostgreSQL 13.2
+. Keycloak 17.0.0 (with enabled authentication)
+. Connection to CDQ API v4.0 (with enabled CDQ component)
+. Elasticsearch 7.17.0 (with enabled Elasticsearch component)
 
 === Profiles
 
 The project offers a variety of different Spring profiles for configuration purposes.
-These profiles enable and configure additional project components which rely on external services and systems.
-Profiles are categorized by component and the stage they belong to.
-Currently, we distinguish between the local and dev stage.
-The local profile expects all enabled components to be locally available on the host machine.
-On the other hand, the dev stage configures external dependencies for the remote dev environment.
-In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
-Single profiles are named via pattern `stage_component` but can also be called as a bundle by their stage name.
-For example you can run the application in full local profile by this command:
+What profiles are available and what effect they have configuration properties is described in the application properties files in the resources folder.
+Application properties files are separated by concern to increase readability.
+`application.properties` file contains general basic properties while the other files manage properties for major application components that usually can also be enabled or disabled.
+Each of the application properties files are multi-documents containing default values for their component as well as value overrides for different environments.
+Currently, the application can be run in the following environment profiles:
 
-`mvn clean spring-boot:run -Dspring.profiles.active=local`
+* default: when no environment specified
+* local: for the execution on local machine (developer profile)
+* dev: for execution in remote dev environment
+* int: for execution in remote int environment
 
-Or you can specify a single component profile to be activated like such:
-
-`mvn clean spring-boot:run -Dspring.profiles.active=local_persist`
-
-The above command only enables persistence in local configuration without enabling any other local components such as Elasticsearch.
+The following sections detail the configuration properties for each component.
 
 ==== Persist
 
-A persist profile enables and configures the usage of an external PostgreSQL database, instead of the in-memory H2 database.
-Therefore, a running Postgres database instance is required (Tested and working on version 13.2).
+The file `application-persist.properties` contains the configuration for general persistence and the database connection.
+A running Postgres database instance is required (Tested and working on version 13.2), available either locally or remotely depending on the environment.
 User and password need to be provided as environment variables  `BPDM_DB_USER` and `BPDM_DB_PASS`.
-The connection URL can be looked at and adapted in respective application properties files.
+For environments like `int` and `dev` you also have to specify the host on where the postgres database is located in the environment variable  `BPDM_DB_HOST`.
 
 ==== Auth
 
-An auth profile enables authorization of endpoints and configures the connection to an external Keycloak instance on which the authorization relies on.
-Besides the URL of the Keycloak the configuration requires the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
+`application-auth.properties` enables authorization of endpoints and configures the connection to an external Keycloak instance on which the authorization relies on.
+Besides the URL of the Keycloak the configuration determines the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
 The client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
 
-This profile also enables the login form in the auto-generated Swagger documentation.
+This profile also enables/disables the login form in the auto-generated Swagger documentation.
 The Swagger login uses the client specified in the property `springdoc.swagger-ui.oauth.client-id`.
 
 ==== Cdq
 
-A cdq profile configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] with which the application can exchange business partner information.
-On activation the profile enables new endpoints to import records from and to export Business Partner Numbers to CDQ.
-Among others, the profile determines the storage and datasource to use.
-For this the profile requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges.
+The file `application-cdq.properties` enables and configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] with which the application can exchange business partner information.
+Depending on whether this component is enabled, the application offers endpoints to import records from and to export Business Partner Numbers to CDQ.
+When enabled the application requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges for accessing the specified storage.
 
 ==== Elastic
 
-An elastic profile enables and configures the connection to an external Elasticsearch instance.
-Therefore, a running Elasticsearch instance is required (Tested on version 7.17.0).
-You can specify the URL to connect to and if need be add user and password over the spring elasticsearch adapter properties.
-When this profile is enabled the application is able to search and filter business partners by their properties other than identifiers.
+`application-elastic.properties` enables/disables and configures the connection to an external Elasticsearch instance.
+When enabled a running Elasticsearch instance is required (Tested on version 7.17.0).
+Then the application is able to search and filter business partners by their properties other than identifiers.
 Additionally, suggestions for autocompletion can be obtained for each business partner property.
 With the activation of the Elasticsearch component the application also features new endpoints for exporting business partner records to the Elasticsearch instance as well as clearing the current Elasticsearch index.
 
+You can specify the URL to connect to and if need be add user and password over the spring elasticsearch adapter properties.
+On `dev` and `int` environment you need to specify in which the host the Elasticsearch instance is reachable in the environment variable `BPDM_ELASTIC_HOST`.
+
 Without the Elasticsearch component enabled the suggestions are always empty and search requests do not filter any business partners.
+
+==== Activating profiles
+
+On default, with no profiles activated, the application persists on a postgresql database with no further dependencies needed.
+In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
+When specifying an environment all components and properties will be configured for that particular environment.
+For development purposes you can also fine tune which component should run in which environment configuration by using the profile of pattern `environment_component`, e.g. `dev_persist`.
+
+.Expected dependencies on each environment
+[%header,cols="h,1,1,1,1"]
+|===
+|
+|Persist
+|Auth
+|CDQ
+|Elastic
+
+|default
+|Localhost
+|Disabled
+|Disabled
+|Disabled
+
+|local
+|Localhost
+|Disabled
+|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] Test Storage
+|Localhost
+
+|dev
+|Host defined in  `BPDM_DB_HOST`
+|https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
+|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
+|Host defined in  `BPDM_ELASTIC_HOST`
+
+|int
+|Host defined in  `BPDM_DB_HOST`
+|https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
+|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
+|Host defined in  `BPDM_ELASTIC_HOST`
+|===
+
+==== Examples
+
+. Run application on default configuration: `mvn clean spring-boot:run`
+. Run on local environment: `mvn clean spring-boot:run -Dspring.profiles.active=local`
+. Run in general default environment against dev environment CDQ Api: `mvn clean spring-boot:run -Dspring.profiles.active=dev_cdq`
+. Run in general local environment against dev environment CDQ Api:  `mvn clean spring-boot:run -Dspring.profiles.active=local,dev_cdq`
+. Configure each component's environment separately: `mvn clean spring-boot:run -Dspring.profiles.active=local_elastic,dev_auth,int_cdq`
 
 == Project Structure
 
