@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class PartnerChangelogServiceTest @Autowired constructor(
+class PartnerChangelogServiceIT @Autowired constructor(
     val partnerChangelogService: PartnerChangelogService,
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val testHelpers: TestHelpers
