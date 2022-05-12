@@ -24,7 +24,6 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
-import org.testcontainers.junit.jupiter.Testcontainers
 
 /**
  * Integration tests for the look-ahead endpoints of the business partner controller
@@ -77,13 +76,11 @@ import org.testcontainers.junit.jupiter.Testcontainers
  * Then don't show property 1 value
  *
  */
-@Testcontainers
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
-    properties = ["bpdm.elastic.enabled=true"]
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles(value = ["test"])
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchContextInitializer::class])
 class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: ImportStarterService,
@@ -93,9 +90,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 ) {
 
     companion object {
-
-        private val elasticsearchContainer = ElasticsearchSingletonContainer.instance
-
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
@@ -105,7 +99,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
-            registry.add("spring.elasticsearch.uris", elasticsearchContainer::getHttpHostAddress)
         }
     }
 
