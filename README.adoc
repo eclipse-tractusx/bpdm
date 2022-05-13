@@ -1,4 +1,4 @@
-= GPDM
+= BPDM
 :icons: font
 :toc:
 :toclevels: 2
@@ -7,12 +7,32 @@
 
 This repository is part of the overarching CatenaX project.
 
-GPDM is a german abbreviation for Geschäfts-Partner-Daten-Management (business partner data management).
-This project lets other CatenaX services query, add and change information on CatenaX business partners.
+BPDM stands for business partner data management.
+This project lets other CatenaX services query, add and change base information on CatenaX business partners.
+
+== Running environments
+
+The BPDM application is released in multiple stages. Currently, these are the available environments:
+
+[%header,cols="h,1,1"]
+|===
+|
+|Description
+|Link
+
+|dev
+|Environment for testing newly developed BPDM features
+|https://catenax-bpdm-dev.demo.catena-x.net/
+
+|int
+|Environment for running integration tests with other CatenaX services
+|https://catenax-bpdm-int.demo.catena-x.net/
+|===
+
 
 == How to run
 
-GPDM is a SpringBoot Kotlin software project managed by Maven.
+BPDM is a SpringBoot Kotlin software project managed by Maven.
 
 The project can be run with the following command: `mvn clean spring-boot:run`
 
@@ -52,7 +72,7 @@ The following sections detail the configuration properties for each component.
 
 The file `application-persist.properties` contains the configuration for general persistence and the database connection.
 A running Postgres database instance is required (Tested and working on version 13.2), available either locally or remotely depending on the environment.
-User and password need to be provided as environment variables  `BPDM_DB_USER` and `BPDM_DB_PASS`.
+User credentials need to be provided as environment variable `BPDM_DB_PASS`.
 For environments like `int` and `dev` you also have to specify the host on where the postgres database is located in the environment variable  `BPDM_DB_HOST`.
 
 ==== Auth
@@ -198,11 +218,15 @@ image:
 When the deployment needs to be updated you can follow the same steps above, except for the last.
 In order to update the Helm release you need the Helm upgrade command: `helm upgrade release_name ./kubernetes/bpdm -n your_namespace`
 
-=== Deployment with Profiles
+=== Different environments
 
-The instructions above deploys an application with the default Spring profile enabled.
-You can set the active profiles in the `springProfiles` value.
-Like so:
+The instructions above deploys an application configured for the dev environment.
+There is also helm configuration available for the int environment, defined int the `int-values.yaml`.
+You would install the application for int environment with: `helm install release_name ./helm/bpdm -n your_namespace -v ./helm/bpdm/int-values.yaml`.
+
+If you want to create a new helm release for a different environment you can create your own values file and adjust the values accordingly.
+One of the most important values you want to adjust is in which profile (or profiles) the bpdm service application should run.
+This is determined by the `springProfiles` value:
 
 [source,yaml]
 ----
@@ -210,21 +234,38 @@ springProfiles:
   - dev
 ----
 
-Be aware that additional profiles usually require secrets to be passed to the application.
-The helm deployment automatically creates Kubernetes applicaton secrets which are being used by the deployed application based on the `applicationSecrets` values.
-You can determine which secrets should be created by specifying the name of the entry in the Kubernetes secret with it's corresponding environment variable name (defined in the Spring profiles) and the actual value of the secret like so:
+=== Secrets
 
+Be aware that you may also want to replace placeholder passwords for the deployment.
+This can be done by giving a values file  overriding the password placeholders like so: `helm install release_name ./helm/bpdm -n your_namespace -v secret-values.yaml`
+
+secret-values.yaml:
 [source,yaml]
 ----
-applicationSecrets:
-    db-user:
-        envName: BPDM_DB_USER
-        secret: some_value
+applicationSecret:
+  keycloak: your_keycloak_secret
+  cdq: your_cdq_api_key
+postgres:
+  auth:
+    postgresPassword: your_postgres_user_password
+    password: your_bpdm_user_password
 ----
 
-In order to avoid pushing secrets to the Github repository it's a good practice to leave the secret value empty and pass it over command line when deploying a helm release via the set flag like `--set applicationSecrets.db-user.secret=some_secret`.
+In order to avoid pushing secrets to the Github repository it's a good practice to pass secret values over command line when deploying a helm release via the set flag like `--set applicationSecrets.db-user.secret=some_secret`.
+You may want to set those secrets on the command line during install or update.
 
-=== Pull Secrets
+[source,bash]
+----
+helm install release_name ./helm/bpdm \
+--namespace your_namespace \
+--set applicationSecret.keycloak=$BPDM_DB_USER \
+--set applicationSecret.cdq=$BPDM_DB_PASS \
+--set postgres.auth.postgresPassword=$BPDM_KEYCLOAK_SECRET \
+--set postgres.auth.password=$BPDM_CDQ_KEY
+----
+
+
+==== Pull Secrets
 
 Private container registries may require authentication in order to be accessed.
 In this case the Helm deployment needs to be given pull secrets to pull the image from such a registry.
@@ -239,43 +280,3 @@ imagePullSecrets:
 ----
 
 As with application secrets instead of writing your credentials directly into a value.yaml you better pass them via command line when deploying the helm release: `--set imagePullSecret.user=your_user`
-
-=== Dev Deployment
-
-In order to deploy the application with the dev environment profile you can use the provided dev-values.yaml which starts the application with the Spring dev profile.
-Taking in all the previous points, for a full dev deployment in it's own dev namespace you would need to use the following command:
-
-[source,bash]
-----
-helm install release_name ./kubernetes/bpdm -f ./kubernetes/dev-values.yaml \
---namespace your_namespace \
---set imagePullSecrets.user=$BPDM_PULL_USER \
---set imagePullSecrets.password=$BPDM_PULL_PASS \
---set applicationSecrets.db-user.secret=$BPDM_DB_USER \
---set applicationSecrets.db-pass.secret=$BPDM_DB_PASS \
---set applicationSecrets.keycloak-secret.secret=$BPDM_KEYCLOAK_SECRET \
---set applicationSecrets.cdq-key.secret=$BPDM_CDQ_KEY
-----
-
-Where the environment variables hold the necessary secret values.
-
-For an update, in case no helm values need to changed you can reuse the old values:
-
-[source,bash]
-----
-helm upgrade release_name ./kubernetes/bpdm -n your_namespace --reuse-values
-----
-
-Otherwise, you need to provide all values again:
-
-[source,bash]
-----
-helm upgrade release_name ./kubernetes/bpdm -f ./kubernetes/dev-values.yaml \
---namespace your_namespace \
---set imagePullSecrets.user=$BPDM_PULL_USER \
---set imagePullSecrets.password=$BPDM_PULL_PASS \
---set applicationSecrets.db-user.secret=$BPDM_DB_USER \
---set applicationSecrets.db-pass.secret=$BPDM_DB_PASS \
---set applicationSecrets.keycloak-secret.secret=$BPDM_KEYCLOAK_SECRET \
---set applicationSecrets.cdq-key.secret=$BPDM_CDQ_KEY
-----
