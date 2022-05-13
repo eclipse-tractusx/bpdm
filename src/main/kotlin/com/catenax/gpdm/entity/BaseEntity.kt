@@ -2,7 +2,7 @@ package com.catenax.gpdm.entity
 
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import java.time.OffsetDateTime
+import java.time.Instant
 import java.util.*
 import javax.persistence.*
 
@@ -19,9 +19,9 @@ abstract class BaseEntity(
 
     @Column(updatable = false, nullable = false, name = "CREATED_AT")
     @CreationTimestamp
-    val createdAt: OffsetDateTime = OffsetDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
     @Column(nullable = false, name = "UPDATED_AT")
     @UpdateTimestamp
-    val updatedAt: OffsetDateTime = OffsetDateTime.now()
+    val updatedAt: Instant = Instant.now()
 )

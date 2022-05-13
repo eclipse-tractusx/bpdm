@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.OffsetDateTime
+import java.time.Instant
 
 @Service
 class ElasticSyncPageService(
@@ -19,7 +19,7 @@ class ElasticSyncPageService(
 
 
     @Transactional
-    fun exportPartnersToElastic(fromTime: OffsetDateTime, pageRequest: PageRequest): Page<BusinessPartnerDoc> {
+    fun exportPartnersToElastic(fromTime: Instant, pageRequest: PageRequest): Page<BusinessPartnerDoc> {
         val partnersToExport = businessPartnerRepository.findByUpdatedAtAfter(fromTime, pageRequest)
         val createdDocs = businessPartnerDocRepository.saveAll(partnersToExport.map { documentMappingService.toDocument(it) }).toList()
         return PageImpl(createdDocs, partnersToExport.pageable, partnersToExport.totalElements)

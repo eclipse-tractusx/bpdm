@@ -1,6 +1,6 @@
 package com.catenax.gpdm.entity
 
-import java.time.OffsetDateTime
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -21,9 +21,9 @@ class SyncRecord(
     @Column(name = "save_state")
     var errorSave: String? = null,
     @Column(name = "started_at")
-    var startedAt: OffsetDateTime? = null,
+    var startedAt: Instant? = null,
     @Column(name = "finished_at")
-    var finishedAt: OffsetDateTime? = null,
+    var finishedAt: Instant? = null,
 
     ): BaseEntity()
 
