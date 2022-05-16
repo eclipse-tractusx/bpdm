@@ -47,7 +47,7 @@ The REST API documentation can be accessed at `+http://localhost:8080/api/swagge
 
 . Maven
 . JDK11
-. PostgreSQL 13.2
+. PostgreSQL 14.2
 . Keycloak 17.0.0 (with enabled authentication)
 . Connection to CDQ API v4.0 (with enabled CDQ component)
 . Elasticsearch 7.17.0 (with enabled Elasticsearch component)
@@ -71,7 +71,7 @@ The following sections detail the configuration properties for each component.
 ==== Persist
 
 The file `application-persist.properties` contains the configuration for general persistence and the database connection.
-A running Postgres database instance is required (Tested and working on version 13.2), available either locally or remotely depending on the environment.
+A running Postgres database instance is required (Tested and working on version 14.2), available either locally or remotely depending on the environment.
 User credentials need to be provided as environment variable `BPDM_DB_PASS`.
 For environments like `int` and `dev` you also have to specify the host on where the postgres database is located in the environment variable  `BPDM_DB_HOST`.
 
@@ -240,6 +240,7 @@ Be aware that you may also want to replace placeholder passwords for the deploym
 This can be done by giving a values file  overriding the password placeholders like so: `helm install release_name ./helm/bpdm -n your_namespace -v secret-values.yaml`
 
 secret-values.yaml:
+
 [source,yaml]
 ----
 applicationSecret:

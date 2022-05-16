@@ -81,6 +81,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>${postgres.version}</version>
             <scope>runtime</scope>
         </dependency>
         <!-- Contains country and language codes per ISO 3166-1 alpha-2 and ISO 639-1 -->
