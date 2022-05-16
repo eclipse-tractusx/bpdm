@@ -10,6 +10,7 @@ import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 /**
  * Service for creating and updating business partner records
@@ -129,7 +130,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm?): BusinessPartner {
-        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet())
+        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet(), Instant.now())
     }
 
     private fun toEntity(dto: BusinessStatusRequest, partner: BusinessPartner): BusinessStatus{
