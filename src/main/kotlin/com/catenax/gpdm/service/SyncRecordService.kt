@@ -8,7 +8,7 @@ import com.catenax.gpdm.exception.BpdmSyncStateException
 import com.catenax.gpdm.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Service
@@ -17,11 +17,11 @@ class SyncRecordService(
 ) {
 
     companion object {
-        val syncStartTime = OffsetDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+        val syncStartTime = LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC)
     }
 
-    fun getOrCreateRecord(type: SyncType): SyncRecord{
-        return syncRecordRepository.findByType(type)?: run {
+    fun getOrCreateRecord(type: SyncType): SyncRecord {
+        return syncRecordRepository.findByType(type) ?: run {
             val newEntry = SyncRecord(
                 type,
                 SyncStatus.NOT_SYNCED
@@ -36,7 +36,7 @@ class SyncRecordService(
 
         record.progress = if (record.status == SyncStatus.ERROR) record.progress else 0f
         record.count = if (record.status == SyncStatus.ERROR) record.count else 0
-        record.startedAt = Instant.now().atOffset(ZoneOffset.UTC)
+        record.startedAt = Instant.now()
         record.finishedAt = null
         record.status = SyncStatus.RUNNING
         record.errorDetails = null
@@ -49,7 +49,7 @@ class SyncRecordService(
         if(record.status != SyncStatus.RUNNING)
             throw BpdmSyncStateException("Synchronization of type ${record.type} can't switch from state ${record.status} to ${SyncStatus.SUCCESS}.")
 
-        record.finishedAt = Instant.now().atOffset(ZoneOffset.UTC)
+        record.finishedAt = Instant.now()
         record.progress = 1f
         record.status = SyncStatus.SUCCESS
         record.errorDetails = null
@@ -59,7 +59,7 @@ class SyncRecordService(
     }
 
     fun setSynchronizationError(record: SyncRecord, errorMessage: String, saveState: String?): SyncRecord {
-        record.finishedAt = Instant.now().atOffset(ZoneOffset.UTC)
+        record.finishedAt = Instant.now()
         record.status = SyncStatus.ERROR
         record.errorDetails = errorMessage.take(255)
         record.errorSave = saveState

@@ -1,5 +1,6 @@
 package com.catenax.gpdm.entity
 
+import java.time.Instant
 import javax.persistence.*
 
 
@@ -19,14 +20,16 @@ class BusinessPartner(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     var types: Set<BusinessPartnerType>,
-    @ManyToMany(cascade = [ CascadeType.ALL ])
+    @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "business_partners_roles",
         joinColumns = [JoinColumn(name = "partner_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")],
         indexes = [Index(columnList = "partner_id")]
     )
-    val roles: Set<Role>
+    val roles: Set<Role>,
+    @Column(name = "currentness", nullable = false)
+    var currentness: Instant
 ): BaseEntity(){
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()

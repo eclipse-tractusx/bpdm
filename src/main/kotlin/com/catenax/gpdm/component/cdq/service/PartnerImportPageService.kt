@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
-import java.time.OffsetDateTime
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -35,7 +35,7 @@ class PartnerImportPageService(
 
 
     @Transactional
-    fun import(modifiedAfter: OffsetDateTime, startAfter: String?): ImportResponsePage {
+    fun import(modifiedAfter: Instant, startAfter: String?): ImportResponsePage {
         val partnerCollection = webClient
             .get()
             .uri { builder ->
@@ -103,7 +103,7 @@ class PartnerImportPageService(
     }
 
 
-    private fun toModifiedAfterFormat(dateTime: OffsetDateTime): String{
+    private fun toModifiedAfterFormat(dateTime: Instant): String {
         return DateTimeFormatter.ISO_INSTANT.format(dateTime)
     }
 

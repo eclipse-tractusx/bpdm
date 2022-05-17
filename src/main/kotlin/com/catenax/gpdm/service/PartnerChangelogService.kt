@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import javax.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * Provides access to changelog entries of business partners. Changelog entries must be created manually via this service, when business partner (including

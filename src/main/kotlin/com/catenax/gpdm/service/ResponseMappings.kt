@@ -46,13 +46,14 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
         legalForm?.toDto(),
-        stati.maxWithOrNull(compareBy{it.validFrom})?.toDto(),
+        stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
         addresses.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },
         roles.map { it.toDto() },
-        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
+        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() }),
+        currentness
     )
 }
 

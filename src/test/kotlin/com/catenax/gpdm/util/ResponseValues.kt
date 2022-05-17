@@ -7,6 +7,7 @@ import com.catenax.gpdm.dto.response.type.TypeNameUrlDto
 import com.catenax.gpdm.entity.*
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import java.time.ZoneOffset
 
 /**
  * Test values for response DTOs
@@ -157,7 +158,8 @@ object ResponseValues {
         legalForm = legalFormDoc1,
         status = status1,
         profileClassifications = listOf(classification1, classification2),
-        addresses = listOf(address1)
+        addresses = listOf(address1),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
     val businessPartner2 = BusinessPartnerResponse(
@@ -167,7 +169,8 @@ object ResponseValues {
         legalForm = legalFormDoc2,
         status = status2,
         profileClassifications = listOf(classification3, classification4),
-        addresses = listOf(address2)
+        addresses = listOf(address2),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
     val businessPartner3 = BusinessPartnerResponse(
@@ -177,6 +180,7 @@ object ResponseValues {
         legalForm = legalFormDoc3,
         status = status3,
         profileClassifications = listOf(classification5),
-        addresses = listOf(address3)
+        addresses = listOf(address3),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 }

@@ -7,9 +7,11 @@ import com.catenax.gpdm.dto.MetadataMappingDto
 import com.catenax.gpdm.dto.request.*
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.entity.*
+import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 /**
  * Service for creating and updating business partner records
@@ -52,12 +54,18 @@ class BusinessPartnerBuildService(
         return businessPartnerRepository.saveAll(allPartners).toList()
     }
 
+    @Transactional
+    fun setBusinessPartnerCurrentness(bpn: String) {
+        val partner = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
+        partner.currentness = Instant.now()
+    }
 
-    private fun createBusinessPartners(requests: Collection<BusinessPartnerRequest>, metadataMap: MetadataMappingDto): Collection<BusinessPartner>{
+
+    private fun createBusinessPartners(requests: Collection<BusinessPartnerRequest>, metadataMap: MetadataMappingDto): Collection<BusinessPartner> {
         val bpns = bpnIssuingService.issueLegalEntities(requests.size)
         val requestBpnPairs = requests.zip(bpns)
 
-       return requestBpnPairs.map { (request, bpn) -> createBusinessPartner(request, bpn, metadataMap) }
+        return requestBpnPairs.map { (request, bpn) -> createBusinessPartner(request, bpn, metadataMap) }
     }
 
     private fun createBusinessPartner(
@@ -129,7 +137,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm?): BusinessPartner {
-        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet())
+        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet(), Instant.now())
     }
 
     private fun toEntity(dto: BusinessStatusRequest, partner: BusinessPartner): BusinessStatus{

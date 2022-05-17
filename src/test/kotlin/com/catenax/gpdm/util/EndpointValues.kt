@@ -21,6 +21,8 @@ object EndpointValues {
     const val CATENA_PREMISE_PATH = "$CATENA_ADDRESS_PATH/premise"
     const val CATENA_POSTAL_DELIVERY_POINT_PATH = "$CATENA_ADDRESS_PATH/postal-delivery-point"
 
+    const val CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX = "/confirm-up-to-date"
+
     const val CATENA_BPN_SEARCH_PATH = "/api/catena/bpn/search"
 
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"

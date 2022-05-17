@@ -327,7 +327,7 @@ class CdqControllerImportIT @Autowired constructor(
 
         actualToExpectedMap.forEach { (actualPartner, expectedPartner) ->
             assertThat(expectedPartner).isNotNull
-            val expectedWithBpn = replaceBpn(expectedPartner!!, actualPartner.bpn)
+            val expectedWithBpn = replaceBpn(expectedPartner!!, actualPartner.bpn).copy(currentness = actualPartner.currentness)
 
             assertThat(actualPartner)
                 .usingRecursiveComparison()

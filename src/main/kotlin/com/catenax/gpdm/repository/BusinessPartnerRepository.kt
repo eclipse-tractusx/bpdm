@@ -6,14 +6,14 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
-import java.time.OffsetDateTime
+import java.time.Instant
 
 interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner, Long>{
     fun findByBpn(bpn: String) : BusinessPartner?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<BusinessPartner>
 
-    fun findByUpdatedAtAfter(updatedAt: OffsetDateTime, pageable: Pageable): Page<BusinessPartner>
+    fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<BusinessPartner>
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.value = ?2")
     fun findByIdentifierTypeAndValue(type: IdentifierType, idValue: String) : BusinessPartner?

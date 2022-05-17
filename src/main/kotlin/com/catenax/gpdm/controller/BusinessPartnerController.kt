@@ -61,7 +61,7 @@ class BusinessPartnerController(
     ])
     @GetMapping("/{idValue}")
     fun getBusinessPartner(
-        @Parameter(description = "Identifier value")@PathVariable idValue: String,
+        @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam
         idType: String?
@@ -71,13 +71,36 @@ class BusinessPartnerController(
         else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
     }
 
-    @Operation(summary = "Create new business partner record",
-    description = "Endpoint to create new business partner records directly in the system. Currently for test purposes only.")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
-    ])
+    @Operation(
+        summary = "Confirms that the data of a business partner is still up to date.",
+        description = "Confirms that the data of a business partner is still up to date " +
+                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\"."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Business partner's \"currentness\" successfully updated"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @PostMapping("/{bpn}/confirm-up-to-date")
+    fun setBusinessPartnerCurrentness(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String
+    ) {
+        businessPartnerBuildService.setBusinessPartnerCurrentness(bpn)
+    }
+
+    @Operation(
+        summary = "Create new business partner record",
+        description = "Endpoint to create new business partner records directly in the system. Currently for test purposes only."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
+        ]
+    )
     @PostMapping
     fun createBusinessPartners(
         @RequestBody
