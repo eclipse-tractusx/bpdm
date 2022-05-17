@@ -6,3 +6,12 @@ springProfiles:
 
 ingress:
   host: catenax-bpdm-int.demo.catena-x.net
+
+applicationSecret:
+  keycloak: <path:bpdm/int/keycloak#credentials-secret>
+  cdq: <path:bpdm/int/cdq#api-key>
+
+postgres:
+  auth:
+    postgresPassword: <path:bpdm/int/postgresql#postgres-password>
+    password: <path:bpdm/int/postgresql#password>
