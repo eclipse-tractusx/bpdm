@@ -39,6 +39,14 @@ class BusinessPartnerFetchService(
     }
 
     /**
+     * Fetch business partners by BPN in [bpns]
+     */
+    @Transactional
+    fun fetchByBpns(bpns: Collection<String>): Set<BusinessPartner> {
+        return fetchBusinessPartnerDependencies(businessPartnerRepository.findDistinctByBpnIn(bpns))
+    }
+
+    /**
      * Fetch a business partner by [identifierValue] of [identifierType] and return as [BusinessPartnerResponse]
      */
     @Transactional
@@ -103,7 +111,6 @@ class BusinessPartnerFetchService(
         addressRepository.joinPremises(addresses)
         addressRepository.joinPostalDeliveryPoints(addresses)
         addressRepository.joinThoroughfares(addresses)
-        addressRepository.joinVersion(addresses)
 
         return addresses
     }
