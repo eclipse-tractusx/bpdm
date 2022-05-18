@@ -1,6 +1,8 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.ChangelogEntryDto
+import com.catenax.gpdm.dto.response.ChangelogEntryResponse
+import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.PartnerChangelogEntry
 import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
 import org.springframework.data.domain.Page
@@ -32,6 +34,11 @@ class PartnerChangelogService(
 
     fun getChangelogEntriesStartingAfterId(startId: Long = -1, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
         return partnerChangelogEntryRepository.findAllByIdGreaterThan(startId, PageRequest.of(pageIndex, pageSize, Sort.by("id").ascending()))
+    }
+
+    fun getChangelogEntriesByBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
+        val page = partnerChangelogEntryRepository.findAllByBpn(bpn, PageRequest.of(pageIndex, pageSize, Sort.by("id").ascending()))
+        return page.toDto(page.content.map { it.toDto() })
     }
 
     private fun ChangelogEntryDto.toEntity(): PartnerChangelogEntry {

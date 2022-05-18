@@ -159,10 +159,16 @@ fun Relation.toDto(): RelationResponse {
 }
 
 fun BankAccount.toDto(): BankAccountResponse {
-    return BankAccountResponse(uuid, trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
-        nationalBankAccountIdentifier, nationalBankIdentifier)
+    return BankAccountResponse(
+        uuid, trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
+        nationalBankAccountIdentifier, nationalBankIdentifier
+    )
 }
 
-fun SyncRecord.toDto(): SyncResponse{
+fun SyncRecord.toDto(): SyncResponse {
     return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
+}
+
+fun PartnerChangelogEntry.toDto(): ChangelogEntryResponse {
+    return ChangelogEntryResponse(bpn, changelogType, createdAt)
 }
