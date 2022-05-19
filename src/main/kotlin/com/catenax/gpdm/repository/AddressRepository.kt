@@ -33,7 +33,4 @@ interface AddressRepository : PagingAndSortingRepository<Address, Long> {
     @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.localities WHERE a IN :addresses")
     fun joinLocalities(addresses: Set<Address>): Set<Address>
 
-    @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.version WHERE a IN :addresses")
-    fun joinVersion(addresses: Set<Address>): Set<Address>
-
 }

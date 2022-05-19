@@ -2,19 +2,22 @@ package com.catenax.gpdm.entity
 
 import com.neovisionaries.i18n.LanguageCode
 import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Table
+import javax.persistence.Embeddable
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 
-@Entity
-@Table(name = "address_versions")
-class AddressVersion (
+
+@Embeddable
+class AddressVersion(
+    @Enumerated(EnumType.STRING)
     @Column(name = "character_set", nullable = false)
     val characterSet: CharacterSet,
+    @Enumerated(EnumType.STRING)
     @Column(name = "language", nullable = false)
     val language: LanguageCode
-        ) : BaseEntity()
+)
 
-enum class CharacterSet(private val typeName: String): NamedType, HasDefaultValue<CharacterSet>{
+enum class CharacterSet(private val typeName: String) : NamedType, HasDefaultValue<CharacterSet> {
     ARABIC("Arabic"),
     CHINESE("Simplified Chinese"),
     CHINESE_TRADITIONAL("Traditional Chinese"),

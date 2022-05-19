@@ -7,8 +7,7 @@ import javax.persistence.*
 @Table(
     name = "addresses",
     indexes = [
-        Index(columnList = "partner_id"),
-        Index(columnList = "version_id")
+        Index(columnList = "partner_id")
     ]
 )
 class Address (
@@ -34,8 +33,7 @@ class Address (
     )
     @Column(name = "type", nullable = false)
     val types: MutableSet<AddressType> = mutableSetOf(),
-    @ManyToOne(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "version_id", nullable = false)
+    @Embedded
     var version: AddressVersion,
     @Embedded
     var geoCoordinates: GeographicCoordinate?,
