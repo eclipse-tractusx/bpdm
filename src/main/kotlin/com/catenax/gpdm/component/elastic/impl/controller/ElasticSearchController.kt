@@ -60,6 +60,6 @@ class ElasticSearchController(
     )
     @DeleteMapping("/business-partner")
     fun clear(){
-        return elasticSyncService.clearElastic()
+        elasticSyncService.clearElastic()
     }
 }

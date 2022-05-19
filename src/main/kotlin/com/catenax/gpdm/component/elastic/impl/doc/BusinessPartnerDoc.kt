@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 
-@Document(indexName = "business-partner", createIndex = true)
+@Document(indexName = "business-partner")
 data class BusinessPartnerDoc(
     @Id
     val bpn: String,
