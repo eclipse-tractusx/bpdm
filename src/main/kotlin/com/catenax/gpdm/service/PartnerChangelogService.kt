@@ -23,7 +23,7 @@ class PartnerChangelogService(
 ) {
     @Transactional
     fun createChangelogEntry(changelogEntry: ChangelogEntryDto): PartnerChangelogEntry {
-        return partnerChangelogEntryRepository.save(changelogEntry.toEntity())
+        return createChangelogEntries(listOf(changelogEntry)).single()
     }
 
     @Transactional

@@ -5,7 +5,6 @@ import com.catenax.gpdm.dto.ChangelogEntryDto
 import com.catenax.gpdm.dto.response.ChangelogEntryResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.ChangelogType
-import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
 import com.catenax.gpdm.util.CdqValues
 import com.catenax.gpdm.util.EndpointValues
 import com.catenax.gpdm.util.PostgreSQLContextInitializer
@@ -30,7 +29,6 @@ import org.springframework.test.web.reactive.server.returnResult
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class PartnerChangelogIT @Autowired constructor(
     val partnerChangelogService: PartnerChangelogService,
-    val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient
 ) {
@@ -59,7 +57,7 @@ class PartnerChangelogIT @Autowired constructor(
      * Then create and update changelog entries are created
      */
     @Test
-    fun updateModifiedPartner() {
+    fun createChangelogEntries() {
         val partnersToImport = listOf(
             CdqValues.businessPartner1,
             CdqValues.businessPartner2
@@ -104,41 +102,6 @@ class PartnerChangelogIT @Autowired constructor(
                     .filteredOn { it.changelogType == ChangelogType.UPDATE }
                     .isEmpty()
             }
-    }
-
-    /**
-     * Given no changelog entries in db
-     * When changelog entry created via service
-     * Then changelog entry saved to db
-     */
-    @Test
-    fun createChangelogEntry() {
-        partnerChangelogService.createChangelogEntry(ChangelogEntryDto("testBpn", ChangelogType.CREATE))
-
-        val changelogEntries = partnerChangelogEntryRepository.findAll()
-        assertThat(changelogEntries).hasSize(1)
-        assertThat(changelogEntries[0].bpn).isEqualTo("testBpn")
-        assertThat(changelogEntries[0].changelogType).isEqualTo(ChangelogType.CREATE)
-    }
-
-    /**
-     * Given no changelog entries in db
-     * When changelog multiple entries created via service in bulk
-     * Then all changelog entries saved to db
-     */
-    @Test
-    fun createChangelogEntries() {
-        partnerChangelogService.createChangelogEntries(
-            listOf(
-                ChangelogEntryDto("testBpn", ChangelogType.CREATE),
-                ChangelogEntryDto("testBpn", ChangelogType.UPDATE)
-            )
-        )
-
-        val changelogEntries = partnerChangelogEntryRepository.findAll()
-        assertThat(changelogEntries).hasSize(2)
-        assertThat(changelogEntries).anyMatch { it.changelogType == ChangelogType.CREATE }
-        assertThat(changelogEntries).anyMatch { it.changelogType == ChangelogType.UPDATE }
     }
 
     /**
