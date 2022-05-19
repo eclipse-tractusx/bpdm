@@ -4,12 +4,10 @@ import com.catenax.gpdm.component.elastic.SearchService
 import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.request.*
-import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
-import com.catenax.gpdm.dto.response.PageResponse
-import com.catenax.gpdm.dto.response.SuggestionResponse
+import com.catenax.gpdm.dto.response.*
 import com.catenax.gpdm.service.BusinessPartnerBuildService
 import com.catenax.gpdm.service.BusinessPartnerFetchService
+import com.catenax.gpdm.service.PartnerChangelogService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -25,7 +23,8 @@ class BusinessPartnerController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val businessPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
-    val bpnConfigProperties: BpnConfigProperties
+    val bpnConfigProperties: BpnConfigProperties,
+    val partnerChangelogService: PartnerChangelogService
 ) {
 
     @Operation(summary = "Get page of business partners matching the search criteria",
@@ -88,6 +87,25 @@ class BusinessPartnerController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ) {
         businessPartnerBuildService.setBusinessPartnerCurrentness(bpn)
+    }
+
+    @Operation(
+        summary = "Get business partner changelog entries by bpn",
+        description = "Get business partner changelog entries by bpn."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The changelog entries for the specified bpn"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @GetMapping("/{bpn}/changelog")
+    fun getChangelogEntries(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<ChangelogEntryResponse> {
+        return partnerChangelogService.getChangelogEntriesByBpn(bpn, paginationRequest.page, paginationRequest.size)
     }
 
     @Operation(

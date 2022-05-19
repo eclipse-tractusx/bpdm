@@ -2,7 +2,6 @@ package com.catenax.gpdm.component.cdq.controller
 
 import com.catenax.gpdm.Application
 import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
-import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
@@ -79,7 +78,7 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import partner  and check whether successfully imported
-        val importedBusinessPartners = importAndGetResponse(partnersToImport)
+        val importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, partnersExpected)
     }
 
@@ -103,11 +102,11 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import partner first time and check whether successfully imported
-        var importedBusinessPartners = importAndGetResponse(partnersToImport)
+        var importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, partnersExpected)
 
         //Import partner second time and check for no duplicates or other changes
-        importedBusinessPartners = importAndGetResponse(partnersToImport)
+        importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, partnersExpected)
 
     }
@@ -217,7 +216,7 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import partner first and check whether successfully imported
-        var importedBusinessPartners = importAndGetResponse(partnersToImport)
+        var importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, partnersExpected)
 
 
@@ -251,7 +250,7 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import updated partners from CDQ and check whether updates in our system
-        importedBusinessPartners = importAndGetResponse(modifiedPartnersToImport)
+        importedBusinessPartners = testHelpers.importAndGetResponse(modifiedPartnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, modifiedExpectedPartners)
     }
 
@@ -263,7 +262,7 @@ class CdqControllerImportIT @Autowired constructor(
      * Then partner is updated
      */
     @Test
-    fun updateModifiedPartner(){
+    fun updateModifiedPartner() {
         val partnersToImport = listOf(
             CdqValues.businessPartner1
         )
@@ -273,12 +272,12 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import partner first and check whether successfully imported
-        var importedBusinessPartners = importAndGetResponse(partnersToImport)
+        var importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, partnersExpected)
 
         //Prepare modified partner to import
         val modifiedPartnersToImport = listOf(
-          CdqValues.businessPartner3.copy(id =  CdqValues.businessPartner1.id)
+            CdqValues.businessPartner3.copy(id = CdqValues.businessPartner1.id)
         )
 
         val modifiedExpectedPartners = listOf(
@@ -286,44 +285,14 @@ class CdqControllerImportIT @Autowired constructor(
         )
 
         //Import updated partners from CDQ and check whether updates in our system
-        importedBusinessPartners = importAndGetResponse(modifiedPartnersToImport)
+        importedBusinessPartners = testHelpers.importAndGetResponse(modifiedPartnersToImport, webTestClient, wireMockServer)
         assertPartnerResponseEqual(importedBusinessPartners.content.map { it.businessPartner }, modifiedExpectedPartners)
     }
 
-    private fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdProperties.typeKey }!!.value
-
-    private fun importAndGetResponse(partnersToImport: Collection<BusinessPartnerCdq>): PageResponse<BusinessPartnerSearchResponse>{
-        val importCollection = BusinessPartnerCollectionCdq(
-            partnersToImport.size,
-            null,
-            null,
-            partnersToImport.size,
-            partnersToImport
-        )
-
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
-                aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withBody(objectMapper.writeValueAsString(importCollection))
-            )
-        )
-
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
-
-        return webTestClient
-            .get()
-            .uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-            .exchange().expectStatus().isOk
-            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
-            .responseBody
-            .blockFirst()!!
-    }
-
     private fun assertPartnerResponseEqual(actualPartners: Collection<BusinessPartnerResponse>, expectedPartners: Collection<BusinessPartnerResponse>){
-        val cdqIdToExpected = expectedPartners.associateBy { extractCdqId(it) }
+        val cdqIdToExpected = expectedPartners.associateBy { testHelpers.extractCdqId(it) }
         val actualToExpectedMap = actualPartners
-            .map { Pair(it, cdqIdToExpected[extractCdqId(it)]) }
+            .map { Pair(it, cdqIdToExpected[testHelpers.extractCdqId(it)]) }
 
         actualToExpectedMap.forEach { (actualPartner, expectedPartner) ->
             assertThat(expectedPartner).isNotNull

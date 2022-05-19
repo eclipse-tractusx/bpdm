@@ -9,17 +9,19 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import java.time.Instant
 
 interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner, Long>{
-    fun findByBpn(bpn: String) : BusinessPartner?
+    fun findByBpn(bpn: String): BusinessPartner?
+
+    fun existsByBpn(bpn: String): Boolean
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<BusinessPartner>
 
     fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<BusinessPartner>
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type = ?1 AND i.value = ?2")
-    fun findByIdentifierTypeAndValue(type: IdentifierType, idValue: String) : BusinessPartner?
+    fun findByIdentifierTypeAndValue(type: IdentifierType, idValue: String): BusinessPartner?
 
     @Query("SELECT DISTINCT i.partner FROM Identifier i WHERE i.type.technicalKey = ?1 AND i.value in ?2")
-    fun findByIdentifierTypeAndValues(type: String, values: Collection<String>) : Set<BusinessPartner>
+    fun findByIdentifierTypeAndValues(type: String, values: Collection<String>): Set<BusinessPartner>
 
     @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
     fun joinLegalForm(partners: Set<BusinessPartner>): Set<BusinessPartner>

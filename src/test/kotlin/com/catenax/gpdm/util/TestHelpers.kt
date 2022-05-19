@@ -1,7 +1,16 @@
 package com.catenax.gpdm.util
 
+import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
+import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCdq
+import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
+import com.catenax.gpdm.dto.response.BusinessPartnerResponse
+import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
+import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SyncResponse
 import com.catenax.gpdm.entity.SyncStatus
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -15,7 +24,9 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 
 @Component
 class TestHelpers(
-    entityManagerFactory: EntityManagerFactory
+    entityManagerFactory: EntityManagerFactory,
+    val objectMapper: ObjectMapper,
+    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
 ) {
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
@@ -61,14 +72,48 @@ class TestHelpers(
                 .responseBody
                 .blockFirst()!!
 
-            if(syncResponse.status == SyncStatus.SUCCESS)
+            if (syncResponse.status == SyncStatus.SUCCESS)
                 break
 
             i++
-        }while (i < RETRY_IMPORT_TIMES)
+        } while (i < RETRY_IMPORT_TIMES)
 
         Assertions.assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
 
         return syncResponse
     }
+
+    fun importAndGetResponse(
+        partnersToImport: Collection<BusinessPartnerCdq>,
+        client: WebTestClient,
+        wireMockServer: WireMockExtension
+    ): PageResponse<BusinessPartnerSearchResponse> {
+        val importCollection = BusinessPartnerCollectionCdq(
+            partnersToImport.size,
+            null,
+            null,
+            partnersToImport.size,
+            partnersToImport
+        )
+
+        wireMockServer.stubFor(
+            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(objectMapper.writeValueAsString(importCollection))
+            )
+        )
+
+        startSyncAndAwaitSuccess(client, EndpointValues.CDQ_SYNCH_PATH)
+
+        return client
+            .get()
+            .uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+            .exchange().expectStatus().isOk
+            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
+            .responseBody
+            .blockFirst()!!
+    }
+
+    fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value
 }
