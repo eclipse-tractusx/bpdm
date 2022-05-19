@@ -96,7 +96,8 @@ class BusinessPartnerController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "The changelog entries for the specified bpn"),
-            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
     @GetMapping("/{bpn}/changelog")

@@ -4,6 +4,8 @@ import com.catenax.gpdm.dto.ChangelogEntryDto
 import com.catenax.gpdm.dto.response.ChangelogEntryResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.entity.PartnerChangelogEntry
+import com.catenax.gpdm.exception.BpdmNotFoundException
+import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -19,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class PartnerChangelogService(
-    val partnerChangelogEntryRepository: PartnerChangelogEntryRepository
+    val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
+    val businessPartnerRepository: BusinessPartnerRepository
 ) {
     @Transactional
     fun createChangelogEntry(changelogEntry: ChangelogEntryDto): PartnerChangelogEntry {
@@ -33,11 +36,17 @@ class PartnerChangelogService(
     }
 
     fun getChangelogEntriesStartingAfterId(startId: Long = -1, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
-        return partnerChangelogEntryRepository.findAllByIdGreaterThan(startId, PageRequest.of(pageIndex, pageSize, Sort.by("id").ascending()))
+        return partnerChangelogEntryRepository.findAllByIdGreaterThan(
+            startId,
+            PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::id.name).ascending())
+        )
     }
 
     fun getChangelogEntriesByBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
-        val page = partnerChangelogEntryRepository.findAllByBpn(bpn, PageRequest.of(pageIndex, pageSize, Sort.by("id").ascending()))
+        if (!businessPartnerRepository.existsByBpn(bpn)) {
+            throw BpdmNotFoundException("Business Partner", bpn)
+        }
+        val page = partnerChangelogEntryRepository.findAllByBpn(bpn, PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::id.name).ascending()))
         return page.toDto(page.content.map { it.toDto() })
     }
 

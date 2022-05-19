@@ -57,7 +57,7 @@ class PartnerChangelogIT @Autowired constructor(
      * Then create and update changelog entries are created
      */
     @Test
-    fun createChangelogEntries() {
+    fun `create changelog entries`() {
         val partnersToImport = listOf(
             CdqValues.businessPartner1,
             CdqValues.businessPartner2
@@ -105,12 +105,32 @@ class PartnerChangelogIT @Autowired constructor(
     }
 
     /**
+     * Given some business partners imported
+     * When trying to retrieve changelog entries using a nonexistent bpn
+     * Then a "not found" response is sent
+     */
+    @Test
+    fun `get changelog entries by nonexistent bpn`() {
+        // import partners
+        val partnersToImport = listOf(
+            CdqValues.businessPartner1,
+            CdqValues.businessPartner2
+        )
+        testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
+
+        val bpn = "NONEXISTENT_BPN"
+        webTestClient.get()
+            .uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
+            .exchange().expectStatus().isNotFound
+    }
+
+    /**
      * Given some changelog entries in db
      * When changelog entries retrieved paginated
      * Then correct changelog page retrieved
      */
     @Test
-    fun getChangelogEntriesStartingAfterId() {
+    fun `get changelog entries starting after id via service`() {
         val startId = partnerChangelogService.createChangelogEntry(ChangelogEntryDto("testBpn1", ChangelogType.CREATE)).id
         partnerChangelogService.createChangelogEntry(ChangelogEntryDto("testBpn1", ChangelogType.UPDATE))
         partnerChangelogService.createChangelogEntry(ChangelogEntryDto("testBpn2", ChangelogType.CREATE))
