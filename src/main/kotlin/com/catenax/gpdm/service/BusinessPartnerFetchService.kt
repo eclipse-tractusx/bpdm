@@ -7,12 +7,7 @@ import com.catenax.gpdm.entity.BusinessPartner
 import com.catenax.gpdm.entity.Identifier
 import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.BusinessPartnerRepository
-import com.catenax.gpdm.repository.IdentifierRepository
-import com.catenax.gpdm.repository.IdentifierTypeRepository
-import com.catenax.gpdm.repository.LegalFormRepository
-import com.catenax.gpdm.repository.entity.AddressRepository
-import com.catenax.gpdm.repository.entity.BankAccountRepository
+import com.catenax.gpdm.repository.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
