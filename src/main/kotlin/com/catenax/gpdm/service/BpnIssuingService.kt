@@ -21,53 +21,63 @@ class BpnIssuingService(
     val configurationEntryRepository: ConfigurationEntryRepository,
     val bpnConfigProperties: BpnConfigProperties
 ) {
-
+    @Transactional
+    fun issueLegalEntityBpns(count: Int): Collection<String> {
+        return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKey)
+    }
 
     @Transactional
-    fun issueLegalEntities(count: Int): Collection<String>{
-        val counterEntry = getOrCreateCounter()
-        val startCounter =  counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
+    fun issueAddressBpns(count: Int): Collection<String> {
+        return issueBpns(count, bpnConfigProperties.addressChar, bpnConfigProperties.counterKeyAddresses)
+    }
 
-        val createdBpns = (0 .. count)
+    @Transactional
+    fun issueSiteBpns(count: Int): Collection<String> {
+        return issueBpns(count, bpnConfigProperties.addressChar, bpnConfigProperties.counterKeySites)
+    }
+
+    private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): Collection<String> {
+        val counterEntry = getOrCreateCounter(bpnCounterKey)
+        val startCounter = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
+
+        val createdBpns = (0..count)
             .map {
-                createLegalEntityNumber(startCounter + it)
+                createBpn(startCounter + it, bpnChar)
             }
 
-        counterEntry.value = (startCounter+count).toString()
+        counterEntry.value = (startCounter + count).toString()
         configurationEntryRepository.save(counterEntry)
 
         return createdBpns
     }
 
-
-    fun addIdentifiers(partners: Collection<BusinessPartner>){
+    fun addIdentifiers(partners: Collection<BusinessPartner>) {
         val type = getOrCreateIdentifierType()
         val status = getOrCreateIdentifierStatus()
         val agency = getOrCreateAgency()
 
-       partners.forEach{ it.identifiers.add(Identifier(it.bpn, type, status, agency, it)) }
+        partners.forEach { it.identifiers.add(Identifier(it.bpn, type, status, agency, it)) }
     }
-
 
     fun createIdentifier(bp: BusinessPartner): Identifier{
         return Identifier(bp.bpn, getOrCreateIdentifierType(), getOrCreateIdentifierStatus(), getOrCreateAgency(), bp)
     }
 
-    private fun createLegalEntityNumber(number: Long): String{
+    private fun createBpn(number: Long, bpnChar: Char): String {
         val code = toBpnCode(number)
         val checksum = calculateChecksum(code)
 
-        return "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}$code$checksum"
+        return "${bpnConfigProperties.id}$bpnChar$code$checksum"
     }
 
-    private fun getOrCreateCounter(): ConfigurationEntry {
-        return configurationEntryRepository.findByKey(bpnConfigProperties.counterKey)?: run {
-            val newEntry = ConfigurationEntry(bpnConfigProperties.counterKey, 0.toString())
+    private fun getOrCreateCounter(bpnCounterKey: String): ConfigurationEntry {
+        return configurationEntryRepository.findByKey(bpnCounterKey) ?: run {
+            val newEntry = ConfigurationEntry(bpnCounterKey, 0.toString())
             configurationEntryRepository.save(newEntry)
         }
     }
 
-    private fun getOrCreateAgency(): IssuingBody{
+    private fun getOrCreateAgency(): IssuingBody {
         return issuingBodyRepository.findByTechnicalKey(bpnConfigProperties.agencyKey) ?: run {
             val catenaIssuingBody = IssuingBody(bpnConfigProperties.agencyName, "", bpnConfigProperties.agencyKey)
             issuingBodyRepository.save(catenaIssuingBody)
