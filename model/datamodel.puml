@@ -1,0 +1,521 @@
+@startuml
+
+class BusinessPartner {
+	BPN
+	Name
+	Business Partner Type
+	Classification
+	Relation
+	LegalForm
+	Identifier
+	Status
+	Address
+	Bank Accounts
+	Roles
+	Profile
+}
+
+enum BusinessPartnerTypeE {
+	Brand
+	Legal Entity
+	Organizational Unit
+	Site
+	Unknown
+	Natural Person
+	Registered Individual
+}
+
+class BusinessPartnerStatus {
+	Official Denotation
+	Valid From
+	Valid Until
+	Type
+}
+
+class BusinessPartnerStatusType {
+	Name
+	Url
+	Technical Key
+}
+
+enum BusinessPartnerStatusTypeE {
+	Active
+	Dissolved
+	In Liquidation
+	Inactive
+	Insolvency
+}
+
+class BusinessPartnerRelation {
+	Started At (ISO 8601 timestamp)
+	Ended At (ISO 8601 timestamp)
+	Type
+	Class
+	Start Node (CX ID of the starting Node)
+	End Node (CX ID of the target Node)
+}
+
+class BusinessPartnerRelationType {
+ 	Name
+	Technical Key
+}
+
+enum BusinessPartnerRelationTypeE {
+	CX_LEGAL_SUCCESSOR_OF
+	CX_LEGAL_PREDECESSOR_OF
+	CX_ADDRESS_OF
+	CX_SITE_OF
+	CX_OWNED_BY
+	DIRECT_LEGALRELATION
+	COMMERCIAL_ULTIMATE
+	DOMMESTIC_BRANCH_RELATION
+	INTERNATIONALBRANCH_RELATION
+	DOMESTIC_LEGAL_ULTIMATE_RELATION
+	GLOBAL_LEGAL_ULTIMATE_RELATION
+	LEGAL_PREDECESSOR
+	LEGAL_SUCCESSOR
+	DNB_PARENT
+	DNB_HEADQUARTER
+	DNB_DOMESTIC_ULTIMATE
+	DNB_GLOBAL_ULTIMATE
+	LEI_DIREcT_PARENT
+	LEI_INTERNATIONAl_BRANCH
+	LEI_ULTIMATE_PARENT
+}
+
+class BusinessPartnerRelationClass {
+	Technical Key: BUSINESS_PARTNER_RELATION_CLASS_CX_HIERARCHY
+	Name: CX Hierarchy
+}
+
+class BusinessPartnerClassificationType {
+ 	Name
+	Url
+}
+
+enum BusinessPartnerClassificationTypeE {
+	NACE
+	NAF
+	NAICS
+	SIC
+}
+
+class BusinessPartnerClassification {
+	Type
+	Code
+	Value
+}
+
+class BusinessPartnerRole {
+	Technical Key
+	Name
+}
+
+class LegalForm {
+	Name
+	Technical Key
+	Language
+	Categories
+	Url
+	Main Abbrevation (An unique identifier for CDL)
+}
+
+note as N4
+	<b>Example:</b>
+	AT_7461 (AG in Austria)
+	DE_9866 (AG in Germany)
+	CH_0680 (AG in Switzerland)
+	CN_1659 (Joint-Stock Company in China)
+	...
+end note
+
+class LegalFormCategory {
+	name
+	url
+}
+
+class BankAccount {
+	National Bank Identifier
+	Natinal Bank Account Identifier
+	Currency
+	International Bank Identifier (BIC/SWIFT)
+	International Bank Account Identifier (IBAN)
+	Trust Scores
+}
+
+class Currency {
+	Technical Key
+	Name
+}
+
+class Identifier {
+	Type
+	Status
+	Issuing Body
+	Value
+}
+
+class IdentifierType {
+ 	Name
+	Url
+	Technical Key
+
+}
+
+note as N3
+	<b>Example:</b>
+	BPN
+	CX ID
+	DE BNUM
+	DUNS ID
+	EU_VAT_ID_DE
+	EU_VAT_ID_FR
+	SIREN
+	SIRET
+	SSI ID
+	...
+end note
+
+class IdentifierStatus {
+	Name
+	Technical Key
+}
+
+class IssuingBody {
+	Name
+	Url
+	technical Key
+}
+
+class Name {
+	Language
+	Short Name
+	Type
+	Value
+}
+
+class NameType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum NameTypeE {
+	Acronym
+	Doing Business As
+	Establishment
+	International
+	Local
+	Other
+	Registered
+	Transliterated
+	VAT Registered
+}
+
+class Language {
+	name ISO 639-1 (German)
+	technicalKey ISO 639-1 two-letters
+}
+
+class Address {
+	Postal Delivery Points
+	Thoroughfares
+	Premises
+	Types
+	Contexts
+	Version
+	Geographic Coordinates
+	Post Codes
+	Care Of
+	Localities
+	Administrative Areas
+	Country
+	Identifiers
+}
+
+class AddressType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum AddressTypeE {
+	Branch Office
+	Care Of
+	Headquarter
+	Legal
+	Legal Alternative
+	PO Box
+	Registered
+	Registered Agent Mail
+	Registered Agent Physical
+	VAT Registered
+	Unspecified
+}
+
+class AddressVersion {
+	CharacterSet
+	Language
+}
+
+class Country {
+	Short Name
+	Value / Country Code
+}
+
+note as N2
+	<b>Example:</b>
+	ISO 3166 Standard
+	AT
+	CH
+	DE
+	...
+end note
+
+class AdministrativeArea {
+	Fips Code
+	Language
+	Short Name
+	Type
+	Value
+}
+
+note as N1
+	<b>Example:</b>
+	FIPS
+	ISO 3166
+	...
+end note
+
+class AdministrativeAreaType {
+	County
+	Other
+	Region
+}
+
+class Locality {
+	Language
+	Short Name
+	Type
+	Value
+}
+
+class LocalityType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum LocalityTypeE {
+	Block
+	City
+	District
+	Other
+	Post Office
+	Quarter
+}
+
+class GeographicCoordinates {
+	latitude
+	longitude
+	altitude
+}
+
+class PostCode {
+	Type
+	Value
+}
+
+class PostCodeType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum PostCodeTypeE {
+	CEDEX
+	Large Mail User
+	Other
+	Post Box
+	Regular
+}
+
+
+class PostalDeliveryPoint {
+	Language
+	Short Name
+	Number
+	Type
+	Value
+}
+
+class PostalDeliveryPointType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum PostalDeliveryPointTypeE {
+	Interurban Delivery Point
+	Mail Station
+	Mailbox
+	Other
+	Post Office Box
+}
+
+
+class Thoroughfare {
+	Name
+	Language
+	Short Name
+	Number
+	Type
+	Direction
+	Value
+}
+
+class ThoroughfareType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum ThoroughfareTypeE {
+	Industrial Zone
+	Other
+	River
+	Square
+	Street
+}
+
+
+class Premise {
+	Language
+	Short Name
+	Number
+	Type
+	Value
+}
+
+class PremiseType {
+ 	Name
+	Url
+	Technical Key
+}
+
+enum PremiseTypeE {
+	Building
+	Harbour
+	Level
+	Other
+	Room
+	Suite
+	Unit
+	Warehouse
+}
+
+
+class CharacterSet {
+	name
+	Technical Key
+}
+
+enum CharacterSetName {
+	Arabic
+	Chinese
+	Chinese traditional
+	Cyrillic
+	Greek
+	Hangul Korean
+	Hebrew
+	Hiragana
+	Kanji
+	Katakana
+	Latin
+	Thai
+	Western Latin Standard
+}
+
+
+N1 .. AdministrativeArea
+N2 .. Country
+N3 .. IdentifierType
+N4 .. LegalForm
+
+Name .. NameType
+Name .. Language
+
+BankAccount .. Currency
+
+CharacterSet .. CharacterSetName
+
+LegalForm .. Language
+LegalForm .. LegalFormCategory
+
+
+BusinessPartner "1" *--> "*" BusinessPartnerClassification
+BusinessPartner "*" --> "0..1" LegalForm
+BusinessPartner "1" *--> "*" BankAccount
+BusinessPartner "1" *--> "*" Name
+BusinessPartner "1" *--> "*" Identifier
+BusinessPartner "1" *--> "*" Address
+BusinessPartner "1" *--> "0..1" BusinessPartnerStatus
+BusinessPartner "*" --> "*" BusinessPartnerRelation
+BusinessPartner "*" --> "*" BusinessPartnerRole
+BusinessPartner "*" --> "*" BusinessPartnerTypeE
+
+BusinessPartnerStatus "*"--> "1" BusinessPartnerStatusType
+BusinessPartnerStatusType .. BusinessPartnerStatusTypeE
+
+BusinessPartnerRelation .. BusinessPartnerRelationType
+BusinessPartnerRelationType .. BusinessPartnerRelationTypeE
+BusinessPartnerRelation .. BusinessPartnerRelationClass
+
+BusinessPartnerClassification "*" --> "1" BusinessPartnerClassificationType
+BusinessPartnerClassificationType .. BusinessPartnerClassificationTypeE
+
+
+Address "*" --> "0..1" Country
+Address "*" --> "0..1" AddressType
+Address "*" --> "0..1" GeographicCoordinates
+Address "1" *--> "*" Premise
+Address "1" *--> "*" Locality
+Address "1" *--> "*" PostCode
+Address "1" *--> "*" AddressVersion
+Address "1" *--> "*" Thoroughfare
+Address "1" *--> "*" AdministrativeArea
+Address "1" *--> "*" PostalDeliveryPoint
+
+Identifier "*" --> "1" IdentifierType
+Identifier "*" --> "1" IssuingBody
+Identifier "*" --> "1" IdentifierStatus
+
+Premise "*" --> "1" Language
+Premise "*" -> "1" PremiseType
+PremiseType .. PremiseTypeE
+
+Locality "*" --> "1" Language
+Locality "*" --> "1" LocalityType
+LocalityType .. LocalityTypeE
+
+PostCode "*" --> "1" PostCodeType
+PostCodeType .. PostCodeTypeE
+
+AddressVersion "*" --> "1" Language
+AddressVersion "*" --> "1" CharacterSet
+AddressType .. AddressTypeE
+
+Thoroughfare "*" --> "1" Language
+Thoroughfare "*" --> "1" ThoroughfareType
+ThoroughfareType .. ThoroughfareTypeE
+
+AdministrativeArea "*" --> "1" Language
+AdministrativeArea "*" --> "1" AdministrativeAreaType
+
+PostalDeliveryPoint "*" --> "1" Language
+PostalDeliveryPoint "*" --> "1" PostalDeliveryPointType
+PostalDeliveryPointType .. PostalDeliveryPointTypeE
+
+NameType .. NameTypeE
+
+@enduml
