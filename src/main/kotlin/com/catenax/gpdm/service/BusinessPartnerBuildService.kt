@@ -110,13 +110,15 @@ class BusinessPartnerBuildService(
         partner: BusinessPartner
     ): Address{
         val address = Address(
+            "TODO",
             dto.careOf,
             dto.contexts.toMutableSet(),
             dto.country,
             dto.types.toMutableSet(),
             toEntity(dto.version),
             dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates) },
-            partner
+            partner,
+            null
         )
 
         address.administrativeAreas.clear()

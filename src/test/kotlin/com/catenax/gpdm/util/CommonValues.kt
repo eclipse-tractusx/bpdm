@@ -12,6 +12,10 @@ object CommonValues {
     val bpn2 = "BPNL0000000001XZ"
     val bpn3 = "BPNL0000000002ZZ"
 
+    val bpnA1 = "BPNA0000000000XY"
+    val bpnA2 = "BPNA0000000001XZ"
+    val bpnA3 = "BPNA0000000002ZZ"
+
     val uuid1 = UUID.fromString("e9975a48-b190-4bf1-a7e6-73c6a1744de8")
 
     val name1 = "Business Partner Name"

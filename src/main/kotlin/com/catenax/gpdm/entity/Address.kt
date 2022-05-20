@@ -11,7 +11,9 @@ import javax.persistence.*
     ]
 )
 class Address (
-    @Column(name="care_of")
+    @Column(name = "bpn", nullable = false, unique = true)
+    var bpn: String,
+    @Column(name = "care_of")
     var careOf: String?,
     @ElementCollection(targetClass = String::class)
     @JoinTable(
@@ -38,11 +40,14 @@ class Address (
     @Embedded
     var geoCoordinates: GeographicCoordinate?,
     @ManyToOne
-    @JoinColumn(name="partner_id", nullable=false)
-    var partner: BusinessPartner
-        ) : BaseEntity(){
+    @JoinColumn(name = "partner_id")
+    var partner: BusinessPartner?,
+    @ManyToOne
+    @JoinColumn(name = "site_id")
+    var site: Site?
+) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-   val administrativeAreas: MutableSet<AdministrativeArea> = mutableSetOf()
+    val administrativeAreas: MutableSet<AdministrativeArea> = mutableSetOf()
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val postCodes: MutableSet<PostCode> = mutableSetOf()

@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Address Request", description = "New localized address record for a business partner")
 data class AddressRequest (
+    @Schema(description = "Business Partner Number")
+    val bpn: String?,
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionRequest = AddressVersionRequest(),
     @Schema(description = "Entity which is in care of this address")

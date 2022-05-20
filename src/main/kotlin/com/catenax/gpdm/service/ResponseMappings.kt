@@ -48,6 +48,7 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         legalForm?.toDto(),
         stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
         addresses.map { it.toDto() },
+        sites.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },
@@ -96,6 +97,7 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 fun Address.toDto(): AddressResponse {
     return AddressResponse(
         uuid,
+        bpn,
         version.toDto(),
         careOf,
         contexts,
@@ -111,6 +113,13 @@ fun Address.toDto(): AddressResponse {
     )
 }
 
+fun Site.toDto(): SiteResponse {
+    return SiteResponse(
+        bpn,
+        name,
+        addresses.map { it.toDto() }
+    )
+}
 
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
