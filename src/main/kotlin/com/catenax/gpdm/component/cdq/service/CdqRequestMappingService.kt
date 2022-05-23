@@ -130,6 +130,7 @@ class CdqRequestMappingService(
     fun toRequest(address: AddressCdq): AddressRequest {
         return AddressRequest(
             null,
+            null,
             toRequest(address.version),
             address.careOf?.value,
             address.contexts.mapNotNull { it.value },

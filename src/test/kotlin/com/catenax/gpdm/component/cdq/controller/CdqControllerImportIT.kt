@@ -299,7 +299,11 @@ class CdqControllerImportIT @Autowired constructor(
 
             assertThat(actualPartner)
                 .usingRecursiveComparison()
-                .ignoringFieldsMatchingRegexes(".*uuid", BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name)
+                .ignoringFieldsMatchingRegexes(
+                    ".*uuid",
+                    BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name,
+                    BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::name.name
+                )
                 .ignoringAllOverriddenEquals()
                 .ignoringCollectionOrder()
                 .isEqualTo(expectedWithBpn)
