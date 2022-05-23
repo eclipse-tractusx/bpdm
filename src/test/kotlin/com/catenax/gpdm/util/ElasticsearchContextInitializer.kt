@@ -17,6 +17,7 @@ class ElasticsearchContextInitializer : ApplicationContextInitializer<Configurab
         val elasticsearchContainer: ElasticsearchContainer =
             ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
                 .withEnv("discovery.type", "single-node")
+                .withEnv("xpack.security.enabled", "false")
                 .withCreateContainerCmdModifier { cmd ->
                     cmd.hostConfig!!
                         .withMemory(memoryInBytes)
