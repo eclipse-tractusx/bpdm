@@ -2,10 +2,7 @@ package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.entity.Address
-import com.catenax.gpdm.entity.BusinessPartner
-import com.catenax.gpdm.entity.Identifier
-import com.catenax.gpdm.entity.IdentifierType
+import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.*
 import org.springframework.stereotype.Service
@@ -21,7 +18,8 @@ class BusinessPartnerFetchService(
     private val addressRepository: AddressRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val bankAccountRepository: BankAccountRepository
+    private val bankAccountRepository: BankAccountRepository,
+    private val siteRepository: SiteRepository
 ) {
 
     /**
@@ -80,6 +78,10 @@ class BusinessPartnerFetchService(
         businessPartnerRepository.joinTypes(partners)
         businessPartnerRepository.joinRoles(partners)
         businessPartnerRepository.joinLegalForm(partners)
+        businessPartnerRepository.joinSites(partners)
+
+        val sites = partners.flatMap { it.sites }.toSet()
+        fetchSiteDependencies(sites)
 
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
@@ -87,13 +89,19 @@ class BusinessPartnerFetchService(
         val legalForms = partners.mapNotNull { it.legalForm }.toSet()
         legalFormRepository.joinCategories(legalForms)
 
-        val addresses = partners.flatMap { it.addresses }.toSet()
+        val addresses = partners.flatMap { it.addresses }.plus(partners.flatMap { it.sites }.flatMap { it.addresses }).toSet()
         fetchAddressDependencies(addresses)
 
         val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
         bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
+    }
+
+    private fun fetchSiteDependencies(sites: Set<Site>): Set<Site> {
+        siteRepository.joinAddresses(sites)
+
+        return sites
     }
 
     private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {

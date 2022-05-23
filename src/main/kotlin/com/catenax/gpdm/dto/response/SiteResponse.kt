@@ -8,7 +8,7 @@ data class SiteResponse(
     @Schema(description = "Business Partner Number, main identifier value for sites")
     val bpn: String,
     @Schema(description = "Site name")
-    val name: String,
+    val name: String?,
     @ArraySchema(arraySchema = Schema(description = "Addresses of the site"))
     val addresses: Collection<AddressResponse> = emptyList(),
 )

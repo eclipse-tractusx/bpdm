@@ -8,7 +8,7 @@ class Site(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
     @Column
-    var name: String,
+    var name: String?,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
     var partner: BusinessPartner,
