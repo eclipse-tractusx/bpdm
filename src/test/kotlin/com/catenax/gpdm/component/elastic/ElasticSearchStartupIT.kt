@@ -23,7 +23,7 @@ import org.springframework.test.web.reactive.server.returnResult
 )
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchValidIndexInitializer::class])
-class ElasticSearchValidIndexStartupTest @Autowired constructor(
+class ElasticSearchValidIndexStartupIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers
 ) {
@@ -61,7 +61,7 @@ class ElasticSearchValidIndexStartupTest @Autowired constructor(
 )
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchOutdatedIndexInitializer::class])
-class ElasticSearchOutdatedIndexStartupTest @Autowired constructor(
+class ElasticSearchOutdatedIndexStartupIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers
 ) {
