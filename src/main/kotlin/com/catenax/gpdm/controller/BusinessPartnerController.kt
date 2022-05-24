@@ -39,10 +39,11 @@ class BusinessPartnerController(
     fun getBusinessPartners(
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerSearchResponse> {
         return searchService.searchBusinessPartners(
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             paginationRequest
         )
     }
@@ -138,12 +139,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.NAME,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -160,12 +162,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show legal form names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.LEGAL_FORM,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -182,12 +185,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show site names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.SITE,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -204,12 +208,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show business status denotations best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.STATUS,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -226,12 +231,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show business partner classifications best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.CLASSIFICATION,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -248,12 +254,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show administrative area names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.ADMIN_AREA,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -270,12 +277,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show postcodes best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.POSTCODE,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -292,12 +300,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show locality names this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.LOCALITY,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -314,12 +323,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show thoroughfare names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.THOROUGHFARE,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -336,12 +346,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show premise names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.PREMISE,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
@@ -358,12 +369,13 @@ class BusinessPartnerController(
         @Parameter(description = "Show postal delivery point names best matching this text") text: String?,
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         return searchService.getSuggestion(
             SuggestionType.POSTAL_DELIVERY_POINT,
             text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             pageRequest
         )
     }
