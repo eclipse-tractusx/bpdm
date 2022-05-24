@@ -10,5 +10,6 @@ enum class SuggestionType(val docName: String) {
     LOCALITY("${BusinessPartnerDoc::addresses.name}.${AddressDoc::localities.name}"),
     THOROUGHFARE("${BusinessPartnerDoc::addresses.name}.${AddressDoc::thoroughfares.name}"),
     PREMISE("${BusinessPartnerDoc::addresses.name}.${AddressDoc::premises.name}"),
-    POSTAL_DELIVERY_POINT("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}")
+    POSTAL_DELIVERY_POINT("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}"),
+    SITE(BusinessPartnerDoc::sites.name),
 }

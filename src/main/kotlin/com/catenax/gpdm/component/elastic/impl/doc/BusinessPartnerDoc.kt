@@ -21,4 +21,6 @@ data class BusinessPartnerDoc(
     val addresses: Collection<AddressDoc>,
     @Field(type = FieldType.Nested)
     val classifications: Collection<TextDoc>,
+    @Field(type = FieldType.Nested)
+    val sites: Collection<TextDoc>
 )

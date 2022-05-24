@@ -21,10 +21,11 @@ class DocumentMappingService{
         return BusinessPartnerDoc(
             partner.bpn,
             partner.names.map { TextDoc(it.value) },
-            if(partner.legalForm != null) TextDoc(partner.legalForm!!.name) else null,
-            if(partnerStatus != null) TextDoc(partnerStatus.officialDenotation) else null,
+            if (partner.legalForm != null) TextDoc(partner.legalForm!!.name) else null,
+            if (partnerStatus != null) TextDoc(partnerStatus.officialDenotation) else null,
             partner.addresses.map { toDocument(it) },
-            partner.classification.map { TextDoc(it.value) }
+            partner.classification.map { TextDoc(it.value) },
+            partner.sites.mapNotNull { if (it.name != null) TextDoc(it.name!!) else null }
         )
     }
 
