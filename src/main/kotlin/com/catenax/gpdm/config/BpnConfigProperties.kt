@@ -13,7 +13,7 @@ data class BpnConfigProperties(
     val legalEntityChar: Char = 'L',
     val siteChar: Char = 'S',
     val addressChar: Char = 'A',
-    val counterKey: String = "bpn-counter",
+    val counterKeyLegalEntities: String = "bpn-l-counter",
     val counterKeySites: String = "bpn-s-counter",
     val counterKeyAddresses: String = "bpn-a-counter",
     val counterDigits: Int = 10,

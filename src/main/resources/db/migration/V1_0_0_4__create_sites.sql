@@ -36,3 +36,7 @@ alter table addresses
 
 alter table addresses
     add constraint uc_addresses_bpn unique (bpn);
+
+update configuration_entries
+set key='bpn-l-counter'
+where key = 'bpn-counter'

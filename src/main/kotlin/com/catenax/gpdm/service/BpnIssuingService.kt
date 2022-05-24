@@ -23,7 +23,7 @@ class BpnIssuingService(
 ) {
     @Transactional
     fun issueLegalEntityBpns(count: Int): Collection<String> {
-        return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKey)
+        return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKeyLegalEntities)
     }
 
     @Transactional
