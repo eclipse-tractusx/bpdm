@@ -85,9 +85,6 @@ class BusinessPartnerBuildService(
         request: BusinessPartnerRequest,
         metadataMap: MetadataMappingDto
     ): BusinessPartner {
-        val bpns = bpnIssuingService.issueAddressBpns(request.addresses.size)
-        val addressBpnPairs = request.addresses.zip(bpns)
-
         partner.names.clear()
         partner.identifiers.clear()
         partner.stati.clear()
@@ -102,17 +99,38 @@ class BusinessPartnerBuildService(
         partner.classification.addAll(request.profileClassifications.map { toEntity(it, partner) }.toSet())
         partner.bankAccounts.addAll(request.bankAccounts.map { toEntity(it, partner) }.toSet())
 
-        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner) })
+        val addressBpns = bpnIssuingService.issueAddressBpns(request.addresses.size)
+        val addressBpnPairs = request.addresses.zip(addressBpns)
+        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner, null) })
+
+        val siteBpns = bpnIssuingService.issueSiteBpns(request.sites.size)
+        val siteBpnPairs = request.sites.zip(siteBpns)
+        partner.sites.addAll(siteBpnPairs.map { (request, bpn) -> createSite(request, bpn, partner) })
 
         return partner
+    }
+
+    private fun createSite(
+        dto: SiteRequest,
+        bpn: String,
+        partner: BusinessPartner
+    ): Site {
+        val site = Site(bpn, dto.name, partner)
+
+        val addressBpns = bpnIssuingService.issueAddressBpns(dto.addresses.size)
+        val addressBpnPairs = dto.addresses.zip(addressBpns)
+        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner, site) })
+
+        return site
     }
 
 
     private fun createAddress(
         dto: AddressRequest,
         bpn: String,
-        partner: BusinessPartner
-    ): Address{
+        partner: BusinessPartner,
+        site: Site?
+    ): Address {
         val address = Address(
             bpn,
             dto.careOf,
@@ -122,7 +140,7 @@ class BusinessPartnerBuildService(
             toEntity(dto.version),
             dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates) },
             partner,
-            null,
+            site,
             dto.name
         )
 
