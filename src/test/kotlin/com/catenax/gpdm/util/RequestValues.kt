@@ -5,8 +5,6 @@ import com.catenax.gpdm.dto.request.NameRequest
 import com.catenax.gpdm.dto.request.SiteRequest
 
 object RequestValues {
-
-
     val siteRequest1 = SiteRequest(
         bpn = null,
         name = CommonValues.siteName1
