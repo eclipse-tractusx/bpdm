@@ -12,6 +12,7 @@ object EndpointValues {
     const val CATENA_LEGAL_FORM_PATH = "$CATENA_BUSINESS_PARTNER_PATH/legal-form"
     const val CATENA_STATUS_PATH = "$CATENA_BUSINESS_PARTNER_PATH/status"
     const val CATENA_CLASSIFICATION_PATH = "$CATENA_BUSINESS_PARTNER_PATH/classification"
+    const val CATENA_SITE_PATH = "$CATENA_BUSINESS_PARTNER_PATH/site"
 
     const val CATENA_ADDRESS_PATH = "$CATENA_BUSINESS_PARTNER_PATH/address"
     const val CATENA_ADMIN_AREA_PATH = "$CATENA_ADDRESS_PATH/administrative-area"

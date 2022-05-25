@@ -23,6 +23,11 @@ object CommonValues {
     val name3 = "Another Organisation Corp"
     val name4 = "Catena Test Name"
     val name5 = "好公司  合伙制企业"
+    val name6 = "Yet another Business Partner Name"
+    val name7 = "Gmbh XY"
+
+    val siteName1 = "Stammwerk A"
+    val siteName2 = "主厂房 B"
 
     val legalFormTechnicalKey1 = "LF1"
     val legalFormTechnicalKey2 = "LF2"

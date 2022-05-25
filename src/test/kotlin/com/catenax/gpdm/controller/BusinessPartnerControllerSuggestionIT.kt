@@ -7,6 +7,7 @@ import com.catenax.gpdm.component.elastic.impl.service.ElasticSyncStarterService
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
+import com.catenax.gpdm.service.BusinessPartnerBuildService
 import com.catenax.gpdm.util.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -86,7 +87,8 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val importService: ImportStarterService,
     val elasticSyncService: ElasticSyncStarterService,
     val objectMapper: ObjectMapper,
-    val testHelpers: TestHelpers
+    val testHelpers: TestHelpers,
+    val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
 
     companion object {
@@ -131,6 +133,12 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         )
 
         importService.import()
+
+        // import partners with sites via service since they can't be imported from cdq data model
+        businessPartnerBuildService.upsertBusinessPartners(
+            listOf(RequestValues.businessPartnerRequest1, RequestValues.businessPartnerRequest2)
+        )
+
         elasticSyncService.export()
     }
 
@@ -986,6 +994,224 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .blockFirst()!!
 
         assertThat(page.content).anyMatch { it.suggestion == expectedClassification }
+    }
+
+    /**
+     * Given partner with site name value
+     * When ask suggestion for site name
+     * Then show site name value
+     */
+    @Test
+    fun `site name__Suggest property values`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+
+        val page = webTestClient.get().uri(EndpointValues.CATENA_SITE_PATH)
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value
+     * When ask suggestion for that value
+     * Then show that value
+     */
+    @Test
+    fun `site name__Suggest by phrase`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSiteName)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value
+     * When ask suggestion for a prefix of that value
+     * Then show that value
+     */
+    @Test
+    fun `site name__Suggest by prefix`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name!!
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSiteName.substring(0, 1))
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value that is several words
+     * When ask suggestion for a word in value
+     * Then show that value
+     */
+    @Test
+    fun `site name__Suggest by word`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name!!
+        val queryText = expectedSiteName.split("\\s".toRegex()).first()
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value
+     * When ask suggestion for text that doesn't have a word or prefix in value
+     * Then don't show that value
+     */
+    @Test
+    fun `site name__Don't suggest by different`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+        val queryText = "xxxxxxDoesntMatchxxxxxx"
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, queryText)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).noneMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value and name value
+     * When ask suggestion site name with filter by name value
+     * Then show site name value
+     */
+    @Test
+    fun `site name__Suggest filtered suggestions`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+        val filterName = RequestValues.businessPartnerRequest1.names.first().value
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value and name value
+     * When ask suggestion for a word in site name value with filter by name value
+     * Then show site name value
+     */
+    @Test
+    fun `site name__Suggest by word in filtered suggestions`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+        val filterName = RequestValues.businessPartnerRequest1.names.first().value
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSiteName)
+                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value and name value
+     * When ask suggestion for a word in site name value with filter by other than name value
+     * Then don't show site name value
+     */
+    @Test
+    fun `site name__Don't suggest by word when filtered out`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest1.sites.first().name
+        val filterName = RequestValues.businessPartnerRequest2.names.first().value
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSiteName)
+                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).noneMatch { it.suggestion == expectedSiteName }
+    }
+
+    /**
+     * Given partner with site name value in non-latin characters
+     * When ask suggestion for that value
+     * Then show that value
+     */
+    @Test
+    fun `site name__Suggest by non-latin characters`() {
+        val expectedSiteName = RequestValues.businessPartnerRequest2.sites.first().name
+
+        val page = webTestClient.get()
+            .uri { builder ->
+                builder.path(EndpointValues.CATENA_SITE_PATH)
+                    .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSiteName)
+                    .build()
+            }
+            .exchange()
+            .expectStatus().is2xxSuccessful
+            .returnResult<PageResponse<SuggestionResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(page.content).anyMatch { it.suggestion == expectedSiteName }
     }
 
     /**
