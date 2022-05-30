@@ -47,10 +47,11 @@ class ElasticSyncStarterService(
 
     /**
      * Clears the whole index and resets the time of the last update
+     *
+     * @throws [BpdmElasticIndexException]
      */
     @Transactional
-    @Throws(BpdmElasticIndexException::class)
-    fun clearElastic(): Boolean {
+    fun clearElastic() {
         val indexOperations = operations.indexOps(BusinessPartnerDoc::class.java)
         val settings = indexOperations.createSettings()
         val mappings = indexOperations.createMapping()
@@ -61,16 +62,15 @@ class ElasticSyncStarterService(
             throw BpdmElasticIndexException("Could not recreate business partner index")
 
         syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.ELASTIC))
-
-        return true
     }
 
 
     /**
      * Checks whether the existing business partner index is up-to-date with the current Entity version and recreates the index if necessary
+     *
+     * @throws [ApplicationContextException] shutting down the application on exception
      */
     @EventListener(ContextRefreshedEvent::class)
-    @Throws(ApplicationContextException::class)
     fun updateOnInit() {
         try {
             val existingIndexOps = operations.indexOps(BusinessPartnerDoc::class.java)

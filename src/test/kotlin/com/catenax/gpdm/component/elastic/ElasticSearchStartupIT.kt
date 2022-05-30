@@ -41,16 +41,16 @@ class ElasticSearchValidIndexStartupIT @Autowired constructor(
         }
     }
 
+    /**
+     * Given non-empty Elasticsearch index with up-to-date document structure
+     * When application starts
+     * Then index not cleared
+     */
     @Test
     fun acceptValidIndexOnStartup() {
         testHelpers.importAndGetResponse(listOf(CdqValues.businessPartner1), webTestClient, wireMockServer)
 
-        val searchResult = webTestClient.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
-            .responseBody
-            .blockFirst()!!
+        val searchResult = getBusinessPartnerPage(webTestClient)
 
         assertThat(searchResult.content).isNotEmpty
     }
@@ -79,17 +79,25 @@ class ElasticSearchOutdatedIndexStartupIT @Autowired constructor(
         }
     }
 
+    /**
+     * Given non-empty Elasticsearch index with outdated/invalid document structure
+     * When application starts
+     * Then index deleted and recreated with up-to-date document structure
+     */
     @Test
     fun recreateOutdatedIndexOnStartup() {
         testHelpers.importAndGetResponse(listOf(CdqValues.businessPartner1), webTestClient, wireMockServer)
 
-        val searchResult = webTestClient.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
-            .responseBody
-            .blockFirst()!!
-
+        val searchResult = getBusinessPartnerPage(webTestClient)
         assertThat(searchResult.content).isEmpty()
     }
+}
+
+private fun getBusinessPartnerPage(client: WebTestClient): PageResponse<BusinessPartnerSearchResponse> {
+    return client.get().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
+        .responseBody
+        .blockFirst()!!
 }

@@ -8,7 +8,7 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer
 /**
  * When used on a spring boot test, starts a singleton elasticsearch container that is shared between all integration tests.
  */
-open class ElasticsearchContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
+class ElasticsearchContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     companion object {
         private const val memoryInBytes = 500L * 1024L * 1024L  //500 mb
@@ -32,6 +32,25 @@ open class ElasticsearchContextInitializer : ApplicationContextInitializer<Confi
                 "spring.elasticsearch.uris=${container.httpHostAddress}",
                 "bpdm.elastic.enabled=true"
             ).applyTo(applicationContext.environment)
+        }
+
+        fun createIndex(container: ElasticsearchContainer, indexPayload: String?, contentPayload: String?) {
+            val curlCommand = "curl"
+            val putCommand = "-X PUT"
+            val contentCommands = listOf("-H", "Content-Type: application/json")
+            val indexAddress = "http://localhost:9200/business-partner"
+
+            val createIndexCommands = mutableListOf(curlCommand, putCommand, indexAddress)
+            if (indexPayload != null)
+                createIndexCommands.addAll(2, contentCommands.plus("-d $indexPayload"))
+
+            container.execInContainer(*createIndexCommands.toTypedArray())
+
+            val createContentCommands = mutableListOf(curlCommand, putCommand, "$indexAddress/_doc/BPNL000000000001")
+            if (contentPayload != null)
+                createContentCommands.addAll(2, contentCommands.plus("-d $contentPayload"))
+
+            container.execInContainer(*createContentCommands.toTypedArray())
         }
     }
 
