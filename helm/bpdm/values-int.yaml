@@ -8,10 +8,10 @@ ingress:
   host: catenax-bpdm-int.demo.catena-x.net
 
 applicationSecret:
-  keycloak: <path:bpdm/int/keycloak#credentials-secret>
-  cdq: <path:bpdm/int/cdq#api-key>
+  keycloak: <path:bpdm/data/int/keycloak#credentials-secret>
+  cdq: <path:bpdm/data/int/cdq#api-key>
 
 postgres:
   auth:
-    postgresPassword: <path:bpdm/int/postgresql#postgres-password>
-    password: <path:bpdm/int/postgresql#password>
+    postgresPassword: <path:bpdm/data/int/postgresql#postgres-password>
+    password: <path:bpdm/data/int/postgresql#password>
