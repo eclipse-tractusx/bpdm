@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.data.elasticsearch.core.IndexOperations
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -52,14 +53,9 @@ class ElasticSyncStarterService(
      */
     @Transactional
     fun clearElastic() {
-        val indexOperations = operations.indexOps(BusinessPartnerDoc::class.java)
-        val settings = indexOperations.createSettings()
-        val mappings = indexOperations.createMapping()
-
-        indexOperations.delete()
-
-        if (!indexOperations.create(settings, mappings))
-            throw BpdmElasticIndexException("Could not recreate business partner index")
+        val index = operations.indexOps(BusinessPartnerDoc::class.java)
+        index.delete()
+        createIndex(index)
 
         syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.ELASTIC))
     }
@@ -73,24 +69,25 @@ class ElasticSyncStarterService(
     @EventListener(ContextRefreshedEvent::class)
     fun updateOnInit() {
         try {
-            val existingIndexOps = operations.indexOps(BusinessPartnerDoc::class.java)
-            val settings = existingIndexOps.createSettings()
-            val mappings = existingIndexOps.createMapping()
+            val currentIndex = operations.indexOps(BusinessPartnerDoc::class.java)
 
-            val tempIndexOps = operations.indexOps(IndexCoordinates.of("temp-business-partner"))
-            tempIndexOps.delete()
+            if (!currentIndex.exists()) {
+                createIndex(currentIndex)
+            } else {
+                val tempIndex = operations.indexOps(IndexCoordinates.of("temp-business-partner"))
 
-            if (!tempIndexOps.create(settings, mappings))
-                throw BpdmElasticIndexException("Could not create temporary business partner index")
+                tempIndex.delete()
+                createIndex(tempIndex, currentIndex)
 
-            val actualTempTree = objectMapper.valueToTree<JsonNode>(tempIndexOps.mapping)
-            val actualExistingTree = objectMapper.valueToTree<JsonNode>(existingIndexOps.mapping)
+                val actualTempTree = objectMapper.valueToTree<JsonNode>(tempIndex.mapping)
+                val actualExistingTree = objectMapper.valueToTree<JsonNode>(currentIndex.mapping)
 
-            if (!actualTempTree.equals(actualExistingTree)) {
-                clearElastic()
+                if (!actualTempTree.equals(actualExistingTree)) {
+                    clearElastic()
+                }
+
+                tempIndex.delete()
             }
-
-            tempIndexOps.delete()
         } catch (e: Throwable) {
             //make sure Application exits when exception is thrown
             throw ApplicationContextException("Exception when updating Elasticsearch index during initialization", e)
@@ -117,5 +114,16 @@ class ElasticSyncStarterService(
         return response
     }
 
+    private fun createIndex(index: IndexOperations) {
+        createIndex(index, index)
+    }
+
+    private fun createIndex(indexToCreate: IndexOperations, indexToTakeConfigFrom: IndexOperations) {
+        val settings = indexToTakeConfigFrom.createSettings()
+        val mappings = indexToTakeConfigFrom.createMapping()
+
+        if (!indexToCreate.create(settings, mappings))
+            throw BpdmElasticIndexException("Could not recreate business partner index")
+    }
 
 }
