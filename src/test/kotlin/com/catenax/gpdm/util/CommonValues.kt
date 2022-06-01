@@ -25,9 +25,11 @@ object CommonValues {
     val name5 = "好公司  合伙制企业"
     val name6 = "Something Ltd."
     val name7 = "Gmbh XY"
+    val name8 = "XX LLC"
 
     val siteName1 = "Stammwerk A"
-    val siteName2 = "主厂房 B"
+    val siteName2 = "Halle B1"
+    val siteName3 = "主厂房 C"
 
     val legalFormTechnicalKey1 = "LF1"
     val legalFormTechnicalKey2 = "LF2"
@@ -94,6 +96,6 @@ object CommonValues {
     val postalDeliveryPoint5 = "邮政投递点"
 
     val addressName1 = "Address Name 1"
-    val addressName2 = "Address Name 2"
-    val addressName3 = "Address Name 3"
+    val addressName2 = "Street A"
+    val addressName3 = "B街"
 }

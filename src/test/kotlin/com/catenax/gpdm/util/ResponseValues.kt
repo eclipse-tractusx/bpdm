@@ -118,7 +118,6 @@ object ResponseValues {
     val address1 = AddressResponse(
         uuid = CommonValues.uuid1,
         bpn = CommonValues.bpnA1,
-        name = CommonValues.addressName1,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea1, adminArea2),
@@ -132,7 +131,6 @@ object ResponseValues {
     val address2 = AddressResponse(
         uuid = CommonValues.uuid1,
         bpn = CommonValues.bpnA2,
-        name = CommonValues.addressName2,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea3, adminArea4),
@@ -146,7 +144,6 @@ object ResponseValues {
     val address3 = AddressResponse(
         uuid = CommonValues.uuid1,
         bpn = CommonValues.bpnA3,
-        name = CommonValues.addressName3,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea5),

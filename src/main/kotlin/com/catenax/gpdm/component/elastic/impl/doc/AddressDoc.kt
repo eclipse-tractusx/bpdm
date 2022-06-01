@@ -15,5 +15,7 @@ data class AddressDoc(
     @Field(type = FieldType.Nested)
     val premises: Collection<TextDoc>,
     @Field(type = FieldType.Nested)
-    val postalDeliveryPoints: Collection<TextDoc>
+    val postalDeliveryPoints: Collection<TextDoc>,
+    @Field(type = FieldType.Nested)
+    val name: TextDoc?
 )

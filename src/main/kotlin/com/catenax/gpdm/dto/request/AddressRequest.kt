@@ -11,11 +11,11 @@ data class AddressRequest (
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @Schema(description = "Address name")
-    val name: String?,
+    val name: String? = null,
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionRequest = AddressVersionRequest(),
     @Schema(description = "Entity which is in care of this address")
-    val careOf: String?,
+    val careOf: String? = null,
     @Schema(description = "Contexts of this address")
     val contexts: Collection<String> = emptyList(),
     @Schema(description = "Address country", defaultValue = "UNDEFINED")
@@ -33,7 +33,7 @@ data class AddressRequest (
     @ArraySchema(arraySchema = Schema(description = "Postal delivery points", defaultValue = "[]"))
     val postalDeliveryPoints: Collection<PostalDeliveryPointRequest> = emptyList(),
     @Schema(description = "Geographic coordinates to find this location")
-    val geographicCoordinates: GeoCoordinateDto?,
+    val geographicCoordinates: GeoCoordinateDto? = null,
     @ArraySchema(arraySchema = Schema(description = "Type of address", defaultValue = "[]"))
     val types: Collection<AddressType> = emptyList()
-        )
+)

@@ -301,8 +301,7 @@ class CdqControllerImportIT @Autowired constructor(
                 .usingRecursiveComparison()
                 .ignoringFieldsMatchingRegexes(
                     ".*uuid",
-                    BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name,
-                    BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::name.name
+                    BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name
                 )
                 .ignoringAllOverriddenEquals()
                 .ignoringCollectionOrder()

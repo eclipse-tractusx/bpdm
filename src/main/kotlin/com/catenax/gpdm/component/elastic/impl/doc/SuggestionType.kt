@@ -11,5 +11,6 @@ enum class SuggestionType(val docName: String) {
     THOROUGHFARE("${BusinessPartnerDoc::addresses.name}.${AddressDoc::thoroughfares.name}"),
     PREMISE("${BusinessPartnerDoc::addresses.name}.${AddressDoc::premises.name}"),
     POSTAL_DELIVERY_POINT("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}"),
+    ADDRESS_NAME("${BusinessPartnerDoc::addresses.name}.${AddressDoc::name.name}"),
     SITE(BusinessPartnerDoc::sites.name),
 }
