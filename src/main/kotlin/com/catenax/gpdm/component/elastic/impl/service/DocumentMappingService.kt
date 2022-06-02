@@ -25,7 +25,7 @@ class DocumentMappingService{
             if (partnerStatus != null) TextDoc(partnerStatus.officialDenotation) else null,
             partner.addresses.map { toDocument(it) } + partner.sites.flatMap { it.addresses }.map { toDocument(it) },
             partner.classification.map { TextDoc(it.value) },
-            partner.sites.mapNotNull { if (it.name != null) TextDoc(it.name!!) else null }
+            partner.sites.map { TextDoc(it.name) }
         )
     }
 

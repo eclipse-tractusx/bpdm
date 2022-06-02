@@ -8,7 +8,7 @@ data class SiteRequest(
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @Schema(description = "Site name")
-    val name: String?,
+    val name: String,
     @ArraySchema(arraySchema = Schema(description = "Addresses the site is located at", required = false))
     val addresses: Collection<AddressRequest> = emptyList()
 )

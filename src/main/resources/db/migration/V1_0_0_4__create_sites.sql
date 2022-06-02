@@ -5,7 +5,7 @@ create table sites
     created_at timestamp    not null,
     updated_at timestamp    not null,
     uuid       uuid         not null,
-    name       varchar(255),
+    name       varchar(255) not null,
     partner_id bigint       not null,
     primary key (id)
 );

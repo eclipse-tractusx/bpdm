@@ -7,8 +7,8 @@ import javax.persistence.*
 class Site(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
-    @Column
-    var name: String?,
+    @Column(name = "name", nullable = false)
+    var name: String,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
     var partner: BusinessPartner,
