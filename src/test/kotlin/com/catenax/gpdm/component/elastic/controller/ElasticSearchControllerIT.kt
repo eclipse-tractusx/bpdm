@@ -95,13 +95,13 @@ class ElasticSearchControllerIT @Autowired constructor(
     @Test
     fun `export only new partners`() {
         //export once to get partners into elasticsearch for given system state
-        var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
         //export now to check behaviour
-        exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(0)
     }
@@ -113,7 +113,7 @@ class ElasticSearchControllerIT @Autowired constructor(
      */
     @Test
     fun `can search exported partners`() {
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
@@ -129,13 +129,13 @@ class ElasticSearchControllerIT @Autowired constructor(
         val names = partnerDocs.map { it.names.first().value }
 
         // fill the elasticsearch index
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(names)
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.ELASTIC_EXPORT_PATH)
+        webTestClient.delete().uri(EndpointValues.ELASTIC_SYNC_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
 
@@ -152,16 +152,16 @@ class ElasticSearchControllerIT @Autowired constructor(
     fun `export all partners after empty index`() {
 
         // fill the elasticsearch index
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.ELASTIC_EXPORT_PATH)
+        webTestClient.delete().uri(EndpointValues.ELASTIC_SYNC_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
 
         //export partners again
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_EXPORT_PATH)
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })

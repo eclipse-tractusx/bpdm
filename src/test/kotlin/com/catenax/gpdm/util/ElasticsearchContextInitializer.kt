@@ -11,23 +11,30 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer
 class ElasticsearchContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     companion object {
-        private const val memoryInBytes = 1024L * 1024L * 1024L  //1 gb
-        private const val memorySwapInBytes = 4L * 1024L * 1024L * 1024L * 1024L //4 gb
+        private const val memoryInBytes = 500L * 1024L * 1024L  //500 mb
+        private const val memorySwapInBytes = 1L * 1024L * 1024L * 1024L //1 gb
 
-        val elasticsearchContainer = ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
-            .withEnv("discovery.type", "single-node")
-            .withCreateContainerCmdModifier { cmd ->
-                cmd.hostConfig!!
-                    .withMemory(memoryInBytes)
-                    .withMemorySwap(memorySwapInBytes)
-            }!!
+        val elasticsearchContainer: ElasticsearchContainer =
+            ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:7.17.0")
+                .withEnv("discovery.type", "single-node")
+                .withCreateContainerCmdModifier { cmd ->
+                    cmd.hostConfig!!
+                        .withMemory(memoryInBytes)
+                        .withMemorySwap(memorySwapInBytes)
+                }!!
+
+        fun applyElasticsearchProperties(applicationContext: ConfigurableApplicationContext, container: ElasticsearchContainer) {
+            TestPropertyValues.of(
+                "spring.elasticsearch.uris=${container.httpHostAddress}",
+                "bpdm.elastic.enabled=true"
+            ).applyTo(applicationContext.environment)
+        }
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         elasticsearchContainer.start()
-        TestPropertyValues.of(
-            "spring.elasticsearch.uris=${elasticsearchContainer.httpHostAddress}",
-            "bpdm.elastic.enabled=true"
-        ).applyTo(applicationContext.environment)
+        applyElasticsearchProperties(applicationContext, elasticsearchContainer)
     }
+
+
 }

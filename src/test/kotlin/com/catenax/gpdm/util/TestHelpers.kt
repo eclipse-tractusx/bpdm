@@ -14,12 +14,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
+import java.time.Instant
 import javax.persistence.EntityManager
 import javax.persistence.EntityManagerFactory
 
-private const val RETRY_IMPORT_TIMES: Int = 10
-private const val RETRY_IMPORT_BACKOFF: Long = 200
+private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
+private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
 private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 
 @Component
@@ -52,31 +52,22 @@ class TestHelpers(
         em.transaction.commit()
     }
 
+
     fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncResponse {
-        client.post().uri(syncPath)
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful
+        client.invokePostEndpointWithoutResponse(syncPath)
 
         //check for async import to finish several times
-        var i = 1
+        val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
         var syncResponse: SyncResponse
         do{
-            Thread.sleep(RETRY_IMPORT_BACKOFF)
+            Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
-            syncResponse = client.get().uri(syncPath)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful
-                .returnResult<SyncResponse>()
-                .responseBody
-                .blockFirst()!!
+            syncResponse = client.invokeGetEndpoint(syncPath)
 
             if (syncResponse.status == SyncStatus.SUCCESS)
                 break
 
-            i++
-        } while (i < RETRY_IMPORT_TIMES)
+        } while (Instant.now().isBefore(timeOutAt))
 
         Assertions.assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
 
@@ -106,13 +97,7 @@ class TestHelpers(
 
         startSyncAndAwaitSuccess(client, EndpointValues.CDQ_SYNCH_PATH)
 
-        return client
-            .get()
-            .uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-            .exchange().expectStatus().isOk
-            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
-            .responseBody
-            .blockFirst()!!
+        return client.invokeGetEndpoint(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
     }
 
     fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value

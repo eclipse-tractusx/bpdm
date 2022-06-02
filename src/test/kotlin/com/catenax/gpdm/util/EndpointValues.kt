@@ -28,6 +28,6 @@ object EndpointValues {
 
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
-    const val ELASTIC_EXPORT_PATH = "api/elastic/business-partner"
+    const val ELASTIC_SYNC_PATH = "api/elastic/business-partner"
 
 }

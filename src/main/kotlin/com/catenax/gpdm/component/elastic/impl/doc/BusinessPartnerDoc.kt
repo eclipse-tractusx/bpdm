@@ -1,13 +1,15 @@
 package com.catenax.gpdm.component.elastic.impl.doc
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.ReadOnlyProperty
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 
-@Document(indexName = "business-partner", createIndex = true)
+@Document(indexName = "business-partner", createIndex = false)
 data class BusinessPartnerDoc(
     @Id
+    @ReadOnlyProperty
     val bpn: String,
     @Field(type = FieldType.Nested)
     val names: Collection<TextDoc>,
