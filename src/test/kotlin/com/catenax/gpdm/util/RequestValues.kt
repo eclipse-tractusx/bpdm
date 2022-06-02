@@ -1,21 +1,15 @@
 package com.catenax.gpdm.util
 
-import com.catenax.gpdm.dto.request.AddressRequest
-import com.catenax.gpdm.dto.request.BusinessPartnerRequest
-import com.catenax.gpdm.dto.request.NameRequest
-import com.catenax.gpdm.dto.request.SiteRequest
+import com.catenax.gpdm.dto.request.*
 
 object RequestValues {
+    val premiseRequest1 = PremiseRequest(
+        value = CommonValues.premise6
+    )
+
     val addressRequest1 = AddressRequest(
-        bpn = null
-    )
-
-    val addressRequest2 = AddressRequest(
-        bpn = null
-    )
-
-    val addressRequest3 = AddressRequest(
-        bpn = null
+        bpn = null,
+        premises = listOf(premiseRequest1)
     )
 
     val siteRequest1 = SiteRequest(
@@ -47,8 +41,7 @@ object RequestValues {
         legalForm = null,
         status = null,
         names = listOf(NameRequest(value = CommonValues.name7, shortName = null)),
-        sites = listOf(siteRequest2),
-        addresses = listOf(addressRequest2)
+        sites = listOf(siteRequest2)
     )
 
     val businessPartnerRequest3 = BusinessPartnerRequest(
@@ -56,7 +49,6 @@ object RequestValues {
         legalForm = null,
         status = null,
         names = listOf(NameRequest(value = CommonValues.name8, shortName = null)),
-        sites = listOf(siteRequest3),
-        addresses = listOf(addressRequest3)
+        sites = listOf(siteRequest3)
     )
 }

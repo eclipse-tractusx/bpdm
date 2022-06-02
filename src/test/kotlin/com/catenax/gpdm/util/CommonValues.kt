@@ -88,6 +88,7 @@ object CommonValues {
     val premise3 = "Building 1"
     val premise4 = "First Floor"
     val premise5 = "主楼"
+    val premise6 = "Komplex X"
 
     val postalDeliveryPoint1 = "Postal Delivery point"
     val postalDeliveryPoint2 = "Mailbox Premise Street"

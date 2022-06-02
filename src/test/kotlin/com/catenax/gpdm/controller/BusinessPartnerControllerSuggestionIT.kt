@@ -107,6 +107,12 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
                     EndpointValues.CATENA_PREMISE_PATH,
                     CdqValues.businessPartner1.names.first().value
                 ),
+                // search for some property of address of site, not directly on business partner
+                Arguments.of(
+                    RequestValues.businessPartnerRequest1.sites.first().addresses.first().premises.first().value,
+                    EndpointValues.CATENA_PREMISE_PATH,
+                    RequestValues.businessPartnerRequest1.names.first().value
+                ),
                 Arguments.of(
                     CdqValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value,
                     EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH,
