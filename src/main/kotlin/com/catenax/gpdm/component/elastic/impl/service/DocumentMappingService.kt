@@ -39,8 +39,7 @@ class DocumentMappingService{
             address.localities.map { TextDoc(it.value) },
             address.thoroughfares.map { TextDoc(it.value) },
             address.premises.map { TextDoc(it.value) },
-            address.postalDeliveryPoints.map { TextDoc(it.value) },
-            if (address.name != null) TextDoc(address.name!!) else null
+            address.postalDeliveryPoints.map { TextDoc(it.value) }
         )
     }
 

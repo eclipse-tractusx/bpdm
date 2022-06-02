@@ -7,18 +7,15 @@ import com.catenax.gpdm.dto.request.SiteRequest
 
 object RequestValues {
     val addressRequest1 = AddressRequest(
-        bpn = null,
-        name = CommonValues.addressName1
+        bpn = null
     )
 
     val addressRequest2 = AddressRequest(
-        bpn = null,
-        name = CommonValues.addressName2
+        bpn = null
     )
 
     val addressRequest3 = AddressRequest(
-        bpn = null,
-        name = CommonValues.addressName3
+        bpn = null
     )
 
     val siteRequest1 = SiteRequest(

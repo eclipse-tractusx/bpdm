@@ -23,9 +23,6 @@ alter table addresses
     add site_id bigint;
 
 alter table addresses
-    add name varchar(255);
-
-alter table addresses
     alter column partner_id drop not null;
 
 alter table addresses

@@ -82,18 +82,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
                     EndpointValues.CATENA_SITE_PATH,
                     RequestValues.businessPartnerRequest1.names.first().value
                 ),
-                // address in site
-                Arguments.of(
-                    RequestValues.businessPartnerRequest1.sites.first().addresses.first().name,
-                    EndpointValues.CATENA_ADDRESS_NAME_PATH,
-                    RequestValues.businessPartnerRequest1.names.first().value
-                ),
-                // address in partner
-                Arguments.of(
-                    RequestValues.businessPartnerRequest2.addresses.first().name,
-                    EndpointValues.CATENA_ADDRESS_NAME_PATH,
-                    RequestValues.businessPartnerRequest2.names.first().value
-                ),
                 Arguments.of(
                     CdqValues.businessPartner1.addresses.first().administrativeAreas.first().value,
                     EndpointValues.CATENA_ADMIN_AREA_PATH,
@@ -132,7 +120,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
                 Arguments.of(CdqValues.businessPartner3.names.first().value, EndpointValues.CATENA_NAME_PATH),
                 Arguments.of(CdqValues.businessPartner3.legalForm!!.name, EndpointValues.CATENA_LEGAL_FORM_PATH),
                 Arguments.of(RequestValues.businessPartnerRequest3.sites.first().name, EndpointValues.CATENA_SITE_PATH),
-                Arguments.of(RequestValues.businessPartnerRequest3.addresses.first().name, EndpointValues.CATENA_ADDRESS_NAME_PATH),
                 Arguments.of(CdqValues.businessPartner3.addresses.first().administrativeAreas.first().value, EndpointValues.CATENA_ADMIN_AREA_PATH),
                 Arguments.of(CdqValues.businessPartner3.addresses.first().postCodes.first().value, EndpointValues.CATENA_POST_CODE_PATH),
                 Arguments.of(CdqValues.businessPartner3.addresses.first().localities.first().value, EndpointValues.CATENA_LOCALITY_PATH),

@@ -44,9 +44,7 @@ class Address (
     var partner: BusinessPartner?,
     @ManyToOne
     @JoinColumn(name = "site_id")
-    var site: Site?,
-    @Column(name = "name")
-    var name: String?
+    var site: Site?
 ) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val administrativeAreas: MutableSet<AdministrativeArea> = mutableSetOf()

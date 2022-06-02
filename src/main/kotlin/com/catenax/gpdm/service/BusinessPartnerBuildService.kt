@@ -140,8 +140,7 @@ class BusinessPartnerBuildService(
             toEntity(dto.version),
             dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates) },
             partner,
-            site,
-            dto.name
+            site
         )
 
         address.administrativeAreas.clear()

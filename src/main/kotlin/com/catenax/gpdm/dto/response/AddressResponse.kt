@@ -14,8 +14,6 @@ data class AddressResponse (
     val uuid: UUID,
     @Schema(description = "Business Partner Number, main identifier value for addresses")
     val bpn: String,
-    @Schema(description = "Address name")
-    val name: String? = null,
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionResponse,
     @Schema(description = "Entity which is in care of this address")

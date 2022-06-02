@@ -98,7 +98,6 @@ fun Address.toDto(): AddressResponse {
     return AddressResponse(
         uuid,
         bpn,
-        name,
         version.toDto(),
         careOf,
         contexts,

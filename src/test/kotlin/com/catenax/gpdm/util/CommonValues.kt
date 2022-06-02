@@ -94,8 +94,4 @@ object CommonValues {
     val postalDeliveryPoint3 = "Mail Station A"
     val postalDeliveryPoint4 = "Post Office Box 1"
     val postalDeliveryPoint5 = "邮政投递点"
-
-    val addressName1 = "Address Name 1"
-    val addressName2 = "Street A"
-    val addressName3 = "B街"
 }

@@ -380,26 +380,4 @@ class BusinessPartnerController(
         )
     }
 
-    @Operation(
-        summary = "Find best matches for given text in address names",
-        description = "Performs search on address names in order to find the best matches for the given text. " +
-                "By specifying further request parameters the set of business partners to search in can be restricted. " +
-                "If no text is given, the endpoint lists possible address names in the search set.",
-        responses = [ApiResponse(responseCode = "200", description = "Best matches found, may be empty")]
-    )
-    @GetMapping("/address/name")
-    fun getAddressNameSuggestion(
-        @Parameter(description = "Show address names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
-        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
-        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
-        @ParameterObject pageRequest: PaginationRequest
-    ): PageResponse<SuggestionResponse> {
-        return searchService.getSuggestion(
-            SuggestionType.ADDRESS_NAME,
-            text,
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
-            pageRequest
-        )
-    }
 }
