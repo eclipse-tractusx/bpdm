@@ -1,5 +1,6 @@
 package com.catenax.gpdm.config
 
+import mu.KotlinLogging
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter
@@ -29,8 +30,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
     matchIfMissing = true)
 class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
 
+    private val logger = KotlinLogging.logger { }
+
     @Throws(Exception::class)
     override fun configure(web: WebSecurity) {
+        logger.info { "Disabling security for any endpoints" }
         web
             .ignoring().antMatchers("**")
     }
@@ -44,6 +48,8 @@ class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
 class KeycloakSecurityConfig(
     val configProperties: SecurityConfigProperties
 ): KeycloakWebSecurityConfigurerAdapter() {
+
+    private val logger = KotlinLogging.logger { }
 
     @Autowired
     @Throws(Exception::class)
@@ -64,6 +70,7 @@ class KeycloakSecurityConfig(
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
+        logger.info { "Security active, securing endpoint" }
         super.configure(http)
         http
             .csrf().disable()

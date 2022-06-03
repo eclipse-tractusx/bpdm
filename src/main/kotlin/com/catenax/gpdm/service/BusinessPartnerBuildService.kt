@@ -9,6 +9,7 @@ import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -24,11 +25,13 @@ class BusinessPartnerBuildService(
     private val changelogService: PartnerChangelogService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Create new business partner records from [createRequests] and return as [BusinessPartnerResponse]
      */
     @Transactional
-    fun upsertBusinessPartners(createRequests: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse>{
+    fun upsertBusinessPartners(createRequests: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse> {
         return upsertBusinessPartners(createRequests, emptyList()).map { it.toDto() }
     }
 
@@ -36,7 +39,12 @@ class BusinessPartnerBuildService(
      * Create new business partner records from [createRequests] and update existing records with [updateRequests]
      */
     @Transactional
-    fun upsertBusinessPartners(createRequests: Collection<BusinessPartnerRequest>, updateRequests: Collection<BusinessPartnerUpdateDto>): Collection<BusinessPartner>{
+    fun upsertBusinessPartners(
+        createRequests: Collection<BusinessPartnerRequest>,
+        updateRequests: Collection<BusinessPartnerUpdateDto>
+    ): Collection<BusinessPartner> {
+        logger.info { "Create ${createRequests.size} new business partners, and update ${updateRequests.size}" }
+
         val allRequests = updateRequests.map { (_, request) -> request }.plus(createRequests)
         val metadataMap = metadataMappingService.mapRequests(allRequests)
 
@@ -56,12 +64,14 @@ class BusinessPartnerBuildService(
 
     @Transactional
     fun setBusinessPartnerCurrentness(bpn: String) {
+        logger.info { "Updating currentness of business partner $bpn" }
         val partner = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
         partner.currentness = Instant.now()
     }
 
 
     private fun createBusinessPartners(requests: Collection<BusinessPartnerRequest>, metadataMap: MetadataMappingDto): Collection<BusinessPartner> {
+
         val bpns = bpnIssuingService.issueLegalEntityBpns(requests.size)
         val requestBpnPairs = requests.zip(bpns)
 

@@ -31,6 +31,7 @@
         <sonar.projectKey>bptm</sonar.projectKey>
         <jacoco.version>0.8.7</jacoco.version>
         <testcontainers.version>1.17.2</testcontainers.version>
+        <kotlinlogging.version>2.1.23</kotlinlogging.version>
     </properties>
 
     <dependencies>
@@ -113,6 +114,12 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
+        </dependency>
+        <!-- Kotlin wrapper for slf4j (Logging)-->
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging-jvm</artifactId>
+            <version>${kotlinlogging.version}</version>
         </dependency>
 
         <dependency>

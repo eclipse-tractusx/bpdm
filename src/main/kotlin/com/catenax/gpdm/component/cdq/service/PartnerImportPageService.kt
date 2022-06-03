@@ -9,6 +9,7 @@ import com.catenax.gpdm.service.BusinessPartnerBuildService
 import com.catenax.gpdm.service.BusinessPartnerFetchService
 import com.catenax.gpdm.service.MetadataService
 import com.catenax.gpdm.service.toDto
+import mu.KotlinLogging
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,15 +28,16 @@ class PartnerImportPageService(
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
 ) {
-
-
     private val cdqIdentifierType = TypeKeyNameUrlCdq(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
     private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
     private val cdqIssuer = TypeKeyNameUrlCdq(cdqIdConfigProperties.issuerKey, cdqIdConfigProperties.issuerName, "")
 
+    private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun import(modifiedAfter: Instant, startAfter: String?): ImportResponsePage {
+        logger.debug { "Import new business partner starting after ID '$startAfter'" }
+
         val partnerCollection = webClient
             .get()
             .uri { builder ->
@@ -52,6 +54,7 @@ class PartnerImportPageService(
             .bodyToMono<BusinessPartnerCollectionCdq>()
             .block()!!
 
+        logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }
 
         addNewMetadata( partnerCollection.values)
         val (createRequests, updateRequests) = partitionCreateAndUpdateRequests(partnerCollection.values)
@@ -71,26 +74,26 @@ class PartnerImportPageService(
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
-            .map{ mappingService.toRequest(it) }
-            .forEach { metadataService.getOrCreateIdentifierStatus(it) }
+            .map { mappingService.toRequest(it) }
+            .forEach { metadataService.createIdentifierStatus(it) }
 
         partners
-            .flatMap { it.identifiers.mapNotNull { id -> if(id.type?.technicalKey == null) null else id.type  } }
+            .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
             .plus(cdqIdentifierType)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
-            .map{ mappingService.toRequest(it) }
-            .forEach { metadataService.getOrCreateIdentifierType(it) }
+            .map { mappingService.toRequest(it) }
+            .forEach { metadataService.createIdentifierType(it) }
 
         partners
-            .flatMap { it.identifiers.mapNotNull { id -> if(id.issuingBody?.technicalKey == null) null else id.issuingBody } }
+            .flatMap { it.identifiers.mapNotNull { id -> if (id.issuingBody?.technicalKey == null) null else id.issuingBody } }
             .plus(cdqIssuer)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIssuingBodies(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
-            .map{ mappingService.toRequest(it) }
-            .forEach { metadataService.getOrCreateIssuingBody(it) }
+            .map { mappingService.toRequest(it) }
+            .forEach { metadataService.createIssuingBody(it) }
 
         partners
             .filter { it.legalForm?.technicalKey != null }
@@ -99,7 +102,7 @@ class PartnerImportPageService(
             .minus(metadataService.getLegalForms(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
             .map { mappingService.toRequest(it.first, it.second) }
-            .forEach { metadataService.getOrCreateLegalForm(it) }
+            .forEach { metadataService.createLegalForm(it) }
     }
 
 

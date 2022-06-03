@@ -5,6 +5,7 @@ import com.catenax.gpdm.config.ElasticSearchConfigProperties
 import com.catenax.gpdm.entity.BaseEntity
 import com.catenax.gpdm.entity.SyncType
 import com.catenax.gpdm.service.SyncRecordService
+import mu.KotlinLogging
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -23,6 +24,7 @@ class ElasticSyncService(
     val entityManager: EntityManager,
     private val syncRecordService: SyncRecordService
 ) {
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Asynchronous version of [exportPaginated]
@@ -41,6 +43,8 @@ class ElasticSyncService(
         var page = saveState?.toIntOrNull() ?: 0
         var docsPage: Page<BusinessPartnerDoc>
 
+        logger.info { "Start Elasticsearch export from time '$fromTime' and page '$page'" }
+
         do {
             try {
                 val pageRequest = PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
@@ -54,11 +58,14 @@ class ElasticSyncService(
                 entityManager.clear()
 
             } catch (exception: RuntimeException) {
+                logger.error(exception) { "Exception encountered on Elasticsearch export" }
                 syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.ELASTIC), exception.message!!, page.toString())
                 throw exception
             }
         } while (docsPage.totalPages > page)
 
         syncRecordService.setSynchronizationSuccess(syncRecordService.getOrCreateRecord(SyncType.ELASTIC))
+
+        logger.info { "Finished Elasticsearch export successfully" }
     }
 }

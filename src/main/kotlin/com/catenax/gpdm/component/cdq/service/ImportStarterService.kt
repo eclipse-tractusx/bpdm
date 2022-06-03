@@ -4,6 +4,7 @@ import com.catenax.gpdm.dto.response.SyncResponse
 import com.catenax.gpdm.entity.SyncType
 import com.catenax.gpdm.service.SyncRecordService
 import com.catenax.gpdm.service.toDto
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
 /**
@@ -14,6 +15,8 @@ class ImportStarterService(
     private val syncRecordService: SyncRecordService,
     private val importService: PartnerImportService
 ) {
+
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Import records synchronously and return a [SyncResponse] about the import result information
@@ -43,6 +46,8 @@ class ImportStarterService(
         val saveState = record.errorSave
 
         val response = syncRecordService.setSynchronizationStart(record).toDto()
+
+        logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '$fromTime' with async: ${!inSync}" }
 
         if (inSync)
             importService.importPaginated(fromTime, saveState)

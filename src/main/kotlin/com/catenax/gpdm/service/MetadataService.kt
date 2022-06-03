@@ -7,7 +7,11 @@ import com.catenax.gpdm.dto.response.type.TypeKeyNameDto
 import com.catenax.gpdm.dto.response.type.TypeKeyNameUrlDto
 import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmAlreadyExists
-import com.catenax.gpdm.repository.*
+import com.catenax.gpdm.repository.IdentifierStatusRepository
+import com.catenax.gpdm.repository.IdentifierTypeRepository
+import com.catenax.gpdm.repository.IssuingBodyRepository
+import com.catenax.gpdm.repository.LegalFormRepository
+import mu.KotlinLogging
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,17 +24,18 @@ class MetadataService(
     val identifierTypeRepository: IdentifierTypeRepository,
     val issuingBodyRepository: IssuingBodyRepository,
     val legalFormRepository: LegalFormRepository,
-    val legalFormCategoryRepository: LegalFormCategoryRepository,
     val identifierStatusRepository: IdentifierStatusRepository
 ) {
 
-    @Transactional
-    fun getOrCreateIdentifierType(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String>{
-        val newIdentifier = identifierTypeRepository.findByTechnicalKey(type.technicalKey)
-            ?.let { throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, type.technicalKey) }
-            ?: IdentifierType(type.name, type.url, type.technicalKey)
+    private val logger = KotlinLogging.logger { }
 
-        return identifierTypeRepository.save(newIdentifier).toDto()
+    @Transactional
+    fun createIdentifierType(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+        if (identifierTypeRepository.findByTechnicalKey(type.technicalKey) != null)
+            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, type.technicalKey)
+
+        logger.info { "Create new Identifier-Type with key ${type.technicalKey} and name ${type.name}" }
+        return identifierTypeRepository.save(IdentifierType(type.name, type.url, type.technicalKey)).toDto()
     }
 
     fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameUrlDto<String>> {
@@ -39,12 +44,12 @@ class MetadataService(
     }
 
     @Transactional
-    fun getOrCreateIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String>{
-        val newStatus = identifierStatusRepository.findByTechnicalKey(status.technicalKey)
-            ?.let { throw BpdmAlreadyExists(IdentifierStatus::class.simpleName!!, status.technicalKey) }
-            ?: IdentifierStatus(status.name, status.technicalKey)
+    fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
+        if (identifierStatusRepository.findByTechnicalKey(status.technicalKey) != null)
+            throw BpdmAlreadyExists(IdentifierStatus::class.simpleName!!, status.technicalKey)
 
-        return identifierStatusRepository.save(newStatus).toDto()
+        logger.info { "Create new Identifier-Status with key ${status.technicalKey} and name ${status.name}" }
+        return identifierStatusRepository.save(IdentifierStatus(status.name, status.technicalKey)).toDto()
     }
 
     fun getIdentifierStati(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
@@ -53,12 +58,12 @@ class MetadataService(
     }
 
     @Transactional
-    fun getOrCreateIssuingBody(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String>{
-        val newIssuingBody = issuingBodyRepository.findByTechnicalKey(type.technicalKey)
-            ?.let { throw BpdmAlreadyExists(IssuingBody::class.simpleName!!, type.technicalKey) }
-            ?: IssuingBody(type.name, type.url, type.technicalKey)
+    fun createIssuingBody(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+        if (issuingBodyRepository.findByTechnicalKey(type.technicalKey) != null)
+            throw BpdmAlreadyExists(IssuingBody::class.simpleName!!, type.technicalKey)
 
-        return issuingBodyRepository.save(newIssuingBody).toDto()
+        logger.info { "Create new Issuing-Body with key ${type.technicalKey} and name ${type.name}" }
+        return issuingBodyRepository.save(IssuingBody(type.name, type.url, type.technicalKey)).toDto()
     }
 
     fun getIssuingBodies(pageRequest: Pageable): PageResponse<TypeKeyNameUrlDto<String>> {
@@ -67,12 +72,14 @@ class MetadataService(
     }
 
     @Transactional
-    fun getOrCreateLegalForm(request: LegalFormRequest): LegalFormResponse{
-        val legalForm = legalFormRepository.findByTechnicalKey(request.technicalKey)
-            ?.let { throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.name) }
-            ?: buildLegalForm(request)
+    fun createLegalForm(request: LegalFormRequest): LegalFormResponse {
+        if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
+            throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.name)
 
-        legalFormCategoryRepository.saveAll(legalForm.categories)
+        logger.info { "Create new Legal-Form with key ${request.technicalKey}, name ${request.name} and ${request.category.size} categories" }
+        val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toSet()
+        val legalForm = LegalForm(request.name, request.url, request.language, request.mainAbbreviation, categories, request.technicalKey)
+
         return legalFormRepository.save(legalForm).toDto()
     }
 
@@ -80,10 +87,4 @@ class MetadataService(
         val page = legalFormRepository.findAll(pageRequest)
         return page.toDto( page.content.map { it.toDto() } )
     }
-
-    private fun buildLegalForm(dto: LegalFormRequest): LegalForm{
-        val categories = dto.category.map { LegalFormCategory(it.name, it.url) }.toSet()
-        return LegalForm(dto.name, dto.url, dto.language, dto.mainAbbreviation, categories, dto.technicalKey)
-    }
-
 }

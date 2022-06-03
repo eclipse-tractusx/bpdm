@@ -19,7 +19,9 @@ import org.springframework.boot.runApplication
         "com.catenax.gpdm.config",
         "com.catenax.gpdm.controller",
         "com.catenax.gpdm.repository",
-        "com.catenax.gpdm.service"])
+        "com.catenax.gpdm.service"
+    ]
+)
 @ConfigurationPropertiesScan
 class Application
 
