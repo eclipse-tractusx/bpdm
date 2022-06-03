@@ -3,17 +3,16 @@ package com.catenax.gpdm.entity
 import java.time.Instant
 import javax.persistence.*
 
-
 @Entity
 @Table(
     name = "business_partners",
     indexes = [Index(columnList = "legal_form_id")]
 )
 class BusinessPartner(
-    @Column(name="bpn", nullable = false, unique = true)
+    @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
     @ManyToOne
-    @JoinColumn(name="legal_form_id")
+    @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
     @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")], indexes = [Index(columnList = "partner_id")])
@@ -30,7 +29,7 @@ class BusinessPartner(
     val roles: Set<Role>,
     @Column(name = "currentness", nullable = false)
     var currentness: Instant
-): BaseEntity(){
+) : BaseEntity() {
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()
 
@@ -41,10 +40,13 @@ class BusinessPartner(
     val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
-   val addresses: MutableSet<Address> = mutableSetOf()
+    val addresses: MutableSet<Address> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
-   val classification: MutableSet<Classification> = mutableSetOf()
+    val sites: MutableSet<Site> = mutableSetOf()
+
+    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val classification: MutableSet<Classification> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
@@ -56,9 +58,7 @@ class BusinessPartner(
     val endNodeRelations: MutableSet<Relation> = mutableSetOf()
 }
 
-
-
-enum class BusinessPartnerType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<BusinessPartnerType>{
+enum class BusinessPartnerType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<BusinessPartnerType> {
     BRAND("Brand", ""),
     LEGAL_ENTITY("Legal Entity", ""),
     ORGANIZATIONAL_UNIT("Organizational Unit", ""),

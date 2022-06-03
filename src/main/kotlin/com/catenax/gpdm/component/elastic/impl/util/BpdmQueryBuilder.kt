@@ -5,6 +5,7 @@ import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
 import com.catenax.gpdm.dto.request.AddressPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerPropertiesSearchRequest
 import com.catenax.gpdm.dto.request.BusinessPartnerSearchRequest
+import com.catenax.gpdm.dto.request.SitePropertiesSearchRequest
 import org.apache.lucene.search.join.ScoreMode
 import org.elasticsearch.common.unit.Fuzziness
 import org.elasticsearch.index.query.BoolQueryBuilder
@@ -59,7 +60,7 @@ class BpdmQueryBuilder {
      * Fields with no query text are omitted.
      */
     fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
-        return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties)
+        return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties) + toFieldTextPairs(searchRequest.siteProperties)
     }
 
     /**
@@ -104,12 +105,27 @@ class BpdmQueryBuilder {
     }
 
     /**
+     * Converts a [siteSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * @see toFieldTextPairs
+     */
+    fun toFieldTextPairs(siteSearch: SitePropertiesSearchRequest): Collection<Pair<String, String>> {
+        val siteParamPairs = listOf(
+            Pair(BusinessPartnerDoc::sites.name, siteSearch.siteName)
+        )
+
+        return siteParamPairs
+            .filter { (_, query) -> query != null }
+            .map { (fieldName, query) -> Pair(fieldName, query!!) }
+    }
+
+    /**
      * Returns a lowercase representation of [searchRequest]
      */
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
         return BusinessPartnerSearchRequest(
             toLowerCaseSearchRequest(searchRequest.partnerProperties),
-            toLowerCaseSearchRequest(searchRequest.addressProperties)
+            toLowerCaseSearchRequest(searchRequest.addressProperties),
+            toLowerCaseSearchRequest(searchRequest.siteProperties)
         )
     }
 
@@ -139,4 +155,12 @@ class BpdmQueryBuilder {
         )
     }
 
+    /**
+     * Returns a lowercase representation of [searchRequest]
+     */
+    fun toLowerCaseSearchRequest(searchRequest: SitePropertiesSearchRequest): SitePropertiesSearchRequest {
+        return SitePropertiesSearchRequest(
+            searchRequest.siteName?.lowercase()
+        )
+    }
 }

@@ -21,10 +21,11 @@ class DocumentMappingService{
         return BusinessPartnerDoc(
             partner.bpn,
             partner.names.map { TextDoc(it.value) },
-            if(partner.legalForm != null) TextDoc(partner.legalForm!!.name) else null,
-            if(partnerStatus != null) TextDoc(partnerStatus.officialDenotation) else null,
-            partner.addresses.map { toDocument(it) },
-            partner.classification.map { TextDoc(it.value) }
+            if (partner.legalForm != null) TextDoc(partner.legalForm!!.name) else null,
+            if (partnerStatus != null) TextDoc(partnerStatus.officialDenotation) else null,
+            partner.addresses.map { toDocument(it) } + partner.sites.flatMap { it.addresses }.map { toDocument(it) },
+            partner.classification.map { TextDoc(it.value) },
+            partner.sites.map { TextDoc(it.name) }
         )
     }
 
@@ -33,13 +34,13 @@ class DocumentMappingService{
      */
     fun toDocument(address: Address): AddressDoc {
         return  AddressDoc(
-         address.administrativeAreas.map { TextDoc(it.value) },
-         address.postCodes.map { TextDoc(it.value) },
-         address.localities.map { TextDoc(it.value) },
-         address.thoroughfares.map { TextDoc(it.value) },
-         address.premises.map { TextDoc(it.value) },
-         address.postalDeliveryPoints.map { TextDoc(it.value) }
-     )
+            address.administrativeAreas.map { TextDoc(it.value) },
+            address.postCodes.map { TextDoc(it.value) },
+            address.localities.map { TextDoc(it.value) },
+            address.thoroughfares.map { TextDoc(it.value) },
+            address.premises.map { TextDoc(it.value) },
+            address.postalDeliveryPoints.map { TextDoc(it.value) }
+        )
     }
 
 }

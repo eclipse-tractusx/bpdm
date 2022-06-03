@@ -6,9 +6,9 @@ import javax.persistence.*
 @Table(name = "partner_changelog_entries")
 class PartnerChangelogEntry(
     @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false)
+    @Column(name = "changelog_type", nullable = false, updatable = false)
     val changelogType: ChangelogType,
-    @Column(name = "bpn", nullable = false)
+    @Column(name = "bpn", nullable = false, updatable = false)
     val bpn: String
 ) : BaseEntity()
 

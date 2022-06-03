@@ -23,6 +23,8 @@ services:
     container_name: bpdm-elasticsearch
     environment:
       - discovery.type=single-node
+      # explicitly disabling security prevents warnings in log
+      - xpack.security.enabled=false
     ports:
       - "9200:9200"
       - "9300:9300"

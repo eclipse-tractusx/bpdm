@@ -67,7 +67,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         bpIndex.create()
 
         //Create a bogus document with a valid BPN
-        val firstBpn = bpnIssuingService.issueLegalEntities(1).first()
+        val firstBpn = bpnIssuingService.issueLegalEntityBpns(1).first()
         val invalidBp = InvalidBusinessPartnerDoc(firstBpn, "outdated")
 
         elasticTemplate.save(invalidBp)

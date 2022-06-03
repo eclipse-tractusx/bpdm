@@ -1,9 +1,9 @@
 package com.catenax.gpdm.component.cdq.controller
 
 import com.catenax.gpdm.Application
-import com.catenax.gpdm.component.cdq.config.CdqIdentifierConfigProperties
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.config.BpnConfigProperties
+import com.catenax.gpdm.dto.response.AddressResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
@@ -33,7 +33,6 @@ private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class CdqControllerImportIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val cdqIdProperties: CdqIdentifierConfigProperties,
     val bpnConfigProperties: BpnConfigProperties,
     val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers
@@ -300,7 +299,7 @@ class CdqControllerImportIT @Autowired constructor(
 
             assertThat(actualPartner)
                 .usingRecursiveComparison()
-                .ignoringFieldsMatchingRegexes(".*uuid")
+                .ignoringFieldsMatchingRegexes(".*uuid", BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name)
                 .ignoringAllOverriddenEquals()
                 .ignoringCollectionOrder()
                 .isEqualTo(expectedWithBpn)
