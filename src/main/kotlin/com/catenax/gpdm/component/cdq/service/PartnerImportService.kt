@@ -4,7 +4,7 @@ import com.catenax.gpdm.entity.SyncType
 import com.catenax.gpdm.service.SyncRecordService
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.time.OffsetDateTime
+import java.time.Instant
 import javax.persistence.EntityManager
 
 /**
@@ -20,7 +20,7 @@ class PartnerImportService(
      * Asynchronous version of [importPaginated]
      */
     @Async
-    fun importPaginatedAsync(fromTime: OffsetDateTime, saveState: String?) {
+    fun importPaginatedAsync(fromTime: Instant, saveState: String?) {
         importPaginated(fromTime, saveState)
     }
 
@@ -29,7 +29,7 @@ class PartnerImportService(
      *
      * Data is imported in a paginated way. On an error during a page import the latest [saveState] ID is saved so that the import can later be resumed
      */
-    fun importPaginated(fromTime: OffsetDateTime, saveState: String?) {
+    fun importPaginated(fromTime: Instant, saveState: String?) {
         var startAfter: String? = saveState
         var importedCount = 0
 

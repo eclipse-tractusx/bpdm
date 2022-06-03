@@ -8,9 +8,9 @@ data class PremiseRequest (
     @Schema(description = "Full denotation of the premise")
     val value: String,
     @Schema(description = "Abbreviation or shorthand, if applicable")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Premise number, if applicable")
-    val number: String?,
+    val number: String? = null,
     @Schema(description = "Type of specified premise", defaultValue = "OTHER")
     val type: PremiseType = PremiseType.OTHER
-        )
+)

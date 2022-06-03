@@ -1,6 +1,8 @@
 package com.catenax.gpdm.repository
 
+import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.entity.Identifier
+import com.catenax.gpdm.entity.IdentifierType
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import java.util.*
@@ -16,4 +18,7 @@ interface IdentifierRepository : CrudRepository<Identifier, Long> {
 
     @Query("SELECT DISTINCT i FROM Identifier i LEFT JOIN FETCH i.issuingBody WHERE i IN :identifiers")
     fun joinIssuingBody(identifiers: Set<Identifier>): Set<Identifier>
+
+    @Query("SELECT new com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse(i.value,i.partner.bpn) FROM Identifier i WHERE i.type = :identifierType AND i.value in :values")
+    fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingResponse>
 }

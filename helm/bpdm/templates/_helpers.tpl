@@ -49,3 +49,30 @@ Selector labels
 app.kubernetes.io/name: {{ include "bpdm.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Create name of application secret
+*/}}
+{{- define "bpdm.applicationSecret.name" -}}
+{{- printf "%s-application" (include "bpdm.fullname" .) }}
+{{- end }}
+
+{{/*
+Invoke include on given definition with postgresql dependency context
+Usage: include "includeWithPostgresContext" (list $ "your_include_function_here")
+*/}}
+{{- define "includeWithPostgresContext" -}}
+{{- $ := index . 0 }}
+{{- $function := index . 1 }}
+{{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release) }}
+{{- end }}
+
+{{/*
+Invoke include on given definition with elastic dependency context
+Usage: include "includeWithElasticContext" (list root "your_include_function_here")
+*/}}
+{{- define "includeWithElasticContext" -}}
+{{- $ := index . 0 }}
+{{- $function := index . 1 }}
+{{- include $function (dict "Values" $.Values.elastic "Chart" (dict "Name" "elastic") "Release" $.Release) }}
+{{- end }}

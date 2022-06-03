@@ -39,7 +39,7 @@ class ImportStarterService(
     private fun startImport(inSync: Boolean): SyncResponse {
         val record = syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT)
 
-        val fromTime = SyncRecordService.syncStartTime
+        val fromTime = record.startedAt ?: SyncRecordService.syncStartTime
         val saveState = record.errorSave
 
         val response = syncRecordService.setSynchronizationStart(record).toDto()

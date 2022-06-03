@@ -13,11 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
-import org.springframework.security.core.session.SessionRegistryImpl
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -60,20 +59,17 @@ class KeycloakSecurityConfig(
 
     @Bean
     override fun sessionAuthenticationStrategy(): SessionAuthenticationStrategy? {
-        return RegisterSessionAuthenticationStrategy(
-            SessionRegistryImpl()
-        )
+        return NullAuthenticatedSessionStrategy()
     }
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         super.configure(http)
         http
-            .csrf()
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
-            .cors().and()
-            .authorizeRequests()
+            .csrf().disable()
+            .cors()
+            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().authorizeRequests()
                 .antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()
                 .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/api/swagger-ui/**").permitAll()

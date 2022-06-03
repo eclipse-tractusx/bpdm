@@ -1,18 +1,28 @@
 package com.catenax.gpdm.component.elastic.impl.service
 
-import com.catenax.gpdm.component.elastic.impl.repository.BusinessPartnerDocRepository
+import com.catenax.gpdm.component.elastic.impl.doc.BusinessPartnerDoc
 import com.catenax.gpdm.dto.response.SyncResponse
 import com.catenax.gpdm.entity.SyncType
+import com.catenax.gpdm.exception.BpdmElasticIndexException
 import com.catenax.gpdm.service.SyncRecordService
 import com.catenax.gpdm.service.toDto
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.context.ApplicationContextException
+import org.springframework.context.event.ContextRefreshedEvent
+import org.springframework.context.event.EventListener
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.data.elasticsearch.core.IndexOperations
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ElasticSyncStarterService(
     private val syncRecordService: SyncRecordService,
-    private val businessPartnerDocRepository: BusinessPartnerDocRepository,
-    private val elasticSyncService: ElasticSyncService
+    private val elasticSyncService: ElasticSyncService,
+    private val operations: ElasticsearchOperations,
+    private val objectMapper: ObjectMapper
 ) {
 
     /**
@@ -38,11 +48,51 @@ class ElasticSyncStarterService(
 
     /**
      * Clears the whole index and resets the time of the last update
+     *
+     * @throws [BpdmElasticIndexException]
      */
     @Transactional
     fun clearElastic() {
-        businessPartnerDocRepository.deleteAll()
+        val index = operations.indexOps(BusinessPartnerDoc::class.java)
+        index.delete()
+        createIndex(index)
+
         syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.ELASTIC))
+    }
+
+
+    /**
+     * Checks whether the existing business partner index is up-to-date with the current Entity version and recreates the index if necessary
+     *
+     * @throws [ApplicationContextException] shutting down the application on exception
+     */
+    @EventListener(ContextRefreshedEvent::class)
+    fun updateOnInit() {
+        try {
+            val currentIndex = operations.indexOps(BusinessPartnerDoc::class.java)
+
+            if (!currentIndex.exists()) {
+                createIndex(currentIndex)
+            } else {
+                val tempIndex = operations.indexOps(IndexCoordinates.of("temp-business-partner"))
+
+                tempIndex.delete()
+                createIndex(tempIndex, currentIndex)
+
+                val actualTempTree = objectMapper.valueToTree<JsonNode>(tempIndex.mapping)
+                val actualExistingTree = objectMapper.valueToTree<JsonNode>(currentIndex.mapping)
+
+                if (!actualTempTree.equals(actualExistingTree)) {
+                    clearElastic()
+                }
+
+                tempIndex.delete()
+            }
+        } catch (e: Throwable) {
+            //make sure Application exits when exception is thrown
+            throw ApplicationContextException("Exception when updating Elasticsearch index during initialization", e)
+        }
+
     }
 
     /**
@@ -64,5 +114,16 @@ class ElasticSyncStarterService(
         return response
     }
 
+    private fun createIndex(index: IndexOperations) {
+        createIndex(index, index)
+    }
+
+    private fun createIndex(indexToCreate: IndexOperations, indexToTakeConfigFrom: IndexOperations) {
+        val settings = indexToTakeConfigFrom.createSettings()
+        val mappings = indexToTakeConfigFrom.createMapping()
+
+        if (!indexToCreate.create(settings, mappings))
+            throw BpdmElasticIndexException("Could not recreate business partner index")
+    }
 
 }

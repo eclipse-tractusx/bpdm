@@ -46,13 +46,15 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
         legalForm?.toDto(),
-        stati.maxWithOrNull(compareBy{it.validFrom})?.toDto(),
+        stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
         addresses.map { it.toDto() },
+        sites.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },
         roles.map { it.toDto() },
-        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
+        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() }),
+        currentness
     )
 }
 
@@ -95,6 +97,7 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 fun Address.toDto(): AddressResponse {
     return AddressResponse(
         uuid,
+        bpn,
         version.toDto(),
         careOf,
         contexts,
@@ -110,6 +113,13 @@ fun Address.toDto(): AddressResponse {
     )
 }
 
+fun Site.toDto(): SiteResponse {
+    return SiteResponse(
+        bpn,
+        name,
+        addresses.map { it.toDto() }
+    )
+}
 
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
@@ -158,10 +168,16 @@ fun Relation.toDto(): RelationResponse {
 }
 
 fun BankAccount.toDto(): BankAccountResponse {
-    return BankAccountResponse(uuid, trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
-        nationalBankAccountIdentifier, nationalBankIdentifier)
+    return BankAccountResponse(
+        uuid, trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
+        nationalBankAccountIdentifier, nationalBankIdentifier
+    )
 }
 
-fun SyncRecord.toDto(): SyncResponse{
+fun SyncRecord.toDto(): SyncResponse {
     return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
+}
+
+fun PartnerChangelogEntry.toDto(): ChangelogEntryResponse {
+    return ChangelogEntryResponse(bpn, changelogType, createdAt)
 }

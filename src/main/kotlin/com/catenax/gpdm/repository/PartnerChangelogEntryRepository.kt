@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long> {
     fun findAllByIdGreaterThan(id: Long, pageable: Pageable): Page<PartnerChangelogEntry>
+
+    fun findAllByBpn(bpn: String, pageable: Pageable): Page<PartnerChangelogEntry>
 }

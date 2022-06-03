@@ -9,7 +9,7 @@ import com.catenax.gpdm.dto.request.PaginationRequest
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
 import com.catenax.gpdm.dto.response.SuggestionResponse
-import com.catenax.gpdm.repository.BusinessPartnerRepository
+import com.catenax.gpdm.service.BusinessPartnerFetchService
 import com.catenax.gpdm.service.toSearchDto
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service
 class SearchServiceImpl(
     val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,
     val textDocSearchRepository: TextDocSearchRepository,
-    val businessPartnerRepository: BusinessPartnerRepository
+    val businessPartnerFetchService: BusinessPartnerFetchService
 ) : SearchService {
 
 
@@ -39,13 +39,14 @@ class SearchServiceImpl(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerSearchResponse> {
+
         val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(
             searchRequest,
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
         val bpnHitMap = searchResult.associateBy { it.content.bpn }
 
-        val businessPartners = businessPartnerRepository.findDistinctByBpnIn(bpnHitMap.keys)
+        val businessPartners = businessPartnerFetchService.fetchByBpns(bpnHitMap.keys)
         val missingPartners = bpnHitMap.keys.minus(businessPartners.map { it.bpn }.toSet()).size
 
         val responseContent =

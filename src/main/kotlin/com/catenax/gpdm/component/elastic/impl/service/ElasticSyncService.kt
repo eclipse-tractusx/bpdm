@@ -10,7 +10,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
-import java.time.OffsetDateTime
+import java.time.Instant
 import javax.persistence.EntityManager
 
 /**
@@ -28,7 +28,7 @@ class ElasticSyncService(
      * Asynchronous version of [exportPaginated]
      */
     @Async
-    fun exportPaginatedAsync(fromTime: OffsetDateTime, saveState: String?) {
+    fun exportPaginatedAsync(fromTime: Instant, saveState: String?) {
         exportPaginated(fromTime, saveState)
     }
 
@@ -37,7 +37,7 @@ class ElasticSyncService(
      *
      * A new change is discovered by comparing the updated timestamp of the business partner record with the time of the last export
      */
-    fun exportPaginated(fromTime: OffsetDateTime, saveState: String?) {
+    fun exportPaginated(fromTime: Instant, saveState: String?) {
         var page = saveState?.toIntOrNull() ?: 0
         var docsPage: Page<BusinessPartnerDoc>
 

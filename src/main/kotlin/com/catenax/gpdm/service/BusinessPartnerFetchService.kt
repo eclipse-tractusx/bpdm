@@ -1,17 +1,10 @@
 package com.catenax.gpdm.service
 
+import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.entity.Address
-import com.catenax.gpdm.entity.BusinessPartner
-import com.catenax.gpdm.entity.Identifier
-import com.catenax.gpdm.entity.IdentifierType
+import com.catenax.gpdm.entity.*
 import com.catenax.gpdm.exception.BpdmNotFoundException
-import com.catenax.gpdm.repository.BusinessPartnerRepository
-import com.catenax.gpdm.repository.IdentifierRepository
-import com.catenax.gpdm.repository.IdentifierTypeRepository
-import com.catenax.gpdm.repository.LegalFormRepository
-import com.catenax.gpdm.repository.entity.AddressRepository
-import com.catenax.gpdm.repository.entity.BankAccountRepository
+import com.catenax.gpdm.repository.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,7 +18,8 @@ class BusinessPartnerFetchService(
     private val addressRepository: AddressRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val bankAccountRepository: BankAccountRepository
+    private val bankAccountRepository: BankAccountRepository,
+    private val siteRepository: SiteRepository
 ) {
 
     /**
@@ -35,6 +29,14 @@ class BusinessPartnerFetchService(
     fun findPartner(bpn: String): BusinessPartnerResponse {
         val bp = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
         return bp.toDto()
+    }
+
+    /**
+     * Fetch business partners by BPN in [bpns]
+     */
+    @Transactional
+    fun fetchByBpns(bpns: Collection<String>): Set<BusinessPartner> {
+        return fetchBusinessPartnerDependencies(businessPartnerRepository.findDistinctByBpnIn(bpns))
     }
 
     /**
@@ -51,11 +53,20 @@ class BusinessPartnerFetchService(
      * Fetch business partners by [values] of [identifierType]
      */
     @Transactional
-    fun fetchByIdentifierValues(identifierType: String, values: Collection<String>): Set<BusinessPartner>{
+    fun fetchByIdentifierValues(identifierType: String, values: Collection<String>): Set<BusinessPartner> {
         return fetchBusinessPartnerDependencies(businessPartnerRepository.findByIdentifierTypeAndValues(identifierType, values))
     }
 
-    private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner>{
+    /**
+     * Find bpn to identifier value mappings by [idValues] of [identifierType]
+     */
+    @Transactional
+    fun findBpnsByIdentifiers(identifierType: String, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
+        val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
+        return identifierRepository.findBpnsByIdentifierTypeAndValues(type, idValues)
+    }
+
+    private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner> {
 
         businessPartnerRepository.joinIdentifiers(partners)
         businessPartnerRepository.joinNames(partners)
@@ -67,6 +78,10 @@ class BusinessPartnerFetchService(
         businessPartnerRepository.joinTypes(partners)
         businessPartnerRepository.joinRoles(partners)
         businessPartnerRepository.joinLegalForm(partners)
+        businessPartnerRepository.joinSites(partners)
+
+        val sites = partners.flatMap { it.sites }.toSet()
+        fetchSiteDependencies(sites)
 
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
@@ -74,13 +89,19 @@ class BusinessPartnerFetchService(
         val legalForms = partners.mapNotNull { it.legalForm }.toSet()
         legalFormRepository.joinCategories(legalForms)
 
-        val addresses = partners.flatMap { it.addresses }.toSet()
+        val addresses = partners.flatMap { it.addresses }.plus(partners.flatMap { it.sites }.flatMap { it.addresses }).toSet()
         fetchAddressDependencies(addresses)
 
         val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
         bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
+    }
+
+    private fun fetchSiteDependencies(sites: Set<Site>): Set<Site> {
+        siteRepository.joinAddresses(sites)
+
+        return sites
     }
 
     private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {
@@ -93,7 +114,6 @@ class BusinessPartnerFetchService(
         addressRepository.joinPremises(addresses)
         addressRepository.joinPostalDeliveryPoints(addresses)
         addressRepository.joinThoroughfares(addresses)
-        addressRepository.joinVersion(addresses)
 
         return addresses
     }

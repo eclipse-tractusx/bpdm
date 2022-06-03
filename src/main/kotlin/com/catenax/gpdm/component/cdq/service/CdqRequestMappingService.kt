@@ -67,10 +67,11 @@ class CdqRequestMappingService(
             partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id)),
             partner.names.map { toRequest(it) },
             toOptionalReference(partner.legalForm),
-            if(partner.status != null) toRequest(partner.status) else null,
+            if (partner.status != null) toRequest(partner.status) else null,
             partner.addresses.map { toRequest(it) },
+            listOf(),
             toRequest(partner.profile),
-            partner.types.map{ toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
+            partner.types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
             partner.bankAccounts.map { toRequest(it) }
         )
     }
@@ -129,6 +130,7 @@ class CdqRequestMappingService(
 
     fun toRequest(address: AddressCdq): AddressRequest {
         return AddressRequest(
+            null,
             toRequest(address.version),
             address.careOf?.value,
             address.contexts.mapNotNull { it.value },

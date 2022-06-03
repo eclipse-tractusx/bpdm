@@ -7,9 +7,11 @@ import com.catenax.gpdm.dto.MetadataMappingDto
 import com.catenax.gpdm.dto.request.*
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.entity.*
+import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 /**
  * Service for creating and updating business partner records
@@ -52,12 +54,18 @@ class BusinessPartnerBuildService(
         return businessPartnerRepository.saveAll(allPartners).toList()
     }
 
+    @Transactional
+    fun setBusinessPartnerCurrentness(bpn: String) {
+        val partner = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
+        partner.currentness = Instant.now()
+    }
 
-    private fun createBusinessPartners(requests: Collection<BusinessPartnerRequest>, metadataMap: MetadataMappingDto): Collection<BusinessPartner>{
-        val bpns = bpnIssuingService.issueLegalEntities(requests.size)
+
+    private fun createBusinessPartners(requests: Collection<BusinessPartnerRequest>, metadataMap: MetadataMappingDto): Collection<BusinessPartner> {
+        val bpns = bpnIssuingService.issueLegalEntityBpns(requests.size)
         val requestBpnPairs = requests.zip(bpns)
 
-       return requestBpnPairs.map { (request, bpn) -> createBusinessPartner(request, bpn, metadataMap) }
+        return requestBpnPairs.map { (request, bpn) -> createBusinessPartner(request, bpn, metadataMap) }
     }
 
     private fun createBusinessPartner(
@@ -72,12 +80,11 @@ class BusinessPartnerBuildService(
         return updateBusinessPartner(partner, dto, metadataMap)
     }
 
-   private  fun updateBusinessPartner(
+    private fun updateBusinessPartner(
         partner: BusinessPartner,
         request: BusinessPartnerRequest,
         metadataMap: MetadataMappingDto
-    ): BusinessPartner{
-
+    ): BusinessPartner {
         partner.names.clear()
         partner.identifiers.clear()
         partner.stati.clear()
@@ -85,30 +92,55 @@ class BusinessPartnerBuildService(
         partner.classification.clear()
         partner.bankAccounts.clear()
 
-        partner.legalForm = if(request.legalForm != null) metadataMap.legalForms[request.legalForm]!! else null
-        partner.stati.addAll(if(request.status != null) setOf(toEntity(request.status, partner)) else setOf())
+        partner.legalForm = if (request.legalForm != null) metadataMap.legalForms[request.legalForm]!! else null
+        partner.stati.addAll(if (request.status != null) setOf(toEntity(request.status, partner)) else setOf())
         partner.names.addAll(request.names.map { toEntity(it, partner) }.toSet())
-        partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner)})
-        partner.addresses.addAll(request.addresses.map { createAddress(it, partner) }.toSet())
+        partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
         partner.classification.addAll(request.profileClassifications.map { toEntity(it, partner) }.toSet())
         partner.bankAccounts.addAll(request.bankAccounts.map { toEntity(it, partner) }.toSet())
 
+        val addressBpns = bpnIssuingService.issueAddressBpns(request.addresses.size)
+        val addressBpnPairs = request.addresses.zip(addressBpns)
+        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner, null) })
+
+        val siteBpns = bpnIssuingService.issueSiteBpns(request.sites.size)
+        val siteBpnPairs = request.sites.zip(siteBpns)
+        partner.sites.addAll(siteBpnPairs.map { (request, bpn) -> createSite(request, bpn, partner) })
+
         return partner
+    }
+
+    private fun createSite(
+        dto: SiteRequest,
+        bpn: String,
+        partner: BusinessPartner
+    ): Site {
+        val site = Site(bpn, dto.name, partner)
+
+        val addressBpns = bpnIssuingService.issueAddressBpns(dto.addresses.size)
+        val addressBpnPairs = dto.addresses.zip(addressBpns)
+        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner, site) })
+
+        return site
     }
 
 
     private fun createAddress(
         dto: AddressRequest,
-        partner: BusinessPartner
-    ): Address{
+        bpn: String,
+        partner: BusinessPartner,
+        site: Site?
+    ): Address {
         val address = Address(
+            bpn,
             dto.careOf,
             dto.contexts.toMutableSet(),
             dto.country,
             dto.types.toMutableSet(),
             toEntity(dto.version),
             dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates) },
-            partner
+            partner,
+            site
         )
 
         address.administrativeAreas.clear()
@@ -129,7 +161,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun toEntity(dto: BusinessPartnerRequest, bpn: String, legalForm: LegalForm?): BusinessPartner {
-        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet())
+        return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet(), Instant.now())
     }
 
     private fun toEntity(dto: BusinessStatusRequest, partner: BusinessPartner): BusinessStatus{

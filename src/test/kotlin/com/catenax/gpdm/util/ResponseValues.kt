@@ -7,6 +7,7 @@ import com.catenax.gpdm.dto.response.type.TypeNameUrlDto
 import com.catenax.gpdm.entity.*
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import java.time.ZoneOffset
 
 /**
  * Test values for response DTOs
@@ -116,6 +117,7 @@ object ResponseValues {
 
     val address1 = AddressResponse(
         uuid = CommonValues.uuid1,
+        bpn = CommonValues.bpnA1,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea1, adminArea2),
@@ -128,6 +130,7 @@ object ResponseValues {
 
     val address2 = AddressResponse(
         uuid = CommonValues.uuid1,
+        bpn = CommonValues.bpnA2,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea3, adminArea4),
@@ -140,6 +143,7 @@ object ResponseValues {
 
     val address3 = AddressResponse(
         uuid = CommonValues.uuid1,
+        bpn = CommonValues.bpnA3,
         version = version1,
         country = country1,
         administrativeAreas = listOf(adminArea5),
@@ -157,7 +161,8 @@ object ResponseValues {
         legalForm = legalFormDoc1,
         status = status1,
         profileClassifications = listOf(classification1, classification2),
-        addresses = listOf(address1)
+        addresses = listOf(address1),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
     val businessPartner2 = BusinessPartnerResponse(
@@ -167,7 +172,8 @@ object ResponseValues {
         legalForm = legalFormDoc2,
         status = status2,
         profileClassifications = listOf(classification3, classification4),
-        addresses = listOf(address2)
+        addresses = listOf(address2),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
     val businessPartner3 = BusinessPartnerResponse(
@@ -177,6 +183,7 @@ object ResponseValues {
         legalForm = legalFormDoc3,
         status = status3,
         profileClassifications = listOf(classification5),
-        addresses = listOf(address3)
+        addresses = listOf(address3),
+        currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 }

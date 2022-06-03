@@ -1,4 +1,4 @@
-package com.catenax.gpdm.repository.entity
+package com.catenax.gpdm.repository
 
 import com.catenax.gpdm.entity.Address
 import org.springframework.data.jpa.repository.Query
@@ -32,8 +32,5 @@ interface AddressRepository : PagingAndSortingRepository<Address, Long> {
 
     @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.localities WHERE a IN :addresses")
     fun joinLocalities(addresses: Set<Address>): Set<Address>
-
-    @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.version WHERE a IN :addresses")
-    fun joinVersion(addresses: Set<Address>): Set<Address>
 
 }

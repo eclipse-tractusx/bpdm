@@ -38,17 +38,26 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfiles | join ","  }}
             - name: BPDM_DB_HOST
-              value: {{ printf "%s-%s" .Release.Name "postgres" }}
+              value: {{ include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
             - name: BPDM_ELASTIC_HOST
-              value: {{ printf "%s-%s" .Release.Name "elastic" }}
-            {{- $appSecretsName := .Values.applicationSecrets.name }}
-            {{- range $key, $val := .Values.applicationSecrets.mappings }}
-            - name: {{ $val }}
+              value: {{ include "includeWithElasticContext" (list $ "elasticsearch.master.fullname") }}
+            - name: BPDM_KEYCLOAK_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ $appSecretsName }}
-                  key: {{ $key }}
-                      {{- end}}
+                  name: {{ include "bpdm.applicationSecret.name" . }}
+                  key: keycloak-secret
+            - name: BPDM_CDQ_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bpdm.applicationSecret.name" . }}
+                  key: cdq-key
+            - name: BPDM_DB_USER
+              value: {{ .Values.postgres.auth.username }}
+            - name: BPDM_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "includeWithPostgresContext" (list $ "postgresql.secretName") }}
+                  key: password
           ports:
             - name: http
               containerPort: 8080

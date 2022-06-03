@@ -12,6 +12,10 @@ object CommonValues {
     val bpn2 = "BPNL0000000001XZ"
     val bpn3 = "BPNL0000000002ZZ"
 
+    val bpnA1 = "BPNA0000000000XY"
+    val bpnA2 = "BPNA0000000001XZ"
+    val bpnA3 = "BPNA0000000002ZZ"
+
     val uuid1 = UUID.fromString("e9975a48-b190-4bf1-a7e6-73c6a1744de8")
 
     val name1 = "Business Partner Name"
@@ -19,6 +23,13 @@ object CommonValues {
     val name3 = "Another Organisation Corp"
     val name4 = "Catena Test Name"
     val name5 = "好公司  合伙制企业"
+    val name6 = "Something Ltd."
+    val name7 = "Gmbh XY"
+    val name8 = "XX LLC"
+
+    val siteName1 = "Stammwerk A"
+    val siteName2 = "Halle B1"
+    val siteName3 = "主厂房 C"
 
     val legalFormTechnicalKey1 = "LF1"
     val legalFormTechnicalKey2 = "LF2"
@@ -77,14 +88,11 @@ object CommonValues {
     val premise3 = "Building 1"
     val premise4 = "First Floor"
     val premise5 = "主楼"
+    val premise6 = "Komplex X"
 
     val postalDeliveryPoint1 = "Postal Delivery point"
     val postalDeliveryPoint2 = "Mailbox Premise Street"
     val postalDeliveryPoint3 = "Mail Station A"
     val postalDeliveryPoint4 = "Post Office Box 1"
     val postalDeliveryPoint5 = "邮政投递点"
-
-
-
-
 }

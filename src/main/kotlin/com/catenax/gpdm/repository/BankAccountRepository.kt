@@ -1,4 +1,4 @@
-package com.catenax.gpdm.repository.entity
+package com.catenax.gpdm.repository
 
 import com.catenax.gpdm.entity.BankAccount
 import org.springframework.data.jpa.repository.Query
