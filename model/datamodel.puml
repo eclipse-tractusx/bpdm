@@ -218,6 +218,7 @@ class Language {
 }
 
 class Address {
+    BPN
 	Postal Delivery Points
 	Thoroughfares
 	Premises
@@ -231,6 +232,11 @@ class Address {
 	Administrative Areas
 	Country
 	Identifiers
+}
+
+class Site {
+    BPN
+    Name
 }
 
 class AddressType {
@@ -458,11 +464,12 @@ BusinessPartner "*" --> "0..1" LegalForm
 BusinessPartner "1" *--> "*" BankAccount
 BusinessPartner "1" *--> "*" Name
 BusinessPartner "1" *--> "*" Identifier
-BusinessPartner "1" *--> "*" Address
+BusinessPartner "0..1" --> "*" Address
 BusinessPartner "1" *--> "0..1" BusinessPartnerStatus
 BusinessPartner "*" --> "*" BusinessPartnerRelation
 BusinessPartner "*" --> "*" BusinessPartnerRole
 BusinessPartner "*" --> "*" BusinessPartnerTypeE
+BusinessPartner "1" *--> "*" Site
 
 BusinessPartnerStatus "*"--> "1" BusinessPartnerStatusType
 BusinessPartnerStatusType .. BusinessPartnerStatusTypeE
@@ -485,6 +492,8 @@ Address "1" *--> "*" AddressVersion
 Address "1" *--> "*" Thoroughfare
 Address "1" *--> "*" AdministrativeArea
 Address "1" *--> "*" PostalDeliveryPoint
+
+Site "0..1" --> "*" Address
 
 Identifier "*" --> "1" IdentifierType
 Identifier "*" --> "1" IssuingBody
