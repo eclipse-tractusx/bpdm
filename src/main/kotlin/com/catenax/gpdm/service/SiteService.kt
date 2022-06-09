@@ -24,6 +24,11 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
+    fun findByBpn(bpn: String): SiteResponse {
+        val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
+        return site.toDto()
+    }
+
     private fun fetchSiteDependencies(sites: Set<Site>) {
         siteRepository.joinAddresses(sites)
     }

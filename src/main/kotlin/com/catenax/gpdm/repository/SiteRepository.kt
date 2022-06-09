@@ -12,4 +12,6 @@ interface SiteRepository : PagingAndSortingRepository<Site, Long> {
 
     @Query("SELECT s FROM Site s join s.partner p where p.bpn=:bpn")
     fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<Site>
+
+    fun findByBpn(bpn: String): Site?
 }
