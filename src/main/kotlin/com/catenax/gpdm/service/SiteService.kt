@@ -1,6 +1,7 @@
 package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.response.PageResponse
+import com.catenax.gpdm.dto.response.SiteLegalEntityResponse
 import com.catenax.gpdm.dto.response.SiteResponse
 import com.catenax.gpdm.entity.Site
 import com.catenax.gpdm.exception.BpdmNotFoundException
@@ -24,9 +25,9 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByBpn(bpn: String): SiteResponse {
+    fun findByBpn(bpn: String): SiteLegalEntityResponse {
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
-        return site.toDto()
+        return site.toDtoWithLegalEntity()
     }
 
     private fun fetchSiteDependencies(sites: Set<Site>) {

@@ -1,6 +1,6 @@
 package com.catenax.gpdm.controller
 
-import com.catenax.gpdm.dto.response.SiteResponse
+import com.catenax.gpdm.dto.response.SiteLegalEntityResponse
 import com.catenax.gpdm.service.SiteService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -32,7 +32,7 @@ class SiteController(
     @GetMapping("/{bpn}")
     fun getSite(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
-    ): SiteResponse {
+    ): SiteLegalEntityResponse {
         return siteService.findByBpn(bpn)
     }
 }

@@ -120,6 +120,14 @@ fun Site.toDto(): SiteResponse {
     )
 }
 
+fun Site.toDtoWithLegalEntity(): SiteLegalEntityResponse {
+    return SiteLegalEntityResponse(
+        bpn,
+        name,
+        addresses.map { it.toDto() },
+        partner.bpn
+    )
+}
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
     return AdministrativeAreaResponse(uuid, value, shortName, fipsCode, type.toDto(), language.toDto())
