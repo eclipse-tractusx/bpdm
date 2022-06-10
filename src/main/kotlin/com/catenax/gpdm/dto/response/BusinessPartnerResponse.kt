@@ -22,8 +22,6 @@ data class BusinessPartnerResponse (
     val status: BusinessStatusResponse? = null,
     @ArraySchema(arraySchema = Schema(description = "Addresses the partner is located at"))
     val addresses: Collection<AddressResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Sites of the partner"))
-    val sites: Collection<SiteResponse> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Profile classifications"))
     val profileClassifications: Collection<ClassificationResponse> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "The partner types"))

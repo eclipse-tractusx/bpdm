@@ -48,7 +48,6 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         legalForm?.toDto(),
         stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
         addresses.map { it.toDto() },
-        sites.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },

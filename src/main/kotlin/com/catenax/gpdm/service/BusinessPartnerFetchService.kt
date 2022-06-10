@@ -2,7 +2,10 @@ package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.entity.*
+import com.catenax.gpdm.entity.Address
+import com.catenax.gpdm.entity.BusinessPartner
+import com.catenax.gpdm.entity.Identifier
+import com.catenax.gpdm.entity.IdentifierType
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.*
 import org.springframework.stereotype.Service
@@ -80,9 +83,6 @@ class BusinessPartnerFetchService(
         businessPartnerRepository.joinLegalForm(partners)
         businessPartnerRepository.joinSites(partners)
 
-        val sites = partners.flatMap { it.sites }.toSet()
-        fetchSiteDependencies(sites)
-
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
 
@@ -96,12 +96,6 @@ class BusinessPartnerFetchService(
         bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
-    }
-
-    private fun fetchSiteDependencies(sites: Set<Site>): Set<Site> {
-        siteRepository.joinAddresses(sites)
-
-        return sites
     }
 
     private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {
