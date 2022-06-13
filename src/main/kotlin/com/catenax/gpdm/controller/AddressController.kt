@@ -1,7 +1,7 @@
 package com.catenax.gpdm.controller
 
-import com.catenax.gpdm.dto.response.SiteWithReferenceResponse
-import com.catenax.gpdm.service.SiteService
+import com.catenax.gpdm.dto.response.AddressWithReferenceResponse
+import com.catenax.gpdm.service.AddressService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -13,26 +13,26 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/catena/sites")
-class SiteController(
-    val siteService: SiteService
+@RequestMapping("/api/catena/addresses")
+class AddressController(
+    val addressService: AddressService
 ) {
 
     @Operation(
-        summary = "Get site by bpn",
-        description = "Get site by bpn-s of the site."
+        summary = "Get address by bpn",
+        description = "Get address by bpn-a of the address."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Found site with specified bpn"),
+            ApiResponse(responseCode = "200", description = "Found address with specified bpn"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No site found under specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No address found under specified bpn", content = [Content()])
         ]
     )
     @GetMapping("/{bpn}")
-    fun getSite(
+    fun getAddress(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
-    ): SiteWithReferenceResponse {
-        return siteService.findByBpn(bpn)
+    ): AddressWithReferenceResponse {
+        return addressService.findByBpn(bpn)
     }
 }

@@ -2,7 +2,6 @@ package com.catenax.gpdm.service
 
 import com.catenax.gpdm.dto.response.BpnIdentifierMappingResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
-import com.catenax.gpdm.entity.Address
 import com.catenax.gpdm.entity.BusinessPartner
 import com.catenax.gpdm.entity.Identifier
 import com.catenax.gpdm.entity.IdentifierType
@@ -18,11 +17,10 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerFetchService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val addressRepository: AddressRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
     private val bankAccountRepository: BankAccountRepository,
-    private val siteRepository: SiteRepository
+    private val addressService: AddressService
 ) {
 
     /**
@@ -90,26 +88,12 @@ class BusinessPartnerFetchService(
         legalFormRepository.joinCategories(legalForms)
 
         val addresses = partners.flatMap { it.addresses }.plus(partners.flatMap { it.sites }.flatMap { it.addresses }).toSet()
-        fetchAddressDependencies(addresses)
+        addressService.fetchAddressDependencies(addresses)
 
         val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
         bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
-    }
-
-    private fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {
-        addressRepository.joinContexts(addresses)
-        addressRepository.joinTypes(addresses)
-        addressRepository.joinVersions(addresses)
-        addressRepository.joinAdminAreas(addresses)
-        addressRepository.joinPostCodes(addresses)
-        addressRepository.joinLocalities(addresses)
-        addressRepository.joinPremises(addresses)
-        addressRepository.joinPostalDeliveryPoints(addresses)
-        addressRepository.joinThoroughfares(addresses)
-
-        return addresses
     }
 
     private fun fetchIdentifierDependencies(identifiers: Set<Identifier>): Set<Identifier>{
