@@ -19,8 +19,7 @@ class BusinessPartnerFetchService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val bankAccountRepository: BankAccountRepository,
-    private val addressService: AddressService
+    private val bankAccountRepository: BankAccountRepository
 ) {
 
     /**
@@ -71,7 +70,6 @@ class BusinessPartnerFetchService(
 
         businessPartnerRepository.joinIdentifiers(partners)
         businessPartnerRepository.joinNames(partners)
-        businessPartnerRepository.joinAddresses(partners)
         businessPartnerRepository.joinStatuses(partners)
         businessPartnerRepository.joinClassifications(partners)
         businessPartnerRepository.joinBankAccounts(partners)
@@ -79,7 +77,8 @@ class BusinessPartnerFetchService(
         businessPartnerRepository.joinTypes(partners)
         businessPartnerRepository.joinRoles(partners)
         businessPartnerRepository.joinLegalForm(partners)
-        businessPartnerRepository.joinSites(partners)
+
+        // don't fetch sites/addresses since those are not needed when mapping to BusinessPartnerResponse
 
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
@@ -87,16 +86,13 @@ class BusinessPartnerFetchService(
         val legalForms = partners.mapNotNull { it.legalForm }.toSet()
         legalFormRepository.joinCategories(legalForms)
 
-        val addresses = partners.flatMap { it.addresses }.plus(partners.flatMap { it.sites }.flatMap { it.addresses }).toSet()
-        addressService.fetchAddressDependencies(addresses)
-
         val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
         bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
     }
 
-    private fun fetchIdentifierDependencies(identifiers: Set<Identifier>): Set<Identifier>{
+    private fun fetchIdentifierDependencies(identifiers: Set<Identifier>): Set<Identifier> {
         identifierRepository.joinType(identifiers)
         identifierRepository.joinStatus(identifiers)
         identifierRepository.joinIssuingBody(identifiers)

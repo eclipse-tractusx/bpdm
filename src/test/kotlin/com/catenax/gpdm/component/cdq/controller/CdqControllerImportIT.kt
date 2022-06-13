@@ -3,7 +3,6 @@ package com.catenax.gpdm.component.cdq.controller
 import com.catenax.gpdm.Application
 import com.catenax.gpdm.component.cdq.dto.BusinessPartnerCollectionCdq
 import com.catenax.gpdm.config.BpnConfigProperties
-import com.catenax.gpdm.dto.response.AddressResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerResponse
 import com.catenax.gpdm.dto.response.BusinessPartnerSearchResponse
 import com.catenax.gpdm.dto.response.PageResponse
@@ -299,7 +298,7 @@ class CdqControllerImportIT @Autowired constructor(
 
             assertThat(actualPartner)
                 .usingRecursiveComparison()
-                .ignoringFieldsMatchingRegexes(".*uuid", BusinessPartnerResponse::addresses.name + "\\." + AddressResponse::bpn.name)
+                .ignoringFieldsMatchingRegexes(".*uuid")
                 .ignoringAllOverriddenEquals()
                 .ignoringCollectionOrder()
                 .isEqualTo(expectedWithBpn)
