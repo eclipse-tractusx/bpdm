@@ -1,8 +1,8 @@
 package com.catenax.gpdm.config
 
+import io.micrometer.core.instrument.util.StringEscapeUtils
 import mu.withLoggingContext
 import org.slf4j.MDC
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.core.task.TaskDecorator
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -12,43 +12,24 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-@ConditionalOnProperty(
-    value = ["bpdm.logging.show-user"],
-    havingValue = "true",
-    matchIfMissing = false
-)
 class UserLoggingFilter(
     private val logConfigProperties: LogConfigProperties
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val userName = request.userPrincipal?.name ?: logConfigProperties.unknownUser
-        val userNameLog = toLogFormat(userName)
+        val escapedUserName = StringEscapeUtils.escapeJson(userName)
+
         withLoggingContext(
-            "user" to userNameLog,
+            "user" to escapedUserName,
         ) {
-            logger.info("User '$userName' requests ${request.method} ${request.requestURI}...")
+            logger.info("User '$escapedUserName' requests ${request.method} ${request.requestURI}...")
             filterChain.doFilter(request, response)
             logger.info("Response with status ${response.status}")
         }
     }
-
-    private fun toLogFormat(userName: String): String {
-        var logUserName: String = if (userName.length > logConfigProperties.userMaxLength)
-            userName.substring(userName.length - logConfigProperties.userMaxLength)
-        else
-            userName
-
-        logUserName = logUserName.padEnd(logConfigProperties.userMaxLength, ' ')
-        return "[$logUserName]"
-    }
 }
 
 @Component
-@ConditionalOnProperty(
-    value = ["bpdm.logging.show-request"],
-    havingValue = "true",
-    matchIfMissing = false
-)
 class RequestLoggingFilter : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val requestId = UUID.randomUUID().toString()

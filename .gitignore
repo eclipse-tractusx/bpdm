@@ -16,3 +16,5 @@ target
 /db
 #Helm dependencies
 /helm/bpdm/charts
+#Created log files
+logs
