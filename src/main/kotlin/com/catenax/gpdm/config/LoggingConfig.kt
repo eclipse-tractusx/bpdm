@@ -1,11 +1,11 @@
 package com.catenax.gpdm.config
 
-import io.micrometer.core.instrument.util.StringEscapeUtils
 import mu.withLoggingContext
 import org.slf4j.MDC
 import org.springframework.core.task.TaskDecorator
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.util.HtmlUtils
 import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -17,12 +17,14 @@ class UserLoggingFilter(
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val userName = request.userPrincipal?.name ?: logConfigProperties.unknownUser
-        val escapedUserName = StringEscapeUtils.escapeJson(userName)
+        val escapedUserName = HtmlUtils.htmlEscape(userName)
+        val escapedRequest = HtmlUtils.htmlEscape(request.requestURI)
+        val escapedMethod = HtmlUtils.htmlEscape(request.method)
 
         withLoggingContext(
             "user" to escapedUserName,
         ) {
-            logger.info("User '$escapedUserName' requests ${request.method} ${request.requestURI}...")
+            logger.info("User '$escapedUserName' requests $escapedMethod $escapedRequest...")
             filterChain.doFilter(request, response)
             logger.info("Response with status ${response.status}")
         }
