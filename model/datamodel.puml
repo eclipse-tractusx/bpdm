@@ -1,18 +1,18 @@
 @startuml
 
 class BusinessPartner {
-	BPN
-	Name
-	Business Partner Type
-	Classification
-	Relation
-	LegalForm
-	Identifier
-	Status
-	Address
-	Bank Accounts
-	Roles
-	Profile
+	{field} BPN
+	{field} Name
+	{field} Business Partner Type
+	{field} Classification
+	{field} Relation
+	{field} LegalForm
+	{field} Identifier
+	{field} Status
+	{field} Address
+	{field} Bank Accounts
+	{field} Roles
+	{field} Profile
 }
 
 enum BusinessPartnerTypeE {
@@ -26,38 +26,38 @@ enum BusinessPartnerTypeE {
 }
 
 class BusinessPartnerStatus {
-	Official Denotation
-	Valid From
-	Valid Until
-	Type
+	{field} Official Denotation   
+	{field} Valid From   
+	{field} Valid Until   
+	{field} Type
 }
 
 class BusinessPartnerStatusType {
-	Name
-	Url
-	Technical Key
+	{field} Name   
+	{field} Url   
+	{field} Technical Key
 }
 
 enum BusinessPartnerStatusTypeE {
-	Active
-	Dissolved
-	In Liquidation
-	Inactive
+	Active   
+	Dissolved   
+	In Liquidation   
+	Inactive   
 	Insolvency
 }
 
 class BusinessPartnerRelation {
-	Started At (ISO 8601 timestamp)
-	Ended At (ISO 8601 timestamp)
-	Type
-	Class
-	Start Node (CX ID of the starting Node)
-	End Node (CX ID of the target Node)
+	{field} Started At (ISO 8601 timestamp)   
+	{field} Ended At (ISO 8601 timestamp)   
+	{field} Type   
+	{field} Class   
+	{field} Start Node (CX ID of the starting Node)   
+	{field} End Node (CX ID of the target Node)
 }
 
 class BusinessPartnerRelationType {
- 	Name
-	Technical Key
+	{field} Name   
+	{field} Technical Key
 }
 
 enum BusinessPartnerRelationTypeE {
@@ -84,13 +84,13 @@ enum BusinessPartnerRelationTypeE {
 }
 
 class BusinessPartnerRelationClass {
-	Technical Key: BUSINESS_PARTNER_RELATION_CLASS_CX_HIERARCHY
-	Name: CX Hierarchy
+	{field} Technical Key: BUSINESS_PARTNER_RELATION_CLASS_CX_HIERARCHY   
+	{field} Name: CX Hierarchy
 }
 
 class BusinessPartnerClassificationType {
- 	Name
-	Url
+	{field} Name   
+	{field} Url
 }
 
 enum BusinessPartnerClassificationTypeE {
@@ -101,23 +101,23 @@ enum BusinessPartnerClassificationTypeE {
 }
 
 class BusinessPartnerClassification {
-	Type
-	Code
-	Value
+	{field} Type   
+	{field} Code   
+	{field} Value
 }
 
 class BusinessPartnerRole {
-	Technical Key
-	Name
+	{field} Technical Key   
+	{field} Name
 }
 
 class LegalForm {
-	Name
-	Technical Key
-	Language
-	Categories
-	Url
-	Main Abbrevation (An unique identifier for CDL)
+	{field} Name  
+	{field} Technical Key  
+	{field} Language  
+	{field} Categories  
+	{field} Url  
+	{field} Main Abbrevation (An unique identifier for CDL)
 }
 
 note as N4
@@ -130,35 +130,35 @@ note as N4
 end note
 
 class LegalFormCategory {
-	name
-	url
+	{field} name  
+	{field} url
 }
 
 class BankAccount {
-	National Bank Identifier
-	Natinal Bank Account Identifier
-	Currency
-	International Bank Identifier (BIC/SWIFT)
-	International Bank Account Identifier (IBAN)
-	Trust Scores
+	{field} National Bank Identifier  
+	{field} Natinal Bank Account Identifier  
+	{field} Currency  
+	{field} International Bank Identifier (BIC/SWIFT)  
+	{field} International Bank Account Identifier (IBAN)  
+	{field} Trust Scores
 }
 
 class Currency {
-	Technical Key
-	Name
+	{field} Technical Key  
+	{field} Name
 }
 
 class Identifier {
-	Type
-	Status
-	Issuing Body
-	Value
+	{field} Type  
+	{field} Status  
+	{field} Issuing Body  
+	{field} Value
 }
 
 class IdentifierType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 
 }
 
@@ -177,72 +177,72 @@ note as N3
 end note
 
 class IdentifierStatus {
-	Name
-	Technical Key
+	{field} Name  
+	{field} Technical Key
 }
 
 class IssuingBody {
-	Name
-	Url
-	technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 class Name {
-	Language
-	Short Name
-	Type
-	Value
+	{field} Language 
+	{field} Short Name  
+	{field} Type  
+	{field} Value
 }
 
 class NameType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum NameTypeE {
-	Acronym
-	Doing Business As
-	Establishment
-	International
-	Local
-	Other
+	Acronym  
+	Doing Business As  
+	Establishment  
+	International  
+	Local  
+	Other  
 	Registered
 	Transliterated
 	VAT Registered
 }
 
 class Language {
-	name ISO 639-1 (German)
-	technicalKey ISO 639-1 two-letters
+	{field} name ISO 639-1 (German)  
+	{field} technicalKey ISO 639-1 two-letters
 }
 
 class Address {
-    BPN
-	Postal Delivery Points
-	Thoroughfares
-	Premises
-	Types
-	Contexts
-	Version
-	Geographic Coordinates
-	Post Codes
-	Care Of
-	Localities
-	Administrative Areas
-	Country
-	Identifiers
+	{field} BPN  
+	{field} Postal Delivery Points  
+	{field} Thoroughfares  
+	{field} Premises  
+	{field} Types  
+	{field} Contexts  
+	{field} Version  
+	{field} Geographic Coordinates  
+	{field} Post Codes  
+	{field} Care Of  
+	{field} Localities  
+	{field} Administrative Areas  
+	{field} Country  
+	{field} Identifiers
 }
 
 class Site {
-    BPN
-    Name
+	{field} BPN     
+	{field} Name
 }
 
 class AddressType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum AddressTypeE {
@@ -260,13 +260,13 @@ enum AddressTypeE {
 }
 
 class AddressVersion {
-	CharacterSet
-	Language
+	{field} CharacterSet  
+	{field} Language
 }
 
 class Country {
-	Short Name
-	Value / Country Code
+	{field} Short Name  
+	{field} Value / Country Code
 }
 
 note as N2
@@ -279,11 +279,11 @@ note as N2
 end note
 
 class AdministrativeArea {
-	Fips Code
-	Language
-	Short Name
-	Type
-	Value
+	{field} Fips Code  
+	{field} Language  
+	{field} Short Name  
+	{field} Type  
+	{field} Value
 }
 
 note as N1
@@ -294,22 +294,22 @@ note as N1
 end note
 
 class AdministrativeAreaType {
-	County
-	Other
-	Region
+	{field} County  
+	{field} Other  
+	{field} Region
 }
 
 class Locality {
-	Language
-	Short Name
-	Type
-	Value
+	{field} Language  
+	{field} Short Name  
+	{field} Type  
+	{field} Value
 }
 
 class LocalityType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum LocalityTypeE {
@@ -322,20 +322,20 @@ enum LocalityTypeE {
 }
 
 class GeographicCoordinates {
-	latitude
-	longitude
-	altitude
+	{field} latitude  
+	{field} longitude  
+	{field} altitude
 }
 
 class PostCode {
-	Type
-	Value
+	{field} Type  
+	{field} Value
 }
 
 class PostCodeType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum PostCodeTypeE {
@@ -348,17 +348,17 @@ enum PostCodeTypeE {
 
 
 class PostalDeliveryPoint {
-	Language
-	Short Name
-	Number
-	Type
-	Value
+	{field} Language  
+	{field} Short Name  
+	{field} Number  
+	{field} Type  
+	{field} Value
 }
 
 class PostalDeliveryPointType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum PostalDeliveryPointTypeE {
@@ -371,19 +371,19 @@ enum PostalDeliveryPointTypeE {
 
 
 class Thoroughfare {
-	Name
-	Language
-	Short Name
-	Number
-	Type
-	Direction
-	Value
+	{field} Name  
+	{field} Language  
+	{field} Short Name  
+	{field} Number  
+	{field} Type  
+	{field} Direction  
+	{field} Value
 }
 
 class ThoroughfareType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum ThoroughfareTypeE {
@@ -394,19 +394,18 @@ enum ThoroughfareTypeE {
 	Street
 }
 
-
 class Premise {
-	Language
-	Short Name
-	Number
-	Type
-	Value
+	{field} Language  
+	{field} Short Name  
+	{field} Number  
+	{field} Type  
+	{field} Value
 }
 
 class PremiseType {
- 	Name
-	Url
-	Technical Key
+	{field} Name  
+	{field} Url  
+	{field} Technical Key
 }
 
 enum PremiseTypeE {
@@ -422,8 +421,8 @@ enum PremiseTypeE {
 
 
 class CharacterSet {
-	name
-	Technical Key
+	{field} name  
+	{field} Technical Key
 }
 
 enum CharacterSetName {
