@@ -60,7 +60,7 @@ class ElasticSyncService(
             } catch (exception: RuntimeException) {
                 logger.error(exception) { "Exception encountered on Elasticsearch export" }
                 syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.ELASTIC), exception.message!!, page.toString())
-                throw exception
+                return
             }
         } while (docsPage.totalPages > page)
 

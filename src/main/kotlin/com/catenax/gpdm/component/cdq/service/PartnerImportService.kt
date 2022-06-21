@@ -46,13 +46,13 @@ class PartnerImportService(
                 val progress = importedCount / response.totalElements.toFloat()
                 syncRecordService.setProgress(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), importedCount, progress)
             } catch (exception: RuntimeException) {
+                logger.error(exception) { "Exception encountered on CDQ import" }
                 syncRecordService.setSynchronizationError(
                     syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT),
                     exception.message ?: "No Message",
                     startAfter
                 )
-                logger.error(exception) { "Exception encountered on CDQ import" }
-                throw exception
+                return
             }
 
             //Clear session after each page import to improve JPA performance
