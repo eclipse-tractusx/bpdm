@@ -42,7 +42,7 @@
 
     <springProfile name="local">
         <root level="DEBUG">
-            <appender-ref ref="Console-Full"/>
+            <appender-ref ref="Console-Min"/>
         </root>
     </springProfile>
 
