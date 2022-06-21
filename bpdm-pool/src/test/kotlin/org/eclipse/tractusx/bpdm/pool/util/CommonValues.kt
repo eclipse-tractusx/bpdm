@@ -39,6 +39,55 @@ object CommonValues {
     val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
     val legalFormName3 = "股份有限公司"
 
+    val legalFormUrl1 = "http://catenax-host/legal-form1"
+    val legalFormUrl2 = "http://catenax-host/legal-form2"
+    val legalFormUrl3 = "http://catenax-host/legal-form3"
+
+    val legalFormAbbreviation1 = "LLC"
+    val legalFormAbbreviation2 = "GmbH"
+    val legalFormAbbreviation3 = "股份有限"
+
+    val legalFormCategoryName1 = "Limited Company"
+    val legalFormCategoryName2 = "Stock Company"
+    val legalFormCategoryName3 = "Private Foundation"
+
+    val legalFormCategoryUrl1 = "http://catenax-host/legal-category1"
+    val legalFormCategoryUrl2 = "http://catenax-host/legal-category2"
+    val legalFormCategoryUrl3 = "http://catenax-host/legal-category3"
+
+    val identifierTypeTechnicalKey1 = "VAT_DE"
+    val identifierTypeTechnicalKey2 = "VAT_US"
+    val identifierTypeTechnicalKey3 = "VAT_FR"
+
+    val identiferTypeName1 = "Steuernummer"
+    val identiferTypeName2 = "VAT USA"
+    val identiferTypeName3 = "VAT France"
+
+    val identifierTypeUrl1 = "http://catenax-host/id-type1"
+    val identifierTypeUrl2 = "http://catenax-host/id-type2"
+    val identifierTypeUrl3 = "http://catenax-host/id-type3"
+
+    val identifierStatusKey1 = "ACTIVE"
+    val identifierStatusKey2 = "EXPIRED"
+    val identifierStatusKey3 = "UNKNOWN"
+
+    val identifierStatusName1 = "Active"
+    val identifierStatusName2 = "Expired"
+    val identifierStatusName3 = "Unknown Status"
+
+    val issuingBodyKey1 = "AGENCYX"
+    val issuingBodyKey2 = "BODYY"
+    val issuingBodyKey3 = "OFFICIALZ"
+
+    val issuingBodyName1 = "Agency X"
+    val issuingBodyName2 = "Body Y"
+    val issuingBodyName3 = "Official Z"
+
+    val issuingBodyUrl1 = "http://catenax-host/issuing-body1"
+    val issuingBodyUrl2 = "http://catenax-host/issuing-body2"
+    val issuingBodyUrl3 = "http://catenax-host/issuing-body3"
+
+
     val statusType1 = "ACTIVE"
     val statusType2 = "DISSOLVED"
     val statusType3 = "INSOLVENCY"

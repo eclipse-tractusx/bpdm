@@ -17,7 +17,10 @@ object ResponseValues {
 
     val nameType1 = TypeKeyNameUrlDto(NameType.OTHER, NameType.OTHER.getTypeName(), NameType.OTHER.getUrl())
 
-    val language1 = TypeKeyNameDto(LanguageCode.undefined, LanguageCode.undefined.getName())
+    val language0 = TypeKeyNameDto(LanguageCode.undefined, LanguageCode.undefined.getName())
+    val language1 = TypeKeyNameDto(LanguageCode.en, LanguageCode.en.getName())
+    val language2 = TypeKeyNameDto(LanguageCode.de, LanguageCode.de.getName())
+    val language3 = TypeKeyNameDto(LanguageCode.zh, LanguageCode.zh.getName())
 
     val characterSet1 = TypeKeyNameDto(CharacterSet.UNDEFINED, CharacterSet.UNDEFINED.getTypeName())
 
@@ -39,15 +42,33 @@ object ResponseValues {
     val identifier5 = IdentifierResponse(CommonValues.uuid1, CdqValues.partnerId3, idTypeCdq, issuerCdq, statusCdq)
     val identifier6 = IdentifierResponse(CommonValues.uuid1, CommonValues.bpn3, idTypeBpn, issuerBpn, statusBpn)
 
-    val name1 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name1, type = nameType1, language = language1)
-    val name2 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name2, type = nameType1, language = language1)
-    val name3 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name3, type =  nameType1, language = language1)
-    val name4 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name4, type =  nameType1, language = language1)
-    val name5 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name5, type =  nameType1, language = language1)
+    val name1 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name1, type = nameType1, language = language0)
+    val name2 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name2, type = nameType1, language = language0)
+    val name3 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name3, type = nameType1, language = language0)
+    val name4 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name4, type = nameType1, language = language0)
+    val name5 = NameResponse(uuid = CommonValues.uuid1, value = CommonValues.name5, type = nameType1, language = language0)
 
-    val legalFormDoc1 = LegalFormResponse(technicalKey = CommonValues.legalFormTechnicalKey1, name = CommonValues.legalFormName1, language = language1)
-    val legalFormDoc2 = LegalFormResponse(technicalKey = CommonValues.legalFormTechnicalKey2, name = CommonValues.legalFormName2, language = language1)
-    val legalFormDoc3 = LegalFormResponse(technicalKey = CommonValues.legalFormTechnicalKey3, name = CommonValues.legalFormName3, language = language1)
+    val legalForm1 = LegalFormResponse(
+        CommonValues.legalFormTechnicalKey1,
+        CommonValues.legalFormName1,
+        CommonValues.legalFormUrl1,
+        CommonValues.legalFormAbbreviation1,
+        language1
+    )
+    val legalForm2 = LegalFormResponse(
+        CommonValues.legalFormTechnicalKey2,
+        CommonValues.legalFormName2,
+        CommonValues.legalFormUrl2,
+        CommonValues.legalFormAbbreviation2,
+        language2
+    )
+    val legalForm3 = LegalFormResponse(
+        CommonValues.legalFormTechnicalKey3,
+        CommonValues.legalFormName3,
+        CommonValues.legalFormUrl3,
+        CommonValues.legalFormAbbreviation3,
+        language3
+    )
 
     val statusType1 = TypeKeyNameUrlDto(BusinessStatusType.ACTIVE, BusinessStatusType.ACTIVE.getTypeName(), BusinessStatusType.ACTIVE.getUrl())
     val statusType2 = TypeKeyNameUrlDto(BusinessStatusType.DISSOLVED, BusinessStatusType.DISSOLVED.getTypeName(), BusinessStatusType.DISSOLVED.getUrl())
@@ -67,11 +88,11 @@ object ResponseValues {
 
     val adminAreaType1 = TypeKeyNameUrlDto(AdministrativeAreaType.OTHER, AdministrativeAreaType.OTHER.getTypeName(), AdministrativeAreaType.OTHER.getUrl())
 
-    val adminArea1 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea1,  type = adminAreaType1, language = language1)
-    val adminArea2 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea2, type = adminAreaType1, language = language1)
-    val adminArea3 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea3, type = adminAreaType1, language = language1)
-    val adminArea4 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea4, type = adminAreaType1, language = language1)
-    val adminArea5 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea5, type = adminAreaType1, language = language1)
+    val adminArea1 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea1, type = adminAreaType1, language = language0)
+    val adminArea2 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea2, type = adminAreaType1, language = language0)
+    val adminArea3 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea3, type = adminAreaType1, language = language0)
+    val adminArea4 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea4, type = adminAreaType1, language = language0)
+    val adminArea5 = AdministrativeAreaResponse(uuid = CommonValues.uuid1, value = CommonValues.adminArea5, type = adminAreaType1, language = language0)
 
     val postCodeType1 = TypeKeyNameUrlDto(PostCodeType.OTHER, PostCodeType.OTHER.getTypeName(), PostCodeType.OTHER.getUrl())
 
@@ -83,37 +104,43 @@ object ResponseValues {
 
     val localityType1 = TypeKeyNameUrlDto(LocalityType.OTHER, LocalityType.OTHER.getTypeName(), LocalityType.OTHER.getUrl())
 
-    val locality1 = LocalityResponse(CommonValues.uuid1, CommonValues.locality1, null, localityType1, language1)
-    val locality2 = LocalityResponse(CommonValues.uuid1, CommonValues.locality2, null, localityType1, language1)
-    val locality3 = LocalityResponse(CommonValues.uuid1, CommonValues.locality3, null, localityType1, language1)
-    val locality4 = LocalityResponse(CommonValues.uuid1, CommonValues.locality4, null, localityType1, language1)
-    val locality5 = LocalityResponse(CommonValues.uuid1, CommonValues.locality5, null, localityType1, language1)
+    val locality1 = LocalityResponse(CommonValues.uuid1, CommonValues.locality1, null, localityType1, language0)
+    val locality2 = LocalityResponse(CommonValues.uuid1, CommonValues.locality2, null, localityType1, language0)
+    val locality3 = LocalityResponse(CommonValues.uuid1, CommonValues.locality3, null, localityType1, language0)
+    val locality4 = LocalityResponse(CommonValues.uuid1, CommonValues.locality4, null, localityType1, language0)
+    val locality5 = LocalityResponse(CommonValues.uuid1, CommonValues.locality5, null, localityType1, language0)
 
     val thoroughfareType1 = TypeKeyNameUrlDto(ThoroughfareType.OTHER, ThoroughfareType.OTHER.getTypeName(), ThoroughfareType.OTHER.getUrl())
 
-    val thoroughfare1 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare1, type = thoroughfareType1, language =  language1)
-    val thoroughfare2 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare2, type = thoroughfareType1, language = language1)
-    val thoroughfare3 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare3, type = thoroughfareType1, language = language1)
-    val thoroughfare4 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare4, type = thoroughfareType1, language = language1)
-    val thoroughfare5 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare5, type = thoroughfareType1, language = language1)
+    val thoroughfare1 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare1, type = thoroughfareType1, language = language0)
+    val thoroughfare2 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare2, type = thoroughfareType1, language = language0)
+    val thoroughfare3 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare3, type = thoroughfareType1, language = language0)
+    val thoroughfare4 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare4, type = thoroughfareType1, language = language0)
+    val thoroughfare5 = ThoroughfareResponse(uuid = CommonValues.uuid1, value = CommonValues.thoroughfare5, type = thoroughfareType1, language = language0)
 
     val premiseType1 = TypeKeyNameUrlDto(PremiseType.OTHER, PremiseType.OTHER.getTypeName(), PremiseType.OTHER.getUrl())
 
-    val premise1 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise1, type = premiseType1, language = language1)
-    val premise2 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise2, type = premiseType1, language = language1)
-    val premise3 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise3, type = premiseType1, language = language1)
-    val premise4 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise4, type = premiseType1, language = language1)
-    val premise5 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise5, type = premiseType1, language = language1)
+    val premise1 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise1, type = premiseType1, language = language0)
+    val premise2 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise2, type = premiseType1, language = language0)
+    val premise3 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise3, type = premiseType1, language = language0)
+    val premise4 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise4, type = premiseType1, language = language0)
+    val premise5 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise5, type = premiseType1, language = language0)
 
-    val postalDeliveryPointType1 = TypeKeyNameUrlDto(PostalDeliveryPointType.OTHER, PostalDeliveryPointType.OTHER.getTypeName(), PostalDeliveryPointType.OTHER.getUrl())
+    val postalDeliveryPointType1 =
+        TypeKeyNameUrlDto(PostalDeliveryPointType.OTHER, PostalDeliveryPointType.OTHER.getTypeName(), PostalDeliveryPointType.OTHER.getUrl())
 
-    val postalDeliveryPoint1 = PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint1, type = postalDeliveryPointType1, language = language1)
-    val postalDeliveryPoint2 = PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint2, type = postalDeliveryPointType1, language = language1)
-    val postalDeliveryPoint3 = PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint3, type = postalDeliveryPointType1, language = language1)
-    val postalDeliveryPoint4 = PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint4, type = postalDeliveryPointType1, language = language1)
-    val postalDeliveryPoint5 = PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint5, type = postalDeliveryPointType1, language = language1)
+    val postalDeliveryPoint1 =
+        PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint1, type = postalDeliveryPointType1, language = language0)
+    val postalDeliveryPoint2 =
+        PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint2, type = postalDeliveryPointType1, language = language0)
+    val postalDeliveryPoint3 =
+        PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint3, type = postalDeliveryPointType1, language = language0)
+    val postalDeliveryPoint4 =
+        PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint4, type = postalDeliveryPointType1, language = language0)
+    val postalDeliveryPoint5 =
+        PostalDeliveryPointResponse(uuid = CommonValues.uuid1, value = CommonValues.postalDeliveryPoint5, type = postalDeliveryPointType1, language = language0)
 
-    val version1 = AddressVersionResponse(characterSet1, language1)
+    val version1 = AddressVersionResponse(characterSet1, language0)
 
     val address1 = AddressResponse(
         uuid = CommonValues.uuid1,
@@ -158,7 +185,7 @@ object ResponseValues {
         bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         names = listOf(name1, name2),
-        legalForm = legalFormDoc1,
+        legalForm = legalForm1,
         status = status1,
         profileClassifications = listOf(classification1, classification2),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
@@ -168,7 +195,7 @@ object ResponseValues {
         bpn = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         names = listOf(name3, name4),
-        legalForm = legalFormDoc2,
+        legalForm = legalForm2,
         status = status2,
         profileClassifications = listOf(classification3, classification4),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
@@ -178,7 +205,7 @@ object ResponseValues {
         bpn = CommonValues.bpn3,
         identifiers = listOf(identifier5, identifier6),
         names = listOf(name5),
-        legalForm = legalFormDoc3,
+        legalForm = legalForm3,
         status = status3,
         profileClassifications = listOf(classification5),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)

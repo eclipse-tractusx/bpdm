@@ -7,7 +7,8 @@ object EndpointValues {
 
     const val TEXT_PARAM_NAME = "text"
 
-    const val CATENA_BUSINESS_PARTNER_PATH = "/api/catena/business-partner"
+    const val CATENA_PATH = "/api/catena"
+    const val CATENA_BUSINESS_PARTNER_PATH = "${CATENA_PATH}/business-partner"
     const val CATENA_NAME_PATH = "$CATENA_BUSINESS_PARTNER_PATH/name"
     const val CATENA_LEGAL_FORM_PATH = "$CATENA_BUSINESS_PARTNER_PATH/legal-form"
     const val CATENA_STATUS_PATH = "$CATENA_BUSINESS_PARTNER_PATH/status"
@@ -36,5 +37,10 @@ object EndpointValues {
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
     const val ELASTIC_SYNC_PATH = "api/elastic/business-partner"
+
+    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-type"
+    const val CATENA_METADATA_IDENTIFIER_STATUS_PATH = "$CATENA_PATH/identifier-status"
+    const val CATENA_METADATA_ISSUING_BODY_PATH = "$CATENA_PATH/issuing-body"
+    const val CATENA_METADATA_LEGAL_FORM_PATH = "$CATENA_PATH/legal-form"
 
 }
