@@ -70,10 +70,11 @@ class KeycloakSecurityConfig(
             .cors()
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS,"/api/**").permitAll()
-                .antMatchers("/v3/api-docs/**").permitAll()
-                .antMatchers("/api/swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/**").authenticated()
+            .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+            .antMatchers("/v3/api-docs/**").permitAll()
+            .antMatchers("/api/swagger-ui/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/**").authenticated()
+            .antMatchers(HttpMethod.POST, "/api/catena/bpn/search").authenticated()
                 .antMatchers("/api/**").hasRole("add_company_data")
     }
 
