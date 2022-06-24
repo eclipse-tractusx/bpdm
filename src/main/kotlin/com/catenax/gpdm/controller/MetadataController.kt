@@ -43,7 +43,7 @@ class MetadataController (
     )
     @PostMapping("/identifier-type")
     fun createIdentifierType(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
-            return metadataService.getOrCreateIdentifierType(type)
+            return metadataService.createIdentifierType(type)
     }
 
     @Operation(summary = "Get page of identifier types",
@@ -70,7 +70,7 @@ class MetadataController (
     ])
     @PostMapping("/identifier-status")
     fun createIdentifierStatus(@RequestBody status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        return metadataService.getOrCreateIdentifierStatus(status)
+        return metadataService.createIdentifierStatus(status)
     }
 
     @Operation(summary = "Get page of identifier statuses",
@@ -97,7 +97,7 @@ class MetadataController (
     ])
     @PostMapping("/issuing-body")
     fun createIssuingBody(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
-            return metadataService.getOrCreateIssuingBody(type)
+        return metadataService.createIssuingBody(type)
     }
 
     @Operation(summary = "Get page of issuing bodies",
@@ -123,7 +123,7 @@ class MetadataController (
     ])
     @PostMapping("/legal-form")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormResponse {
-            return metadataService.getOrCreateLegalForm(type)
+        return metadataService.createLegalForm(type)
     }
 
 

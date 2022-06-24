@@ -8,6 +8,7 @@ import com.catenax.gpdm.service.SyncRecordService
 import com.catenax.gpdm.service.toDto
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import mu.KotlinLogging
 import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
@@ -24,6 +25,7 @@ class ElasticSyncStarterService(
     private val operations: ElasticsearchOperations,
     private val objectMapper: ObjectMapper
 ) {
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Checks for changed records since the last export and exports those changes to Elasticsearch
@@ -53,6 +55,8 @@ class ElasticSyncStarterService(
      */
     @Transactional
     fun clearElastic() {
+        logger.info { "Recreating the Elasticsearch index" }
+
         val index = operations.indexOps(BusinessPartnerDoc::class.java)
         index.delete()
         createIndex(index)
@@ -68,10 +72,13 @@ class ElasticSyncStarterService(
      */
     @EventListener(ContextRefreshedEvent::class)
     fun updateOnInit() {
+
+        logger.info { "Checking whether Elasticsearch index needs to be recreated..." }
         try {
             val currentIndex = operations.indexOps(BusinessPartnerDoc::class.java)
 
             if (!currentIndex.exists()) {
+                logger.info { "Create index as it does not exist yet" }
                 createIndex(currentIndex)
             } else {
                 val tempIndex = operations.indexOps(IndexCoordinates.of("temp-business-partner"))
@@ -84,6 +91,8 @@ class ElasticSyncStarterService(
 
                 if (!actualTempTree.equals(actualExistingTree)) {
                     clearElastic()
+                } else {
+                    logger.info { "Index still up-to-date" }
                 }
 
                 tempIndex.delete()
@@ -105,6 +114,8 @@ class ElasticSyncStarterService(
         val saveState = record.errorSave
 
         val response = syncRecordService.setSynchronizationStart(record).toDto()
+
+        logger.debug { "Initializing Elasticsearch export with records after '$fromTime' from page '${record.errorSave}' and asynchronously: ${!inSync}" }
 
         if (inSync)
             elasticSyncService.exportPaginated(fromTime, saveState)

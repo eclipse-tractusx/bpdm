@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.security.OAuthFlows
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.servers.Server
+import mu.KotlinLogging
 import org.springdoc.core.customizers.OpenApiCustomiser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +20,7 @@ class OpenApiConfig(
     val securityProperties: SecurityConfigProperties,
     val infoProperties: AppInfoProperties
 ) {
+    private val logger = KotlinLogging.logger { }
 
     @Bean
     fun bpdmOpenApiDefinition(): OpenAPI{
@@ -30,6 +32,7 @@ class OpenApiConfig(
     }
 
     private fun addSecurity(definition: OpenAPI): OpenAPI{
+        logger.info { "Add security schemes to OpenAPI definition" }
         return definition
             .components(Components()
                 .addSecuritySchemes("open_id_scheme",

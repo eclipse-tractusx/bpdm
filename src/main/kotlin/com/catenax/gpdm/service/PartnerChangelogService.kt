@@ -7,6 +7,7 @@ import com.catenax.gpdm.entity.PartnerChangelogEntry
 import com.catenax.gpdm.exception.BpdmNotFoundException
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.repository.PartnerChangelogEntryRepository
+import mu.KotlinLogging
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -24,13 +25,17 @@ class PartnerChangelogService(
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
     val businessPartnerRepository: BusinessPartnerRepository
 ) {
+    private val logger = KotlinLogging.logger { }
+
     @Transactional
     fun createChangelogEntry(changelogEntry: ChangelogEntryDto): PartnerChangelogEntry {
+        logger.debug { "Create new change log entry for BPN ${changelogEntry.bpn}" }
         return createChangelogEntries(listOf(changelogEntry)).single()
     }
 
     @Transactional
     fun createChangelogEntries(changelogEntries: Collection<ChangelogEntryDto>): List<PartnerChangelogEntry> {
+        logger.debug { "Create ${changelogEntries.size} new change log entries" }
         val entities = changelogEntries.map { it.toEntity() }
         return partnerChangelogEntryRepository.saveAll(entities)
     }
