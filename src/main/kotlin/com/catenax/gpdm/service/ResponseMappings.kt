@@ -113,20 +113,7 @@ fun Address.toDto(): AddressResponse {
 
 fun Address.toDtoWithReference(): AddressWithReferenceResponse {
     return AddressWithReferenceResponse(
-        uuid,
-        bpn,
-        version.toDto(),
-        careOf,
-        contexts,
-        country.toDto(),
-        administrativeAreas.map { it.toDto() },
-        postCodes.map { it.toDto() },
-        localities.map { it.toDto() },
-        thoroughfares.map { it.toDto() },
-        premises.map { it.toDto() },
-        postalDeliveryPoints.map { it.toDto() },
-        geoCoordinates?.toDto(),
-        types.map { it.toDto() },
+        toDto(),
         partner?.bpn,
         site?.bpn
     )
@@ -142,9 +129,7 @@ fun Site.toDto(): SiteResponse {
 
 fun Site.toDtoWithReference(): SiteWithReferenceResponse {
     return SiteWithReferenceResponse(
-        bpn,
-        name,
-        addresses.map { it.toDto() },
+        toDto(),
         partner.bpn
     )
 }
