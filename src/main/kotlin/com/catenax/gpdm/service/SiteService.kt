@@ -13,7 +13,8 @@ import org.springframework.stereotype.Service
 @Service
 class SiteService(
     private val siteRepository: SiteRepository,
-    private val businessPartnerRepository: BusinessPartnerRepository
+    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val addressService: AddressService
 ) {
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SiteResponse> {
         if (!businessPartnerRepository.existsByBpn(bpn)) {
@@ -32,5 +33,7 @@ class SiteService(
 
     private fun fetchSiteDependencies(sites: Set<Site>) {
         siteRepository.joinAddresses(sites)
+        val addresses = sites.flatMap { it.addresses }.toSet()
+        addressService.fetchAddressDependencies(addresses)
     }
 }
