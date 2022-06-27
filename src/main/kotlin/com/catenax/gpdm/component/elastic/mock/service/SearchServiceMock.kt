@@ -10,6 +10,7 @@ import com.catenax.gpdm.dto.response.SuggestionResponse
 import com.catenax.gpdm.repository.BusinessPartnerRepository
 import com.catenax.gpdm.service.toDto
 import com.catenax.gpdm.service.toSearchDto
+import mu.KotlinLogging
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -22,6 +23,8 @@ class SearchServiceMock(
     val businessPartnerRepository: BusinessPartnerRepository
 ) : SearchService {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Ignores [searchRequest] and returns an unfiltered result of business partners in the database,
      * adding a default relevancy score to each entry
@@ -32,6 +35,9 @@ class SearchServiceMock(
     ): PageResponse<BusinessPartnerSearchResponse> {
         val resultPage =
             businessPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        logger.info { "Mock search: Returning ${resultPage.size} business partners from database" }
+
         return resultPage.toDto(resultPage.content.map { it.toSearchDto(1f) })
     }
 
@@ -45,6 +51,9 @@ class SearchServiceMock(
         paginationRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
         val emptyPage = Page.empty<SuggestionResponse>(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        logger.info { "Mock search: Returning no suggestions" }
+
         return emptyPage.toDto(emptyPage.content)
     }
 }

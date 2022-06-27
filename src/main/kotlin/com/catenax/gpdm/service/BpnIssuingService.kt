@@ -8,6 +8,7 @@ import com.catenax.gpdm.repository.ConfigurationEntryRepository
 import com.catenax.gpdm.repository.IdentifierStatusRepository
 import com.catenax.gpdm.repository.IdentifierTypeRepository
 import com.catenax.gpdm.repository.IssuingBodyRepository
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
@@ -21,6 +22,8 @@ class BpnIssuingService(
     val configurationEntryRepository: ConfigurationEntryRepository,
     val bpnConfigProperties: BpnConfigProperties
 ) {
+    private val logger = KotlinLogging.logger { }
+
     @Transactional
     fun issueLegalEntityBpns(count: Int): Collection<String> {
         return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKeyLegalEntities)
@@ -37,6 +40,10 @@ class BpnIssuingService(
     }
 
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): Collection<String> {
+        if (count == 0) return emptyList()
+
+        logger.info { "Issuing $count new BPNs of type $bpnChar" }
+
         val counterEntry = getOrCreateCounter(bpnCounterKey)
         val startCounter = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
 
@@ -48,6 +55,8 @@ class BpnIssuingService(
         counterEntry.value = (startCounter + count).toString()
         configurationEntryRepository.save(counterEntry)
 
+        logger.debug { "Created BPNs: ${createdBpns.joinToString()}" }
+
         return createdBpns
     }
 
@@ -57,10 +66,6 @@ class BpnIssuingService(
         val agency = getOrCreateAgency()
 
         partners.forEach { it.identifiers.add(Identifier(it.bpn, type, status, agency, it)) }
-    }
-
-    fun createIdentifier(bp: BusinessPartner): Identifier{
-        return Identifier(bp.bpn, getOrCreateIdentifierType(), getOrCreateIdentifierStatus(), getOrCreateAgency(), bp)
     }
 
     private fun createBpn(number: Long, bpnChar: Char): String {
@@ -80,6 +85,7 @@ class BpnIssuingService(
     private fun getOrCreateAgency(): IssuingBody {
         return issuingBodyRepository.findByTechnicalKey(bpnConfigProperties.agencyKey) ?: run {
             val catenaIssuingBody = IssuingBody(bpnConfigProperties.agencyName, "", bpnConfigProperties.agencyKey)
+            logger.info { "Create Catena Issuing-Body with technical key ${catenaIssuingBody.technicalKey} and name ${catenaIssuingBody.name}" }
             issuingBodyRepository.save(catenaIssuingBody)
         }
 
@@ -88,6 +94,7 @@ class BpnIssuingService(
     private fun getOrCreateIdentifierType(): IdentifierType{
         return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.id) ?: run{
             val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.id)
+            logger.info { "Create Catena Identifier-Type with technical key ${catenaIdentifierType.technicalKey} and name ${catenaIdentifierType.name}" }
             identifierTypeRepository.save(catenaIdentifierType)
         }
 
@@ -96,6 +103,7 @@ class BpnIssuingService(
     private fun getOrCreateIdentifierStatus(): IdentifierStatus{
         return identifierStatusRepository.findByTechnicalKey("UNKNOWN") ?: run{
             val catenaIdentifierStatus=  IdentifierStatus("Unknown", "UNKNOWN")
+            logger.info { "Create Catena Identifier-Status with technical key ${catenaIdentifierStatus.technicalKey} and name ${catenaIdentifierStatus.name}" }
             identifierStatusRepository.save(catenaIdentifierStatus)
         }
 

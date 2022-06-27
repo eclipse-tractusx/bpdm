@@ -27,14 +27,18 @@ class BusinessPartnerController(
     val partnerChangelogService: PartnerChangelogService
 ) {
 
-    @Operation(summary = "Get page of business partners matching the search criteria",
-    description = "This endpoint tries to find matches among all existing business partners, " +
-            "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
-            "The match of a partner is better the higher its relevancy score.")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
-        ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
-    ])
+    @Operation(
+        summary = "Get page of business partners matching the search criteria",
+        description = "This endpoint tries to find matches among all existing business partners, " +
+                "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
+                "The match of a partner is better the higher its relevancy score."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
+        ]
+    )
     @GetMapping
     fun getBusinessPartners(
         @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,

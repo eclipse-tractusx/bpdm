@@ -2,6 +2,7 @@ package com.catenax.gpdm.component.cdq.service
 
 import com.catenax.gpdm.entity.SyncType
 import com.catenax.gpdm.service.SyncRecordService
+import mu.KotlinLogging
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -16,6 +17,8 @@ class PartnerImportService(
     private val partnerImportPageService: PartnerImportPageService,
     private val entityManager: EntityManager
 ) {
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Asynchronous version of [importPaginated]
      */
@@ -30,6 +33,8 @@ class PartnerImportService(
      * Data is imported in a paginated way. On an error during a page import the latest [saveState] ID is saved so that the import can later be resumed
      */
     fun importPaginated(fromTime: Instant, saveState: String?) {
+        logger.info { "Starting CDQ import starting with ID ${saveState}' for modified records from '$fromTime'" }
+
         var startAfter: String? = saveState
         var importedCount = 0
 
@@ -40,10 +45,14 @@ class PartnerImportService(
                 importedCount += response.partners.size
                 val progress = importedCount / response.totalElements.toFloat()
                 syncRecordService.setProgress(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), importedCount, progress)
-
             } catch (exception: RuntimeException) {
-                syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), exception.message?: "No Message", startAfter)
-                throw exception
+                logger.error(exception) { "Exception encountered on CDQ import" }
+                syncRecordService.setSynchronizationError(
+                    syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT),
+                    exception.message ?: "No Message",
+                    startAfter
+                )
+                return
             }
 
             //Clear session after each page import to improve JPA performance
@@ -51,5 +60,7 @@ class PartnerImportService(
         } while (startAfter != null)
 
         syncRecordService.setSynchronizationSuccess(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT))
+
+        logger.info { "CDQ import finished successfully" }
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>com.catenax</groupId>
     <artifactId>gpdm</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <name>Business Partner Data Management</name>
     <description>Service that manages and shares business partner data with other CatenaX services</description>
     <packaging>jar</packaging>
@@ -20,17 +20,18 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <kotlin.version>1.6.21</kotlin.version>
-        <postgres.version>42.3.4</postgres.version>
-        <springdoc.version>1.6.8</springdoc.version>
+        <kotlin.version>1.7.0</kotlin.version>
+        <postgres.version>42.3.6</postgres.version>
+        <springdoc.version>1.6.9</springdoc.version>
         <neo.version>1.29</neo.version>
         <keycloack.version>18.0.0</keycloack.version>
-        <flyway.version>8.5.10</flyway.version>
+        <flyway.version>8.5.12</flyway.version>
         <sonar.organization>catenax</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>bptm</sonar.projectKey>
         <jacoco.version>0.8.7</jacoco.version>
-        <testcontainers.version>1.17.1</testcontainers.version>
+        <testcontainers.version>1.17.2</testcontainers.version>
+        <kotlinlogging.version>2.1.23</kotlinlogging.version>
     </properties>
 
     <dependencies>
@@ -114,6 +115,12 @@
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
         </dependency>
+        <!-- Kotlin wrapper for slf4j (Logging)-->
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging-jvm</artifactId>
+            <version>${kotlinlogging.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -142,7 +149,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.22.0</version>
+            <version>3.23.1</version>
             <scope>test</scope>
         </dependency>
         <!-- Runs an elasticsearch container to run integration tests against -->
