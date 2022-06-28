@@ -201,9 +201,9 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
-     * Given no identifier type
-     * When creating new identifier type
-     * Then created identifier type returned
+     * Given no metadata
+     * When creating new metadata
+     * Then created metadata returned
      */
     @ParameterizedTest
     @MethodSource("creationTestArguments")
@@ -248,9 +248,9 @@ class MetadataControllerIT @Autowired constructor(
     }
 
     /**
-     * Given page with metadata
-     * When asking for second page
-     * Then return next metadata
+     * Given entries of metadata
+     * When paginating through all entries
+     * Then all entries returned
      */
     @ParameterizedTest
     @MethodSource("paginationTestArguments")
@@ -284,7 +284,7 @@ class MetadataControllerIT @Autowired constructor(
         assertThat(returnedPage.page).isEqualTo(0)
         assertThat(returnedPage.contentSize).isEqualTo(2)
         assertThat(returnedPage.content.size).isEqualTo(2)
-        assertThat(returnedPage.content).containsAnyElementsOf(expected)
+        assertThat(returnedPage.content).isSubsetOf(expected)
     }
 
     /**
