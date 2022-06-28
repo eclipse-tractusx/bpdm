@@ -47,8 +47,6 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         names.map { it.toDto() },
         legalForm?.toDto(),
         stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
-        addresses.map { it.toDto() },
-        sites.map { it.toDto() },
         classification.map { it.toDto() },
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },
@@ -113,6 +111,14 @@ fun Address.toDto(): AddressResponse {
     )
 }
 
+fun Address.toDtoWithReference(): AddressWithReferenceResponse {
+    return AddressWithReferenceResponse(
+        toDto(),
+        partner?.bpn,
+        site?.bpn
+    )
+}
+
 fun Site.toDto(): SiteResponse {
     return SiteResponse(
         bpn,
@@ -121,6 +127,12 @@ fun Site.toDto(): SiteResponse {
     )
 }
 
+fun Site.toDtoWithReference(): SiteWithReferenceResponse {
+    return SiteWithReferenceResponse(
+        toDto(),
+        partner.bpn
+    )
+}
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
     return AdministrativeAreaResponse(uuid, value, shortName, fipsCode, type.toDto(), language.toDto())

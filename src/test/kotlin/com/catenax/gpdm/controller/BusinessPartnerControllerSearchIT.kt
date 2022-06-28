@@ -50,9 +50,9 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner by site name, result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name!!).content
+        val foundPartners = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name).content
         assertThat(foundPartners).hasSize(1)
-        assertThat(foundPartners.single().businessPartner.sites.first().name).isEqualTo(RequestValues.businessPartnerRequest1.sites.first().name)
+        assertThat(foundPartners.single().businessPartner.names.first().value).isEqualTo(RequestValues.businessPartnerRequest1.names.first().value)
     }
 
     /**

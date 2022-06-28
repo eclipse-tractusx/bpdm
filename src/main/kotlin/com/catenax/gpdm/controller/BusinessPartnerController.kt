@@ -5,9 +5,7 @@ import com.catenax.gpdm.component.elastic.impl.doc.SuggestionType
 import com.catenax.gpdm.config.BpnConfigProperties
 import com.catenax.gpdm.dto.request.*
 import com.catenax.gpdm.dto.response.*
-import com.catenax.gpdm.service.BusinessPartnerBuildService
-import com.catenax.gpdm.service.BusinessPartnerFetchService
-import com.catenax.gpdm.service.PartnerChangelogService
+import com.catenax.gpdm.service.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -24,7 +22,9 @@ class BusinessPartnerController(
     val businessPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties,
-    val partnerChangelogService: PartnerChangelogService
+    val partnerChangelogService: PartnerChangelogService,
+    val siteService: SiteService,
+    val addressService: AddressService
 ) {
 
     @Operation(
@@ -111,6 +111,44 @@ class BusinessPartnerController(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
         return partnerChangelogService.getChangelogEntriesByBpn(bpn, paginationRequest.page, paginationRequest.size)
+    }
+
+    @Operation(
+        summary = "Get sites of a business partner",
+        description = "Get sites for a business partner, identified by the business partner's bpn."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The sites for the specified bpn"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @GetMapping("/{bpn}/sites")
+    fun getSites(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<SiteResponse> {
+        return siteService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
+    }
+
+    @Operation(
+        summary = "Get addresses of a business partner",
+        description = "Get addresses for a business partner, identified by the business partner's bpn."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The addresses for the specified bpn"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @GetMapping("/{bpn}/addresses")
+    fun getAddresses(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<AddressResponse> {
+        return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
     }
 
     @Operation(

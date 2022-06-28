@@ -1,10 +1,16 @@
 package com.catenax.gpdm.repository
 
 import com.catenax.gpdm.entity.Address
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
 
 interface AddressRepository : PagingAndSortingRepository<Address, Long> {
+    @Query("SELECT a FROM Address a join a.partner p where p.bpn=:bpn")
+    fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<Address>
+
+    fun findByBpn(bpn: String): Address?
 
     @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.contexts WHERE a IN :addresses")
     fun joinContexts(addresses: Set<Address>): Set<Address>

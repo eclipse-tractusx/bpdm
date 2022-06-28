@@ -161,7 +161,6 @@ object ResponseValues {
         legalForm = legalFormDoc1,
         status = status1,
         profileClassifications = listOf(classification1, classification2),
-        addresses = listOf(address1),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
@@ -172,7 +171,6 @@ object ResponseValues {
         legalForm = legalFormDoc2,
         status = status2,
         profileClassifications = listOf(classification3, classification4),
-        addresses = listOf(address2),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
@@ -183,7 +181,6 @@ object ResponseValues {
         legalForm = legalFormDoc3,
         status = status3,
         profileClassifications = listOf(classification5),
-        addresses = listOf(address3),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 }
