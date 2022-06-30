@@ -32,7 +32,7 @@
     </dependencies>
 
     <build>
-        <finalName>wrapper</finalName>
+        <finalName>bpdm-wrapper</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
