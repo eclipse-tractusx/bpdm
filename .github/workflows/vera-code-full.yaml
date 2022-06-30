@@ -39,7 +39,7 @@ jobs:
 
       #Package application with Maven
       - name: Package to JAR
-        run: ./mvnw -B package
+        run: ./mvnw -B package -DskipTests
 
       #Start Veracode scan
       - name: Run Veracode Upload And Scan
@@ -47,6 +47,6 @@ jobs:
         with:
           appname: "BPDM - Business Partner Data Management"
           createprofile: false
-          filepath: "target/bpdm.jar"
+          filepath: gpdm/target/bpdm.jar
           vid: "${{ secrets.VERACODE_API_ID }}"
           vkey: "${{ secrets.VERACODE_API_KEY }}"

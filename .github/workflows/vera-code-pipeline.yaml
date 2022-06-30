@@ -36,13 +36,13 @@ jobs:
         # Sometimes there are conflicts, e.g. README.md
         run: unzip -o pipeline-scan-LATEST.zip
 
-      #Verify with Vera Code local scan
-      - name: Run Pipeline Scanner
+      #Verify BPDM with Vera Code local scan
+      - name: Run Pipeline Scanner GPDM
         run: |
           java -Dpipeline.debug=true -jar pipeline-scan.jar \
           --veracode_api_id "${{secrets.VERACODE_API_ID}}" \
           --veracode_api_key "${{secrets.VERACODE_API_KEY}}" \
-          --file "target/bpdm.jar" \
+          --file "gpdm/target/bpdm.jar" \
           --fail_on_severity="Very High, High" \
           -jo true
 
