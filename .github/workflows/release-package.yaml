@@ -1,0 +1,49 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  determine-changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      bpdm-changed: ${{ steps.changes.outputs.shared }} == 'true' ||  ${{ steps.changes.outputs.bpdm }} == 'true'
+      wrapper-changed: ${{ steps.changes.outputs.shared }} == 'true' ||  ${{ steps.changes.outputs.wrapper }} == 'true'
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            shared:
+              - 'pom.xml'
+              - 'gpdm-common/**'
+            bpdm:
+              - 'gpdm/**'
+            wrapper:
+              - 'gpdm-wrapper/**'
+
+  call-sonar-scan:
+    uses: ./.github/workflows/sonar-scan.yaml
+    secrets: inherit
+
+  call-release-bpdm:
+    needs: [determine-changes, call-sonar-scan]
+    if: ${{ needs.determine-changes.outputs.bpdm-changed }}
+    uses:  ./.github/workflows/release.yaml
+    with:
+      imageName: bpdm
+      dockerfilePath: ./gpdm/Dockerfile
+
+  call-release-wrapper:
+    needs: [ determine-changes, call-sonar-scan ]
+    if: ${{ needs.determine-changes.outputs.wrapper-changed }}
+    uses: ./.github/workflows/release.yaml
+    with:
+      imageName: bpdm-wrappper
+      dockerfilePath: ./gpdm-wrapper/Dockerfile
