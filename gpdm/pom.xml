@@ -7,12 +7,13 @@
     <artifactId>gpdm</artifactId>
     <name>Business Partner Data Management</name>
     <description>Service that manages and shares business partner data with other CatenaX services</description>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.catenax</groupId>
         <artifactId>gpdm-parent</artifactId>
-        <version>1.2.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -21,6 +22,11 @@
         <testcontainers.version>1.17.2</testcontainers.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.catenax</groupId>
+            <artifactId>gpdm-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
