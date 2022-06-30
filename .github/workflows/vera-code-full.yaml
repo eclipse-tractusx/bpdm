@@ -41,12 +41,20 @@ jobs:
       - name: Package to JAR
         run: ./mvnw -B package -DskipTests
 
+      #Copy the bpdm jar to directory which gets uploaded to Veracode
+      - name: Copy Bpdm JAR
+        run: cp gpdm/target/bpdm.jar target/veracode/bpdm.jar
+
+      #Copy the bpdm-wrapper jar to directory which gets uploaded to Veracode
+      - name: Copy Wrapper JAR
+        run: cp gpdm-wrapper/target/bpdm-wrapper.jar target/veracode/bpdm-wrapper.jar
+
       #Start Veracode scan
       - name: Run Veracode Upload And Scan
         uses: veracode/veracode-uploadandscan-action@0.2.1
         with:
           appname: "BPDM - Business Partner Data Management"
           createprofile: false
-          filepath: gpdm/target/bpdm.jar
+          filepath: target/veracode
           vid: "${{ secrets.VERACODE_API_ID }}"
           vkey: "${{ secrets.VERACODE_API_KEY }}"

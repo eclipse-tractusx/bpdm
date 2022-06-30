@@ -1,0 +1,23 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    paths:
+      - 'pom.xml'
+      - 'gpdm-common/**'
+      - 'gpdm/**'
+    branches:
+      - main
+      - develop
+
+jobs:
+  call-sonar-scan:
+    uses: ./.github/workflows/sonar-scan.yaml
+    secrets: inherit
+
+  call-release:
+    needs: [call-sonar-scan]
+    uses:  ./.github/workflows/release.yaml
+    with:
+      imageName: bpdm
+      dockerfilePath: ./gpdm/Dockerfile
