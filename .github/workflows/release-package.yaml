@@ -11,16 +11,16 @@ jobs:
     uses: ./.github/workflows/sonar-scan.yaml
     secrets: inherit
 
-  call-release-bpdm:
-    needs: [call-sonar-scan]
-    uses:  ./.github/workflows/release.yaml
-    with:
-      imageName: bpdm
-      dockerfilePath: ./gpdm/Dockerfile
-
-  call-release-wrapper:
-    needs: [call-sonar-scan ]
+  call-release-pool:
+    needs: [ call-sonar-scan ]
     uses: ./.github/workflows/release.yaml
     with:
-      imageName: bpdm-wrappper
-      dockerfilePath: ./gpdm-wrapper/Dockerfile
+      imageName: pool
+      dockerfilePath: ./bpdm-pool/Dockerfile
+
+  call-release-gate:
+    needs: [ call-sonar-scan ]
+    uses: ./.github/workflows/release.yaml
+    with:
+      imageName: gate
+      dockerfilePath: ./bpdm-gate/Dockerfile

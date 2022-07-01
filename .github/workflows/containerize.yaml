@@ -20,16 +20,16 @@ jobs:
 
       # Build Docker image with Buildx
       # https://github.com/docker/build-push-action
-      - name: Build Bpdm Docker image
+      - name: Build Pool Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          file: ./gpdm/Dockerfile
+          file: ./bpdm-pool/Dockerfile
           push: false
 
-      - name: Build Wrapper Docker image
+      - name: Build Gate Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          file: ./gpdm-wrapper/Dockerfile
+          file: ./bpdm-gate/Dockerfile
           push: false

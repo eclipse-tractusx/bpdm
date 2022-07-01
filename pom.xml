@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.catenax</groupId>
-    <artifactId>gpdm-parent</artifactId>
+    <groupId>org.eclipse.tractusx</groupId>
+    <artifactId>bpdm-parent</artifactId>
     <name>Business Partner Data Management Parent</name>
     <description>Parent pom of Business Partner Data Management</description>
     <version>2.0.0-SNAPSHOT</version>
@@ -17,9 +17,9 @@
         <version>2.7.0</version>
     </parent>
     <modules>
-        <module>gpdm</module>
-        <module>gpdm-wrapper</module>
-        <module>gpdm-common</module>
+        <module>bpdm-pool</module>
+        <module>bpdm-gate</module>
+        <module>bpdm-common</module>
     </modules>
 
     <properties>
@@ -44,8 +44,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.catenax</groupId>
-                <artifactId>gpdm-common</artifactId>
+                <groupId>${groupId}</groupId>
+                <artifactId>bpdm-common</artifactId>
                 <version>${version}</version>
             </dependency>
             <dependency>

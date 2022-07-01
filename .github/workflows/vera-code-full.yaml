@@ -41,13 +41,13 @@ jobs:
       - name: Package to JAR
         run: ./mvnw -B package -DskipTests
 
-      #Copy the bpdm jar to directory which gets uploaded to Veracode
-      - name: Copy Bpdm JAR
-        run: cp gpdm/target/bpdm.jar target/veracode/bpdm.jar
+      #Copy the bpdm-pool jar to directory which gets uploaded to Veracode
+      - name: Copy Pool JAR
+        run: cp bpdm-pool/target/bpdm-pool.jar target/veracode/bpdm-pool.jar
 
-      #Copy the bpdm-wrapper jar to directory which gets uploaded to Veracode
-      - name: Copy Wrapper JAR
-        run: cp gpdm-wrapper/target/bpdm-wrapper.jar target/veracode/bpdm-wrapper.jar
+      #Copy the bpdm-gate jar to directory which gets uploaded to Veracode
+      - name: Copy Gate JAR
+        run: cp bpdm-gate/target/bpdm-gate.jar target/veracode/bpdm-gate.jar
 
       #Start Veracode scan
       - name: Run Veracode Upload And Scan
