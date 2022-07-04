@@ -22,7 +22,7 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>bpdm-common</artifactId>
         </dependency>
         <dependency>
@@ -145,7 +145,7 @@
 
     <build>
         <!-- Name jar without version to make it easier to reference it during CICD -->
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <resources>
             <resource>
                 <filtering>true</filtering>
