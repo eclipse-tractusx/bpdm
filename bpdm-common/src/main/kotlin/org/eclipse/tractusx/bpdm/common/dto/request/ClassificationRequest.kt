@@ -1,7 +1,7 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(name = "Classification Request", description = "New classification record for a business partner")
 data class ClassificationRequest (

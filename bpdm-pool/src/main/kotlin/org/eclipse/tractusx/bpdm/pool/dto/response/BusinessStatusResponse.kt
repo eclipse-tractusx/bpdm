@@ -1,8 +1,8 @@
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessStatusType
 import java.time.LocalDateTime
 import java.util.*
 

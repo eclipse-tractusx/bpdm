@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto.request
 
 import com.neovisionaries.i18n.CurrencyCode
 import io.swagger.v3.oas.annotations.media.Schema

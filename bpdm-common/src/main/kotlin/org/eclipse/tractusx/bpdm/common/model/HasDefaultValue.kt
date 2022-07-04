@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.common.model
 
 interface HasDefaultValue<T> {
     fun getDefault(): T

@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.common.model.NamedType
 import java.time.LocalDateTime
 import javax.persistence.*
 

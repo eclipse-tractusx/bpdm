@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.common.model
 
 interface NamedUrlType : NamedType {
     fun getUrl(): String

@@ -1,8 +1,8 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto.request
 
 import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.NameType
+import org.eclipse.tractusx.bpdm.common.model.NameType
 
 @Schema(name = "Name Request", description = "New name record for a business partner")
 data class NameRequest (

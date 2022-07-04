@@ -101,6 +101,11 @@
                 <artifactId>springdoc-openapi-kotlin</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-common</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
             <!-- Kotlin wrapper for slf4j (Logging)-->
             <dependency>
                 <groupId>io.github.microutils</groupId>

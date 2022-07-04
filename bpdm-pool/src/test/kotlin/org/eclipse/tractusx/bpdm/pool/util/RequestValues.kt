@@ -1,10 +1,11 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
+import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.request.NameRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeNameUrlDto
-import com.neovisionaries.i18n.LanguageCode
 
 object RequestValues {
 
