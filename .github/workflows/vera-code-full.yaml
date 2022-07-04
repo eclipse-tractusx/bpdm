@@ -41,6 +41,10 @@ jobs:
       - name: Package to JAR
         run: ./mvnw -B package -DskipTests
 
+      #Create the directory which will be uploaded to Veracode
+      - name: Create Veracode Upload Directory
+        run: mkdir -p target/veracode
+
       #Copy the bpdm-pool jar to directory which gets uploaded to Veracode
       - name: Copy Pool JAR
         run: cp bpdm-pool/target/bpdm-pool.jar target/veracode/bpdm-pool.jar
