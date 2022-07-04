@@ -1,6 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
+import com.neovisionaries.i18n.LanguageCode
 import java.time.LocalDateTime
 
 /**
@@ -17,15 +18,37 @@ object CdqValues {
 
     val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
 
+    val language1 = LanguageCdq(LanguageCode.en, LanguageCode.en.getName())
+    val language2 = LanguageCdq(LanguageCode.de, LanguageCode.de.getName())
+    val language3 = LanguageCdq(LanguageCode.zh, LanguageCode.zh.getName())
+
     val name1 = NameCdq(CommonValues.name1)
     val name2 = NameCdq(CommonValues.name2)
     val name3 = NameCdq(CommonValues.name3)
     val name4 = NameCdq(CommonValues.name4)
     val name5 = NameCdq(CommonValues.name5)
 
-    val legalFormDoc1 = LegalFormCdq(name = CommonValues.legalFormName1, technicalKey = CommonValues.legalFormTechnicalKey1)
-    val legalFormDoc2 = LegalFormCdq(name = CommonValues.legalFormName2, technicalKey = CommonValues.legalFormTechnicalKey2)
-    val legalFormDoc3 = LegalFormCdq(name = CommonValues.legalFormName3, technicalKey = CommonValues.legalFormTechnicalKey3)
+    val legalForm1 = LegalFormCdq(
+        CommonValues.legalFormName1,
+        CommonValues.legalFormUrl1,
+        CommonValues.legalFormTechnicalKey1,
+        CommonValues.legalFormAbbreviation1,
+        language1
+    )
+    val legalForm2 = LegalFormCdq(
+        CommonValues.legalFormName2,
+        CommonValues.legalFormUrl2,
+        CommonValues.legalFormTechnicalKey2,
+        CommonValues.legalFormAbbreviation2,
+        language2
+    )
+    val legalForm3 = LegalFormCdq(
+        CommonValues.legalFormName3,
+        CommonValues.legalFormUrl3,
+        CommonValues.legalFormTechnicalKey3,
+        CommonValues.legalFormAbbreviation3,
+        language3
+    )
 
     val statusType1 = TypeKeyNameUrlCdq(CommonValues.statusType1)
     val statusType2 = TypeKeyNameUrlCdq(CommonValues.statusType2)
@@ -131,7 +154,7 @@ object CdqValues {
         externalId = partnerId1,
         dataSource = datasource1,
         names = listOf(name1, name2),
-        legalForm = legalFormDoc1,
+        legalForm = legalForm1,
         status = status1,
         profile = profile1,
         addresses = listOf(address1)
@@ -144,7 +167,7 @@ object CdqValues {
         externalId = partnerId2,
         dataSource = datasource1,
         names = listOf(name3, name4),
-        legalForm = legalFormDoc2,
+        legalForm = legalForm2,
         status = status2,
         profile = profile2,
         addresses = listOf(address2)
@@ -157,7 +180,7 @@ object CdqValues {
         externalId = partnerId3,
         dataSource = datasource1,
         names = listOf(name5),
-        legalForm = legalFormDoc3,
+        legalForm = legalForm3,
         status = status3,
         profile = profile3,
         addresses = listOf(address3)
