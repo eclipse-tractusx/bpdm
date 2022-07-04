@@ -3,8 +3,8 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
 import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
@@ -67,7 +67,7 @@ class CdqRequestMappingService(
             partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id)),
             partner.names.map { toRequest(it) },
             toOptionalReference(partner.legalForm),
-            if (partner.status != null) toRequest(partner.status) else null,
+            if (partner.status != null) toRequest(partner.status!!) else null,
             partner.addresses.map { toRequest(it) },
             listOf(),
             toRequest(partner.profile),
@@ -141,7 +141,7 @@ class CdqRequestMappingService(
             address.thoroughfares.map { toRequest(it) },
             address.premises.map { toRequest(it) },
             address.postalDeliveryPoints.map { toRequest(it) },
-            if(address.geographicCoordinates != null) toRequest(address.geographicCoordinates) else null,
+            if (address.geographicCoordinates != null) toRequest(address.geographicCoordinates!!) else null,
             address.types.map { toTypeOrDefault(it) }
         )
     }

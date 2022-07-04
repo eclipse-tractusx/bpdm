@@ -1,9 +1,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameUrlCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportResponsePage
 import org.eclipse.tractusx.bpdm.pool.dto.BusinessPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService

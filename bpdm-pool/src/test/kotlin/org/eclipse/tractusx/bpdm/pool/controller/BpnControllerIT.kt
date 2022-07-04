@@ -5,9 +5,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
