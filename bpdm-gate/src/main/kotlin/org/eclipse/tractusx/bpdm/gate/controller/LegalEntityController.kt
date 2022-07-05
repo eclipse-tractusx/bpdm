@@ -16,8 +16,8 @@ class LegalEntityController(
 ) {
 
     @PutMapping
-    fun upsertLegalEntities(@RequestBody legalEntityRequest: LegalEntityRequest): ResponseEntity<Any> {
-        legalEntityService.upsertLegalEntities(legalEntityRequest)
+    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityRequest>): ResponseEntity<Any> {
+        legalEntityService.upsertLegalEntities(legalEntities)
         return ResponseEntity(HttpStatus.CREATED)
     }
 }
