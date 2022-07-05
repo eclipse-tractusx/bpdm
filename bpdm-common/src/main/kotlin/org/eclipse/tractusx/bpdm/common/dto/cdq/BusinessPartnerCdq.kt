@@ -3,13 +3,13 @@ package org.eclipse.tractusx.bpdm.common.dto.cdq
 import java.time.LocalDateTime
 
 data class BusinessPartnerCdq (
-    val id: String,
-    val createdAt: LocalDateTime,
-    val lastModifiedAt: LocalDateTime,
+    val id: String? = null,
+    val createdAt: LocalDateTime? = null,
+    val lastModifiedAt: LocalDateTime? = null,
     val externalId: String? = null,
-    val dataSource: String,
-    val disclosed: Boolean = false,
-    val updateMonitoring: Boolean = false,
+    val dataSource: String? = null,
+    val disclosed: Boolean? = false,
+    val updateMonitoring: Boolean? = false,
     val metadata: BusinessPartnerMetadataCdq? = null,
     val record: String? = null,
     val names: Collection<NameCdq> = emptyList(),

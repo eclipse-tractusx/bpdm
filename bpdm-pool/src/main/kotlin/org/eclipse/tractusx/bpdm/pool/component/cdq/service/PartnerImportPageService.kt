@@ -115,13 +115,13 @@ class PartnerImportPageService(
     }
 
     private fun partitionCreateAndUpdateRequests(cdqPartners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerRequest>, Collection<BusinessPartnerUpdateDto>>{
-        val partnersToUpdate = businessPartnerFetchService.fetchByIdentifierValues( cdqIdConfigProperties.typeKey,cdqPartners.map { it.id })
-        val cdqIdToPartnerMap = partnersToUpdate.associateBy { it.identifiers.find { id -> id.type.technicalKey == cdqIdConfigProperties.typeKey}!!.value }
+        val partnersToUpdate = businessPartnerFetchService.fetchByIdentifierValues(cdqIdConfigProperties.typeKey, cdqPartners.map { it.id!! })
+        val cdqIdToPartnerMap = partnersToUpdate.associateBy { it.identifiers.find { id -> id.type.technicalKey == cdqIdConfigProperties.typeKey }!!.value }
         val (knownPartners, unknownPartners) = cdqPartners.partition { cdqIdToPartnerMap.containsKey(it.id) }
 
         return Pair(
             unknownPartners.map { mappingService.toRequest(it) },
-            knownPartners.map { BusinessPartnerUpdateDto(cdqIdToPartnerMap.getValue(it.id), mappingService.toRequest(it)) }
+            knownPartners.map { BusinessPartnerUpdateDto(cdqIdToPartnerMap.getValue(it.id!!), mappingService.toRequest(it)) }
         )
     }
 

@@ -5,5 +5,5 @@ data class BankAccountCdq(
     val internationalBankIdentifier: String,
     val nationalBankAccountIdentifier: String,
     val nationalBankIdentifier: String,
-    val country: CountryCdq,
+    val country: CountryCdq? = null,
 )

@@ -91,7 +91,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, all found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id))
+            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!, CdqValues.businessPartner2.id!!))
 
         val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +114,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, only some found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id, "someNonexistentCdqId"))
+            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!, "someNonexistentCdqId"))
 
         val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +139,7 @@ class BpnControllerIT @Autowired constructor(
         val identifiersSearchRequest =
             IdentifiersSearchRequest(
                 cdqIdentifierConfigProperties.typeKey,
-                listOf(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id, CdqValues.businessPartner3.id)
+                listOf(CdqValues.businessPartner1.id!!, CdqValues.businessPartner2.id!!, CdqValues.businessPartner3.id!!)
             )
 
         webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
@@ -158,7 +158,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by nonexistent identifier type`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(CdqValues.businessPartner1.id))
+            IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(CdqValues.businessPartner1.id!!))
 
         webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)

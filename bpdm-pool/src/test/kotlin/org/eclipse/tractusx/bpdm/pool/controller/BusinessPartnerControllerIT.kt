@@ -90,7 +90,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
      */
     @Test
     fun `set business partner currentness`() {
-        val identifiersSearchRequest = IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id))
+        val identifiersSearchRequest = IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!))
 
         val bpn = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)

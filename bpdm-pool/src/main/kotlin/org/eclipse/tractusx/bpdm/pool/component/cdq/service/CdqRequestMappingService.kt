@@ -65,7 +65,7 @@ class CdqRequestMappingService(
     fun toRequest(partner: BusinessPartnerCdq): BusinessPartnerRequest {
         return BusinessPartnerRequest(
             partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id)),
+            partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id!!)),
             partner.names.map { toRequest(it) },
             toOptionalReference(partner.legalForm),
             if (partner.status != null) toRequest(partner.status!!) else null,
@@ -110,7 +110,7 @@ class CdqRequestMappingService(
     fun toRequest(legalForm: LegalFormCdq, partner: BusinessPartnerCdq): LegalFormRequest {
         return LegalFormRequest(
             legalForm.technicalKey,
-            legalForm.name,
+            legalForm.name!!,
             legalForm.url,
             legalForm.mainAbbreviation,
             toLanguageCode(legalForm.language),
@@ -200,7 +200,7 @@ class CdqRequestMappingService(
     }
 
     fun toRequest(classification: ClassificationCdq): ClassificationRequest {
-        return ClassificationRequest(classification.value, classification.code, toType<ClassificationType>(classification.type))
+        return ClassificationRequest(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
     }
 
     fun toRequest(account: BankAccountCdq): BankAccountRequest {
