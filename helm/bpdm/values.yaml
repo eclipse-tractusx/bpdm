@@ -44,10 +44,8 @@ ingress:
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
-  host: catenax-bpdm-dev.demo.catena-x.net
+  hosts:
+    - partners-pool.dev.demo.catena-x.net
 
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
 # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-resource-requests-and-limits
@@ -93,8 +91,8 @@ readinessProbe:
 
 applicationSecret:
   enabled: true
-  keycloak: <path:bpdm/data/dev/keycloak#credentials-secret>
-  cdq: <path:bpdm/data/dev/cdq#api-key>
+  keycloak: <path:bpdm/data/dev/pool/keycloak#credentials-secret>
+  cdq: <path:bpdm/data/dev/pool/cdq#api-key>
 
 elastic:
   enabled: true
@@ -107,6 +105,6 @@ postgres:
   enabled: true
   auth:
     database: bpdm
-    postgresPassword: <path:bpdm/data/dev/postgresql#postgres-password>
+    postgresPassword: <path:bpdm/data/dev/pool/postgresql#postgres-password>
     username: bpdm
-    password: <path:bpdm/data/dev/postgresql#password>
+    password: <path:bpdm/data/dev/pool/postgresql#password>

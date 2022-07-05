@@ -12,16 +12,20 @@ spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
-      secretName: {{ include "bpdm.fullname" . }}-tls
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end}}
+      secretName: tls-secret
   rules:
-    - host: {{ .Values.ingress.host }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ include "bpdm.fullname" . }}
+                name: {{ include "bpdm.fullname" $ }}
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $.Values.service.port }}
+    {{- end}}
