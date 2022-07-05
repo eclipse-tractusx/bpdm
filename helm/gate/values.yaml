@@ -2,11 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+nameOverride:
+fullnameOverride:
+
 replicaCount: 1
 
 image:
   registry: ghcr.io
-  repository: catenax-ng/product-bpdm/pool
+  repository: catenax-ng/product-bpdm/gate
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "develop"
@@ -14,9 +17,6 @@ image:
 imagePullSecrets: [ ]
 
 podAnnotations: { }
-
-podSecurityContext:
-  fsGroup: 2000
 
 #Spring profiles under which the application should run
 springProfiles:
@@ -45,7 +45,7 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
   hosts:
-    - partners-pool.dev.demo.catena-x.net
+    - partners-gate.dev.demo.catena-x.net
 
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
 # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-resource-requests-and-limits
@@ -91,20 +91,4 @@ readinessProbe:
 
 applicationSecret:
   enabled: true
-  keycloak: <path:bpdm/data/dev/pool/keycloak#credentials-secret>
-  cdq: <path:bpdm/data/dev/pool/cdq#api-key>
-
-elastic:
-  enabled: true
-  security:
-    tls:
-      restEncryption: false
-
-
-postgres:
-  enabled: true
-  auth:
-    database: bpdm
-    postgresPassword: <path:bpdm/data/dev/pool/postgresql#postgres-password>
-    username: bpdm
-    password: <path:bpdm/data/dev/pool/postgresql#password>
+  cdq: <path:bpdm/data/dev/gate/cdq#api-key>
