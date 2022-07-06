@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
 import org.springframework.context.annotation.Configuration

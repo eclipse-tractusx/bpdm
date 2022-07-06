@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.common.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
@@ -7,6 +7,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 @ConstructorBinding
 data class AppInfoProperties(
     val name: String = "BPDM",
-    val description: String = "Service that manages and shares business partner data with other CatenaX services",
-    val version: String = "0.0.1"
+    val description: String = "",
+    val version: String = ""
 )

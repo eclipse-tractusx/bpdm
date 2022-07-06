@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.common.config
 
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI

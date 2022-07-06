@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.common.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

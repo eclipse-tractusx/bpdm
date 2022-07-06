@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver
@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
@@ -46,7 +44,8 @@ class NoAuthenticationConfig: WebSecurityConfigurerAdapter() {
     value = ["bpdm.security.enabled"],
     havingValue = "true")
 class KeycloakSecurityConfig(
-    val configProperties: SecurityConfigProperties
+    val configProperties: SecurityConfigProperties,
+    val bpdmSecurityConfigurerAdapter: BpdmSecurityConfigurerAdapter
 ): KeycloakWebSecurityConfigurerAdapter() {
 
     private val logger = KotlinLogging.logger { }
@@ -72,17 +71,7 @@ class KeycloakSecurityConfig(
     override fun configure(http: HttpSecurity) {
         logger.info { "Security active, securing endpoint" }
         super.configure(http)
-        http
-            .csrf().disable()
-            .cors()
-            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().authorizeRequests()
-            .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
-            .antMatchers("/v3/api-docs/**").permitAll()
-            .antMatchers("/api/swagger-ui/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/**").authenticated()
-            .antMatchers(HttpMethod.POST, "/api/catena/bpn/search").authenticated()
-                .antMatchers("/api/**").hasRole("add_company_data")
+        bpdmSecurityConfigurerAdapter.configure(http)
     }
 
     @Bean
