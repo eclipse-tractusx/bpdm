@@ -1,5 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteWithReferenceResponse
@@ -24,6 +26,14 @@ class SiteService(
         val page = siteRepository.findByPartnerBpn(bpn, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())
         return page.toDto(page.content.map { it.toDto() })
+    }
+
+    fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SiteWithReferenceResponse> {
+        val partners =
+            if (siteSearchRequest.legalEntities.isNotEmpty()) businessPartnerRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
+        val sitePage = siteRepository.findByPartnerIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        fetchSiteDependencies(sitePage.toSet())
+        return sitePage.toDto(sitePage.content.map { it.toDtoWithReference() })
     }
 
     fun findByBpn(bpn: String): SiteWithReferenceResponse {

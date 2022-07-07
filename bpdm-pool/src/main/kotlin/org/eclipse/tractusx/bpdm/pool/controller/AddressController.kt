@@ -5,12 +5,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springdoc.api.annotations.ParameterObject
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/addresses")
@@ -34,5 +35,23 @@ class AddressController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): AddressWithReferenceResponse {
         return addressService.findByBpn(bpn)
+    }
+
+    @Operation(
+        summary = "Search addresses by site and/or legal entity BPNs",
+        description = "Search addresses by BPNLs and BPNSs."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found sites for the specified sites and legal entities"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
+        ]
+    )
+    @PostMapping("/search")
+    fun searchAddresses(
+        @RequestBody addressSearchRequest: AddressSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
+    ): PageResponse<AddressWithReferenceResponse> {
+        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
     }
 }

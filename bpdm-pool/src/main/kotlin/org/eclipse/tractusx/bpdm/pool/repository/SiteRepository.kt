@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
 import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -13,5 +14,9 @@ interface SiteRepository : PagingAndSortingRepository<Site, Long> {
     @Query("SELECT s FROM Site s join s.partner p where p.bpn=:bpn")
     fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<Site>
 
+    fun findByPartnerIn(partners: Collection<BusinessPartner>, pageable: Pageable): Page<Site>
+
     fun findByBpn(bpn: String): Site?
+
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<Site>
 }
