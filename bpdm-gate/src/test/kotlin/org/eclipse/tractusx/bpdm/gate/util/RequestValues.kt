@@ -20,45 +20,45 @@ object RequestValues {
     val name3 = NameRequest(value = CommonValues.name3, shortName = CommonValues.shortName3, type = CommonValues.nameType1, language = CommonValues.language1)
     val name4 = NameRequest(value = CommonValues.name4, shortName = CommonValues.shortName4, type = CommonValues.nameType1, language = CommonValues.language1)
 
-    val businessStatusRequest1 = BusinessStatusRequest(
+    val businessStatus1 = BusinessStatusRequest(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validUntil = CommonValues.businessStatusValidUntil1,
         type = CommonValues.businessStatusType1
     )
 
-    val businessStatusRequest2 = BusinessStatusRequest(
+    val businessStatus2 = BusinessStatusRequest(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validUntil = CommonValues.businessStatusValidUntil2,
         type = CommonValues.businessStatusType2
     )
 
-    val classificationRequest1 = ClassificationRequest(
+    val classification1 = ClassificationRequest(
         value = CommonValues.classificationValue1,
         code = CommonValues.classificationCode1,
         type = CommonValues.classificationType
     )
 
-    val classificationRequest2 = ClassificationRequest(
+    val classification2 = ClassificationRequest(
         value = CommonValues.classificationValue2,
         code = CommonValues.classificationCode2,
         type = CommonValues.classificationType
     )
 
-    val classificationRequest3 = ClassificationRequest(
+    val classification3 = ClassificationRequest(
         value = CommonValues.classificationValue3,
         code = CommonValues.classificationCode3,
         type = CommonValues.classificationType
     )
 
-    val classificationRequest4 = ClassificationRequest(
+    val classification4 = ClassificationRequest(
         value = CommonValues.classificationValue4,
         code = CommonValues.classificationCode4,
         type = CommonValues.classificationType
     )
 
-    val bankAccountRequest1 = BankAccountRequest(
+    val bankAccount1 = BankAccountRequest(
         trustScores = emptyList(),
         currency = CurrencyCode.UNDEFINED,
         internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier1,
@@ -67,7 +67,7 @@ object RequestValues {
         nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
-    val bankAccountRequest2 = BankAccountRequest(
+    val bankAccount2 = BankAccountRequest(
         trustScores = emptyList(),
         currency = CurrencyCode.UNDEFINED,
         internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier2,
@@ -76,7 +76,7 @@ object RequestValues {
         nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
-    val bankAccountRequest3 = BankAccountRequest(
+    val bankAccount3 = BankAccountRequest(
         trustScores = emptyList(),
         currency = CurrencyCode.UNDEFINED,
         internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier3,
@@ -85,7 +85,7 @@ object RequestValues {
         nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
-    val bankAccountRequest4 = BankAccountRequest(
+    val bankAccount4 = BankAccountRequest(
         trustScores = emptyList(),
         currency = CurrencyCode.UNDEFINED,
         internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier4,
@@ -100,10 +100,10 @@ object RequestValues {
         identifiers = listOf(identifier1, identifier2),
         names = listOf(name1, name2),
         legalForm = CommonValues.legalFormTechnicalKey1,
-        status = businessStatusRequest1,
-        profileClassifications = listOf(classificationRequest1, classificationRequest2),
+        status = businessStatus1,
+        profileClassifications = listOf(classification1, classification2),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
-        bankAccounts = listOf(bankAccountRequest1, bankAccountRequest2)
+        bankAccounts = listOf(bankAccount1, bankAccount2)
     )
 
     val legalEntity2 = LegalEntityRequest(
@@ -112,9 +112,9 @@ object RequestValues {
         identifiers = listOf(identifier3, identifier4),
         names = listOf(name3, name4),
         legalForm = CommonValues.legalFormTechnicalKey2,
-        status = businessStatusRequest2,
-        profileClassifications = listOf(classificationRequest3, classificationRequest4),
+        status = businessStatus2,
+        profileClassifications = listOf(classification3, classification4),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
-        bankAccounts = listOf(bankAccountRequest3, bankAccountRequest4)
+        bankAccounts = listOf(bankAccount3, bankAccount4)
     )
 }

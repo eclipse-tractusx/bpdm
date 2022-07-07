@@ -1,11 +1,15 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
+import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -16,8 +20,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-
-private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -45,10 +47,15 @@ internal class LegalEntityControllerIT @Autowired constructor(
             RequestValues.legalEntity2
         )
 
+        val expectedLegalEntities = listOf(
+            CdqValues.legalEntity1,
+            CdqValues.legalEntity2
+        )
+
         wireMockServer.stubFor(
-            WireMock.put(WireMock.urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
+            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
-                    WireMock.aResponse()
+                    aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
@@ -72,5 +79,9 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .expectBody(UpsertResponse::class.java)
             .returnResult()
             .responseBody
+
+        val body = wireMockServer.allServeEvents.single().request.bodyAsString
+        val upsertRequest = objectMapper.readValue(body, UpsertRequest::class.java)
+        assertThat(upsertRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedLegalEntities)
     }
 }
