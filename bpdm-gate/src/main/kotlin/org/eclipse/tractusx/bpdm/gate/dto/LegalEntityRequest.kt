@@ -4,16 +4,15 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.request.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import javax.validation.constraints.NotEmpty
 
 data class LegalEntityRequest(
+    @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<IdentifierRequest> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
-    @field:NotEmpty
     val names: Collection<NameRequest>,
     @Schema(description = "Technical key of the legal form")
     val legalForm: String?,

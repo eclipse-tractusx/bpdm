@@ -1,12 +1,15 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
@@ -83,5 +86,38 @@ internal class LegalEntityControllerIT @Autowired constructor(
         val body = wireMockServer.allServeEvents.single().request.bodyAsString
         val upsertRequest = objectMapper.readValue(body, UpsertRequest::class.java)
         assertThat(upsertRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedLegalEntities)
+    }
+
+    @Test
+    fun `upsert legal entities, missing external id`() {
+        val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
+            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntity1)
+                .apply { remove(LegalEntityRequest::externalId.name) }
+        )
+
+        wireMockServer.stubFor(
+            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                UpsertResponse(
+                                    emptyList(),
+                                    emptyList(),
+                                    2,
+                                    0
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(legalEntitiesJson.toString())
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 }
