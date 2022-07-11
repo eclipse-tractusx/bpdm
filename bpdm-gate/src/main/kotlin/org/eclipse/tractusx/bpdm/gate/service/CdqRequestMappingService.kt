@@ -90,9 +90,9 @@ class CdqRequestMappingService(
 
     private fun createBpnIdentifierCdq(bpn: String): IdentifierCdq {
         return IdentifierCdq(
-            type = TypeKeyNameUrlCdq(bpnConfigProperties.id, bpnConfigProperties.name, ""),
+            type = TypeKeyNameUrlCdq(bpnConfigProperties.id, bpnConfigProperties.name),
             value = bpn,
-            issuingBody = TypeKeyNameUrlCdq(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName, "")
+            issuingBody = TypeKeyNameUrlCdq(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName)
         )
     }
 }

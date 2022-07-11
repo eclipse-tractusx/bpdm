@@ -8,8 +8,8 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
  * Numbered values should match with RequestValues numbered values for easier testing
  */
 object CdqValues {
-    val idTypeBpn = TypeKeyNameUrlCdq("BPN", "Business Partner Number", "")
-    val issuerBpn = TypeKeyNameUrlCdq("CATENAX", "Catena-X", "")
+    val idTypeBpn = TypeKeyNameUrlCdq("BPN", "Business Partner Number")
+    val issuerBpn = TypeKeyNameUrlCdq("CATENAX", "Catena-X")
 
     val identifier1 = IdentifierCdq(
         type = TypeKeyNameUrlCdq(technicalKey = CommonValues.idTypeTechnicalKey1),
