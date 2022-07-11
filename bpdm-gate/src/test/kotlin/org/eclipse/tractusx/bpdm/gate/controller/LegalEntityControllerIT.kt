@@ -78,7 +78,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .bodyValue(objectMapper.writeValueAsString(legalEntities))
             .exchange()
             .expectStatus()
-            .isCreated
+            .isOk
             .expectBody(UpsertResponse::class.java)
             .returnResult()
             .responseBody

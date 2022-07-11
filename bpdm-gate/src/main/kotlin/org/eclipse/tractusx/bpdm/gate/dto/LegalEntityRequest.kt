@@ -5,8 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.request.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
+@Schema(name = "Legal Entity Request")
 data class LegalEntityRequest(
-    @Schema(description = "ID the record has in the external system where the record originates from")
+    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
     @Schema(description = "Business Partner Number")
     val bpn: String?,
