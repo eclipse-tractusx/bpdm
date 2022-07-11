@@ -25,12 +25,16 @@ class LegalEntityService(
         val upsertRequest =
             UpsertRequest(cdqConfigProperties.datasource, legalEntitiesCdq, listOf(CdqFeatures.UPSERT_BY_EXTERNAL_ID, CdqFeatures.API_ERROR_ON_FAILURES))
 
-        webClient
-            .put()
-            .uri(BUSINESS_PARTNER_PATH)
-            .bodyValue(objectMapper.writeValueAsString(upsertRequest))
-            .retrieve()
-            .bodyToMono<UpsertResponse>()
-            .block()!!
+        try {
+            webClient
+                .put()
+                .uri(BUSINESS_PARTNER_PATH)
+                .bodyValue(objectMapper.writeValueAsString(upsertRequest))
+                .retrieve()
+                .bodyToMono<UpsertResponse>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Upsert request failed.", e)
+        }
     }
 }

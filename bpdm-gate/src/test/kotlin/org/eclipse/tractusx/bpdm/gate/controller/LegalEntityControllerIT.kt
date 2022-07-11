@@ -95,29 +95,33 @@ internal class LegalEntityControllerIT @Autowired constructor(
                 .apply { remove(LegalEntityRequest::externalId.name) }
         )
 
-        wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertResponse(
-                                    emptyList(),
-                                    emptyList(),
-                                    2,
-                                    0
-                                )
-                            )
-                        )
-                )
-        )
-
         webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(legalEntitiesJson.toString())
             .exchange()
             .expectStatus()
             .isBadRequest
+    }
+
+    @Test
+    fun `upsert legal entities, cdq error`() {
+        val legalEntities = listOf(
+            RequestValues.legalEntity1,
+            RequestValues.legalEntity2
+        )
+
+        wireMockServer.stubFor(
+            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    permanentRedirect("foo")
+                )
+        )
+
+        webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(legalEntities))
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
     }
 }
