@@ -185,6 +185,6 @@ class AddressControllerIT @Autowired constructor(
         candidates.single { bp -> bp.identifiers.any { id -> id.value == cdqPartner.id } }
 
     private fun getMatchingFromCandidates(partnerRequest: BusinessPartnerRequest, candidates: Collection<BusinessPartnerResponse>) =
-        candidates.single { bp -> bp.names.any { id -> partnerRequest.names.map { it.value }.contains(id.value) } }
+        candidates.single { bp -> bp.names.any { name -> partnerRequest.names.map { it.value }.contains(name.value) } }
 
 }

@@ -12,7 +12,7 @@ interface AddressRepository : PagingAndSortingRepository<Address, Long> {
     @Query("SELECT a FROM Address a join a.partner p where p.bpn=:bpn")
     fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<Address>
 
-    fun findByPartnerInOrSiteIn(partnerBpns: Collection<BusinessPartner>, siteBpns: Collection<Site>, pageable: Pageable): Page<Address>
+    fun findByPartnerInOrSiteIn(partners: Collection<BusinessPartner>, sites: Collection<Site>, pageable: Pageable): Page<Address>
 
     fun findByBpn(bpn: String): Address?
 
