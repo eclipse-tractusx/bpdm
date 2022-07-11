@@ -24,7 +24,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=2"])
 @ActiveProfiles("test")
 internal class LegalEntityControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
@@ -98,6 +98,37 @@ internal class LegalEntityControllerIT @Autowired constructor(
         webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(legalEntitiesJson.toString())
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    @Test
+    fun `upsert legal entities, legal entity limit exceeded`() {
+        val legalEntities = listOf(
+            RequestValues.legalEntity1,
+            RequestValues.legalEntity1.copy("external-2"),
+            RequestValues.legalEntity1.copy("external-3")
+        )
+
+        webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(legalEntities))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    @Test
+    fun `upsert legal entities, duplicate external id`() {
+        val legalEntities = listOf(
+            RequestValues.legalEntity1,
+            RequestValues.legalEntity1.copy()
+        )
+
+        webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(legalEntities))
             .exchange()
             .expectStatus()
             .isBadRequest
