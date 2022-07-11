@@ -103,6 +103,6 @@ class SiteControllerIT @Autowired constructor(
         webTestClient.invokeGetEndpoint<PageResponse<SiteResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
 
     private fun getMatchingFromCandidates(partnerRequest: BusinessPartnerRequest, candidates: Collection<BusinessPartnerResponse>) =
-        candidates.single { bp -> bp.names.any { id -> partnerRequest.names.map { it.value }.contains(id.value) } }
+        candidates.single { bp -> bp.names.any { name -> partnerRequest.names.map { it.value }.contains(name.value) } }
 
 }
