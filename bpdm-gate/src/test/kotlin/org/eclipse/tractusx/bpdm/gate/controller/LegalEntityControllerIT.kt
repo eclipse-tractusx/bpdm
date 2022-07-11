@@ -43,6 +43,10 @@ internal class LegalEntityControllerIT @Autowired constructor(
         }
     }
 
+    /**
+     * When upserting legal entities
+     * Then cdq upsert api should be called with the legal entity data mapped to the cdq data model
+     */
     @Test
     fun `upsert legal entities`() {
         val legalEntities = listOf(
@@ -88,6 +92,10 @@ internal class LegalEntityControllerIT @Autowired constructor(
         assertThat(upsertRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedLegalEntities)
     }
 
+    /**
+     * When upserting legal entities with missing external id
+     * Then a bad request response should be sent
+     */
     @Test
     fun `upsert legal entities, missing external id`() {
         val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
@@ -103,6 +111,10 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .isBadRequest
     }
 
+    /**
+     * When upper limit of legal entities in a request is exceeded when upserting legal entities
+     * Then a bad request response should be sent
+     */
     @Test
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
@@ -119,6 +131,10 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .isBadRequest
     }
 
+    /**
+     * When upserting legal entities with duplicate external ids within the same request
+     * Then a bad request response should be sent
+     */
     @Test
     fun `upsert legal entities, duplicate external id`() {
         val legalEntities = listOf(
@@ -134,6 +150,10 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .isBadRequest
     }
 
+    /**
+     * When cdq api responds with an error status code while upserting legal entities
+     * Then an internal server error response should be sent
+     */
     @Test
     fun `upsert legal entities, cdq error`() {
         val legalEntities = listOf(
