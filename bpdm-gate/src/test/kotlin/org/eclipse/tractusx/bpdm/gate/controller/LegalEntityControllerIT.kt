@@ -10,7 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
@@ -102,7 +102,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
     fun `upsert legal entities, missing external id`() {
         val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
             objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntity1)
-                .apply { remove(LegalEntityRequest::externalId.name) }
+                .apply { remove(LegalEntityDto::externalId.name) }
         )
 
         webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)

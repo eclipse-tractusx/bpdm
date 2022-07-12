@@ -1,11 +1,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.common.dto.request.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,7 +13,7 @@ class CdqRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val cdqConfigProperties: CdqConfigProperties
 ) {
-    fun toCdqModel(legalEntity: LegalEntityRequest): BusinessPartnerCdq {
+    fun toCdqModel(legalEntity: LegalEntityDto): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = legalEntity.externalId,
             dataSource = cdqConfigProperties.datasource,
@@ -27,7 +27,7 @@ class CdqRequestMappingService(
         )
     }
 
-    private fun BankAccountRequest.toCdqModel(): BankAccountCdq {
+    private fun BankAccountDto.toCdqModel(): BankAccountCdq {
         return BankAccountCdq(
             internationalBankAccountIdentifier = internationalBankAccountIdentifier,
             internationalBankIdentifier = internationalBankIdentifier,
@@ -40,14 +40,14 @@ class CdqRequestMappingService(
         return TypeKeyNameUrlCdq(name)
     }
 
-    private fun toPartnerProfileCdq(profileClassifications: Collection<ClassificationRequest>): PartnerProfileCdq? {
+    private fun toPartnerProfileCdq(profileClassifications: Collection<ClassificationDto>): PartnerProfileCdq? {
         if (profileClassifications.isEmpty()) {
             return null
         }
         return PartnerProfileCdq(classifications = profileClassifications.map { it.toCdqModel() })
     }
 
-    private fun ClassificationRequest.toCdqModel(): ClassificationCdq {
+    private fun ClassificationDto.toCdqModel(): ClassificationCdq {
         return ClassificationCdq(
             value = value,
             code = code,
@@ -55,7 +55,7 @@ class CdqRequestMappingService(
         )
     }
 
-    private fun BusinessStatusRequest.toCdqModel(): BusinessPartnerStatusCdq {
+    private fun BusinessStatusDto.toCdqModel(): BusinessPartnerStatusCdq {
         return BusinessPartnerStatusCdq(
             type = TypeKeyNameUrlCdq(type.name),
             officialDenotation = officialDenotation,
@@ -66,7 +66,7 @@ class CdqRequestMappingService(
 
     private fun toLegalFormCdq(technicalKey: String?) = if (technicalKey != null) LegalFormCdq(technicalKey = technicalKey) else null
 
-    private fun NameRequest.toCdqModel(): NameCdq {
+    private fun NameDto.toCdqModel(): NameCdq {
         return NameCdq(
             value = value,
             shortName = shortName,
@@ -74,7 +74,7 @@ class CdqRequestMappingService(
         )
     }
 
-    private fun IdentifierRequest.toCdqModel(): IdentifierCdq {
+    private fun IdentifierDto.toCdqModel(): IdentifierCdq {
         return IdentifierCdq(
             type = TypeKeyNameUrlCdq(type),
             value = value,
@@ -83,7 +83,7 @@ class CdqRequestMappingService(
         )
     }
 
-    private fun toIdentifiersCdq(identifiers: Collection<IdentifierRequest>, bpn: String?): Collection<IdentifierCdq> {
+    private fun toIdentifiersCdq(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierCdq> {
         var identifiersCdq = identifiers.map { it.toCdqModel() }
         if (bpn != null) {
             identifiersCdq = identifiersCdq.plus(createBpnIdentifierCdq(bpn))

@@ -3,8 +3,8 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.common.dto.request.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
@@ -77,18 +77,22 @@ class CdqRequestMappingService(
         )
     }
 
-    fun toRequest(identifier: IdentifierCdq): IdentifierRequest {
-        return IdentifierRequest(identifier.value,
+    fun toRequest(identifier: IdentifierCdq): IdentifierDto {
+        return IdentifierDto(
+            identifier.value,
             toReference(identifier.type),
             toOptionalReference(identifier.issuingBody),
-            toOptionalReference(identifier.status))
+            toOptionalReference(identifier.status)
+        )
     }
 
-    fun toCdqIdentifierRequest(idValue: String): IdentifierRequest {
-        return IdentifierRequest(idValue,
+    fun toCdqIdentifierRequest(idValue: String): IdentifierDto {
+        return IdentifierDto(
+            idValue,
             cdqIdentifierConfigProperties.typeKey,
             cdqIdentifierConfigProperties.issuerKey,
-            cdqIdentifierConfigProperties.statusImportedKey)
+            cdqIdentifierConfigProperties.statusImportedKey
+        )
     }
 
     fun toRequest(idType: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<String> {
@@ -99,8 +103,9 @@ class CdqRequestMappingService(
         return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name!!)
     }
 
-    fun toRequest(name: NameCdq): NameRequest {
-        return NameRequest(name.value,
+    fun toRequest(name: NameCdq): NameDto {
+        return NameDto(
+            name.value,
             name.shortName,
             toTypeOrDefault(name.type),
             toLanguageCode(name.language)
@@ -122,11 +127,13 @@ class CdqRequestMappingService(
         return TypeNameUrlDto(category.name!!, category.url)
     }
 
-    fun toRequest(status: BusinessPartnerStatusCdq): BusinessStatusRequest {
-        return BusinessStatusRequest(status.officialDenotation,
+    fun toRequest(status: BusinessPartnerStatusCdq): BusinessStatusDto {
+        return BusinessStatusDto(
+            status.officialDenotation,
             status.validFrom,
             status.validUntil,
-            toType(status.type))
+            toType(status.type)
+        )
     }
 
     fun toRequest(address: AddressCdq): AddressRequest {
@@ -195,22 +202,23 @@ class CdqRequestMappingService(
         return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, 0.0f)
     }
 
-    fun toRequest(profile: PartnerProfileCdq?): Collection<ClassificationRequest>{
+    fun toRequest(profile: PartnerProfileCdq?): Collection<ClassificationDto> {
         return profile?.classifications?.map { toRequest(it) } ?: emptyList()
     }
 
-    fun toRequest(classification: ClassificationCdq): ClassificationRequest {
-        return ClassificationRequest(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
+    fun toRequest(classification: ClassificationCdq): ClassificationDto {
+        return ClassificationDto(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
     }
 
-    fun toRequest(account: BankAccountCdq): BankAccountRequest {
-        return BankAccountRequest(
+    fun toRequest(account: BankAccountCdq): BankAccountDto {
+        return BankAccountDto(
             emptyList(),
             CurrencyCode.UNDEFINED,
             account.internationalBankAccountIdentifier,
             account.internationalBankIdentifier,
             account.nationalBankAccountIdentifier,
-            account.nationalBankIdentifier)
+            account.nationalBankIdentifier
+        )
     }
 
 }

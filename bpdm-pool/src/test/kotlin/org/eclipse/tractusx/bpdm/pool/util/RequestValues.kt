@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.dto.request.NameRequest
+import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
@@ -77,7 +77,7 @@ object RequestValues {
         bpn = null,
         legalForm = null,
         status = null,
-        names = listOf(NameRequest(value = CommonValues.name6, shortName = null)),
+        names = listOf(NameDto(value = CommonValues.name6, shortName = null)),
         sites = listOf(siteRequest1)
     )
 
@@ -85,7 +85,7 @@ object RequestValues {
         bpn = null,
         legalForm = null,
         status = null,
-        names = listOf(NameRequest(value = CommonValues.name7, shortName = null)),
+        names = listOf(NameDto(value = CommonValues.name7, shortName = null)),
         sites = listOf(siteRequest2)
     )
 
@@ -93,7 +93,7 @@ object RequestValues {
         bpn = null,
         legalForm = null,
         status = null,
-        names = listOf(NameRequest(value = CommonValues.name8, shortName = null)),
+        names = listOf(NameDto(value = CommonValues.name8, shortName = null)),
         sites = listOf(siteRequest3)
     )
 }

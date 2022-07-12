@@ -5,7 +5,7 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.CdqFeatures
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -21,7 +21,7 @@ class LegalEntityService(
     private val objectMapper: ObjectMapper
 ) {
 
-    fun upsertLegalEntities(legalEntities: Collection<LegalEntityRequest>) {
+    fun upsertLegalEntities(legalEntities: Collection<LegalEntityDto>) {
         val legalEntitiesCdq = legalEntities.map { cdqRequestMappingService.toCdqModel(it) }
         val upsertRequest =
             UpsertRequest(cdqConfigProperties.datasource, legalEntitiesCdq, listOf(CdqFeatures.UPSERT_BY_EXTERNAL_ID, CdqFeatures.API_ERROR_ON_FAILURES))

@@ -1,18 +1,16 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/legal-entities")
@@ -35,12 +33,17 @@ class LegalEntityController(
         ]
     )
     @PutMapping
-    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityRequest>): ResponseEntity<Any> {
+    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityDto>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || containsDuplicates(legalEntities.map { it.externalId })) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         legalEntityService.upsertLegalEntities(legalEntities)
         return ResponseEntity(HttpStatus.OK)
+    }
+
+    @GetMapping("/{externalId}")
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String) {
+
     }
 
     private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size
