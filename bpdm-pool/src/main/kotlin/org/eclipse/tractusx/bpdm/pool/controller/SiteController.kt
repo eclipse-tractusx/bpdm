@@ -5,12 +5,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteWithReferenceResponse
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springdoc.api.annotations.ParameterObject
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/sites")
@@ -34,5 +35,23 @@ class SiteController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): SiteWithReferenceResponse {
         return siteService.findByBpn(bpn)
+    }
+
+    @Operation(
+        summary = "Search sites by BPNLs",
+        description = "Search sites by legal entity BPNs"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found sites that belong to specified legal entites"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @PostMapping("/search")
+    fun searchSites(
+        @RequestBody siteSearchRequest: SiteSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<SiteWithReferenceResponse> {
+        return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 }

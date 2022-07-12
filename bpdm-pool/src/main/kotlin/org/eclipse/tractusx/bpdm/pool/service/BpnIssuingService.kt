@@ -36,7 +36,7 @@ class BpnIssuingService(
 
     @Transactional
     fun issueSiteBpns(count: Int): Collection<String> {
-        return issueBpns(count, bpnConfigProperties.addressChar, bpnConfigProperties.counterKeySites)
+        return issueBpns(count, bpnConfigProperties.siteChar, bpnConfigProperties.counterKeySites)
     }
 
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): Collection<String> {

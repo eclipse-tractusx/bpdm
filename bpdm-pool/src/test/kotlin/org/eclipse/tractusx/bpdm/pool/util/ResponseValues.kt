@@ -125,6 +125,7 @@ object ResponseValues {
     val premise3 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise3, type = premiseType1, language = language0)
     val premise4 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise4, type = premiseType1, language = language0)
     val premise5 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise5, type = premiseType1, language = language0)
+    val premise6 = PremiseResponse(uuid = CommonValues.uuid1, value = CommonValues.premise6, type = premiseType1, language = language0)
 
     val postalDeliveryPointType1 =
         TypeKeyNameUrlDto(PostalDeliveryPointType.OTHER, PostalDeliveryPointType.OTHER.getTypeName(), PostalDeliveryPointType.OTHER.getUrl())
@@ -181,6 +182,25 @@ object ResponseValues {
         postalDeliveryPoints = listOf(postalDeliveryPoint5)
     )
 
+    val address4 = AddressResponse(
+        uuid = CommonValues.uuid1,
+        bpn = CommonValues.bpnA3,
+        version = version1,
+        country = country1,
+        premises = listOf(premise6)
+    )
+
+    val site1 = SiteResponse(
+        CommonValues.bpnS1,
+        CommonValues.siteName1,
+        listOf(address4)
+    )
+
+    val site2 = SiteResponse(
+        CommonValues.bpnS2,
+        CommonValues.siteName2,
+    )
+
     val businessPartner1 = BusinessPartnerResponse(
         bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
@@ -210,4 +230,6 @@ object ResponseValues {
         profileClassifications = listOf(classification5),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
+
+
 }

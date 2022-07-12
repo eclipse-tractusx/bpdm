@@ -129,7 +129,7 @@ class BusinessPartnerBuildService(
 
         val addressBpns = bpnIssuingService.issueAddressBpns(dto.addresses.size)
         val addressBpnPairs = dto.addresses.zip(addressBpns)
-        partner.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, partner, site) })
+        site.addresses.addAll(addressBpnPairs.map { (request, bpn) -> createAddress(request, bpn, null, site) })
 
         return site
     }
@@ -138,7 +138,7 @@ class BusinessPartnerBuildService(
     private fun createAddress(
         dto: AddressRequest,
         bpn: String,
-        partner: BusinessPartner,
+        partner: BusinessPartner?,
         site: Site?
     ): Address {
         val address = Address(

@@ -31,8 +31,10 @@ object EndpointValues {
     const val CATENA_BPN_SEARCH_PATH = "/api/catena/bpn/search"
 
     const val CATENA_ADDRESSES_PATH = "/api/catena/addresses"
+    const val CATENA_ADDRESSES_SEARCH_PATH = "$CATENA_ADDRESSES_PATH/search"
 
     const val CATENA_SITES_PATH = "/api/catena/sites"
+    const val CATENA_SITE_SEARCH_PATH = "$CATENA_SITES_PATH/search"
 
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
