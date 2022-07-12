@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.gate.service
+package org.eclipse.tractusx.bpdm.gate.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus

@@ -4,16 +4,19 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.dto.request.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
 import org.springframework.stereotype.Service
 
 @Service
 class CdqRequestMappingService(
-    private val bpnConfigProperties: BpnConfigProperties
+    private val bpnConfigProperties: BpnConfigProperties,
+    private val cdqConfigProperties: CdqConfigProperties
 ) {
     fun toCdqModel(legalEntity: LegalEntityRequest): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = legalEntity.externalId,
+            dataSource = cdqConfigProperties.datasource,
             identifiers = toIdentifiersCdq(legalEntity.identifiers, legalEntity.bpn),
             names = legalEntity.names.map { it.toCdqModel() },
             legalForm = toLegalFormCdq(legalEntity.legalForm),

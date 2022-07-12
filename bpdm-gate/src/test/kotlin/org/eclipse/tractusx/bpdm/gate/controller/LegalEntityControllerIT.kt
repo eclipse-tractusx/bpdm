@@ -9,6 +9,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
@@ -28,7 +29,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles("test")
 internal class LegalEntityControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper
+    val objectMapper: ObjectMapper,
+    val cdqConfigProperties: CdqConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -55,8 +57,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            CdqValues.legalEntity1.copy(dataSource = cdqConfigProperties.datasource),
+            CdqValues.legalEntity2.copy(dataSource = cdqConfigProperties.datasource)
         )
 
         wireMockServer.stubFor(

@@ -6,6 +6,7 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityRequest
+import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono

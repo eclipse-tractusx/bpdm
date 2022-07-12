@@ -21,7 +21,7 @@ data class LegalEntityRequest(
     val status: BusinessStatusRequest?,
     @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
     val profileClassifications: Collection<ClassificationRequest> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "UNKNOWN"))
+    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[\"UNKNOWN\"]"))
     val types: Collection<BusinessPartnerType> = listOf(BusinessPartnerType.UNKNOWN),
     @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
     val bankAccounts: Collection<BankAccountRequest> = emptyList()
