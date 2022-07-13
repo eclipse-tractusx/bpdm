@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

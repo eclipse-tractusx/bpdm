@@ -1,11 +1,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.cdq.CdqFeatures
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient

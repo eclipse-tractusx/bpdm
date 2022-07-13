@@ -3,7 +3,6 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 
 object RequestValues {
     val identifier1 =

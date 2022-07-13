@@ -1,13 +1,11 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.CurrencyCode
-import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
@@ -20,69 +18,27 @@ import org.springframework.stereotype.Service
 class CdqRequestMappingService(
     val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
 ) {
-    private fun toReference(type: TypeKeyNameUrlCdq?): String{
-        return type!!.technicalKey!!
+
+    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
+        return CdqMappings.technicalKeyToType(type?.technicalKey)
     }
 
-    private fun toOptionalReference(type: TypeKeyNameUrlCdq?): String?{
-        return type?.technicalKey
-    }
-
-    private fun toOptionalReference(type: TypeKeyNameCdq?): String?{
-        return type?.technicalKey
-    }
-
-    private fun toOptionalReference(legalForm: LegalFormCdq?): String?{
-        return legalForm?.technicalKey
-    }
-
-    private inline fun <reified T> toType(type: TypeKeyNameUrlCdq): T where T: Enum<T>{
-        return enumValueOf(type.technicalKey!!)
-    }
-
-    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameUrlCdq?): T where T: Enum<T>, T: HasDefaultValue<T> {
-        return technicalKeyToType(type?.technicalKey)
-    }
-
-    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T: Enum<T>, T: HasDefaultValue<T> {
-       return technicalKeyToType(type?.technicalKey)
-    }
-
-    private inline fun <reified T> technicalKeyToType(technicalKey: String?): T where T: Enum<T>, T: HasDefaultValue<T> {
-        val allValues =   enumValues<T>()
-        val foundValue = if(technicalKey != null) allValues.map { it.name }.find { technicalKey == it } else null
-        return if(foundValue != null) enumValueOf(foundValue) else allValues.first().getDefault()
-    }
-
-    private fun  toLanguageCode(language: LanguageCdq?): LanguageCode{
-        return language?.technicalKey ?: LanguageCode.undefined
-    }
-
-    private fun  toCountryCode(country: CountryCdq?): CountryCode{
+    private fun toCountryCode(country: CountryCdq?): CountryCode {
         return country?.shortName ?: CountryCode.UNDEFINED
     }
 
     fun toRequest(partner: BusinessPartnerCdq): BusinessPartnerRequest {
         return BusinessPartnerRequest(
             partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id!!)),
-            partner.names.map { toRequest(it) },
-            toOptionalReference(partner.legalForm),
-            if (partner.status != null) toRequest(partner.status!!) else null,
+            partner.identifiers.map { CdqMappings.toDto(it) }.plus(toCdqIdentifierRequest(partner.id!!)),
+            partner.names.map { CdqMappings.toDto(it) },
+            CdqMappings.toOptionalReference(partner.legalForm),
+            if (partner.status != null) CdqMappings.toDto(partner.status!!) else null,
             partner.addresses.map { toRequest(it) },
             listOf(),
-            toRequest(partner.profile),
-            partner.types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
-            partner.bankAccounts.map { toRequest(it) }
-        )
-    }
-
-    fun toRequest(identifier: IdentifierCdq): IdentifierDto {
-        return IdentifierDto(
-            identifier.value,
-            toReference(identifier.type),
-            toOptionalReference(identifier.issuingBody),
-            toOptionalReference(identifier.status)
+            CdqMappings.toDto(partner.profile),
+            partner.types.map { CdqMappings.toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
+            partner.bankAccounts.map { CdqMappings.toDto(it) }
         )
     }
 
@@ -103,37 +59,19 @@ class CdqRequestMappingService(
         return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name!!)
     }
 
-    fun toRequest(name: NameCdq): NameDto {
-        return NameDto(
-            name.value,
-            name.shortName,
-            toTypeOrDefault(name.type),
-            toLanguageCode(name.language)
-        )
-    }
-
     fun toRequest(legalForm: LegalFormCdq, partner: BusinessPartnerCdq): LegalFormRequest {
         return LegalFormRequest(
             legalForm.technicalKey,
             legalForm.name!!,
             legalForm.url,
             legalForm.mainAbbreviation,
-            toLanguageCode(legalForm.language),
+            CdqMappings.toLanguageCode(legalForm.language),
             partner.categories.map { toCategoryRequest(it) }
         )
     }
 
     fun toCategoryRequest(category: TypeKeyNameUrlCdq): TypeNameUrlDto {
         return TypeNameUrlDto(category.name!!, category.url)
-    }
-
-    fun toRequest(status: BusinessPartnerStatusCdq): BusinessStatusDto {
-        return BusinessStatusDto(
-            status.officialDenotation,
-            status.validFrom,
-            status.validUntil,
-            toType(status.type)
-        )
     }
 
     fun toRequest(address: AddressCdq): AddressRequest {
@@ -150,27 +88,29 @@ class CdqRequestMappingService(
             address.premises.map { toRequest(it) },
             address.postalDeliveryPoints.map { toRequest(it) },
             if (address.geographicCoordinates != null) toRequest(address.geographicCoordinates!!) else null,
-            address.types.map { toTypeOrDefault(it) }
+            address.types.map { CdqMappings.toTypeOrDefault(it) }
         )
     }
 
     fun toRequest(version: AddressVersionCdq?): AddressVersionRequest {
-        return AddressVersionRequest(toTypeOrDefault(version?.characterSet), toLanguageCode(version?.language))
+        return AddressVersionRequest(toTypeOrDefault(version?.characterSet), CdqMappings.toLanguageCode(version?.language))
     }
 
     fun toRequest(area: AdministrativeAreaCdq): AdministrativeAreaRequest {
-        return AdministrativeAreaRequest(area.value,
+        return AdministrativeAreaRequest(
+            area.value,
             area.shortName,
             null,
-            toTypeOrDefault(area.type))
+            CdqMappings.toTypeOrDefault(area.type)
+        )
     }
 
     fun toRequest(postcode: PostCodeCdq): PostCodeRequest {
-        return PostCodeRequest(postcode.value, toTypeOrDefault(postcode.type))
+        return PostCodeRequest(postcode.value, CdqMappings.toTypeOrDefault(postcode.type))
     }
 
     fun toRequest(locality: LocalityCdq): LocalityRequest {
-        return LocalityRequest(locality.value, locality.shortName, toTypeOrDefault(locality.type))
+        return LocalityRequest(locality.value, locality.shortName, CdqMappings.toTypeOrDefault(locality.type))
     }
 
     fun toRequest(thoroughfare: ThoroughfareCdq): ThoroughfareRequest {
@@ -180,45 +120,30 @@ class CdqRequestMappingService(
             thoroughfare.shortName,
             thoroughfare.number,
             thoroughfare.direction,
-            toTypeOrDefault(thoroughfare.type)
+            CdqMappings.toTypeOrDefault(thoroughfare.type)
         )
     }
 
     fun toRequest(premise: PremiseCdq): PremiseRequest {
-        return PremiseRequest(premise.value,
+        return PremiseRequest(
+            premise.value,
             premise.shortName,
             premise.number,
-            toTypeOrDefault(premise.type))
+            CdqMappings.toTypeOrDefault(premise.type)
+        )
     }
 
     fun toRequest(deliveryPoint: PostalDeliveryPointCdq): PostalDeliveryPointRequest {
-        return PostalDeliveryPointRequest(deliveryPoint.value,
+        return PostalDeliveryPointRequest(
+            deliveryPoint.value,
             deliveryPoint.shortName,
             deliveryPoint.number,
-            toTypeOrDefault(deliveryPoint.type))
+            CdqMappings.toTypeOrDefault(deliveryPoint.type)
+        )
     }
 
     fun toRequest(geoCoords: GeoCoordinatesCdq): GeoCoordinateDto {
         return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, 0.0f)
-    }
-
-    fun toRequest(profile: PartnerProfileCdq?): Collection<ClassificationDto> {
-        return profile?.classifications?.map { toRequest(it) } ?: emptyList()
-    }
-
-    fun toRequest(classification: ClassificationCdq): ClassificationDto {
-        return ClassificationDto(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
-    }
-
-    fun toRequest(account: BankAccountCdq): BankAccountDto {
-        return BankAccountDto(
-            emptyList(),
-            CurrencyCode.UNDEFINED,
-            account.internationalBankAccountIdentifier,
-            account.internationalBankIdentifier,
-            account.nationalBankAccountIdentifier,
-            account.nationalBankIdentifier
-        )
     }
 
 }

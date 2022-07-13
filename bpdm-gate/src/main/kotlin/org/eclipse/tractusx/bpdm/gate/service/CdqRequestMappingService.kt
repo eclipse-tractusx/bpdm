@@ -5,7 +5,6 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityDto
 import org.springframework.stereotype.Service
 
 @Service
