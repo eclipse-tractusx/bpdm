@@ -37,6 +37,8 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.springProfiles | join ","  }}
+            - name: SPRING_CONFIG_IMPORT
+              value: /etc/conf/external.properties
             - name: BPDM_DB_HOST
               value: {{ include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
             - name: BPDM_ELASTIC_HOST
@@ -84,9 +86,12 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
             successThreshold: {{ .Values.readinessProbe.successThreshold }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /etc/conf
+              name: config
+              readOnly: true
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -99,3 +104,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "bpdm.fullname" . }}
