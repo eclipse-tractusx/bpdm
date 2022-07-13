@@ -41,9 +41,16 @@ class LegalEntityController(
         return ResponseEntity(HttpStatus.OK)
     }
 
+    @Operation(summary = "Get legal entity by external identifier")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found legal entity with external identifier"),
+            ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
+        ]
+    )
     @GetMapping("/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String) {
-
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityDto {
+        return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
     private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size

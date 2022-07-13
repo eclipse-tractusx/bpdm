@@ -5,14 +5,14 @@ data class UpsertRequest(
     val businessPartners: Collection<BusinessPartnerCdq>,
     val featuresOn: Collection<CdqFeatures> = emptyList(),
     val featuresOff: Collection<CdqFeatures> = emptyList()
-)
-
-enum class CdqFeatures {
-    UPSERT_BY_EXTERNAL_ID,
-    API_ERROR_ON_FAILURES,
-    LAB_USE_QUEUES,
-    ENABLE_PRECURATION,
-    TRANSFORM_RECORD,
-    ENABLE_SETTINGS,
-    ENABLE_ASYNC
+) {
+    enum class CdqFeatures {
+        UPSERT_BY_EXTERNAL_ID,
+        API_ERROR_ON_FAILURES,
+        LAB_USE_QUEUES,
+        ENABLE_PRECURATION,
+        TRANSFORM_RECORD,
+        ENABLE_SETTINGS,
+        ENABLE_ASYNC
+    }
 }

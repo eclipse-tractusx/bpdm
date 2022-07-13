@@ -1,11 +1,11 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.springframework.data.domain.Page

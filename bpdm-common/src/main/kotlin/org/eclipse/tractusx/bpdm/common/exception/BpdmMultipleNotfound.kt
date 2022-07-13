@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.exception
+package org.eclipse.tractusx.bpdm.common.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus

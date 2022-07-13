@@ -1,11 +1,11 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
