@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 private const val BUSINESS_PARTNER_PATH = "/businesspartners"
-private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH + /fetch"
+private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
 
 @Service
 class LegalEntityService(
@@ -48,21 +48,21 @@ class LegalEntityService(
     fun getLegalEntityByExternalId(externalId: String): LegalEntityDto {
         val fetchRequest = FetchRequest(cdqConfigProperties.datasource, externalId)
 
-        try {
-            val fetchResponse = webClient
+        val fetchResponse = try {
+            webClient
                 .post()
                 .uri(FETCH_BUSINESS_PARTNER_PATH)
                 .bodyValue(objectMapper.writeValueAsString(fetchRequest))
                 .retrieve()
                 .bodyToMono<FetchResponse>()
                 .block()!!
-
-            when (fetchResponse.status) {
-                FetchResponse.Status.OK -> return fetchResponse.businessPartner!!.toDto()
-                FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
-            }
         } catch (e: Exception) {
             throw CdqRequestException("Fetch business partners request failed.", e)
+        }
+
+        when (fetchResponse.status) {
+            FetchResponse.Status.OK -> return fetchResponse.businessPartner!!.toDto()
+            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
         }
     }
 

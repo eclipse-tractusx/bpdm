@@ -8,6 +8,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
@@ -165,9 +166,96 @@ internal class LegalEntityControllerIT @Autowired constructor(
 
         wireMockServer.stubFor(
             put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(legalEntities))
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
+     * Given legal entity exists in cdq
+     * When getting legal entity by external id
+     * Then legal entity mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get legal entity by external id`() {
+        val expectedLegalEntity = RequestValues.legalEntity1
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
-                    permanentRedirect("foo")
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = CdqValues.legalEntity1,
+                                    status = FetchResponse.Status.OK
+                                )
+                            )
+                        )
                 )
+        )
+
+        val legalEntity = webTestClient.get().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBody(LegalEntityDto::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(legalEntity).isEqualTo(expectedLegalEntity)
+    }
+
+    /**
+     * Given legal entity does not exist in cdq
+     * When getting legal entity by external id
+     * Then "not found" response is sent
+     */
+    @Test
+    fun `get legal entity by external id, not found`() {
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = null,
+                                    status = FetchResponse.Status.NOT_FOUND
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.get().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+            .exchange()
+            .expectStatus()
+            .isNotFound
+    }
+
+    /**
+     * When cdq api responds with an error status code while fetching legal entity by external id
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get legal entity by external id, cdq error`() {
+        val legalEntities = listOf(
+            RequestValues.legalEntity1,
+            RequestValues.legalEntity2
+        )
+
+        wireMockServer.stubFor(
+            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
         )
 
         webTestClient.put().uri(EndpointValues.CATENA_LEGAL_ENTITIES_PATH)

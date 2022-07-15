@@ -47,7 +47,7 @@ object CdqMappings {
         return LegalEntityDto(
             externalId = externalId!!,
             bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            identifiers = identifiers.map { toDto(it) },
+            identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
             names = names.map { toDto(it) },
             legalForm = toOptionalReference(legalForm),
             status = if (status != null) toDto(status) else null,
