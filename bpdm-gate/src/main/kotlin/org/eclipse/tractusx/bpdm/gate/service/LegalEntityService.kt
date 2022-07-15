@@ -2,13 +2,11 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchRequest
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
-import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -43,7 +41,7 @@ class LegalEntityService(
                 .bodyToMono<UpsertResponse>()
                 .block()!!
         } catch (e: Exception) {
-            throw CdqRequestException("Upsert request failed.", e)
+            throw CdqRequestException("Upsert business partners request failed.", e)
         }
     }
 
@@ -64,7 +62,34 @@ class LegalEntityService(
                 FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
             }
         } catch (e: Exception) {
-            throw CdqRequestException("Fetch request failed.", e)
+            throw CdqRequestException("Fetch business partners request failed.", e)
         }
+    }
+
+    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityDto> {
+        val partnerCollection = try {
+            webClient
+                .get()
+                .uri { builder ->
+                    builder
+                        .path(BUSINESS_PARTNER_PATH)
+                        .queryParam("limit", limit)
+                        .queryParam("datasource", cdqConfigProperties.datasource)
+                        .queryParam("featuresOn", "USE_NEXT_START_AFTER")
+                    if (startAfter != null) builder.queryParam("startAfter", startAfter)
+                    builder.build()
+                }
+                .retrieve()
+                .bodyToMono<BusinessPartnerCollectionCdq>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Get business partners request failed.", e)
+        }
+
+        return PageStartAfterResponse(
+            total = partnerCollection.total,
+            nextStartAfter = partnerCollection.nextStartAfter,
+            content = partnerCollection.values.map { it.toDto() }
+        )
     }
 }
