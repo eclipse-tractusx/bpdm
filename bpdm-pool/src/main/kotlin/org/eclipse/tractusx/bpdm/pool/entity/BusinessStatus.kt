@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import java.time.LocalDateTime
 import javax.persistence.*
 
@@ -21,19 +22,3 @@ class BusinessStatus (
     @JoinColumn(name = "partner_id", nullable = false)
     var partner: BusinessPartner
         ): BaseEntity()
-
-enum class BusinessStatusType(private val statusName: String, private val url: String): NamedUrlType {
-    ACTIVE("Active", ""),
-    DISSOLVED("Dissolved", ""),
-    IN_LIQUIDATION("In Liquidation", ""),
-    INACTIVE("Inactive", ""),
-    INSOLVENCY("Insolvency", "");
-
-    override fun getTypeName(): String {
-        return statusName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-}

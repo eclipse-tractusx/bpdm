@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import javax.persistence.*
 
 @Entity
@@ -20,9 +21,3 @@ class Classification (
     var partner: BusinessPartner
         ): BaseEntity()
 
-enum class ClassificationType(val url: String){
-    NACE(""),
-    NAF(""),
-    NAICS( ""),
-    SIC("")
-}

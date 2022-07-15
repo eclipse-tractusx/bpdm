@@ -2,7 +2,8 @@ package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.request.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import javax.validation.constraints.NotEmpty
 
 @Schema(name = "Business Partner Request", description = "New business partner record")
@@ -24,7 +25,7 @@ data class BusinessPartnerRequest (
     val sites: Collection<SiteRequest> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
     val profileClassifications: Collection<ClassificationRequest> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "UNKNOWN"))
+    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[\"UNKNOWN\"]"))
     val types: Collection<BusinessPartnerType> = listOf(BusinessPartnerType.UNKNOWN),
     @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
     val bankAccounts: Collection<BankAccountRequest> = emptyList()

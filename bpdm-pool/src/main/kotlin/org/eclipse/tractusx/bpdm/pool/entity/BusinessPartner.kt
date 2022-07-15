@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import java.time.Instant
 import javax.persistence.*
 
@@ -58,22 +59,3 @@ class BusinessPartner(
     val endNodeRelations: MutableSet<Relation> = mutableSetOf()
 }
 
-enum class BusinessPartnerType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<BusinessPartnerType> {
-    BRAND("Brand", ""),
-    LEGAL_ENTITY("Legal Entity", ""),
-    ORGANIZATIONAL_UNIT("Organizational Unit", ""),
-    SITE("Site", ""),
-    UNKNOWN("Unknown", "");
-
-    override fun getTypeName(): String {
-        return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): BusinessPartnerType {
-        return UNKNOWN
-    }
-}

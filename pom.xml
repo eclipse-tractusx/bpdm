@@ -44,9 +44,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${groupId}</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.keycloak.bom</groupId>
@@ -99,6 +99,11 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-kotlin</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-common</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
             <!-- Kotlin wrapper for slf4j (Logging)-->

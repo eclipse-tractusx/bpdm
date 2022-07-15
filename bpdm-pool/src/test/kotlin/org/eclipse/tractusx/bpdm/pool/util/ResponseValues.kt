@@ -2,6 +2,8 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
+import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto

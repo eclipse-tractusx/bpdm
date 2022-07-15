@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import java.time.LocalDateTime
 
 /**

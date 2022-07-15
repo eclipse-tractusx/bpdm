@@ -3,16 +3,17 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.request.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
 import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.entity.ClassificationType
-import org.eclipse.tractusx.bpdm.pool.entity.HasDefaultValue
 import org.springframework.stereotype.Service
 
 @Service
@@ -64,10 +65,10 @@ class CdqRequestMappingService(
     fun toRequest(partner: BusinessPartnerCdq): BusinessPartnerRequest {
         return BusinessPartnerRequest(
             partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id)),
+            partner.identifiers.map { toRequest(it) }.plus(toCdqIdentifierRequest(partner.id!!)),
             partner.names.map { toRequest(it) },
             toOptionalReference(partner.legalForm),
-            if (partner.status != null) toRequest(partner.status) else null,
+            if (partner.status != null) toRequest(partner.status!!) else null,
             partner.addresses.map { toRequest(it) },
             listOf(),
             toRequest(partner.profile),
@@ -109,7 +110,7 @@ class CdqRequestMappingService(
     fun toRequest(legalForm: LegalFormCdq, partner: BusinessPartnerCdq): LegalFormRequest {
         return LegalFormRequest(
             legalForm.technicalKey,
-            legalForm.name,
+            legalForm.name!!,
             legalForm.url,
             legalForm.mainAbbreviation,
             toLanguageCode(legalForm.language),
@@ -141,7 +142,7 @@ class CdqRequestMappingService(
             address.thoroughfares.map { toRequest(it) },
             address.premises.map { toRequest(it) },
             address.postalDeliveryPoints.map { toRequest(it) },
-            if(address.geographicCoordinates != null) toRequest(address.geographicCoordinates) else null,
+            if (address.geographicCoordinates != null) toRequest(address.geographicCoordinates!!) else null,
             address.types.map { toTypeOrDefault(it) }
         )
     }
@@ -199,7 +200,7 @@ class CdqRequestMappingService(
     }
 
     fun toRequest(classification: ClassificationCdq): ClassificationRequest {
-        return ClassificationRequest(classification.value, classification.code, toType<ClassificationType>(classification.type))
+        return ClassificationRequest(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
     }
 
     fun toRequest(account: BankAccountCdq): BankAccountRequest {

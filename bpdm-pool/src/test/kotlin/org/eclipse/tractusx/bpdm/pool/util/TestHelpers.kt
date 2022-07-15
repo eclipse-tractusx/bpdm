@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
