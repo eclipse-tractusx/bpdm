@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
+import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
@@ -51,28 +52,37 @@ object CdqValues {
         issuingBody = issuerBpn
     )
 
+    val language1 = LanguageCdq(
+        technicalKey = LanguageCode.en,
+        name = null
+    )
+
     val name1 = NameCdq(
         value = CommonValues.name1,
         shortName = CommonValues.shortName1,
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name),
+        language = language1
     )
 
     val name2 = NameCdq(
         value = CommonValues.name2,
         shortName = CommonValues.shortName2,
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name),
+        language = language1
     )
 
     val name3 = NameCdq(
         value = CommonValues.name3,
         shortName = CommonValues.shortName3,
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name),
+        language = language1
     )
 
     val name4 = NameCdq(
         value = CommonValues.name4,
         shortName = CommonValues.shortName4,
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name),
+        language = language1
     )
 
     val legalForm1 = LegalFormCdq(technicalKey = CommonValues.legalFormTechnicalKey1)

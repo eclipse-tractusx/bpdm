@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
@@ -65,11 +66,17 @@ class CdqRequestMappingService(
 
     private fun toLegalFormCdq(technicalKey: String?) = if (technicalKey != null) LegalFormCdq(technicalKey = technicalKey) else null
 
+    private fun toLanguageCdq(technicalKey: LanguageCode) = LanguageCdq(
+        technicalKey = technicalKey,
+        name = null
+    )
+
     private fun NameDto.toCdqModel(): NameCdq {
         return NameCdq(
             value = value,
             shortName = shortName,
-            type = TypeKeyNameUrlCdq(type.name)
+            type = TypeKeyNameUrlCdq(type.name),
+            language = toLanguageCdq(this.language)
         )
     }
 
