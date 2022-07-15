@@ -14,6 +14,7 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena/legal-entities")
@@ -70,7 +71,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping
-    fun getLegalEntities(@ParameterObject paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityDto> {
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityDto> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }
 
