@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class FetchRequest(
-    val datasource: String,
+    val dataSource: String,
     val externalId: String,
     val featuresOn: Collection<CdqFeatures> = emptyList(),
     val featuresOff: Collection<CdqFeatures> = emptyList()
