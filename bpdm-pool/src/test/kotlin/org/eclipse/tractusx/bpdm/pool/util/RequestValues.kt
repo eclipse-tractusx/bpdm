@@ -4,9 +4,9 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.PremiseDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeNameUrlDto
