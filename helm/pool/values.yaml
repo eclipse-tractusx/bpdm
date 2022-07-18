@@ -39,8 +39,8 @@ autoscaling:
 
 ingress:
   className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  createRootPath: true
+  subPath: /v1
   hosts:
     - partners-pool.dev.demo.catena-x.net
 
@@ -91,12 +91,14 @@ applicationSecret:
   keycloak: <path:bpdm/data/dev/pool/keycloak#credentials-secret>
   cdq: <path:bpdm/data/dev/pool/cdq#api-key>
 
+applicationConfig: # |
+  # property=value
+
 elastic:
   enabled: true
   security:
     tls:
       restEncryption: false
-
 
 postgres:
   enabled: true
