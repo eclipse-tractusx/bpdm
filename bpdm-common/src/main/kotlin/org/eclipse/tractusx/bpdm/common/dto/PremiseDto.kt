@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.PremiseType
 
 @Schema(name = "Premise Request", description = "New premise record for an address such as building, room or floor")
-data class PremiseRequest (
+data class PremiseDto(
     @Schema(description = "Full denotation of the premise")
     val value: String,
     @Schema(description = "Abbreviation or shorthand, if applicable")

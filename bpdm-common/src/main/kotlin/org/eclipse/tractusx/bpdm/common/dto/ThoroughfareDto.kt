@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.ThoroughfareType
 
 @Schema(name = "Thoroughfare Request", description = "New thoroughfare record for an address such as street, square or industrial zone")
-data class ThoroughfareRequest (
+data class ThoroughfareDto(
         @Schema(description = "Full denotation of the thoroughfare")
         val value: String,
         @Schema(description = "Full name of the thoroughfare")

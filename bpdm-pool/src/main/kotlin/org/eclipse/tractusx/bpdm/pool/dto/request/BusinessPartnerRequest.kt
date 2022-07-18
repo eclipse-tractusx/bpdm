@@ -20,7 +20,7 @@ data class BusinessPartnerRequest(
     @Schema(description = "Current business status")
     val status: BusinessStatusDto?,
     @ArraySchema(arraySchema = Schema(description = "Addresses the partner is located at", required = false))
-    val addresses: Collection<AddressRequest> = emptyList(),
+    val addresses: Collection<AddressDto> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Sites of the partner", required = false))
     val sites: Collection<SiteRequest> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))

@@ -137,7 +137,7 @@ class BusinessPartnerBuildService(
 
 
     private fun createAddress(
-        dto: AddressRequest,
+        dto: AddressDto,
         bpn: String,
         partner: BusinessPartner?,
         site: Site?
@@ -215,7 +215,7 @@ class BusinessPartnerBuildService(
         return Identifier(dto.value, type, status, issuingBody, partner)
     }
 
-    private fun toEntity(dto: AddressVersionRequest): AddressVersion {
+    private fun toEntity(dto: AddressVersionDto): AddressVersion {
         return AddressVersion(dto.characterSet, dto.language)
     }
 
@@ -223,27 +223,27 @@ class BusinessPartnerBuildService(
         return GeographicCoordinate(dto.latitude, dto.longitude, dto.altitude)
     }
 
-    private fun toEntity(dto: ThoroughfareRequest, address: Address): Thoroughfare {
+    private fun toEntity(dto: ThoroughfareDto, address: Address): Thoroughfare {
         return Thoroughfare(dto.value, dto.name, dto.shortName, dto.number, dto.direction, dto.type, address.version.language, address)
     }
 
-    private fun toEntity(dto: LocalityRequest, address: Address): Locality {
+    private fun toEntity(dto: LocalityDto, address: Address): Locality {
         return Locality(dto.value, dto.shortName, dto.type, address.version.language, address)
     }
 
-    private fun toEntity(dto: PremiseRequest, address: Address): Premise {
+    private fun toEntity(dto: PremiseDto, address: Address): Premise {
         return Premise(dto.value, dto.shortName, dto.number, dto.type, address.version.language, address)
     }
 
-    private fun toEntity(dto: PostalDeliveryPointRequest, address: Address): PostalDeliveryPoint {
+    private fun toEntity(dto: PostalDeliveryPointDto, address: Address): PostalDeliveryPoint {
         return PostalDeliveryPoint(dto.value, dto.shortName, dto.number, dto.type, address.version.language, address)
     }
 
-    private fun toEntity(dto: AdministrativeAreaRequest, address: Address): AdministrativeArea {
-       return AdministrativeArea(dto.value, dto.shortName, dto.fipsCode, dto.type, address.version.language, address.country, address)
+    private fun toEntity(dto: AdministrativeAreaDto, address: Address): AdministrativeArea {
+        return AdministrativeArea(dto.value, dto.shortName, dto.fipsCode, dto.type, address.version.language, address.country, address)
     }
 
-    private fun toEntity(dto: PostCodeRequest, address: Address): PostCode {
+    private fun toEntity(dto: PostCodeDto, address: Address): PostCode {
         return PostCode(dto.value, dto.type, address.country, address)
     }
 }
