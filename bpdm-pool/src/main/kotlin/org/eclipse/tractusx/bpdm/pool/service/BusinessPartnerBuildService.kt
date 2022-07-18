@@ -1,7 +1,8 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.request.*
+import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.BusinessPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
@@ -9,7 +10,6 @@ import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -175,12 +175,13 @@ class BusinessPartnerBuildService(
         return BusinessPartner(bpn, legalForm, dto.types.toSet(), emptySet(), Instant.now())
     }
 
-    private fun toEntity(dto: BusinessStatusRequest, partner: BusinessPartner): BusinessStatus {
+    private fun toEntity(dto: BusinessStatusDto, partner: BusinessPartner): BusinessStatus {
         return BusinessStatus(dto.officialDenotation, dto.validFrom, dto.validUntil, dto.type, partner)
     }
 
-    private fun toEntity(dto: BankAccountRequest, partner: BusinessPartner): BankAccount {
-        return BankAccount(dto.trustScores.toSet(),
+    private fun toEntity(dto: BankAccountDto, partner: BusinessPartner): BankAccount {
+        return BankAccount(
+            dto.trustScores.toSet(),
             dto.currency,
             dto.internationalBankAccountIdentifier,
             dto.internationalBankIdentifier,
@@ -190,16 +191,16 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: NameRequest, partner: BusinessPartner): Name {
+    private fun toEntity(dto: NameDto, partner: BusinessPartner): Name {
         return Name(dto.value, dto.shortName, dto.type, dto.language, partner)
     }
 
-    private fun toEntity(dto: ClassificationRequest, partner: BusinessPartner): Classification {
-        return Classification(dto.value,dto.code, dto.type, partner)
+    private fun toEntity(dto: ClassificationDto, partner: BusinessPartner): Classification {
+        return Classification(dto.value, dto.code, dto.type, partner)
     }
 
     private fun toEntity(
-        dto: IdentifierRequest,
+        dto: IdentifierDto,
         metadataMap: MetadataMappingDto,
         partner: BusinessPartner
     ): Identifier {
@@ -210,7 +211,7 @@ class BusinessPartnerBuildService(
             partner)
     }
 
-    private fun toEntity(dto: IdentifierRequest, type: IdentifierType, status: IdentifierStatus?, issuingBody: IssuingBody?, partner: BusinessPartner): Identifier {
+    private fun toEntity(dto: IdentifierDto, type: IdentifierType, status: IdentifierStatus?, issuingBody: IssuingBody?, partner: BusinessPartner): Identifier {
         return Identifier(dto.value, type, status, issuingBody, partner)
     }
 

@@ -1,9 +1,9 @@
-package org.eclipse.tractusx.bpdm.common.dto.request
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Identifier Request", description = "New identifier record for a business partner")
-data class IdentifierRequest (
+@Schema(name = "Identifier", description = "Identifier record for a business partner")
+data class IdentifierDto(
     @Schema(description = "Value of the identifier")
     val value: String,
     @Schema(description = "Technical key of the type to which this identifier belongs to")
@@ -12,4 +12,4 @@ data class IdentifierRequest (
     val issuingBody: String?,
     @Schema(description = "Technical key of the status this identifier has")
     val status: String?
-        )
+)

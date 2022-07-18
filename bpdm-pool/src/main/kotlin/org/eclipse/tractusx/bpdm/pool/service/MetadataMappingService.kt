@@ -1,12 +1,12 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
-import org.eclipse.tractusx.bpdm.pool.exception.BpdmMultipleNotfound
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierStatusRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IssuingBodyRepository
