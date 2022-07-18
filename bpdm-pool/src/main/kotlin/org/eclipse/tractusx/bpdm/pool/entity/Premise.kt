@@ -1,8 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.model.PremiseType
 import javax.persistence.*
 
 @Entity
@@ -28,25 +27,3 @@ class Premise(
     var address: Address
 ) : BaseEntity()
 
-enum class PremiseType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<PremiseType> {
-    BUILDING("Building", ""),
-    OTHER("Other type", ""),
-    LEVEL("Level", ""),
-    HARBOUR("Harbour", ""),
-    ROOM("Room", ""),
-    SUITE("Suite", ""),
-    UNIT("Unit", ""),
-    WAREHOUSE("Warehouse", "");
-
-    override fun getTypeName(): String {
-        return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): PremiseType {
-        return OTHER
-    }
-}

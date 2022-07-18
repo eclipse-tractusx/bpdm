@@ -1,8 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.model.LocalityType
 import javax.persistence.*
 
 @Entity
@@ -26,23 +25,3 @@ class Locality (
     var address: Address
         ) : BaseEntity()
 
-enum class LocalityType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<LocalityType> {
-    BLOCK("Block", ""),
-    CITY("City", ""),
-    DISTRICT("District", ""),
-    OTHER("Other", ""),
-    POST_OFFICE_CITY("Post Office City", ""),
-    QUARTER("Quarter", "");
-
-    override fun getTypeName(): String {
-        return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): LocalityType {
-        return OTHER
-    }
-}

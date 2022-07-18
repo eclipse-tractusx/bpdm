@@ -1,8 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.model.ThoroughfareType
 import javax.persistence.*
 
 @Entity
@@ -32,22 +31,3 @@ class Thoroughfare (
     var address: Address
         ) : BaseEntity()
 
-enum class ThoroughfareType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<ThoroughfareType> {
-    INDUSTRIAL_ZONE("An industrial zone", ""),
-    OTHER("Other type", ""),
-    RIVER("River", ""),
-    SQUARE("Square", ""),
-    STREET("Street", "");
-
-    override fun getTypeName(): String {
-        return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): ThoroughfareType {
-        return OTHER
-    }
-}

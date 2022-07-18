@@ -3,10 +3,10 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.entity.AddressType
 import java.util.*
 
 @Schema(name = "Address Response", description = "Localized address record of a business partner")

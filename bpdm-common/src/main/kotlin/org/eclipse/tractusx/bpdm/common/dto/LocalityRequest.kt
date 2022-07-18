@@ -1,7 +1,7 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.LocalityType
+import org.eclipse.tractusx.bpdm.common.model.LocalityType
 
 @Schema(name = "Locality Request", description = "New locality record for an address such as city, block or district")
 data class LocalityRequest (

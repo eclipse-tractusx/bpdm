@@ -1,10 +1,9 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.pool.entity.AddressType
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 
 @Schema(name = "Address Request", description = "New localized address record for a business partner")
 data class AddressRequest (

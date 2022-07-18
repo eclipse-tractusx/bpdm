@@ -5,9 +5,9 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.BusinessPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
-import org.eclipse.tractusx.bpdm.pool.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
-import org.eclipse.tractusx.bpdm.pool.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
@@ -149,7 +149,7 @@ class BusinessPartnerBuildService(
             dto.country,
             dto.types.toMutableSet(),
             toEntity(dto.version),
-            dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates) },
+            dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) },
             partner,
             site
         )

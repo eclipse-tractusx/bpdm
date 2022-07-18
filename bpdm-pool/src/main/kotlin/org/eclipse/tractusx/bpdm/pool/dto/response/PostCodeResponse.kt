@@ -1,8 +1,8 @@
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.model.PostCodeType
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.entity.PostCodeType
 import java.util.*
 
 @Schema(name = "Postcode Response", description = "Postcode record of an address")

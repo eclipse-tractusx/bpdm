@@ -1,7 +1,7 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.PostalDeliveryPointType
+import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
 @Schema(name = "Postal Delivery Point Request", description = "New postal delivery point record for an address")
 data class PostalDeliveryPointRequest (

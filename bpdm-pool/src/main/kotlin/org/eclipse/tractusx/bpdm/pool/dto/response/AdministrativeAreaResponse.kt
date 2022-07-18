@@ -2,9 +2,9 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.entity.AdministrativeAreaType
 import java.util.*
 
 @Schema(name = "Administrative Area Response", description = "Area of an address such as country region or county")

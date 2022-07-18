@@ -2,8 +2,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 import javax.persistence.*
 
 @Entity
@@ -33,20 +32,3 @@ class AdministrativeArea(
     var address: Address
 ): BaseEntity()
 
-enum class AdministrativeAreaType(private val areaName: String, private val url: String): NamedUrlType, HasDefaultValue<AdministrativeAreaType> {
-    COUNTY("County", ""),
-    REGION("Region", ""),
-    OTHER("Other", "");
-
-    override fun getTypeName(): String {
-        return areaName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): AdministrativeAreaType {
-        return OTHER
-    }
-}

@@ -1,8 +1,8 @@
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.CharacterSet
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 
 @Schema(name = "Address Version Request", description = "New localization record for an address")
 data class AddressVersionRequest (

@@ -1,8 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 import javax.persistence.*
 
 @Entity
@@ -28,22 +27,3 @@ class PostalDeliveryPoint(
     var address: Address
 ) : BaseEntity()
 
-enum class PostalDeliveryPointType(private val typeName: String, private val url: String): NamedUrlType, HasDefaultValue<PostalDeliveryPointType> {
-    INTERURBAN_DELIVERY_POINT("Interurban Delivery Point", ""),
-    MAIL_STATION("Mail Station", ""),
-    MAILBOX("Mailbox", ""),
-    OTHER("Other Type", ""),
-    POST_OFFICE_BOX("Post Office Box", "");
-
-    override fun getTypeName(): String {
-        return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
-    }
-
-    override fun getDefault(): PostalDeliveryPointType {
-        return OTHER
-    }
-}
