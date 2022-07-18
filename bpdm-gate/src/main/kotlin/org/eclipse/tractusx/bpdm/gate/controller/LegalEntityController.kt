@@ -66,7 +66,7 @@ class LegalEntityController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The sites for the specified bpn"),
+            ApiResponse(responseCode = "200", description = "The requested page of legal entities"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
