@@ -15,8 +15,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena/addresses")
-class AddressController(
-) {
+class AddressController {
 
     @Operation(
         summary = "Create or update addresses.",
