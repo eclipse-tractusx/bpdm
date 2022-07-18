@@ -121,7 +121,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun createSite(
-        dto: SiteRequest,
+        dto: SiteDto,
         bpn: String,
         partner: BusinessPartner
     ): Site {

@@ -4,7 +4,7 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.PremiseDto
-import org.eclipse.tractusx.bpdm.common.dto.SiteRequest
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
@@ -61,18 +61,18 @@ object RequestValues {
         premises = listOf(premiseRequest1)
     )
 
-    val siteRequest1 = SiteRequest(
+    val siteRequest1 = SiteDto(
         bpn = null,
         name = CommonValues.siteName1,
         addresses = listOf(addressRequest1)
     )
 
-    val siteRequest2 = SiteRequest(
+    val siteRequest2 = SiteDto(
         bpn = null,
         name = CommonValues.siteName2
     )
 
-    val siteRequest3 = SiteRequest(
+    val siteRequest3 = SiteDto(
         bpn = null,
         name = CommonValues.siteName3
     )

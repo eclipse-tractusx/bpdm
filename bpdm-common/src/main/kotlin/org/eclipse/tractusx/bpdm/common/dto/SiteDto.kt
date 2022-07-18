@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Site Request", description = "New site record")
-data class SiteRequest(
+data class SiteDto(
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @Schema(description = "Site name")
