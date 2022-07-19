@@ -15,4 +15,4 @@ target
 #local database data
 /db
 #Helm dependencies
-/helm/bpdm/charts
+/helm/pool/charts

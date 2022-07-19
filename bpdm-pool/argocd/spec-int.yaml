@@ -1,0 +1,15 @@
+project: project-bpdm
+source:
+  repoURL: 'https://github.com/catenax-ng/product-bpdm.git'
+  path: helm/pool
+  targetRevision: main
+  plugin:
+    name: argocd-vault-plugin-helm-args
+    env:
+      - name: AVP_SECRET
+        value: vault-secret
+      - name: helm_args
+        value: '-f values-int.yaml'
+destination:
+  server: 'https://kubernetes.default.svc'
+  namespace: product-bpdm

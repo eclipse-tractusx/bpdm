@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "bpdm.fullname" . }}
+  labels:
+      {{- include "bpdm.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- if .Values.ingress.subPath }}
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ .Values.ingress.subPath }}
+    {{- end}}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+    - hosts:
+        {{- range .Values.ingress.hosts }}
+        - {{ . }}
+        {{- end}}
+      secretName: tls-secret
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          {{- if $.Values.ingress.subPath }}
+          - path: {{ $.Values.ingress.subPath }}(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "bpdm.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- end }}
+          {{- if or ($.Values.ingress.createRootPath) (not $.Values.ingress.subPath)  }}
+          - path: /()(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "bpdm.fullname" $ }}
+                port:
+                  number: {{ $.Values.service.port }}
+          {{- end}}
+    {{- end}}

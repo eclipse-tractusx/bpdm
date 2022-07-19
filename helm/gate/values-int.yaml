@@ -1,0 +1,12 @@
+image:
+  tag: "main"
+
+springProfiles:
+  - int
+
+ingress:
+  hosts:
+    - partners-gate.demo.catena-x.net
+
+applicationSecret:
+  cdq: <path:bpdm/data/int/gate/cdq#api-key>

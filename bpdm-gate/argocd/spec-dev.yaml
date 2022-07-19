@@ -1,0 +1,13 @@
+project: project-bpdm
+source:
+  repoURL: 'https://github.com/catenax-ng/product-bpdm.git'
+  path: helm/gate
+  targetRevision: develop
+  plugin:
+    name: argocd-vault-plugin-helm
+    env:
+      - name: AVP_SECRET
+        value: vault-secret
+destination:
+  server: 'https://kubernetes.default.svc'
+  namespace: product-bpdm
