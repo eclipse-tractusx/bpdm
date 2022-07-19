@@ -12,7 +12,7 @@ image:
   repository: catenax-ng/product-bpdm/gate
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "develop"
+  tag: "main"
 
 imagePullSecrets: [ ]
 
@@ -42,8 +42,8 @@ autoscaling:
 
 ingress:
   className: nginx
-  annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+  createRootPath: false
+  subPath: /v2
   hosts:
     - partners-gate.dev.demo.catena-x.net
 
@@ -92,3 +92,6 @@ readinessProbe:
 applicationSecret:
   enabled: true
   cdq: <path:bpdm/data/dev/gate/cdq#api-key>
+
+applicationConfig: # |
+# property=value
