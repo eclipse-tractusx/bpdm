@@ -6,8 +6,6 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
 @Schema(name = "Legal Entity")
 data class LegalEntityDto(
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
-    val externalId: String,
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))

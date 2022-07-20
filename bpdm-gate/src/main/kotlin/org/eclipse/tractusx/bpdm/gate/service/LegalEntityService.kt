@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityWithReferencesDto
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
@@ -23,7 +23,7 @@ class LegalEntityService(
     private val objectMapper: ObjectMapper
 ) {
 
-    fun upsertLegalEntities(legalEntities: Collection<LegalEntityDto>) {
+    fun upsertLegalEntities(legalEntities: Collection<LegalEntityWithReferencesDto>) {
         val legalEntitiesCdq = legalEntities.map { cdqRequestMappingService.toCdqModel(it) }
         val upsertRequest =
             UpsertRequest(
@@ -45,7 +45,7 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntityByExternalId(externalId: String): LegalEntityDto {
+    fun getLegalEntityByExternalId(externalId: String): LegalEntityWithReferencesDto {
         val fetchRequest = FetchRequest(cdqConfigProperties.datasource, externalId)
 
         val fetchResponse = try {
@@ -66,7 +66,7 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityDto> {
+    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityWithReferencesDto> {
         val partnerCollection = try {
             webClient
                 .get()

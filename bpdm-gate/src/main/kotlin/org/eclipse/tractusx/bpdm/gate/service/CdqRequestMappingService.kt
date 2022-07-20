@@ -13,9 +13,13 @@ class CdqRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val cdqConfigProperties: CdqConfigProperties
 ) {
-    fun toCdqModel(legalEntity: LegalEntityDto): BusinessPartnerCdq {
+    fun toCdqModel(legalEntity: LegalEntityWithReferencesDto): BusinessPartnerCdq {
+        return toCdqModel(legalEntity.legalEntity, legalEntity.externalId)
+    }
+
+    private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String): BusinessPartnerCdq {
         return BusinessPartnerCdq(
-            externalId = legalEntity.externalId,
+            externalId = externalId,
             dataSource = cdqConfigProperties.datasource,
             identifiers = toIdentifiersCdq(legalEntity.identifiers, legalEntity.bpn),
             names = legalEntity.names.map { it.toCdqModel() },

@@ -94,7 +94,6 @@ object RequestValues {
     )
 
     val legalEntity1 = LegalEntityDto(
-        externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         names = listOf(name1, name2),
@@ -106,7 +105,6 @@ object RequestValues {
     )
 
     val legalEntity2 = LegalEntityDto(
-        externalId = CommonValues.externalId2,
         bpn = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         names = listOf(name3, name4),
@@ -115,5 +113,15 @@ object RequestValues {
         profileClassifications = listOf(classification3, classification4),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
         bankAccounts = listOf(bankAccount3, bankAccount4)
+    )
+
+    val legalEntityWithReferences1 = LegalEntityWithReferencesDto(
+        externalId = CommonValues.externalId1,
+        legalEntity = legalEntity1
+    )
+
+    val legalEntityWithReferences2 = LegalEntityWithReferencesDto(
+        externalId = CommonValues.externalId2,
+        legalEntity = legalEntity2
     )
 }

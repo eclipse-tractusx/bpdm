@@ -43,17 +43,19 @@ object CdqMappings {
         return language?.technicalKey ?: LanguageCode.undefined
     }
 
-    fun BusinessPartnerCdq.toDto(): LegalEntityDto {
-        return LegalEntityDto(
+    fun BusinessPartnerCdq.toDto(): LegalEntityWithReferencesDto {
+        return LegalEntityWithReferencesDto(
             externalId = externalId!!,
-            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
-            names = names.map { toDto(it) },
-            legalForm = toOptionalReference(legalForm),
-            status = if (status != null) toDto(status) else null,
-            profileClassifications = toDto(profile),
-            types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
-            bankAccounts = bankAccounts.map { toDto(it) }
+            legalEntity = LegalEntityDto(
+                bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
+                identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
+                names = names.map { toDto(it) },
+                legalForm = toOptionalReference(legalForm),
+                status = if (status != null) toDto(status) else null,
+                profileClassifications = toDto(profile),
+                types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
+                bankAccounts = bankAccounts.map { toDto(it) }
+            )
         )
     }
 

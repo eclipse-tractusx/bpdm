@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityWithReferencesDto
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
@@ -58,8 +58,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `upsert legal entities`() {
         val legalEntities = listOf(
-            RequestValues.legalEntity1,
-            RequestValues.legalEntity2
+            RequestValues.legalEntityWithReferences1,
+            RequestValues.legalEntityWithReferences2
         )
 
         val expectedLegalEntities = listOf(
@@ -107,8 +107,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `upsert legal entities, missing external id`() {
         val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
-            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntity1)
-                .apply { remove(LegalEntityDto::externalId.name) }
+            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntityWithReferences1)
+                .apply { remove(LegalEntityWithReferencesDto::externalId.name) }
         )
 
         webTestClient.put().uri(CATENA_LEGAL_ENTITIES_PATH)
@@ -126,9 +126,9 @@ internal class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
-            RequestValues.legalEntity1,
-            RequestValues.legalEntity1.copy("external-2"),
-            RequestValues.legalEntity1.copy("external-3")
+            RequestValues.legalEntityWithReferences1,
+            RequestValues.legalEntityWithReferences1.copy(externalId = "external-2"),
+            RequestValues.legalEntityWithReferences1.copy(externalId = "external-3")
         )
 
         webTestClient.put().uri(CATENA_LEGAL_ENTITIES_PATH)
@@ -146,8 +146,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `upsert legal entities, duplicate external id`() {
         val legalEntities = listOf(
-            RequestValues.legalEntity1,
-            RequestValues.legalEntity1.copy()
+            RequestValues.legalEntityWithReferences1,
+            RequestValues.legalEntityWithReferences1.copy()
         )
 
         webTestClient.put().uri(CATENA_LEGAL_ENTITIES_PATH)
@@ -165,8 +165,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `upsert legal entities, cdq error`() {
         val legalEntities = listOf(
-            RequestValues.legalEntity1,
-            RequestValues.legalEntity2
+            RequestValues.legalEntityWithReferences1,
+            RequestValues.legalEntityWithReferences2
         )
 
         wireMockServer.stubFor(
@@ -189,7 +189,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = RequestValues.legalEntity1
+        val expectedLegalEntity = RequestValues.legalEntityWithReferences1
 
         wireMockServer.stubFor(
             post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -211,7 +211,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(LegalEntityDto::class.java)
+            .expectBody(LegalEntityWithReferencesDto::class.java)
             .returnResult()
             .responseBody
 
@@ -277,8 +277,8 @@ internal class LegalEntityControllerIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            RequestValues.legalEntity1,
-            RequestValues.legalEntity2
+            RequestValues.legalEntityWithReferences1,
+            RequestValues.legalEntityWithReferences2
         )
 
         val limit = 2
@@ -315,7 +315,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityDto>>()
+            .returnResult<PageStartAfterResponse<LegalEntityWithReferencesDto>>()
             .responseBody
             .blockFirst()!!
 
