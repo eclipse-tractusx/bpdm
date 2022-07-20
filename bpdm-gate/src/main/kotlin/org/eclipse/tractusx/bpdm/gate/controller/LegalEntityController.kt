@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api/catena/legal-entities")
+@RequestMapping("/api/catena")
 class LegalEntityController(
     val legalEntityService: LegalEntityService,
     val apiConfigProperties: ApiConfigProperties
@@ -36,7 +36,7 @@ class LegalEntityController(
             ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
         ]
     )
-    @PutMapping
+    @PutMapping("/input/legal-entities")
     fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityDto>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || containsDuplicates(legalEntities.map { it.externalId })) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -55,7 +55,7 @@ class LegalEntityController(
             ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
         ]
     )
-    @GetMapping("/{externalId}")
+    @GetMapping("/input/legal-entities/{externalId}")
     fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityDto {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
@@ -70,7 +70,7 @@ class LegalEntityController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping
+    @GetMapping("/input/legal-entities")
     fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityDto> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }

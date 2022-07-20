@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api/catena/sites")
+@RequestMapping("/api/catena")
 class SiteController {
     @Operation(
         summary = "Create or update sites.",
@@ -29,7 +29,7 @@ class SiteController {
             ApiResponse(responseCode = "400", description = "On malformed site request", content = [Content()]),
         ]
     )
-    @PutMapping
+    @PutMapping("/input/sites")
     fun upsertSites(@RequestBody sites: Collection<SiteWithReferencesDto>): ResponseEntity<Any> {
         TODO()
     }
@@ -44,7 +44,7 @@ class SiteController {
             ApiResponse(responseCode = "404", description = "No site found under specified external identifier", content = [Content()])
         ]
     )
-    @GetMapping("/{externalId}")
+    @GetMapping("/input/sites/{externalId}")
     fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteWithReferencesDto {
         TODO()
     }
@@ -59,7 +59,7 @@ class SiteController {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping
+    @GetMapping("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteWithReferencesDto> {
         TODO()
     }

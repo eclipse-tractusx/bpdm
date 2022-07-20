@@ -7,5 +7,6 @@ object EndpointValues {
     const val CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_BUSINESS_PARTNER_PATH/fetch"
 
     const val CATENA_PATH = "/api/catena"
-    const val CATENA_LEGAL_ENTITIES_PATH = "${CATENA_PATH}/legal-entities"
+    const val CATENA_INPUT_PATH = "${CATENA_PATH}/input"
+    const val CATENA_LEGAL_ENTITIES_PATH = "${CATENA_INPUT_PATH}/legal-entities"
 }

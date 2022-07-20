@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api/catena/addresses")
+@RequestMapping("/api/catena")
 class AddressController {
 
     @Operation(
@@ -30,7 +30,7 @@ class AddressController {
             ApiResponse(responseCode = "400", description = "On malformed address request", content = [Content()]),
         ]
     )
-    @PutMapping
+    @PutMapping("/input/addresses")
     fun upsertAddresses(@RequestBody addresses: Collection<AddressWithReferencesDto>): ResponseEntity<Any> {
         TODO()
     }
@@ -45,7 +45,7 @@ class AddressController {
             ApiResponse(responseCode = "404", description = "No address found under specified external identifier", content = [Content()])
         ]
     )
-    @GetMapping("/{externalId}")
+    @GetMapping("/input/addresses/{externalId}")
     fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressWithReferencesDto {
         TODO()
     }
@@ -60,7 +60,7 @@ class AddressController {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping
+    @GetMapping("/input/addresses")
     fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressWithReferencesDto> {
         TODO()
     }
