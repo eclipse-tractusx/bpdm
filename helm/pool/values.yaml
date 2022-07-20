@@ -9,7 +9,7 @@ image:
   repository: catenax-ng/product-bpdm/pool
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "develop"
+  tag: "main"
 
 imagePullSecrets: [ ]
 
@@ -39,8 +39,8 @@ autoscaling:
 
 ingress:
   className: nginx
-  createRootPath: true
-  subPath: /v1
+  createRootPath: false
+  subPath: /v2
   hosts:
     - partners-pool.dev.demo.catena-x.net
 

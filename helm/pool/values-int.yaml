@@ -7,7 +7,6 @@ springProfiles:
 ingress:
   hosts:
     - partners-pool.demo.catena-x.net
-    - catenax-bpdm-int.demo.catena-x.net
 
 applicationSecret:
   keycloak: <path:bpdm/data/int/pool/keycloak#credentials-secret>
