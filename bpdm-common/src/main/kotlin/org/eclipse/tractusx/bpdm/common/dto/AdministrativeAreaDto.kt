@@ -3,7 +3,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 
-@Schema(name = "Administrative Area Request", description = "New areas such as country regions or counties")
+@Schema(name = "Administrative Area", description = "Areas such as country regions or counties")
 data class AdministrativeAreaDto(
     @Schema(description = "Full name of the area")
     val value: String,

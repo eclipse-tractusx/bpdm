@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.AddressWithReferencesDto
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressWithReferencesResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.springdoc.api.annotations.ParameterObject
@@ -80,8 +80,8 @@ class AddressController {
     @GetMapping("/output/addresses")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show addresses that were updated after the specified timestamp") from: Instant
-    ): PageStartAfterResponse<AddressResponse> {
+        @Parameter(description = "Only show addresses that were updated after the specified ISO-8601 timestamp") from: Instant?
+    ): PageStartAfterResponse<AddressWithReferencesResponse> {
         TODO()
     }
 }

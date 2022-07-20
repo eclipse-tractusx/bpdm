@@ -7,7 +7,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
-@Schema(name = "Business Partner Response", description = "Business partner record")
+@Schema(name = "Legal Entity Response", description = "Legal entity record")
 data class LegalEntityResponse(
     @Schema(description = "Business Partner Number, main identifier value for business partners")
     val bpn: String,

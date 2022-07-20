@@ -3,7 +3,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
-@Schema(name = "Postal Delivery Point Request", description = "New postal delivery point record for an address")
+@Schema(name = "Postal Delivery Point", description = "Postal delivery point record for an address")
 data class PostalDeliveryPointDto(
     @Schema(description = "Full name of the delivery point")
     val value: String,

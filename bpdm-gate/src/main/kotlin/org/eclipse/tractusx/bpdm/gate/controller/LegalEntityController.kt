@@ -90,7 +90,7 @@ class LegalEntityController(
     @GetMapping("/output/legal-entities")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show legal entities that were updated after the specified timestamp") from: Instant
+        @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
     ): PageStartAfterResponse<LegalEntityResponse> {
         TODO()
     }

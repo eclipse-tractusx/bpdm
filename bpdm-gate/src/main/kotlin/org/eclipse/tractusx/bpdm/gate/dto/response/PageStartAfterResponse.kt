@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.gate.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Page Response", description = "Paginated collection of results")
+@Schema(description = "Paginated collection of results")
 data class PageStartAfterResponse<T>(
     @Schema(description = "Total number of all results in all pages")
     val total: Int,

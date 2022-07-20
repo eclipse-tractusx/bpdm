@@ -3,7 +3,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.LocalityType
 
-@Schema(name = "Locality Request", description = "New locality record for an address such as city, block or district")
+@Schema(name = "Locality", description = "Locality record for an address such as city, block or district")
 data class LocalityDto(
     @Schema(description = "Full name of the locality")
     val value: String,

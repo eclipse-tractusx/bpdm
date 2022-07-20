@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Site Request", description = "New site record")
+@Schema(name = "Site", description = "Site record")
 data class SiteDto(
     @Schema(description = "Business Partner Number")
     val bpn: String?,

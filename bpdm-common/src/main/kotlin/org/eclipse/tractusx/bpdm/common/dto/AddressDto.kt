@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 
-@Schema(name = "Address Request", description = "New localized address record for a business partner")
+@Schema(name = "Address", description = "Localized address record for a business partner")
 data class AddressDto(
     @Schema(description = "Business Partner Number")
     val bpn: String?,
