@@ -3,9 +3,10 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameUrlDto
 import java.time.Instant
 
 @Schema(name = "Business Partner Response", description = "Business partner record")

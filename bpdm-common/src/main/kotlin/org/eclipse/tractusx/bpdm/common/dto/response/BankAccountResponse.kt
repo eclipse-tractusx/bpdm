@@ -1,8 +1,8 @@
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import com.neovisionaries.i18n.CurrencyCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import java.util.*
 
 @Schema(name = "Bank Account Response", description = "Bank account record for a business partner")

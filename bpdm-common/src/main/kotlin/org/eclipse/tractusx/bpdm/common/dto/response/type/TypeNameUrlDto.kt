@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.dto.response.type
+package org.eclipse.tractusx.bpdm.common.dto.response.type
 
 import io.swagger.v3.oas.annotations.media.Schema
 

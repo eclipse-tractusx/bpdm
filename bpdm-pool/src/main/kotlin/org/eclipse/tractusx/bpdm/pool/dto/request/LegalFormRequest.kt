@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 
 @Schema(name = "Legal Form Request", description = "New legal form record to be referenced by business partners")
 data class LegalFormRequest(

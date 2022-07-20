@@ -1,9 +1,9 @@
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.pool.entity.RelationClass
-import org.eclipse.tractusx.bpdm.pool.entity.RelationType
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.RelationClass
+import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
 import java.util.*
 
