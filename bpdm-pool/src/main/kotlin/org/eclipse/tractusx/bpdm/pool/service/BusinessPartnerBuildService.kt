@@ -7,6 +7,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.BusinessPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
@@ -121,7 +122,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun createSite(
-        dto: SiteDto,
+        dto: SiteRequest,
         bpn: String,
         partner: BusinessPartner
     ): Site {

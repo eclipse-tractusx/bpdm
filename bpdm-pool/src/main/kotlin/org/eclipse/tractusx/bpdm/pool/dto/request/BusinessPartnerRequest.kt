@@ -22,7 +22,7 @@ data class BusinessPartnerRequest(
     @ArraySchema(arraySchema = Schema(description = "Addresses the partner is located at", required = false))
     val addresses: Collection<AddressDto> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Sites of the partner", required = false))
-    val sites: Collection<SiteDto> = emptyList(),
+    val sites: Collection<SiteRequest> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
     val profileClassifications: Collection<ClassificationDto> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[\"UNKNOWN\"]"))
