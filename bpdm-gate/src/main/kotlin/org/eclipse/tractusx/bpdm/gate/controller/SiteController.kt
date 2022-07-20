@@ -83,4 +83,19 @@ class SiteController {
     ): PageStartAfterResponse<SiteWithReferencesResponse> {
         TODO()
     }
+
+    @Operation(
+        summary = "Get site by external identifier",
+        description = "Get site by external identifier."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found site with external identifier"),
+            ApiResponse(responseCode = "404", description = "No site found under specified external identifier", content = [Content()])
+        ]
+    )
+    @GetMapping("/output/sites/{externalId}")
+    fun getSiteByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteWithReferencesResponse {
+        TODO()
+    }
 }

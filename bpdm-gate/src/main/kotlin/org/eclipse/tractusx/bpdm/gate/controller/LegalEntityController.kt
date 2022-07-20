@@ -95,5 +95,20 @@ class LegalEntityController(
         TODO()
     }
 
+    @Operation(
+        summary = "Get legal entity by external identifier",
+        description = "Get legal entity by external identifier."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found legal entity with external identifier"),
+            ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
+        ]
+    )
+    @GetMapping("/output/legal-entities/{externalId}")
+    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityResponse {
+        TODO()
+    }
+
     private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size
 }

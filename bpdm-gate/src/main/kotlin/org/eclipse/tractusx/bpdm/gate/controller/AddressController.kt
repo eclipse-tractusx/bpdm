@@ -84,4 +84,19 @@ class AddressController {
     ): PageStartAfterResponse<AddressWithReferencesResponse> {
         TODO()
     }
+
+    @Operation(
+        summary = "Get address by external identifier",
+        description = "Get address by external identifier."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found address with external identifier"),
+            ApiResponse(responseCode = "404", description = "No address found under specified external identifier", content = [Content()])
+        ]
+    )
+    @GetMapping("/output/addresses/{externalId}")
+    fun getAddressByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressWithReferencesResponse {
+        TODO()
+    }
 }
