@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.AddressWithReferencesDto
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -62,6 +64,24 @@ class AddressController {
     )
     @GetMapping("/input/addresses")
     fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressWithReferencesDto> {
+        TODO()
+    }
+
+    @Operation(
+        summary = "Get page of addresses",
+        description = "Get page of addresses."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of addresses"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @GetMapping("/output/addresses")
+    fun getAddressesOutput(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @Parameter(description = "Only show addresses that were updated after the specified timestamp") from: Instant
+    ): PageStartAfterResponse<AddressResponse> {
         TODO()
     }
 }

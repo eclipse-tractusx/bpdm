@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.SiteWithReferencesDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -61,6 +63,24 @@ class SiteController {
     )
     @GetMapping("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteWithReferencesDto> {
+        TODO()
+    }
+
+    @Operation(
+        summary = "Get page of sites",
+        description = "Get page of sites."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of sites"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @GetMapping("/output/sites")
+    fun getSitesOutput(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @Parameter(description = "Only show sites that were updated after the specified timestamp") from: Instant
+    ): PageStartAfterResponse<SiteResponse> {
         TODO()
     }
 }

@@ -12,6 +12,7 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 

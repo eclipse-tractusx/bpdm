@@ -7,7 +7,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import java.time.ZoneOffset
 
 /**
