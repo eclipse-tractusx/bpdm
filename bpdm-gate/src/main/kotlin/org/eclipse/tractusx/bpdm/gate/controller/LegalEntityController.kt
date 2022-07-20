@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityWithReferencesResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -91,7 +91,7 @@ class LegalEntityController(
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
-    ): PageStartAfterResponse<LegalEntityResponse> {
+    ): PageStartAfterResponse<LegalEntityWithReferencesResponse> {
         TODO()
     }
 
@@ -106,7 +106,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/output/legal-entities/{externalId}")
-    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityResponse {
+    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityWithReferencesResponse {
         TODO()
     }
 
