@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -14,6 +15,7 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -73,6 +75,24 @@ class LegalEntityController(
     @GetMapping("/input/legal-entities")
     fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityDto> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
+    }
+
+    @Operation(
+        summary = "Get page of legal entities",
+        description = "Get page of legal entities."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of legal entities"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @GetMapping("/output/legal-entities")
+    fun getLegalEntitiesOutput(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @Parameter(description = "Only show legal entities that were updated after the specified timestamp") from: Instant
+    ): PageStartAfterResponse<LegalEntityResponse> {
+        TODO()
     }
 
     private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size
