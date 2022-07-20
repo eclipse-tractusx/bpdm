@@ -5,12 +5,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.model.RelationClass
 import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
-import java.util.*
 
 @Schema(name = "Relation Response", description = "Directed relation between two business partners")
 data class RelationResponse (
-    @Schema(description = "Unique identifier for reference purposes")
-    val uuid: UUID,
     @Schema(description = "Class of relation like Catena, LEI or DNB relation")
     val relationClass: TypeKeyNameDto<RelationClass>,
     @Schema(description = "Type of relation like predecessor or ownership relation")

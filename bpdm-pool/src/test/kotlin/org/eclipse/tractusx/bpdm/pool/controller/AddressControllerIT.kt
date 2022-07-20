@@ -155,9 +155,8 @@ class AddressControllerIT @Autowired constructor(
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
-        val expectedPremise = PremiseResponse(CommonValues.uuid1, CommonValues.premise6, null, null, ResponseValues.premiseType1, ResponseValues.language0)
+        val expectedPremise = PremiseResponse(CommonValues.premise6, null, null, ResponseValues.premiseType1, ResponseValues.language0)
         val expectedAddress1 = AddressResponse(
-            CommonValues.uuid1,
             CommonValues.bpn1,
             ResponseValues.version1,
             country = ResponseValues.country1,

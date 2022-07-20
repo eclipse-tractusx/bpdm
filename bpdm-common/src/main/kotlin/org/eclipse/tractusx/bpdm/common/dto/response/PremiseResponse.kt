@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.PremiseType
-import java.util.*
 
 @Schema(name = "Premise Response", description = "Premise record of an address such as building, room or floor")
 data class PremiseResponse (
-    @Schema(description = "Unique identifier for reference purposes")
-    val uuid: UUID,
     @Schema(description = "Full denotation of the premise")
     val value: String,
     @Schema(description = "Abbreviation or shorthand")

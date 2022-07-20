@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.LocalityType
-import java.util.*
 
 @Schema(name = "Locality Response", description = "Locality record of an address such as city, block or district")
 data class LocalityResponse (
-    @Schema(description = "Unique identifier for reference purposes")
-    val uuid: UUID,
     @Schema(description = "Full name of the locality")
     val value: String,
     @Schema(description = "Abbreviation or shorthand of the locality's name")

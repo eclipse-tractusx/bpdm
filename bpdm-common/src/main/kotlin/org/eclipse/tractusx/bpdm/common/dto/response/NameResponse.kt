@@ -5,12 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.NameType
-import java.util.*
 
 @Schema(name = "Name Response", description = "Name record of a business partner")
 data class NameResponse (
-    @Schema(description = "Unique identifier for reference purposes")
-    val uuid: UUID,
     @Schema(description = "Full name")
     val value: String,
     @Schema(description = "Abbreviated name or shorthand")
