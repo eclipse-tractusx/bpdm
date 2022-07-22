@@ -1,0 +1,97 @@
+{
+  "properties": {
+    "names": {
+      "type": "nested",
+      "properties": {
+        "text": {
+          "type": "search_as_you_type"
+        }
+      }
+    },
+    "legalForm": {
+      "type": "nested",
+      "properties": {
+        "text": {
+          "type": "search_as_you_type"
+        }
+      }
+    },
+    "status": {
+      "type": "nested",
+      "properties": {
+        "text": {
+          "type": "search_as_you_type"
+        }
+      }
+    },
+    "addresses": {
+      "type": "object",
+      "properties": {
+        "administrativeAreas": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        },
+        "postCodes": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        },
+        "localities": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        },
+        "thoroughfares": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        },
+        "premises": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        },
+        "postalDeliveryPoints": {
+          "type": "nested",
+          "properties": {
+            "text": {
+              "type": "search_as_you_type"
+            }
+          }
+        }
+      }
+    },
+    "classifications": {
+      "type": "nested",
+      "properties": {
+        "text": {
+          "type": "search_as_you_type"
+        }
+      }
+    },
+    "sites": {
+      "type": "nested",
+      "properties": {
+        "text": {
+          "type": "search_as_you_type"
+        }
+      }
+    }
+  }
+}

@@ -19,6 +19,8 @@
         <postgres.version>42.3.6</postgres.version>
         <flyway.version>8.5.12</flyway.version>
         <testcontainers.version>1.17.2</testcontainers.version>
+        <opensearch.version>2.1.0</opensearch.version>
+        <opensearch-java.version>2.0.0</opensearch-java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -93,6 +95,24 @@
         <dependency>
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-rest-client</artifactId>
+            <version>${opensearch.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-java</artifactId>
+            <version>${opensearch-java.version}</version>
+        </dependency>
+        <!-- Needed for opensearch, since org.springframework.boot:spring-boot-dependencies:2.7.0 defines jakarta.json:jakarta.json-api:1.1.6. -->
+        <!-- This has javax.json packages instead of jakarta.json. -->
+        <!-- see https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/installation.html#class-not-found-jsonprovider -->
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
         <dependency>
