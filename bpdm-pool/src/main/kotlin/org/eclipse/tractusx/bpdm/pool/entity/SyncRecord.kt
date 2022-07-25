@@ -29,6 +29,7 @@ class SyncRecord(
 
 
 enum class SyncType{
+    OPENSEARCH,
     ELASTIC,
     CDQ_IMPORT
 }

@@ -9,5 +9,6 @@ class OpenSearchConfigProperties(
     val enabled: Boolean = false,
     val host: String = "localhost",
     val port: Int = 9201,
-    val scheme: String = "http"
+    val scheme: String = "http",
+    val exportPageSize: Int = 100
 )
