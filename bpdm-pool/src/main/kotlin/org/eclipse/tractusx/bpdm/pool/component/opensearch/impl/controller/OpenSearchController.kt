@@ -43,8 +43,7 @@ class OpenSearchController(
     )
     @GetMapping("/business-partner")
     fun getBusinessPartners(): SyncResponse {
-//        return openSearchSyncService.getExportStatus()
-        TODO()
+        return openSearchSyncService.getExportStatus()
     }
 
 
@@ -61,7 +60,6 @@ class OpenSearchController(
     )
     @DeleteMapping("/business-partner")
     fun clear() {
-//        openSearchSyncService.clearOpenSearch()
-        TODO()
+        openSearchSyncService.clearOpenSearch()
     }
 }

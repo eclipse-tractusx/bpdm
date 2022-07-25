@@ -1,6 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
@@ -8,9 +9,11 @@ import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.mapping.TypeMapping
 import org.opensearch.client.opensearch.indices.CreateIndexRequest
+import org.opensearch.client.opensearch.indices.DeleteIndexRequest
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.ResourceUtils
 
 @Service
@@ -35,17 +38,32 @@ class OpenSearchSyncStarterService(
         return startExport(false)
     }
 
+    /**
+     * Fetch a [SyncResponse] about the state of the latest export
+     */
+    fun getExportStatus(): SyncResponse {
+        return syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH).toDto()
+    }
+
+    /**
+     * Clears the whole index and resets the time of the last update
+     */
+    @Transactional
+    fun clearOpenSearch() {
+        logger.info { "Recreating the OpenSearch index" }
+
+        deleteIndex()
+        createIndex()
+
+        syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH))
+    }
+
     @EventListener(ContextRefreshedEvent::class)
     fun createOnInit() {
-        val indexAlreadyExists = openSearchClient.indices().exists { it.index("business-partner") }.value()
+        val indexAlreadyExists = openSearchClient.indices().exists { it.index(BUSINESS_PARTNER_INDEX_NAME) }.value()
 
         if (!indexAlreadyExists) {
-            val indexFile = ResourceUtils.getFile("classpath:opensearch/index-mappings.json")
-            val jsonpMapper = openSearchClient._transport().jsonpMapper()
-            val jsonParser = jsonpMapper.jsonProvider().createParser(indexFile.inputStream())
-            val createIndexRequest =
-                CreateIndexRequest.Builder().index("business-partner").mappings(TypeMapping._DESERIALIZER.deserialize(jsonParser, jsonpMapper)).build()
-            openSearchClient.indices().create(createIndexRequest)
+            createIndex()
         }
     }
 
@@ -68,5 +86,19 @@ class OpenSearchSyncStarterService(
             openSearchSyncService.exportPaginatedAsync(fromTime, saveState)
 
         return response
+    }
+
+    private fun deleteIndex() {
+        val deleteIndexRequest: DeleteIndexRequest = DeleteIndexRequest.Builder().index(BUSINESS_PARTNER_INDEX_NAME).build()
+        openSearchClient.indices().delete(deleteIndexRequest)
+    }
+
+    private fun createIndex() {
+        val indexFile = ResourceUtils.getFile("classpath:opensearch/index-mappings.json")
+        val jsonpMapper = openSearchClient._transport().jsonpMapper()
+        val jsonParser = jsonpMapper.jsonProvider().createParser(indexFile.inputStream())
+        val createIndexRequest =
+            CreateIndexRequest.Builder().index(BUSINESS_PARTNER_INDEX_NAME).mappings(TypeMapping._DESERIALIZER.deserialize(jsonParser, jsonpMapper)).build()
+        openSearchClient.indices().create(createIndexRequest)
     }
 }

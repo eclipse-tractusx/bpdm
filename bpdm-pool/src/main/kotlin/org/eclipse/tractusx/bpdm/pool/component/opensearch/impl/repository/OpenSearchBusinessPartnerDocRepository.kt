@@ -1,6 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch.core.BulkRequest
@@ -23,7 +24,7 @@ class OpenSearchBusinessPartnerDocRepository(
         for (businessPartnerDoc in businessPartnerDocs) {
             builder.operations { op ->
                 op.index { idx ->
-                    idx.index("business-partner")
+                    idx.index(BUSINESS_PARTNER_INDEX_NAME)
                         .id(businessPartnerDoc.bpn)
                         .document(businessPartnerDoc)
                 }
