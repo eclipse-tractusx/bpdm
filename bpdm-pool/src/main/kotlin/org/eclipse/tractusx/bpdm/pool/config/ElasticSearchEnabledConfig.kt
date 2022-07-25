@@ -27,7 +27,8 @@ class ElasticSearchEnabledConfig
 @Configuration
 @Import(ElasticsearchMockConfig::class)
 @ConditionalOnProperty(
-    value = ["bpdm.elastic.enabled"],
+    value = ["bpdm.elastic.enabled", "bpdm.opensearch.enabled"],
     havingValue = "false",
-    matchIfMissing = true)
+    matchIfMissing = true
+)
 class ElasticSearchDisabledConfig

@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.component.opensearch.service
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.mapping.TypeMapping

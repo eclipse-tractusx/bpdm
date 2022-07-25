@@ -1,6 +1,7 @@
-package org.eclipse.tractusx.bpdm.pool.component.opensearch.config
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.config
 
 import org.apache.http.HttpHost
+import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.opensearch.client.RestClient
 import org.opensearch.client.json.jackson.JacksonJsonpMapper
 import org.opensearch.client.opensearch.OpenSearchClient
