@@ -1,8 +1,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchException
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch.core.BulkRequest
 import org.opensearch.client.opensearch.core.BulkResponse
@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service
 class OpenSearchBusinessPartnerDocRepository(
     private val openSearchClient: OpenSearchClient
 ) {
-    private val logger = KotlinLogging.logger { }
-
     fun saveAll(businessPartnerDocs: Collection<BusinessPartnerDoc>) {
         if (businessPartnerDocs.isEmpty()) {
             return
@@ -33,13 +31,9 @@ class OpenSearchBusinessPartnerDocRepository(
         val result: BulkResponse = openSearchClient.bulk(builder.build())
 
         if (result.errors()) {
-            //TODO: throw exception?
-            logger.error("Error when saving business partner docs")
-            for (item in result.items()) {
-                if (item.error() != null) {
-                    logger.error(item.error()!!.reason())
-                }
-            }
+            val message = result.items().mapNotNull { it.error() }.mapNotNull { it.reason() }
+                .joinToString(separator = "\n", prefix = "Error when saving business partner docs \n")
+            throw BpdmOpenSearchException(message)
         }
     }
 }
