@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.OpenSearchBusinessPartnerDocRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -14,7 +14,7 @@ import java.time.Instant
 @Service
 class OpenSearchSyncPageService(
     val businessPartnerRepository: BusinessPartnerRepository,
-    val businessPartnerDocRepository: OpenSearchBusinessPartnerDocRepository,
+    val businessPartnerDocRepository: BusinessPartnerDocRepository,
     val documentMappingService: DocumentMappingService
 ) {
     private val logger = KotlinLogging.logger { }

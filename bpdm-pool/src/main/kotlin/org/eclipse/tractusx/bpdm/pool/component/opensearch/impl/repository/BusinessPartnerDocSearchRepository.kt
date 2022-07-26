@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository
 /**
  * Creates and executes OpenSearch queries for querying [BusinessPartnerDoc] entries
  */
-@Repository
-class OpenSearchBusinessPartnerDocSearchRepository(
+@Repository("OpenSearchBusinessPartnerDocSearchRepository")
+class BusinessPartnerDocSearchRepository(
     val restHighLevelClient: RestHighLevelClient,
     val bpdmQueryBuilder: BpdmOpenSearchQueryBuilder
 ) {

@@ -9,7 +9,7 @@ import org.opensearch.client.opensearch.core.BulkResponse
 import org.springframework.stereotype.Repository
 
 @Repository("OpenSearchBusinessPartnerDocRepository")
-class OpenSearchBusinessPartnerDocRepository(
+class BusinessPartnerDocRepository(
     private val openSearchClient: OpenSearchClient
 ) {
     fun saveAll(businessPartnerDocs: Collection<BusinessPartnerDoc>) {

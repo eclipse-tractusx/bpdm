@@ -1,9 +1,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.elastic.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.OpenSearchBusinessPartnerDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
@@ -21,8 +25,10 @@ import org.springframework.stereotype.Service
 @Service("OpenSearchServiceImpl")
 @Primary
 class SearchServiceImpl(
-    val businessPartnerDocSearchRepository: OpenSearchBusinessPartnerDocSearchRepository,
-    val businessPartnerFetchService: BusinessPartnerFetchService
+    val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,
+    val textDocSearchRepository: TextDocSearchRepository,
+    val businessPartnerFetchService: BusinessPartnerFetchService,
+    val objectMapper: ObjectMapper
 ) : SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -66,12 +72,42 @@ class SearchServiceImpl(
         return PageResponse(totalHits, totalPages, paginationRequest.page, responseContent.size, responseContent)
     }
 
+    /**
+     * Query OpenSearch for [field] values by [text] and [filters]
+     *
+     * The found values and their hit scores are converted to [SuggestionResponse] and returned as a paginated result.
+     */
     override fun getSuggestion(
         field: SuggestionType,
         text: String?,
         filters: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<SuggestionResponse> {
-        TODO()
+
+        logger.debug { "Search index for suggestion type $field" }
+
+        val hits = textDocSearchRepository.findByFieldAndTextAndFilters(
+            field,
+            text,
+            filters,
+            PageRequest.of(paginationRequest.page, paginationRequest.size)
+        )
+
+        logger.debug { "Returning ${hits.hits.size} suggestions for $field. (${hits.totalHits} found in total)" }
+
+        return PageResponse(
+            hits.totalHits!!.value,
+            hits.totalHits!!.value.toInt() / paginationRequest.size,
+            paginationRequest.page,
+            hits.hits.size,
+            hits.map { hit ->
+                SuggestionResponse(extractTextDocText(hit.sourceAsString), hit.score)
+            }.toList()
+        )
+    }
+
+    private fun extractTextDocText(textDocJson: String): String {
+        val textDoc: TextDoc = objectMapper.readValue(textDocJson)
+        return textDoc.text
     }
 }
