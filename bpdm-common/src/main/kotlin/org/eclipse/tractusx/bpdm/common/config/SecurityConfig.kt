@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.common.config.security
+package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.config.BpdmSecurityConfigurerAdapter
