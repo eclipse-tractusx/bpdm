@@ -1,6 +1,8 @@
 package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.config.BpdmSecurityConfigurerAdapter
+import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter

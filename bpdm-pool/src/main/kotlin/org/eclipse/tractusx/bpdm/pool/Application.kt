@@ -19,15 +19,10 @@ import org.springframework.boot.runApplication
         "org.eclipse.tractusx.bpdm.pool.config",
         "org.eclipse.tractusx.bpdm.pool.controller",
         "org.eclipse.tractusx.bpdm.pool.repository",
-        "org.eclipse.tractusx.bpdm.pool.service",
-        "org.eclipse.tractusx.bpdm.common"
+        "org.eclipse.tractusx.bpdm.pool.service"
     ]
 )
-@ConfigurationPropertiesScan(
-    basePackages = [
-        "org.eclipse.tractusx.bpdm.pool",
-        "org.eclipse.tractusx.bpdm.common"]
-)
+@ConfigurationPropertiesScan
 class Application
 
 fun main(args: Array<String>) {
