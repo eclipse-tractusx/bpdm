@@ -6,9 +6,9 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchException
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch.core.BulkRequest
 import org.opensearch.client.opensearch.core.BulkResponse
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Repository
 
-@Service
+@Repository("OpenSearchBusinessPartnerDocRepository")
 class OpenSearchBusinessPartnerDocRepository(
     private val openSearchClient: OpenSearchClient
 ) {

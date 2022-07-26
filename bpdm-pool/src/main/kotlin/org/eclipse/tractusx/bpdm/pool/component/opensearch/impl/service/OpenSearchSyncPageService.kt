@@ -15,7 +15,7 @@ import java.time.Instant
 class OpenSearchSyncPageService(
     val businessPartnerRepository: BusinessPartnerRepository,
     val businessPartnerDocRepository: OpenSearchBusinessPartnerDocRepository,
-    val documentMappingService: OpenSearchDocumentMappingService
+    val documentMappingService: DocumentMappingService
 ) {
     private val logger = KotlinLogging.logger { }
 

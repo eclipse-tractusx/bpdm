@@ -3,6 +3,8 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.config
 import org.apache.http.HttpHost
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.opensearch.client.RestClient
+import org.opensearch.client.RestClientBuilder
+import org.opensearch.client.RestHighLevelClient
 import org.opensearch.client.json.jackson.JacksonJsonpMapper
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.transport.OpenSearchTransport
@@ -21,5 +23,12 @@ class OpenSearchClientConfig(
             RestClient.builder(HttpHost(openSearchConfigProperties.host, openSearchConfigProperties.port, openSearchConfigProperties.scheme)).build()
         val transport: OpenSearchTransport = RestClientTransport(restClient, JacksonJsonpMapper())
         return OpenSearchClient(transport)
+    }
+
+    @Bean
+    fun openSearchHighLevelRestClient(): RestHighLevelClient {
+        val restClientBuilder: RestClientBuilder =
+            RestClient.builder(HttpHost(openSearchConfigProperties.host, openSearchConfigProperties.port, openSearchConfigProperties.scheme))
+        return RestHighLevelClient(restClientBuilder)
     }
 }
