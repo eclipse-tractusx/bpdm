@@ -25,7 +25,7 @@
       }
     },
     "addresses": {
-      "type": "object",
+      "type": "nested",
       "properties": {
         "administrativeAreas": {
           "type": "nested",
