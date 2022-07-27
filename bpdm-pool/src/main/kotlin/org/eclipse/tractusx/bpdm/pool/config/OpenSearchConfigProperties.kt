@@ -10,5 +10,6 @@ class OpenSearchConfigProperties(
     val host: String = "localhost",
     val port: Int = 9201,
     val scheme: String = "http",
-    val exportPageSize: Int = 100
+    val exportPageSize: Int = 100,
+    val refreshOnWrite: Boolean = false
 )
