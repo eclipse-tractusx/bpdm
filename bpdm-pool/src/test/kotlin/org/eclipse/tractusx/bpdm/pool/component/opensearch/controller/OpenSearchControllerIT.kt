@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic.controller
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.service.ElasticSyncStarterService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
@@ -27,17 +27,17 @@ import org.springframework.test.web.reactive.server.returnResult
 
 
 /**
- * Integration tests for the data synch endpoints in the ElasticSearchController
+ * Integration tests for the data sync endpoints in the OpenSearchController
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchContextInitializer::class])
-class ElasticSearchControllerIT @Autowired constructor(
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+class OpenSearchControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: ImportStarterService,
-    val elasticSyncService: ElasticSyncStarterService,
+    val openSearchSyncService: OpenSearchSyncStarterService,
     val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers
 ) {
@@ -64,7 +64,7 @@ class ElasticSearchControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        elasticSyncService.clearElastic()
+        openSearchSyncService.clearOpenSearch()
 
         val importCollection = BusinessPartnerCollectionCdq(
             partnerDocs.size,
@@ -90,18 +90,18 @@ class ElasticSearchControllerIT @Autowired constructor(
     /**
      * Given partners in database already exported
      * When export
-     * Then partners are not exported to Elasticsearch
+     * Then partners are not exported to OpenSearch
      */
     @Test
     fun `export only new partners`() {
-        //export once to get partners into elasticsearch for given system state
-        var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        //export once to get partners into opensearch for given system state
+        var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
         //export now to check behaviour
-        exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(0)
     }
@@ -113,14 +113,14 @@ class ElasticSearchControllerIT @Autowired constructor(
      */
     @Test
     fun `can search exported partners`() {
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
     }
 
     /**
-     * Given partners in Elasticsearch
+     * Given partners in OpenSearch
      * When delete index
      * Then partners can't be searched anymore
      */
@@ -128,14 +128,14 @@ class ElasticSearchControllerIT @Autowired constructor(
     fun `empty index`() {
         val names = partnerDocs.map { it.names.first().value }
 
-        // fill the elasticsearch index
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        // fill the opensearch index
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(names)
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.ELASTIC_SYNC_PATH)
+        webTestClient.delete().uri(EndpointValues.OPENSEARCH_SYNC_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
 
@@ -144,24 +144,24 @@ class ElasticSearchControllerIT @Autowired constructor(
     }
 
     /**
-     * Given partners in Elasticsearch
+     * Given partners in OpenSearch
      * When delete index and export
-     * Then partners again in Elasticsearch
+     * Then partners again in OpenSearch
      */
     @Test
     fun `export all partners after empty index`() {
 
-        // fill the elasticsearch index
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        // fill the opensearch index
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.ELASTIC_SYNC_PATH)
+        webTestClient.delete().uri(EndpointValues.OPENSEARCH_SYNC_PATH)
             .exchange()
             .expectStatus().is2xxSuccessful
 
         //export partners again
-        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(3)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })

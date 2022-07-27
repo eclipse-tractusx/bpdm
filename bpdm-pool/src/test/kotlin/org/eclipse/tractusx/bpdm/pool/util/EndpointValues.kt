@@ -39,6 +39,7 @@ object EndpointValues {
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
     const val ELASTIC_SYNC_PATH = "api/elastic/business-partner"
+    const val OPENSEARCH_SYNC_PATH = "api/opensearch/business-partner"
 
     const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-type"
     const val CATENA_METADATA_IDENTIFIER_STATUS_PATH = "$CATENA_PATH/identifier-status"
