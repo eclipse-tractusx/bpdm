@@ -7,7 +7,6 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.service.BpnIssuingService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
@@ -34,8 +33,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class InvalidIndexStartupIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val testHelpers: TestHelpers,
-    private val openSearchClient: OpenSearchClient,
-    private val bpnIssuingService: BpnIssuingService
+    private val openSearchClient: OpenSearchClient
 ) {
 
     companion object {
@@ -50,6 +48,8 @@ class InvalidIndexStartupIT @Autowired constructor(
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
         }
     }
+
+    val bpnBogusDocument = "BPN_FAKE"
 
     /**
      * Not a real test but prepares the OpenSearch container for the next test that will be run in a fresh Spring-Boot context
@@ -71,14 +71,15 @@ class InvalidIndexStartupIT @Autowired constructor(
         }
 
         //Create a bogus document with a valid BPN
-        val firstBpn = bpnIssuingService.issueLegalEntityBpns(1).first()
         val invalidBp = InvalidBusinessPartnerDoc("outdated")
 
-        openSearchClient.index { indexRequest -> indexRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(firstBpn).document(invalidBp).refresh(Refresh.True) }
+        openSearchClient.index { indexRequest ->
+            indexRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument).document(invalidBp).refresh(Refresh.True)
+        }
 
         //Check whether it really is inside the index
         val getResponse =
-            openSearchClient.get({ getRequest -> getRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(firstBpn) }, InvalidBusinessPartnerDoc::class.java)
+            openSearchClient.get({ getRequest -> getRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
         assertThat(getResponse.found()).isTrue
     }
 
@@ -90,17 +91,18 @@ class InvalidIndexStartupIT @Autowired constructor(
     @Test
     @Order(1)
     fun recreateOutdatedIndexOnStartup() {
-        //in case bogus document is still there we should find it by importing a business partner to DB and search it
+        // bogus document should not be in index anymore
+        val getResponse =
+            openSearchClient.get({ getRequest -> getRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
+        assertThat(getResponse.found()).isFalse
+
+        //import a business partner to DB
         testHelpers.importAndGetResponse(listOf(CdqValues.businessPartner1), webTestClient, wireMockServer)
 
-        var searchResult = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-        //should not find anything otherwise the bogus document is still there
-        assertThat(searchResult.content).isEmpty()
-
-        //Now export to index again and check whether the imported business partner can be found as normal
+        //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        searchResult = webTestClient.invokeGetEndpoint(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
         assertThat(searchResult.content).isNotEmpty
         assertThat(searchResult.contentSize).isEqualTo(1)
     }
