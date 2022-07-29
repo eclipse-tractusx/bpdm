@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic
+package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -25,7 +25,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ValidIndexStartupIT @Autowired constructor(
     val webTestClient: WebTestClient,
@@ -46,22 +46,22 @@ class ValidIndexStartupIT @Autowired constructor(
     }
 
     /**
-     * Not a real test but prepares the Elasticsearch container for the next test that will be run in a fresh Spring-Boot context
-     * Create a valid Elasticsearch index and fill it with content
+     * Not a real test but prepares the OpenSearch container for the next test that will be run in a fresh Spring-Boot context
+     * Create a valid OpenSearch index and fill it with content
      */
     @Test
     @Order(0)
     @DirtiesContext
     fun setupIndexForNextTest() {
         testHelpers.truncateDbTables()
-        //Clear and setup a fresh valid Elasticsearch context
-        webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.ELASTIC_SYNC_PATH)
+        //Clear and set up a fresh valid OpenSearch context
+        webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
 
         //Import values to DB
         val partnersToImport = listOf(CdqValues.businessPartner1, CdqValues.businessPartner2, CdqValues.businessPartner3)
         testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
-        //Export to Elasticsearch index
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.ELASTIC_SYNC_PATH)
+        //Export to OpenSearch index
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
         val searchResult = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
         Assertions.assertThat(searchResult.content).isNotEmpty
@@ -69,7 +69,7 @@ class ValidIndexStartupIT @Autowired constructor(
     }
 
     /**
-     * Given non-empty Elasticsearch index with up-to-date document structure
+     * Given non-empty OpenSearch index with up-to-date document structure
      * When application starts
      * Then index not cleared
      */
