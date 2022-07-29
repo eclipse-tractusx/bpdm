@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 /**
  * Responsible for mapping entities to their OpenSearch document representations
  */
-@Service("OpenSearchDocumentMappingService")
+@Service
 class DocumentMappingService {
 
     /**

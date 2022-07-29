@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
-import org.eclipse.tractusx.bpdm.pool.component.elastic.mock.ElasticsearchMockConfig
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.OpenSearchImplConfig
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.mock.OpenSearchMockConfig
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -17,9 +17,9 @@ import org.springframework.context.annotation.Import
 class OpenSearchEnabledConfig
 
 @Configuration
-@Import(ElasticsearchMockConfig::class)
+@Import(OpenSearchMockConfig::class)
 @ConditionalOnProperty(
-    value = ["bpdm.opensearch.enabled", "bpdm.elastic.enabled"],
+    value = ["bpdm.opensearch.enabled"],
     havingValue = "false",
     matchIfMissing = true
 )

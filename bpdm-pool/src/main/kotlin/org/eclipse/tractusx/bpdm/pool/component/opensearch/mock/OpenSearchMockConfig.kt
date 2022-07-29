@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic.mock
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.mock
 
 import mu.KotlinLogging
 import org.springframework.context.annotation.ComponentScan
@@ -7,11 +7,11 @@ import javax.annotation.PostConstruct
 
 @Configuration
 @ComponentScan
-class ElasticsearchMockConfig {
+class OpenSearchMockConfig {
     private val logger = KotlinLogging.logger { }
 
     @PostConstruct
     fun logCreation() {
-        logger.info { "Elasticsearch not enabled, mock connection" }
+        logger.info { "OpenSearch not enabled, mock connection" }
     }
 }

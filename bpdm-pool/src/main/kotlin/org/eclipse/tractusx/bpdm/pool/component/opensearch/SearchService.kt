@@ -1,6 +1,6 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic
+package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse

@@ -3,8 +3,8 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.elastic.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service
 /**
  * Implements search functionality by using OpenSearch
  */
-@Service("OpenSearchServiceImpl")
+@Service
 @Primary
 class SearchServiceImpl(
     val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,

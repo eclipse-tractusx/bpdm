@@ -18,23 +18,6 @@ services:
     volumes:
       - bpdm-postgres-data:/var/lib/postgresql/data
 
-  elasticsearch:
-    image: elasticsearch:7.17.1
-    container_name: bpdm-elasticsearch
-    environment:
-      - discovery.type=single-node
-      # explicitly disabling security prevents warnings in log
-      - xpack.security.enabled=false
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    deploy:
-      resources:
-        limits:
-          memory: 2g
-    volumes:
-      - bpdm-elasticsearch-data:/usr/share/elasticsearch/data
-
   # based on sample docker-compose for development from https://opensearch.org/docs/latest/opensearch/install/docker
   opensearch:
     image: opensearchproject/opensearch:2.1.0
@@ -57,13 +40,11 @@ services:
     volumes:
       - bpdm-opensearch-data:/usr/share/opensearch/data
     ports:
-      - 9201:9200
+      - 9200:9200
       - 9600:9600 # required for Performance Analyzer
 
 volumes:
   bpdm-postgres-data:
     name: bpdm-postgres-data
-  bpdm-elasticsearch-data:
-    name: bpdm-elasticsearch-data
   bpdm-opensearch-data:
     name: bpdm-opensearch-data

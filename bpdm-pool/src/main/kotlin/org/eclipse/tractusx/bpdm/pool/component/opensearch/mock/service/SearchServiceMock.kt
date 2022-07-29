@@ -1,8 +1,8 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic.mock.service
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.mock.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.elastic.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 /**
- * Mock implementation of the [SearchService] in case the system is configured to run without Elasticsearch
+ * Mock implementation of the [SearchService] in case the system is configured to run without OpenSearch
  */
 @Service
 class SearchServiceMock(

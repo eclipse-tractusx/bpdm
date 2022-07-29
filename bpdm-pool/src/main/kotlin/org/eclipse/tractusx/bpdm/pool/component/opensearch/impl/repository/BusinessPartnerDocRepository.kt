@@ -10,7 +10,7 @@ import org.opensearch.client.opensearch.core.BulkRequest
 import org.opensearch.client.opensearch.core.BulkResponse
 import org.springframework.stereotype.Repository
 
-@Repository("OpenSearchBusinessPartnerDocRepository")
+@Repository
 class BusinessPartnerDocRepository(
     private val openSearchClient: OpenSearchClient,
     private val openSearchConfigProperties: OpenSearchConfigProperties

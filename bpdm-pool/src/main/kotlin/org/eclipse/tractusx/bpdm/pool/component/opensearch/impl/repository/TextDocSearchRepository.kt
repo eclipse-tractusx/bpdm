@@ -1,7 +1,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository
 /**
  * Creates and executes OpenSearch queries for querying [BusinessPartnerDoc] properties of type [TextDoc]
  */
-@Repository("OpenSearchTextDocSearchRepository")
+@Repository
 class TextDocSearchRepository(
     val restHighLevelClient: RestHighLevelClient,
     val bpdmQueryBuilder: BpdmOpenSearchQueryBuilder

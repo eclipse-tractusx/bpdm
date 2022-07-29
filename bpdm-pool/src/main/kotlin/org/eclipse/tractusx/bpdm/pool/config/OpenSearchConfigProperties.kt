@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class OpenSearchConfigProperties(
     val enabled: Boolean = false,
     val host: String = "localhost",
-    val port: Int = 9201,
+    val port: Int = 9200,
     val scheme: String = "http",
     val exportPageSize: Int = 100,
     val refreshOnWrite: Boolean = false

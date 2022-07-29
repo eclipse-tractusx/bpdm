@@ -1,4 +1,4 @@
-package org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc
 
 enum class SuggestionType(val docName: String) {
     NAME(BusinessPartnerDoc::names.name),
