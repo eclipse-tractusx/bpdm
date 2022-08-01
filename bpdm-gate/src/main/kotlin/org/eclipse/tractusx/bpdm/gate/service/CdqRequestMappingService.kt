@@ -1,11 +1,15 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.springframework.stereotype.Service
 
 @Service
@@ -13,7 +17,7 @@ class CdqRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val cdqConfigProperties: CdqConfigProperties
 ) {
-    fun toCdqModel(legalEntity: LegalEntityWithReferencesDto): BusinessPartnerCdq {
+    fun toCdqModel(legalEntity: LegalEntityGateInput): BusinessPartnerCdq {
         return toCdqModel(legalEntity.legalEntity, legalEntity.externalId)
     }
 
@@ -27,7 +31,8 @@ class CdqRequestMappingService(
             status = legalEntity.status?.toCdqModel(),
             profile = toPartnerProfileCdq(legalEntity.profileClassifications),
             types = legalEntity.types.map { it.toCdqModel() },
-            bankAccounts = legalEntity.bankAccounts.map { it.toCdqModel() }
+            bankAccounts = legalEntity.bankAccounts.map { it.toCdqModel() },
+            addresses = listOf(toCdqModel(legalEntity.legalAddress))
         )
     }
 
@@ -70,11 +75,6 @@ class CdqRequestMappingService(
 
     private fun toLegalFormCdq(technicalKey: String?) = if (technicalKey != null) LegalFormCdq(technicalKey = technicalKey) else null
 
-    private fun toLanguageCdq(technicalKey: LanguageCode) = LanguageCdq(
-        technicalKey = technicalKey,
-        name = null
-    )
-
     private fun NameDto.toCdqModel(): NameCdq {
         return NameCdq(
             value = value,
@@ -93,6 +93,76 @@ class CdqRequestMappingService(
         )
     }
 
+    private fun toCdqModel(address: AddressDto): AddressCdq {
+        return with(address) {
+            AddressCdq(
+                version = toCdqModel(version),
+                careOf = toCareOfCdq(careOf),
+                contexts = contexts.map { toContextCdq(it) },
+                country = toCountryCdq(country),
+                administrativeAreas = administrativeAreas.map { toCdqModel(it, version.language) },
+                postCodes = postCodes.map { toCdqModel(it) },
+                localities = localities.map { toCdqModel(it, version.language) },
+                thoroughfares = thoroughfares.map { toCdqModel(it, version.language) },
+                postalDeliveryPoints = postalDeliveryPoints.map { toCdqModel(it, version.language) },
+                premises = premises.map { toCdqModel(it, version.language) },
+                geographicCoordinates = toCdqModel(geographicCoordinates),
+                types = toAddressTypesCdq(types)
+            )
+        }
+    }
+
+    private fun toCdqModel(version: AddressVersionDto): AddressVersionCdq? {
+        val languageCdq = toLanguageCdq(version.language)
+        val characterSetCdq = toCharacterSetCdq(version.characterSet)
+
+        return if (languageCdq == null && characterSetCdq == null) null else AddressVersionCdq(languageCdq, characterSetCdq)
+    }
+
+
+    private fun toCareOfCdq(careOf: String?): WrappedValueCdq? =
+        if (careOf != null) WrappedValueCdq(careOf) else null
+
+    private fun toContextCdq(context: String): WrappedValueCdq =
+        WrappedValueCdq(context)
+
+    private fun toCdqModel(adminArea: AdministrativeAreaDto, languageCode: LanguageCode): AdministrativeAreaCdq =
+        AdministrativeAreaCdq(adminArea.value, adminArea.shortName, toKeyNameUrlTypeCdq(adminArea.type), toLanguageCdq(languageCode))
+
+
+    private fun toCdqModel(postcode: PostCodeDto): PostCodeCdq =
+        PostCodeCdq(postcode.value, toKeyNameUrlTypeCdq(postcode.type))
+
+    private fun toCdqModel(locality: LocalityDto, languageCode: LanguageCode): LocalityCdq =
+        LocalityCdq(toKeyNameUrlTypeCdq(locality.type), locality.shortName, locality.value, toLanguageCdq(languageCode))
+
+    private fun toCdqModel(thoroughfare: ThoroughfareDto, languageCode: LanguageCode): ThoroughfareCdq =
+        ThoroughfareCdq(
+            toKeyNameUrlTypeCdq(thoroughfare.type),
+            thoroughfare.shortName,
+            thoroughfare.number,
+            thoroughfare.value,
+            thoroughfare.name,
+            thoroughfare.direction,
+            toLanguageCdq(languageCode)
+        )
+
+    private fun toCdqModel(deliveryPoint: PostalDeliveryPointDto, languageCode: LanguageCode): PostalDeliveryPointCdq =
+        PostalDeliveryPointCdq(
+            toKeyNameUrlTypeCdq(deliveryPoint.type),
+            deliveryPoint.shortName,
+            deliveryPoint.number,
+            deliveryPoint.value,
+            toLanguageCdq(languageCode)
+        )
+
+    private fun toCdqModel(premise: PremiseDto, languageCode: LanguageCode): PremiseCdq =
+        PremiseCdq(toKeyNameUrlTypeCdq(premise.type), premise.shortName, premise.number, premise.value, toLanguageCdq(languageCode))
+
+
+    private fun toCdqModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesCdq? =
+        geoCoordinate?.let { GeoCoordinatesCdq(it.longitude, it.latitude) }
+
     private fun toIdentifiersCdq(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierCdq> {
         var identifiersCdq = identifiers.map { it.toCdqModel() }
         if (bpn != null) {
@@ -101,6 +171,12 @@ class CdqRequestMappingService(
         return identifiersCdq
     }
 
+    private fun toAddressTypesCdq(types: Collection<AddressType>): Collection<TypeKeyNameUrlCdq> {
+        val legalAddressTypes = if (!types.contains(AddressType.LEGAL)) types.plus(AddressType.LEGAL) else types
+        return legalAddressTypes.map { toKeyNameUrlTypeCdq(it) }
+    }
+
+
     private fun createBpnIdentifierCdq(bpn: String): IdentifierCdq {
         return IdentifierCdq(
             type = TypeKeyNameUrlCdq(bpnConfigProperties.id, bpnConfigProperties.name),
@@ -108,4 +184,20 @@ class CdqRequestMappingService(
             issuingBody = TypeKeyNameUrlCdq(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName)
         )
     }
+
+    private inline fun <reified T> toKeyNameTypeCdq(type: Enum<T>): TypeKeyNameCdq where T : Enum<T> =
+        TypeKeyNameCdq(type.name, null)
+
+    private inline fun <reified T> toKeyNameUrlTypeCdq(type: Enum<T>): TypeKeyNameUrlCdq where T : Enum<T> =
+        TypeKeyNameUrlCdq(type.name, null)
+
+    private fun toLanguageCdq(technicalKey: LanguageCode) =
+        if (technicalKey != LanguageCode.undefined) LanguageCdq(technicalKey, null) else null
+
+    private fun toCountryCdq(countryCode: CountryCode) =
+        if (countryCode != CountryCode.UNDEFINED) CountryCdq(null, countryCode.name) else null
+
+    private fun toCharacterSetCdq(characterSet: CharacterSet) =
+        if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeCdq(characterSet) else null
+
 }

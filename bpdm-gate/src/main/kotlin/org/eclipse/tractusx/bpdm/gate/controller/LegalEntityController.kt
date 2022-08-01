@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityWithReferencesDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityWithReferencesResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -39,7 +39,7 @@ class LegalEntityController(
         ]
     )
     @PutMapping("/input/legal-entities")
-    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityWithReferencesDto>): ResponseEntity<Any> {
+    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInput>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || containsDuplicates(legalEntities.map { it.externalId })) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -58,7 +58,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/input/legal-entities/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityWithReferencesDto {
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInput {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
@@ -73,7 +73,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/input/legal-entities")
-    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityWithReferencesDto> {
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInput> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }
 
@@ -91,7 +91,7 @@ class LegalEntityController(
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
-    ): PageStartAfterResponse<LegalEntityWithReferencesResponse> {
+    ): PageStartAfterResponse<LegalEntityGateOutput> {
         TODO()
     }
 
@@ -106,7 +106,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/output/legal-entities/{externalId}")
-    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityWithReferencesResponse {
+    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateOutput {
         TODO()
     }
 

@@ -2,7 +2,9 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 
 object RequestValues {
     val identifier1 =
@@ -93,6 +95,9 @@ object RequestValues {
         nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
+    val legalAddress1 = AddressDto(types = listOf(AddressType.LEGAL))
+
+
     val legalEntity1 = LegalEntityDto(
         bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
@@ -101,7 +106,8 @@ object RequestValues {
         status = businessStatus1,
         profileClassifications = listOf(classification1, classification2),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
-        bankAccounts = listOf(bankAccount1, bankAccount2)
+        bankAccounts = listOf(bankAccount1, bankAccount2),
+        legalAddress = legalAddress1
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -112,15 +118,16 @@ object RequestValues {
         status = businessStatus2,
         profileClassifications = listOf(classification3, classification4),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
-        bankAccounts = listOf(bankAccount3, bankAccount4)
+        bankAccounts = listOf(bankAccount3, bankAccount4),
+        legalAddress = legalAddress1
     )
 
-    val legalEntityWithReferences1 = LegalEntityWithReferencesDto(
+    val legalEntityGateInput1 = LegalEntityGateInput(
         externalId = CommonValues.externalId1,
         legalEntity = legalEntity1
     )
 
-    val legalEntityWithReferences2 = LegalEntityWithReferencesDto(
+    val legalEntityGateInput2 = LegalEntityGateInput(
         externalId = CommonValues.externalId2,
         legalEntity = legalEntity2
     )

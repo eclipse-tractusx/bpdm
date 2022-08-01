@@ -2,6 +2,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
 /**
@@ -163,6 +164,8 @@ object CdqValues {
         nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
+    val legalAddress1 = AddressCdq(types = listOf(TypeKeyNameUrlCdq(AddressType.LEGAL.name)))
+
     val legalEntity1 = BusinessPartnerCdq(
         externalId = CommonValues.externalId1,
         identifiers = listOf(identifier1, identifier2, identifierBpn1),
@@ -171,7 +174,8 @@ object CdqValues {
         status = businessStatus1,
         profile = profile1,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount1, bankAccount2)
+        bankAccounts = listOf(bankAccount1, bankAccount2),
+        addresses = listOf(legalAddress1)
     )
 
     val legalEntity2 = BusinessPartnerCdq(
@@ -182,6 +186,7 @@ object CdqValues {
         status = businessStatus2,
         profile = profile2,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount3, bankAccount4)
+        bankAccounts = listOf(bankAccount3, bankAccount4),
+        addresses = listOf(legalAddress1)
     )
 }

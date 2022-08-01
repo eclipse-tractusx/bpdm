@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.SiteWithReferencesDto
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteWithReferencesResponse
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.springdoc.api.annotations.ParameterObject
@@ -32,7 +32,7 @@ class SiteController {
         ]
     )
     @PutMapping("/input/sites")
-    fun upsertSites(@RequestBody sites: Collection<SiteWithReferencesDto>): ResponseEntity<Any> {
+    fun upsertSites(@RequestBody sites: Collection<SiteGateInput>): ResponseEntity<Any> {
         TODO()
     }
 
@@ -47,7 +47,7 @@ class SiteController {
         ]
     )
     @GetMapping("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteWithReferencesDto {
+    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInput {
         TODO()
     }
 
@@ -62,7 +62,7 @@ class SiteController {
         ]
     )
     @GetMapping("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteWithReferencesDto> {
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput> {
         TODO()
     }
 
@@ -80,7 +80,7 @@ class SiteController {
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @Parameter(description = "Only show sites that were updated after the specified ISO-8601 timestamp") from: Instant?
-    ): PageStartAfterResponse<SiteWithReferencesResponse> {
+    ): PageStartAfterResponse<SiteGateOutput> {
         TODO()
     }
 
@@ -95,7 +95,7 @@ class SiteController {
         ]
     )
     @GetMapping("/output/sites/{externalId}")
-    fun getSiteByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteWithReferencesResponse {
+    fun getSiteByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateOutput {
         TODO()
     }
 }

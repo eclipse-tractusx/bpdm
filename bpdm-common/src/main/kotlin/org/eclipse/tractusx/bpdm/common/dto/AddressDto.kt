@@ -7,8 +7,6 @@ import org.eclipse.tractusx.bpdm.common.model.AddressType
 
 @Schema(name = "Address", description = "Localized address record for a business partner")
 data class AddressDto(
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionDto = AddressVersionDto(),
     @Schema(description = "Entity which is in care of this address")

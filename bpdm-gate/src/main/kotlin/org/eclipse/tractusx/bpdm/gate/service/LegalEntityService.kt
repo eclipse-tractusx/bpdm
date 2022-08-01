@@ -1,12 +1,14 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityWithReferencesDto
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
+import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -19,11 +21,15 @@ private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
 class LegalEntityService(
     private val webClient: WebClient,
     private val cdqRequestMappingService: CdqRequestMappingService,
+    private val inputCdqMappingService: InputCdqMappingService,
     private val cdqConfigProperties: CdqConfigProperties,
     private val objectMapper: ObjectMapper
 ) {
 
-    fun upsertLegalEntities(legalEntities: Collection<LegalEntityWithReferencesDto>) {
+    private val logger = KotlinLogging.logger { }
+
+    fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>) {
+
         val legalEntitiesCdq = legalEntities.map { cdqRequestMappingService.toCdqModel(it) }
         val upsertRequest =
             UpsertRequest(
@@ -45,7 +51,7 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntityByExternalId(externalId: String): LegalEntityWithReferencesDto {
+    fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {
         val fetchRequest = FetchRequest(cdqConfigProperties.datasource, externalId)
 
         val fetchResponse = try {
@@ -61,12 +67,12 @@ class LegalEntityService(
         }
 
         when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return fetchResponse.businessPartner!!.toDto()
+            FetchResponse.Status.OK -> return toValidLegalEntityInput(fetchResponse.businessPartner!!)
             FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
         }
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityWithReferencesDto> {
+    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInput> {
         val partnerCollection = try {
             webClient
                 .get()
@@ -86,10 +92,29 @@ class LegalEntityService(
             throw CdqRequestException("Get business partners request failed.", e)
         }
 
+        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it) }
+
         return PageStartAfterResponse(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
-            content = partnerCollection.values.map { it.toDto() }
+            content = validEntries.map { inputCdqMappingService.toInput(it) },
+            invalidEntries = partnerCollection.values.size - validEntries.size
         )
+    }
+
+    private fun toValidLegalEntityInput(partner: BusinessPartnerCdq): LegalEntityGateInput {
+        if (!validateBusinessPartner(partner)) {
+            throw CdqInvalidRecordException(partner.id)
+        }
+        return inputCdqMappingService.toInput(partner)
+    }
+
+    private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
+        if (!partner.addresses.any { address -> address.types.any { type -> type.technicalKey == AddressType.LEGAL.name } }) {
+            logger.warn { "CDQ business partner with CDQ ID ${partner.id} does not have legal address" }
+            return false
+        }
+
+        return true
     }
 }

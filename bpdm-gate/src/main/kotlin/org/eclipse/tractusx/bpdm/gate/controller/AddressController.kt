@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.AddressWithReferencesDto
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressWithReferencesResponse
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.springdoc.api.annotations.ParameterObject
@@ -33,7 +33,7 @@ class AddressController {
         ]
     )
     @PutMapping("/input/addresses")
-    fun upsertAddresses(@RequestBody addresses: Collection<AddressWithReferencesDto>): ResponseEntity<Any> {
+    fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInput>): ResponseEntity<Any> {
         TODO()
     }
 
@@ -48,7 +48,7 @@ class AddressController {
         ]
     )
     @GetMapping("/input/addresses/{externalId}")
-    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressWithReferencesDto {
+    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInput {
         TODO()
     }
 
@@ -63,7 +63,7 @@ class AddressController {
         ]
     )
     @GetMapping("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressWithReferencesDto> {
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput> {
         TODO()
     }
 
@@ -81,7 +81,7 @@ class AddressController {
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @Parameter(description = "Only show addresses that were updated after the specified ISO-8601 timestamp") from: Instant?
-    ): PageStartAfterResponse<AddressWithReferencesResponse> {
+    ): PageStartAfterResponse<AddressGateOutput> {
         TODO()
     }
 
@@ -96,7 +96,7 @@ class AddressController {
         ]
     )
     @GetMapping("/output/addresses/{externalId}")
-    fun getAddressByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressWithReferencesResponse {
+    fun getAddressByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateOutput {
         TODO()
     }
 }

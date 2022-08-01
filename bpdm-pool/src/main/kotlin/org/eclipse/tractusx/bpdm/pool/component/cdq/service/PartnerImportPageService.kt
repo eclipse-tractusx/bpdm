@@ -28,7 +28,7 @@ class PartnerImportPageService(
     private val adapterProperties: CdqAdapterConfigProperties,
     private val cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
-    private val mappingService: CdqRequestMappingService,
+    private val mappingService: CdqToRequestMapper,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
 ) {
