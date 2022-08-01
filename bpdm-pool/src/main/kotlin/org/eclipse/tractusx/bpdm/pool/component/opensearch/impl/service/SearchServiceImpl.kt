@@ -18,6 +18,7 @@ import org.eclipse.tractusx.bpdm.pool.service.toSearchDto
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import kotlin.math.ceil
 
 /**
  * Implements search functionality by using OpenSearch
@@ -67,7 +68,7 @@ class SearchServiceImpl(
             businessPartners.map { it.toSearchDto(bpnHitMap[it.bpn]!!.score) }.sortedByDescending { it.score }
 
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
-        val totalPages = totalHits.toInt() / paginationRequest.size
+        val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
 
         return PageResponse(totalHits, totalPages, paginationRequest.page, responseContent.size, responseContent)
     }
@@ -97,7 +98,7 @@ class SearchServiceImpl(
 
         return PageResponse(
             hits.totalHits!!.value,
-            hits.totalHits!!.value.toInt() / paginationRequest.size,
+            ceil(hits.totalHits!!.value.toDouble() / paginationRequest.size).toInt(),
             paginationRequest.page,
             hits.hits.size,
             hits.map { hit ->
