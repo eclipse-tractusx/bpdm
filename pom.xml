@@ -221,6 +221,14 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.eclipse.dash</groupId>
+                    <artifactId>license-tool-plugin</artifactId>
+                    <version>0.0.1-SNAPSHOT</version>
+                    <configuration>
+                        <projectId>automotive.tractusx</projectId>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -248,14 +256,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.dash</groupId>
-                <artifactId>license-tool-plugin</artifactId>
-                <version>0.0.1-SNAPSHOT</version>
-                <configuration>
-                    <projectId>automotive.tractusx</projectId>
-                </configuration>
             </plugin>
         </plugins>
     </build>
