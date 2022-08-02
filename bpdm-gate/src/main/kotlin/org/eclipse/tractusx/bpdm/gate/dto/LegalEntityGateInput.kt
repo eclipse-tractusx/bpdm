@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 
 @JsonDeserialize(using = LegalEntityGateInputDeserializer::class)
-@Schema(name = "Legal Entity With References", description = "Legal entity with external id")
+@Schema(name = "Legal Entity Gate Input", description = "Legal entity with external id")
 data class LegalEntityGateInput(
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,

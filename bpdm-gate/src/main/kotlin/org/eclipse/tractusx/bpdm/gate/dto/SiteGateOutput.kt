@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 
 @JsonDeserialize(using = SiteGateOutputDeserializer::class)
-@Schema(name = "Site With References Response", description = "Site with legal entity reference.")
+@Schema(name = "Site Gate Output", description = "Site with legal entity reference.")
 data class SiteGateOutput(
     @JsonUnwrapped
     val site: SiteResponse,

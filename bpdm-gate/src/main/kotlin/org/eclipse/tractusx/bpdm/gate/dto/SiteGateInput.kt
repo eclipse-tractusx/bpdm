@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
 @JsonDeserialize(using = SiteGateInputDeserializer::class)
-@Schema(name = "Site With References", description = "Site with legal entity reference.")
+@Schema(
+    name = "Site Gate Input", description = " Site with legal entity reference ."
+)
 data class SiteGateInput(
     @JsonUnwrapped
     val site: SiteDto,

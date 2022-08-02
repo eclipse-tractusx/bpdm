@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 
 @JsonDeserialize(using = LegalEntityGateOutputDeserializer::class)
-@Schema(name = "Legal Entity With References Response", description = "Legal entity with references")
+@Schema(name = "Legal Entity Gate Output", description = "Legal entity with references")
 data class LegalEntityGateOutput(
     @JsonUnwrapped
     val legalEntity: LegalEntityResponse,
