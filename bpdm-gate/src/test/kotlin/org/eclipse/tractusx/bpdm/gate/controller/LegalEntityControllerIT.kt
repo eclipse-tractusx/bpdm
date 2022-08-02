@@ -127,7 +127,7 @@ internal class LegalEntityControllerIT @Autowired constructor(
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
             RequestValues.legalEntityGateInput1,
-            LegalEntityGateInput("external-2", RequestValues.legalEntityGateInput1.legalEntity.copy()),
+            LegalEntityGateInput("external-1", RequestValues.legalEntityGateInput1.legalEntity.copy()),
             LegalEntityGateInput("external-2", RequestValues.legalEntityGateInput1.legalEntity.copy())
         )
 
