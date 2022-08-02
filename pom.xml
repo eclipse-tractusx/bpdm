@@ -256,14 +256,6 @@
                 <configuration>
                     <projectId>automotive.tractusx</projectId>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>license-check</id>
-                        <goals>
-                            <goal>license-check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
