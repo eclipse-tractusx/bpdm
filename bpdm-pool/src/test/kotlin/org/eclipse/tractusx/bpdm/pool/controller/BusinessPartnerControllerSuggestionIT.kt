@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.service.ElasticSyncStarterService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
@@ -36,11 +36,11 @@ import java.util.stream.Stream
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles(value = ["test"])
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val importService: ImportStarterService,
-    val elasticSyncService: ElasticSyncStarterService,
+    val openSearchSyncService: OpenSearchSyncStarterService,
     val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers,
     val businessPartnerBuildService: BusinessPartnerBuildService
@@ -139,7 +139,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        elasticSyncService.clearElastic()
+        openSearchSyncService.clearOpenSearch()
 
         val partnerDocs = listOf(
             CdqValues.businessPartner1,
@@ -170,7 +170,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             listOf(RequestValues.businessPartnerRequest1, RequestValues.businessPartnerRequest2)
         )
 
-        elasticSyncService.export()
+        openSearchSyncService.export()
     }
 
     /**

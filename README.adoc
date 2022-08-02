@@ -50,7 +50,7 @@ The REST API documentation can be accessed at `+http://localhost:8080/api/swagge
 . PostgreSQL 14.2
 . Keycloak 17.0.0 (with enabled authentication)
 . Connection to CDQ API v4.0 (with enabled CDQ component)
-. Elasticsearch 7.17.0 (with enabled Elasticsearch component)
+. OpenSearch 2.1.0 (with enabled OpenSearch component)
 
 === Profiles
 
@@ -90,18 +90,18 @@ The file `application-cdq.properties` enables and configures the connection to a
 Depending on whether this component is enabled, the application offers endpoints to import records from and to export Business Partner Numbers to CDQ.
 When enabled the application requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges for accessing the specified storage.
 
-==== Elastic
+==== OpenSearch
 
-`application-elastic.properties` enables/disables and configures the connection to an external Elasticsearch instance.
-When enabled a running Elasticsearch instance is required (Tested on version 7.17.0).
+`application-opensearch.properties` enables/disables and configures the connection to an external OpenSearch instance.
+When enabled a running OpenSearch instance is required (Tested on version 2.1.0).
 Then the application is able to search and filter business partners by their properties other than identifiers.
 Additionally, suggestions for autocompletion can be obtained for each business partner property.
-With the activation of the Elasticsearch component the application also features new endpoints for exporting business partner records to the Elasticsearch instance as well as clearing the current Elasticsearch index.
+With the activation of the OpenSearch component the application also features new endpoints for exporting business partner records to the OpenSearch instance as well as clearing the current OpenSearch index.
 
-You can specify the URL to connect to and if need be add user and password over the spring elasticsearch adapter properties.
-On `dev` and `int` environment you need to specify in which the host the Elasticsearch instance is reachable in the environment variable `BPDM_ELASTIC_HOST`.
+You can specify the URL to connect to over the `bpdm.opensearch` properties.
+On `dev` and `int` environment you need to specify the host of the OpenSearch instance with the variable `BPDM_OPENSEARCH_HOST`.
 
-Without the Elasticsearch component enabled the suggestions are always empty and search requests do not filter any business partners.
+Without the OpenSearch component enabled the suggestions are always empty and search requests do not filter any business partners.
 
 ==== Activating profiles
 
@@ -117,7 +117,7 @@ For development purposes you can also fine tune which component should run in wh
 |Persist
 |Auth
 |CDQ
-|Elastic
+|OpenSearch
 
 |default
 |Localhost
@@ -135,13 +135,13 @@ For development purposes you can also fine tune which component should run in wh
 |Host defined in  `BPDM_DB_HOST`
 |https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
 |https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
-|Host defined in  `BPDM_ELASTIC_HOST`
+|Host defined in  `BPDM_OPENSEARCH_HOST`
 
 |int
 |Host defined in  `BPDM_DB_HOST`
 |https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
 |https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
-|Host defined in  `BPDM_ELASTIC_HOST`
+|Host defined in  `BPDM_OPENSEARCH_HOST`
 |===
 
 ==== Examples
@@ -150,7 +150,7 @@ For development purposes you can also fine tune which component should run in wh
 . Run on local environment: `mvn clean spring-boot:run -Dspring.profiles.active=local`
 . Run in general default environment against dev environment CDQ Api: `mvn clean spring-boot:run -Dspring.profiles.active=dev_cdq`
 . Run in general local environment against dev environment CDQ Api:  `mvn clean spring-boot:run -Dspring.profiles.active=local,dev_cdq`
-. Configure each component's environment separately: `mvn clean spring-boot:run -Dspring.profiles.active=local_elastic,dev_auth,int_cdq`
+. Configure each component's environment separately: `mvn clean spring-boot:run -Dspring.profiles.active=local_opensearch,dev_auth,int_cdq`
 
 == Project Structure
 
@@ -177,7 +177,7 @@ These property classes contain values obtained from the application.properties f
 When possible, configuration classes services and components should use configuration properties instead of accessing property values from the application.properties directly.
 However, in some cases such as conditional activation on configurations by annotation such an approach is not possible and direct access is permissible.
 
-Optional components which require more logic than just simple configuration files are placed in the `component` package such as the cdq and elastic component subpackages.
+Optional components which require more logic than just simple configuration files are placed in the `component` package such as the cdq and opensearch component subpackages.
 Such a component package is structured again like a mirror of the project structure.
 That is, a component package can contain its own repository, service, configuration packages and so on.
 By default, the application component scan ignores the component packages.

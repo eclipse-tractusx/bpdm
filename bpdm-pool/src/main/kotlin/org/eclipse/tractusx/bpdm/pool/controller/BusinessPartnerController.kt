@@ -7,8 +7,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
-import org.eclipse.tractusx.bpdm.pool.component.elastic.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.*

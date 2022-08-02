@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.elastic.impl.service.ElasticSyncStarterService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
@@ -24,27 +24,27 @@ import org.springframework.test.web.reactive.server.returnResult
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles(value = ["test"])
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, ElasticsearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class BusinessPartnerControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val elasticSyncService: ElasticSyncStarterService,
+    val openSearchSyncStarterService: OpenSearchSyncStarterService,
     val testHelpers: TestHelpers,
     val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        elasticSyncService.clearElastic()
+        openSearchSyncStarterService.clearOpenSearch()
 
         businessPartnerBuildService.upsertBusinessPartners(
             listOf(RequestValues.businessPartnerRequest1, RequestValues.businessPartnerRequest2)
         )
 
-        elasticSyncService.export()
+        openSearchSyncStarterService.export()
     }
 
     /**
-     * Given partners in Elasticsearch
+     * Given partners in OpenSearch
      * When searching by site name
      * Then business partner is found
      */
@@ -56,7 +56,7 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
     }
 
     /**
-     * Given partners in Elasticsearch
+     * Given partners in OpenSearch
      * When searching by nonexistent site name
      * Then no business partner is found
      */
