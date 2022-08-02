@@ -94,11 +94,23 @@ applicationSecret:
 applicationConfig: # |
   # property=value
 
-elastic:
+opensearch:
   enabled: true
-  security:
-    tls:
-      restEncryption: false
+  replicas: 1
+  protocol: http
+  roles:
+    - master
+    - ingest
+    - data
+  config:
+    opensearch.yml: |
+      cluster.name: opensearch-cluster
+      # Bind to all interfaces because we don't know what IP address Docker will assign to us.
+      network.host: 0.0.0.0
+      # Disable security
+      plugins.security.disabled: true
+  securityConfig:
+    enabled: false
 
 postgres:
   enabled: true

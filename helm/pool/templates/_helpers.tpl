@@ -68,11 +68,11 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- end }}
 
 {{/*
-Invoke include on given definition with elastic dependency context
-Usage: include "includeWithElasticContext" (list root "your_include_function_here")
+Invoke include on given definition with opensearch dependency context
+Usage: include "includeWithOpensearchContext" (list root "your_include_function_here")
 */}}
-{{- define "includeWithElasticContext" -}}
+{{- define "includeWithOpensearchContext" -}}
 {{- $ := index . 0 }}
 {{- $function := index . 1 }}
-{{- include $function (dict "Values" $.Values.elastic "Chart" (dict "Name" "elastic") "Release" $.Release) }}
+{{- include $function (dict "Values" $.Values.opensearch "Chart" (dict "Name" "opensearch") "Release" $.Release) }}
 {{- end }}
