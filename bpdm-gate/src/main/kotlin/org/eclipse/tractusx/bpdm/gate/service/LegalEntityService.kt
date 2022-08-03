@@ -7,6 +7,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
@@ -22,6 +23,7 @@ class LegalEntityService(
     private val webClient: WebClient,
     private val cdqRequestMappingService: CdqRequestMappingService,
     private val inputCdqMappingService: InputCdqMappingService,
+    private val outputCdqMappingService: OutputCdqMappingService,
     private val cdqConfigProperties: CdqConfigProperties,
     private val objectMapper: ObjectMapper
 ) {
@@ -100,6 +102,34 @@ class LegalEntityService(
             content = validEntries.map { inputCdqMappingService.toInput(it) },
             invalidEntries = partnerCollection.values.size - validEntries.size
         )
+    }
+
+    fun getLegalEntityByExternalIdOutput(externalId: String): LegalEntityGateOutput {
+        val fetchRequest = ReadAugmentedBusinessPartnerRequestCdq(externalId)
+
+        val response = try {
+            webClient
+                .post()
+                .uri("/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch")
+                .bodyValue(objectMapper.writeValueAsString(fetchRequest))
+                .retrieve()
+                .bodyToMono<AugmentedBusinessPartnerResponseCdq>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Read augmented business partner request failed.", e)
+        }
+
+        if (response.augmentedBusinessPartner == null) {
+            throw BpdmNotFoundException("Legal Entity", externalId)
+        }
+        return toValidLegalEntityOutput(response.augmentedBusinessPartner!!)
+    }
+
+    private fun toValidLegalEntityOutput(partner: BusinessPartnerCdq): LegalEntityGateOutput {
+        if (!validateBusinessPartner(partner)) {
+            throw CdqInvalidRecordException(partner.id)
+        }
+        return outputCdqMappingService.toOutput(partner)
     }
 
     private fun toValidLegalEntityInput(partner: BusinessPartnerCdq): LegalEntityGateInput {

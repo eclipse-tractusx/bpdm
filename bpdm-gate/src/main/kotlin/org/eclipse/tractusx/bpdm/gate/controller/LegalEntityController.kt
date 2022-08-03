@@ -107,7 +107,7 @@ class LegalEntityController(
     )
     @GetMapping("/output/legal-entities/{externalId}")
     fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateOutput {
-        TODO()
+        return legalEntityService.getLegalEntityByExternalIdOutput(externalId)
     }
 
     private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size
