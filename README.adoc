@@ -281,3 +281,22 @@ imagePullSecrets:
 ----
 
 As with application secrets instead of writing your credentials directly into a value.yaml you better pass them via command line when deploying the helm release: `--set imagePullSecret.user=your_user`
+
+== License Check
+
+Licenses of all maven dependencies need to be approved by eclipse.
+The Eclipse Dash License Tool can be used to check the license approval status of dependencies and to request reviews by the intellectual property team.
+
+.generate summary of dependencies and their approval status
+[source,bash]
+----
+mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.summary=DEPENDENCIES
+----
+
+.automatically create IP Team review requests
+[source,bash]
+----
+mvn org.eclipse.dash:license-tool-plugin:license-check -Ddash.iplab.token=<token>
+----
+
+Check the https://github.com/eclipse/dash-licenses[Eclipse Dash License Tool documentation] for more detailed information.
