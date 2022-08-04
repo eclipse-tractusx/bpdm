@@ -36,18 +36,7 @@ class OutputCdqMappingService(
             types = businessPartner.types.map { toDtoTyped(it) },
             bankAccounts = businessPartner.bankAccounts.map { toDto(it) },
             roles = emptyList(),
-            relations = businessPartner.relations.map { toDto(it) }
-        )
-    }
-
-    private fun toDto(relation: RelationCdq): RelationResponse {
-        return RelationResponse(
-            relationClass = toDtoTyped(relation.relationClass),
-            type = toDtoTyped(relation.type),
-            startNode = relation.startNode,
-            endNode = relation.endNode,
-            startedAt = relation.startedAt,
-            endedAt = relation.endedAt
+            relations = emptyList()
         )
     }
 
@@ -110,10 +99,6 @@ class OutputCdqMappingService(
 
     private inline fun <reified T> toDtoTyped(type: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<T> where T : Enum<T>, T : HasDefaultValue<T> {
         return TypeKeyNameUrlDto(CdqMappings.toTypeOrDefault(type), type.name!!, type.url)
-    }
-
-    private inline fun <reified T> toDtoTyped(type: TypeKeyNameCdq): TypeKeyNameDto<T> where T : Enum<T>, T : HasDefaultValue<T> {
-        return TypeKeyNameDto(CdqMappings.toTypeOrDefault(type), type.name!!)
     }
 
     private fun toDto(identifierCdq: IdentifierCdq): IdentifierResponse {

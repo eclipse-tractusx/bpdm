@@ -45,7 +45,7 @@ object CdqMappings {
         return language?.technicalKey ?: LanguageCode.undefined
     }
 
-    inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
+    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
         return technicalKeyToType(type?.technicalKey)
     }
 

@@ -1,6 +1,6 @@
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class RelationType(private val typeName: String) : NamedType, HasDefaultValue<RelationType> {
+enum class RelationType(private val typeName: String) : NamedType {
     CX_LEGAL_SUCCESSOR_OF("Start is legal successor of End"),
     CX_LEGAL_PREDECESSOR_OF("Start is legal predecessor of End"),
     CX_ADDRESS_OF("Start is legally registered at End"),
@@ -20,14 +20,9 @@ enum class RelationType(private val typeName: String) : NamedType, HasDefaultVal
     DNB_GLOBAL_ULTIMATE("End is globally highest organization in hierarchy of Start"),
     LEI_DIRECT_PARENT("Start legally owns End"),
     LEI_INTERNATIONAL_BRANCH("Start is international branch of End"),
-    LEI_ULTIMATE_PARENT("End is globally highest organization in hierarchy of Start"),
-    UNKNOWN("Unknown");
+    LEI_ULTIMATE_PARENT("End is globally highest organization in hierarchy of Start");
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getDefault(): RelationType {
-        return UNKNOWN
     }
 }
