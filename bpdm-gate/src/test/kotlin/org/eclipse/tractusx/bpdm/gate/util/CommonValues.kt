@@ -1,9 +1,8 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
+import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.bpdm.common.model.NameType
+import org.eclipse.tractusx.bpdm.common.model.*
 import java.time.LocalDateTime
 
 /**
@@ -15,6 +14,15 @@ object CommonValues {
 
     val bpn1 = "BPNL0000000000XY"
     val bpn2 = "BPNL0000000001XZ"
+
+    val language1 = LanguageCode.de
+    val language2 = LanguageCode.en
+
+    val characterSet1 = CharacterSet.WESTERN_LATIN_STANDARD
+    val characterSet2 = CharacterSet.GREEK
+
+    val country1 = CountryCode.DE
+    val country2 = CountryCode.US
 
     val name1 = "Business Partner Name"
     val name2 = "Company ABC AG"
@@ -42,7 +50,6 @@ object CommonValues {
     val idStatusTechnicalKey4 = "EXPIRED"
 
     val nameType1 = NameType.OTHER
-    val language1 = LanguageCode.en
 
     val shortName1 = "short1"
     val shortName2 = "short2"
@@ -90,4 +97,50 @@ object CommonValues {
 
     val internationalBankAccountIdentifier4 = "DE0000000000000000002"
     val nationalBankAccountIdentifier4 = "000000002"
+
+    val careOf1 = "Caring Entity Co"
+    val careOf2 = "Another Caring Entity"
+
+    val context1 = "Context1"
+    val context2 = "Context2"
+
+    val adminArea1 = "Baden-Württemberg"
+    val adminArea2 = "Stuttgart"
+
+    val adminAreaType1 = AdministrativeAreaType.COUNTY
+    val adminAreaType2 = AdministrativeAreaType.REGION
+
+    val postCode1 = "70546"
+    val postCode2 = "70547"
+
+    val postCodeType1 = PostCodeType.REGULAR
+    val postCodeType2 = PostCodeType.POST_BOX
+
+    val locality1 = "Stuttgart"
+    val locality2 = "Vaihingen"
+
+    val localityType1 = LocalityType.CITY
+    val localityType2 = LocalityType.DISTRICT
+
+    val thoroughfare1 = "Mercedesstraße 120"
+    val thoroughfare2 = "Werk 1"
+
+    val thoroughfareType1 = ThoroughfareType.STREET
+    val thoroughfareType2 = ThoroughfareType.INDUSTRIAL_ZONE
+
+    val premise1 = "Bauteil A"
+    val premise2 = "Etage 1"
+
+    val premiseType1 = PremiseType.BUILDING
+    val premiseType2 = PremiseType.WAREHOUSE
+
+    val postalDeliveryPoint1 = "Postal Delivery point"
+    val postalDeliveryPoint2 = "Mailbox Premise Street"
+
+    val postalDeliveryPointType1 = PostalDeliveryPointType.MAILBOX
+    val postalDeliveryPointType2 = PostalDeliveryPointType.POST_OFFICE_BOX
+
+    val geoCoordinates1 = Triple(0f, 0f, 0f)
+    val geoCoordinates2 = Triple(1f, 1f, 0f)
+
 }

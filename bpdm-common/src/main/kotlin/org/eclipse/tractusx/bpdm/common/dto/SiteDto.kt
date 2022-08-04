@@ -7,5 +7,7 @@ data class SiteDto(
     @Schema(description = "Business Partner Number")
     val bpn: String?,
     @Schema(description = "Site name")
-    val name: String
+    val name: String,
+    @Schema(description = "Main address where this site resides")
+    val mainAddress: AddressDto
 )

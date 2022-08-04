@@ -8,7 +8,7 @@ data class LocalityDto(
     @Schema(description = "Full name of the locality")
     val value: String,
     @Schema(description = "Abbreviation or shorthand of the locality's name, if applicable")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Type of specified locality", defaultValue = "OTHER")
     val type: LocalityType = LocalityType.OTHER
 )

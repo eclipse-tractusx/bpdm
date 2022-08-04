@@ -21,5 +21,7 @@ data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[\"UNKNOWN\"]"))
     val types: Collection<BusinessPartnerType> = listOf(BusinessPartnerType.UNKNOWN),
     @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
-    val bankAccounts: Collection<BankAccountDto> = emptyList()
+    val bankAccounts: Collection<BankAccountDto> = emptyList(),
+    @Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: AddressDto
 )

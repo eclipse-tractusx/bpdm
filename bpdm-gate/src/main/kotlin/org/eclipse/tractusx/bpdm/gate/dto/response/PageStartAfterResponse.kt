@@ -9,5 +9,7 @@ data class PageStartAfterResponse<T>(
     @Schema(description = "Value to be used as startAfter in request for next page. Value is only sent if more data exists for a next page.")
     val nextStartAfter: String?,
     @Schema(description = "Collection of results in the page")
-    val content: Collection<T>
+    val content: Collection<T>,
+    @Schema(description = "Number of entries in the page that have been omitted due to being invalid")
+    val invalidEntries: Int
 )

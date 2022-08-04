@@ -4,5 +4,5 @@ import com.neovisionaries.i18n.CountryCode
 
 data class CountryCdq(
     val shortName: CountryCode?,
-    val value: String?
+    val value: String? = null
 )

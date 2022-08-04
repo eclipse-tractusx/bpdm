@@ -57,7 +57,6 @@ object RequestValues {
     )
 
     val addressRequest1 = AddressDto(
-        bpn = null,
         premises = listOf(premiseRequest1)
     )
 
