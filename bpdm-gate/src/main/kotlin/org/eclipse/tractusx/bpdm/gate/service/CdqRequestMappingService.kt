@@ -195,7 +195,7 @@ class CdqRequestMappingService(
         if (technicalKey != LanguageCode.undefined) LanguageCdq(technicalKey, null) else null
 
     private fun toCountryCdq(countryCode: CountryCode) =
-        if (countryCode != CountryCode.UNDEFINED) CountryCdq(null, countryCode.name) else null
+        if (countryCode != CountryCode.UNDEFINED) CountryCdq(countryCode, null) else null
 
     private fun toCharacterSetCdq(characterSet: CharacterSet) =
         if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeCdq(characterSet) else null
