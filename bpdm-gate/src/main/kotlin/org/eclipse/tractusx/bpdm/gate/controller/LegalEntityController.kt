@@ -92,7 +92,7 @@ class LegalEntityController(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
     ): PageStartAfterResponse<LegalEntityGateOutput> {
-        TODO()
+        return legalEntityService.getLegalEntitiesOutput(paginationRequest.limit, paginationRequest.startAfter, from)
     }
 
     @Operation(

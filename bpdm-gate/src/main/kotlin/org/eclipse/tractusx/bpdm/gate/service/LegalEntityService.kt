@@ -14,6 +14,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.time.Instant
 
 private const val BUSINESS_PARTNER_PATH = "/businesspartners"
 private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
@@ -100,6 +101,36 @@ class LegalEntityService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = validEntries.map { inputCdqMappingService.toInput(it) },
+            invalidEntries = partnerCollection.values.size - validEntries.size
+        )
+    }
+
+    fun getLegalEntitiesOutput(limit: Int, startAfter: String?, from: Instant?): PageStartAfterResponse<LegalEntityGateOutput> {
+        val partnerCollection = try {
+            webClient
+                .get()
+                .uri { builder ->
+                    builder
+                        .path("/augmentedbusinesspartners")
+                        .queryParam("limit", limit)
+                        .queryParam("datasource", cdqConfigProperties.datasource)
+                    if (startAfter != null) builder.queryParam("startAfter", startAfter)
+                    if (from != null) builder.queryParam("from", from)
+                    builder.build()
+                }
+                .retrieve()
+                .bodyToMono<BusinessPartnerCollectionCdq>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Read augmented business partners request failed.", e)
+        }
+
+        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it) }
+
+        return PageStartAfterResponse(
+            total = partnerCollection.total,
+            nextStartAfter = partnerCollection.nextStartAfter ?: partnerCollection.values.lastOrNull()?.id,
+            content = validEntries.map { outputCdqMappingService.toOutput(it) },
             invalidEntries = partnerCollection.values.size - validEntries.size
         )
     }
