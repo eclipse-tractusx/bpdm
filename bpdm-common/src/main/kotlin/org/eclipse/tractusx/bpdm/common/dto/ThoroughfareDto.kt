@@ -8,13 +8,13 @@ data class ThoroughfareDto(
         @Schema(description = "Full denotation of the thoroughfare")
         val value: String,
         @Schema(description = "Full name of the thoroughfare")
-        val name: String?,
+        val name: String? = null,
         @Schema(description = "Abbreviation or shorthand, if applicable")
-        val shortName: String?,
+        val shortName: String? = null,
         @Schema(description = "Thoroughfare number, if applicable")
-        val number: String?,
+        val number: String? = null,
         @Schema(description = "Direction information on the thoroughfare, if applicable")
-        val direction: String?,
+        val direction: String? = null,
         @Schema(description = "Type of specified thoroughfare", defaultValue = "OTHER")
         var type: ThoroughfareType = ThoroughfareType.OTHER
-        )
+)

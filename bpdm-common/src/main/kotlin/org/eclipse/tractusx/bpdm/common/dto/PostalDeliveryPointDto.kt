@@ -8,9 +8,9 @@ data class PostalDeliveryPointDto(
     @Schema(description = "Full name of the delivery point")
     val value: String,
     @Schema(description = "Abbreviation or shorthand, if applicable")
-    val shortName: String?,
+    val shortName: String? = null,
     @Schema(description = "Number/code of the delivery point, if applicable")
-    val number: String?,
+    val number: String? = null,
     @Schema(description = "Type of the specified delivery point", defaultValue = "OTHER")
     val type: PostalDeliveryPointType = PostalDeliveryPointType.OTHER
 )
