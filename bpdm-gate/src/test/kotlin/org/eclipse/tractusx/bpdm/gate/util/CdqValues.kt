@@ -22,31 +22,87 @@ object CdqValues {
     val country2 = CountryCdq(shortName = CommonValues.country2)
 
     val identifier1 = IdentifierCdq(
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.idTypeTechnicalKey1),
-        value = CommonValues.idValue1,
-        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.idIssuingBodyTechnicalKey1),
-        status = TypeKeyNameCdq(technicalKey = CommonValues.idStatusTechnicalKey1)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierTypeTechnicalKey1),
+        value = CommonValues.identifierValue1,
+        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey1),
+        status = TypeKeyNameCdq(technicalKey = CommonValues.identifierStatusTechnicalKey1)
+    )
+
+    val identifier1Response = identifier1.copy(
+        type = identifier1.type!!.copy(
+            name = CommonValues.identifierTypeName1,
+            url = CommonValues.identifierTypeUrl1
+        ),
+        issuingBody = identifier1.issuingBody!!.copy(
+            name = CommonValues.identifierIssuingBodyName1,
+            url = CommonValues.identifierIssuingBodyUrl1
+        ),
+        status = identifier1.status!!.copy(
+            name = CommonValues.identifierStatusName1
+        )
     )
 
     val identifier2 = IdentifierCdq(
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.idTypeTechnicalKey2),
-        value = CommonValues.idValue2,
-        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.idIssuingBodyTechnicalKey2),
-        status = TypeKeyNameCdq(technicalKey = CommonValues.idStatusTechnicalKey2)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierTypeTechnicalKey2),
+        value = CommonValues.identifierValue2,
+        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey2),
+        status = TypeKeyNameCdq(technicalKey = CommonValues.identifierStatusTechnicalKey2)
+    )
+
+    val identifier2Response = identifier2.copy(
+        type = identifier2.type!!.copy(
+            name = CommonValues.identifierTypeName2,
+            url = CommonValues.identifierTypeUrl2
+        ),
+        issuingBody = identifier2.issuingBody!!.copy(
+            name = CommonValues.identifierIssuingBodyName2,
+            url = CommonValues.identifierIssuingBodyUrl2
+        ),
+        status = identifier2.status!!.copy(
+            name = CommonValues.identifierStatusName2
+        )
     )
 
     val identifier3 = IdentifierCdq(
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.idTypeTechnicalKey3),
-        value = CommonValues.idValue3,
-        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.idIssuingBodyTechnicalKey3),
-        status = TypeKeyNameCdq(technicalKey = CommonValues.idStatusTechnicalKey3)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierTypeTechnicalKey3),
+        value = CommonValues.identifierValue3,
+        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey3),
+        status = TypeKeyNameCdq(technicalKey = CommonValues.identifierStatusTechnicalKey3)
+    )
+
+    val identifier3Response = identifier3.copy(
+        type = identifier3.type!!.copy(
+            name = CommonValues.identifierTypeName3,
+            url = CommonValues.identifierTypeUrl3
+        ),
+        issuingBody = identifier3.issuingBody!!.copy(
+            name = CommonValues.identifierIssuingBodyName3,
+            url = CommonValues.identifierIssuingBodyUrl3
+        ),
+        status = identifier3.status!!.copy(
+            name = CommonValues.identifierStatusName3
+        )
     )
 
     val identifier4 = IdentifierCdq(
-        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.idTypeTechnicalKey4),
-        value = CommonValues.idValue4,
-        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.idIssuingBodyTechnicalKey4),
-        status = TypeKeyNameCdq(technicalKey = CommonValues.idStatusTechnicalKey4)
+        type = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierTypeTechnicalKey4),
+        value = CommonValues.identifierValue4,
+        issuingBody = TypeKeyNameUrlCdq(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey4),
+        status = TypeKeyNameCdq(technicalKey = CommonValues.identifierStatusTechnicalKey4)
+    )
+
+    val identifier4Response = identifier4.copy(
+        type = identifier4.type!!.copy(
+            name = CommonValues.identifierTypeName4,
+            url = CommonValues.identifierTypeUrl4
+        ),
+        issuingBody = identifier4.issuingBody!!.copy(
+            name = CommonValues.identifierIssuingBodyName4,
+            url = CommonValues.identifierIssuingBodyUrl4
+        ),
+        status = identifier4.status!!.copy(
+            name = CommonValues.identifierStatusName4
+        )
     )
 
     val identifierBpn1 = IdentifierCdq(
@@ -91,7 +147,21 @@ object CdqValues {
 
     val legalForm1 = LegalFormCdq(technicalKey = CommonValues.legalFormTechnicalKey1)
 
+    val legalForm1Response = legalForm1.copy(
+        name = CommonValues.legalFormName1,
+        url = CommonValues.legalFormUrl1,
+        mainAbbreviation = CommonValues.legalFormAbbreviation1,
+        language = language1
+    )
+
     val legalForm2 = LegalFormCdq(technicalKey = CommonValues.legalFormTechnicalKey2)
+
+    val legalForm2Response = legalForm2.copy(
+        name = CommonValues.legalFormName2,
+        url = CommonValues.legalFormUrl2,
+        mainAbbreviation = CommonValues.legalFormAbbreviation2,
+        language = language2
+    )
 
     val businessStatus1 = BusinessPartnerStatusCdq(
         type = TypeKeyNameUrlCdq(technicalKey = CommonValues.businessStatusType1.name),
@@ -247,7 +317,6 @@ object CdqValues {
         geographicCoordinates = geoCoordinate2
     )
 
-
     val legalEntity1 = BusinessPartnerCdq(
         externalId = CommonValues.externalId1,
         identifiers = listOf(identifier1, identifier2, identifierBpn1),
@@ -270,5 +339,15 @@ object CdqValues {
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(legalAddress2)
+    )
+
+    val legalEntity1Response = legalEntity1.copy(
+        identifiers = listOf(identifier1Response, identifier2Response, identifierBpn1),
+        legalForm = legalForm1Response
+    )
+
+    val legalEntity2Response = legalEntity2.copy(
+        identifiers = listOf(identifier3Response, identifier4Response, identifierBpn2),
+        legalForm = legalForm2Response
     )
 }

@@ -29,25 +29,50 @@ object CommonValues {
     val name3 = "Another Organisation Corp"
     val name4 = "Catena Test Name"
 
-    val idValue1 = "DE123456789"
-    val idTypeTechnicalKey1 = "VAT_DE"
-    val idIssuingBodyTechnicalKey1 = "issuing body 1"
-    val idStatusTechnicalKey1 = "ACTIVE"
+    val identifierValue1 = "DE123456789"
+    val identifierValue2 = "US123456789"
+    val identifierValue3 = "FR123456789"
+    val identifierValue4 = "NL123456789"
 
-    val idValue2 = "US123456789"
-    val idTypeTechnicalKey2 = "VAT_US"
-    val idIssuingBodyTechnicalKey2 = "issuing body 2"
-    val idStatusTechnicalKey2 = "EXPIRED"
+    val identifierIssuingBodyTechnicalKey1 = "issuing body 1"
+    val identifierIssuingBodyTechnicalKey2 = "issuing body 2"
+    val identifierIssuingBodyTechnicalKey3 = "issuing body 3"
+    val identifierIssuingBodyTechnicalKey4 = "issuing body 4"
 
-    val idValue3 = "FR123456789"
-    val idTypeTechnicalKey3 = "VAT_FR"
-    val idIssuingBodyTechnicalKey3 = "issuing body 3"
-    val idStatusTechnicalKey3 = "PENDING"
+    val identifierIssuingBodyName1 = "Agency X"
+    val identifierIssuingBodyName2 = "Body Y"
+    val identifierIssuingBodyName3 = "Official Z"
+    val identifierIssuingBodyName4 = "Gov A"
 
-    val idValue4 = "NL123456789"
-    val idTypeTechnicalKey4 = "VAT_NL"
-    val idIssuingBodyTechnicalKey4 = "issuing body 4"
-    val idStatusTechnicalKey4 = "EXPIRED"
+    val identifierIssuingBodyUrl1 = "http://catenax-host/issuing-body1"
+    val identifierIssuingBodyUrl2 = "http://catenax-host/issuing-body2"
+    val identifierIssuingBodyUrl3 = "http://catenax-host/issuing-body3"
+    val identifierIssuingBodyUrl4 = "http://catenax-host/issuing-body4"
+
+    val identifierStatusTechnicalKey1 = "ACTIVE"
+    val identifierStatusTechnicalKey2 = "EXPIRED"
+    val identifierStatusTechnicalKey3 = "PENDING"
+    val identifierStatusTechnicalKey4 = "UNKNOWN"
+
+    val identifierStatusName1 = "Active"
+    val identifierStatusName2 = "Expired"
+    val identifierStatusName3 = "Pending"
+    val identifierStatusName4 = "Unknown Status"
+
+    val identifierTypeName1 = "Steuernummer"
+    val identifierTypeName2 = "VAT USA"
+    val identifierTypeName3 = "VAT France"
+    val identifierTypeName4 = "VAT Netherlands"
+
+    val identifierTypeUrl1 = "http://catenax-host/id-type1"
+    val identifierTypeUrl2 = "http://catenax-host/id-type2"
+    val identifierTypeUrl3 = "http://catenax-host/id-type3"
+    val identifierTypeUrl4 = "http://catenax-host/id-type4"
+
+    val identifierTypeTechnicalKey1 = "VAT_DE"
+    val identifierTypeTechnicalKey2 = "VAT_US"
+    val identifierTypeTechnicalKey3 = "VAT_FR"
+    val identifierTypeTechnicalKey4 = "VAT_NL"
 
     val nameType1 = NameType.OTHER
 
@@ -56,8 +81,18 @@ object CommonValues {
     val shortName3 = "short3"
     val shortName4 = "short4"
 
-    val legalFormTechnicalKey1 = "GMBH"
-    val legalFormTechnicalKey2 = "LLC"
+
+    val legalFormTechnicalKey1 = "LF1"
+    val legalFormTechnicalKey2 = "LF2"
+
+    val legalFormName1 = "Limited Liability Company"
+    val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
+
+    val legalFormUrl1 = "http://catenax-host/legal-form1"
+    val legalFormUrl2 = "http://catenax-host/legal-form2"
+
+    val legalFormAbbreviation1 = "LLC"
+    val legalFormAbbreviation2 = "GmbH"
 
     val businessStatusOfficialDenotation1 = "Active"
     val businessStatusOfficialDenotation2 = "Insolvent"

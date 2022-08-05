@@ -8,5 +8,8 @@ object EndpointValues {
 
     const val CATENA_PATH = "/api/catena"
     const val CATENA_INPUT_PATH = "${CATENA_PATH}/input"
-    const val CATENA_LEGAL_ENTITIES_PATH = "${CATENA_INPUT_PATH}/legal-entities"
+    const val CATENA_INPUT_LEGAL_ENTITIES_PATH = "${CATENA_INPUT_PATH}/legal-entities"
+
+    const val CATENA_OUTPUT_PATH = "${CATENA_PATH}/output"
+    const val CATENA_OUTPUT_LEGAL_ENTITIES_PATH = "${CATENA_OUTPUT_PATH}/legal-entities"
 }

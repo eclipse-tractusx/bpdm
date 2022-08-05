@@ -8,13 +8,33 @@ import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 
 object RequestValues {
     val identifier1 =
-        IdentifierDto(CommonValues.idValue1, CommonValues.idTypeTechnicalKey1, CommonValues.idIssuingBodyTechnicalKey1, CommonValues.idStatusTechnicalKey1)
+        IdentifierDto(
+            CommonValues.identifierValue1,
+            CommonValues.identifierTypeTechnicalKey1,
+            CommonValues.identifierIssuingBodyTechnicalKey1,
+            CommonValues.identifierStatusTechnicalKey1
+        )
     val identifier2 =
-        IdentifierDto(CommonValues.idValue2, CommonValues.idTypeTechnicalKey2, CommonValues.idIssuingBodyTechnicalKey2, CommonValues.idStatusTechnicalKey2)
+        IdentifierDto(
+            CommonValues.identifierValue2,
+            CommonValues.identifierTypeTechnicalKey2,
+            CommonValues.identifierIssuingBodyTechnicalKey2,
+            CommonValues.identifierStatusTechnicalKey2
+        )
     val identifier3 =
-        IdentifierDto(CommonValues.idValue3, CommonValues.idTypeTechnicalKey3, CommonValues.idIssuingBodyTechnicalKey3, CommonValues.idStatusTechnicalKey3)
+        IdentifierDto(
+            CommonValues.identifierValue3,
+            CommonValues.identifierTypeTechnicalKey3,
+            CommonValues.identifierIssuingBodyTechnicalKey3,
+            CommonValues.identifierStatusTechnicalKey3
+        )
     val identifier4 =
-        IdentifierDto(CommonValues.idValue4, CommonValues.idTypeTechnicalKey4, CommonValues.idIssuingBodyTechnicalKey4, CommonValues.idStatusTechnicalKey4)
+        IdentifierDto(
+            CommonValues.identifierValue4,
+            CommonValues.identifierTypeTechnicalKey4,
+            CommonValues.identifierIssuingBodyTechnicalKey4,
+            CommonValues.identifierStatusTechnicalKey4
+        )
 
     val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1, type = CommonValues.nameType1, language = CommonValues.language1)
     val name2 = NameDto(value = CommonValues.name2, shortName = CommonValues.shortName2, type = CommonValues.nameType1, language = CommonValues.language1)
