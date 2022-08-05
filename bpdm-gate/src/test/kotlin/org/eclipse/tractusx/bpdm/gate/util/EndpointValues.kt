@@ -5,6 +5,7 @@ object EndpointValues {
     const val CDQ_MOCK_STORAGE_PATH = "/test-cdq-api/storages/test-cdq-storage"
     const val CDQ_MOCK_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_STORAGE_PATH/businesspartners"
     const val CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_BUSINESS_PARTNER_PATH/fetch"
+    const val CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_STORAGE_PATH/augmentedbusinesspartners"
 
     const val CATENA_PATH = "/api/catena"
     const val CATENA_INPUT_PATH = "${CATENA_PATH}/input"

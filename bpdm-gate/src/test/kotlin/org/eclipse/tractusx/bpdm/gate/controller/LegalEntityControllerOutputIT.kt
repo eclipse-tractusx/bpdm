@@ -6,10 +6,14 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_OUTPUT_LEGAL_ENTITIES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_STORAGE_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
@@ -20,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -43,7 +48,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
     /**
      * Given augmented business partner exists in cdq
-     * When getting legal entity by external id with output route
+     * When getting legal entity by external id via output route
      * Then legal entity mapped to the catena data model should be returned
      */
     @Test
@@ -72,6 +77,72 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             .responseBody
 
         assertThat(legalEntity).usingRecursiveComparison().isEqualTo(expectedLegalEntity)
+    }
+
+    /**
+     * Given augmented business partners exists in cdq
+     * When getting legal entities page via output route
+     * Then legal entities page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get legal entities`() {
+        val legalEntitiesCdq = listOf(
+            CdqValues.legalEntity1Response,
+            CdqValues.legalEntity2Response
+        )
+
+        val expectedLegalEntities = listOf(
+            ResponseValues.legalEntityGateOutput1,
+            ResponseValues.legalEntityGateOutput2
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                BusinessPartnerCollectionCdq(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = legalEntitiesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        val pageResponse = webTestClient.get()
+            .uri { builder ->
+                builder.path(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
+                    .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
+                    .queryParam(PaginationStartAfterRequest::limit.name, limit)
+                    .build()
+            }
+            .exchange()
+            .expectStatus()
+            .isOk
+            .returnResult<PageStartAfterResponse<LegalEntityGateOutput>>()
+            .responseBody
+            .blockFirst()!!
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedLegalEntities,
+                invalidEntries = invalidEntries
+            )
+        )
     }
 
     private fun getReadAugmentedBusinessPartnerPath(): String {
