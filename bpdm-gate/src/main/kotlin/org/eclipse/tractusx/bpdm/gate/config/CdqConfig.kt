@@ -22,9 +22,17 @@ class CdqConfig(
             .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
                 .build())
-            .baseUrl("${cdqProperties.host}/${cdqProperties.api}/storages/${cdqProperties.storage}")
+            .baseUrl(cdqProperties.host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("x-api-key", cdqProperties.apiKey)
             .build()
+    }
+
+    fun getDataExchangeApiUrl(): String {
+        return "/data-exchange/rest/v4/storages/${cdqProperties.storage}"
+    }
+
+    fun getDataClinicApiUrl(): String {
+        return "/data-clinic/rest/storages/${cdqProperties.storage}"
     }
 }

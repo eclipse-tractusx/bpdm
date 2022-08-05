@@ -14,7 +14,7 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_OUTPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_STORAGE_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_DATA_CLINIC_API_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -146,6 +146,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     private fun getReadAugmentedBusinessPartnerPath(): String {
-        return "$CDQ_MOCK_STORAGE_PATH/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch"
+        return "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch"
     }
 }
