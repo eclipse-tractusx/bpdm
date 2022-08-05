@@ -8,7 +8,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
+import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.springframework.stereotype.Service
@@ -91,14 +93,13 @@ class OutputCdqMappingService(
     }
 
     private fun toDto(language: LanguageCdq?): TypeKeyNameDto<LanguageCode> {
-        return TypeKeyNameDto(
-            technicalKey = CdqMappings.toLanguageCode(language),
-            name = language!!.name!!
-        )
+        val languageCode = CdqMappings.toLanguageCode(language)
+        return languageCode.toDto()
     }
 
-    private inline fun <reified T> toDtoTyped(type: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<T> where T : Enum<T>, T : HasDefaultValue<T> {
-        return TypeKeyNameUrlDto(CdqMappings.toTypeOrDefault(type), type.name!!, type.url)
+    private inline fun <reified T> toDtoTyped(type: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<T> where T : Enum<T>, T : HasDefaultValue<T>, T : NamedUrlType {
+        val enumValue = CdqMappings.toTypeOrDefault<T>(type)
+        return enumValue.toDto()
     }
 
     private fun toDto(identifierCdq: IdentifierCdq): IdentifierResponse {
