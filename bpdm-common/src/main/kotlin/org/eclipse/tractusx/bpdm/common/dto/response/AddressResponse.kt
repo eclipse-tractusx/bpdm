@@ -9,9 +9,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 
 @Schema(name = "Address Response", description = "Localized address record of a business partner")
-data class AddressResponse (
-    @Schema(description = "Business Partner Number, main identifier value for addresses")
-    val bpn: String,
+data class AddressResponse(
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionResponse,
     @Schema(description = "Entity which is in care of this address")
@@ -35,5 +33,5 @@ data class AddressResponse (
     @Schema(description = "Geographic coordinates to find this location")
     val geographicCoordinates: GeoCoordinateDto? = null,
     @ArraySchema(arraySchema = Schema(description = "Types of this address"))
-    val types: Collection<TypeKeyNameUrlDto<AddressType>>  = emptyList()
-    )
+    val types: Collection<TypeKeyNameUrlDto<AddressType>> = emptyList()
+)

@@ -145,47 +145,55 @@ object ResponseValues {
 
     val version1 = AddressVersionResponse(characterSet1, language0)
 
-    val address1 = AddressResponse(
+    val address1 = AddressBpnResponse(
         bpn = CommonValues.bpnA1,
-        version = version1,
-        country = country1,
-        administrativeAreas = listOf(adminArea1, adminArea2),
-        postCodes = listOf(postCode1, postCode2),
-        localities = listOf(locality1, locality2),
-        thoroughfares = listOf(thoroughfare1, thoroughfare2),
-        premises = listOf(premise1, premise2),
-        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+        AddressResponse(
+            version = version1,
+            country = country1,
+            administrativeAreas = listOf(adminArea1, adminArea2),
+            postCodes = listOf(postCode1, postCode2),
+            localities = listOf(locality1, locality2),
+            thoroughfares = listOf(thoroughfare1, thoroughfare2),
+            premises = listOf(premise1, premise2),
+            postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+        )
     )
 
-    val address2 = AddressResponse(
+    val address2 = AddressBpnResponse(
         bpn = CommonValues.bpnA2,
-        version = version1,
-        country = country1,
-        administrativeAreas = listOf(adminArea3, adminArea4),
-        postCodes = listOf(postCode3, postCode4),
-        localities = listOf(locality3, locality4),
-        thoroughfares = listOf(thoroughfare3, thoroughfare4),
-        premises = listOf(premise3, premise4),
-        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+        AddressResponse(
+            version = version1,
+            country = country1,
+            administrativeAreas = listOf(adminArea3, adminArea4),
+            postCodes = listOf(postCode3, postCode4),
+            localities = listOf(locality3, locality4),
+            thoroughfares = listOf(thoroughfare3, thoroughfare4),
+            premises = listOf(premise3, premise4),
+            postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+        )
     )
 
-    val address3 = AddressResponse(
+    val address3 = AddressBpnResponse(
         bpn = CommonValues.bpnA3,
-        version = version1,
-        country = country1,
-        administrativeAreas = listOf(adminArea5),
-        postCodes = listOf(postCode5),
-        localities = listOf(locality5),
-        thoroughfares = listOf(thoroughfare5),
-        premises = listOf(premise5),
-        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+        AddressResponse(
+            version = version1,
+            country = country1,
+            administrativeAreas = listOf(adminArea5),
+            postCodes = listOf(postCode5),
+            localities = listOf(locality5),
+            thoroughfares = listOf(thoroughfare5),
+            premises = listOf(premise5),
+            postalDeliveryPoints = listOf(postalDeliveryPoint5)
+        )
     )
 
-    val address4 = AddressResponse(
+    val address4 = AddressBpnResponse(
         bpn = CommonValues.bpnA3,
-        version = version1,
-        country = country1,
-        premises = listOf(premise6)
+        AddressResponse(
+            version = version1,
+            country = country1,
+            premises = listOf(premise6)
+        )
     )
 
     val site1 = SiteResponse(

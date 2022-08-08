@@ -73,21 +73,21 @@ fun Role.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
-fun Address.toDto(): AddressResponse {
-    return AddressResponse(
+fun Address.toDto(): AddressBpnResponse {
+    return AddressBpnResponse(
         bpn,
-        version.toDto(),
-        careOf,
-        contexts,
-        country.toDto(),
-        administrativeAreas.map { it.toDto() },
-        postCodes.map { it.toDto() },
-        localities.map { it.toDto() },
-        thoroughfares.map { it.toDto() },
-        premises.map { it.toDto() },
-        postalDeliveryPoints.map { it.toDto() },
-        geoCoordinates?.toDto(),
-        types.map { it.toDto() }
+        AddressResponse(version.toDto(),
+            careOf,
+            contexts,
+            country.toDto(),
+            administrativeAreas.map { it.toDto() },
+            postCodes.map { it.toDto() },
+            localities.map { it.toDto() },
+            thoroughfares.map { it.toDto() },
+            premises.map { it.toDto() },
+            postalDeliveryPoints.map { it.toDto() },
+            geoCoordinates?.toDto(),
+            types.map { it.toDto() })
     )
 }
 

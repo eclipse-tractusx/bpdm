@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
@@ -194,7 +194,7 @@ class CdqControllerImportIT @Autowired constructor(
         val savedBusinessPartnersWithAddresses = savedBusinessPartners.content.map { it.businessPartner }.map {
             Pair(
                 it,
-                webTestClient.invokeGetEndpoint<PageResponse<AddressResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${it.bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX).content.first()
+                webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${it.bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX).content.first()
             )
         }
 
@@ -299,13 +299,13 @@ class CdqControllerImportIT @Autowired constructor(
         testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer).content.map { it.businessPartner }.map {
             Pair(
                 it,
-                webTestClient.invokeGetEndpoint<PageResponse<AddressResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${it.bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX).content.first()
+                webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${it.bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX).content.first()
             )
         }
 
     private fun assertPartnerAddressResponseEqual(
-        actualPartners: Collection<Pair<BusinessPartnerResponse, AddressResponse>>,
-        expectedPartners: Collection<Pair<BusinessPartnerResponse, AddressResponse>>
+        actualPartners: Collection<Pair<BusinessPartnerResponse, AddressBpnResponse>>,
+        expectedPartners: Collection<Pair<BusinessPartnerResponse, AddressBpnResponse>>
     ) {
         val cdqIdToExpected = expectedPartners.associateBy { testHelpers.extractCdqId(it.first) }
         val actualToExpectedMap = actualPartners
@@ -318,7 +318,7 @@ class CdqControllerImportIT @Autowired constructor(
 
             assertThat(actualPartner)
                 .usingRecursiveComparison()
-                .ignoringFieldsMatchingRegexes(".*uuid", Pair<BusinessPartnerResponse, AddressResponse>::second.name + "\\." + AddressResponse::bpn.name)
+                .ignoringFieldsMatchingRegexes(".*uuid", Pair<BusinessPartnerResponse, AddressBpnResponse>::second.name + "\\." + AddressBpnResponse::bpn.name)
                 .ignoringAllOverriddenEquals()
                 .ignoringCollectionOrder()
                 .isEqualTo(expectedWithBpn)
