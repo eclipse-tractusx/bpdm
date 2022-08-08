@@ -80,6 +80,45 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
+     * Given augmented business partner does not exist in cdq
+     * When getting legal entity by external id via output route
+     * Then "not found" response is sent
+     */
+    @Test
+    fun `get legal entity by external id from output route, not found`() {
+        wireMockServer.stubFor(
+            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{}")
+                )
+        )
+
+        webTestClient.get().uri("$CATENA_OUTPUT_LEGAL_ENTITIES_PATH/nonexistent-externalid123")
+            .exchange()
+            .expectStatus()
+            .isNotFound
+    }
+
+    /**
+     * When cdq api responds with an error status code while fetching augmented business partner by external id
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get legal entity by external id from output route, cdq error`() {
+        wireMockServer.stubFor(
+            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.get().uri("$CATENA_OUTPUT_LEGAL_ENTITIES_PATH/some-externalid123")
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
      * Given augmented business partners exists in cdq
      * When getting legal entities page via output route
      * Then legal entities page mapped to the catena data model should be returned
@@ -143,6 +182,39 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                 invalidEntries = invalidEntries
             )
         )
+    }
+
+    /**
+     * When cdq api responds with an error status code while getting augmented business partners
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get legal entities, cdq error`() {
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.get().uri(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
+     * When cdq api responds with an error status code while getting augmented business partners
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get legal entities, pagination limit exceeded`() {
+        webTestClient.get().uri { builder ->
+            builder.path(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
+                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
+                .build()
+        }
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 
     private fun getReadAugmentedBusinessPartnerPath(): String {

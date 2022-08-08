@@ -241,7 +241,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(CATENA_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri("$CATENA_INPUT_LEGAL_ENTITIES_PATH/nonexistent-externalid123")
             .exchange()
             .expectStatus()
             .isNotFound
