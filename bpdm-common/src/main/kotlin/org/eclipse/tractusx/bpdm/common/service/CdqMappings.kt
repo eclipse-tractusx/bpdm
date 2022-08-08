@@ -45,11 +45,11 @@ object CdqMappings {
         return language?.technicalKey ?: LanguageCode.undefined
     }
 
-    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
+    inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
         return technicalKeyToType(type?.technicalKey)
     }
 
-    private fun toCountryCode(country: CountryCdq?): CountryCode {
+    fun toCountryCode(country: CountryCdq?): CountryCode {
         return country?.shortName ?: CountryCode.UNDEFINED
     }
 

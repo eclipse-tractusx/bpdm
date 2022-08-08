@@ -1,5 +1,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
@@ -8,6 +9,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
+import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -38,7 +40,90 @@ class OutputCdqMappingService(
             types = businessPartner.types.map { toDtoTyped(it) },
             bankAccounts = businessPartner.bankAccounts.map { toDto(it) },
             roles = emptyList(),
-            relations = emptyList()
+            relations = emptyList(),
+            legalAddress = toDto(businessPartner.addresses.single())
+        )
+    }
+
+    private fun toDto(address: AddressCdq): AddressResponse {
+        return AddressResponse(
+            version = toDto(address.version!!),
+            careOf = address.careOf?.value,
+            contexts = address.contexts.mapNotNull { it.value },
+            country = toDto(address.country),
+            administrativeAreas = address.administrativeAreas.map { toDto(it) },
+            postCodes = address.postCodes.map { toDto(it) },
+            localities = address.localities.map { toDto(it) },
+            thoroughfares = address.thoroughfares.map { toDto(it) },
+            premises = address.premises.map { toDto(it) },
+            postalDeliveryPoints = address.postalDeliveryPoints.map { toDto(it) },
+            geographicCoordinates = if (address.geographicCoordinates != null) CdqMappings.toDto(address.geographicCoordinates!!) else null,
+            types = address.types.map { toDtoTyped(it) }
+        )
+    }
+
+    private fun toDto(postalDeliveryPointCdq: PostalDeliveryPointCdq): PostalDeliveryPointResponse {
+        return PostalDeliveryPointResponse(
+            value = postalDeliveryPointCdq.value,
+            shortName = postalDeliveryPointCdq.shortName,
+            number = postalDeliveryPointCdq.number,
+            type = toDtoTyped(postalDeliveryPointCdq.type),
+            language = toDto(postalDeliveryPointCdq.language)
+        )
+    }
+
+    private fun toDto(premiseCdq: PremiseCdq): PremiseResponse {
+        return PremiseResponse(
+            value = premiseCdq.value,
+            shortName = premiseCdq.shortName,
+            number = premiseCdq.number,
+            type = toDtoTyped(premiseCdq.type),
+            language = toDto(premiseCdq.language)
+        )
+    }
+
+    private fun toDto(thoroughfareCdq: ThoroughfareCdq): ThoroughfareResponse {
+        return ThoroughfareResponse(
+            value = thoroughfareCdq.value ?: "",
+            name = thoroughfareCdq.name,
+            shortName = thoroughfareCdq.shortName,
+            number = thoroughfareCdq.number,
+            direction = thoroughfareCdq.direction,
+            type = toDtoTyped(thoroughfareCdq.type),
+            language = toDto(thoroughfareCdq.language)
+        )
+    }
+
+    private fun toDto(localityCdq: LocalityCdq): LocalityResponse {
+        return LocalityResponse(
+            value = localityCdq.value,
+            shortName = localityCdq.shortName,
+            type = toDtoTyped(localityCdq.type),
+            language = toDto(localityCdq.language)
+        )
+    }
+
+    private fun toDto(postCodeCdq: PostCodeCdq): PostCodeResponse {
+        return PostCodeResponse(
+            value = postCodeCdq.value,
+            type = toDtoTyped(postCodeCdq.type)
+        )
+    }
+
+    private fun toDto(administrativeAreaCdq: AdministrativeAreaCdq): AdministrativeAreaResponse {
+        return AdministrativeAreaResponse(
+            value = administrativeAreaCdq.value,
+            shortName = administrativeAreaCdq.shortName,
+            null,
+            type = toDtoTyped(administrativeAreaCdq.type),
+            language = toDto(administrativeAreaCdq.language)
+        )
+    }
+
+    private fun toDto(addressVersion: AddressVersionCdq): AddressVersionResponse {
+        return AddressVersionResponse(
+            characterSet = toDtoTyped(addressVersion.characterSet),
+            language = toDto(addressVersion.language)
         )
     }
 
@@ -87,7 +172,7 @@ class OutputCdqMappingService(
         return NameResponse(
             value = name.value,
             shortName = name.shortName,
-            type = toDtoTyped(name.type!!),
+            type = toDtoTyped(name.type),
             language = toDto(name.language)
         )
     }
@@ -97,7 +182,17 @@ class OutputCdqMappingService(
         return languageCode.toDto()
     }
 
-    private inline fun <reified T> toDtoTyped(type: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<T> where T : Enum<T>, T : HasDefaultValue<T>, T : NamedUrlType {
+    private fun toDto(country: CountryCdq?): TypeKeyNameDto<CountryCode> {
+        val countryCode = CdqMappings.toCountryCode(country)
+        return countryCode.toDto()
+    }
+
+    private inline fun <reified T> toDtoTyped(type: TypeKeyNameUrlCdq?): TypeKeyNameUrlDto<T> where T : Enum<T>, T : HasDefaultValue<T>, T : NamedUrlType {
+        val enumValue = CdqMappings.toTypeOrDefault<T>(type)
+        return enumValue.toDto()
+    }
+
+    private inline fun <reified T> toDtoTyped(type: TypeKeyNameCdq?): TypeKeyNameDto<T> where T : Enum<T>, T : HasDefaultValue<T>, T : NamedType {
         val enumValue = CdqMappings.toTypeOrDefault<T>(type)
         return enumValue.toDto()
     }

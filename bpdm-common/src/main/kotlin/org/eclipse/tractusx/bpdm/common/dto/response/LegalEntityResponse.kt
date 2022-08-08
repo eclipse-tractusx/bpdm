@@ -29,4 +29,6 @@ data class LegalEntityResponse(
     val roles: Collection<TypeKeyNameDto<String>> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
+    @Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: AddressResponse
 )
