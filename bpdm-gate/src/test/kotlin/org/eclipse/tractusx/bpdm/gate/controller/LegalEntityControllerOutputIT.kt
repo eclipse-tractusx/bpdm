@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
@@ -176,7 +176,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                BusinessPartnerCollectionCdq(
+                                PagedResponseCdq(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
@@ -243,7 +243,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                BusinessPartnerCollectionCdq(
+                                PagedResponseCdq(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,

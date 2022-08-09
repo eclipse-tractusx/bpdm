@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
@@ -123,7 +123,7 @@ class CdqControllerImportIT @Autowired constructor(
             Pair(ResponseValues.businessPartner3, ResponseValues.address3)
         )
 
-        val page1 =  BusinessPartnerCollectionCdq(
+        val page1 = PagedResponseCdq(
             1,
             null,
             CdqValues.partnerId2,
@@ -142,7 +142,7 @@ class CdqControllerImportIT @Autowired constructor(
                 )
         )
 
-        val page2 =  BusinessPartnerCollectionCdq(
+        val page2 = PagedResponseCdq(
             1,
             null,
             CdqValues.partnerId3,
@@ -161,7 +161,7 @@ class CdqControllerImportIT @Autowired constructor(
                 )
         )
 
-        val page3 =  BusinessPartnerCollectionCdq(
+        val page3 = PagedResponseCdq(
             1,
             null,
             null,

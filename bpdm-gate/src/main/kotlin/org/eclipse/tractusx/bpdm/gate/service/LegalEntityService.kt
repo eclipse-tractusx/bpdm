@@ -91,7 +91,7 @@ class LegalEntityService(
                     builder.build()
                 }
                 .retrieve()
-                .bodyToMono<BusinessPartnerCollectionCdq>()
+                .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
                 .block()!!
         } catch (e: Exception) {
             throw CdqRequestException("Get business partners request failed.", e)
@@ -121,7 +121,7 @@ class LegalEntityService(
                     builder.build()
                 }
                 .retrieve()
-                .bodyToMono<BusinessPartnerCollectionCdq>()
+                .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
                 .block()!!
         } catch (e: Exception) {
             throw CdqRequestException("Read augmented business partners request failed.", e)
@@ -174,7 +174,7 @@ class LegalEntityService(
 
     private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
         if (!partner.addresses.any { address -> address.types.any { type -> type.technicalKey == AddressType.LEGAL.name } }) {
-            logger.warn { "CDQ business partner with CDQ ID ${partner.id} does not have legal address" }
+            logger.warn { "CDQ business partner with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId} does not have legal address" }
             return false
         }
 

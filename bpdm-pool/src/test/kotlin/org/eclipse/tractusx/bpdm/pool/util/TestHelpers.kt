@@ -5,7 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
@@ -79,7 +79,7 @@ class TestHelpers(
         client: WebTestClient,
         wireMockServer: WireMockExtension
     ): PageResponse<BusinessPartnerSearchResponse> {
-        val importCollection = BusinessPartnerCollectionCdq(
+        val importCollection = PagedResponseCdq(
             partnersToImport.size,
             null,
             null,
