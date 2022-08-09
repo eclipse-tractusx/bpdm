@@ -164,7 +164,8 @@ class OutputCdqMappingService(
             name = legalForm.name!!,
             url = legalForm.url,
             mainAbbreviation = legalForm.mainAbbreviation,
-            language = toDto(legalForm.language)
+            language = toDto(legalForm.language),
+            categories = legalForm.categories.map { toDto(it) }
         )
     }
 
@@ -204,6 +205,10 @@ class OutputCdqMappingService(
             issuingBody = toDtoOptional(identifierCdq.issuingBody),
             status = toDtoOptional(identifierCdq.status)
         )
+    }
+
+    private fun toDto(type: TypeNameUrlCdq): TypeNameUrlDto {
+        return TypeNameUrlDto(type.name!!, type.url)
     }
 
     private fun toDto(type: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<String> {

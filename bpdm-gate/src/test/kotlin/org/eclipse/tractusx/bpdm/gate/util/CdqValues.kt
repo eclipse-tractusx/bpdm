@@ -145,13 +145,24 @@ object CdqValues {
         language = language1
     )
 
+    val legalFormCategory1 = TypeNameUrlCdq(
+        name = CommonValues.legalFormCategoryName1,
+        url = CommonValues.legalFormCategoryUrl1
+    )
+
+    val legalFormCategory2 = TypeNameUrlCdq(
+        name = CommonValues.legalFormCategoryName2,
+        url = CommonValues.legalFormCategoryUrl2
+    )
+
     val legalForm1 = LegalFormCdq(technicalKey = CommonValues.legalFormTechnicalKey1)
 
     val legalForm1Response = legalForm1.copy(
         name = CommonValues.legalFormName1,
         url = CommonValues.legalFormUrl1,
         mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1
+        language = language1,
+        categories = listOf(legalFormCategory1)
     )
 
     val legalForm2 = LegalFormCdq(technicalKey = CommonValues.legalFormTechnicalKey2)
@@ -160,7 +171,8 @@ object CdqValues {
         name = CommonValues.legalFormName2,
         url = CommonValues.legalFormUrl2,
         mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2
+        language = language2,
+        categories = listOf(legalFormCategory2)
     )
 
     val businessStatus1 = BusinessPartnerStatusCdq(

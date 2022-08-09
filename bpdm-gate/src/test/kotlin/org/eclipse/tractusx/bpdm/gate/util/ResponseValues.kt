@@ -5,6 +5,7 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
@@ -133,12 +134,16 @@ object ResponseValues {
         language = language1
     )
 
+    val legalFormCategory1 = TypeNameUrlDto(CommonValues.legalFormCategoryName1, CommonValues.legalFormCategoryUrl1)
+    val legalFormCategory2 = TypeNameUrlDto(CommonValues.legalFormCategoryName2, CommonValues.legalFormCategoryUrl2)
+
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
         url = CommonValues.legalFormUrl1,
         mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1
+        language = language1,
+        categories = listOf(legalFormCategory1)
     )
 
     val legalForm2 = LegalFormResponse(
@@ -146,7 +151,8 @@ object ResponseValues {
         name = CommonValues.legalFormName2,
         url = CommonValues.legalFormUrl2,
         mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2
+        language = language2,
+        categories = listOf(legalFormCategory2)
     )
 
     val businessStatus1 = BusinessStatusResponse(
