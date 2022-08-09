@@ -181,7 +181,7 @@ object CdqMappings {
     }
 
     fun toDto(geoCoords: GeoCoordinatesCdq): GeoCoordinateDto {
-        return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, 0.0f)
+        return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null)
     }
 
 
