@@ -1,9 +1,0 @@
-dependencies:
-- name: elasticsearch
-  repository: https://charts.bitnami.com/bitnami
-  version: 17.9.29
-- name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 11.1.28
-digest: sha256:8beefad8c22f86ee8618fecddf3430f2fdfd1327f27e112e94bccdf7280ee73d
-generated: "2022-05-10T16:39:20.942572+02:00"

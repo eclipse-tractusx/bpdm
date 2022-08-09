@@ -41,8 +41,8 @@ spec:
               value: /etc/conf/external.properties
             - name: BPDM_DB_HOST
               value: {{ include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
-            - name: BPDM_ELASTIC_HOST
-              value: {{ include "includeWithElasticContext" (list $ "elasticsearch.master.fullname") }}
+            - name: BPDM_OPENSEARCH_HOST
+              value: {{ include "includeWithOpensearchContext" (list $ "opensearch.masterService") }}
             - name: BPDM_KEYCLOAK_SECRET
               valueFrom:
                 secretKeyRef:

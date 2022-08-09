@@ -16,3 +16,4 @@ target
 /db
 #Helm dependencies
 /helm/pool/charts
+/helm/pool/Chart.lock
