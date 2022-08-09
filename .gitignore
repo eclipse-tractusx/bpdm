@@ -9,6 +9,8 @@
 !/.idea/inspectionProfiles
 /.idea/inspectionProfiles/*
 !/.idea/inspectionProfiles/Project_Default.xml
+# keep copyright settings
+!/.idea/copyright
 *.iml
 #created artifacts
 target
