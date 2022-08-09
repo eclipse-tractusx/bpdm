@@ -145,7 +145,7 @@ class OpenSearchSyncStarterService(
     }
 
     private fun createIndex(indexName: String) {
-        val indexMappings = String(indexResource.inputStream.readAllBytes(), Charset.defaultCharset())
+        val indexMappings = String(indexResource.inputStream.readAllBytes())
         val request = CreateIndexRequest(indexName)
         request.mapping(indexMappings, XContentType.JSON)
 
