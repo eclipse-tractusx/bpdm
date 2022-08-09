@@ -121,18 +121,18 @@ class LegalEntityService(
                     builder.build()
                 }
                 .retrieve()
-                .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
+                .bodyToMono<PagedResponseCdq<AugmentedBusinessPartnerResponseCdq>>()
                 .block()!!
         } catch (e: Exception) {
             throw CdqRequestException("Read augmented business partners request failed.", e)
         }
 
-        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it) }
+        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it.augmentedBusinessPartner!!) }
 
         return PageStartAfterResponse(
             total = partnerCollection.total,
-            nextStartAfter = partnerCollection.nextStartAfter ?: partnerCollection.values.lastOrNull()?.id,
-            content = validEntries.map { outputCdqMappingService.toOutput(it) },
+            nextStartAfter = partnerCollection.nextStartAfter,
+            content = validEntries.map { outputCdqMappingService.toOutput(it.augmentedBusinessPartner!!) },
             invalidEntries = partnerCollection.values.size - validEntries.size
         )
     }

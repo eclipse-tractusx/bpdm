@@ -181,7 +181,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
                                 )
                             )
                         )
@@ -248,7 +248,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
                                 )
                             )
                         )
