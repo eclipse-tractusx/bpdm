@@ -15,13 +15,14 @@ import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest
 import org.opensearch.cluster.metadata.MappingMetadata
 import org.opensearch.common.xcontent.XContentType
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
+import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.util.ResourceUtils
-import java.nio.file.Files
+import java.nio.charset.Charset
 
 @Service
 class OpenSearchSyncStarterService(
@@ -31,6 +32,9 @@ class OpenSearchSyncStarterService(
     private val restHighLevelClient: RestHighLevelClient
 ) {
     private val logger = KotlinLogging.logger { }
+
+    @Value("classpath:opensearch/index-mappings.json")
+    private lateinit var indexResource: Resource
 
     /**
      * Checks for changed records since the last export and exports those changes to OpenSearch
@@ -141,11 +145,9 @@ class OpenSearchSyncStarterService(
     }
 
     private fun createIndex(indexName: String) {
-        val indexFile = ResourceUtils.getFile("classpath:opensearch/index-mappings.json")
-        val indexJson = Files.readString(indexFile.toPath())
-
+        val indexMappings = String(indexResource.inputStream.readAllBytes())
         val request = CreateIndexRequest(indexName)
-        request.mapping(indexJson, XContentType.JSON)
+        request.mapping(indexMappings, XContentType.JSON)
 
         restHighLevelClient.indices().create(request, RequestOptions.DEFAULT)
     }
