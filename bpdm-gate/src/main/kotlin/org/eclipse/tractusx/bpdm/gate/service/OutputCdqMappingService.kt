@@ -31,7 +31,7 @@ class OutputCdqMappingService(
 
     private fun toDto(businessPartner: BusinessPartnerCdq): LegalEntityResponse {
         return LegalEntityResponse(
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }!!.value,
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             identifiers = businessPartner.identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }.map { toDto(it) },
             names = businessPartner.names.map { toDto(it) },
             legalForm = if (businessPartner.legalForm != null) toDto(businessPartner.legalForm!!) else null,
@@ -201,8 +201,8 @@ class OutputCdqMappingService(
         return IdentifierResponse(
             value = identifierCdq.value,
             type = toDto(identifierCdq.type!!),
-            issuingBody = toDto(identifierCdq.issuingBody!!),
-            status = toDto(identifierCdq.status!!)
+            issuingBody = toDtoOptional(identifierCdq.issuingBody),
+            status = toDtoOptional(identifierCdq.status)
         )
     }
 
@@ -210,7 +210,21 @@ class OutputCdqMappingService(
         return TypeKeyNameUrlDto(type.technicalKey!!, type.name!!, type.url)
     }
 
+    private fun toDtoOptional(type: TypeKeyNameUrlCdq?): TypeKeyNameUrlDto<String>? {
+        if (type == null) {
+            return null
+        }
+        return toDto(type)
+    }
+
     private fun toDto(type: TypeKeyNameCdq): TypeKeyNameDto<String> {
         return TypeKeyNameDto(type.technicalKey!!, type.name!!)
+    }
+
+    private fun toDtoOptional(type: TypeKeyNameCdq?): TypeKeyNameDto<String>? {
+        if (type == null) {
+            return null
+        }
+        return toDto(type)
     }
 }
