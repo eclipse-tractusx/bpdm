@@ -27,12 +27,4 @@ class CdqConfig(
             .defaultHeader("x-api-key", cdqProperties.apiKey)
             .build()
     }
-
-    fun getDataExchangeApiUrl(): String {
-        return "/data-exchange/rest/v4/storages/${cdqProperties.storage}"
-    }
-
-    fun getDataClinicApiUrl(): String {
-        return "/data-clinic/rest/storages/${cdqProperties.storage}"
-    }
 }

@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfig
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
@@ -27,7 +26,6 @@ class LegalEntityService(
     private val inputCdqMappingService: InputCdqMappingService,
     private val outputCdqMappingService: OutputCdqMappingService,
     private val cdqConfigProperties: CdqConfigProperties,
-    private val cdqConfig: CdqConfig,
     private val objectMapper: ObjectMapper
 ) {
 
@@ -46,7 +44,7 @@ class LegalEntityService(
         try {
             webClient
                 .put()
-                .uri(cdqConfig.getDataExchangeApiUrl() + BUSINESS_PARTNER_PATH)
+                .uri(cdqConfigProperties.dataExchangeApiUrl + BUSINESS_PARTNER_PATH)
                 .bodyValue(objectMapper.writeValueAsString(upsertRequest))
                 .retrieve()
                 .bodyToMono<UpsertResponse>()
@@ -62,7 +60,7 @@ class LegalEntityService(
         val fetchResponse = try {
             webClient
                 .post()
-                .uri(cdqConfig.getDataExchangeApiUrl() + FETCH_BUSINESS_PARTNER_PATH)
+                .uri(cdqConfigProperties.dataExchangeApiUrl + FETCH_BUSINESS_PARTNER_PATH)
                 .bodyValue(objectMapper.writeValueAsString(fetchRequest))
                 .retrieve()
                 .bodyToMono<FetchResponse>()
@@ -83,7 +81,7 @@ class LegalEntityService(
                 .get()
                 .uri { builder ->
                     builder
-                        .path(cdqConfig.getDataExchangeApiUrl() + BUSINESS_PARTNER_PATH)
+                        .path(cdqConfigProperties.dataExchangeApiUrl + BUSINESS_PARTNER_PATH)
                         .queryParam("limit", limit)
                         .queryParam("datasource", cdqConfigProperties.datasource)
                         .queryParam("featuresOn", "USE_NEXT_START_AFTER")
@@ -113,7 +111,7 @@ class LegalEntityService(
                 .get()
                 .uri { builder ->
                     builder
-                        .path(cdqConfig.getDataClinicApiUrl() + "/augmentedbusinesspartners")
+                        .path(cdqConfigProperties.dataClinicApiUrl + "/augmentedbusinesspartners")
                         .queryParam("limit", limit)
                         .queryParam("datasource", cdqConfigProperties.datasource)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
@@ -143,7 +141,7 @@ class LegalEntityService(
         val response = try {
             webClient
                 .post()
-                .uri(cdqConfig.getDataClinicApiUrl() + "/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch")
+                .uri(cdqConfigProperties.dataClinicApiUrl + "/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch")
                 .bodyValue(objectMapper.writeValueAsString(fetchRequest))
                 .retrieve()
                 .bodyToMono<AugmentedBusinessPartnerResponseCdq>()
