@@ -45,11 +45,11 @@ object CdqMappings {
         return language?.technicalKey ?: LanguageCode.undefined
     }
 
-    private inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
+    inline fun <reified T> toTypeOrDefault(type: TypeKeyNameCdq?): T where T : Enum<T>, T : HasDefaultValue<T> {
         return technicalKeyToType(type?.technicalKey)
     }
 
-    private fun toCountryCode(country: CountryCdq?): CountryCode {
+    fun toCountryCode(country: CountryCdq?): CountryCode {
         return country?.shortName ?: CountryCode.UNDEFINED
     }
 
@@ -181,7 +181,7 @@ object CdqMappings {
     }
 
     fun toDto(geoCoords: GeoCoordinatesCdq): GeoCoordinateDto {
-        return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, 0.0f)
+        return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null)
     }
 
 

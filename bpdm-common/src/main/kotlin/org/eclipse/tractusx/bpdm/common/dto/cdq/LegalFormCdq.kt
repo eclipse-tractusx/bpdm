@@ -6,4 +6,5 @@ data class LegalFormCdq(
     val technicalKey: String,
     val mainAbbreviation: String? = null,
     val language: LanguageCdq? = null,
+    val categories: Collection<TypeNameUrlCdq> = emptyList()
 )

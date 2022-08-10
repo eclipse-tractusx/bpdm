@@ -22,7 +22,7 @@ class CdqConfig(
             .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
                 .build())
-            .baseUrl("${cdqProperties.host}/${cdqProperties.api}/storages/${cdqProperties.storage}")
+            .baseUrl(cdqProperties.host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("x-api-key", cdqProperties.apiKey)
             .build()

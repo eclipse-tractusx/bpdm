@@ -2,7 +2,7 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCollectionCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameUrlCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
@@ -55,7 +55,7 @@ class PartnerImportPageService(
                 builder.build()
             }
             .retrieve()
-            .bodyToMono<BusinessPartnerCollectionCdq>()
+            .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
             .block()!!
 
         logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }

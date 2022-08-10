@@ -1,16 +1,12 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.CurrencyCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.bpdm.common.model.NamedType
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -19,26 +15,6 @@ import org.springframework.data.domain.Page
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
-}
-
-fun <T: NamedUrlType> T.toDto(): TypeKeyNameUrlDto<T> {
-    return TypeKeyNameUrlDto(this, getTypeName(), getUrl())
-}
-
-fun <T: NamedType> T.toDto(): TypeKeyNameDto<T> {
-    return TypeKeyNameDto(this, getTypeName())
-}
-
-fun LanguageCode.toDto(): TypeKeyNameDto<LanguageCode> {
-    return TypeKeyNameDto(this, getName())
-}
-
-fun CountryCode.toDto(): TypeKeyNameDto<CountryCode> {
-    return TypeKeyNameDto(this, getName())
-}
-
-fun CurrencyCode.toDto(): TypeKeyNameDto<CurrencyCode> {
-    return TypeKeyNameDto(this, getName())
 }
 
 fun BusinessPartner.toSearchDto(score: Float): BusinessPartnerSearchResponse {
@@ -97,21 +73,21 @@ fun Role.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
-fun Address.toDto(): AddressResponse {
-    return AddressResponse(
+fun Address.toDto(): AddressBpnResponse {
+    return AddressBpnResponse(
         bpn,
-        version.toDto(),
-        careOf,
-        contexts,
-        country.toDto(),
-        administrativeAreas.map { it.toDto() },
-        postCodes.map { it.toDto() },
-        localities.map { it.toDto() },
-        thoroughfares.map { it.toDto() },
-        premises.map { it.toDto() },
-        postalDeliveryPoints.map { it.toDto() },
-        geoCoordinates?.toDto(),
-        types.map { it.toDto() }
+        AddressResponse(version.toDto(),
+            careOf,
+            contexts,
+            country.toDto(),
+            administrativeAreas.map { it.toDto() },
+            postCodes.map { it.toDto() },
+            localities.map { it.toDto() },
+            thoroughfares.map { it.toDto() },
+            premises.map { it.toDto() },
+            postalDeliveryPoints.map { it.toDto() },
+            geoCoordinates?.toDto(),
+            types.map { it.toDto() })
     )
 }
 
