@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Bpdm Scope" pattern="(!lib:*..*&amp;&amp;!file[bpdm-parent]:*/||file[bpdm-parent]:pom.xml)&amp;&amp;!file[bpdm-pool]:bpdm-pool.iml&amp;&amp;!file[bpdm-pool]:src/main/resources/db/*&amp;&amp;!file[bpdm-pool]:src/main/resources/db//*&amp;&amp;!file[bpdm-gate]:bpdm-gate.iml&amp;&amp;!file[bpdm-common]:bpdm-common.iml" />
+</component>

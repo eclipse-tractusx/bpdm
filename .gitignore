@@ -11,6 +11,8 @@
 !/.idea/inspectionProfiles/Project_Default.xml
 # keep copyright settings
 !/.idea/copyright
+# keep custom scopes
+!/.idea/scopes
 *.iml
 #created artifacts
 target
