@@ -1,0 +1,15 @@
+<component name="CopyrightManager">
+  <settings default="Bpdm Copyright">
+    <module2copyright>
+      <element module="Bpdm Scope" copyright="Bpdm Copyright" />
+    </module2copyright>
+    <LanguageOptions name="SQL">
+      <option name="fileTypeOverride" value="1" />
+    </LanguageOptions>
+    <LanguageOptions name="Shell Script" />
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="separateBefore" value="true" />
+      <option name="separateAfter" value="true" />
+    </LanguageOptions>
+  </settings>
+</component>

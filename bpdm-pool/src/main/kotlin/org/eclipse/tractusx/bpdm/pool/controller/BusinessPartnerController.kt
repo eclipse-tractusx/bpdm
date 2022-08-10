@@ -1,3 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import io.swagger.v3.oas.annotations.Operation
@@ -53,12 +72,14 @@ class BusinessPartnerController(
         )
     }
 
-    @Operation(summary = "Get business partner by identifier",
-    description = "This endpoint tries to find a business partner by the specified identifier. " +
-            "The identifier value is case insensitively compared but needs to be given exactly. " +
-            "By default the value given is interpreted as a BPN. " +
-            "By specifying the technical key of another identifier type" +
-            "the value is matched against the identifiers of that given type.")
+    @Operation(
+        summary = "Get business partner by identifier",
+        description = "This endpoint tries to find a business partner by the specified identifier. " +
+                "The identifier value is case insensitively compared but needs to be given exactly. " +
+                "By default the value given is interpreted as a BPN. " +
+                "By specifying the technical key of another identifier type" +
+                "the value is matched against the identifiers of that given type."
+    )
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Found business partner with specified identifier"),
         ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
