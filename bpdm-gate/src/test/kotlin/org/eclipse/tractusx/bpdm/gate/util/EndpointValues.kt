@@ -28,6 +28,8 @@ object EndpointValues {
 
     const val CDQ_MOCK_DATA_CLINIC_API_PATH = "/test-cdq-data-clinic-api/test-cdq-storage"
     const val CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_DATA_CLINIC_API_PATH/augmentedbusinesspartners"
+    const val CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH =
+        "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/test-cdq-datasource-legal-entity/augmentedbusinesspartners/fetch"
 
     const val CATENA_PATH = "/api/catena"
     const val CATENA_INPUT_PATH = "${CATENA_PATH}/input"

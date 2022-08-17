@@ -372,7 +372,8 @@ object CdqValues {
         profile = profile1,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount1, bankAccount2),
-        addresses = listOf(address1)
+        addresses = listOf(address1),
+        dataSource = "test-cdq-datasource-legal-entity"
     )
 
     val legalEntity2 = BusinessPartnerCdq(
@@ -384,20 +385,23 @@ object CdqValues {
         profile = profile2,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount3, bankAccount4),
-        addresses = listOf(address2)
+        addresses = listOf(address2),
+        dataSource = "test-cdq-datasource-legal-entity"
     )
 
     val site1 = BusinessPartnerCdq(
         externalId = CommonValues.externalIdSite1,
         identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
         names = listOf(nameSite1),
-        addresses = listOf(address1)
+        addresses = listOf(address1),
+        dataSource = "test-cdq-datasource-site"
     )
     val site2 = BusinessPartnerCdq(
         externalId = CommonValues.externalIdSite2,
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
-        addresses = listOf(address2)
+        addresses = listOf(address2),
+        dataSource = "test-cdq-datasource-site"
     )
 
     val legalEntity1Response = legalEntity1.copy(

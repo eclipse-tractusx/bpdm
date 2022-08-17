@@ -25,7 +25,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
@@ -46,8 +45,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles("test")
 internal class SiteControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper,
-    val cdqConfigProperties: CdqConfigProperties
+    val objectMapper: ObjectMapper
 ) {
     companion object {
         @RegisterExtension
@@ -63,8 +61,9 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When upserting sites
-     * Then cdq api should be called with the site data mapped to the cdq data model
+     * Given legal entities in cdq
+     * When upserting sites of legal entities
+     * Then upsert sites and relations in cdq api should be called with the site data mapped to the cdq data model
      */
     @Test
     fun `upsert sites`() {
@@ -79,8 +78,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val expectedSites = listOf(
-            CdqValues.site1.copy(dataSource = cdqConfigProperties.datasourceSite),
-            CdqValues.site2.copy(dataSource = cdqConfigProperties.datasourceSite)
+            CdqValues.site1,
+            CdqValues.site2
         )
 
         val expectedRelations = listOf(
