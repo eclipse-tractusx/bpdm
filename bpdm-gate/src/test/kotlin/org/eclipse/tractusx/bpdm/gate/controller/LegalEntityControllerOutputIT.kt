@@ -313,6 +313,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     private fun getReadAugmentedBusinessPartnerPath(): String {
-        return "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch"
+        return "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/${cdqConfigProperties.datasourceLegalEntity}/augmentedbusinesspartners/fetch"
     }
 }

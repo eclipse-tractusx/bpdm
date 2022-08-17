@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.common.dto.cdq
 import java.time.LocalDateTime
 
 data class RelationCdq(
-    val startedAt: LocalDateTime?,
-    val endedAt: LocalDateTime?,
+    val startedAt: LocalDateTime? = null,
+    val endedAt: LocalDateTime? = null,
     val type: TypeKeyNameCdq,
-    val relationClass: TypeKeyNameCdq,
+    val relationClass: TypeKeyNameCdq? = null,
     val startNode: String,
     val startNodeDataSource: String,
     val endNode: String,

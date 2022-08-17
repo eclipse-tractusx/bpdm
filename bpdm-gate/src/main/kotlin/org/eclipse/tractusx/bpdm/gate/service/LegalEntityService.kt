@@ -43,7 +43,7 @@ class LegalEntityService(
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>) {
         val legalEntitiesCdq = legalEntities.map { cdqRequestMappingService.toCdqModel(it) }
-        cdqClient.upsertBusinessPartners(legalEntitiesCdq)
+        cdqClient.upsertLegalEntities(legalEntitiesCdq)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {
@@ -56,7 +56,7 @@ class LegalEntityService(
     }
 
     fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInput> {
-        val partnerCollection = cdqClient.getBusinessPartners(limit, startAfter)
+        val partnerCollection = cdqClient.getLegalEntities(limit, startAfter)
 
         val validEntries = partnerCollection.values.filter { validateBusinessPartner(it) }
 
@@ -69,7 +69,7 @@ class LegalEntityService(
     }
 
     fun getLegalEntitiesOutput(limit: Int, startAfter: String?, from: Instant?): PageStartAfterResponse<LegalEntityGateOutput> {
-        val partnerCollection = cdqClient.getAugmentedBusinessPartners(limit, startAfter, from)
+        val partnerCollection = cdqClient.getAugmentedLegalEntities(limit, startAfter, from)
 
         val validEntries = partnerCollection.values.filter { validateBusinessPartner(it.augmentedBusinessPartner!!) }
 

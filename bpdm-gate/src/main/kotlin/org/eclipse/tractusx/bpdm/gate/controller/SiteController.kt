@@ -24,11 +24,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.service.SiteService
 import org.springdoc.api.annotations.ParameterObject
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
@@ -36,7 +40,10 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena")
-class SiteController {
+class SiteController(
+    val siteService: SiteService,
+    val apiConfigProperties: ApiConfigProperties
+) {
     @Operation(
         summary = "Create or update sites.",
         description = "Create or update sites. " +
@@ -52,7 +59,11 @@ class SiteController {
     )
     @PutMapping("/input/sites")
     fun upsertSites(@RequestBody sites: Collection<SiteGateInput>): ResponseEntity<Any> {
-        TODO()
+        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        siteService.upsertSites(sites)
+        return ResponseEntity(HttpStatus.OK)
     }
 
     @Operation(

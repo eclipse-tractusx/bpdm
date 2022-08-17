@@ -82,8 +82,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            CdqValues.legalEntity1.copy(dataSource = cdqConfigProperties.datasource),
-            CdqValues.legalEntity2.copy(dataSource = cdqConfigProperties.datasource)
+            CdqValues.legalEntity1.copy(dataSource = cdqConfigProperties.datasourceLegalEntity),
+            CdqValues.legalEntity2.copy(dataSource = cdqConfigProperties.datasourceLegalEntity)
         )
 
         wireMockServer.stubFor(
