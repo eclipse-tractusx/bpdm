@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolResponse
 import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
@@ -38,16 +39,17 @@ class BusinessPartnerFetchService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val bankAccountRepository: BankAccountRepository
+    private val bankAccountRepository: BankAccountRepository,
+    private val addressService: AddressService
 ) {
 
     /**
      * Fetch a business partner by [bpn] and return as [BusinessPartnerResponse]
      */
     @Transactional
-    fun findPartner(bpn: String): BusinessPartnerResponse {
+    fun findPartner(bpn: String): LegalEntityPoolResponse {
         val bp = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-        return bp.toDto()
+        return bp.toPoolDto()
     }
 
     /**
@@ -62,9 +64,9 @@ class BusinessPartnerFetchService(
      * Fetch a business partner by [identifierValue] of [identifierType] and return as [BusinessPartnerResponse]
      */
     @Transactional
-    fun findPartnerByIdentifier(identifierType: String, identifierValue: String): BusinessPartnerResponse {
+    fun findPartnerByIdentifier(identifierType: String, identifierValue: String): LegalEntityPoolResponse {
         val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
-        return businessPartnerRepository.findByIdentifierTypeAndValue(type, identifierValue)?.toDto()
+        return businessPartnerRepository.findByIdentifierTypeAndValue(type, identifierValue)?.toPoolDto()
             ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
     }
 
@@ -83,6 +85,13 @@ class BusinessPartnerFetchService(
     fun findBpnsByIdentifiers(identifierType: String, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
         val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
         return identifierRepository.findBpnsByIdentifierTypeAndValues(type, idValues)
+    }
+
+    fun fetchDependenciesWithLegalAddress(partners: Set<BusinessPartner>): Set<BusinessPartner> {
+        fetchBusinessPartnerDependencies(partners)
+        businessPartnerRepository.joinLegalAddresses(partners)
+        addressService.fetchAddressDependencies(partners.map { it.legalAddress }.toSet())
+        return partners
     }
 
     private fun fetchBusinessPartnerDependencies(partners: Set<BusinessPartner>): Set<BusinessPartner> {

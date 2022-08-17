@@ -27,10 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.util.CdqValues
-import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -68,6 +65,7 @@ class PartnerChangelogIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
+        testHelpers.createTestMetadata(webTestClient)
     }
 
     /**
@@ -77,28 +75,27 @@ class PartnerChangelogIT @Autowired constructor(
      */
     @Test
     fun `create changelog entries`() {
-        val partnersToImport = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2)
+            ),
+            webTestClient
         )
-
-        // import partner first
-        testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
+        val bpnL1 = createdStructures[0].legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.bpn
 
         // prepare modified partner to import
         val modifiedPartnersToImport = listOf(
-            CdqValues.businessPartner3.copy(id = CdqValues.businessPartner1.id)
+            RequestValues.legalEntityUpdate3.copy(bpn = bpnL1)
         )
 
-        // import updated partners from CDQ
-        val importedBusinessPartners = testHelpers.importAndGetResponse(modifiedPartnersToImport, webTestClient, wireMockServer)
+        // update partner with modified values
+        webTestClient.invokePutWithoutResponse(EndpointValues.CATENA_LEGAL_ENTITY_PATH, modifiedPartnersToImport)
 
         // check changelog entries were created
         // first business partner was created and updated
-        importedBusinessPartners.content
-            .single { testHelpers.extractCdqId(it.businessPartner) == CdqValues.businessPartner1.id }
-            .businessPartner.bpn
-            .let { bpnBusinessPartner1 -> retrieveChangelog(bpnBusinessPartner1).content }
+        retrieveChangelog(bpnL1).content
             .let { changelogEntries ->
                 assertThat(changelogEntries)
                     .filteredOn { it.changelogType == ChangelogType.CREATE }
@@ -109,10 +106,7 @@ class PartnerChangelogIT @Autowired constructor(
             }
 
         // second business partner was only created
-        importedBusinessPartners.content
-            .single { testHelpers.extractCdqId(it.businessPartner) == CdqValues.businessPartner2.id }
-            .businessPartner.bpn
-            .let { bpnBusinessPartner1 -> retrieveChangelog(bpnBusinessPartner1).content }
+        retrieveChangelog(bpnL2).content
             .let { changelogEntries ->
                 assertThat(changelogEntries)
                     .filteredOn { it.changelogType == ChangelogType.CREATE }
@@ -131,11 +125,10 @@ class PartnerChangelogIT @Autowired constructor(
     @Test
     fun `get changelog entries by nonexistent bpn`() {
         // import partners
-        val partnersToImport = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2
+        webTestClient.invokePostEndpointWithoutResponse(
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+            listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
         )
-        testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
 
         val bpn = "NONEXISTENT_BPN"
         webTestClient.get()

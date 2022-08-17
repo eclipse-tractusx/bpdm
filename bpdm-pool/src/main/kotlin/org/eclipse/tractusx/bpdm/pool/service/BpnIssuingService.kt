@@ -21,7 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntry
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
 import org.eclipse.tractusx.bpdm.pool.exception.BpnMaxNumberReachedException
 import org.eclipse.tractusx.bpdm.pool.repository.ConfigurationEntryRepository
@@ -35,13 +38,17 @@ import kotlin.math.pow
 
 @Service
 class BpnIssuingService(
-    val issuingBodyRepository: IssuingBodyRepository,
-    val identifierTypeRepository: IdentifierTypeRepository,
-    val identifierStatusRepository: IdentifierStatusRepository,
-    val configurationEntryRepository: ConfigurationEntryRepository,
-    val bpnConfigProperties: BpnConfigProperties
+    private val issuingBodyRepository: IssuingBodyRepository,
+    private val identifierTypeRepository: IdentifierTypeRepository,
+    private val identifierStatusRepository: IdentifierStatusRepository,
+    private val configurationEntryRepository: ConfigurationEntryRepository,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
+
+    val bpnlPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}"
+    val bpnsPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.siteChar}"
+    val bpnAPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.addressChar}"
 
     @Transactional
     fun issueLegalEntityBpns(count: Int): Collection<String> {
@@ -57,6 +64,7 @@ class BpnIssuingService(
     fun issueSiteBpns(count: Int): Collection<String> {
         return issueBpns(count, bpnConfigProperties.siteChar, bpnConfigProperties.counterKeySites)
     }
+
 
     private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): Collection<String> {
         if (count == 0) return emptyList()
@@ -77,14 +85,6 @@ class BpnIssuingService(
         logger.debug { "Created BPNs: ${createdBpns.joinToString()}" }
 
         return createdBpns
-    }
-
-    fun addIdentifiers(partners: Collection<BusinessPartner>) {
-        val type = getOrCreateIdentifierType()
-        val status = getOrCreateIdentifierStatus()
-        val agency = getOrCreateAgency()
-
-        partners.forEach { it.identifiers.add(Identifier(it.bpn, type, status, agency, it)) }
     }
 
     private fun createBpn(number: Long, bpnChar: Char): String {

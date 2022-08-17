@@ -19,28 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.util.CdqValues
-import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
+import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -56,10 +46,7 @@ import java.time.Instant
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val importService: ImportStarterService,
-    val objectMapper: ObjectMapper,
     val webTestClient: WebTestClient,
-    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -74,32 +61,17 @@ class BusinessPartnerControllerIT @Autowired constructor(
         }
     }
 
-    private val partnerDocs = listOf(
-        CdqValues.businessPartner1
-    )
+    lateinit var createdLegalEntity: LegalEntityPoolUpsertResponse
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-
-        val importCollection = PagedResponseCdq(
-            partnerDocs.size,
-            null,
-            null,
-            partnerDocs.size,
-            partnerDocs
+        testHelpers.createTestMetadata(webTestClient)
+        val createdStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1)),
+            webTestClient
         )
-
-        wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(importCollection))
-                )
-        )
-
-        importService.import()
+        createdLegalEntity = createdStructure[0].legalEntity
     }
 
     /**
@@ -109,28 +81,15 @@ class BusinessPartnerControllerIT @Autowired constructor(
      */
     @Test
     fun `set business partner currentness`() {
-        val identifiersSearchRequest = IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!))
-
-        val bpn = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBodyList(BpnIdentifierMappingResponse::class.java)
-            .returnResult()
-            .responseBody!!.first().bpn
-
-        val initialCurrentness = retrieveCurrentness(bpn)
+        val bpnL = createdLegalEntity.bpn
+        val initialCurrentness = retrieveCurrentness(bpnL)
         val instantBeforeCurrentnessUpdate = Instant.now()
+
         assertThat(initialCurrentness).isBeforeOrEqualTo(instantBeforeCurrentnessUpdate)
 
-        webTestClient.post().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
-            .exchange()
-            .expectStatus()
-            .isOk
+        webTestClient.invokePostEndpointWithoutResponse(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpnL}" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
 
-        val updatedCurrentness = retrieveCurrentness(bpn)
+        val updatedCurrentness = retrieveCurrentness(bpnL)
         assertThat(updatedCurrentness).isBetween(instantBeforeCurrentnessUpdate, Instant.now())
     }
 

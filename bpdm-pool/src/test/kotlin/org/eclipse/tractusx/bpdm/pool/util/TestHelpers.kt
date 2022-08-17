@@ -25,11 +25,9 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -72,13 +70,77 @@ class TestHelpers(
     }
 
 
+    /**
+     * Creates legal entities, sites and addresses according to the given [partnerStructures]
+     * Retains the order: All response objects will be in the same order as their request counterparts
+     * Assumption: Legal entities, sites and addresses have unique indexes among them each
+     */
+    fun createBusinessPartnerStructure(
+        partnerStructures: List<LegalEntityStructureRequest>,
+        client: WebTestClient
+    ): List<LegalEntityStructureResponse> {
+
+        val legalEntities =
+            client.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, partnerStructures.map { it.legalEntity })
+        val indexedLegalEntities = legalEntities.associateBy { it.index }
+
+        val assignedSiteRequests =
+            partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
+        val sites = client.invokePostWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
+        val indexedSites = sites.associateBy { it.index }
+
+        val assignedSitelessAddresses =
+            partnerStructures.flatMap { it.addresses.map { address -> address.copy(parent = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
+        val assignedSiteAddresses =
+            partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
+
+        val addresses =
+            client.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, assignedSitelessAddresses + assignedSiteAddresses)
+        val indexedAddresses = addresses.associateBy { it.index }
+
+        return partnerStructures.map { legalEntityStructure ->
+            LegalEntityStructureResponse(
+                legalEntity = indexedLegalEntities[legalEntityStructure.legalEntity.index]!!,
+                siteStructures = legalEntityStructure.siteStructures.map { siteStructure ->
+                    SiteStructureResponse(
+                        site = indexedSites[siteStructure.site.index]!!,
+                        addresses = siteStructure.addresses.map { indexedAddresses[it.index]!! }
+                    )
+                },
+                addresses = legalEntityStructure.addresses.map { indexedAddresses[it.index]!! }
+            )
+        }
+    }
+
+    /**
+     * Creates metadata needed for test data defined in the [RequestValues]
+     */
+    fun createTestMetadata(client: WebTestClient) {
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm1)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm2)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm3)
+
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType1)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType2)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType3)
+
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody1)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody2)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody3)
+
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus1)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus2)
+        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus3)
+    }
+
+
     fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncResponse {
         client.invokePostEndpointWithoutResponse(syncPath)
 
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
         var syncResponse: SyncResponse
-        do{
+        do {
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
             syncResponse = client.invokeGetEndpoint(syncPath)
@@ -119,5 +181,5 @@ class TestHelpers(
         return client.invokeGetEndpoint(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
     }
 
-    fun extractCdqId(it: BusinessPartnerResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value
+    fun extractCdqId(it: LegalEntityResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value
 }

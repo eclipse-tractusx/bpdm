@@ -24,18 +24,24 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPoolResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/addresses")
 class AddressController(
-    val addressService: AddressService
+    private val addressService: AddressService,
+    private val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
 
     @Operation(
@@ -72,5 +78,21 @@ class AddressController(
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<AddressWithReferenceResponse> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
+    }
+
+    @PostMapping
+    fun createAddresses(
+        @RequestBody
+        requests: Collection<AddressRequest>
+    ): Collection<AddressCreateResponse> {
+        return businessPartnerBuildService.createAddresses(requests)
+    }
+
+    @PutMapping
+    fun updateAddresses(
+        @RequestBody
+        requests: Collection<AddressUpdateRequest>
+    ): Collection<AddressPoolResponse> {
+        return businessPartnerBuildService.updateAddresses(requests)
     }
 }

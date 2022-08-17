@@ -33,6 +33,8 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteDto
     name = "Site Gate Input", description = " Site with legal entity reference ."
 )
 data class SiteGateInput(
+    @Schema(description = "Business Partner Number")
+    val bpn: String?,
     @JsonUnwrapped
     val site: SiteDto,
     @Schema(description = "ID the record has in the external system where the record originates from")
@@ -45,6 +47,7 @@ class SiteGateInputDeserializer(vc: Class<SiteGateInput>?) : StdDeserializer<Sit
     override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteGateInput {
         val node = parser.codec.readTree<JsonNode>(parser)
         return SiteGateInput(
+            node.get(SiteGateInput::bpn.name).textValue(),
             ctxt.readTreeAsValue(node, SiteDto::class.java),
             node.get(SiteGateInput::externalId.name).textValue(),
             node.get(SiteGateInput::legalEntityExternalId.name)?.textValue()!!

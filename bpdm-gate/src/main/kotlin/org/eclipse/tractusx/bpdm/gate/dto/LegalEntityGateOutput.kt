@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 
 @JsonDeserialize(using = LegalEntityGateOutputDeserializer::class)
@@ -34,6 +35,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 data class LegalEntityGateOutput(
     @JsonUnwrapped
     val legalEntity: LegalEntityResponse,
+    @Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: AddressResponse,
+    @Schema(description = "Business Partner Number, main identifier value for business partners")
+    val bpn: String?,
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String
 )
@@ -43,7 +48,9 @@ class LegalEntityGateOutputDeserializer(vc: Class<LegalEntityGateOutput>?) : Std
         val node = parser.codec.readTree<JsonNode>(parser)
         return LegalEntityGateOutput(
             ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
-            node.get(LegalEntityGateInput::externalId.name).textValue()
+            ctxt.readTreeAsValue(node.get(LegalEntityGateOutput::legalAddress.name), AddressResponse::class.java),
+            node.get(LegalEntityGateOutput::bpn.name).textValue(),
+            node.get(LegalEntityGateOutput::externalId.name).textValue()
         )
     }
 }

@@ -37,12 +37,29 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T> {
 }
 
 fun BusinessPartner.toSearchDto(score: Float): BusinessPartnerSearchResponse {
-    return BusinessPartnerSearchResponse(score, this.toDto())
+    return BusinessPartnerSearchResponse(score, this.toPoolDto())
 }
 
-fun BusinessPartner.toDto(): BusinessPartnerResponse {
-    return BusinessPartnerResponse(
+fun BusinessPartner.toPoolDto(): LegalEntityPoolResponse{
+    return LegalEntityPoolResponse(
         bpn,
+        toDto(),
+        currentness
+    )
+}
+
+fun BusinessPartner.toUpsertDto(entryId: String?): LegalEntityPoolUpsertResponse {
+    return LegalEntityPoolUpsertResponse(
+        bpn,
+        toDto(),
+        currentness,
+        legalAddress.toDto(),
+        entryId
+    )
+}
+
+fun BusinessPartner.toDto(): LegalEntityResponse {
+    return LegalEntityResponse(
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
         legalForm?.toDto(),
@@ -51,8 +68,7 @@ fun BusinessPartner.toDto(): BusinessPartnerResponse {
         types.map { it.toDto() },
         bankAccounts.map { it.toDto() },
         roles.map { it.toDto() },
-        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() }),
-        currentness
+        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
     )
 }
 
@@ -92,25 +108,60 @@ fun Role.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
-fun Address.toDto(): AddressBpnResponse {
+
+fun PartnerAddress.toDto(): AddressBpnResponse {
     return AddressBpnResponse(
         bpn,
-        AddressResponse(version.toDto(),
-            careOf,
-            contexts,
-            country.toDto(),
-            administrativeAreas.map { it.toDto() },
-            postCodes.map { it.toDto() },
-            localities.map { it.toDto() },
-            thoroughfares.map { it.toDto() },
-            premises.map { it.toDto() },
-            postalDeliveryPoints.map { it.toDto() },
-            geoCoordinates?.toDto(),
-            types.map { it.toDto() })
+        address.toDto()
     )
 }
 
-fun Address.toDtoWithReference(): AddressWithReferenceResponse {
+fun Address.toDto(): AddressResponse {
+    return AddressResponse(
+        version.toDto(),
+        careOf,
+        contexts,
+        country.toDto(),
+        administrativeAreas.map { it.toDto() },
+        postCodes.map { it.toDto() },
+        localities.map { it.toDto() },
+        thoroughfares.map { it.toDto() },
+        premises.map { it.toDto() },
+        postalDeliveryPoints.map { it.toDto() },
+        geoCoordinates?.toDto(),
+        types.map { it.toDto() })
+}
+
+fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
+    return LegalAddressSearchResponse(
+        bpnL,
+        this.toDto()
+    )
+}
+
+fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
+    return MainAddressSearchResponse(
+        bpnS,
+        this.toDto()
+    )
+}
+
+fun PartnerAddress.toPoolDto(): AddressPoolResponse {
+    return AddressPoolResponse(
+        bpn,
+        address.toDto()
+    )
+}
+
+fun PartnerAddress.toCreateResponse(index: String?): AddressCreateResponse {
+    return AddressCreateResponse(
+        bpn,
+        address.toDto(),
+        index
+    )
+}
+
+fun PartnerAddress.toDtoWithReference(): AddressWithReferenceResponse {
     return AddressWithReferenceResponse(
         toDto(),
         partner?.bpn,
@@ -118,15 +169,24 @@ fun Address.toDtoWithReference(): AddressWithReferenceResponse {
     )
 }
 
-fun Site.toDto(): SiteResponse {
-    return SiteResponse(
+
+fun Site.toUpsertDto(entryId: String?): SiteUpsertResponse {
+    return SiteUpsertResponse(
         bpn,
         name,
-        addresses.map { it.toDto() }
+        mainAddress.toDto(),
+        entryId
     )
 }
 
-fun Site.toDtoWithReference(): SiteWithReferenceResponse {
+fun Site.toDto(): SiteResponse {
+    return SiteResponse(
+        bpn,
+        name
+    )
+}
+
+fun Site.toWithReferenceDto(): SiteWithReferenceResponse {
     return SiteWithReferenceResponse(
         toDto(),
         partner.bpn

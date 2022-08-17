@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.model.*
 import java.time.LocalDateTime
 import java.util.*
 
@@ -27,21 +30,34 @@ import java.util.*
  */
 object CommonValues {
 
-    val bpn1 = "BPNL0000000000XY"
-    val bpn2 = "BPNL0000000001XZ"
-    val bpn3 = "BPNL0000000002ZZ"
+    val bpnL1 = "BPNL000000000001"
+    val bpnL2 = "BPNL0000000001YN"
+    val bpnL3 = "BPNS0000000002XY"
 
-    val bpnA1 = "BPNA0000000000XY"
-    val bpnA2 = "BPNA0000000001XZ"
-    val bpnA3 = "BPNA0000000002ZZ"
-    val bpnA4 = "BPNA0000000003A1"
+    val bpnA1 = "BPNA000000000001"
+    val bpnA2 = "BPNA0000000001YN"
+    val bpnA3 = "BPNA0000000002XY"
 
+    val bpnS1 = "BPNS000000000001"
+    val bpnS2 = "BPNS0000000001YN"
+    val bpnS3 = "BPNS0000000002XY"
 
-    val bpnS1 = "BPNS0000000000XY"
-    val bpnS2 = "BPNS0000000001XZ"
-    val bpnS3 = "BPNS0000000002ZZ"
+    val index1 = "1"
+    val index2 = "2"
+    val index3 = "3"
 
     val uuid1 = UUID.fromString("e9975a48-b190-4bf1-a7e6-73c6a1744de8")
+
+    val language0 = LanguageCode.undefined
+    val language1 = LanguageCode.en
+    val language2 = LanguageCode.de
+    val language3 = LanguageCode.zh
+
+    val characterSet1 = CharacterSet.UNDEFINED
+
+    val country1 = CountryCode.UNDEFINED
+
+    val nameType1 = NameType.OTHER
 
     val name1 = "Business Partner Name"
     val name2 = "Company ABC AG"
@@ -112,10 +128,13 @@ object CommonValues {
     val issuingBodyUrl2 = "http://catenax-host/issuing-body2"
     val issuingBodyUrl3 = "http://catenax-host/issuing-body3"
 
+    val identifierValue1 = "ID-XYZ"
+    val identifierValue2 = "Another ID Value"
+    val identifierValue3 = "An ID Value"
 
-    val statusType1 = "ACTIVE"
-    val statusType2 = "DISSOLVED"
-    val statusType3 = "INSOLVENCY"
+    val statusType1 = BusinessStatusType.ACTIVE
+    val statusType2 = BusinessStatusType.DISSOLVED
+    val statusType3 = BusinessStatusType.INSOLVENCY
 
     val statusDenotation1 = "Active"
     val statusDenotation2 = "Dissolved"
@@ -125,7 +144,7 @@ object CommonValues {
     val statusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
     val statusValidFrom3 = LocalDateTime.of(2018, 1, 1, 0, 0)
 
-    val classificationType = "NACE"
+    val classificationType = ClassificationType.NACE
 
     val classification1 = "Sale of motor vehicles"
     val classification2 = "Data processing, hosting and related activities"
@@ -133,11 +152,15 @@ object CommonValues {
     val classification4 = "Financial and insurance activities"
     val classification5 = "Accounting, bookkeeping and auditing activities; tax consultancy"
 
+    val adminAreaType1 = AdministrativeAreaType.OTHER
+
     val adminArea1 = "Baden-Württemberg"
     val adminArea2 = "Stuttgart"
     val adminArea3 = "Georgia"
     val adminArea4 = "South Carolina"
     val adminArea5 = "河北省"
+
+    val postCodeType1 = PostCodeType.OTHER
 
     val postCode1 = "70546"
     val postCode2 = "70547"
@@ -145,11 +168,15 @@ object CommonValues {
     val postCode4 = "07677-7731"
     val postCode5 = "511464"
 
+    val localityType1 = LocalityType.OTHER
+
     val locality1 = "Stuttgart"
     val locality2 = "Vaihingen"
     val locality3 = "5th Congressional District"
     val locality4 = "Woodcliff Lake"
     val locality5 = "北京市"
+
+    val thoroughfareType1 = ThoroughfareType.OTHER
 
     val thoroughfare1 = "Mercedesstraße 120"
     val thoroughfare2 = "Werk 1"
@@ -157,12 +184,16 @@ object CommonValues {
     val thoroughfare4 = "Factory 1"
     val thoroughfare5 = "工人体育场东路"
 
+    val premiseType1 = PremiseType.OTHER
+
     val premise1 = "Bauteil A"
     val premise2 = "Etage 1"
     val premise3 = "Building 1"
     val premise4 = "First Floor"
     val premise5 = "主楼"
     val premise6 = "Komplex X"
+
+    val postalDeliveryPointType1 = PostalDeliveryPointType.OTHER
 
     val postalDeliveryPoint1 = "Postal Delivery point"
     val postalDeliveryPoint2 = "Mailbox Premise Street"

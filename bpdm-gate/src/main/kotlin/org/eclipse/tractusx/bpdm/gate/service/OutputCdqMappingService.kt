@@ -24,14 +24,15 @@ class OutputCdqMappingService(
 
     fun toOutput(businessPartner: BusinessPartnerCdq): LegalEntityGateOutput {
         return LegalEntityGateOutput(
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             externalId = businessPartner.externalId!!,
-            legalEntity = toDto(businessPartner)
+            legalEntity = toDto(businessPartner),
+            legalAddress = toDto(businessPartner.addresses.single())
         )
     }
 
     private fun toDto(businessPartner: BusinessPartnerCdq): LegalEntityResponse {
         return LegalEntityResponse(
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             identifiers = businessPartner.identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }.map { toDto(it) },
             names = businessPartner.names.map { toDto(it) },
             legalForm = if (businessPartner.legalForm != null) toDto(businessPartner.legalForm!!) else null,
@@ -41,7 +42,6 @@ class OutputCdqMappingService(
             bankAccounts = businessPartner.bankAccounts.map { toDto(it) },
             roles = emptyList(),
             relations = emptyList(),
-            legalAddress = toDto(businessPartner.addresses.single())
         )
     }
 

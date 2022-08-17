@@ -33,6 +33,8 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 data class LegalEntityGateInput(
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
+    @Schema(description = "Business Partner Number")
+    val bpn: String?,
     @JsonUnwrapped
     val legalEntity: LegalEntityDto
 )
@@ -42,6 +44,7 @@ class LegalEntityGateInputDeserializer(vc: Class<LegalEntityGateInput>?) : StdDe
         val node = parser.codec.readTree<JsonNode>(parser)
         return LegalEntityGateInput(
             node.get(LegalEntityGateInput::externalId.name).textValue(),
+            node.get(LegalEntityGateInput::bpn.name).textValue(),
             ctxt.readTreeAsValue(node, LegalEntityDto::class.java)
         )
     }

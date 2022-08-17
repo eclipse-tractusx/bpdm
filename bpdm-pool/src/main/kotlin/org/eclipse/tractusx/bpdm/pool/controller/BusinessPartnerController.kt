@@ -83,15 +83,20 @@ class BusinessPartnerController(
     @ApiResponses(value = [
         ApiResponse(responseCode = "200", description = "Found business partner with specified identifier"),
         ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ApiResponse(responseCode = "404", description = "No business partner found under specified identifier or specified identifier type not found", content = [Content()])
-    ])
+        ApiResponse(
+            responseCode = "404",
+            description = "No business partner found under specified identifier or specified identifier type not found",
+            content = [Content()]
+        )
+    ]
+    )
     @GetMapping("/{idValue}")
     fun getBusinessPartner(
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam
         idType: String?
-    ): BusinessPartnerResponse {
+    ): LegalEntityPoolResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findPartner(idValue)
         else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
@@ -171,24 +176,6 @@ class BusinessPartnerController(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<AddressBpnResponse> {
         return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
-    }
-
-    @Operation(
-        summary = "Create new business partner record",
-        description = "Endpoint to create new business partner records directly in the system. Currently for test purposes only."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
-        ]
-    )
-    @PostMapping
-    fun createBusinessPartners(
-        @RequestBody
-        businessPartners: Collection<BusinessPartnerRequest>): Collection<BusinessPartnerResponse> {
-        return businessPartnerBuildService.upsertBusinessPartners(businessPartners)
     }
 
     @Operation(

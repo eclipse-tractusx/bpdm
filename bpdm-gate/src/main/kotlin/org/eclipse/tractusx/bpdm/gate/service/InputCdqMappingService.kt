@@ -38,6 +38,7 @@ class InputCdqMappingService(
     fun toInputLegalEntity(businessPartner: BusinessPartnerCdq): LegalEntityGateInput {
         return LegalEntityGateInput(
             businessPartner.externalId!!,
+            businessPartner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             businessPartner.toLegalEntityDto()
         )
     }
@@ -53,6 +54,7 @@ class InputCdqMappingService(
 
     fun toInputSite(businessPartner: BusinessPartnerCdq): SiteGateInput {
         return SiteGateInput(
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             site = businessPartner.toSiteDto(),
             externalId = businessPartner.externalId!!,
             legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations)!!

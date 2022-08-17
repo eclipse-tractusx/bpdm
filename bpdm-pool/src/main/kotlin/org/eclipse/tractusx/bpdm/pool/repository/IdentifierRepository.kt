@@ -29,6 +29,8 @@ import java.util.*
 interface IdentifierRepository : CrudRepository<Identifier, Long> {
     fun findByUuidIn(uuid: Collection<UUID>): Set<Identifier>
 
+    fun findByValueIn(identifierValues: Collection<String>): Set<Identifier>
+
     @Query("SELECT DISTINCT i FROM Identifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
     fun joinType(identifiers: Set<Identifier>): Set<Identifier>
 
@@ -40,4 +42,6 @@ interface IdentifierRepository : CrudRepository<Identifier, Long> {
 
     @Query("SELECT new org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse(i.value,i.partner.bpn) FROM Identifier i WHERE i.type = :identifierType AND i.value in :values")
     fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingResponse>
+
+
 }

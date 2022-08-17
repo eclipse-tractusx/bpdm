@@ -25,9 +25,15 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteWithReferenceResponse
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
@@ -35,8 +41,15 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/catena/sites")
 class SiteController(
-    val siteService: SiteService
+    private val siteService: SiteService,
+    private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val addressService: AddressService
 ) {
+
+    @PostMapping("/main-addresses/search")
+    fun searchMainAddresses(bpnS: Collection<String>): Collection<MainAddressSearchResponse> {
+        return addressService.findMainAddresses(bpnS)
+    }
 
     @Operation(
         summary = "Get site by bpn",
@@ -72,5 +85,21 @@ class SiteController(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SiteWithReferenceResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
+    }
+
+    @PostMapping
+    fun createSite(
+        @RequestBody
+        requests: Collection<SiteCreateRequest>
+    ): Collection<SiteUpsertResponse> {
+        return businessPartnerBuildService.createSites(requests)
+    }
+
+    @PutMapping
+    fun updateSite(
+        @RequestBody
+        requests: Collection<SiteUpdateRequest>
+    ): Collection<SiteUpsertResponse> {
+        return businessPartnerBuildService.updateSites(requests)
     }
 }

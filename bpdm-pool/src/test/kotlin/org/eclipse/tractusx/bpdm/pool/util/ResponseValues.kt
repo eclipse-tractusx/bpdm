@@ -19,14 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import java.time.ZoneOffset
 
@@ -36,32 +33,23 @@ import java.time.ZoneOffset
  */
 object ResponseValues {
 
-    val nameType1 = TypeKeyNameUrlDto(NameType.OTHER, NameType.OTHER.getTypeName(), NameType.OTHER.getUrl())
+    val nameType1 = TypeKeyNameUrlDto(CommonValues.nameType1, CommonValues.nameType1.getTypeName(), CommonValues.nameType1.getUrl())
 
-    val language0 = TypeKeyNameDto(LanguageCode.undefined, LanguageCode.undefined.getName())
-    val language1 = TypeKeyNameDto(LanguageCode.en, LanguageCode.en.getName())
-    val language2 = TypeKeyNameDto(LanguageCode.de, LanguageCode.de.getName())
-    val language3 = TypeKeyNameDto(LanguageCode.zh, LanguageCode.zh.getName())
+    val language0 = TypeKeyNameDto(CommonValues.language0, CommonValues.language0.getName())
+    val language1 = TypeKeyNameDto(CommonValues.language1, CommonValues.language1.getName())
+    val language2 = TypeKeyNameDto(CommonValues.language2, CommonValues.language2.getName())
+    val language3 = TypeKeyNameDto(CommonValues.language3, CommonValues.language3.getName())
 
-    val characterSet1 = TypeKeyNameDto(CharacterSet.UNDEFINED, CharacterSet.UNDEFINED.getTypeName())
+    val characterSet1 = TypeKeyNameDto(CommonValues.characterSet1, CommonValues.characterSet1.getTypeName())
 
-    val country1 = TypeKeyNameDto(CountryCode.UNDEFINED, CountryCode.UNDEFINED.getName())
+    val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
 
-    val idTypeCdq = TypeKeyNameUrlDto("CDQID", "CDQ Identifier", "")
-    val issuerCdq = TypeKeyNameUrlDto("CDQ", "CDQ AG", "")
-    val statusCdq = TypeKeyNameDto("CDQ_IMPORTED", "Imported from CDQ but not synchronized")
-
-    val idTypeBpn = TypeKeyNameUrlDto("BPN", "Business Partner Number", "")
-    val issuerBpn = TypeKeyNameUrlDto("CATENAX", "Catena-X", "")
-    val statusBpn = TypeKeyNameDto("UNKNOWN", "Unknown")
-
-
-    val identifier1 = IdentifierResponse(CdqValues.partnerId1, idTypeCdq, issuerCdq, statusCdq)
-    val identifier2 = IdentifierResponse(CommonValues.bpn1, idTypeBpn, issuerBpn, statusBpn)
-    val identifier3 = IdentifierResponse(CdqValues.partnerId2, idTypeCdq, issuerCdq, statusCdq)
-    val identifier4 = IdentifierResponse(CommonValues.bpn2, idTypeBpn, issuerBpn, statusBpn)
-    val identifier5 = IdentifierResponse(CdqValues.partnerId3, idTypeCdq, issuerCdq, statusCdq)
-    val identifier6 = IdentifierResponse(CommonValues.bpn3, idTypeBpn, issuerBpn, statusBpn)
+    val identifier1 =
+        IdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
+    val identifier2 =
+        IdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
+    val identifier3 =
+        IdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
 
     val name1 = NameResponse(value = CommonValues.name1, type = nameType1, language = language0)
     val name2 = NameResponse(value = CommonValues.name2, type = nameType1, language = language0)
@@ -91,15 +79,15 @@ object ResponseValues {
         language3
     )
 
-    val statusType1 = TypeKeyNameUrlDto(BusinessStatusType.ACTIVE, BusinessStatusType.ACTIVE.getTypeName(), BusinessStatusType.ACTIVE.getUrl())
-    val statusType2 = TypeKeyNameUrlDto(BusinessStatusType.DISSOLVED, BusinessStatusType.DISSOLVED.getTypeName(), BusinessStatusType.DISSOLVED.getUrl())
-    val statusType3 = TypeKeyNameUrlDto(BusinessStatusType.INSOLVENCY, BusinessStatusType.INSOLVENCY.getTypeName(), BusinessStatusType.INSOLVENCY.getUrl())
+    val statusType1 = TypeKeyNameUrlDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName(), CommonValues.statusType1.getUrl())
+    val statusType2 = TypeKeyNameUrlDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName(), CommonValues.statusType2.getUrl())
+    val statusType3 = TypeKeyNameUrlDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName(), CommonValues.statusType3.getUrl())
 
     val status1 = BusinessStatusResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
     val status2 = BusinessStatusResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
     val status3 = BusinessStatusResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
 
-    val classificationType = TypeNameUrlDto(CommonValues.classificationType, "")
+    val classificationType = TypeNameUrlDto(CommonValues.classificationType.name, "")
 
     val classification1 = ClassificationResponse(CommonValues.classification1, null, classificationType)
     val classification2 = ClassificationResponse(CommonValues.classification2, null, classificationType)
@@ -107,7 +95,7 @@ object ResponseValues {
     val classification4 = ClassificationResponse(CommonValues.classification4, null, classificationType)
     val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
-    val adminAreaType1 = TypeKeyNameUrlDto(AdministrativeAreaType.OTHER, AdministrativeAreaType.OTHER.getTypeName(), AdministrativeAreaType.OTHER.getUrl())
+    val adminAreaType1 = TypeKeyNameUrlDto(CommonValues.adminAreaType1, CommonValues.adminAreaType1.getTypeName(), CommonValues.adminAreaType1.getUrl())
 
     val adminArea1 = AdministrativeAreaResponse(value = CommonValues.adminArea1, type = adminAreaType1, language = language0)
     val adminArea2 = AdministrativeAreaResponse(value = CommonValues.adminArea2, type = adminAreaType1, language = language0)
@@ -115,7 +103,7 @@ object ResponseValues {
     val adminArea4 = AdministrativeAreaResponse(value = CommonValues.adminArea4, type = adminAreaType1, language = language0)
     val adminArea5 = AdministrativeAreaResponse(value = CommonValues.adminArea5, type = adminAreaType1, language = language0)
 
-    val postCodeType1 = TypeKeyNameUrlDto(PostCodeType.OTHER, PostCodeType.OTHER.getTypeName(), PostCodeType.OTHER.getUrl())
+    val postCodeType1 = TypeKeyNameUrlDto(CommonValues.postCodeType1, CommonValues.postCodeType1.getTypeName(), CommonValues.postCodeType1.getUrl())
 
     val postCode1 = PostCodeResponse(CommonValues.postCode1, postCodeType1)
     val postCode2 = PostCodeResponse(CommonValues.postCode2, postCodeType1)
@@ -123,7 +111,7 @@ object ResponseValues {
     val postCode4 = PostCodeResponse(CommonValues.postCode4, postCodeType1)
     val postCode5 = PostCodeResponse(CommonValues.postCode5, postCodeType1)
 
-    val localityType1 = TypeKeyNameUrlDto(LocalityType.OTHER, LocalityType.OTHER.getTypeName(), LocalityType.OTHER.getUrl())
+    val localityType1 = TypeKeyNameUrlDto(CommonValues.localityType1, CommonValues.localityType1.getTypeName(), CommonValues.localityType1.getUrl())
 
     val locality1 = LocalityResponse(CommonValues.locality1, null, localityType1, language0)
     val locality2 = LocalityResponse(CommonValues.locality2, null, localityType1, language0)
@@ -131,7 +119,8 @@ object ResponseValues {
     val locality4 = LocalityResponse(CommonValues.locality4, null, localityType1, language0)
     val locality5 = LocalityResponse(CommonValues.locality5, null, localityType1, language0)
 
-    val thoroughfareType1 = TypeKeyNameUrlDto(ThoroughfareType.OTHER, ThoroughfareType.OTHER.getTypeName(), ThoroughfareType.OTHER.getUrl())
+    val thoroughfareType1 =
+        TypeKeyNameUrlDto(CommonValues.thoroughfareType1, CommonValues.thoroughfareType1.getTypeName(), CommonValues.thoroughfareType1.getUrl())
 
     val thoroughfare1 = ThoroughfareResponse(value = CommonValues.thoroughfare1, type = thoroughfareType1, language = language0)
     val thoroughfare2 = ThoroughfareResponse(value = CommonValues.thoroughfare2, type = thoroughfareType1, language = language0)
@@ -139,7 +128,7 @@ object ResponseValues {
     val thoroughfare4 = ThoroughfareResponse(value = CommonValues.thoroughfare4, type = thoroughfareType1, language = language0)
     val thoroughfare5 = ThoroughfareResponse(value = CommonValues.thoroughfare5, type = thoroughfareType1, language = language0)
 
-    val premiseType1 = TypeKeyNameUrlDto(PremiseType.OTHER, PremiseType.OTHER.getTypeName(), PremiseType.OTHER.getUrl())
+    val premiseType1 = TypeKeyNameUrlDto(CommonValues.premiseType1, CommonValues.premiseType1.getTypeName(), CommonValues.premiseType1.getUrl())
 
     val premise1 = PremiseResponse(value = CommonValues.premise1, type = premiseType1, language = language0)
     val premise2 = PremiseResponse(value = CommonValues.premise2, type = premiseType1, language = language0)
@@ -148,8 +137,11 @@ object ResponseValues {
     val premise5 = PremiseResponse(value = CommonValues.premise5, type = premiseType1, language = language0)
     val premise6 = PremiseResponse(value = CommonValues.premise6, type = premiseType1, language = language0)
 
-    val postalDeliveryPointType1 =
-        TypeKeyNameUrlDto(PostalDeliveryPointType.OTHER, PostalDeliveryPointType.OTHER.getTypeName(), PostalDeliveryPointType.OTHER.getUrl())
+    val postalDeliveryPointType1 = TypeKeyNameUrlDto(
+        CommonValues.postalDeliveryPointType1,
+        CommonValues.postalDeliveryPointType1.getTypeName(),
+        CommonValues.postalDeliveryPointType1.getUrl()
+    )
 
     val postalDeliveryPoint1 =
         PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint1, type = postalDeliveryPointType1, language = language0)
@@ -164,96 +156,173 @@ object ResponseValues {
 
     val version1 = AddressVersionResponse(characterSet1, language0)
 
-    val address1 = AddressBpnResponse(
+    val address1 = AddressResponse(
+        version = version1,
+        country = country1,
+        administrativeAreas = listOf(adminArea1, adminArea2),
+        postCodes = listOf(postCode1, postCode2),
+        localities = listOf(locality1, locality2),
+        thoroughfares = listOf(thoroughfare1, thoroughfare2),
+        premises = listOf(premise1, premise2),
+        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+    )
+
+    val address2 = AddressResponse(
+        version = version1,
+        country = country1,
+        administrativeAreas = listOf(adminArea3, adminArea4),
+        postCodes = listOf(postCode3, postCode4),
+        localities = listOf(locality3, locality4),
+        thoroughfares = listOf(thoroughfare3, thoroughfare4),
+        premises = listOf(premise3, premise4),
+        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+    )
+
+    val address3 = AddressResponse(
+        version = version1,
+        country = country1,
+        administrativeAreas = listOf(adminArea5),
+        postCodes = listOf(postCode5),
+        localities = listOf(locality5),
+        thoroughfares = listOf(thoroughfare5),
+        premises = listOf(premise5),
+        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+    )
+
+    val address4 = AddressResponse(
+        version = version1,
+        country = country1,
+        premises = listOf(premise6)
+    )
+
+    val addressPartner1 = AddressBpnResponse(
         bpn = CommonValues.bpnA1,
-        AddressResponse(
-            version = version1,
-            country = country1,
-            administrativeAreas = listOf(adminArea1, adminArea2),
-            postCodes = listOf(postCode1, postCode2),
-            localities = listOf(locality1, locality2),
-            thoroughfares = listOf(thoroughfare1, thoroughfare2),
-            premises = listOf(premise1, premise2),
-            postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
-        )
+        address = address1
     )
 
-    val address2 = AddressBpnResponse(
+    val addressPartner2 = AddressBpnResponse(
         bpn = CommonValues.bpnA2,
-        AddressResponse(
-            version = version1,
-            country = country1,
-            administrativeAreas = listOf(adminArea3, adminArea4),
-            postCodes = listOf(postCode3, postCode4),
-            localities = listOf(locality3, locality4),
-            thoroughfares = listOf(thoroughfare3, thoroughfare4),
-            premises = listOf(premise3, premise4),
-            postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
-        )
+        address = address2
     )
 
-    val address3 = AddressBpnResponse(
+    val addressPartner3 = AddressBpnResponse(
         bpn = CommonValues.bpnA3,
-        AddressResponse(
-            version = version1,
-            country = country1,
-            administrativeAreas = listOf(adminArea5),
-            postCodes = listOf(postCode5),
-            localities = listOf(locality5),
-            thoroughfares = listOf(thoroughfare5),
-            premises = listOf(premise5),
-            postalDeliveryPoints = listOf(postalDeliveryPoint5)
-        )
+        address = address3
     )
 
-    val address4 = AddressBpnResponse(
-        bpn = CommonValues.bpnA3,
-        AddressResponse(
-            version = version1,
-            country = country1,
-            premises = listOf(premise6)
-        )
+    val addressPartnerCreate1 = AddressCreateResponse(
+        bpn = addressPartner1.bpn,
+        properties = addressPartner1.address,
+        index = CommonValues.index1
+    )
+
+    val addressPartnerCreate2 = AddressCreateResponse(
+        bpn = addressPartner2.bpn,
+        properties = addressPartner2.address,
+        index = CommonValues.index2
+    )
+
+    val addressPartnerCreate3 = AddressCreateResponse(
+        bpn = addressPartner3.bpn,
+        properties = addressPartner3.address,
+        index = CommonValues.index3
     )
 
     val site1 = SiteResponse(
         CommonValues.bpnS1,
-        CommonValues.siteName1,
-        listOf(address4)
+        CommonValues.siteName1
     )
 
     val site2 = SiteResponse(
         CommonValues.bpnS2,
-        CommonValues.siteName2,
+        CommonValues.siteName2
     )
 
-    val businessPartner1 = BusinessPartnerResponse(
-        bpn = CommonValues.bpn1,
-        identifiers = listOf(identifier1, identifier2),
-        names = listOf(name1, name2),
-        legalForm = legalForm1,
-        status = status1,
-        profileClassifications = listOf(classification1, classification2),
+    val site3 = SiteResponse(
+        CommonValues.bpnS3,
+        CommonValues.siteName3,
+    )
+
+    val siteUpsert1 = SiteUpsertResponse(
+        site1.bpn,
+        site1.name,
+        address1,
+        CommonValues.index1
+    )
+
+    val siteUpsert2 = SiteUpsertResponse(
+        site2.bpn,
+        site2.name,
+        address2,
+        CommonValues.index2
+    )
+
+    val siteUpsert3 = SiteUpsertResponse(
+        site3.bpn,
+        site3.name,
+        address3,
+        CommonValues.index3
+    )
+
+
+    val legalEntity1 = LegalEntityPoolResponse(
+        bpn = CommonValues.bpnL1,
+        properties = LegalEntityResponse(
+            names = listOf(name1, name2),
+            identifiers = listOf(identifier1),
+            legalForm = legalForm1,
+            status = status1,
+            profileClassifications = listOf(classification1, classification2)
+        ),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
-    val businessPartner2 = BusinessPartnerResponse(
-        bpn = CommonValues.bpn2,
-        identifiers = listOf(identifier3, identifier4),
-        names = listOf(name3, name4),
-        legalForm = legalForm2,
-        status = status2,
-        profileClassifications = listOf(classification3, classification4),
+    val legalEntity2 = LegalEntityPoolResponse(
+        bpn = CommonValues.bpnL2,
+        properties = LegalEntityResponse(
+            names = listOf(name3, name4),
+            identifiers = listOf(identifier2),
+            legalForm = legalForm2,
+            status = status2,
+            profileClassifications = listOf(classification3, classification4)
+        ),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
-    val businessPartner3 = BusinessPartnerResponse(
-        bpn = CommonValues.bpn3,
-        identifiers = listOf(identifier5, identifier6),
-        names = listOf(name5),
-        legalForm = legalForm3,
-        status = status3,
-        profileClassifications = listOf(classification5),
+    val legalEntity3 = LegalEntityPoolResponse(
+        bpn = CommonValues.bpnL3,
+        properties = LegalEntityResponse(
+            names = listOf(name5),
+            identifiers = listOf(identifier3),
+            legalForm = legalForm3,
+            status = status3,
+            profileClassifications = listOf(classification5)
+        ),
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
+    )
+
+    val legalEntityUpsert1 = LegalEntityPoolUpsertResponse(
+        bpn = legalEntity1.bpn,
+        properties = legalEntity1.properties,
+        currentness = legalEntity1.currentness,
+        legalAddress = address1,
+        index = CommonValues.index1
+    )
+
+    val legalEntityUpsert2 = LegalEntityPoolUpsertResponse(
+        bpn = legalEntity2.bpn,
+        properties = legalEntity2.properties,
+        currentness = legalEntity2.currentness,
+        legalAddress = address2,
+        index = CommonValues.index2
+    )
+
+    val legalEntityUpsert3 = LegalEntityPoolUpsertResponse(
+        bpn = legalEntity3.bpn,
+        properties = legalEntity3.properties,
+        currentness = legalEntity3.currentness,
+        legalAddress = address3,
+        index = CommonValues.index3
     )
 
 

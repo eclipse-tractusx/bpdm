@@ -17,18 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import javax.persistence.*
 
-@Schema(name = "Site Request", description = "New site record")
-data class SiteRequest(
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
-    @Schema(description = "Site name")
-    val name: String,
-    @ArraySchema(arraySchema = Schema(description = "Addresses the site is located at", required = false))
-    val addresses: Collection<AddressDto> = emptyList()
+@Entity
+@Table(
+    name = "partner_addresses",
+    indexes = [
+        Index(columnList = "partner_id"),
+        Index(columnList = "site_id"),
+    ]
 )
+class PartnerAddress(
+    @Column(name = "bpn", nullable = true, unique = true)
+    var bpn: String,
+    @ManyToOne
+    @JoinColumn(name = "partner_id")
+    var partner: BusinessPartner?,
+    @ManyToOne
+    @JoinColumn(name = "site_id")
+    var site: Site?,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "address_id")
+    var address: Address
+) : BaseEntity()

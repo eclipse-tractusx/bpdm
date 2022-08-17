@@ -48,7 +48,10 @@ class BusinessPartner(
     )
     val roles: Set<Role>,
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant
+    var currentness: Instant,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "legal_address_id", nullable = false)
+    var legalAddress: Address
 ) : BaseEntity() {
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()
@@ -60,7 +63,7 @@ class BusinessPartner(
     val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<Address> = mutableSetOf()
+    val addresses: MutableSet<PartnerAddress> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()

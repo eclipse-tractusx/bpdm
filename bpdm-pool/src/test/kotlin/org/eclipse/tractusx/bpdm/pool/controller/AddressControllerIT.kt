@@ -22,18 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PremiseResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,7 +45,6 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
-    val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
     companion object {
         @RegisterExtension
@@ -70,6 +62,7 @@ class AddressControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
+        testHelpers.createTestMetadata(webTestClient)
     }
 
     /**
@@ -79,10 +72,16 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `get address by bpn-a`() {
-        val partnersToImport = listOf(CdqValues.businessPartner1)
-        val importedBusinessPartners = testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    addresses = listOf(RequestValues.addressPartnerCreate1)
+                )
+            ), webTestClient
+        )
 
-        val importedPartner = importedBusinessPartners.content.single().businessPartner
+        val importedPartner = createdStructures.single().legalEntity
         importedPartner.bpn
             .let { bpn -> requestAddressesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnAddress -> requestAddress(bpnAddress) }
@@ -98,8 +97,14 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `get address by bpn-a, not found`() {
-        val partnersToImport = listOf(CdqValues.businessPartner1)
-        testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
+        testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    addresses = listOf(RequestValues.addressPartnerCreate1)
+                )
+            ), webTestClient
+        )
 
         webTestClient.get()
             .uri(EndpointValues.CATENA_ADDRESSES_PATH + "/NONEXISTENT_BPN")
@@ -113,23 +118,30 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `search addresses by BPNL`() {
-        val newAddress = CdqValues.address1.copy(localities = listOf(CdqValues.locality1.copy(value = "New Value")))
-        val newPartner = CdqValues.businessPartner1.copy(addresses = listOf(CdqValues.address1, newAddress))
-        val givenPartners = listOf(newPartner, CdqValues.businessPartner2, CdqValues.businessPartner3)
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                )
+            ),
+            webTestClient
+        )
 
-        val importedBusinessPartners = testHelpers.importAndGetResponse(givenPartners, webTestClient, wireMockServer).content.map { it.businessPartner }
-
-        val bpnL1 = getMatchingFromCandidates(newPartner, importedBusinessPartners).bpn
-        val bpnL2 = getMatchingFromCandidates(CdqValues.businessPartner2, importedBusinessPartners).bpn
+        val bpnL1 = createdStructures[0].legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.bpn
 
         val searchRequest = AddressSearchRequest(listOf(bpnL1, bpnL2), emptyList())
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
-        val expectedAddress1 = ResponseValues.address1
-        val expectedAddress2 =
-            ResponseValues.address1.copy(address = ResponseValues.address1.address.copy(localities = listOf(ResponseValues.locality1.copy(value = "New Value"))))
-        val expectedAddress3 = ResponseValues.address2
+        val expectedAddress1 = ResponseValues.addressPartner1
+        val expectedAddress2 = ResponseValues.addressPartner2
+        val expectedAddress3 = ResponseValues.addressPartner3
 
         val expectedAddressWithReferences1 = AddressWithReferenceResponse(expectedAddress1, bpnL1, null)
         val expectedAddressWithReferences2 = AddressWithReferenceResponse(expectedAddress2, bpnL1, null)
@@ -143,7 +155,6 @@ class AddressControllerIT @Autowired constructor(
             .isEqualTo(listOf(expectedAddressWithReferences1, expectedAddressWithReferences2, expectedAddressWithReferences3))
     }
 
-
     /**
      * Given multiple addresses of business partners
      * When searching addresses with BPNS
@@ -151,46 +162,40 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `search addresses by BPNS`() {
-        val newAddress1 = RequestValues.addressRequest1.copy(premises = listOf(RequestValues.premiseRequest1.copy(value = "New Value")))
-        val newAddress2 = RequestValues.addressRequest1.copy(premises = listOf(RequestValues.premiseRequest1.copy(value = "Another Value")))
-        val newSite1 = RequestValues.siteRequest1.copy(addresses = listOf(RequestValues.addressRequest1, newAddress1))
-        val newSite2 = RequestValues.siteRequest2.copy(addresses = listOf(newAddress2))
-        val newPartner1 = RequestValues.businessPartnerRequest1.copy(sites = listOf(newSite1))
-        val newPartner2 = RequestValues.businessPartnerRequest2.copy(sites = listOf(newSite2))
-        val givenPartners = listOf(newPartner1, newPartner2, RequestValues.businessPartnerRequest3)
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate1,
+                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                        )
+                    )
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate2,
+                            addresses = listOf(RequestValues.addressPartnerCreate3)
+                        )
+                    )
+                )
+            ),
+            webTestClient
+        )
 
-        val createdPartners = businessPartnerBuildService.upsertBusinessPartners(givenPartners)
-
-        val bpnL1 = getMatchingFromCandidates(newPartner1, createdPartners).bpn
-        val bpnL2 = getMatchingFromCandidates(newPartner2, createdPartners).bpn
-
-        val partner1Site =
-            webTestClient.invokeGetEndpoint<PageResponse<SiteResponse>>("${EndpointValues.CATENA_BUSINESS_PARTNER_PATH}/$bpnL1/${EndpointValues.CATENA_SITES_PATH_POSTFIX}").content.single()
-        val partner2Site =
-            webTestClient.invokeGetEndpoint<PageResponse<SiteResponse>>("${EndpointValues.CATENA_BUSINESS_PARTNER_PATH}/$bpnL2/${EndpointValues.CATENA_SITES_PATH_POSTFIX}").content.single()
-
-        val bpnS1 = partner1Site.bpn
-        val bpnS2 = partner2Site.bpn
+        val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
+        val bpnS2 = createdStructures[1].siteStructures[0].site.bpn
 
         val searchRequest = AddressSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
-        val expectedPremise = PremiseResponse(CommonValues.premise6, null, null, ResponseValues.premiseType1, ResponseValues.language0)
-        val expectedAddress1 = AddressBpnResponse(
-            CommonValues.bpn1,
-            AddressResponse(
-                version = ResponseValues.version1,
-                country = ResponseValues.country1,
-                premises = listOf(expectedPremise)
-            )
-        )
-        val expectedAddress2 = expectedAddress1.copy(address = expectedAddress1.address.copy(premises = listOf(expectedPremise.copy(value = "New Value"))))
-        val expectedAddress3 = expectedAddress1.copy(address = expectedAddress1.address.copy(premises = listOf(expectedPremise.copy(value = "Another Value"))))
-
-        val expectedAddressWithReferences1 = AddressWithReferenceResponse(expectedAddress1, null, bpnS1)
-        val expectedAddressWithReferences2 = AddressWithReferenceResponse(expectedAddress2, null, bpnS1)
-        val expectedAddressWithReferences3 = AddressWithReferenceResponse(expectedAddress3, null, bpnS2)
+        val expectedAddressWithReferences1 = AddressWithReferenceResponse(ResponseValues.addressPartner1, null, bpnS1)
+        val expectedAddressWithReferences2 = AddressWithReferenceResponse(ResponseValues.addressPartner2, null, bpnS1)
+        val expectedAddressWithReferences3 = AddressWithReferenceResponse(ResponseValues.addressPartner3, null, bpnS2)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -206,12 +211,4 @@ class AddressControllerIT @Autowired constructor(
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
         webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX)
-
-
-    private fun getMatchingFromCandidates(cdqPartner: BusinessPartnerCdq, candidates: Collection<BusinessPartnerResponse>) =
-        candidates.single { bp -> bp.identifiers.any { id -> id.value == cdqPartner.id } }
-
-    private fun getMatchingFromCandidates(partnerRequest: BusinessPartnerRequest, candidates: Collection<BusinessPartnerResponse>) =
-        candidates.single { bp -> bp.names.any { name -> partnerRequest.names.map { it.value }.contains(name.value) } }
-
 }

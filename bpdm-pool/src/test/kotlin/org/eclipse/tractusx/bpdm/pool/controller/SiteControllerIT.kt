@@ -21,13 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteWithReferenceResponse
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,12 +39,12 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val webTestClient: WebTestClient,
-    val businessPartnerBuildService: BusinessPartnerBuildService
+    val webTestClient: WebTestClient
 ) {
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
+        testHelpers.createTestMetadata(webTestClient)
     }
 
     /**
@@ -57,11 +54,9 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s`() {
-        val importedBusinessPartners = businessPartnerBuildService.upsertBusinessPartners(
-            listOf(RequestValues.businessPartnerRequest1)
-        )
+        val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1), webTestClient)
 
-        val importedPartner = importedBusinessPartners.single()
+        val importedPartner = createdStructures.single().legalEntity
         importedPartner.bpn
             .let { bpn -> requestSitesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnSite -> requestSite(bpnSite) }
@@ -77,7 +72,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s, not found`() {
-        businessPartnerBuildService.upsertBusinessPartners(listOf(RequestValues.businessPartnerRequest1))
+        testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1), webTestClient)
 
         webTestClient.get()
             .uri(EndpointValues.CATENA_SITES_PATH + "/NONEXISTENT_BPN")
@@ -91,25 +86,36 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `search sites by BPNL`() {
-        val newSite = RequestValues.siteRequest1.copy(name = "New Name")
-        val newBusinessPartner = RequestValues.businessPartnerRequest1.copy(sites = listOf(newSite, RequestValues.siteRequest1))
-        val givenPartners = listOf(newBusinessPartner, RequestValues.businessPartnerRequest2, RequestValues.businessPartnerRequest3)
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(site = RequestValues.siteCreate1),
+                        SiteStructureRequest(site = RequestValues.siteCreate2),
+                    )
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate3))
+                )
+            ),
+            webTestClient
+        )
 
-        val createdPartners = businessPartnerBuildService.upsertBusinessPartners(givenPartners)
-
-        val bpnL1 = getMatchingFromCandidates(newBusinessPartner, createdPartners).bpn
-        val bpnL2 = getMatchingFromCandidates(RequestValues.businessPartnerRequest2, createdPartners).bpn
+        val bpnL1 = createdStructures[0].legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.bpn
 
         val siteSearchRequest = SiteSearchRequest(listOf(bpnL1, bpnL2))
         val searchResult = webTestClient.invokePostEndpoint<PageResponse<SiteWithReferenceResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
 
-        val expectedSiteWithReference1 = SiteWithReferenceResponse(ResponseValues.site1.copy(name = "New Name"), bpnL1)
-        val expectedSiteWithReference2 = SiteWithReferenceResponse(ResponseValues.site1, bpnL1)
-        val expectedSiteWithReference3 = SiteWithReferenceResponse(ResponseValues.site2, bpnL2)
+        val expectedSiteWithReference1 = SiteWithReferenceResponse(ResponseValues.site1, bpnL1)
+        val expectedSiteWithReference2 = SiteWithReferenceResponse(ResponseValues.site2, bpnL1)
+        val expectedSiteWithReference3 = SiteWithReferenceResponse(ResponseValues.site3, bpnL2)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
-            .ignoringFieldsMatchingRegexes(".*uuid", ".*${SiteResponse::bpn.name}")
+            .ignoringFieldsMatchingRegexes(".*uuid")
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
@@ -120,8 +126,4 @@ class SiteControllerIT @Autowired constructor(
 
     private fun requestSitesOfLegalEntity(bpn: String) =
         webTestClient.invokeGetEndpoint<PageResponse<SiteResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
-
-    private fun getMatchingFromCandidates(partnerRequest: BusinessPartnerRequest, candidates: Collection<BusinessPartnerResponse>) =
-        candidates.single { bp -> bp.names.any { name -> partnerRequest.names.map { it.value }.contains(name.value) } }
-
 }

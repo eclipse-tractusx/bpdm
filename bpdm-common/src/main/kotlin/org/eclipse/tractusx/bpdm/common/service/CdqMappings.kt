@@ -74,7 +74,6 @@ object CdqMappings {
 
     fun BusinessPartnerCdq.toLegalEntityDto(): LegalEntityDto {
         return LegalEntityDto(
-            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
             names = names.map { toDto(it) },
             legalForm = toOptionalReference(legalForm),
@@ -88,7 +87,6 @@ object CdqMappings {
 
     fun BusinessPartnerCdq.toSiteDto(): SiteDto {
         return SiteDto(
-            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             name = names.single().value,
             mainAddress = toDto(addresses.single())
         )

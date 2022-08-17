@@ -52,17 +52,17 @@ class SiteService(
             if (siteSearchRequest.legalEntities.isNotEmpty()) businessPartnerRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage = siteRepository.findByPartnerIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
-        return sitePage.toDto(sitePage.content.map { it.toDtoWithReference() })
+        return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })
     }
 
     fun findByBpn(bpn: String): SiteWithReferenceResponse {
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
-        return site.toDtoWithReference()
+        return site.toWithReferenceDto()
     }
 
     private fun fetchSiteDependencies(sites: Set<Site>) {
         siteRepository.joinAddresses(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()
-        addressService.fetchAddressDependencies(addresses)
+        addressService.fetchPartnerAddressDependencies(addresses)
     }
 }

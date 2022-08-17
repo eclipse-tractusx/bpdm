@@ -20,20 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.util.CdqValues
-import org.eclipse.tractusx.bpdm.pool.util.EndpointValues
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -54,10 +47,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val importService: ImportStarterService,
     val objectMapper: ObjectMapper,
     val webTestClient: WebTestClient,
-    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -72,34 +63,23 @@ class BpnControllerIT @Autowired constructor(
         }
     }
 
-    private val partnerDocs = listOf(
-        CdqValues.businessPartner1,
-        CdqValues.businessPartner2,
-        CdqValues.businessPartner3
-    )
+    val identifierType = RequestValues.legalEntityCreate1.properties.identifiers.first().type
+    val identifierValue1 = RequestValues.legalEntityCreate1.properties.identifiers.first().value
+    val identifierValue2 = RequestValues.legalEntityCreate2.properties.identifiers.first().value
+    val identifierValue3 = RequestValues.legalEntityCreate3.properties.identifiers.first().value
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-
-        val importCollection = PagedResponseCdq(
-            partnerDocs.size,
-            null,
-            null,
-            partnerDocs.size,
-            partnerDocs
+        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3),
+            ),
+            webTestClient
         )
-
-        wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(importCollection))
-                )
-        )
-
-        importService.import()
     }
 
     /**
@@ -109,8 +89,7 @@ class BpnControllerIT @Autowired constructor(
      */
     @Test
     fun `find bpns by identifiers, all found`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!, CdqValues.businessPartner2.id!!))
+        val identifiersSearchRequest = IdentifiersSearchRequest(identifierType, listOf(identifierValue1, identifierValue2))
 
         val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +101,7 @@ class BpnControllerIT @Autowired constructor(
             .returnResult()
             .responseBody
 
-        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id, CdqValues.businessPartner2.id)
+        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1, identifierValue2)
     }
 
     /**
@@ -133,7 +112,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, only some found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(cdqIdentifierConfigProperties.typeKey, listOf(CdqValues.businessPartner1.id!!, "someNonexistentCdqId"))
+            IdentifiersSearchRequest(identifierType, listOf(identifierValue1, "someNonexistentCdqId"))
 
         val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +124,7 @@ class BpnControllerIT @Autowired constructor(
             .returnResult()
             .responseBody
 
-        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(CdqValues.businessPartner1.id)
+        assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1)
     }
 
     /**
@@ -155,11 +134,7 @@ class BpnControllerIT @Autowired constructor(
      */
     @Test
     fun `find bpns by identifiers, bpn request limit exceeded`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest(
-                cdqIdentifierConfigProperties.typeKey,
-                listOf(CdqValues.businessPartner1.id!!, CdqValues.businessPartner2.id!!, CdqValues.businessPartner3.id!!)
-            )
+        val identifiersSearchRequest = IdentifiersSearchRequest(identifierType, listOf(identifierValue1, identifierValue2, identifierValue3))
 
         webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -176,8 +151,7 @@ class BpnControllerIT @Autowired constructor(
      */
     @Test
     fun `find bpns by nonexistent identifier type`() {
-        val identifiersSearchRequest =
-            IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(CdqValues.businessPartner1.id!!))
+        val identifiersSearchRequest = IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
 
         webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)

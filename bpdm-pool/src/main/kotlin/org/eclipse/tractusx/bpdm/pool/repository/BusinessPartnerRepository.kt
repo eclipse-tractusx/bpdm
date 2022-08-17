@@ -68,4 +68,7 @@ interface BusinessPartnerRepository : PagingAndSortingRepository<BusinessPartner
 
     @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.roles WHERE p IN :partners")
     fun joinRoles(partners: Set<BusinessPartner>): Set<BusinessPartner>
+
+    @Query("SELECT DISTINCT p FROM BusinessPartner p LEFT JOIN FETCH p.legalAddress WHERE p IN :partners")
+    fun joinLegalAddresses(partners: Set<BusinessPartner>): Set<BusinessPartner>
 }

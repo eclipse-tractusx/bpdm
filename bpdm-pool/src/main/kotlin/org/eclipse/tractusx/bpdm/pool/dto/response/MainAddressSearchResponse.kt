@@ -17,12 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-data class BusinessPartnerUpdateDto(
-    val businessPartner: BusinessPartner,
-    val updateRequest: BusinessPartnerRequest
+
+data class MainAddressSearchResponse(
+    val site: String,
+    val mainAddress: AddressResponse
 )
