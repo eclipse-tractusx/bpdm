@@ -31,8 +31,14 @@ object CommonValues {
     val externalId1 = "external-1"
     val externalId2 = "external-2"
 
+    val externalIdSite1 = "site-external-1"
+    val externalIdSite2 = "site-external-2"
+
     val bpn1 = "BPNL0000000000XY"
     val bpn2 = "BPNL0000000001XZ"
+
+    val bpnSite1 = "BPNS0000000001XY"
+    val bpnSite2 = "BPNS0000000001XZ"
 
     val language1 = LanguageCode.de
     val language2 = LanguageCode.en
@@ -47,6 +53,9 @@ object CommonValues {
     val name2 = "Company ABC AG"
     val name3 = "Another Organisation Corp"
     val name4 = "Catena Test Name"
+
+    val nameSite1 = "Site A"
+    val nameSite2 = "Site B"
 
     val identifierValue1 = "DE123456789"
     val identifierValue2 = "US123456789"

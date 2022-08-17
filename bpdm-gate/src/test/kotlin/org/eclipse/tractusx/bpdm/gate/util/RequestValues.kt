@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 
 object RequestValues {
     val identifier1 =
@@ -158,7 +159,7 @@ object RequestValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val legalAddress1 = AddressDto(
+    val address1 = AddressDto(
         addressVersion1,
         CommonValues.careOf1,
         listOf(CommonValues.context1),
@@ -173,7 +174,7 @@ object RequestValues {
         listOf(AddressType.LEGAL)
     )
 
-    val legalAddress2 = AddressDto(
+    val address2 = AddressDto(
         addressVersion2,
         CommonValues.careOf2,
         listOf(CommonValues.context2),
@@ -198,7 +199,7 @@ object RequestValues {
         profileClassifications = listOf(classification1, classification2),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
         bankAccounts = listOf(bankAccount1, bankAccount2),
-        legalAddress = legalAddress1
+        legalAddress = address1
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -210,7 +211,7 @@ object RequestValues {
         profileClassifications = listOf(classification3, classification4),
         types = listOf(BusinessPartnerType.LEGAL_ENTITY),
         bankAccounts = listOf(bankAccount3, bankAccount4),
-        legalAddress = legalAddress2
+        legalAddress = address2
     )
 
     val legalEntityGateInput1 = LegalEntityGateInput(
@@ -221,5 +222,29 @@ object RequestValues {
     val legalEntityGateInput2 = LegalEntityGateInput(
         externalId = CommonValues.externalId2,
         legalEntity = legalEntity2
+    )
+
+    val site1 = SiteDto(
+        bpn = CommonValues.bpnSite1,
+        name = CommonValues.nameSite1,
+        mainAddress = address1
+    )
+
+    val site2 = SiteDto(
+        bpn = CommonValues.bpnSite2,
+        name = CommonValues.nameSite2,
+        mainAddress = address2
+    )
+
+    val siteGateInput1 = SiteGateInput(
+        site = site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1
+    )
+
+    val siteGateInput2 = SiteGateInput(
+        site = site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2
     )
 }

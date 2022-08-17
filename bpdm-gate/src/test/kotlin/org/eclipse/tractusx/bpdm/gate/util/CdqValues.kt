@@ -136,6 +136,18 @@ object CdqValues {
         issuingBody = issuerBpn
     )
 
+    val identifierBpnSite1 = IdentifierCdq(
+        type = idTypeBpn,
+        value = CommonValues.bpnSite1,
+        issuingBody = issuerBpn
+    )
+
+    val identifierBpnSite2 = IdentifierCdq(
+        type = idTypeBpn,
+        value = CommonValues.bpnSite2,
+        issuingBody = issuerBpn
+    )
+
     val name1 = NameCdq(
         value = CommonValues.name1,
         shortName = CommonValues.shortName1,
@@ -163,6 +175,9 @@ object CdqValues {
         type = TypeKeyNameUrlCdq(technicalKey = CommonValues.nameType1.name),
         language = language1
     )
+
+    val nameSite1 = NameCdq(value = CommonValues.nameSite1)
+    val nameSite2 = NameCdq(value = CommonValues.nameSite2)
 
     val legalFormCategory1 = TypeNameUrlCdq(
         name = CommonValues.legalFormCategoryName1,
@@ -318,7 +333,7 @@ object CdqValues {
     val geoCoordinate1 = GeoCoordinatesCdq(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinatesCdq(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val legalAddress1 = AddressCdq(
+    val address1 = AddressCdq(
         version = version1,
         country = country1,
         careOf = careOf1,
@@ -333,7 +348,7 @@ object CdqValues {
         geographicCoordinates = geoCoordinate1
     )
 
-    val legalAddress2 = AddressCdq(
+    val address2 = AddressCdq(
         country = country2,
         version = version2,
         careOf = careOf2,
@@ -357,7 +372,7 @@ object CdqValues {
         profile = profile1,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount1, bankAccount2),
-        addresses = listOf(legalAddress1)
+        addresses = listOf(address1)
     )
 
     val legalEntity2 = BusinessPartnerCdq(
@@ -369,7 +384,20 @@ object CdqValues {
         profile = profile2,
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerType.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount3, bankAccount4),
-        addresses = listOf(legalAddress2)
+        addresses = listOf(address2)
+    )
+
+    val site1 = BusinessPartnerCdq(
+        externalId = CommonValues.externalIdSite1,
+        identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
+        names = listOf(nameSite1),
+        addresses = listOf(address1)
+    )
+    val site2 = BusinessPartnerCdq(
+        externalId = CommonValues.externalIdSite2,
+        identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
+        names = listOf(nameSite2),
+        addresses = listOf(address2)
     )
 
     val legalEntity1Response = legalEntity1.copy(
@@ -380,5 +408,23 @@ object CdqValues {
     val legalEntity2Response = legalEntity2.copy(
         identifiers = listOf(identifier3Response, identifier4Response, identifierBpn2),
         legalForm = legalForm2Response
+    )
+
+    val relationType = TypeKeyNameCdq(technicalKey = "PARENT")
+
+    val relationSite1ToLegalEntity = RelationCdq(
+        startNode = legalEntity1.externalId!!,
+        startNodeDataSource = "test-cdq-datasource-legal-entity",
+        endNode = site1.externalId!!,
+        endNodeDataSource = "test-cdq-datasource-site",
+        type = relationType
+    )
+
+    val relationSite2ToLegalEntity = RelationCdq(
+        startNode = legalEntity2.externalId!!,
+        startNodeDataSource = "test-cdq-datasource-legal-entity",
+        endNode = site2.externalId!!,
+        endNodeDataSource = "test-cdq-datasource-site",
+        type = relationType
     )
 }

@@ -110,9 +110,6 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(UpsertResponse::class.java)
-            .returnResult()
-            .responseBody
 
         val body = wireMockServer.allServeEvents.single().request.bodyAsString
         val upsertRequest = objectMapper.readValue(body, UpsertRequest::class.java)

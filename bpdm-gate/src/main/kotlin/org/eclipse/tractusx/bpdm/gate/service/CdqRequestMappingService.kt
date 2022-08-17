@@ -47,6 +47,7 @@ class CdqRequestMappingService(
     private fun toCdqModel(site: SiteDto, externalId: String): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = externalId,
+            dataSource = cdqConfigProperties.datasourceSite,
             names = listOf(NameCdq(value = site.name)),
             addresses = listOf(toCdqModel(site.mainAddress)),
             identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn!!)) else emptyList()

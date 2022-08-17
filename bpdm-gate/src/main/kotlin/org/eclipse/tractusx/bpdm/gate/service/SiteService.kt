@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
 import org.springframework.stereotype.Service
@@ -27,7 +28,8 @@ import org.springframework.stereotype.Service
 @Service
 class SiteService(
     private val cdqRequestMappingService: CdqRequestMappingService,
-    private val cdqClient: CdqClient
+    private val cdqClient: CdqClient,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
     fun upsertSites(sites: Collection<SiteGateInput>) {
         val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = sites.map { it.legalEntityExternalId }.toList())
@@ -50,6 +52,7 @@ class SiteService(
             throw CdqNonexistentParentException(site.legalEntityExternalId)
         }
         val siteCdq = cdqRequestMappingService.toCdqModel(site)
-        return siteCdq.copy(identifiers = siteCdq.identifiers.plus(parentLegalEntity.identifiers))
+        val parentIdentifiersWithoutBpn = parentLegalEntity.identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
+        return siteCdq.copy(identifiers = siteCdq.identifiers.plus(parentIdentifiersWithoutBpn))
     }
 }
