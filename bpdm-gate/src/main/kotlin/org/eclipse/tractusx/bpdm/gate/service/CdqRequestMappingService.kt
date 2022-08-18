@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.springframework.stereotype.Service
@@ -42,6 +43,19 @@ class CdqRequestMappingService(
 
     fun toCdqModel(site: SiteGateInput): BusinessPartnerCdq {
         return toCdqModel(site.site, site.externalId)
+    }
+
+    fun toCdqModel(address: AddressGateInput): BusinessPartnerCdq {
+        return toCdqModel(address.address, address.externalId)
+    }
+
+    private fun toCdqModel(address: AddressBpnDto, externalId: String): BusinessPartnerCdq {
+        return BusinessPartnerCdq(
+            externalId = externalId,
+            dataSource = cdqConfigProperties.datasourceAddress,
+            addresses = listOf(toCdqModel(address.address)),
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn!!)) else emptyList()
+        )
     }
 
     private fun toCdqModel(site: SiteDto, externalId: String): BusinessPartnerCdq {

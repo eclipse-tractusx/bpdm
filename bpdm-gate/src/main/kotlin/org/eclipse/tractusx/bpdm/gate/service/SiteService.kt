@@ -32,11 +32,7 @@ class SiteService(
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     fun upsertSites(sites: Collection<SiteGateInput>) {
-        val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = sites.map { it.legalEntityExternalId }.toList())
-        if (parentLegalEntitiesPage.limit < sites.size) {
-            throw IllegalStateException("Could not fetch all parent legal entities in single request.")
-        }
-        val parentLegalEntitiesByExternalId = parentLegalEntitiesPage.values.associateBy { it.externalId }
+        val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
 
         val sitesCdq = sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
         cdqClient.upsertSites(sitesCdq)
@@ -48,6 +44,15 @@ class SiteService(
             )
         }.toList()
         cdqClient.upsertSiteRelations(relations)
+    }
+
+    private fun getParentLegalEntities(sites: Collection<SiteGateInput>): Map<String, BusinessPartnerCdq> {
+        val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = sites.map { it.legalEntityExternalId }.toList())
+        if (parentLegalEntitiesPage.limit < sites.size) {
+            throw IllegalStateException("Could not fetch all parent legal entities in single request.")
+        }
+        val parentLegalEntitiesByExternalId = parentLegalEntitiesPage.values.associateBy { it.externalId!! }
+        return parentLegalEntitiesByExternalId
     }
 
     fun toCdqModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerCdq?): BusinessPartnerCdq {

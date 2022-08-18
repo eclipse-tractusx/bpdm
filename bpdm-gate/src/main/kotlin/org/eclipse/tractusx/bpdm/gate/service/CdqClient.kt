@@ -99,6 +99,10 @@ class CdqClient(
         return upsertBusinessPartners(sites, cdqConfigProperties.datasourceSite)
     }
 
+    fun upsertAddresses(sites: List<BusinessPartnerCdq>) {
+        return upsertBusinessPartners(sites, cdqConfigProperties.datasourceAddress)
+    }
+
     private fun upsertBusinessPartners(businessPartners: List<BusinessPartnerCdq>, datasource: String) {
         val upsertRequest =
             UpsertRequest(
@@ -139,6 +143,9 @@ class CdqClient(
 
     fun getLegalEntities(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceLegalEntity)
+
+    fun getSites(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
+        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceSite)
 
     private fun getBusinessPartners(
         limit: Int?,
@@ -182,6 +189,28 @@ class CdqClient(
         upsertBusinessPartnerRelations(relationsCdq)
     }
 
+    fun upsertAddressRelations(legalEntityRelations: Collection<AddressLegalEntityRelation>, siteRelations: Collection<AddressSiteRelation>) {
+        val legalEntityRelationsCdq = legalEntityRelations.map {
+            RelationCdq(
+                startNode = it.legalEntityExternalId,
+                startNodeDataSource = cdqConfigProperties.datasourceLegalEntity,
+                endNode = it.addressExternalId,
+                endNodeDataSource = cdqConfigProperties.datasourceAddress,
+                type = TypeKeyNameCdq(technicalKey = RELATION_TYPE_KEY)
+            )
+        }.toList()
+        val siteRelationsCdq = siteRelations.map {
+            RelationCdq(
+                startNode = it.siteExternalId,
+                startNodeDataSource = cdqConfigProperties.datasourceSite,
+                endNode = it.addressExternalId,
+                endNodeDataSource = cdqConfigProperties.datasourceAddress,
+                type = TypeKeyNameCdq(technicalKey = RELATION_TYPE_KEY)
+            )
+        }.toList()
+        upsertBusinessPartnerRelations(legalEntityRelationsCdq.plus(siteRelationsCdq))
+    }
+
     private fun upsertBusinessPartnerRelations(relations: Collection<RelationCdq>) {
         val upsertRelationsRequest = UpsertRelationsRequestCdq(relations)
         val upsertResponse = try {
@@ -204,5 +233,15 @@ class CdqClient(
     data class SiteLegalEntityRelation(
         val siteExternalId: String,
         val legalEntityExternalId: String
+    )
+
+    data class AddressLegalEntityRelation(
+        val addressExternalId: String,
+        val legalEntityExternalId: String
+    )
+
+    data class AddressSiteRelation(
+        val addressExternalId: String,
+        val siteExternalId: String
     )
 }
