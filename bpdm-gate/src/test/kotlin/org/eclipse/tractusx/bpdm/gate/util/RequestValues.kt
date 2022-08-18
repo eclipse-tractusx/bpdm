@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 
@@ -246,5 +247,25 @@ object RequestValues {
         site = site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2
+    )
+
+    val addressWithBpn1 = AddressBpnDto(
+        bpn = CommonValues.bpnAddress1,
+        address = address1
+    )
+    val addressWithBpn2 = AddressBpnDto(
+        bpn = CommonValues.bpnAddress2,
+        address = address2
+    )
+
+    val addressGateInput1 = AddressGateInput(
+        address = addressWithBpn1,
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = CommonValues.externalId1
+    )
+    val addressGateInput2 = AddressGateInput(
+        address = addressWithBpn2,
+        externalId = CommonValues.externalIdAddress2,
+        siteExternalId = CommonValues.externalIdSite1
     )
 }

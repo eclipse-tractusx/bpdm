@@ -163,7 +163,7 @@ class CdqClient(
                         .queryParam("featuresOn", "USE_NEXT_START_AFTER")
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (limit != null) builder.queryParam("limit", limit)
-                    if (externalIds != null) builder.queryParam(externalIds.joinToString(","))
+                    if (externalIds != null) builder.queryParam("externalId", externalIds.joinToString(","))
                     builder.build()
                 }
                 .retrieve()

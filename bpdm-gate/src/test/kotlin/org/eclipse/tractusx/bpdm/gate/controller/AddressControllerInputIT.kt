@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_ADDRESSES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
@@ -43,7 +43,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-internal class SiteControllerInputIT @Autowired constructor(
+internal class AddressControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val objectMapper: ObjectMapper
 ) {
@@ -61,50 +61,72 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities in cdq
-     * When upserting sites of legal entities
-     * Then upsert sites and relations in cdq api should be called with the site data mapped to the cdq data model
+     * Given legal entities and sites in cdq
+     * When upserting addresses of legal entities and sites
+     * Then upsert addresses and relations in cdq api should be called with the address data mapped to the cdq data model
      */
     @Test
-    fun `upsert sites`() {
-        val sites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
+    fun `upsert addresses`() {
+        val addresses = listOf(
+            RequestValues.addressGateInput1,
+            RequestValues.addressGateInput2
         )
 
         val parentLegalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            CdqValues.legalEntity1
         )
 
-        val expectedSites = listOf(
-            CdqValues.siteBusinessPartner1,
-            CdqValues.siteBusinessPartner2
+        val parentSitesCdq = listOf(
+            CdqValues.siteBusinessPartner1
+        )
+
+        val expectedAddresses = listOf(
+            CdqValues.addressBusinessPartner1,
+            CdqValues.addressBusinessPartner2
         )
 
         val expectedRelations = listOf(
-            CdqValues.relationSite1ToLegalEntity,
-            CdqValues.relationSite2ToLegalEntity
+            CdqValues.relationAddress1ToLegalEntity,
+            CdqValues.relationAddress2ToSite
         )
 
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(parentLegalEntitiesCdq.map { it.externalId }.joinToString(",")))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
-                                    limit = 2,
-                                    total = 2,
+                                    limit = 1,
+                                    total = 1,
                                     values = parentLegalEntitiesCdq
                                 )
                             )
                         )
                 )
         )
-        val stubMappingUpsertSites = wireMockServer.stubFor(
+        // mock "get parent sites"
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(parentSitesCdq.map { it.externalId }.joinToString(",")))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 1,
+                                    total = 1,
+                                    values = parentSitesCdq
+                                )
+                            )
+                        )
+                )
+        )
+        val stubMappingUpsertAddresses = wireMockServer.stubFor(
             put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
@@ -140,58 +162,17 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
+        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(sites))
+            .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
             .expectStatus()
             .isOk
 
-        val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()
-        Assertions.assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
+        val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
+        assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
-        Assertions.assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
-    }
-
-    /**
-     * Given legal entities in cdq
-     * When upserting sites of legal entities using a legal entity external id that does not exist
-     * Then a bad request response should be sent
-     */
-    @Test
-    fun `upsert sites, legal entity parent not found`() {
-        val sites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
-        )
-        val parentLegalEntitiesCdq = listOf(
-            CdqValues.legalEntity1
-        )
-
-        // mock "get parent legal entities"
-        wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseCdq(
-                                    limit = 2,
-                                    total = 2,
-                                    values = parentLegalEntitiesCdq
-                                )
-                            )
-                        )
-                )
-        )
-
-        webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(sites))
-            .exchange()
-            .expectStatus()
-            .isBadRequest
+        assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 }

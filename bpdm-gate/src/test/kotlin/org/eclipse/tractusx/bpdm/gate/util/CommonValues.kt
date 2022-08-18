@@ -34,11 +34,17 @@ object CommonValues {
     val externalIdSite1 = "site-external-1"
     val externalIdSite2 = "site-external-2"
 
+    val externalIdAddress1 = "address-external-1"
+    val externalIdAddress2 = "address-external-2"
+
     val bpn1 = "BPNL0000000000XY"
     val bpn2 = "BPNL0000000001XZ"
 
     val bpnSite1 = "BPNS0000000001XY"
     val bpnSite2 = "BPNS0000000001XZ"
+
+    val bpnAddress1 = "BPNA0000000001XY"
+    val bpnAddress2 = "BPNA0000000001XZ"
 
     val language1 = LanguageCode.de
     val language2 = LanguageCode.en
