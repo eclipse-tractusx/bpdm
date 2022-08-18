@@ -33,6 +33,9 @@ class SiteService(
 ) {
     fun upsertSites(sites: Collection<SiteGateInput>) {
         val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = sites.map { it.legalEntityExternalId }.toList())
+        if (parentLegalEntitiesPage.limit < sites.size) {
+            throw IllegalStateException("Could not fetch all parent legal entities in single request.")
+        }
         val parentLegalEntitiesByExternalId = parentLegalEntitiesPage.values.associateBy { it.externalId }
 
         val sitesCdq = sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }

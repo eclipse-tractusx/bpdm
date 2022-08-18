@@ -41,7 +41,7 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=2"])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 internal class SiteControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
@@ -72,7 +72,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInput2
         )
 
-        val legalEntitiesCdq = listOf(
+        val parentLegalEntitiesCdq = listOf(
             CdqValues.legalEntity1,
             CdqValues.legalEntity2
         )
@@ -87,6 +87,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             CdqValues.relationSite2ToLegalEntity
         )
 
+        // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
@@ -97,7 +98,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                                 PagedResponseCdq(
                                     limit = 2,
                                     total = 2,
-                                    values = legalEntitiesCdq
+                                    values = parentLegalEntitiesCdq
                                 )
                             )
                         )
@@ -151,5 +152,46 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<Collection<RelationCdq>>(stubMappingUpsertRelations, objectMapper).single()
         Assertions.assertThat(upsertRelationsRequest).containsExactlyInAnyOrderElementsOf(expectedRelations)
+    }
+
+    /**
+     * Given legal entities in cdq
+     * When upserting sites of legal entities using a legal entity external id that does not exist
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert sites, legal entity parent not found`() {
+        val sites = listOf(
+            RequestValues.siteGateInput1,
+            RequestValues.siteGateInput2
+        )
+        val parentLegalEntitiesCdq = listOf(
+            CdqValues.legalEntity1
+        )
+
+        // mock "get parent legal entities"
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 2,
+                                    total = 2,
+                                    values = parentLegalEntitiesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(sites))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 }
