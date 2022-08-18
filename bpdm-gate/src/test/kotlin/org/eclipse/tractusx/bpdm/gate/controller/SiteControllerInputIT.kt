@@ -150,8 +150,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()
         Assertions.assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
-        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<Collection<RelationCdq>>(stubMappingUpsertRelations, objectMapper).single()
-        Assertions.assertThat(upsertRelationsRequest).containsExactlyInAnyOrderElementsOf(expectedRelations)
+        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
+        Assertions.assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
     /**

@@ -163,6 +163,7 @@ class CdqClient(
                 .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
                 .block()!!
         } catch (e: Exception) {
+            e.printStackTrace()
             throw CdqRequestException("Get business partners request failed.", e)
         }
         return partnerCollection
@@ -182,11 +183,12 @@ class CdqClient(
     }
 
     private fun upsertBusinessPartnerRelations(relations: Collection<RelationCdq>) {
+        val upsertRelationsRequest = UpsertRelationsRequestCdq(relations)
         val upsertResponse = try {
             webClient
                 .put()
                 .uri(cdqConfigProperties.dataExchangeApiUrl + RELATIONS_PATH)
-                .bodyValue(objectMapper.writeValueAsString(relations))
+                .bodyValue(objectMapper.writeValueAsString(upsertRelationsRequest))
                 .retrieve()
                 .bodyToMono<UpsertRelationsResponseCdq>()
                 .block()!!
