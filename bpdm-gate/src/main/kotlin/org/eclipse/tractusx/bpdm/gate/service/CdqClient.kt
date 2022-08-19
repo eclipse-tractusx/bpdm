@@ -58,7 +58,7 @@ class CdqClient(
                 .uri { builder ->
                     builder
                         .path(cdqConfigProperties.dataClinicApiUrl + "/augmentedbusinesspartners")
-                        .queryParam("datasource", datasource)
+                        .queryParam("dataSourceId", datasource)
                     if (limit != null) builder.queryParam("limit", limit)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (from != null) builder.queryParam("from", from)
@@ -159,7 +159,7 @@ class CdqClient(
                 .uri { builder ->
                     builder
                         .path(cdqConfigProperties.dataExchangeApiUrl + BUSINESS_PARTNER_PATH)
-                        .queryParam("datasource", datasource)
+                        .queryParam("dataSource", datasource)
                         .queryParam("featuresOn", "USE_NEXT_START_AFTER")
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (limit != null) builder.queryParam("limit", limit)
