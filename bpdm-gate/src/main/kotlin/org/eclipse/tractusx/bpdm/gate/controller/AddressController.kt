@@ -62,7 +62,9 @@ class AddressController(
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        if (addresses.any { it.siteExternalId == null && it.legalEntityExternalId == null }) {
+        if (addresses.any {
+                (it.siteExternalId == null && it.legalEntityExternalId == null) || (it.siteExternalId != null && it.legalEntityExternalId != null)
+            }) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         addressService.upsertAddresses(addresses)

@@ -25,7 +25,9 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_ADDRESSES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
@@ -45,7 +47,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles("test")
 internal class AddressControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper
+    val objectMapper: ObjectMapper,
+    val cdqConfigProperties: CdqConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -93,14 +96,15 @@ internal class AddressControllerInputIT @Autowired constructor(
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(parentLegalEntitiesCdq.map { it.externalId }.joinToString(",")))
+                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
-                                    limit = 1,
+                                    limit = 50,
                                     total = 1,
                                     values = parentLegalEntitiesCdq
                                 )
@@ -111,14 +115,15 @@ internal class AddressControllerInputIT @Autowired constructor(
         // mock "get parent sites"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(parentSitesCdq.map { it.externalId }.joinToString(",")))
+                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
-                                    limit = 1,
+                                    limit = 50,
                                     total = 1,
                                     values = parentSitesCdq
                                 )
@@ -174,5 +179,123 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
+    }
+
+    /**
+     * When upserting addresses of legal entities using a legal entity external id that does not exist
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert addresses, legal entity parent not found`() {
+        val addresses = listOf(
+            RequestValues.addressGateInput1
+        )
+
+        // mock "get parent legal entities"
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 50,
+                                    total = 0,
+                                    values = emptyList<BusinessPartnerCdq>()
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(addresses))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    /**
+     * When upserting addresses of sites using a site external id that does not exist
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert addresses, site parent not found`() {
+        val addresses = listOf(
+            RequestValues.addressGateInput2
+        )
+
+        // mock "get parent sites"
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 50,
+                                    total = 0,
+                                    values = emptyList<BusinessPartnerCdq>()
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(addresses))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    /**
+     * When upserting an address without reference to either a parent site or a parent legal entity
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert address without any parent`() {
+        val addresses = listOf(
+            RequestValues.addressGateInput1.copy(
+                siteExternalId = null,
+                legalEntityExternalId = null
+            )
+        )
+
+        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(addresses))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    /**
+     * When upserting an address without reference to both a parent site and a parent legal entity
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert address with site and legal entity parents`() {
+        val addresses = listOf(
+            RequestValues.addressGateInput1.copy(
+                siteExternalId = CommonValues.externalIdSite1,
+                legalEntityExternalId = CommonValues.externalId1
+            )
+        )
+
+        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(addresses))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 }

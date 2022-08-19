@@ -25,6 +25,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
@@ -45,7 +46,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ActiveProfiles("test")
 internal class SiteControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper
+    val objectMapper: ObjectMapper,
+    val cdqConfigProperties: CdqConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -90,13 +92,15 @@ internal class SiteControllerInputIT @Autowired constructor(
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
-                                    limit = 2,
+                                    limit = 50,
                                     total = 2,
                                     values = parentLegalEntitiesCdq
                                 )
@@ -172,14 +176,16 @@ internal class SiteControllerInputIT @Autowired constructor(
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
-                                    limit = 2,
-                                    total = 2,
+                                    limit = 50,
+                                    total = 1,
                                     values = parentLegalEntitiesCdq
                                 )
                             )
