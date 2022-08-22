@@ -39,9 +39,9 @@ data class AddressGateInput(
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
     @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String?,
+    val legalEntityExternalId: String? = null,
     @Schema(description = "External id of the related site")
-    val siteExternalId: String?
+    val siteExternalId: String? = null
 )
 
 class AddressGateInputDeserializer(vc: Class<AddressGateInput>?) : StdDeserializer<AddressGateInput>(vc) {

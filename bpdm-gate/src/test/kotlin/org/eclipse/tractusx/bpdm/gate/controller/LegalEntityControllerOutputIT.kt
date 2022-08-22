@@ -7,14 +7,13 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_OUTPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_DATA_CLINIC_API_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -30,8 +29,7 @@ import org.springframework.test.web.reactive.server.returnResult
 @ActiveProfiles("test")
 internal class LegalEntityControllerOutputIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper,
-    val cdqConfigProperties: CdqConfigProperties
+    val objectMapper: ObjectMapper
 ) {
     companion object {
         @RegisterExtension
@@ -56,7 +54,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         val expectedLegalEntity = ResponseValues.legalEntityGateOutput1
 
         wireMockServer.stubFor(
-            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -87,7 +85,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entity by external id, not found`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -108,7 +106,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entity by external id, cdq error`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
                 .willReturn(badRequest())
         )
 
@@ -128,7 +126,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         val invalidPartner = CdqValues.legalEntity1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
-            post(urlPathMatching(getReadAugmentedBusinessPartnerPath()))
+            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -310,9 +308,5 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isBadRequest
-    }
-
-    private fun getReadAugmentedBusinessPartnerPath(): String {
-        return "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/${cdqConfigProperties.datasource}/augmentedbusinesspartners/fetch"
     }
 }

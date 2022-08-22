@@ -17,13 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.common.dto.cdq
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-class CdqRequestException : RuntimeException {
-    constructor(message: String, cause: Throwable) : super(message, cause)
-    constructor(message: String) : super(message)
-}
+data class UpsertRelationsFailureCdq(
+    val endNodeExternalId: String?,
+    val message: String?,
+    val startNodeExternalId: String?
+)

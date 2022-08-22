@@ -38,7 +38,7 @@ data class SiteGateInput(
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
     @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String?,
+    val legalEntityExternalId: String,
 )
 
 class SiteGateInputDeserializer(vc: Class<SiteGateInput>?) : StdDeserializer<SiteGateInput>(vc) {
@@ -47,7 +47,7 @@ class SiteGateInputDeserializer(vc: Class<SiteGateInput>?) : StdDeserializer<Sit
         return SiteGateInput(
             ctxt.readTreeAsValue(node, SiteDto::class.java),
             node.get(SiteGateInput::externalId.name).textValue(),
-            node.get(SiteGateInput::legalEntityExternalId.name)?.textValue()
+            node.get(SiteGateInput::legalEntityExternalId.name)?.textValue()!!
         )
     }
 }

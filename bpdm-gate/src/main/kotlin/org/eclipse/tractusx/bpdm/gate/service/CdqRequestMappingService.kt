@@ -23,12 +23,13 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.springframework.stereotype.Service
 
 @Service
@@ -40,10 +41,37 @@ class CdqRequestMappingService(
         return toCdqModel(legalEntity.legalEntity, legalEntity.externalId)
     }
 
+    fun toCdqModel(site: SiteGateInput): BusinessPartnerCdq {
+        return toCdqModel(site.site, site.externalId)
+    }
+
+    fun toCdqModel(address: AddressGateInput): BusinessPartnerCdq {
+        return toCdqModel(address.address, address.externalId)
+    }
+
+    private fun toCdqModel(address: AddressBpnDto, externalId: String): BusinessPartnerCdq {
+        return BusinessPartnerCdq(
+            externalId = externalId,
+            dataSource = cdqConfigProperties.datasourceAddress,
+            addresses = listOf(toCdqModel(address.address)),
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn!!)) else emptyList()
+        )
+    }
+
+    private fun toCdqModel(site: SiteDto, externalId: String): BusinessPartnerCdq {
+        return BusinessPartnerCdq(
+            externalId = externalId,
+            dataSource = cdqConfigProperties.datasourceSite,
+            names = listOf(NameCdq(value = site.name)),
+            addresses = listOf(toCdqModel(site.mainAddress)),
+            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn!!)) else emptyList()
+        )
+    }
+
     private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = externalId,
-            dataSource = cdqConfigProperties.datasource,
+            dataSource = cdqConfigProperties.datasourceLegalEntity,
             identifiers = toIdentifiersCdq(legalEntity.identifiers, legalEntity.bpn),
             names = legalEntity.names.map { it.toCdqModel() },
             legalForm = toLegalFormCdq(legalEntity.legalForm),
@@ -126,7 +154,7 @@ class CdqRequestMappingService(
                 postalDeliveryPoints = postalDeliveryPoints.map { toCdqModel(it, version.language) },
                 premises = premises.map { toCdqModel(it, version.language) },
                 geographicCoordinates = toCdqModel(geographicCoordinates),
-                types = toAddressTypesCdq(types)
+                types = types.map { toKeyNameUrlTypeCdq(it) }
             )
         }
     }
@@ -189,12 +217,6 @@ class CdqRequestMappingService(
         }
         return identifiersCdq
     }
-
-    private fun toAddressTypesCdq(types: Collection<AddressType>): Collection<TypeKeyNameUrlCdq> {
-        val legalAddressTypes = if (!types.contains(AddressType.LEGAL)) types.plus(AddressType.LEGAL) else types
-        return legalAddressTypes.map { toKeyNameUrlTypeCdq(it) }
-    }
-
 
     private fun createBpnIdentifierCdq(bpn: String): IdentifierCdq {
         return IdentifierCdq(

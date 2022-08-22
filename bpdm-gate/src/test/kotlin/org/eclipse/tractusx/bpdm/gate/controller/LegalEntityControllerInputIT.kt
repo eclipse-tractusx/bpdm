@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -54,8 +53,7 @@ import org.springframework.test.web.reactive.server.returnResult
 @ActiveProfiles("test")
 internal class LegalEntityControllerInputIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper,
-    val cdqConfigProperties: CdqConfigProperties
+    val objectMapper: ObjectMapper
 ) {
     companion object {
         @RegisterExtension
@@ -82,8 +80,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            CdqValues.legalEntity1.copy(dataSource = cdqConfigProperties.datasource),
-            CdqValues.legalEntity2.copy(dataSource = cdqConfigProperties.datasource)
+            CdqValues.legalEntity1,
+            CdqValues.legalEntity2
         )
 
         wireMockServer.stubFor(
@@ -110,9 +108,6 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(UpsertResponse::class.java)
-            .returnResult()
-            .responseBody
 
         val body = wireMockServer.allServeEvents.single().request.bodyAsString
         val upsertRequest = objectMapper.readValue(body, UpsertRequest::class.java)

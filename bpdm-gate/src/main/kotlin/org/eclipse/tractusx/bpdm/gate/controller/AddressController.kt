@@ -24,11 +24,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.service.AddressService
 import org.springdoc.api.annotations.ParameterObject
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
@@ -36,8 +40,10 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena")
-class AddressController {
-
+class AddressController(
+    val addressService: AddressService,
+    val apiConfigProperties: ApiConfigProperties
+) {
     @Operation(
         summary = "Create or update addresses.",
         description = "Create or update addresses. " +
@@ -53,7 +59,16 @@ class AddressController {
     )
     @PutMapping("/input/addresses")
     fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInput>): ResponseEntity<Any> {
-        TODO()
+        if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        if (addresses.any {
+                (it.siteExternalId == null && it.legalEntityExternalId == null) || (it.siteExternalId != null && it.legalEntityExternalId != null)
+            }) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        addressService.upsertAddresses(addresses)
+        return ResponseEntity(HttpStatus.OK)
     }
 
     @Operation(

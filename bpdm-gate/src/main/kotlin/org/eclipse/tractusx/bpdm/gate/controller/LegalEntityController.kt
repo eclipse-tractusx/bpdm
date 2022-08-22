@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
@@ -59,7 +60,7 @@ class LegalEntityController(
     )
     @PutMapping("/input/legal-entities")
     fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInput>): ResponseEntity<Any> {
-        if (legalEntities.size > apiConfigProperties.upsertLimit || containsDuplicates(legalEntities.map { it.externalId })) {
+        if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         legalEntityService.upsertLegalEntities(legalEntities)
@@ -128,6 +129,4 @@ class LegalEntityController(
     fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateOutput {
         return legalEntityService.getLegalEntityByExternalIdOutput(externalId)
     }
-
-    private fun containsDuplicates(list: List<String>): Boolean = list.size != list.distinct().size
 }

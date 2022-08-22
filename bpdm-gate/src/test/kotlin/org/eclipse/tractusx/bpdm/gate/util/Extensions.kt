@@ -17,13 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.util
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-class CdqRequestException : RuntimeException {
-    constructor(message: String, cause: Throwable) : super(message, cause)
-    constructor(message: String) : super(message)
+inline fun <reified T> WireMockExtension.deserializeMatchedRequests(stubMapping: StubMapping, objectMapper: ObjectMapper): Collection<T> {
+    val requestBodies = getServeEvents(ServeEventQuery.forStubMapping(stubMapping)).serveEvents.map { it.request.bodyAsString }
+    return requestBodies.map { objectMapper.readValue(it) }
 }
