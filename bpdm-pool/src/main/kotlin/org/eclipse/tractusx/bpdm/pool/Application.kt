@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
+import org.springframework.scheduling.annotation.EnableScheduling
 
 
 @SpringBootApplication(
@@ -33,6 +34,7 @@ import org.springframework.boot.runApplication
     ]
 )
 @ConfigurationPropertiesScan
+@EnableScheduling
 class Application
 
 fun main(args: Array<String>) {

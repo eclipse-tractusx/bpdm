@@ -39,6 +39,7 @@ import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.core.io.Resource
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -57,6 +58,7 @@ class OpenSearchSyncStarterService(
     /**
      * Checks for changed records since the last export and exports those changes to OpenSearch
      */
+    @Scheduled(cron = "\${bpdm.opensearch.export-scheduler-cron-expr:-}", zone = "UTC")
     fun export(): SyncResponse {
         return startExport(true)
     }
