@@ -61,12 +61,12 @@ class ImportStarterService(
     }
 
     private fun startImport(inSync: Boolean): SyncResponse {
-        val record = syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT)
+        val (record, previousStartedAt) = syncRecordService.setSynchronizationStart(SyncType.CDQ_IMPORT)
 
-        val fromTime = record.startedAt ?: SyncRecordService.syncStartTime
+        val fromTime = previousStartedAt ?: SyncRecordService.syncStartTime
         val saveState = record.errorSave
 
-        val response = syncRecordService.setSynchronizationStart(record).toDto()
+        val response = record.toDto()
 
         logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '$fromTime' with async: ${!inSync}" }
 

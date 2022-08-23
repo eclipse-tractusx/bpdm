@@ -21,9 +21,16 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.SyncRecord
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
+import org.springframework.data.jpa.repository.Lock
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import javax.persistence.LockModeType
 
 interface SyncRecordRepository : CrudRepository<SyncRecord, Long> {
 
     fun findByType(type: SyncType): SyncRecord?
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s from SyncRecord s where s.type=:type")
+    fun findByTypeWithPessimisticLock(type: SyncType): SyncRecord?
 }

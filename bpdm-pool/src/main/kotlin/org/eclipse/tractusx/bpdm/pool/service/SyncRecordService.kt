@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncConflictException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncStateException
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -52,11 +53,27 @@ class SyncRecordService(
         }
     }
 
-    fun setSynchronizationStart(record: SyncRecord): SyncRecord {
+    /**
+     * Uses pessimistic locking in order to make sure that in case of parallel execution on different spring boot instances,
+     * only one instance can get the sync record and set it to "running" state at the same time.
+     */
+    @Transactional
+    fun setSynchronizationStart(type: SyncType): Pair<SyncRecord, Instant?> {
+        val record = syncRecordRepository.findByTypeWithPessimisticLock(type) ?: run {
+            logger.info { "Create new sync record entry for type $type" }
+            val newEntry = SyncRecord(
+                type,
+                SyncStatus.NOT_SYNCED
+            )
+            syncRecordRepository.save(newEntry)
+        }
+
         if (record.status == SyncStatus.RUNNING)
             throw BpdmSyncConflictException(SyncType.CDQ_IMPORT)
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.RUNNING}" }
+
+        val previousStartedAt = record.startedAt
 
         record.progress = if (record.status == SyncStatus.ERROR) record.progress else 0f
         record.count = if (record.status == SyncStatus.ERROR) record.count else 0
@@ -65,8 +82,7 @@ class SyncRecordService(
         record.status = SyncStatus.RUNNING
         record.errorDetails = null
 
-
-        return syncRecordRepository.save(record)
+        return Pair(syncRecordRepository.save(record), previousStartedAt)
     }
 
     fun setSynchronizationSuccess(record: SyncRecord): SyncRecord {
