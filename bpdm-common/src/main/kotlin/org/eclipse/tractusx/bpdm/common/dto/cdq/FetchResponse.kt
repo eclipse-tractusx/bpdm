@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class FetchResponse(
-    val businessPartner: BusinessPartnerCdq?,
+    val businessPartner: BusinessPartnerCdq? = null,
     val message: String? = null,
     val status: Status
 ) {

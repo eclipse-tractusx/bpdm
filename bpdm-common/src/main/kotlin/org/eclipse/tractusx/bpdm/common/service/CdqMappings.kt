@@ -109,7 +109,7 @@ object CdqMappings {
             status.officialDenotation,
             status.validFrom,
             status.validUntil,
-            toType(status.type)
+            toTypeOrDefault(status.type)
         )
     }
 
@@ -172,7 +172,7 @@ object CdqMappings {
 
     fun toDto(thoroughfare: ThoroughfareCdq): ThoroughfareDto {
         return ThoroughfareDto(
-            thoroughfare.value ?: "",
+            thoroughfare.value,
             thoroughfare.name,
             thoroughfare.shortName,
             thoroughfare.number,
@@ -199,8 +199,8 @@ object CdqMappings {
         )
     }
 
-    fun toDto(geoCoords: GeoCoordinatesCdq): GeoCoordinateDto {
-        return GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null)
+    fun toDto(geoCoords: GeoCoordinatesCdq): GeoCoordinateDto? {
+        return if (geoCoords.latitude != null && geoCoords.longitude != null) GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null) else null
     }
 
 

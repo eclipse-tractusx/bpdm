@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 
 @Schema(name = "Classification Response", description = "Classification record of a business partner")
 data class ClassificationResponse(
-    val value: String,
+    val value: String? = null,
     val code: String? = null,
     val type: TypeNameUrlDto? = null
 )

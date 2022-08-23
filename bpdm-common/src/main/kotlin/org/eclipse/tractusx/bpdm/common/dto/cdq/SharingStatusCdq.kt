@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class SharingStatusCdq(
     val status: SharingStatusType,
-    val description: String?
+    val description: String? = null
 )
 
 enum class SharingStatusType {

@@ -30,8 +30,8 @@ import javax.persistence.*
     ]
 )
 class Classification (
-    @Column(name = "`value`", nullable = false)
-    val value: String,
+    @Column(name = "`value`")
+    val value: String?,
     @Column(name = "code")
     val code: String?,
     @Column(name = "type")

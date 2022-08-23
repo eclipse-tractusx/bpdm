@@ -20,5 +20,5 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class UpsertRelationsRequestCdq(
-    val relations: Collection<RelationCdq>
+    val relations: Collection<RelationCdq> = emptyList()
 )

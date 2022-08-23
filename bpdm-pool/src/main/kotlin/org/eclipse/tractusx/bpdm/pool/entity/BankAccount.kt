@@ -36,14 +36,14 @@ class BankAccount (
     @Column(name = "currency", nullable = false)
     @Enumerated(EnumType.STRING)
     val currency: CurrencyCode,
-    @Column(name = "international_account_identifier", nullable = false)
-    val internationalBankAccountIdentifier: String,
-    @Column(name = "international_bank_identifier", nullable = false)
-    val internationalBankIdentifier: String,
-    @Column(name = "national_account_identifier", nullable = false)
-    val nationalBankAccountIdentifier: String,
-    @Column(name = "national_bank_identifier", nullable = false)
-    val nationalBankIdentifier: String,
+    @Column(name = "international_account_identifier")
+    val internationalBankAccountIdentifier: String?,
+    @Column(name = "international_bank_identifier")
+    val internationalBankIdentifier: String?,
+    @Column(name = "national_account_identifier")
+    val nationalBankAccountIdentifier: String?,
+    @Column(name = "national_bank_identifier")
+    val nationalBankIdentifier: String?,
 
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)

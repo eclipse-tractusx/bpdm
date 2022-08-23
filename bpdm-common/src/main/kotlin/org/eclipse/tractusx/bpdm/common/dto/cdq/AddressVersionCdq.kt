@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class AddressVersionCdq(
-    val language: LanguageCdq?,
-    val characterSet: TypeKeyNameCdq?
+    val language: LanguageCdq? = null,
+    val characterSet: TypeKeyNameCdq? = null
 )

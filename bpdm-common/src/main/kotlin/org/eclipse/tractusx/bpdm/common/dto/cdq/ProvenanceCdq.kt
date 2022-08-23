@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class ProvenanceCdq(
-    val technicalKey: String?,
-    val name: String?,
-    val url: String?,
+    val technicalKey: String? = null,
+    val name: String? = null,
+    val url: String? = null,
     val cdqId: String
 )

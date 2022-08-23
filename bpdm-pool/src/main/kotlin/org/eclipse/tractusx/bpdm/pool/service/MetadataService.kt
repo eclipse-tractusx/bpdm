@@ -93,7 +93,7 @@ class MetadataService(
     @Transactional
     fun createLegalForm(request: LegalFormRequest): LegalFormResponse {
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
-            throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.name)
+            throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.technicalKey)
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey}, name ${request.name} and ${request.category.size} categories" }
         val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toSet()

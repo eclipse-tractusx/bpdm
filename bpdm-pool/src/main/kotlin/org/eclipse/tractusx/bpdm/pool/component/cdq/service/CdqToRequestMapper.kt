@@ -67,13 +67,13 @@ class CdqToRequestMapper(
     }
 
     fun toRequest(idStatus: TypeKeyNameCdq): TypeKeyNameDto<String> {
-        return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name!!)
+        return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name ?: "")
     }
 
     fun toRequest(legalForm: LegalFormCdq, partner: BusinessPartnerCdq): LegalFormRequest {
         return LegalFormRequest(
             legalForm.technicalKey,
-            legalForm.name!!,
+            legalForm.name,
             legalForm.url,
             legalForm.mainAbbreviation,
             CdqMappings.toLanguageCode(legalForm.language),

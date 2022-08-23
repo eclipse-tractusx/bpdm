@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class GeoCoordinatesCdq(
-    val longitude: Float,
-    val latitude: Float
+    val longitude: Float? = null,
+    val latitude: Float? = null
 )

@@ -25,8 +25,8 @@ import javax.persistence.*
 @Entity
 @Table(name = "legal_forms")
 class LegalForm(
-    @Column(name = "name", nullable = false)
-    val name: String,
+    @Column(name = "name")
+    val name: String?,
     @Column(name = "url")
     val url: String?,
     @Column(name = "language", nullable = false)

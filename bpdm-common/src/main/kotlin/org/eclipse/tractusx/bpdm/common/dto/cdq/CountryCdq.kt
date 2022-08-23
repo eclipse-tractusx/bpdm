@@ -22,6 +22,6 @@ package org.eclipse.tractusx.bpdm.common.dto.cdq
 import com.neovisionaries.i18n.CountryCode
 
 data class CountryCdq(
-    val shortName: CountryCode?,
+    val shortName: CountryCode? = null,
     val value: String? = null
 )

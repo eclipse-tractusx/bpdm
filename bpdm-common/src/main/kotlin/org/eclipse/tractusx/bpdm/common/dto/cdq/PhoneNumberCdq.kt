@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class PhoneNumberCdq(
-    val countryPrefix: String?,
-    val number: String?,
-    val type: TypeKeyNameUrlCdq?,
+    val countryPrefix: String? = null,
+    val number: String? = null,
+    val type: TypeKeyNameUrlCdq? = null,
     val value: String
 )
