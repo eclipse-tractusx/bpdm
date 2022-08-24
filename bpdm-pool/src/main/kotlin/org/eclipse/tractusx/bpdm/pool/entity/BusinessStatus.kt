@@ -31,10 +31,10 @@ import javax.persistence.*
     ]
 )
 class BusinessStatus (
-    @Column(name="denotation", nullable = false)
-    val officialDenotation: String,
-    @Column(name = "valid_from", nullable = false)
-    val validFrom: LocalDateTime,
+    @Column(name = "denotation")
+    val officialDenotation: String?,
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
     @Column(name = "valid_to")
     val validUntil: LocalDateTime?,
     @Column(name = "type", nullable = false)

@@ -29,11 +29,11 @@ data class BankAccountDto(
     @Schema(description = "Used currency in the account", defaultValue = "UNDEFINED")
     val currency: CurrencyCode = CurrencyCode.UNDEFINED,
     @Schema(description = "ID used to identify this account internationally")
-    val internationalBankAccountIdentifier: String,
+    val internationalBankAccountIdentifier: String?,
     @Schema(description = "ID used to identify the account's bank internationally")
-    val internationalBankIdentifier: String,
+    val internationalBankIdentifier: String?,
     @Schema(description = "ID used to identify the account domestically")
-    val nationalBankAccountIdentifier: String,
+    val nationalBankAccountIdentifier: String?,
     @Schema(description = "ID used to identify the account's bank domestically")
-    val nationalBankIdentifier: String,
+    val nationalBankIdentifier: String?,
 )

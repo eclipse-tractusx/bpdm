@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class BusinessPartnerMetadataCdq(
-    val status: BusinessPartnerDocumentStatusCdq?,
-    val sharingStatus: SharingStatusCdq?,
+    val status: BusinessPartnerDocumentStatusCdq? = null,
+    val sharingStatus: SharingStatusCdq? = null,
     val identityLinks: Collection<IdentityLinkCdq> = emptyList()
 )

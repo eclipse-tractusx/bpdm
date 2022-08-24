@@ -240,5 +240,4 @@ class CdqRequestMappingService(
 
     private fun toCharacterSetCdq(characterSet: CharacterSet) =
         if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeCdq(characterSet) else null
-
 }

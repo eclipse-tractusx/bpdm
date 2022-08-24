@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class UpsertRelationsFailureCdq(
-    val endNodeExternalId: String?,
-    val message: String?,
-    val startNodeExternalId: String?
+    val endNodeExternalId: String? = null,
+    val message: String? = null,
+    val startNodeExternalId: String? = null
 )
