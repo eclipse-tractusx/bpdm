@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
-import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
@@ -155,7 +154,7 @@ class CdqRequestMappingService(
                 postalDeliveryPoints = postalDeliveryPoints.map { toCdqModel(it, version.language) },
                 premises = premises.map { toCdqModel(it, version.language) },
                 geographicCoordinates = toCdqModel(geographicCoordinates),
-                types = types.mapNotNull { toKeyNameUrlTypeCdq(it) }
+                types = types.map { toKeyNameUrlTypeCdq(it) }
             )
         }
     }
@@ -227,11 +226,11 @@ class CdqRequestMappingService(
         )
     }
 
-    private inline fun <reified T> toKeyNameTypeCdq(type: Enum<T>): TypeKeyNameCdq? where T : Enum<T>, T : HasDefaultValue<T> =
-        if ((type as HasDefaultValue<*>).getDefault() == type) null else TypeKeyNameCdq(type.name, null)
+    private inline fun <reified T> toKeyNameTypeCdq(type: Enum<T>): TypeKeyNameCdq where T : Enum<T> =
+        TypeKeyNameCdq(type.name, null)
 
-    private inline fun <reified T> toKeyNameUrlTypeCdq(type: Enum<T>): TypeKeyNameUrlCdq? where T : Enum<T>, T : HasDefaultValue<T> =
-        if ((type as HasDefaultValue<*>).getDefault() == type) null else TypeKeyNameUrlCdq(type.name, null)
+    private inline fun <reified T> toKeyNameUrlTypeCdq(type: Enum<T>): TypeKeyNameUrlCdq where T : Enum<T> =
+        TypeKeyNameUrlCdq(type.name, null)
 
     private fun toLanguageCdq(technicalKey: LanguageCode) =
         if (technicalKey != LanguageCode.undefined) LanguageCdq(technicalKey, null) else null
