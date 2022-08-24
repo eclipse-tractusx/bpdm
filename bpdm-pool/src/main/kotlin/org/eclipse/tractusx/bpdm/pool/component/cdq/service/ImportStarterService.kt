@@ -61,21 +61,15 @@ class ImportStarterService(
     }
 
     private fun startImport(inSync: Boolean): SyncResponse {
-        val (record, previousStartedAt) = syncRecordService.setSynchronizationStart(SyncType.CDQ_IMPORT)
-
-        val fromTime = previousStartedAt ?: SyncRecordService.syncStartTime
-        val saveState = record.errorSave
-
-        val response = record.toDto()
-
-        logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '$fromTime' with async: ${!inSync}" }
+        val record = syncRecordService.setSynchronizationStart(SyncType.CDQ_IMPORT)
+        logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '${record.fromTime}' with async: ${!inSync}" }
 
         if (inSync)
-            importService.importPaginated(fromTime, saveState)
+            importService.importPaginated(record.fromTime, record.errorSave)
         else
-            importService.importPaginatedAsync(fromTime, saveState)
+            importService.importPaginatedAsync(record.fromTime, record.errorSave)
 
-        return response
+        return record.toDto()
     }
 
 }

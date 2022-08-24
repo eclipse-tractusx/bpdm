@@ -31,6 +31,8 @@ class SyncRecord(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: SyncStatus,
+    @Column(name = "from_time", nullable = false)
+    var fromTime: Instant,
     @Column(name = "progress", nullable = false)
     var progress: Float = 0f,
     @Column(name = "count", nullable = false)
@@ -43,7 +45,6 @@ class SyncRecord(
     var startedAt: Instant? = null,
     @Column(name = "finished_at")
     var finishedAt: Instant? = null,
-
     ): BaseEntity()
 
 
