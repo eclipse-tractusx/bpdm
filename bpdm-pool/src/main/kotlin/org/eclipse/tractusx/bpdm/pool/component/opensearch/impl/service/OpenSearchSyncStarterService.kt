@@ -87,7 +87,7 @@ class OpenSearchSyncStarterService(
         deleteIndexIfExists(BUSINESS_PARTNER_INDEX_NAME)
         createIndex(BUSINESS_PARTNER_INDEX_NAME)
 
-        syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH))
+        syncRecordService.reset(SyncType.OPENSEARCH)
     }
 
     /**

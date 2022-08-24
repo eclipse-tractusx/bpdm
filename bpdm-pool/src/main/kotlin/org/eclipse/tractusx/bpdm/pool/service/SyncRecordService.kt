@@ -27,11 +27,16 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncConflictException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncStateException
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+/**
+ * Uses transaction isolation level "serializable" in order to make sure that in case of parallel execution on different spring boot instances,
+ * only one instance can get the sync record and make changes like setting it to "running" state at the same time.
+ */
 @Service
 class SyncRecordService(
     private val syncRecordRepository: SyncRecordRepository
@@ -42,6 +47,7 @@ class SyncRecordService(
 
     private val logger = KotlinLogging.logger { }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     fun getOrCreateRecord(type: SyncType): SyncRecord {
         return syncRecordRepository.findByType(type) ?: run {
             logger.info { "Create new sync record entry for type $type" }
@@ -53,20 +59,9 @@ class SyncRecordService(
         }
     }
 
-    /**
-     * Uses pessimistic locking in order to make sure that in case of parallel execution on different spring boot instances,
-     * only one instance can get the sync record and set it to "running" state at the same time.
-     */
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     fun setSynchronizationStart(type: SyncType): Pair<SyncRecord, Instant?> {
-        val record = syncRecordRepository.findByTypeWithPessimisticLock(type) ?: run {
-            logger.info { "Create new sync record entry for type $type" }
-            val newEntry = SyncRecord(
-                type,
-                SyncStatus.NOT_SYNCED
-            )
-            syncRecordRepository.save(newEntry)
-        }
+        val record = getOrCreateRecord(type)
 
         if (record.status == SyncStatus.RUNNING)
             throw BpdmSyncConflictException(SyncType.CDQ_IMPORT)
@@ -85,7 +80,9 @@ class SyncRecordService(
         return Pair(syncRecordRepository.save(record), previousStartedAt)
     }
 
-    fun setSynchronizationSuccess(record: SyncRecord): SyncRecord {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    fun setSynchronizationSuccess(type: SyncType): SyncRecord {
+        val record = getOrCreateRecord(type)
         if (record.status != SyncStatus.RUNNING)
             throw BpdmSyncStateException("Synchronization of type ${record.type} can't switch from state ${record.status} to ${SyncStatus.SUCCESS}.")
 
@@ -100,7 +97,9 @@ class SyncRecordService(
         return syncRecordRepository.save(record)
     }
 
-    fun setSynchronizationError(record: SyncRecord, errorMessage: String, saveState: String?): SyncRecord {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    fun setSynchronizationError(type: SyncType, errorMessage: String, saveState: String?): SyncRecord {
+        val record = getOrCreateRecord(type)
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.ERROR} with message $errorMessage" }
 
         record.finishedAt = Instant.now()
@@ -111,7 +110,9 @@ class SyncRecordService(
         return syncRecordRepository.save(record)
     }
 
-    fun setProgress(record: SyncRecord, count: Int, progress: Float): SyncRecord {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    fun setProgress(type: SyncType, count: Int, progress: Float): SyncRecord {
+        val record = getOrCreateRecord(type)
         if (record.status != SyncStatus.RUNNING)
             throw BpdmSyncStateException("Synchronization of type ${record.type} can't change progress when not running.")
 
@@ -123,7 +124,9 @@ class SyncRecordService(
         return syncRecordRepository.save(record)
     }
 
-    fun reset(record: SyncRecord): SyncRecord {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    fun reset(type: SyncType): SyncRecord {
+        val record = getOrCreateRecord(type)
         logger.debug { "Reset sync status of type ${record.type}" }
 
         record.status = SyncStatus.NOT_SYNCED
@@ -136,5 +139,4 @@ class SyncRecordService(
 
         return syncRecordRepository.save(record)
     }
-
 }

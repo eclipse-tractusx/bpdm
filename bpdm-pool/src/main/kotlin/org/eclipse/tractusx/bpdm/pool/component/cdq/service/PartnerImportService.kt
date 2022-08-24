@@ -63,11 +63,11 @@ class PartnerImportService(
                 startAfter = response.nextStartAfter
                 importedCount += response.partners.size
                 val progress = importedCount / response.totalElements.toFloat()
-                syncRecordService.setProgress(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT), importedCount, progress)
+                syncRecordService.setProgress(SyncType.CDQ_IMPORT, importedCount, progress)
             } catch (exception: RuntimeException) {
                 logger.error(exception) { "Exception encountered on CDQ import" }
                 syncRecordService.setSynchronizationError(
-                    syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT),
+                    SyncType.CDQ_IMPORT,
                     exception.message ?: "No Message",
                     startAfter
                 )
@@ -78,7 +78,7 @@ class PartnerImportService(
             entityManager.clear()
         } while (startAfter != null)
 
-        syncRecordService.setSynchronizationSuccess(syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT))
+        syncRecordService.setSynchronizationSuccess(SyncType.CDQ_IMPORT)
 
         logger.info { "CDQ import finished successfully" }
     }
