@@ -33,5 +33,6 @@ class CdqAdapterConfigProperties(
     val apiKey: String = "",
     val timestampKey: String = "last-import",
     val importLimit: Int = 100,
+    val importSchedulerCronExpr: String = "-",
     val exportPageSize: Int = 100
 )

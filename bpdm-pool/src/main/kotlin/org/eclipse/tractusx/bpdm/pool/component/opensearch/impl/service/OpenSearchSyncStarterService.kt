@@ -39,6 +39,7 @@ import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.core.io.Resource
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -57,6 +58,7 @@ class OpenSearchSyncStarterService(
     /**
      * Checks for changed records since the last export and exports those changes to OpenSearch
      */
+    @Scheduled(cron = "\${bpdm.opensearch.export-scheduler-cron-expr:-}", zone = "UTC")
     fun export(): SyncResponse {
         return startExport(true)
     }
@@ -85,7 +87,7 @@ class OpenSearchSyncStarterService(
         deleteIndexIfExists(BUSINESS_PARTNER_INDEX_NAME)
         createIndex(BUSINESS_PARTNER_INDEX_NAME)
 
-        syncRecordService.reset(syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH))
+        syncRecordService.reset(SyncType.OPENSEARCH)
     }
 
     /**
@@ -137,12 +139,12 @@ class OpenSearchSyncStarterService(
      *  Start export either asynchronously or synchronously depending on whether [inSync]
      */
     private fun startExport(inSync: Boolean): SyncResponse {
-        val record = syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH)
+        val (record, previousStartedAt) = syncRecordService.setSynchronizationStart(SyncType.OPENSEARCH)
 
-        val fromTime = record.startedAt ?: SyncRecordService.syncStartTime
+        val fromTime = previousStartedAt ?: SyncRecordService.syncStartTime
         val saveState = record.errorSave
 
-        val response = syncRecordService.setSynchronizationStart(record).toDto()
+        val response = record.toDto()
 
         logger.debug { "Initializing OpenSearch export with records after '$fromTime' from page '${record.errorSave}' and asynchronously: ${!inSync}" }
 

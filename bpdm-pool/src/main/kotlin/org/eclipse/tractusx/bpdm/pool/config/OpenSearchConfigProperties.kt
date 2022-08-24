@@ -30,5 +30,6 @@ class OpenSearchConfigProperties(
     val port: Int = 9200,
     val scheme: String = "http",
     val exportPageSize: Int = 100,
+    val exportSchedulerCronExpr: String = "-",
     val refreshOnWrite: Boolean = false
 )

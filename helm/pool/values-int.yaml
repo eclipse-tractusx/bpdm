@@ -12,6 +12,12 @@ applicationSecret:
   keycloak: <path:bpdm/data/int/pool/keycloak#credentials-secret>
   cdq: <path:bpdm/data/int/pool/cdq#api-key>
 
+applicationConfig: |
+  # every hour at minute 30
+  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
+  # every hour at minute 0
+  bpdm.cdq.import-scheduler-cron-expr=0 0 * * * *
+
 postgres:
   auth:
     postgresPassword: <path:bpdm/data/int/pool/postgresql#postgres-password>

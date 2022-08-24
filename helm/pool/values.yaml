@@ -91,8 +91,11 @@ applicationSecret:
   keycloak: <path:bpdm/data/dev/pool/keycloak#credentials-secret>
   cdq: <path:bpdm/data/dev/pool/cdq#api-key>
 
-applicationConfig: # |
-  # property=value
+applicationConfig: |
+  # every hour at minute 30
+  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
+  # every hour at minute 0
+  bpdm.cdq.import-scheduler-cron-expr=0 0 * * * *
 
 opensearch:
   enabled: true

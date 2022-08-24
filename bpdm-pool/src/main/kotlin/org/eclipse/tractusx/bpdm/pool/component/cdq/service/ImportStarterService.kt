@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 /**
@@ -40,6 +41,7 @@ class ImportStarterService(
     /**
      * Import records synchronously and return a [SyncResponse] about the import result information
      */
+    @Scheduled(cron = "\${bpdm.cdq.import-scheduler-cron-expr:-}", zone = "UTC")
     fun import(): SyncResponse {
         return startImport(true)
     }
@@ -59,12 +61,12 @@ class ImportStarterService(
     }
 
     private fun startImport(inSync: Boolean): SyncResponse {
-        val record = syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT)
+        val (record, previousStartedAt) = syncRecordService.setSynchronizationStart(SyncType.CDQ_IMPORT)
 
-        val fromTime = record.startedAt ?: SyncRecordService.syncStartTime
+        val fromTime = previousStartedAt ?: SyncRecordService.syncStartTime
         val saveState = record.errorSave
 
-        val response = syncRecordService.setSynchronizationStart(record).toDto()
+        val response = record.toDto()
 
         logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '$fromTime' with async: ${!inSync}" }
 

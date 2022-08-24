@@ -71,19 +71,19 @@ class OpenSearchSyncService(
                 page++
                 val record = syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH)
                 val newCount = record.count + docsPage.content.size
-                syncRecordService.setProgress(record, newCount, newCount.toFloat() / docsPage.totalElements)
+                syncRecordService.setProgress(SyncType.OPENSEARCH, newCount, newCount.toFloat() / docsPage.totalElements)
 
                 //Clear session after each page import to improve JPA performance
                 entityManager.clear()
 
             } catch (exception: RuntimeException) {
                 logger.error(exception) { "Exception encountered on OpenSearch export" }
-                syncRecordService.setSynchronizationError(syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH), exception.message!!, page.toString())
+                syncRecordService.setSynchronizationError(SyncType.OPENSEARCH, exception.message!!, page.toString())
                 return
             }
         } while (docsPage.totalPages > page)
 
-        syncRecordService.setSynchronizationSuccess(syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH))
+        syncRecordService.setSynchronizationSuccess(SyncType.OPENSEARCH)
 
         logger.info { "Finished OpenSearch export successfully" }
     }
