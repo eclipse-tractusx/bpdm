@@ -93,7 +93,7 @@ class SiteController(
     )
     @GetMapping("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput> {
-        TODO()
+        return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
     }
 
     @Operation(
