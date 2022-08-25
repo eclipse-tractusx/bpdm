@@ -53,14 +53,15 @@ class SyncRecordService(
             logger.info { "Create new sync record entry for type $type" }
             val newEntry = SyncRecord(
                 type,
-                SyncStatus.NOT_SYNCED
+                SyncStatus.NOT_SYNCED,
+                syncStartTime
             )
             syncRecordRepository.save(newEntry)
         }
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    fun setSynchronizationStart(type: SyncType): Pair<SyncRecord, Instant?> {
+    fun setSynchronizationStart(type: SyncType): SyncRecord {
         val record = getOrCreateRecord(type)
 
         if (record.status == SyncStatus.RUNNING)
@@ -68,16 +69,20 @@ class SyncRecordService(
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.RUNNING}" }
 
-        val previousStartedAt = record.startedAt
-
-        record.progress = if (record.status == SyncStatus.ERROR) record.progress else 0f
-        record.count = if (record.status == SyncStatus.ERROR) record.count else 0
-        record.startedAt = Instant.now()
-        record.finishedAt = null
-        record.status = SyncStatus.RUNNING
         record.errorDetails = null
 
-        return Pair(syncRecordRepository.save(record), previousStartedAt)
+        if (record.status != SyncStatus.ERROR) {
+            record.fromTime = record.startedAt ?: syncStartTime
+            record.errorDetails = null
+            record.errorSave = null
+            record.startedAt = Instant.now()
+            record.finishedAt = null
+            record.count = 0
+            record.progress = 0f
+        }
+        record.status = SyncStatus.RUNNING
+
+        return syncRecordRepository.save(record)
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -136,6 +141,7 @@ class SyncRecordService(
         record.finishedAt = null
         record.count = 0
         record.progress = 0f
+        record.fromTime = syncStartTime
 
         return syncRecordRepository.save(record)
     }

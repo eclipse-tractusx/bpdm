@@ -139,19 +139,15 @@ class OpenSearchSyncStarterService(
      *  Start export either asynchronously or synchronously depending on whether [inSync]
      */
     private fun startExport(inSync: Boolean): SyncResponse {
-        val (record, previousStartedAt) = syncRecordService.setSynchronizationStart(SyncType.OPENSEARCH)
-
-        val fromTime = previousStartedAt ?: SyncRecordService.syncStartTime
-        val saveState = record.errorSave
-
+        val record = syncRecordService.setSynchronizationStart(SyncType.OPENSEARCH)
         val response = record.toDto()
 
-        logger.debug { "Initializing OpenSearch export with records after '$fromTime' from page '${record.errorSave}' and asynchronously: ${!inSync}" }
+        logger.debug { "Initializing OpenSearch export with records after '${record.fromTime}' from page '${record.errorSave}' and asynchronously: ${!inSync}" }
 
         if (inSync)
-            openSearchSyncService.exportPaginated(fromTime, saveState)
+            openSearchSyncService.exportPaginated(record.fromTime, record.errorSave)
         else
-            openSearchSyncService.exportPaginatedAsync(fromTime, saveState)
+            openSearchSyncService.exportPaginatedAsync(record.fromTime, record.errorSave)
 
         return response
     }
