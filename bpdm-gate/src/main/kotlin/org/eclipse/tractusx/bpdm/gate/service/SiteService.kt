@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
@@ -36,15 +35,14 @@ class SiteService(
     private val cdqRequestMappingService: CdqRequestMappingService,
     private val inputCdqMappingService: InputCdqMappingService,
     private val cdqClient: CdqClient,
-    private val bpnConfigProperties: BpnConfigProperties,
-    private val cdqConfigProperties: CdqConfigProperties
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
     fun getSites(limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateInput> {
         val sitesPage = cdqClient.getSites(limit, startAfter)
 
-        val validEntries = sitesPage.values.filter { validateBusinessPartner(it) }
+        val validEntries = sitesPage.values.filter { validateSiteBusinessPartner(it) }
 
         return PageStartAfterResponse(
             total = sitesPage.total,
@@ -79,13 +77,13 @@ class SiteService(
     }
 
     private fun toValidSiteInput(partner: BusinessPartnerCdq): SiteGateInput {
-        if (!validateBusinessPartner(partner)) {
+        if (!validateSiteBusinessPartner(partner)) {
             throw CdqInvalidRecordException(partner.id)
         }
         return inputCdqMappingService.toInputSite(partner)
     }
 
-    private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
+    private fun validateSiteBusinessPartner(partner: BusinessPartnerCdq): Boolean {
         var valid = true
         val logMessageStart = "CDQ business partner for site with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
 
@@ -119,9 +117,7 @@ class SiteService(
     }
 
     private fun validateLegalEntityParents(partner: BusinessPartnerCdq, logMessageStart: String): Boolean {
-        val numLegalEntityParents = partner.relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceLegalEntity }
-            .filter { it.type.technicalKey == "PARENT" }
-            .map { it.startNode }.size
+        val numLegalEntityParents = inputCdqMappingService.toParentLegalEntityExternalIds(partner.relations).size
         if (numLegalEntityParents > 1) {
             logger.warn { "$logMessageStart has multiple parent legal entities." }
         }
@@ -142,7 +138,7 @@ class SiteService(
         return parentLegalEntitiesPage.values.associateBy { it.externalId!! }
     }
 
-    fun toCdqModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerCdq?): BusinessPartnerCdq {
+    private fun toCdqModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerCdq?): BusinessPartnerCdq {
         if (parentLegalEntity == null) {
             throw CdqNonexistentParentException(site.legalEntityExternalId)
         }

@@ -83,7 +83,7 @@ class AddressController(
     )
     @GetMapping("/input/addresses/{externalId}")
     fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInput {
-        TODO()
+        return addressService.getAddressByExternalId(externalId)
     }
 
     @Operation(
@@ -98,7 +98,7 @@ class AddressController(
     )
     @GetMapping("/input/addresses")
     fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput> {
-        TODO()
+        return addressService.getAddresses(paginationRequest.limit, paginationRequest.startAfter)
     }
 
     @Operation(

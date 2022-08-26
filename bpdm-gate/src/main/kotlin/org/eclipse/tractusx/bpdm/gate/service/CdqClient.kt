@@ -147,6 +147,9 @@ class CdqClient(
     fun getSites(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceSite, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
 
+    fun getAddresses(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
+        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceAddress, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
+
     private fun getBusinessPartners(
         limit: Int?,
         startAfter: String?,
