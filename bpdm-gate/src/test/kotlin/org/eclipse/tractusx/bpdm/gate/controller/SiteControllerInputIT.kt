@@ -26,6 +26,9 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
@@ -41,13 +44,14 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.returnResult
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 internal class SiteControllerInputIT @Autowired constructor(
-    val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper,
-    val cdqConfigProperties: CdqConfigProperties
+    private val webTestClient: WebTestClient,
+    private val objectMapper: ObjectMapper,
+    private val cdqConfigProperties: CdqConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -60,6 +64,141 @@ internal class SiteControllerInputIT @Autowired constructor(
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
         }
+    }
+
+    /**
+     * Given sites exists in cdq
+     * When getting sites page
+     * Then sites page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get sites`() {
+        val sitesCdq = listOf(
+            CdqValues.siteBusinessPartnerWithRelations1,
+            CdqValues.siteBusinessPartnerWithRelations2
+        )
+
+        val expectedSites = listOf(
+            RequestValues.siteGateInput1,
+            RequestValues.siteGateInput2
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = sitesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        val pageResponse = webTestClient.get()
+            .uri { builder ->
+                builder.path(CATENA_INPUT_SITES_PATH)
+                    .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
+                    .queryParam(PaginationStartAfterRequest::limit.name, limit)
+                    .build()
+            }
+            .exchange()
+            .expectStatus()
+            .isOk
+            .returnResult<PageStartAfterResponse<SiteGateInput>>()
+            .responseBody
+            .blockFirst()!!
+
+        Assertions.assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedSites,
+                invalidEntries = invalidEntries
+            )
+        )
+    }
+
+    /**
+     * Given invalid sites in CDQ
+     * When getting sites page
+     * Then only valid sites on page returned
+     */
+    @Test
+    fun `filter invalid sites`() {
+        val sitesCdq = listOf(
+            CdqValues.siteBusinessPartnerWithRelations1,
+            CdqValues.siteBusinessPartnerWithRelations2,
+            CdqValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList()), // site without address
+            CdqValues.siteBusinessPartnerWithRelations1.copy(names = listOf()), // site without names
+            CdqValues.siteBusinessPartnerWithRelations1.copy(relations = listOf()) // site without legal entity parent
+        )
+
+        val expectedSites = listOf(
+            RequestValues.siteGateInput1,
+            RequestValues.siteGateInput2
+        )
+
+        val limit = 5
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 3
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = sitesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        val pageResponse = webTestClient.get()
+            .uri { builder ->
+                builder.path(CATENA_INPUT_SITES_PATH)
+                    .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
+                    .queryParam(PaginationStartAfterRequest::limit.name, limit)
+                    .build()
+            }
+            .exchange()
+            .expectStatus()
+            .isOk
+            .returnResult<PageStartAfterResponse<SiteGateInput>>()
+            .responseBody
+            .blockFirst()!!
+
+        Assertions.assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedSites,
+                invalidEntries = invalidEntries
+            )
+        )
     }
 
     /**
@@ -196,6 +335,39 @@ internal class SiteControllerInputIT @Autowired constructor(
         webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(sites))
+            .exchange()
+            .expectStatus()
+            .isBadRequest
+    }
+
+    /**
+     * When cdq api responds with an error status code while getting sites
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get sites, cdq error`() {
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.get().uri(CATENA_INPUT_SITES_PATH)
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
+     * When requesting too many sites
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `get sites, pagination limit exceeded`() {
+        webTestClient.get().uri { builder ->
+            builder.path(CATENA_INPUT_SITES_PATH)
+                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
+                .build()
+        }
             .exchange()
             .expectStatus()
             .isBadRequest

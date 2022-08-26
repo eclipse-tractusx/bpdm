@@ -462,8 +462,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting legal entities
-     * Then an internal server error response should be sent
+     * When requesting too many legal entities
+     * Then a bad request response should be sent
      */
     @Test
     fun `get legal entities, pagination limit exceeded`() {

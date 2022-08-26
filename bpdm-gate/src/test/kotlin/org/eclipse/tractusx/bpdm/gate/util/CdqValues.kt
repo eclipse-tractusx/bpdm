@@ -416,30 +416,6 @@ object CdqValues {
         dataSource = "test-cdq-datasource-site"
     )
 
-    val addressBusinessPartner1 = BusinessPartnerCdq(
-        externalId = CommonValues.externalIdAddress1,
-        identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
-        addresses = listOf(address1),
-        dataSource = "test-cdq-datasource-address"
-    )
-
-    val addressBusinessPartner2 = BusinessPartnerCdq(
-        externalId = CommonValues.externalIdAddress2,
-        identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
-        addresses = listOf(address2),
-        dataSource = "test-cdq-datasource-address"
-    )
-
-    val legalEntity1Response = legalEntity1.copy(
-        identifiers = listOf(identifier1Response, identifier2Response, identifierBpn1),
-        legalForm = legalForm1Response
-    )
-
-    val legalEntity2Response = legalEntity2.copy(
-        identifiers = listOf(identifier3Response, identifier4Response, identifierBpn2),
-        legalForm = legalForm2Response
-    )
-
     val relationType = TypeKeyNameCdq(technicalKey = "PARENT")
 
     val relationSite1ToLegalEntity = RelationCdq(
@@ -458,6 +434,28 @@ object CdqValues {
         type = relationType
     )
 
+    val siteBusinessPartnerWithRelations1 = siteBusinessPartner1.copy(
+        relations = listOf(relationSite1ToLegalEntity)
+    )
+
+    val siteBusinessPartnerWithRelations2 = siteBusinessPartner2.copy(
+        relations = listOf(relationSite2ToLegalEntity)
+    )
+
+    val addressBusinessPartner1 = BusinessPartnerCdq(
+        externalId = CommonValues.externalIdAddress1,
+        identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
+        addresses = listOf(address1),
+        dataSource = "test-cdq-datasource-address"
+    )
+
+    val addressBusinessPartner2 = BusinessPartnerCdq(
+        externalId = CommonValues.externalIdAddress2,
+        identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
+        addresses = listOf(address2),
+        dataSource = "test-cdq-datasource-address"
+    )
+
     val relationAddress1ToLegalEntity = RelationCdq(
         startNode = legalEntity1.externalId!!,
         startNodeDataSource = "test-cdq-datasource-legal-entity",
@@ -472,5 +470,15 @@ object CdqValues {
         endNode = addressBusinessPartner2.externalId!!,
         endNodeDataSource = "test-cdq-datasource-address",
         type = relationType
+    )
+
+    val legalEntity1Response = legalEntity1.copy(
+        identifiers = listOf(identifier1Response, identifier2Response, identifierBpn1),
+        legalForm = legalForm1Response
+    )
+
+    val legalEntity2Response = legalEntity2.copy(
+        identifiers = listOf(identifier3Response, identifier4Response, identifierBpn2),
+        legalForm = legalForm2Response
     )
 }
