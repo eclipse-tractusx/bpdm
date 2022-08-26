@@ -472,6 +472,14 @@ object CdqValues {
         type = relationType
     )
 
+    val addressBusinessPartnerWithRelations1 = addressBusinessPartner1.copy(
+        relations = listOf(relationAddress1ToLegalEntity)
+    )
+
+    val addressBusinessPartnerWithRelations2 = addressBusinessPartner2.copy(
+        relations = listOf(relationAddress2ToSite)
+    )
+
     val legalEntity1Response = legalEntity1.copy(
         identifiers = listOf(identifier1Response, identifier2Response, identifierBpn1),
         legalForm = legalForm1Response

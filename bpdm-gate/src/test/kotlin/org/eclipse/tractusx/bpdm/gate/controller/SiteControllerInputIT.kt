@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
@@ -56,7 +56,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
@@ -100,7 +100,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .returnResult()
             .responseBody
 
-        Assertions.assertThat(site).usingRecursiveComparison().isEqualTo(expectedSite)
+        assertThat(site).usingRecursiveComparison().isEqualTo(expectedSite)
     }
 
     /**
@@ -237,7 +237,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .responseBody
             .blockFirst()!!
 
-        Assertions.assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
@@ -306,7 +306,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .responseBody
             .blockFirst()!!
 
-        Assertions.assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
@@ -314,6 +314,39 @@ internal class SiteControllerInputIT @Autowired constructor(
                 invalidEntries = invalidEntries
             )
         )
+    }
+
+    /**
+     * When cdq api responds with an error status code while getting sites
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get sites, cdq error`() {
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.get().uri(CATENA_INPUT_SITES_PATH)
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
+     * When requesting too many sites
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `get sites, pagination limit exceeded`() {
+        webTestClient.get().uri { builder ->
+            builder.path(CATENA_INPUT_SITES_PATH)
+                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
+                .build()
+        }
+            .exchange()
+            .expectStatus()
+            .isBadRequest
     }
 
     /**
@@ -406,10 +439,10 @@ internal class SiteControllerInputIT @Autowired constructor(
             .isOk
 
         val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()
-        Assertions.assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
+        assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
-        Assertions.assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
+        assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
     /**
@@ -450,39 +483,6 @@ internal class SiteControllerInputIT @Autowired constructor(
         webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(sites))
-            .exchange()
-            .expectStatus()
-            .isBadRequest
-    }
-
-    /**
-     * When cdq api responds with an error status code while getting sites
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get sites, cdq error`() {
-        wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        webTestClient.get().uri(CATENA_INPUT_SITES_PATH)
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
-
-    /**
-     * When requesting too many sites
-     * Then a bad request response should be sent
-     */
-    @Test
-    fun `get sites, pagination limit exceeded`() {
-        webTestClient.get().uri { builder ->
-            builder.path(CATENA_INPUT_SITES_PATH)
-                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
-                .build()
-        }
             .exchange()
             .expectStatus()
             .isBadRequest
