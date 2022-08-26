@@ -46,13 +46,13 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 internal class AddressControllerInputIT @Autowired constructor(
-    val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper,
-    val cdqConfigProperties: CdqConfigProperties
+    private val webTestClient: WebTestClient,
+    private val objectMapper: ObjectMapper,
+    private val cdqConfigProperties: CdqConfigProperties
 ) {
     companion object {
         @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 

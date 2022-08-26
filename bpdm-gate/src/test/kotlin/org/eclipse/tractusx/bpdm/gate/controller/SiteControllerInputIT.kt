@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
@@ -64,6 +65,120 @@ internal class SiteControllerInputIT @Autowired constructor(
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
         }
+    }
+
+    /**
+     * Given site exists in cdq
+     * When getting site by external id
+     * Then site mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get site by external id`() {
+        val expectedSite = RequestValues.siteGateInput1
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = CdqValues.siteBusinessPartnerWithRelations1,
+                                    status = FetchResponse.Status.OK
+                                )
+                            )
+                        )
+                )
+        )
+
+        val site = webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+            .exchange()
+            .expectStatus()
+            .isOk
+            .expectBody(SiteGateInput::class.java)
+            .returnResult()
+            .responseBody
+
+        Assertions.assertThat(site).usingRecursiveComparison().isEqualTo(expectedSite)
+    }
+
+    /**
+     * Given site does not exist in cdq
+     * When getting site by external id
+     * Then "not found" response is sent
+     */
+    @Test
+    fun `get site by external id, not found`() {
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = null,
+                                    status = FetchResponse.Status.NOT_FOUND
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.get().uri("${CATENA_INPUT_SITES_PATH}/nonexistent-externalid123")
+            .exchange()
+            .expectStatus()
+            .isNotFound
+    }
+
+    /**
+     * When cdq api responds with an error status code while fetching site by external id
+     * Then an internal server error response should be sent
+     */
+    @Test
+    fun `get site by external id, cdq error`() {
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .willReturn(badRequest())
+        )
+
+        webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.legalEntity1.externalId}")
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+    }
+
+    /**
+     * Given site without main address in CDQ
+     * When query by its external ID
+     * Then server error is returned
+     */
+    @Test
+    fun `get site without main address, expect error`() {
+
+        val invalidPartner = CdqValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList())
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = invalidPartner,
+                                    status = FetchResponse.Status.OK
+                                )
+                            )
+                        )
+                )
+        )
+
+        webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
     }
 
     /**

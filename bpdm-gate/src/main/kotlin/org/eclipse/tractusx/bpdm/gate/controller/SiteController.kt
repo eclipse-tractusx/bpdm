@@ -78,7 +78,7 @@ class SiteController(
     )
     @GetMapping("/input/sites/{externalId}")
     fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInput {
-        TODO()
+        return siteService.getSiteByExternalId(externalId)
     }
 
     @Operation(

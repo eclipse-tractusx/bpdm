@@ -52,12 +52,12 @@ import org.springframework.test.web.reactive.server.returnResult
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=2"])
 @ActiveProfiles("test")
 internal class LegalEntityControllerInputIT @Autowired constructor(
-    val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper
+    private val webTestClient: WebTestClient,
+    private val objectMapper: ObjectMapper
 ) {
     companion object {
         @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 

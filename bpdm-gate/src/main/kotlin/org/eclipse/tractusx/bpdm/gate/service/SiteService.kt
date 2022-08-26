@@ -21,10 +21,13 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
 import org.springframework.stereotype.Service
 
@@ -51,6 +54,15 @@ class SiteService(
         )
     }
 
+    fun getSiteByExternalId(externalId: String): SiteGateInput {
+        val fetchResponse = cdqClient.getBusinessPartner(externalId)
+
+        when (fetchResponse.status) {
+            FetchResponse.Status.OK -> return toValidSiteInput(fetchResponse.businessPartner!!)
+            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Site", externalId)
+        }
+    }
+
     fun upsertSites(sites: Collection<SiteGateInput>) {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
 
@@ -64,6 +76,13 @@ class SiteService(
             )
         }.toList()
         cdqClient.upsertSiteRelations(relations)
+    }
+
+    private fun toValidSiteInput(partner: BusinessPartnerCdq): SiteGateInput {
+        if (!validateBusinessPartner(partner)) {
+            throw CdqInvalidRecordException(partner.id)
+        }
+        return inputCdqMappingService.toInputSite(partner)
     }
 
     private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
