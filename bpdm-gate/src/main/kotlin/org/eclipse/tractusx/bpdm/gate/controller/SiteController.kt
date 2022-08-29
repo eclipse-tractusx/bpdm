@@ -78,7 +78,7 @@ class SiteController(
     )
     @GetMapping("/input/sites/{externalId}")
     fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInput {
-        TODO()
+        return siteService.getSiteByExternalId(externalId)
     }
 
     @Operation(
@@ -93,7 +93,7 @@ class SiteController(
     )
     @GetMapping("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput> {
-        TODO()
+        return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
     }
 
     @Operation(

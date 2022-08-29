@@ -20,20 +20,63 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
+import org.eclipse.tractusx.bpdm.common.dto.cdq.RelationCdq
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toAddressBpnDto
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.springframework.stereotype.Service
 
 @Service
-class InputCdqMappingService {
+class InputCdqMappingService(
+    private val cdqConfigProperties: CdqConfigProperties
+) {
 
-    fun toInput(businessPartner: BusinessPartnerCdq): LegalEntityGateInput {
+    fun toInputLegalEntity(businessPartner: BusinessPartnerCdq): LegalEntityGateInput {
         return LegalEntityGateInput(
             businessPartner.externalId!!,
-            businessPartner.toDto()
+            businessPartner.toLegalEntityDto()
         )
     }
 
+    fun toInputAddress(businessPartner: BusinessPartnerCdq): AddressGateInput {
+        return AddressGateInput(
+            address = businessPartner.toAddressBpnDto(),
+            externalId = businessPartner.externalId!!,
+            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations),
+            siteExternalId = toParentSiteExternalId(businessPartner.relations)
+        )
+    }
 
+    fun toInputSite(businessPartner: BusinessPartnerCdq): SiteGateInput {
+        return SiteGateInput(
+            site = businessPartner.toSiteDto(),
+            externalId = businessPartner.externalId!!,
+            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations)!!
+        )
+    }
+
+    fun toParentLegalEntityExternalId(relations: Collection<RelationCdq>): String? {
+        return toParentLegalEntityExternalIds(relations).firstOrNull()
+    }
+
+    fun toParentSiteExternalId(relations: Collection<RelationCdq>): String? {
+        return toParentSiteExternalIds(relations).firstOrNull()
+    }
+
+    fun toParentLegalEntityExternalIds(relations: Collection<RelationCdq>): Collection<String> {
+        return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceLegalEntity }
+            .filter { it.type.technicalKey == "PARENT" }
+            .map { it.startNode }
+    }
+
+    fun toParentSiteExternalIds(relations: Collection<RelationCdq>): Collection<String> {
+        return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceSite }
+            .filter { it.type.technicalKey == "PARENT" }
+            .map { it.startNode }
+    }
 }
 

@@ -63,7 +63,7 @@ class LegalEntityService(
         return PageStartAfterResponse(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
-            content = validEntries.map { inputCdqMappingService.toInput(it) },
+            content = validEntries.map { inputCdqMappingService.toInputLegalEntity(it) },
             invalidEntries = partnerCollection.values.size - validEntries.size
         )
     }
@@ -101,12 +101,12 @@ class LegalEntityService(
         if (!validateBusinessPartner(partner)) {
             throw CdqInvalidRecordException(partner.id)
         }
-        return inputCdqMappingService.toInput(partner)
+        return inputCdqMappingService.toInputLegalEntity(partner)
     }
 
     private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
         if (!partner.addresses.any { address -> address.types.any { type -> type.technicalKey == AddressType.LEGAL.name } }) {
-            logger.warn { "CDQ business partner with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId} does not have legal address" }
+            logger.warn { "CDQ business partner for legal entity with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId} does not have a legal address" }
             return false
         }
 

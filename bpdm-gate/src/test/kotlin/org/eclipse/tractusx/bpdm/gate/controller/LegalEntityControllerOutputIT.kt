@@ -28,12 +28,12 @@ import org.springframework.test.web.reactive.server.returnResult
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 internal class LegalEntityControllerOutputIT @Autowired constructor(
-    val webTestClient: WebTestClient,
-    val objectMapper: ObjectMapper
+    private val webTestClient: WebTestClient,
+    private val objectMapper: ObjectMapper
 ) {
     companion object {
         @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
@@ -295,8 +295,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting legal entities
-     * Then an internal server error response should be sent
+     * When requesting too many legal entities
+     * Then a bad request response should be sent
      */
     @Test
     fun `get legal entities, pagination limit exceeded`() {

@@ -72,7 +72,7 @@ object CdqMappings {
         return country?.shortName ?: CountryCode.UNDEFINED
     }
 
-    fun BusinessPartnerCdq.toDto(): LegalEntityDto {
+    fun BusinessPartnerCdq.toLegalEntityDto(): LegalEntityDto {
         return LegalEntityDto(
             bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
             identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
@@ -83,6 +83,21 @@ object CdqMappings {
             types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
             bankAccounts = bankAccounts.map { toDto(it) },
             legalAddress = toDto(addresses.single())
+        )
+    }
+
+    fun BusinessPartnerCdq.toSiteDto(): SiteDto {
+        return SiteDto(
+            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
+            name = names.single().value,
+            mainAddress = toDto(addresses.single())
+        )
+    }
+
+    fun BusinessPartnerCdq.toAddressBpnDto(): AddressBpnDto {
+        return AddressBpnDto(
+            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
+            address = toDto(addresses.single())
         )
     }
 
