@@ -32,6 +32,7 @@ private const val BUSINESS_PARTNER_PATH = "/businesspartners"
 private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
 
 private const val RELATIONS_PATH = "/relations"
+private const val DELETE_RELATIONS_PATH = "$RELATIONS_PATH/delete"
 
 private const val RELATION_TYPE_KEY = "PARENT"
 
@@ -89,6 +90,20 @@ class CdqClient(
             throw CdqRequestException("Read augmented business partner request failed.", e)
         }
         return response
+    }
+
+    fun deleteRelations(relations: Collection<DeleteRelationsRequestCdq.RelationToDeleteCdq>) {
+        try {
+            webClient
+                .put()
+                .uri(cdqConfigProperties.dataExchangeApiUrl + DELETE_RELATIONS_PATH)
+                .bodyValue(objectMapper.writeValueAsString(DeleteRelationsRequestCdq(relations)))
+                .retrieve()
+                .bodyToMono<DeleteRelationsResponseCdq>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Delete relations request failed.", e)
+        }
     }
 
     fun upsertLegalEntities(legalEntities: List<BusinessPartnerCdq>) {

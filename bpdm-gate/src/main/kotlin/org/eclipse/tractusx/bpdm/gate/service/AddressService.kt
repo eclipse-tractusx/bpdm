@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -61,17 +62,47 @@ class AddressService(
         }
     }
 
+    /**
+     * Upsert addresses by:
+     *
+     * - Retrieving parent legal entities and sites to check whether they exist and since their identifiers are copied to site
+     * - Upserting the addresses
+     * - Retrieving the old relations of the addresses and deleting them
+     * - Upserting the new relations
+     */
     fun upsertAddresses(addresses: Collection<AddressGateInput>) {
         val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq> = getParentLegalEntities(addresses)
         val parentSitesByExternalId: Map<String, BusinessPartnerCdq> = getParentSites(addresses)
 
-        val addressesCdq =
-            addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
-        cdqClient.upsertAddresses(addressesCdq)
+        doUpsertAddresses(addresses, parentLegalEntitiesByExternalId, parentSitesByExternalId)
 
+        deleteRelationsOfAddresses(addresses)
+
+        upsertRelations(addresses)
+    }
+
+    private fun upsertRelations(addresses: Collection<AddressGateInput>) {
         val legalEntityRelations = toLegalEntityRelations(addresses)
         val siteRelations = toSiteRelations(addresses)
         cdqClient.upsertAddressRelations(legalEntityRelations, siteRelations)
+    }
+
+    private fun doUpsertAddresses(
+        addresses: Collection<AddressGateInput>,
+        parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq>,
+        parentSitesByExternalId: Map<String, BusinessPartnerCdq>
+    ) {
+        val addressesCdq =
+            addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
+        cdqClient.upsertAddresses(addressesCdq)
+    }
+
+    private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInput>) {
+        val addressesPage = cdqClient.getAddresses(externalIds = addresses.map { it.externalId })
+        val relationsToDelete = addressesPage.values.flatMap { it.relations }.map { CdqMappings.toRelationToDelete(it) }
+        if (relationsToDelete.isNotEmpty()) {
+            cdqClient.deleteRelations(relationsToDelete)
+        }
     }
 
     private fun toSiteRelations(addresses: Collection<AddressGateInput>) = addresses.filter {

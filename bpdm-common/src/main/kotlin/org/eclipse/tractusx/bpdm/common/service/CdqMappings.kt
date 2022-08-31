@@ -218,5 +218,16 @@ object CdqMappings {
         return if (geoCoords.latitude != null && geoCoords.longitude != null) GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null) else null
     }
 
-
+    fun toRelationToDelete(relation: RelationCdq): DeleteRelationsRequestCdq.RelationToDeleteCdq {
+        return DeleteRelationsRequestCdq.RelationToDeleteCdq(
+            startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                dataSourceId = relation.startNodeDataSource,
+                externalId = relation.startNode
+            ),
+            endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                dataSourceId = relation.endNodeDataSource,
+                externalId = relation.endNode
+            )
+        )
+    }
 }
