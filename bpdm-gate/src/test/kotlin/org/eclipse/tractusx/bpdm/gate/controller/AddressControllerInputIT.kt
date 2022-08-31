@@ -374,6 +374,29 @@ internal class AddressControllerInputIT @Autowired constructor(
             CdqValues.relationAddress2ToSite
         )
 
+        val expectedDeletedRelations = listOf(
+            DeleteRelationsRequestCdq.RelationToDeleteCdq(
+                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().startNode
+                ),
+                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceAddress,
+                    externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().endNode
+                ),
+            ),
+            DeleteRelationsRequestCdq.RelationToDeleteCdq(
+                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().startNode
+                ),
+                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceAddress,
+                    externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().endNode
+                ),
+            ),
+        )
+
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
@@ -429,6 +452,42 @@ internal class AddressControllerInputIT @Autowired constructor(
                         )
                 )
         )
+        // mock "get addresses with relations"
+        // this simulates the case that the address already had some relations
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceAddress))
+                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 50,
+                                    total = 2,
+                                    values = listOf(
+                                        CdqValues.addressBusinessPartnerWithRelations1,
+                                        CdqValues.addressBusinessPartnerWithRelations2
+                                    )
+                                )
+                            )
+                        )
+                )
+        )
+        val stubMappingDeleteRelations = wireMockServer.stubFor(
+            put(urlPathMatching(EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                DeleteRelationsResponseCdq(2)
+                            )
+                        )
+                )
+        )
         val stubMappingUpsertRelations = wireMockServer.stubFor(
             put(urlPathMatching(CDQ_MOCK_RELATIONS_PATH))
                 .willReturn(
@@ -457,6 +516,10 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
         assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
+
+        // check that "delete relations" was called in cdq as expected
+        val deleteRelationsRequestCdq = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestCdq>(stubMappingDeleteRelations, objectMapper).single()
+        assertThat(deleteRelationsRequestCdq.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)

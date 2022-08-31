@@ -437,6 +437,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
         // mock "get sites with relations"
+        // this simulates the case that the site already had some relations
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.externalId }.joinToString(",")))
