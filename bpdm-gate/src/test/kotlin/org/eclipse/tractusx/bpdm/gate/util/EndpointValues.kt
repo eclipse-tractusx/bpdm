@@ -24,6 +24,7 @@ object EndpointValues {
     const val CDQ_MOCK_DATA_EXCHANGE_API_PATH = "/test-cdq-data-exchange-api/test-cdq-storage"
     const val CDQ_MOCK_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_DATA_EXCHANGE_API_PATH/businesspartners"
     const val CDQ_MOCK_RELATIONS_PATH = "$CDQ_MOCK_DATA_EXCHANGE_API_PATH/relations"
+    const val CDQ_MOCK_DELETE_RELATIONS_PATH = "$CDQ_MOCK_RELATIONS_PATH/delete"
     const val CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_BUSINESS_PARTNER_PATH/fetch"
 
     const val CDQ_MOCK_DATA_CLINIC_API_PATH = "/test-cdq-data-clinic-api/test-cdq-storage"
