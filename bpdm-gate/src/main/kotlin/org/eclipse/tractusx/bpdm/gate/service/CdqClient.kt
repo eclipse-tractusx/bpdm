@@ -95,7 +95,7 @@ class CdqClient(
     fun deleteRelations(relations: Collection<DeleteRelationsRequestCdq.RelationToDeleteCdq>) {
         try {
             webClient
-                .put()
+                .post()
                 .uri(cdqConfigProperties.dataExchangeApiUrl + DELETE_RELATIONS_PATH)
                 .bodyValue(objectMapper.writeValueAsString(DeleteRelationsRequestCdq(relations)))
                 .retrieve()

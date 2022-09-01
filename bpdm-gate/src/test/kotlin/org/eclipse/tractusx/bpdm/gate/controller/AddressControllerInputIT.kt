@@ -477,7 +477,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
         val stubMappingDeleteRelations = wireMockServer.stubFor(
-            put(urlPathMatching(EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH))
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
