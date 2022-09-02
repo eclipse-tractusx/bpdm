@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -61,12 +62,25 @@ class SiteService(
         }
     }
 
+    /**
+     * Upsert sites by:
+     *
+     * - Retrieving parent legal entities to check whether they exist and since their identifiers are copied to site
+     * - Upserting the sites
+     * - Retrieving the old relations of the sites and deleting them
+     * - Upserting the new relations
+     */
     fun upsertSites(sites: Collection<SiteGateInput>) {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
 
-        val sitesCdq = sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
-        cdqClient.upsertSites(sitesCdq)
+        doUpsertSites(sites, parentLegalEntitiesByExternalId)
 
+        deleteRelationsOfSites(sites)
+
+        upsertRelations(sites)
+    }
+
+    private fun upsertRelations(sites: Collection<SiteGateInput>) {
         val relations = sites.map {
             CdqClient.SiteLegalEntityRelation(
                 siteExternalId = it.externalId,
@@ -74,6 +88,22 @@ class SiteService(
             )
         }.toList()
         cdqClient.upsertSiteRelations(relations)
+    }
+
+    private fun doUpsertSites(
+        sites: Collection<SiteGateInput>,
+        parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq>
+    ) {
+        val sitesCdq = sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
+        cdqClient.upsertSites(sitesCdq)
+    }
+
+    private fun deleteRelationsOfSites(sites: Collection<SiteGateInput>) {
+        val sitesPage = cdqClient.getSites(externalIds = sites.map { it.externalId })
+        val relationsToDelete = sitesPage.values.flatMap { it.relations }.map { CdqMappings.toRelationToDelete(it) }
+        if (relationsToDelete.isNotEmpty()) {
+            cdqClient.deleteRelations(relationsToDelete)
+        }
     }
 
     private fun toValidSiteInput(partner: BusinessPartnerCdq): SiteGateInput {

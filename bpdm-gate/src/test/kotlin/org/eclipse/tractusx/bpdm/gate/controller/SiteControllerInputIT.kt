@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.eclipse.tractusx.bpdm.gate.util.deserializeMatchedRequests
@@ -376,6 +377,29 @@ internal class SiteControllerInputIT @Autowired constructor(
             CdqValues.relationSite2ToLegalEntity
         )
 
+        val expectedDeletedRelations = listOf(
+            DeleteRelationsRequestCdq.RelationToDeleteCdq(
+                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().startNode
+                ),
+                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().endNode
+                ),
+            ),
+            DeleteRelationsRequestCdq.RelationToDeleteCdq(
+                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().startNode
+                ),
+                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
+                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().endNode
+                ),
+            ),
+        )
+
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
@@ -412,6 +436,44 @@ internal class SiteControllerInputIT @Autowired constructor(
                         )
                 )
         )
+        // mock "get sites with relations"
+        // this simulates the case that the site already had some relations
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", equalTo(sites.map { it.externalId }.joinToString(",")))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
+                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = 50,
+                                    total = 2,
+                                    values = listOf(
+                                        CdqValues.siteBusinessPartnerWithRelations1,
+                                        CdqValues.siteBusinessPartnerWithRelations2
+                                    )
+                                )
+                            )
+                        )
+                )
+        )
+
+        val stubMappingDeleteRelations = wireMockServer.stubFor(
+            post(urlPathMatching(CDQ_MOCK_DELETE_RELATIONS_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                DeleteRelationsResponseCdq(2)
+                            )
+                        )
+                )
+        )
+
         val stubMappingUpsertRelations = wireMockServer.stubFor(
             put(urlPathMatching(CDQ_MOCK_RELATIONS_PATH))
                 .willReturn(
@@ -438,9 +500,15 @@ internal class SiteControllerInputIT @Autowired constructor(
             .expectStatus()
             .isOk
 
+        // check that "upsert sites" was called in cdq as expected
         val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()
         assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
+        // check that "delete relations" was called in cdq as expected
+        val deleteRelationsRequestCdq = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestCdq>(stubMappingDeleteRelations, objectMapper).single()
+        assertThat(deleteRelationsRequestCdq.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
+
+        // check that "upsert relations" was called in cdq as expected
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
