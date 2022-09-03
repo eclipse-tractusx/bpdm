@@ -75,6 +75,16 @@ fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
      */
 }
 
+inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: String, body: Any): Collection<T> {
+    return put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBodyList(T::class.java)
+        .returnResult()
+        .responseBody!!
+}
+
 fun WebTestClient.invokePutWithoutResponse(path: String, body: Any) {
     put().uri(path)
         .body(BodyInserters.fromValue(body))

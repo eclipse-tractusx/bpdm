@@ -24,6 +24,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -61,27 +62,163 @@ class BusinessPartnerControllerIT @Autowired constructor(
         }
     }
 
-    lateinit var createdLegalEntity: LegalEntityPoolUpsertResponse
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
         testHelpers.createTestMetadata(webTestClient)
-        val createdStructure = testHelpers.createBusinessPartnerStructure(
-            listOf(LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1)),
-            webTestClient
-        )
-        createdLegalEntity = createdStructure[0].legalEntity
     }
 
     /**
-     * Given business partner imported
+     * Given no legal entities
+     * When creating new legal entity
+     * Then new legal entity is created with first BPN
+     */
+    @Test
+    fun `create new legal entity`() {
+        val expectedBpn = CommonValues.bpnL1
+        val expected = ResponseValues.legalEntityUpsert1.copy(bpn = expectedBpn)
+
+        val toCreate = RequestValues.legalEntityCreate1
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(toCreate))
+
+        assertThat(response.size).isEqualTo(1)
+        assertThat(response.single())
+            .usingRecursiveComparison()
+            .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name)
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given no legal entities
+     * When creating new legal entities
+     * Then new legal entities created
+     */
+    @Test
+    fun `create new legal entities`() {
+        val expected = listOf(ResponseValues.legalEntityUpsert1, ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
+
+        val toCreate = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
+
+        testHelpers.assertThatCreatedLegalEntitiesEqual(response, expected)
+    }
+
+    /**
+     * Given legal entity
+     * When creating legal entities
+     * Then only create new legal entities with different identifiers
+     */
+    @Test
+    fun `don't create legal entity with same identifier`() {
+        val given = with(RequestValues.legalEntityCreate1) { copy(properties = properties.copy(identifiers = listOf(RequestValues.identifier1))) }
+        webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(given))
+
+        val expected = listOf(ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
+
+        val toCreate = listOf(given, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
+
+        testHelpers.assertThatCreatedLegalEntitiesEqual(response, expected)
+    }
+
+    /**
+     * Given legal entity
+     * When updating values of legal entity via BPN
+     * Then legal entity updated with the values
+     */
+    @Test
+    fun `update existing legal entities`() {
+        val given = listOf(RequestValues.legalEntityCreate1)
+        val givenBpn = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
+            .single().bpn
+
+        val expected = listOf(ResponseValues.legalEntityUpsert3.copy(bpn = givenBpn))
+
+        val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = givenBpn))
+        val response = webTestClient.invokePutWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
+
+        testHelpers.assertThatModifiedLegalEntitiesEqual(response, expected)
+    }
+
+    /**
+     * Given legal entities
+     * When trying to update via non-existent BPN
+     * Then don't update
+     */
+    @Test
+    fun `ignore legal entity update `() {
+        val given = listOf(RequestValues.legalEntityCreate1)
+        webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
+
+        val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = "NONEXISTENT"))
+        val response = webTestClient.invokePutWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
+
+        assertThat(response).isEmpty()
+    }
+
+    /**
+     * Given legal addresses of legal entities
+     * When asking for legal addresses via BPNs of those legal entities
+     * Then get those legal addresses
+     */
+    @Test
+    fun `find legal addresses by BPN`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map { LegalAddressSearchResponse(it.bpn, it.legalAddress) }
+
+        val bpnsToSearch = givenLegalEntities.map { it.bpn }
+        val response = webTestClient.invokePostWithArrayResponse<LegalAddressSearchResponse>(EndpointValues.CATENA_LEGAL_ADDRESS_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When asking for legal address with wrong and correct BPNLs
+     * Then only get legal addresses with correct BPNLs
+     */
+    fun `only find legal addresses with matching BPNLs`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map { LegalAddressSearchResponse(it.bpn, it.legalAddress) }.take(2)
+
+        val bpnsToSearch = expected.map { it.legalEntity }.plus("NONEXISTENT")
+        val response = webTestClient.invokePostWithArrayResponse<LegalAddressSearchResponse>(EndpointValues.CATENA_LEGAL_ADDRESS_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given business partner
      * When updating currentness of an imported business partner
      * Then currentness timestamp is updated
      */
     @Test
     fun `set business partner currentness`() {
-        val bpnL = createdLegalEntity.bpn
+        val given = listOf(RequestValues.legalEntityCreate1)
+        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given).single().bpn
         val initialCurrentness = retrieveCurrentness(bpnL)
         val instantBeforeCurrentnessUpdate = Instant.now()
 

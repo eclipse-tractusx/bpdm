@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
@@ -43,8 +44,14 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
     val objectMapper: ObjectMapper,
-    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
+    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
+
+    private val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
+    private val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
+    private val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
+
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
 
@@ -179,6 +186,42 @@ class TestHelpers(
         startSyncAndAwaitSuccess(client, EndpointValues.CDQ_SYNCH_PATH)
 
         return client.invokeGetEndpoint(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+    }
+
+    /**
+     * Asserts whether the [actuals] create response of legal entities matches the expected values
+     * BPNs are just checked for matching the valid pattern
+     * Currentness is just checked for being recent
+     */
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPoolUpsertResponse>, expected: Collection<LegalEntityPoolUpsertResponse>) {
+        val now = Instant.now()
+        val justBeforeCreate = now.minusSeconds(2)
+        actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
+        actuals.forEach { Assertions.assertThat(it.bpn).matches(bpnLPattern) }
+
+        Assertions.assertThat(actuals)
+            .usingRecursiveComparison()
+            .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::bpn.name)
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPoolUpsertResponse>, expected: Collection<LegalEntityPoolUpsertResponse>) {
+        val now = Instant.now()
+        val justBeforeCreate = now.minusSeconds(2)
+        actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
+
+        Assertions.assertThat(actuals)
+            .usingRecursiveComparison()
+            .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::index.name)
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    private fun createBpnPattern(typeId: Char): String {
+        return "${bpnConfigProperties.id}$typeId[${bpnConfigProperties.alphabet}]{${bpnConfigProperties.counterDigits + 2}}"
     }
 
     fun extractCdqId(it: LegalEntityResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value

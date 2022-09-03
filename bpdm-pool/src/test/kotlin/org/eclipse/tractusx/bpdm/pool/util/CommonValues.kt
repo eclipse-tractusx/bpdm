@@ -30,6 +30,7 @@ import java.util.*
  */
 object CommonValues {
 
+    //The BPNs should match the first generated BPNs from the Issuer in order
     val bpnL1 = "BPNL000000000001"
     val bpnL2 = "BPNL0000000001YN"
     val bpnL3 = "BPNS0000000002XY"
