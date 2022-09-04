@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
-import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.service.toSearchDto
 import org.springframework.data.domain.Page
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SearchServiceMock(
-    val businessPartnerRepository: BusinessPartnerRepository
+    val legalEntityRepository: LegalEntityRepository
 ) : SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -53,7 +53,7 @@ class SearchServiceMock(
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse> {
         val resultPage =
-            businessPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+            legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         logger.info { "Mock search: Returning ${resultPage.size} business partners from database" }
 

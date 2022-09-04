@@ -35,11 +35,11 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun BusinessPartner.toSearchDto(score: Float): LegalEntityMatchResponse {
+fun LegalEntity.toSearchDto(score: Float): LegalEntityMatchResponse {
     return LegalEntityMatchResponse(score, this.toPoolDto())
 }
 
-fun BusinessPartner.toPoolDto(): LegalEntityPartnerResponse {
+fun LegalEntity.toPoolDto(): LegalEntityPartnerResponse {
     return LegalEntityPartnerResponse(
         bpn,
         toDto(),
@@ -47,7 +47,7 @@ fun BusinessPartner.toPoolDto(): LegalEntityPartnerResponse {
     )
 }
 
-fun BusinessPartner.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
+fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
         bpn,
         toDto(),
@@ -57,7 +57,7 @@ fun BusinessPartner.toUpsertDto(entryId: String?): LegalEntityPartnerCreateRespo
     )
 }
 
-fun BusinessPartner.toDto(): LegalEntityResponse {
+fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
         identifiers.map { it.toDto() },
         names.map { it.toDto() },
@@ -108,7 +108,7 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 }
 
 
-fun PartnerAddress.toDto(): AddressPartnerResponse {
+fun AddressPartner.toDto(): AddressPartnerResponse {
     return AddressPartnerResponse(
         bpn,
         address.toDto()
@@ -145,14 +145,14 @@ fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
     )
 }
 
-fun PartnerAddress.toPoolDto(): AddressPartnerResponse {
+fun AddressPartner.toPoolDto(): AddressPartnerResponse {
     return AddressPartnerResponse(
         bpn,
         address.toDto()
     )
 }
 
-fun PartnerAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateResponse {
     return AddressPartnerCreateResponse(
         bpn,
         address.toDto(),
@@ -160,7 +160,7 @@ fun PartnerAddress.toCreateResponse(index: String?): AddressPartnerCreateRespons
     )
 }
 
-fun PartnerAddress.toDtoWithReference(): AddressPartnerSearchResponse {
+fun AddressPartner.toDtoWithReference(): AddressPartnerSearchResponse {
     return AddressPartnerSearchResponse(
         toDto(),
         partner?.bpn,

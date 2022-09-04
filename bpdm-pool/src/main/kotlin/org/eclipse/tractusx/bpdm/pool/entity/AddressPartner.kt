@@ -23,18 +23,18 @@ import javax.persistence.*
 
 @Entity
 @Table(
-    name = "partner_addresses",
+    name = "address_partners",
     indexes = [
         Index(columnList = "partner_id"),
         Index(columnList = "site_id"),
     ]
 )
-class PartnerAddress(
+class AddressPartner(
     @Column(name = "bpn", nullable = true, unique = true)
     var bpn: String,
     @ManyToOne
     @JoinColumn(name = "partner_id")
-    var partner: BusinessPartner?,
+    var partner: LegalEntity?,
     @ManyToOne
     @JoinColumn(name = "site_id")
     var site: Site?,

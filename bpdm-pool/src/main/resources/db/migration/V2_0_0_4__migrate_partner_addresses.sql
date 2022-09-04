@@ -31,7 +31,7 @@ SET main_address_id = subquery.id FROM(
 WHERE subquery.site_id = sites.id AND subquery.rn = 1;
 
 -- the remaining addresses of a legal entity will be business partner addresses
-INSERT INTO partner_addresses(id, uuid, created_at, updated_at, bpn, partner_id, address_id)
+INSERT INTO address_partners(id, uuid, created_at, updated_at, bpn, partner_id, address_id)
 SELECT nextval('bpdm_sequence'), gen_random_uuid(), created_at, updated_at, bpn, partner_id, address_id
 FROM (SELECT id as address_id, created_at, updated_at, bpn, partner_id, row_number() over(partition BY partner_id  ORDER BY created_at DESC) AS rn
       FROM addresses
@@ -39,7 +39,7 @@ FROM (SELECT id as address_id, created_at, updated_at, bpn, partner_id, row_numb
 WHERE rn > 1;
 
 -- the remaining addresses of a legal entity will be business partner addresses
-INSERT INTO partner_addresses(id, uuid, created_at, updated_at, bpn, site_id, address_id)
+INSERT INTO address_partners(id, uuid, created_at, updated_at, bpn, site_id, address_id)
 SELECT nextval('bpdm_sequence'), gen_random_uuid(), created_at, updated_at, bpn, site_id, address_id
 FROM (SELECT id as address_id, created_at, updated_at, bpn, site_id, row_number() over(partition BY site_id  ORDER BY created_at DESC) AS rn
       FROM addresses

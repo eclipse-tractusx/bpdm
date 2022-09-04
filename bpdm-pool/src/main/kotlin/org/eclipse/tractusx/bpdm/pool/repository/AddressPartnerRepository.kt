@@ -19,32 +19,32 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerAddress
+import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface PartnerAddressRepository : PagingAndSortingRepository<PartnerAddress, Long> {
+interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, Long> {
 
-    @Query("SELECT a FROM PartnerAddress a join a.partner p where p.bpn=:bpn")
-    fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<PartnerAddress>
+    @Query("SELECT a FROM AddressPartner a join a.partner p where p.bpn=:bpn")
+    fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<AddressPartner>
 
-    fun findByPartnerInOrSiteIn(partners: Collection<BusinessPartner>, sites: Collection<Site>, pageable: Pageable): Page<PartnerAddress>
+    fun findByPartnerInOrSiteIn(partners: Collection<LegalEntity>, sites: Collection<Site>, pageable: Pageable): Page<AddressPartner>
 
-    fun findByBpn(bpn: String): PartnerAddress?
+    fun findByBpn(bpn: String): AddressPartner?
 
-    fun findDistinctByBpnIn(bpns: Collection<String>): Set<PartnerAddress>
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<AddressPartner>
 
-    @Query("SELECT DISTINCT a FROM PartnerAddress a LEFT JOIN FETCH a.partner WHERE a IN :addresses")
-    fun joinLegalEntities(addresses: Set<PartnerAddress>): Set<PartnerAddress>
+    @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.partner WHERE a IN :addresses")
+    fun joinLegalEntities(addresses: Set<AddressPartner>): Set<AddressPartner>
 
-    @Query("SELECT DISTINCT a FROM PartnerAddress a LEFT JOIN FETCH a.site WHERE a IN :addresses")
-    fun joinSites(addresses: Set<PartnerAddress>): Set<PartnerAddress>
+    @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.site WHERE a IN :addresses")
+    fun joinSites(addresses: Set<AddressPartner>): Set<AddressPartner>
 
-    @Query("SELECT DISTINCT a FROM PartnerAddress a LEFT JOIN FETCH a.address WHERE a IN :addresses")
-    fun joinAddresses(addresses: Set<PartnerAddress>): Set<PartnerAddress>
+    @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.address WHERE a IN :addresses")
+    fun joinAddresses(addresses: Set<AddressPartner>): Set<AddressPartner>
 
 }

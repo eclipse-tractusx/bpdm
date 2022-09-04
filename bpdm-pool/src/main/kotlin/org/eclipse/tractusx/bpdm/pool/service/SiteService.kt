@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Site
-import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -34,11 +34,11 @@ import org.springframework.stereotype.Service
 @Service
 class SiteService(
     private val siteRepository: SiteRepository,
-    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val legalEntityRepository: LegalEntityRepository,
     private val addressService: AddressService
 ) {
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SitePartnerResponse> {
-        if (!businessPartnerRepository.existsByBpn(bpn)) {
+        if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
 
@@ -49,7 +49,7 @@ class SiteService(
 
     fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
         val partners =
-            if (siteSearchRequest.legalEntities.isNotEmpty()) businessPartnerRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
+            if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage = siteRepository.findByPartnerIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
         return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })

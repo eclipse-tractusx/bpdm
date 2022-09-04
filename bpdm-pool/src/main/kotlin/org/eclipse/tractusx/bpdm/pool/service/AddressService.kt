@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.Address
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerAddress
+import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRepository
-import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -35,39 +35,39 @@ import javax.transaction.Transactional
 
 @Service
 class AddressService(
-    private val partnerAddressRepository: PartnerAddressRepository,
-    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val addressPartnerRepository: AddressPartnerRepository,
+    private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
     private val addressRepository: AddressRepository
 ) {
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressPartnerResponse> {
-        if (!businessPartnerRepository.existsByBpn(bpn)) {
+        if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
 
-        val page = partnerAddressRepository.findByPartnerBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        val page = addressPartnerRepository.findByPartnerBpn(bpn, PageRequest.of(pageIndex, pageSize))
         fetchPartnerAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
 
     fun findByBpn(bpn: String): AddressPartnerSearchResponse {
-        val address = partnerAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
+        val address = addressPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDtoWithReference()
     }
 
     @Transactional
     fun findByPartnerAndSiteBpns(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressPartnerSearchResponse> {
-        val partners = if (searchRequest.legalEntities.isNotEmpty()) businessPartnerRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
+        val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
-        val addressPage = partnerAddressRepository.findByPartnerInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val addressPage = addressPartnerRepository.findByPartnerInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
         return addressPage.toDto(addressPage.content.map { it.toDtoWithReference() })
     }
 
     fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressSearchResponse> {
-        val legalEntities = businessPartnerRepository.findDistinctByBpnIn(bpnLs)
-        businessPartnerRepository.joinLegalAddresses(legalEntities)
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
+        legalEntityRepository.joinLegalAddresses(legalEntities)
         val bpnAddressPairs = legalEntities.map { Pair(it.bpn, it.legalAddress) }
         fetchAddressDependencies(bpnAddressPairs.map { (_, legalAddress) -> legalAddress }.toSet())
         return bpnAddressPairs.map { (bpn, legalAddress) -> legalAddress.toLegalSearchResponse(bpn) }
@@ -81,14 +81,14 @@ class AddressService(
         return bpnAddressPairs.map { (bpn, legalAddress) -> legalAddress.toMainSearchResponse(bpn) }
     }
 
-    fun fetchPartnerAddressDependencies(partnerAddresses: Set<PartnerAddress>): Set<PartnerAddress> {
-        partnerAddressRepository.joinLegalEntities(partnerAddresses)
-        partnerAddressRepository.joinSites(partnerAddresses)
-        partnerAddressRepository.joinAddresses(partnerAddresses)
+    fun fetchPartnerAddressDependencies(addressPartners: Set<AddressPartner>): Set<AddressPartner> {
+        addressPartnerRepository.joinLegalEntities(addressPartners)
+        addressPartnerRepository.joinSites(addressPartners)
+        addressPartnerRepository.joinAddresses(addressPartners)
 
-        fetchAddressDependencies(partnerAddresses.map { it.address }.toSet())
+        fetchAddressDependencies(addressPartners.map { it.address }.toSet())
 
-        return partnerAddresses
+        return addressPartners
     }
 
     fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {

@@ -30,12 +30,12 @@ class Site(
     var name: String,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    var partner: BusinessPartner,
+    var partner: LegalEntity,
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     var mainAddress: Address
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<PartnerAddress> = mutableSetOf()
+    val addresses: MutableSet<AddressPartner> = mutableSetOf()
 }

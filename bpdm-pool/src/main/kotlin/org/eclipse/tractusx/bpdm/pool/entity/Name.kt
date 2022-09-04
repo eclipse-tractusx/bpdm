@@ -42,7 +42,7 @@ class Name(
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,
     @ManyToOne
-    @JoinColumn(name="partner_id", nullable=false)
-    var partner: BusinessPartner
+    @JoinColumn(name = "partner_id", nullable = false)
+    var partner: LegalEntity
 ) : BaseEntity()
 

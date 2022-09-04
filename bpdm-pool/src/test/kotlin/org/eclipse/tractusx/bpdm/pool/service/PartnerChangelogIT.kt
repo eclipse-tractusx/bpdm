@@ -155,7 +155,7 @@ class PartnerChangelogIT @Autowired constructor(
 
     private fun retrieveChangelog(bpn: String) = webTestClient
         .get()
-        .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}" + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
+        .uri(EndpointValues.CATENA_BUSINESS_PARTNERS_PATH + "/${bpn}" + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
         .exchange().expectStatus().isOk
         .returnResult<PageResponse<ChangelogEntryResponse>>()
         .responseBody

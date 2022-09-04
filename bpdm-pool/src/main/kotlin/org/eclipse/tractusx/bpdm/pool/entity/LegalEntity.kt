@@ -25,23 +25,23 @@ import javax.persistence.*
 
 @Entity
 @Table(
-    name = "business_partners",
+    name = "legal_entities",
     indexes = [Index(columnList = "legal_form_id")]
 )
-class BusinessPartner(
+class LegalEntity(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
-    @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")], indexes = [Index(columnList = "partner_id")])
+    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "partner_id")], indexes = [Index(columnList = "partner_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     var types: Set<BusinessPartnerType>,
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "business_partners_roles",
+        name = "legal_entity_roles",
         joinColumns = [JoinColumn(name = "partner_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")],
         indexes = [Index(columnList = "partner_id")]
@@ -63,7 +63,7 @@ class BusinessPartner(
     val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<PartnerAddress> = mutableSetOf()
+    val addresses: MutableSet<AddressPartner> = mutableSetOf()
 
     @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()

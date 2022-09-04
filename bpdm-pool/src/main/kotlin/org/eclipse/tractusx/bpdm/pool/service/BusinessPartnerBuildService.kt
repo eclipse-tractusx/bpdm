@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
-import org.eclipse.tractusx.bpdm.pool.repository.PartnerAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -44,12 +44,12 @@ import java.time.Instant
 @Service
 class BusinessPartnerBuildService(
     private val bpnIssuingService: BpnIssuingService,
-    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val legalEntityRepository: LegalEntityRepository,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val metadataMappingService: MetadataMappingService,
     private val changelogService: PartnerChangelogService,
     private val siteRepository: SiteRepository,
-    private val partnerAddressRepository: PartnerAddressRepository,
+    private val addressPartnerRepository: AddressPartnerRepository,
     private val identifierRepository: IdentifierRepository
 ) {
 
@@ -74,7 +74,7 @@ class BusinessPartnerBuildService(
         val legalEntities = bpnMap.values.map { (legalEntity, _) -> legalEntity }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
-        businessPartnerRepository.saveAll(legalEntities)
+        legalEntityRepository.saveAll(legalEntities)
 
         return legalEntities.map { it.toUpsertDto(bpnMap[it.bpn]!!.second) }
     }
@@ -83,7 +83,7 @@ class BusinessPartnerBuildService(
     fun createSites(requests: Collection<SitePartnerCreateRequest>): Collection<SitePartnerCreateResponse> {
         logger.info { "Create ${requests.size} new sites" }
 
-        val legalEntities = businessPartnerRepository.findDistinctByBpnIn(requests.map { it.legalEntity })
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.legalEntity })
         val legalEntityMap = legalEntities.associateBy { it.bpn }
 
         val validRequests = requests.filter { legalEntityMap[it.legalEntity] != null }
@@ -122,7 +122,7 @@ class BusinessPartnerBuildService(
 
         changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
 
-        return partnerAddressRepository.saveAll(addresses).map { it.toCreateResponse(bpnaMap[it.bpn]!!.second) }
+        return addressPartnerRepository.saveAll(addresses).map { it.toCreateResponse(bpnaMap[it.bpn]!!.second) }
     }
 
     /**
@@ -134,7 +134,7 @@ class BusinessPartnerBuildService(
         val metadataMap = metadataMappingService.mapRequests(requests.map { it.properties })
 
         val bpnsToFetch = requests.map { it.bpn }
-        val legalEntities = businessPartnerRepository.findDistinctByBpnIn(bpnsToFetch)
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
         businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntities)
 
         if (legalEntities.size != bpnsToFetch.size) {
@@ -147,7 +147,7 @@ class BusinessPartnerBuildService(
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE) })
 
-        return businessPartnerRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
+        return legalEntityRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
     }
 
     @Transactional
@@ -171,7 +171,7 @@ class BusinessPartnerBuildService(
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPartnerResponse> {
         logger.info { "Update ${requests.size} business partner addresses" }
 
-        val addresses = partnerAddressRepository.findDistinctByBpnIn(requests.map { it.bpn })
+        val addresses = addressPartnerRepository.findDistinctByBpnIn(requests.map { it.bpn })
 
         if (addresses.size != requests.size) {
             val notFetched = requests.map { it.bpn }.minus(addresses.map { it.bpn }.toSet())
@@ -183,17 +183,17 @@ class BusinessPartnerBuildService(
 
         changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE) })
 
-        return partnerAddressRepository.saveAll(addresses).map { it.toPoolDto() }
+        return addressPartnerRepository.saveAll(addresses).map { it.toPoolDto() }
     }
 
     @Transactional
     fun setBusinessPartnerCurrentness(bpn: String) {
         logger.info { "Updating currentness of business partner $bpn" }
-        val partner = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
+        val partner = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
         partner.currentness = Instant.now()
     }
 
-    private fun createLegalEntityAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<PartnerAddress, String?>> {
+    private fun createLegalEntityAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
         val bpnLsToFetch = requests.map { it.parent }
         val legalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
         val bpnlMap = legalEntities.associateBy { it.bpn }
@@ -211,7 +211,7 @@ class BusinessPartnerBuildService(
             .map { (request, bpna) -> Pair(createPartnerAddress(request.properties, bpna, bpnlMap[request.parent], null), request.index) }
     }
 
-    private fun createSiteAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<PartnerAddress, String?>> {
+    private fun createSiteAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
         val bpnsToFetch = requests.map { it.parent }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
         val bpnsMap = sites.associateBy { it.bpn }
@@ -233,11 +233,11 @@ class BusinessPartnerBuildService(
         dto: LegalEntityDto,
         bpnL: String,
         metadataMap: MetadataMappingDto
-    ): BusinessPartner {
+    ): LegalEntity {
         val legalForm = if (dto.legalForm != null) metadataMap.legalForms[dto.legalForm]!! else null
 
         val legalAddress = createAddress(dto.legalAddress)
-        val partner = BusinessPartner(bpnL, legalForm, dto.types.toSet(), emptySet(), Instant.now(), legalAddress)
+        val partner = LegalEntity(bpnL, legalForm, dto.types.toSet(), emptySet(), Instant.now(), legalAddress)
 
         return updateLegalEntity(partner, dto, metadataMap)
     }
@@ -245,7 +245,7 @@ class BusinessPartnerBuildService(
     private fun createSite(
         dto: SiteDto,
         bpnS: String,
-        partner: BusinessPartner
+        partner: LegalEntity
     ): Site {
         val mainAddress = createAddress(dto.mainAddress)
         val site = Site(bpnS, dto.name, partner, mainAddress)
@@ -255,10 +255,10 @@ class BusinessPartnerBuildService(
 
 
     private fun updateLegalEntity(
-        partner: BusinessPartner,
+        partner: LegalEntity,
         request: LegalEntityDto,
         metadataMap: MetadataMappingDto
-    ): BusinessPartner {
+    ): LegalEntity {
         partner.names.clear()
         partner.identifiers.clear()
         partner.stati.clear()
@@ -303,19 +303,19 @@ class BusinessPartnerBuildService(
     private fun createPartnerAddress(
         dto: AddressDto,
         bpn: String,
-        partner: BusinessPartner?,
+        partner: LegalEntity?,
         site: Site?
-    ): PartnerAddress {
-        val partnerAddress = PartnerAddress(
+    ): AddressPartner {
+        val addressPartner = AddressPartner(
             bpn,
             partner,
             site,
             createAddress(dto)
         )
 
-        updateAddress(partnerAddress.address, dto)
+        updateAddress(addressPartner.address, dto)
 
-        return partnerAddress
+        return addressPartner
     }
 
     private fun updateAddress(address: Address, dto: AddressDto): Address{
@@ -344,11 +344,11 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun toEntity(dto: BusinessStatusDto, partner: BusinessPartner): BusinessStatus {
+    private fun toEntity(dto: BusinessStatusDto, partner: LegalEntity): BusinessStatus {
         return BusinessStatus(dto.officialDenotation, dto.validFrom, dto.validUntil, dto.type, partner)
     }
 
-    private fun toEntity(dto: BankAccountDto, partner: BusinessPartner): BankAccount {
+    private fun toEntity(dto: BankAccountDto, partner: LegalEntity): BankAccount {
         return BankAccount(
             dto.trustScores.toSet(),
             dto.currency,
@@ -360,18 +360,18 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: NameDto, partner: BusinessPartner): Name {
+    private fun toEntity(dto: NameDto, partner: LegalEntity): Name {
         return Name(dto.value, dto.shortName, dto.type, dto.language, partner)
     }
 
-    private fun toEntity(dto: ClassificationDto, partner: BusinessPartner): Classification {
+    private fun toEntity(dto: ClassificationDto, partner: LegalEntity): Classification {
         return Classification(dto.value, dto.code, dto.type, partner)
     }
 
     private fun toEntity(
         dto: IdentifierDto,
         metadataMap: MetadataMappingDto,
-        partner: BusinessPartner
+        partner: LegalEntity
     ): Identifier {
         return toEntity(dto,
             metadataMap.idTypes[dto.type]!!,
@@ -380,7 +380,7 @@ class BusinessPartnerBuildService(
             partner)
     }
 
-    private fun toEntity(dto: IdentifierDto, type: IdentifierType, status: IdentifierStatus?, issuingBody: IssuingBody?, partner: BusinessPartner): Identifier {
+    private fun toEntity(dto: IdentifierDto, type: IdentifierType, status: IdentifierStatus?, issuingBody: IssuingBody?, partner: LegalEntity): Identifier {
         return Identifier(dto.value, type, status, issuingBody, partner)
     }
 

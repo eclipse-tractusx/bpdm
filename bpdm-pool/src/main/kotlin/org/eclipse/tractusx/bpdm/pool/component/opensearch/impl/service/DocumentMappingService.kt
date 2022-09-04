@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.entity.Address
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.springframework.stereotype.Service
 
 /**
@@ -35,7 +35,7 @@ class DocumentMappingService {
     /**
      * Maps [partner] to [BusinessPartnerDoc] representation
      */
-    fun toDocument(partner: BusinessPartner): BusinessPartnerDoc {
+    fun toDocument(partner: LegalEntity): BusinessPartnerDoc {
         val partnerStatus = partner.stati.maxWithOrNull(compareBy { it.validFrom })
         return BusinessPartnerDoc(
             partner.bpn,
