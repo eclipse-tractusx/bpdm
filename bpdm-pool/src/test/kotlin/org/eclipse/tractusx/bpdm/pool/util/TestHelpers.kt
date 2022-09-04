@@ -194,32 +194,6 @@ class TestHelpers(
         return client.invokeGetEndpoint(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
     }
 
-    /**
-     * Asserts whether the [actuals] create response of legal entities matches the expected values
-     * BPNs are just checked for matching the valid pattern
-     * Currentness is just checked for being recent
-     */
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
-        val now = Instant.now()
-        val justBeforeCreate = now.minusSeconds(2)
-        actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
-        actuals.forEach { Assertions.assertThat(it.bpn).matches(bpnLPattern) }
-
-        assertRecursively(actuals)
-            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::bpn.name)
-            .isEqualTo(expected)
-    }
-
-    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
-        val now = Instant.now()
-        val justBeforeCreate = now.minusSeconds(2)
-        actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
-
-        assertRecursively(actuals)
-            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::index.name)
-            .isEqualTo(expected)
-    }
-
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
         return Assertions.assertThat(actual)
             .usingRecursiveComparison()

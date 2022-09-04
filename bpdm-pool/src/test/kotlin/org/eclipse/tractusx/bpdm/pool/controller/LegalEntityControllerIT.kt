@@ -103,7 +103,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val toCreate = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
         val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
 
-        testHelpers.assertThatCreatedLegalEntitiesEqual(response, expected)
+        assertThatCreatedLegalEntitiesEqual(response, expected)
     }
 
     /**
@@ -121,7 +121,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val toCreate = listOf(given, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
         val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
 
-        testHelpers.assertThatCreatedLegalEntitiesEqual(response, expected)
+        assertThatCreatedLegalEntitiesEqual(response, expected)
     }
 
     /**
@@ -140,7 +140,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = givenBpn))
         val response = webTestClient.invokePutWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
 
-        testHelpers.assertThatModifiedLegalEntitiesEqual(response, expected)
+        assertThatModifiedLegalEntitiesEqual(response, expected)
     }
 
     /**
@@ -242,6 +242,27 @@ class LegalEntityControllerIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isNotFound
+    }
+
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
+        val now = Instant.now()
+        val justBeforeCreate = now.minusSeconds(2)
+        actuals.forEach { assertThat(it.currentness).isBetween(justBeforeCreate, now) }
+        actuals.forEach { assertThat(it.bpn).matches(testHelpers.bpnLPattern) }
+
+        testHelpers.assertRecursively(actuals)
+            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::bpn.name)
+            .isEqualTo(expected)
+    }
+
+    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
+        val now = Instant.now()
+        val justBeforeCreate = now.minusSeconds(2)
+        actuals.forEach { assertThat(it.currentness).isBetween(justBeforeCreate, now) }
+
+        testHelpers.assertRecursively(actuals)
+            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::index.name)
+            .isEqualTo(expected)
     }
 
     private fun retrieveCurrentness(bpn: String) = webTestClient
