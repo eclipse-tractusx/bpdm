@@ -64,7 +64,7 @@ class BusinessPartnerController(
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<BusinessPartnerSearchResponse> {
+    ): PageResponse<LegalEntityMatchResponse> {
         return searchService.searchBusinessPartners(
             BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             paginationRequest
@@ -95,7 +95,7 @@ class BusinessPartnerController(
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam
         idType: String?
-    ): LegalEntityPoolResponse {
+    ): LegalEntityPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findPartner(idValue)
         else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
@@ -154,7 +154,7 @@ class BusinessPartnerController(
     fun getSites(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse> {
+    ): PageResponse<SitePartnerResponse> {
         return siteService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
     }
 
@@ -173,7 +173,7 @@ class BusinessPartnerController(
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressPoolResponse> {
+    ): PageResponse<AddressPartnerResponse> {
         return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
     }
 

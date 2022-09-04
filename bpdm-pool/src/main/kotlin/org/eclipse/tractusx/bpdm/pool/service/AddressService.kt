@@ -40,7 +40,7 @@ class AddressService(
     private val siteRepository: SiteRepository,
     private val addressRepository: AddressRepository
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressPoolResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressPartnerResponse> {
         if (!businessPartnerRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -50,13 +50,13 @@ class AddressService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByBpn(bpn: String): AddressWithReferenceResponse {
+    fun findByBpn(bpn: String): AddressPartnerSearchResponse {
         val address = partnerAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDtoWithReference()
     }
 
     @Transactional
-    fun findByPartnerAndSiteBpns(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressWithReferenceResponse> {
+    fun findByPartnerAndSiteBpns(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressPartnerSearchResponse> {
         val partners = if (searchRequest.legalEntities.isNotEmpty()) businessPartnerRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 

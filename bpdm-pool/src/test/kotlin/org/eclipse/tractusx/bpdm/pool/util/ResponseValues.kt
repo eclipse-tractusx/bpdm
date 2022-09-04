@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import java.time.ZoneOffset
 
 /**
@@ -135,7 +134,6 @@ object ResponseValues {
     val premise3 = PremiseResponse(value = CommonValues.premise3, type = premiseType1, language = language0)
     val premise4 = PremiseResponse(value = CommonValues.premise4, type = premiseType1, language = language0)
     val premise5 = PremiseResponse(value = CommonValues.premise5, type = premiseType1, language = language0)
-    val premise6 = PremiseResponse(value = CommonValues.premise6, type = premiseType1, language = language0)
 
     val postalDeliveryPointType1 = TypeKeyNameUrlDto(
         CommonValues.postalDeliveryPointType1,
@@ -189,75 +187,69 @@ object ResponseValues {
         postalDeliveryPoints = listOf(postalDeliveryPoint5)
     )
 
-    val address4 = AddressResponse(
-        version = version1,
-        country = country1,
-        premises = listOf(premise6)
-    )
-
-    val addressPartner1 = AddressPoolResponse(
+    val addressPartner1 = AddressPartnerResponse(
         bpn = CommonValues.bpnA1,
         properties = address1
     )
 
-    val addressPartner2 = AddressPoolResponse(
+    val addressPartner2 = AddressPartnerResponse(
         bpn = CommonValues.bpnA2,
         properties = address2
     )
 
-    val addressPartner3 = AddressPoolResponse(
+    val addressPartner3 = AddressPartnerResponse(
         bpn = CommonValues.bpnA3,
         properties = address3
     )
 
-    val addressPartnerCreate1 = AddressCreateResponse(
+    val addressPartnerCreate1 = AddressPartnerCreateResponse(
         bpn = addressPartner1.bpn,
         properties = addressPartner1.properties,
         index = CommonValues.index1
     )
 
-    val addressPartnerCreate2 = AddressCreateResponse(
+    val addressPartnerCreate2 = AddressPartnerCreateResponse(
         bpn = addressPartner2.bpn,
         properties = addressPartner2.properties,
         index = CommonValues.index2
     )
 
-    val addressPartnerCreate3 = AddressCreateResponse(
+    val addressPartnerCreate3 = AddressPartnerCreateResponse(
         bpn = addressPartner3.bpn,
         properties = addressPartner3.properties,
         index = CommonValues.index3
     )
 
-    val site1 = SiteResponse(
+    val site1 = SitePartnerResponse(
         CommonValues.bpnS1,
         CommonValues.siteName1
     )
 
-    val site2 = SiteResponse(
+    val site2 = SitePartnerResponse(
         CommonValues.bpnS2,
         CommonValues.siteName2
     )
 
-    val site3 = SiteResponse(
+    val site3 = SitePartnerResponse(
         CommonValues.bpnS3,
         CommonValues.siteName3,
     )
 
-    val siteUpsert1 = SiteUpsertResponse(
+    val siteUpsert1 = SitePartnerCreateResponse(
         site1.bpn,
         site1.name,
         address1,
         CommonValues.index1
     )
 
-    val siteUpsert2 = SiteUpsertResponse(
+    val siteUpsert2 = SitePartnerCreateResponse(
         site2.bpn,
         site2.name,
         address2,
         CommonValues.index2
     )
 
-    val siteUpsert3 = SiteUpsertResponse(
+    val siteUpsert3 = SitePartnerCreateResponse(
         site3.bpn,
         site3.name,
         address3,
@@ -265,7 +257,7 @@ object ResponseValues {
     )
 
 
-    val legalEntity1 = LegalEntityPoolResponse(
+    val legalEntity1 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL1,
         properties = LegalEntityResponse(
             names = listOf(name1, name2),
@@ -277,7 +269,7 @@ object ResponseValues {
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
-    val legalEntity2 = LegalEntityPoolResponse(
+    val legalEntity2 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL2,
         properties = LegalEntityResponse(
             names = listOf(name3, name4),
@@ -289,7 +281,7 @@ object ResponseValues {
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
-    val legalEntity3 = LegalEntityPoolResponse(
+    val legalEntity3 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL3,
         properties = LegalEntityResponse(
             names = listOf(name5),
@@ -301,7 +293,7 @@ object ResponseValues {
         currentness = CdqValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
 
-    val legalEntityUpsert1 = LegalEntityPoolUpsertResponse(
+    val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
         bpn = legalEntity1.bpn,
         properties = legalEntity1.properties,
         currentness = legalEntity1.currentness,
@@ -309,7 +301,7 @@ object ResponseValues {
         index = CommonValues.index1
     )
 
-    val legalEntityUpsert2 = LegalEntityPoolUpsertResponse(
+    val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
         bpn = legalEntity2.bpn,
         properties = legalEntity2.properties,
         currentness = legalEntity2.currentness,
@@ -317,7 +309,7 @@ object ResponseValues {
         index = CommonValues.index2
     )
 
-    val legalEntityUpsert3 = LegalEntityPoolUpsertResponse(
+    val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
         bpn = legalEntity3.bpn,
         properties = legalEntity3.properties,
         currentness = legalEntity3.currentness,

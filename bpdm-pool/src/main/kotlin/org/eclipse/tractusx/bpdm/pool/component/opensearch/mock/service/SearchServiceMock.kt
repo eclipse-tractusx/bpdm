@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
@@ -51,7 +51,7 @@ class SearchServiceMock(
     override fun searchBusinessPartners(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<BusinessPartnerSearchResponse> {
+    ): PageResponse<LegalEntityMatchResponse> {
         val resultPage =
             businessPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 

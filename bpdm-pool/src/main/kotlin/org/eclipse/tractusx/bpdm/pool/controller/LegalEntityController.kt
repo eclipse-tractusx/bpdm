@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.springframework.web.bind.annotation.*
@@ -73,7 +73,7 @@ class LegalEntityController(
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPoolUpsertResponse> {
+    ): Collection<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
@@ -93,7 +93,7 @@ class LegalEntityController(
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPoolUpsertResponse> {
+    ): Collection<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
 

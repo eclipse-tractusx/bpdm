@@ -30,8 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteWithReferenceResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -78,7 +78,7 @@ class SiteController(
     @GetMapping("/{bpn}")
     fun getSite(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
-    ): SiteWithReferenceResponse {
+    ): SitePartnerSearchResponse {
         return siteService.findByBpn(bpn)
     }
 
@@ -96,7 +96,7 @@ class SiteController(
     fun searchSites(
         @RequestBody siteSearchRequest: SiteSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SiteWithReferenceResponse> {
+    ): PageResponse<SitePartnerSearchResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
@@ -116,7 +116,7 @@ class SiteController(
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
-    ): Collection<SiteUpsertResponse> {
+    ): Collection<SitePartnerCreateResponse> {
         return businessPartnerBuildService.createSites(requests)
     }
 
@@ -135,7 +135,7 @@ class SiteController(
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
-    ): Collection<SiteUpsertResponse> {
+    ): Collection<SitePartnerCreateResponse> {
         return businessPartnerBuildService.updateSites(requests)
     }
 }

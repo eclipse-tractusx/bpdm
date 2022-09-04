@@ -26,23 +26,29 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import java.time.Instant
 
-@JsonDeserialize(using = AddressPoolResponseDeserializer::class)
-@Schema(name = "Address Pool Response", description = "Address information with BPN")
-data class AddressPoolResponse(
+@JsonDeserialize(using = LegalEntityPartnerResponse.CustomDeserializer::class)
+@Schema(name = "Legal Entity Partner Response", description = "Business partner of type legal entity with currentness")
+data class LegalEntityPartnerResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,
     @JsonUnwrapped
-    val properties: AddressResponse
-)
-
-class AddressPoolResponseDeserializer(vc: Class<AddressPoolResponse>?) : StdDeserializer<AddressPoolResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPoolResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressPoolResponse(
-            node.get(AddressPoolResponse::bpn.name).textValue(),
-            ctxt.readTreeAsValue(node, AddressResponse::class.java)
-        )
+    val properties: LegalEntityResponse,
+    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    val currentness: Instant
+) {
+    class CustomDeserializer(vc: Class<LegalEntityPartnerResponse>?) : StdDeserializer<LegalEntityPartnerResponse>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerResponse {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return LegalEntityPartnerResponse(
+                node.get(LegalEntityPartnerResponse::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
+                ctxt.readTreeAsValue(node.get(LegalEntityPartnerResponse::currentness.name), Instant::class.java)
+            )
+        }
     }
 }
+
+

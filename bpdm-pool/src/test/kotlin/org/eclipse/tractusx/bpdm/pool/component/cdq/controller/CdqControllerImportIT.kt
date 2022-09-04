@@ -30,8 +30,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -217,7 +217,7 @@ class CdqControllerImportIT @Autowired constructor(
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
 
-        val savedBusinessPartners = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val savedBusinessPartners = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
         assertLegalEntityResponseEquals(savedBusinessPartners.content.map { it.legalEntity }, expectedPartners)
     }
 
@@ -329,8 +329,8 @@ class CdqControllerImportIT @Autowired constructor(
         partner.copy(identifiers = partner.identifiers.plus(IdentifierCdq(idTypeBpn, bpn, issuerBpn, statusBpn)))
 
     private fun assertLegalEntityResponseEquals(
-        actualPartners: Collection<LegalEntityPoolResponse>,
-        expectedPartners: Collection<LegalEntityPoolResponse>
+        actualPartners: Collection<LegalEntityPartnerResponse>,
+        expectedPartners: Collection<LegalEntityPartnerResponse>
     ) {
         assertThat(actualPartners)
             .usingRecursiveComparison()

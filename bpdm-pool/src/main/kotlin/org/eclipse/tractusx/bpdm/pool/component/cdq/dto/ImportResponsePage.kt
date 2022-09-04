@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
 
 
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 
 data class ImportResponsePage(
     val totalElements: Int,
     val nextStartAfter: String?,
-    val partners: Collection<LegalEntityPoolUpsertResponse>
+    val partners: Collection<LegalEntityPartnerCreateResponse>
 )

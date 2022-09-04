@@ -17,20 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
-import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
+import io.swagger.v3.oas.annotations.media.Schema
 
-object AssertionHelper {
-
-    fun assertAddressWithReferenceEquals(actual: AddressWithReferenceResponse, expected: AddressWithReferenceResponse) {
-        assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringFieldsMatchingRegexes(".*uuid")
-            .ignoringAllOverriddenEquals()
-            .ignoringCollectionOrder()
-            .isEqualTo(expected)
-    }
-
-}
+@Schema(name = "Site Partner Response", description = "Business partner of type site")
+data class SitePartnerResponse(
+    @Schema(description = "Business Partner Number, main identifier value for sites")
+    val bpn: String,
+    @Schema(description = "Site name")
+    val name: String
+)

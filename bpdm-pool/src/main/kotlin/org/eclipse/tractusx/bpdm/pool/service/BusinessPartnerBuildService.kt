@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPoolResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
@@ -59,7 +59,7 @@ class BusinessPartnerBuildService(
      * Create new business partner records from [requests]
      */
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): Collection<LegalEntityPoolUpsertResponse> {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): Collection<LegalEntityPartnerCreateResponse> {
         logger.info { "Create ${requests.size} new legal entities" }
 
         val validRequests = filterDuplicatesByIdentifier(requests)
@@ -80,7 +80,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createSites(requests: Collection<SitePartnerCreateRequest>): Collection<SiteUpsertResponse> {
+    fun createSites(requests: Collection<SitePartnerCreateRequest>): Collection<SitePartnerCreateResponse> {
         logger.info { "Create ${requests.size} new sites" }
 
         val legalEntities = businessPartnerRepository.findDistinctByBpnIn(requests.map { it.legalEntity })
@@ -107,7 +107,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<AddressCreateResponse> {
+    fun createAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<AddressPartnerCreateResponse> {
         logger.info { "Create ${requests.size} new addresses" }
 
         val (bpnlRequests, otherAddresses) = requests.partition { it.parent.startsWith(bpnIssuingService.bpnlPrefix) }
@@ -129,7 +129,7 @@ class BusinessPartnerBuildService(
      * Update existing records with [requests]
      */
     @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): Collection<LegalEntityPoolUpsertResponse> {
+    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): Collection<LegalEntityPartnerCreateResponse> {
         logger.info { "Update ${requests.size} legal entities" }
         val metadataMap = metadataMappingService.mapRequests(requests.map { it.properties })
 
@@ -151,7 +151,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): Collection<SiteUpsertResponse> {
+    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): Collection<SitePartnerCreateResponse> {
         logger.info { "Update ${requests.size} sites" }
         val bpnsToFetch = requests.map { it.bpn }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -168,7 +168,7 @@ class BusinessPartnerBuildService(
         return siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
     }
 
-    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPoolResponse> {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPartnerResponse> {
         logger.info { "Update ${requests.size} business partner addresses" }
 
         val addresses = partnerAddressRepository.findDistinctByBpnIn(requests.map { it.bpn })

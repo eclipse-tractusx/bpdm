@@ -89,12 +89,14 @@ class TestHelpers(
     ): List<LegalEntityStructureResponse> {
 
         val legalEntities =
-            client.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, partnerStructures.map { it.legalEntity })
+            client.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
+                EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+                partnerStructures.map { it.legalEntity })
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = client.invokePostWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
+        val sites = client.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
         val indexedSites = sites.associateBy { it.index }
 
         val assignedSitelessAddresses =
@@ -103,7 +105,10 @@ class TestHelpers(
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
         val addresses =
-            client.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, assignedSitelessAddresses + assignedSiteAddresses)
+            client.invokePostWithArrayResponse<AddressPartnerCreateResponse>(
+                EndpointValues.CATENA_ADDRESSES_PATH,
+                assignedSitelessAddresses + assignedSiteAddresses
+            )
         val indexedAddresses = addresses.associateBy { it.index }
 
         return partnerStructures.map { legalEntityStructure ->
@@ -167,7 +172,7 @@ class TestHelpers(
         partnersToImport: Collection<BusinessPartnerCdq>,
         client: WebTestClient,
         wireMockServer: WireMockExtension
-    ): PageResponse<BusinessPartnerSearchResponse> {
+    ): PageResponse<LegalEntityMatchResponse> {
         val importCollection = PagedResponseCdq(
             partnersToImport.size,
             null,
@@ -194,24 +199,24 @@ class TestHelpers(
      * BPNs are just checked for matching the valid pattern
      * Currentness is just checked for being recent
      */
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPoolUpsertResponse>, expected: Collection<LegalEntityPoolUpsertResponse>) {
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
         actuals.forEach { Assertions.assertThat(it.bpn).matches(bpnLPattern) }
 
         assertRecursively(actuals)
-            .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::bpn.name)
+            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::bpn.name)
             .isEqualTo(expected)
     }
 
-    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPoolUpsertResponse>, expected: Collection<LegalEntityPoolUpsertResponse>) {
+    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
 
         assertRecursively(actuals)
-            .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::index.name)
+            .ignoringFields(LegalEntityPartnerCreateResponse::currentness.name, LegalEntityPartnerCreateResponse::index.name)
             .isEqualTo(expected)
     }
 

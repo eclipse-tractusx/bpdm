@@ -23,7 +23,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer
@@ -82,7 +82,7 @@ class ValidIndexStartupIT @Autowired constructor(
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)
     }
@@ -95,7 +95,7 @@ class ValidIndexStartupIT @Autowired constructor(
     @Test
     @Order(1)
     fun acceptValidIndexOnStartup() {
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerSearchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
 
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)

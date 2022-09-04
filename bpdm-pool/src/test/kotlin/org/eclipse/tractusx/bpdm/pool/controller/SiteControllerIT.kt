@@ -105,11 +105,11 @@ class SiteControllerIT @Autowired constructor(
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
         val siteSearchRequest = SiteSearchRequest(listOf(bpnL1, bpnL2))
-        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SiteWithReferenceResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
+        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
 
-        val expectedSiteWithReference1 = SiteWithReferenceResponse(ResponseValues.site1, bpnL1)
-        val expectedSiteWithReference2 = SiteWithReferenceResponse(ResponseValues.site2, bpnL1)
-        val expectedSiteWithReference3 = SiteWithReferenceResponse(ResponseValues.site3, bpnL2)
+        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)
+        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL1)
+        val expectedSiteWithReference3 = SitePartnerSearchResponse(ResponseValues.site3, bpnL2)
 
         testHelpers.assertRecursively(searchResult.content)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
@@ -123,7 +123,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create new sites`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(
+        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
         )
@@ -138,7 +138,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = bpnL2)
         )
-        val response = webTestClient.invokePostWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
         assertThatCreatedSitesEqual(response, expected)
     }
@@ -150,7 +150,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create sites with non-existing parent`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(
+        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
         )
@@ -166,7 +166,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
-        val response = webTestClient.invokePostWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
         assertThatCreatedSitesEqual(response, expected)
     }
@@ -207,7 +207,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = bpnS2)
         )
-        val response = webTestClient.invokePutWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
+        val response = webTestClient.invokePutWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
@@ -242,7 +242,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
-        val response = webTestClient.invokePutWithArrayResponse<SiteUpsertResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
+        val response = webTestClient.invokePutWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
@@ -305,15 +305,15 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
-    private fun assertThatCreatedSitesEqual(actuals: Collection<SiteUpsertResponse>, expected: Collection<SiteUpsertResponse>) {
+    private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateResponse>, expected: Collection<SitePartnerCreateResponse>) {
         actuals.forEach { assertThat(it.bpn).matches(testHelpers.bpnSPattern) }
 
-        testHelpers.assertRecursively(actuals).ignoringFields(SiteUpsertResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(actuals).ignoringFields(SitePartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     private fun requestSite(bpnSite: String) =
-        webTestClient.invokeGetEndpoint<SiteWithReferenceResponse>(EndpointValues.CATENA_SITES_PATH + "/${bpnSite}")
+        webTestClient.invokeGetEndpoint<SitePartnerSearchResponse>(EndpointValues.CATENA_SITES_PATH + "/${bpnSite}")
 
     private fun requestSitesOfLegalEntity(bpn: String) =
-        webTestClient.invokeGetEndpoint<PageResponse<SiteResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
+        webTestClient.invokeGetEndpoint<PageResponse<SitePartnerResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
 }

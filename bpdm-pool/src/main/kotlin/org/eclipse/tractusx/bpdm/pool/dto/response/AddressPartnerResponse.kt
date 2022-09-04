@@ -26,27 +26,24 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-@JsonDeserialize(using = LegalEntityPoolResponseDeserializer::class)
-@Schema(name = "Legal Entity Pool Response", description = "Legal entity business partner record")
-data class LegalEntityPoolResponse(
+@JsonDeserialize(using = AddressPartnerResponse.CustomDeserializer::class)
+@Schema(name = "Address Partner Response", description = "Business partner of type address")
+data class AddressPartnerResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,
     @JsonUnwrapped
-    val properties: LegalEntityResponse,
-    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
-    val currentness: Instant
-)
-
-private class LegalEntityPoolResponseDeserializer(vc: Class<LegalEntityPoolResponse>?) : StdDeserializer<LegalEntityPoolResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPoolResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return LegalEntityPoolResponse(
-            node.get(LegalEntityPoolResponse::bpn.name).textValue(),
-            ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
-            ctxt.readTreeAsValue(node.get(LegalEntityPoolResponse::currentness.name), Instant::class.java)
-        )
+    val properties: AddressResponse
+) {
+    class CustomDeserializer(vc: Class<AddressPartnerResponse>?) : StdDeserializer<AddressPartnerResponse>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerResponse {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return AddressPartnerResponse(
+                node.get(AddressPartnerResponse::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, AddressResponse::class.java)
+            )
+        }
     }
 }
+

@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.util
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 
 data class LegalEntityStructureRequest(
     val legalEntity: LegalEntityPartnerCreateRequest,
@@ -38,12 +38,12 @@ data class SiteStructureRequest(
 )
 
 data class LegalEntityStructureResponse(
-    val legalEntity: LegalEntityPoolUpsertResponse,
+    val legalEntity: LegalEntityPartnerCreateResponse,
     val siteStructures: List<SiteStructureResponse> = emptyList(),
-    val addresses: List<AddressCreateResponse> = emptyList()
+    val addresses: List<AddressPartnerCreateResponse> = emptyList()
 )
 
 data class SiteStructureResponse(
-    val site: SiteUpsertResponse,
-    val addresses: List<AddressCreateResponse> = emptyList()
+    val site: SitePartnerCreateResponse,
+    val addresses: List<AddressPartnerCreateResponse> = emptyList()
 )

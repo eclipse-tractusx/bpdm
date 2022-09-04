@@ -27,26 +27,35 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import java.time.Instant
 
-@JsonDeserialize(using = AddressCreateResponseDeserializer::class)
-@Schema(name = "Address Create Response", description = "Response model for created addresses")
-data class AddressCreateResponse(
+@JsonDeserialize(using = LegalEntityPartnerCreateResponse.CustomDeserializer::class)
+@Schema(name = "Legal Entity Partner Create Response", description = "Created business partner of type legal entity")
+data class LegalEntityPartnerCreateResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,
     @JsonUnwrapped
-    val properties: AddressResponse,
+    val properties: LegalEntityResponse,
+    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    val currentness: Instant,
+    @Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: AddressResponse,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
-)
-
-
-class AddressCreateResponseDeserializer(vc: Class<AddressCreateResponse>?) : StdDeserializer<AddressCreateResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressCreateResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressCreateResponse(
-            node.get(AddressCreateResponse::bpn.name).textValue(),
-            ctxt.readTreeAsValue(node, AddressResponse::class.java),
-            node.get(AddressCreateResponse::index.name).textValue(),
-        )
+) {
+    class CustomDeserializer(vc: Class<LegalEntityPartnerCreateResponse>?) : StdDeserializer<LegalEntityPartnerCreateResponse>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerCreateResponse {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return LegalEntityPartnerCreateResponse(
+                node.get(LegalEntityPartnerCreateResponse::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
+                ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::currentness.name), Instant::class.java),
+                ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::legalAddress.name), AddressResponse::class.java),
+                node.get(LegalEntityPartnerCreateResponse::index.name).textValue(),
+            )
+        }
     }
 }
+
+

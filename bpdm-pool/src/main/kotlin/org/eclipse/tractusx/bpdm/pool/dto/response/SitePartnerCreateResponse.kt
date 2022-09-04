@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-@Schema(name = "Site Upsert Response", description = "Site response object after creating or updating a record")
-data class SiteUpsertResponse(
+@Schema(name = "Site Partner Create Response", description = "Created business partner record of type site")
+data class SitePartnerCreateResponse(
     @Schema(description = "Business Partner Number, main identifier value for sites")
     val bpn: String,
     @Schema(description = "Site name")
@@ -32,4 +32,6 @@ data class SiteUpsertResponse(
     val mainAddress: AddressResponse,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
-)
+) {
+
+}

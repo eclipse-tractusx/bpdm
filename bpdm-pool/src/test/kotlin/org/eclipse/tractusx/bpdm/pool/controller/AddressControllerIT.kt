@@ -136,15 +136,15 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerSearchRequest(listOf(bpnL1, bpnL2), emptyList())
         val searchResult =
-            webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
+            webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
         val expectedAddress1 = ResponseValues.addressPartner1
         val expectedAddress2 = ResponseValues.addressPartner2
         val expectedAddress3 = ResponseValues.addressPartner3
 
-        val expectedAddressWithReferences1 = AddressWithReferenceResponse(expectedAddress1, bpnL1, null)
-        val expectedAddressWithReferences2 = AddressWithReferenceResponse(expectedAddress2, bpnL1, null)
-        val expectedAddressWithReferences3 = AddressWithReferenceResponse(expectedAddress3, bpnL2, null)
+        val expectedAddressWithReferences1 = AddressPartnerSearchResponse(expectedAddress1, bpnL1, null)
+        val expectedAddressWithReferences2 = AddressPartnerSearchResponse(expectedAddress2, bpnL1, null)
+        val expectedAddressWithReferences3 = AddressPartnerSearchResponse(expectedAddress3, bpnL2, null)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -190,11 +190,11 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult =
-            webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
+            webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
-        val expectedAddressWithReferences1 = AddressWithReferenceResponse(ResponseValues.addressPartner1, null, bpnS1)
-        val expectedAddressWithReferences2 = AddressWithReferenceResponse(ResponseValues.addressPartner2, null, bpnS1)
-        val expectedAddressWithReferences3 = AddressWithReferenceResponse(ResponseValues.addressPartner3, null, bpnS2)
+        val expectedAddressWithReferences1 = AddressPartnerSearchResponse(ResponseValues.addressPartner1, null, bpnS1)
+        val expectedAddressWithReferences2 = AddressPartnerSearchResponse(ResponseValues.addressPartner2, null, bpnS1)
+        val expectedAddressWithReferences3 = AddressPartnerSearchResponse(ResponseValues.addressPartner3, null, bpnS2)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -235,10 +235,10 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate2.copy(parent = bpnL),
             RequestValues.addressPartnerCreate3.copy(parent = bpnS)
         )
-        val response = webTestClient.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+        val response = webTestClient.invokePostWithArrayResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
 
         response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressCreateResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -248,7 +248,7 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create addresses with non-existent parent`() {
-        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(
+        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1)
         ).single().bpn
@@ -262,10 +262,10 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate2.copy(parent = "BPNSXXXXXXXXXX"),
             RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
         )
-        val response = webTestClient.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+        val response = webTestClient.invokePostWithArrayResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
 
         response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressCreateResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -309,7 +309,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate2.copy(bpn = bpnA3),
             RequestValues.addressPartnerUpdate3.copy(bpn = bpnA1)
         )
-        val response = webTestClient.invokePutWithArrayResponse<AddressPoolResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+        val response = webTestClient.invokePutWithArrayResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
@@ -347,14 +347,14 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate2.copy(bpn = "BPNLXXXXXXXX"),
             RequestValues.addressPartnerUpdate3.copy(bpn = "BPNAXXXXXXXX")
         )
-        val response = webTestClient.invokePutWithArrayResponse<AddressPoolResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+        val response = webTestClient.invokePutWithArrayResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
 
     private fun requestAddress(bpnAddress: String) =
-        webTestClient.invokeGetEndpoint<AddressWithReferenceResponse>(EndpointValues.CATENA_ADDRESSES_PATH + "/${bpnAddress}")
+        webTestClient.invokeGetEndpoint<AddressPartnerSearchResponse>(EndpointValues.CATENA_ADDRESSES_PATH + "/${bpnAddress}")
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
         webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX)

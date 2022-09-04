@@ -21,11 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Address With Reference Response", description = "Address with bpn references")
-data class AddressWithReferenceResponse(
-    val address: AddressPoolResponse,
-    @Schema(description = "Business Partner Number of the related legal entity")
-    val bpnLegalEntity: String?,
-    @Schema(description = "Business Partner Number of the related site")
-    val bpnSite: String?,
+@Schema(name = "Legal Entity Match Response", description = "Match with score for a business partner record of type legal entity")
+data class LegalEntityMatchResponse(
+    @Schema(description = "Relative quality score of the match. The higher the better")
+    val score: Float,
+    @Schema(description = "Matched legal entity business partner record")
+    val legalEntity: LegalEntityPartnerResponse
 )

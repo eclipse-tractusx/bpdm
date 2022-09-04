@@ -19,10 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-
+@Schema(name = "Main Address Search Response", description = "Main address record with parent BPN")
 data class MainAddressSearchResponse(
+    @Schema(description = "BPNS of the site this main address belongs to")
     val site: String,
+    @Schema(description = "Adress properties")
     val mainAddress: AddressResponse
 )

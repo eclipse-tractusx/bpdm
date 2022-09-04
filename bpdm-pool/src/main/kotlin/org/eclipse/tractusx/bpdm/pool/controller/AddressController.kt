@@ -28,9 +28,9 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPoolResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -58,7 +58,7 @@ class AddressController(
     @GetMapping("/{bpn}")
     fun getAddress(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
-    ): AddressWithReferenceResponse {
+    ): AddressPartnerSearchResponse {
         return addressService.findByBpn(bpn)
     }
 
@@ -76,7 +76,7 @@ class AddressController(
     fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
-    ): PageResponse<AddressWithReferenceResponse> {
+    ): PageResponse<AddressPartnerSearchResponse> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
     }
 
@@ -97,7 +97,7 @@ class AddressController(
     fun createAddresses(
         @RequestBody
         requests: Collection<AddessPartnerCreateRequest>
-    ): Collection<AddressCreateResponse> {
+    ): Collection<AddressPartnerCreateResponse> {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
@@ -116,7 +116,7 @@ class AddressController(
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
-    ): Collection<AddressPoolResponse> {
+    ): Collection<AddressPartnerResponse> {
         return businessPartnerBuildService.updateAddresses(requests)
     }
 }

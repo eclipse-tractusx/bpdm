@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
@@ -36,20 +35,20 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun BusinessPartner.toSearchDto(score: Float): BusinessPartnerSearchResponse {
-    return BusinessPartnerSearchResponse(score, this.toPoolDto())
+fun BusinessPartner.toSearchDto(score: Float): LegalEntityMatchResponse {
+    return LegalEntityMatchResponse(score, this.toPoolDto())
 }
 
-fun BusinessPartner.toPoolDto(): LegalEntityPoolResponse{
-    return LegalEntityPoolResponse(
+fun BusinessPartner.toPoolDto(): LegalEntityPartnerResponse {
+    return LegalEntityPartnerResponse(
         bpn,
         toDto(),
         currentness
     )
 }
 
-fun BusinessPartner.toUpsertDto(entryId: String?): LegalEntityPoolUpsertResponse {
-    return LegalEntityPoolUpsertResponse(
+fun BusinessPartner.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
+    return LegalEntityPartnerCreateResponse(
         bpn,
         toDto(),
         currentness,
@@ -109,8 +108,8 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 }
 
 
-fun PartnerAddress.toDto(): AddressPoolResponse {
-    return AddressPoolResponse(
+fun PartnerAddress.toDto(): AddressPartnerResponse {
+    return AddressPartnerResponse(
         bpn,
         address.toDto()
     )
@@ -146,23 +145,23 @@ fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
     )
 }
 
-fun PartnerAddress.toPoolDto(): AddressPoolResponse {
-    return AddressPoolResponse(
+fun PartnerAddress.toPoolDto(): AddressPartnerResponse {
+    return AddressPartnerResponse(
         bpn,
         address.toDto()
     )
 }
 
-fun PartnerAddress.toCreateResponse(index: String?): AddressCreateResponse {
-    return AddressCreateResponse(
+fun PartnerAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+    return AddressPartnerCreateResponse(
         bpn,
         address.toDto(),
         index
     )
 }
 
-fun PartnerAddress.toDtoWithReference(): AddressWithReferenceResponse {
-    return AddressWithReferenceResponse(
+fun PartnerAddress.toDtoWithReference(): AddressPartnerSearchResponse {
+    return AddressPartnerSearchResponse(
         toDto(),
         partner?.bpn,
         site?.bpn
@@ -170,8 +169,8 @@ fun PartnerAddress.toDtoWithReference(): AddressWithReferenceResponse {
 }
 
 
-fun Site.toUpsertDto(entryId: String?): SiteUpsertResponse {
-    return SiteUpsertResponse(
+fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
+    return SitePartnerCreateResponse(
         bpn,
         name,
         mainAddress.toDto(),
@@ -179,15 +178,15 @@ fun Site.toUpsertDto(entryId: String?): SiteUpsertResponse {
     )
 }
 
-fun Site.toDto(): SiteResponse {
-    return SiteResponse(
+fun Site.toDto(): SitePartnerResponse {
+    return SitePartnerResponse(
         bpn,
         name
     )
 }
 
-fun Site.toWithReferenceDto(): SiteWithReferenceResponse {
-    return SiteWithReferenceResponse(
+fun Site.toWithReferenceDto(): SitePartnerSearchResponse {
+    return SitePartnerSearchResponse(
         toDto(),
         partner.bpn
     )

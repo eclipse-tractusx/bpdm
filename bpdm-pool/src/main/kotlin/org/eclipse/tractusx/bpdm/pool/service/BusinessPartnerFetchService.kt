@@ -21,8 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
@@ -44,10 +43,10 @@ class BusinessPartnerFetchService(
 ) {
 
     /**
-     * Fetch a business partner by [bpn] and return as [BusinessPartnerResponse]
+     * Fetch a business partner by [bpn] and return as [LegalEntityPartnerResponse]
      */
     @Transactional
-    fun findPartner(bpn: String): LegalEntityPoolResponse {
+    fun findPartner(bpn: String): LegalEntityPartnerResponse {
         val bp = businessPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
         return bp.toPoolDto()
     }
@@ -61,21 +60,13 @@ class BusinessPartnerFetchService(
     }
 
     /**
-     * Fetch a business partner by [identifierValue] of [identifierType] and return as [BusinessPartnerResponse]
+     * Fetch a business partner by [identifierValue] of [identifierType] and return as [LegalEntityPartnerResponse]
      */
     @Transactional
-    fun findPartnerByIdentifier(identifierType: String, identifierValue: String): LegalEntityPoolResponse {
+    fun findPartnerByIdentifier(identifierType: String, identifierValue: String): LegalEntityPartnerResponse {
         val type = identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class, identifierType)
         return businessPartnerRepository.findByIdentifierTypeAndValue(type, identifierValue)?.toPoolDto()
             ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
-    }
-
-    /**
-     * Fetch business partners by [values] of [identifierType]
-     */
-    @Transactional
-    fun fetchByIdentifierValues(identifierType: String, values: Collection<String>): Set<BusinessPartner> {
-        return fetchBusinessPartnerDependencies(businessPartnerRepository.findByIdentifierTypeAndValues(identifierType, values))
     }
 
     /**

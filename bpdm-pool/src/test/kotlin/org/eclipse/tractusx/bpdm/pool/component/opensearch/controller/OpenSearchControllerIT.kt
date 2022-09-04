@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -187,7 +187,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
     }
 
-    private fun searchBusinessPartnerByName(name: String): PageResponse<BusinessPartnerSearchResponse> {
+    private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
         return webTestClient.get().uri { builder ->
             builder.path(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
                 .queryParam(LegalEntityPropertiesSearchRequest::name.name, name)
@@ -195,7 +195,7 @@ class OpenSearchControllerIT @Autowired constructor(
         }
             .exchange()
             .expectStatus().is2xxSuccessful
-            .returnResult<PageResponse<BusinessPartnerSearchResponse>>()
+            .returnResult<PageResponse<LegalEntityMatchResponse>>()
             .responseBody
             .blockFirst()!!
     }
