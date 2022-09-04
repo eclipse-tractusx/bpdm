@@ -19,14 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.springframework.boot.context.properties.ConstructorBinding
 
-@Schema(name = "Site Address Request", description = "Address of site request model")
-data class SiteAddressRequest(
-    @JsonUnwrapped
-    val properties: AddressDto,
-    @Schema(description = "Business Partner Number of the legal entity this address belongs to")
-    val legalEntity: String
+@Schema(name = "Legal Entity Properties Search Request", description = "Contains keywords used for searching in legal entity properties")
+data class LegalEntityPropertiesSearchRequest @ConstructorBinding constructor(
+    @field:Parameter(description = "Filter legal entities by name")
+    val name: String?,
+    @field:Parameter(description = "Filter legal entities by legal form name")
+    val legalForm: String?,
+    @field:Parameter(description = "Filter legal entities by status official denotation")
+    val status: String?,
+    @field:Parameter(description = "Filter legal entities by classification denotation")
+    val classification: String?,
 )
+

@@ -26,23 +26,24 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 
-@JsonDeserialize(using = AddressUpdateRequestDeserializer::class)
-@Schema(name = "Address Update Request", description = "Update an address business partner")
-data class AddressUpdateRequest(
-    @Schema(description = "Business Partner Number of this address")
-    val bpn: String,
+@JsonDeserialize(using = LegalEntityPartnerCreateRequest.CustomDeserializer::class)
+@Schema(name = "Legal Entity Partner Create Request", description = "Request for creating new business partner record of type legal entity")
+data class LegalEntityPartnerCreateRequest(
     @JsonUnwrapped
-    val properties: AddressDto
-)
-
-class AddressUpdateRequestDeserializer(vc: Class<AddressUpdateRequest>?) : StdDeserializer<AddressUpdateRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressUpdateRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressUpdateRequest(
-            node.get(AddressUpdateRequest::properties.name).textValue(),
-            ctxt.readTreeAsValue(node, AddressDto::class.java),
-        )
+    val properties: LegalEntityDto,
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
+    val index: String?
+) {
+    class CustomDeserializer(vc: Class<LegalEntityPartnerCreateRequest>?) : StdDeserializer<LegalEntityPartnerCreateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerCreateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return LegalEntityPartnerCreateRequest(
+                ctxt.readTreeAsValue(node, LegalEntityDto::class.java),
+                node.get(LegalEntityPartnerCreateRequest::index.name).textValue(),
+            )
+        }
     }
 }
+

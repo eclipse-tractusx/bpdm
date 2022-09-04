@@ -60,7 +60,7 @@ class BusinessPartnerController(
     )
     @GetMapping
     fun getBusinessPartners(
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -187,7 +187,7 @@ class BusinessPartnerController(
     @GetMapping("/name")
     fun getNameSuggestion(
         @Parameter(description = "Show names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -210,7 +210,7 @@ class BusinessPartnerController(
     @GetMapping("/legal-form")
     fun getLegalFormSuggestion(
         @Parameter(description = "Show legal form names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -233,7 +233,7 @@ class BusinessPartnerController(
     @GetMapping("/site")
     fun getSiteSuggestion(
         @Parameter(description = "Show site names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -256,7 +256,7 @@ class BusinessPartnerController(
     @GetMapping("/status")
     fun getStatusSuggestion(
         @Parameter(description = "Show business status denotations best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -279,7 +279,7 @@ class BusinessPartnerController(
     @GetMapping("/classification")
     fun getClassificationSuggestion(
         @Parameter(description = "Show business partner classifications best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -302,7 +302,7 @@ class BusinessPartnerController(
     @GetMapping("/address/administrative-area")
     fun getAdminAreaSuggestion(
         @Parameter(description = "Show administrative area names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -325,7 +325,7 @@ class BusinessPartnerController(
     @GetMapping("/address/postcode")
     fun getPostcodeSuggestion(
         @Parameter(description = "Show postcodes best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -348,7 +348,7 @@ class BusinessPartnerController(
     @GetMapping("/address/locality")
     fun getLocalitySuggestion(
         @Parameter(description = "Show locality names this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -371,7 +371,7 @@ class BusinessPartnerController(
     @GetMapping("/address/thoroughfare")
     fun getThoroughfareSuggestion(
         @Parameter(description = "Show thoroughfare names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -394,7 +394,7 @@ class BusinessPartnerController(
     @GetMapping("/address/premise")
     fun getPremiseSuggestion(
         @Parameter(description = "Show premise names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -417,7 +417,7 @@ class BusinessPartnerController(
     @GetMapping("/address/postal-delivery-point")
     fun getPostalDeliverPointSuggestion(
         @Parameter(description = "Show postal delivery point names best matching this text") text: String?,
-        @ParameterObject bpSearchRequest: BusinessPartnerPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest

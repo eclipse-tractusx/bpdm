@@ -26,23 +26,25 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 
-@JsonDeserialize(using = SiteUpdateRequestDeserializer::class)
-@Schema(name = "Site Update Request", description = "Specify a site record to be updated")
-data class SiteUpdateRequest(
-    @Schema(description = "Business Partner Number of this site")
+@JsonDeserialize(using = LegalEntityPartnerUpdateRequest.CustomDeserializer::class)
+@Schema(name = "Legal Entity Update Request", description = "Request for updating a business partner record of type legal entity")
+data class LegalEntityPartnerUpdateRequest(
+    @Schema(description = "Business Partner Number")
     val bpn: String,
     @JsonUnwrapped
-    val site: SiteDto
-)
-
-class SiteUpdateRequestDeserializer(vc: Class<SiteUpdateRequest>?) : StdDeserializer<SiteUpdateRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteUpdateRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return SiteUpdateRequest(
-            node.get(LegalEntityPoolUpdateRequest::bpn.name).textValue(),
-            ctxt.readTreeAsValue(node, SiteDto::class.java)
-        )
+    val properties: LegalEntityDto
+) {
+    class CustomDeserializer(vc: Class<LegalEntityPartnerUpdateRequest>?) : StdDeserializer<LegalEntityPartnerUpdateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerUpdateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return LegalEntityPartnerUpdateRequest(
+                node.get(LegalEntityPartnerUpdateRequest::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, LegalEntityDto::class.java)
+            )
+        }
     }
 }
+
+

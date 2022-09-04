@@ -28,24 +28,25 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
-@JsonDeserialize(using = SiteRequestDeserializer::class)
-@Schema(name = "Site Request", description = "New site record")
-data class SiteCreateRequest(
+@JsonDeserialize(using = SitePartnerCreateRequest.CustomDeserializer::class)
+@Schema(name = "Site Partner Create Request", description = "Request for creating new business partner record of type site")
+data class SitePartnerCreateRequest(
     @JsonUnwrapped
     val site: SiteDto,
     @Schema(description = "Business Partner Number of the legal entity this site belongs to")
     val legalEntity: String,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
-)
-
-class SiteRequestDeserializer(vc: Class<SiteCreateRequest>?) : StdDeserializer<SiteCreateRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteCreateRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return SiteCreateRequest(
-            ctxt.readTreeAsValue(node, SiteDto::class.java),
-            node.get(SiteCreateRequest::legalEntity.name).textValue(),
-            node.get(SiteCreateRequest::index.name).textValue(),
-        )
+) {
+    class CustomDeserializer(vc: Class<SitePartnerCreateRequest>?) : StdDeserializer<SitePartnerCreateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SitePartnerCreateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return SitePartnerCreateRequest(
+                ctxt.readTreeAsValue(node, SiteDto::class.java),
+                node.get(SitePartnerCreateRequest::legalEntity.name).textValue(),
+                node.get(SitePartnerCreateRequest::index.name).textValue(),
+            )
+        }
     }
 }
+

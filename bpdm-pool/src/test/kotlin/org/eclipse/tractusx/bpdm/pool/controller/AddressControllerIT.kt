@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -134,7 +134,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.bpn
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
-        val searchRequest = AddressSearchRequest(listOf(bpnL1, bpnL2), emptyList())
+        val searchRequest = AddressPartnerSearchRequest(listOf(bpnL1, bpnL2), emptyList())
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
@@ -188,7 +188,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
         val bpnS2 = createdStructures[1].siteStructures[0].site.bpn
 
-        val searchRequest = AddressSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
+        val searchRequest = AddressPartnerSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressWithReferenceResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
@@ -273,6 +273,7 @@ class AddressControllerIT @Autowired constructor(
      * When updating addresses via BPNs
      * Then update and return those addresses
      */
+    @Test
     fun `update addresses`() {
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
@@ -318,6 +319,7 @@ class AddressControllerIT @Autowired constructor(
      * When updating addresses with some having non-existent BPNs
      * Then only update and return addresses with existent BPNs
      */
+    @Test
     fun `updates addresses, ignore non-existent`() {
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(

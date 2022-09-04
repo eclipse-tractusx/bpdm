@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPoolUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
@@ -72,7 +72,7 @@ class LegalEntityController(
     @PostMapping
     fun createBusinessPartners(
         @RequestBody
-        businessPartners: Collection<LegalEntityCreateRequest>
+        businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): Collection<LegalEntityPoolUpsertResponse> {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
@@ -92,7 +92,7 @@ class LegalEntityController(
     @PutMapping
     fun updateBusinessPartners(
         @RequestBody
-        businessPartners: Collection<LegalEntityPoolUpdateRequest>
+        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): Collection<LegalEntityPoolUpsertResponse> {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }

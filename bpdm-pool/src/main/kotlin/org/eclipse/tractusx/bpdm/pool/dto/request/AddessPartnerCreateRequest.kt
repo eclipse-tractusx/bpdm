@@ -28,25 +28,26 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 
-
-@JsonDeserialize(using = LegalEntityAddressRequestDeserializer::class)
-@Schema(name = "Legal Entity Address Request", description = "Address of an legal entity request model")
-data class LegalEntityAddressRequest(
+@JsonDeserialize(using = AddessPartnerCreateRequest.CustomDeserializer::class)
+@Schema(name = "Address Partner Request", description = "Request for creating new business partner record of type address")
+data class AddessPartnerCreateRequest(
     @JsonUnwrapped
     val properties: AddressDto,
-    @Schema(description = "Business Partner Number of the legal entity this address belongs to")
-    val legalEntity: String,
-    @Schema(description = "User defined identifier to conveniently match this entry to the corresponding entry in the response")
-    val entryIdentifier: String?
-)
-
-class LegalEntityAddressRequestDeserializer(vc: Class<LegalEntityAddressRequest>?) : StdDeserializer<LegalEntityAddressRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityAddressRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return LegalEntityAddressRequest(
-            ctxt.readTreeAsValue(node, AddressDto::class.java),
-            node.get(LegalEntityAddressRequest::legalEntity.name).textValue(),
-            node.get(LegalEntityAddressRequest::entryIdentifier.name).textValue(),
-        )
+    @Schema(description = "Business Partner Number of the legal entity or site this address belongs to")
+    val parent: String,
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
+    val index: String?
+) {
+    class CustomDeserializer(vc: Class<AddessPartnerCreateRequest>?) : StdDeserializer<AddessPartnerCreateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddessPartnerCreateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return AddessPartnerCreateRequest(
+                ctxt.readTreeAsValue(node, AddressDto::class.java),
+                node.get(AddessPartnerCreateRequest::parent.name).textValue(),
+                node.get(AddessPartnerCreateRequest::index.name).textValue()
+            )
+        }
     }
 }
+
+

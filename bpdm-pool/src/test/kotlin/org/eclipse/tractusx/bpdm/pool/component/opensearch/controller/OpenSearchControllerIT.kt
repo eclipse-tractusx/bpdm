@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -190,7 +190,7 @@ class OpenSearchControllerIT @Autowired constructor(
     private fun searchBusinessPartnerByName(name: String): PageResponse<BusinessPartnerSearchResponse> {
         return webTestClient.get().uri { builder ->
             builder.path(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
-                .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, name)
+                .queryParam(LegalEntityPropertiesSearchRequest::name.name, name)
                 .build()
         }
             .exchange()

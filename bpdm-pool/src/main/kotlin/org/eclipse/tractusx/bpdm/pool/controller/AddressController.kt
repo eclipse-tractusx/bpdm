@@ -24,9 +24,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPoolResponse
@@ -74,7 +74,7 @@ class AddressController(
     )
     @PostMapping("/search")
     fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressSearchRequest,
+        @RequestBody addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<AddressWithReferenceResponse> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
@@ -96,7 +96,7 @@ class AddressController(
     @PostMapping
     fun createAddresses(
         @RequestBody
-        requests: Collection<AddressRequest>
+        requests: Collection<AddessPartnerCreateRequest>
     ): Collection<AddressCreateResponse> {
         return businessPartnerBuildService.createAddresses(requests)
     }
@@ -115,7 +115,7 @@ class AddressController(
     @PutMapping
     fun updateAddresses(
         @RequestBody
-        requests: Collection<AddressUpdateRequest>
+        requests: Collection<AddressPartnerUpdateRequest>
     ): Collection<AddressPoolResponse> {
         return businessPartnerBuildService.updateAddresses(requests)
     }

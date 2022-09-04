@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.LegalFormCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
@@ -29,37 +28,24 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPoolUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
 import org.springframework.stereotype.Service
 
 @Service
-class CdqToRequestMapper(
-    private val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties
-) {
-    fun toUpdateRequest(partner: BusinessPartnerCdq): LegalEntityPoolUpdateRequest {
-        return LegalEntityPoolUpdateRequest(
+class CdqToRequestMapper {
+    fun toUpdateRequest(partner: BusinessPartnerCdq): LegalEntityPartnerUpdateRequest {
+        return LegalEntityPartnerUpdateRequest(
             partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value!!,
             partner.toLegalEntityDto()
         )
     }
 
-    fun toCreateRequest(partner: BusinessPartnerCdq, index: String? = null): LegalEntityCreateRequest {
-        return LegalEntityCreateRequest(
+    fun toCreateRequest(partner: BusinessPartnerCdq, index: String? = null): LegalEntityPartnerCreateRequest {
+        return LegalEntityPartnerCreateRequest(
             partner.toLegalEntityDto(),
             index
-        )
-    }
-
-
-    fun toCdqIdentifierRequest(idValue: String): IdentifierDto {
-        return IdentifierDto(
-            idValue,
-            cdqIdentifierConfigProperties.typeKey,
-            cdqIdentifierConfigProperties.issuerKey,
-            cdqIdentifierConfigProperties.statusImportedKey
         )
     }
 

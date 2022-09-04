@@ -26,26 +26,25 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
-@JsonDeserialize(using = AddressRequestDeserializer::class)
-@Schema(name = "Address Request", description = "Create an address business partner")
-data class AddressRequest(
+@JsonDeserialize(using = SitePartnerUpdateRequest.CustomDeserializer::class)
+@Schema(name = "Site Partner Update Request", description = "Request for updating a business partner record of type site")
+data class SitePartnerUpdateRequest(
+    @Schema(description = "Business Partner Number of this site")
+    val bpn: String,
     @JsonUnwrapped
-    val properties: AddressDto,
-    @Schema(description = "Business Partner Number of the legal entity or site this address belongs to")
-    val parent: String,
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
-    val index: String?
-)
-
-class AddressRequestDeserializer(vc: Class<AddressRequest>?) : StdDeserializer<AddressRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressRequest(
-            ctxt.readTreeAsValue(node, AddressDto::class.java),
-            node.get(AddressRequest::parent.name).textValue(),
-            node.get(AddressRequest::index.name).textValue()
-        )
+    val site: SiteDto
+) {
+    class CustomDeserializer(vc: Class<SitePartnerUpdateRequest>?) : StdDeserializer<SitePartnerUpdateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SitePartnerUpdateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return SitePartnerUpdateRequest(
+                node.get(LegalEntityPartnerUpdateRequest::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, SiteDto::class.java)
+            )
+        }
     }
 }
+
+

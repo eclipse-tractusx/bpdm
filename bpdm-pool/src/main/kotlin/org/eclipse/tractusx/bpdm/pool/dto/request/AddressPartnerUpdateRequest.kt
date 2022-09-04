@@ -26,23 +26,25 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 
-@JsonDeserialize(using = BusinessPartnerRequestDeserializer::class)
-@Schema(name = "Legal Entity Update Request", description = "For updating a legal entity record")
-data class LegalEntityPoolUpdateRequest(
-    @Schema(description = "Business Partner Number")
+@JsonDeserialize(using = AddressPartnerUpdateRequest.CustomDeserializer::class)
+@Schema(name = "Address Partner Update Request", description = "Request for updating a business partner record of type address")
+data class AddressPartnerUpdateRequest(
+    @Schema(description = "Business Partner Number of this address")
     val bpn: String,
     @JsonUnwrapped
-    val properties: LegalEntityDto
-)
-
-class BusinessPartnerRequestDeserializer(vc: Class<LegalEntityPoolUpdateRequest>?) : StdDeserializer<LegalEntityPoolUpdateRequest>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPoolUpdateRequest {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return LegalEntityPoolUpdateRequest(
-            node.get(LegalEntityPoolUpdateRequest::bpn.name).textValue(),
-            ctxt.readTreeAsValue(node, LegalEntityDto::class.java)
-        )
+    val properties: AddressDto
+) {
+    class CustomDeserializer(vc: Class<AddressPartnerUpdateRequest>?) : StdDeserializer<AddressPartnerUpdateRequest>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerUpdateRequest {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return AddressPartnerUpdateRequest(
+                node.get(AddressPartnerUpdateRequest::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, AddressDto::class.java),
+            )
+        }
     }
 }
+
+

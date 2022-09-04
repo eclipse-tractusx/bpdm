@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -69,7 +69,6 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         private val expectedLegalEntityName = expectedLegalEntity.names.first().value
         private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
-        private val expectedSiteMainAddress = expectedSite.mainAddress
 
         private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.properties
         private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
@@ -324,7 +323,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         val page = webTestClient.get()
             .uri { builder ->
                 builder.path(endpointPath)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()
@@ -348,7 +347,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()
@@ -374,7 +373,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()

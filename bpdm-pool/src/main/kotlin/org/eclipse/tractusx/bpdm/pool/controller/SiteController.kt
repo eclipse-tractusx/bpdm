@@ -25,9 +25,9 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
@@ -115,7 +115,7 @@ class SiteController(
     @PostMapping
     fun createSite(
         @RequestBody
-        requests: Collection<SiteCreateRequest>
+        requests: Collection<SitePartnerCreateRequest>
     ): Collection<SiteUpsertResponse> {
         return businessPartnerBuildService.createSites(requests)
     }
@@ -134,7 +134,7 @@ class SiteController(
     @PutMapping
     fun updateSite(
         @RequestBody
-        requests: Collection<SiteUpdateRequest>
+        requests: Collection<SitePartnerUpdateRequest>
     ): Collection<SiteUpsertResponse> {
         return businessPartnerBuildService.updateSites(requests)
     }

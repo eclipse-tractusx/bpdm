@@ -19,22 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPoolUpsertResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SiteUpsertResponse
 
 data class LegalEntityStructureRequest(
-    val legalEntity: LegalEntityCreateRequest,
+    val legalEntity: LegalEntityPartnerCreateRequest,
     val siteStructures: List<SiteStructureRequest> = emptyList(),
-    val addresses: List<AddressRequest> = emptyList()
+    val addresses: List<AddessPartnerCreateRequest> = emptyList()
 )
 
 data class SiteStructureRequest(
-    val site: SiteCreateRequest,
-    val addresses: List<AddressRequest> = emptyList()
+    val site: SitePartnerCreateRequest,
+    val addresses: List<AddessPartnerCreateRequest> = emptyList()
 )
 
 data class LegalEntityStructureResponse(

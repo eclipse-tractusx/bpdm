@@ -59,7 +59,7 @@ class BusinessPartnerBuildService(
      * Create new business partner records from [requests]
      */
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityCreateRequest>): Collection<LegalEntityPoolUpsertResponse> {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): Collection<LegalEntityPoolUpsertResponse> {
         logger.info { "Create ${requests.size} new legal entities" }
 
         val validRequests = filterDuplicatesByIdentifier(requests)
@@ -80,7 +80,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createSites(requests: Collection<SiteCreateRequest>): Collection<SiteUpsertResponse> {
+    fun createSites(requests: Collection<SitePartnerCreateRequest>): Collection<SiteUpsertResponse> {
         logger.info { "Create ${requests.size} new sites" }
 
         val legalEntities = businessPartnerRepository.findDistinctByBpnIn(requests.map { it.legalEntity })
@@ -107,7 +107,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createAddresses(requests: Collection<AddressRequest>): Collection<AddressCreateResponse> {
+    fun createAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<AddressCreateResponse> {
         logger.info { "Create ${requests.size} new addresses" }
 
         val (bpnlRequests, otherAddresses) = requests.partition { it.parent.startsWith(bpnIssuingService.bpnlPrefix) }
@@ -129,7 +129,7 @@ class BusinessPartnerBuildService(
      * Update existing records with [requests]
      */
     @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPoolUpdateRequest>): Collection<LegalEntityPoolUpsertResponse> {
+    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): Collection<LegalEntityPoolUpsertResponse> {
         logger.info { "Update ${requests.size} legal entities" }
         val metadataMap = metadataMappingService.mapRequests(requests.map { it.properties })
 
@@ -151,7 +151,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun updateSites(requests: Collection<SiteUpdateRequest>): Collection<SiteUpsertResponse> {
+    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): Collection<SiteUpsertResponse> {
         logger.info { "Update ${requests.size} sites" }
         val bpnsToFetch = requests.map { it.bpn }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -168,7 +168,7 @@ class BusinessPartnerBuildService(
         return siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
     }
 
-    fun updateAddresses(requests: Collection<AddressUpdateRequest>): Collection<AddressPoolResponse> {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPoolResponse> {
         logger.info { "Update ${requests.size} business partner addresses" }
 
         val addresses = partnerAddressRepository.findDistinctByBpnIn(requests.map { it.bpn })
@@ -193,7 +193,7 @@ class BusinessPartnerBuildService(
         partner.currentness = Instant.now()
     }
 
-    private fun createLegalEntityAddresses(requests: Collection<AddressRequest>): Collection<Pair<PartnerAddress, String?>> {
+    private fun createLegalEntityAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<PartnerAddress, String?>> {
         val bpnLsToFetch = requests.map { it.parent }
         val legalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
         val bpnlMap = legalEntities.associateBy { it.bpn }
@@ -211,7 +211,7 @@ class BusinessPartnerBuildService(
             .map { (request, bpna) -> Pair(createPartnerAddress(request.properties, bpna, bpnlMap[request.parent], null), request.index) }
     }
 
-    private fun createSiteAddresses(requests: Collection<AddressRequest>): Collection<Pair<PartnerAddress, String?>> {
+    private fun createSiteAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<PartnerAddress, String?>> {
         val bpnsToFetch = requests.map { it.parent }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
         val bpnsMap = sites.associateBy { it.bpn }
@@ -416,7 +416,7 @@ class BusinessPartnerBuildService(
         return PostCode(dto.value, dto.type, address.country, address)
     }
 
-    private fun filterDuplicatesByIdentifier(requests: Collection<LegalEntityCreateRequest>): Collection<LegalEntityCreateRequest> {
+    private fun filterDuplicatesByIdentifier(requests: Collection<LegalEntityPartnerCreateRequest>): Collection<LegalEntityPartnerCreateRequest> {
         val idValues = requests.flatMap { it.properties.identifiers }.map { it.value }
         val idHash = identifierRepository.findByValueIn(idValues).map { Pair(it.value, it.type.technicalKey) }.toHashSet()
 
