@@ -149,7 +149,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
      * Then don't update
      */
     @Test
-    fun `ignore legal entity update `() {
+    fun `ignore invalid legal entity update`() {
         val given = listOf(RequestValues.legalEntityCreate1)
         webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
 
@@ -250,4 +250,5 @@ class BusinessPartnerControllerIT @Autowired constructor(
         .returnResult<BusinessPartnerResponse>()
         .responseBody
         .blockFirst()!!.currentness
+
 }

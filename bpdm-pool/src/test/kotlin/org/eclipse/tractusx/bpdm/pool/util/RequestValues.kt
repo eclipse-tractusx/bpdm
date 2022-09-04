@@ -261,13 +261,13 @@ object RequestValues {
     )
 
     val siteUpdate2 = SiteUpdateRequest(
-        bpn = CommonValues.bpnS1,
-        site = siteCreate1.site
+        bpn = CommonValues.bpnS2,
+        site = siteCreate2.site
     )
 
     val siteUpdate3 = SiteUpdateRequest(
-        bpn = CommonValues.bpnS1,
-        site = siteCreate1.site
+        bpn = CommonValues.bpnS3,
+        site = siteCreate3.site
     )
 
     val addressPartnerCreate1 = AddressRequest(

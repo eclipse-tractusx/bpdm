@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
@@ -43,14 +44,14 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 @Component
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
-    val objectMapper: ObjectMapper,
-    val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties,
+    private val objectMapper: ObjectMapper,
+    private val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
-    private val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
-    private val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
-    private val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
+    val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
+    val bpnSPattern = createBpnPattern(bpnConfigProperties.siteChar)
+    val bpnAPattern = createBpnPattern(bpnConfigProperties.addressChar)
 
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
@@ -199,11 +200,8 @@ class TestHelpers(
         actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
         actuals.forEach { Assertions.assertThat(it.bpn).matches(bpnLPattern) }
 
-        Assertions.assertThat(actuals)
-            .usingRecursiveComparison()
+        assertRecursively(actuals)
             .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::bpn.name)
-            .ignoringCollectionOrder()
-            .ignoringAllOverriddenEquals()
             .isEqualTo(expected)
     }
 
@@ -212,12 +210,16 @@ class TestHelpers(
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { Assertions.assertThat(it.currentness).isBetween(justBeforeCreate, now) }
 
-        Assertions.assertThat(actuals)
-            .usingRecursiveComparison()
+        assertRecursively(actuals)
             .ignoringFields(LegalEntityPoolUpsertResponse::currentness.name, LegalEntityPoolUpsertResponse::index.name)
+            .isEqualTo(expected)
+    }
+
+    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
+        return Assertions.assertThat(actual)
+            .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
-            .isEqualTo(expected)
     }
 
     private fun createBpnPattern(typeId: Char): String {

@@ -47,7 +47,10 @@ class SiteController(
 ) {
 
     @PostMapping("/main-addresses/search")
-    fun searchMainAddresses(bpnS: Collection<String>): Collection<MainAddressSearchResponse> {
+    fun searchMainAddresses(
+        @RequestBody
+        bpnS: Collection<String>
+    ): Collection<MainAddressSearchResponse> {
         return addressService.findMainAddresses(bpnS)
     }
 

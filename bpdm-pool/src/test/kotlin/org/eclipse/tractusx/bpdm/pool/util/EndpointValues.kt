@@ -58,6 +58,7 @@ object EndpointValues {
 
     const val CATENA_SITES_PATH = "/api/catena/sites"
     const val CATENA_SITE_SEARCH_PATH = "$CATENA_SITES_PATH/search"
+    const val CATENA_SITE_MAIN_ADDRESS_SEARCH_PATH = "$CATENA_SITES_PATH/main-addresses/search"
 
     const val CDQ_SYNCH_PATH = "/api/cdq/business-partner/sync"
 
