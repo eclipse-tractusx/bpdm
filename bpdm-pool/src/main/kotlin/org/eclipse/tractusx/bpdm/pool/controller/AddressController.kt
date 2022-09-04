@@ -80,6 +80,19 @@ class AddressController(
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
     }
 
+    @Operation(
+        summary = "Create new address business partners",
+        description = "Create new business partners of type address by specifying the BPN of the parent each address belongs to. " +
+                "A parent can be either a site or legal entity business partner. " +
+                "If the parent cannot be found, the record is ignored." +
+                "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
+        ]
+    )
     @PostMapping
     fun createAddresses(
         @RequestBody
@@ -88,6 +101,17 @@ class AddressController(
         return businessPartnerBuildService.createAddresses(requests)
     }
 
+    @Operation(
+        summary = "Update existing address business partners",
+        description = "Update existing business partner records of type address referenced via BPNA. " +
+                "The endpoint expects to receive the full updated record, including values that didn't change."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
+        ]
+    )
     @PutMapping
     fun updateAddresses(
         @RequestBody

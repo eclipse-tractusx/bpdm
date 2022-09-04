@@ -46,6 +46,16 @@ class SiteController(
     private val addressService: AddressService
 ) {
 
+    @Operation(
+        summary = "Search Main Addresses",
+        description = "Search main addresses of site business partners by BPNS"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The found main addresses"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+        ]
+    )
     @PostMapping("/main-addresses/search")
     fun searchMainAddresses(
         @RequestBody
@@ -90,6 +100,18 @@ class SiteController(
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
+    @Operation(
+        summary = "Create new site business partners",
+        description = "Create new business partners of type site by specifying the BPNL of the legal entity each site belongs to. " +
+                "If the legal entitiy cannot be found, the record is ignored." +
+                "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
+        ]
+    )
     @PostMapping
     fun createSite(
         @RequestBody
@@ -98,6 +120,17 @@ class SiteController(
         return businessPartnerBuildService.createSites(requests)
     }
 
+    @Operation(
+        summary = "Update existing site business partners",
+        description = "Update existing business partner records of type site referenced via BPNS. " +
+                "The endpoint expects to receive the full updated record, including values that didn't change."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
+        ]
+    )
     @PutMapping
     fun updateSite(
         @RequestBody

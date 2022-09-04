@@ -38,6 +38,16 @@ class LegalEntityController(
     private val addressService: AddressService
 ) {
 
+    @Operation(
+        summary = "Search Legal Addresses",
+        description = "Search legal addresses of legal entities by BPNL"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The found legal addresses"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+        ]
+    )
     @PostMapping("/legal-addresses/search")
     fun searchLegalAddresses(
         @RequestBody
@@ -47,13 +57,15 @@ class LegalEntityController(
     }
 
     @Operation(
-        summary = "Create new business partner record",
-        description = "Endpoint to create new business partner records directly in the system. Currently for test purposes only."
+        summary = "Create new legal entity business partners",
+        description = "Create new business partners of type legal entity. " +
+                "The given additional identifiers of a record need to be unique, otherwise they are ignored. " +
+                "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
             ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
     )
@@ -65,6 +77,18 @@ class LegalEntityController(
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
+    @Operation(
+        summary = "Update existing legal entity business partners",
+        description = "Update existing business partner records of type legal entity referenced via BPNL. " +
+                "The endpoint expects to receive the full updated record, including values that didn't change."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
+        ]
+    )
     @PutMapping
     fun updateBusinessPartners(
         @RequestBody
