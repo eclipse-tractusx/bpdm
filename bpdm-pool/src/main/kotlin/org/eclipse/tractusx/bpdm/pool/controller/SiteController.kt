@@ -65,8 +65,8 @@ class SiteController(
     }
 
     @Operation(
-        summary = "Get site by bpn",
-        description = "Get site by bpn-s of the site."
+        summary = "Get site partners by bpn",
+        description = "Get business partners of type site by bpn-s."
     )
     @ApiResponses(
         value = [
@@ -83,8 +83,8 @@ class SiteController(
     }
 
     @Operation(
-        summary = "Search sites by BPNLs",
-        description = "Search sites by legal entity BPNs"
+        summary = "Search site partners by BPNLs",
+        description = "Search business partners of type site by the BPNLs of their parent legal entities"
     )
     @ApiResponses(
         value = [

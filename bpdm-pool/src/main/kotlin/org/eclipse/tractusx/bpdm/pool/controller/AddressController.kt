@@ -45,8 +45,8 @@ class AddressController(
 ) {
 
     @Operation(
-        summary = "Get address by bpn",
-        description = "Get address by bpn-a of the address."
+        summary = "Get address partners by bpn",
+        description = "Get business partners of type address by bpn-a."
     )
     @ApiResponses(
         value = [
@@ -63,8 +63,8 @@ class AddressController(
     }
 
     @Operation(
-        summary = "Search addresses by site and/or legal entity BPNs",
-        description = "Search addresses by BPNLs and BPNSs."
+        summary = "Search address partners by site and/or legal entity BPNs",
+        description = "Search business partners of type address by their parent partners BPN (BPNLs or BPNS)."
     )
     @ApiResponses(
         value = [
