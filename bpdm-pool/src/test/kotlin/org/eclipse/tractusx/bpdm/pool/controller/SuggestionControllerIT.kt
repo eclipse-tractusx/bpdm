@@ -53,7 +53,7 @@ import java.util.stream.Stream
 @ActiveProfiles(value = ["test"])
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 @AutoConfigureWebTestClient(timeout = "10000")
-class BusinessPartnerControllerSuggestionIT @Autowired constructor(
+class SuggestionControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val openSearchSyncService: OpenSearchSyncStarterService,
     val testHelpers: TestHelpers,
@@ -85,57 +85,57 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             Stream.of(
                 Arguments.of(
                     expectedLegalEntityName,
-                    EndpointValues.CATENA_NAME_PATH,
+                    EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalEntity.legalForm!!.name,
-                    EndpointValues.CATENA_LEGAL_FORM_PATH,
+                    EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH,
                     expectedLegalEntity.names.first().value
                 ),
                 Arguments.of(
                     expectedLegalEntity.status!!.officialDenotation,
-                    EndpointValues.CATENA_STATUS_PATH,
+                    EndpointValues.CATENA_SUGGESTION_LE_STATUS_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalEntity.profileClassifications.first().value,
-                    EndpointValues.CATENA_CLASSIFICATION_PATH,
+                    EndpointValues.CATENA_SUGGESTION_LE_CLASSIFICATION_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedSite.name,
-                    EndpointValues.CATENA_SITE_PATH,
+                    EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.administrativeAreas.first().value,
-                    EndpointValues.CATENA_ADMIN_AREA_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.postCodes.first().value,
-                    EndpointValues.CATENA_POST_CODE_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.localities.first().value,
-                    EndpointValues.CATENA_LOCALITY_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.thoroughfares.first().value,
-                    EndpointValues.CATENA_THOROUGHFARE_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.premises.first().value,
-                    EndpointValues.CATENA_PREMISE_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
                     expectedLegalAddress.postalDeliveryPoints.first().value,
-                    EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
                     expectedLegalEntityName
                 )
             )
@@ -143,15 +143,15 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         @JvmStatic
         fun argumentsSuggestPropertyValuesNonLatin(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(nonlatinLegalEntity.names.first().value, EndpointValues.CATENA_NAME_PATH),
-                Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_LEGAL_FORM_PATH),
-                Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SITE_PATH),
-                Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_ADMIN_AREA_PATH),
-                Arguments.of(nonlatinLegalAddress.postCodes.first().value, EndpointValues.CATENA_POST_CODE_PATH),
-                Arguments.of(nonlatinLegalAddress.localities.first().value, EndpointValues.CATENA_LOCALITY_PATH),
-                Arguments.of(nonlatinLegalAddress.thoroughfares.first().value, EndpointValues.CATENA_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.premises.first().value, EndpointValues.CATENA_PREMISE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalDeliveryPoints.first().value, EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinLegalEntity.names.first().value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
+                Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
+                Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
+                Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.postCodes.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.localities.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.thoroughfares.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.premises.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.postalDeliveryPoints.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 
@@ -397,7 +397,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(EndpointValues.CATENA_NAME_PATH)
+                builder.path(EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .build()
             }
