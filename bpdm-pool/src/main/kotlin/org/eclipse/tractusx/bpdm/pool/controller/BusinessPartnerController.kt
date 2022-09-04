@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
@@ -174,7 +173,7 @@ class BusinessPartnerController(
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressBpnResponse> {
+    ): PageResponse<AddressPoolResponse> {
         return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
     }
 

@@ -149,7 +149,7 @@ class SiteControllerIT @Autowired constructor(
      * Then only create sites with existing bpnl
      */
     @Test
-    fun `don't create legal entity with same identifier`() {
+    fun `don't create sites with non-existing parent`() {
         val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)

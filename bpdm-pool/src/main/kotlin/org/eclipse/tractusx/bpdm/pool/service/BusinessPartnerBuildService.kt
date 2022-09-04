@@ -198,13 +198,15 @@ class BusinessPartnerBuildService(
         val legalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
         val bpnlMap = legalEntities.associateBy { it.bpn }
 
-        if (legalEntities.size != bpnLsToFetch.size) {
+        val validRequests = requests.filter { bpnlMap[it.parent] != null }
+
+        if (validRequests.size != requests.size) {
             val notFetched = bpnLsToFetch.minus(legalEntities.map { it.bpn }.toSet())
             notFetched.forEach { logger.warn { "Address could not be created: legal entity $it not found" } }
         }
 
-        val bpnAs = bpnIssuingService.issueAddressBpns(legalEntities.size)
-        return requests
+        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
+        return validRequests
             .zip(bpnAs)
             .map { (request, bpna) -> Pair(createPartnerAddress(request.properties, bpna, bpnlMap[request.parent], null), request.index) }
     }
@@ -214,13 +216,15 @@ class BusinessPartnerBuildService(
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
         val bpnsMap = sites.associateBy { it.bpn }
 
-        if (sites.size != bpnsToFetch.size) {
+        val validRequests = requests.filter { bpnsMap[it.parent] != null }
+
+        if (validRequests.size != requests.size) {
             val notFetched = bpnsToFetch.minus(sites.map { it.bpn }.toSet())
             notFetched.forEach { logger.warn { "Address could not be created: site $it not found" } }
         }
 
-        val bpnAs = bpnIssuingService.issueAddressBpns(sites.size)
-        return requests
+        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
+        return validRequests
             .zip(bpnAs)
             .map { (request, bpna) -> Pair(createPartnerAddress(request.properties, bpna, null, bpnsMap[request.parent]), request.index) }
     }

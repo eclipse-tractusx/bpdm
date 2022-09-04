@@ -195,36 +195,36 @@ object ResponseValues {
         premises = listOf(premise6)
     )
 
-    val addressPartner1 = AddressBpnResponse(
+    val addressPartner1 = AddressPoolResponse(
         bpn = CommonValues.bpnA1,
-        address = address1
+        properties = address1
     )
 
-    val addressPartner2 = AddressBpnResponse(
+    val addressPartner2 = AddressPoolResponse(
         bpn = CommonValues.bpnA2,
-        address = address2
+        properties = address2
     )
 
-    val addressPartner3 = AddressBpnResponse(
+    val addressPartner3 = AddressPoolResponse(
         bpn = CommonValues.bpnA3,
-        address = address3
+        properties = address3
     )
 
     val addressPartnerCreate1 = AddressCreateResponse(
         bpn = addressPartner1.bpn,
-        properties = addressPartner1.address,
+        properties = addressPartner1.properties,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressCreateResponse(
         bpn = addressPartner2.bpn,
-        properties = addressPartner2.address,
+        properties = addressPartner2.properties,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressCreateResponse(
         bpn = addressPartner3.bpn,
-        properties = addressPartner3.address,
+        properties = addressPartner3.properties,
         index = CommonValues.index3
     )
 

@@ -19,14 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.Address
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerAddress
 import org.eclipse.tractusx.bpdm.pool.repository.AddressRepository
@@ -44,7 +40,7 @@ class AddressService(
     private val siteRepository: SiteRepository,
     private val addressRepository: AddressRepository
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressBpnResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressPoolResponse> {
         if (!businessPartnerRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }

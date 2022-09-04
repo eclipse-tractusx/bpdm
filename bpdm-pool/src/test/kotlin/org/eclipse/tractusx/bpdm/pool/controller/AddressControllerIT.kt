@@ -25,8 +25,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -203,6 +202,152 @@ class AddressControllerIT @Autowired constructor(
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
             .isEqualTo(listOf(expectedAddressWithReferences1, expectedAddressWithReferences2, expectedAddressWithReferences3))
+    }
+
+    /**
+     * Given sites and legal entities
+     * When creating addresses for sites and legal entities
+     * Then new addresses created and returned
+     */
+    @Test
+    fun `create new addresses`() {
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                ),
+            ),
+            webTestClient
+        )
+
+        val bpnL = givenStructure[0].legalEntity.bpn
+        val bpnS = givenStructure[0].siteStructures[0].site.bpn
+
+        val expected = listOf(
+            ResponseValues.addressPartnerCreate1,
+            ResponseValues.addressPartnerCreate2,
+            ResponseValues.addressPartnerCreate3
+        )
+
+        val toCreate = listOf(
+            RequestValues.addressPartnerCreate1.copy(parent = bpnL),
+            RequestValues.addressPartnerCreate2.copy(parent = bpnL),
+            RequestValues.addressPartnerCreate3.copy(parent = bpnS)
+        )
+        val response = webTestClient.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+
+        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response).ignoringFields(AddressCreateResponse::bpn.name).isEqualTo(expected)
+    }
+
+    /**
+     * Given sites and legal entities
+     * When creating addresses with some having non-existent parents
+     * Then only addresses with existing parents created and returned
+     */
+    @Test
+    fun `don't create addresses with non-existent parent`() {
+        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPoolUpsertResponse>(
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+            listOf(RequestValues.legalEntityCreate1)
+        ).single().bpn
+
+        val expected = listOf(
+            ResponseValues.addressPartnerCreate1,
+        )
+
+        val toCreate = listOf(
+            RequestValues.addressPartnerCreate1.copy(parent = bpnL),
+            RequestValues.addressPartnerCreate2.copy(parent = "BPNSXXXXXXXXXX"),
+            RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
+        )
+        val response = webTestClient.invokePostWithArrayResponse<AddressCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+
+        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response).ignoringFields(AddressCreateResponse::bpn.name).isEqualTo(expected)
+    }
+
+    /**
+     * Given addresses
+     * When updating addresses via BPNs
+     * Then update and return those addresses
+     */
+    fun `update addresses`() {
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate1,
+                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                        )
+                    )
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].bpn
+        val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].bpn
+        val bpnA3 = givenStructure[1].addresses[0].bpn
+
+        val expected = listOf(
+            ResponseValues.addressPartner1.copy(bpn = bpnA2),
+            ResponseValues.addressPartner2.copy(bpn = bpnA3),
+            ResponseValues.addressPartner3.copy(bpn = bpnA1)
+        )
+
+        val toUpdate = listOf(
+            RequestValues.addressPartnerUpdate1.copy(bpn = bpnA2),
+            RequestValues.addressPartnerUpdate2.copy(bpn = bpnA3),
+            RequestValues.addressPartnerUpdate3.copy(bpn = bpnA1)
+        )
+        val response = webTestClient.invokePutWithArrayResponse<AddressPoolResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+
+        testHelpers.assertRecursively(response).isEqualTo(expected)
+    }
+
+    /**
+     * Given addresses
+     * When updating addresses with some having non-existent BPNs
+     * Then only update and return addresses with existent BPNs
+     */
+    fun `updates addresses, ignore non-existent`() {
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate1,
+                            addresses = listOf(RequestValues.addressPartnerCreate1)
+                        )
+                    )
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].bpn
+
+        val expected = listOf(
+            ResponseValues.addressPartner2.copy(bpn = bpnA1)
+        )
+
+        val toUpdate = listOf(
+            RequestValues.addressPartnerUpdate2.copy(bpn = bpnA1),
+            RequestValues.addressPartnerUpdate2.copy(bpn = "BPNLXXXXXXXX"),
+            RequestValues.addressPartnerUpdate3.copy(bpn = "BPNAXXXXXXXX")
+        )
+        val response = webTestClient.invokePutWithArrayResponse<AddressPoolResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+
+        testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
 

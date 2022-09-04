@@ -109,8 +109,8 @@ fun Role.toDto(): TypeKeyNameDto<String> {
 }
 
 
-fun PartnerAddress.toDto(): AddressBpnResponse {
-    return AddressBpnResponse(
+fun PartnerAddress.toDto(): AddressPoolResponse {
+    return AddressPoolResponse(
         bpn,
         address.toDto()
     )
