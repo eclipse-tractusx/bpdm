@@ -20,23 +20,142 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.pool.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.service.*
+import org.springdoc.api.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/catena/legal-entities")
 class LegalEntityController(
-    private val businessPartnerBuildService: BusinessPartnerBuildService,
-    private val addressService: AddressService
+    val businessPartnerFetchService: BusinessPartnerFetchService,
+    val businessPartnerBuildService: BusinessPartnerBuildService,
+    val searchService: SearchService,
+    val bpnConfigProperties: BpnConfigProperties,
+    val siteService: SiteService,
+    val addressService: AddressService
 ) {
+
+    @Operation(
+        summary = "Get page of legal entity business partners matching the search criteria",
+        description = "This endpoint tries to find matches among all existing business partners of type legal entity, " +
+                "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
+                "The match of a partner is better the higher its relevancy score."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
+        ]
+    )
+    @GetMapping
+    fun getLegalEntities(
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<LegalEntityMatchResponse> {
+        return searchService.searchBusinessPartners(
+            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
+            paginationRequest
+        )
+    }
+
+    @Operation(
+        summary = "Get legal entity business partner by identifier",
+        description = "This endpoint tries to find a business partner by the specified identifier. " +
+                "The identifier value is case insensitively compared but needs to be given exactly. " +
+                "By default the value given is interpreted as a BPN. " +
+                "By specifying the technical key of another identifier type" +
+                "the value is matched against the identifiers of that given type."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found business partner with specified identifier"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(
+                responseCode = "404",
+                description = "No business partner found under specified identifier or specified identifier type not found",
+                content = [Content()]
+            )
+        ]
+    )
+    @GetMapping("/{idValue}")
+    fun getLegalEntity(
+        @Parameter(description = "Identifier value") @PathVariable idValue: String,
+        @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
+        @RequestParam
+        idType: String?
+    ): LegalEntityPartnerResponse {
+        val actualType = idType ?: bpnConfigProperties.id
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findPartner(idValue)
+        else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
+    }
+
+    @Operation(
+        summary = "Confirms that the data of a legal entity business partner is still up to date.",
+        description = "Confirms that the data of a business partner is still up to date " +
+                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\"."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Business partner's \"currentness\" successfully updated"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @PostMapping("/{bpn}/confirm-up-to-date")
+    fun setLegalEntityCurrentness(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String
+    ) {
+        businessPartnerBuildService.setBusinessPartnerCurrentness(bpn)
+    }
+
+    @Operation(
+        summary = "Get site partners of a legal entity",
+        description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpn."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The sites for the specified bpn"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @GetMapping("/{bpn}/sites")
+    fun getSites(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<SitePartnerResponse> {
+        return siteService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
+    }
+
+    @Operation(
+        summary = "Get address partners of a legal entity",
+        description = "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's bpn."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The addresses for the specified bpn"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+        ]
+    )
+    @GetMapping("/{bpn}/addresses")
+    fun getAddresses(
+        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<AddressPartnerResponse> {
+        return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
+    }
 
     @Operation(
         summary = "Search Legal Addresses",

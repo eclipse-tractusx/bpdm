@@ -27,7 +27,6 @@ object EndpointValues {
     const val TEXT_PARAM_NAME = "text"
 
     const val CATENA_PATH = "/api/catena"
-    const val CATENA_BUSINESS_PARTNER_PATH = "${CATENA_PATH}/business-partner"
 
     const val CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX = "/confirm-up-to-date"
     const val CATENA_CHANGELOG_PATH_POSTFIX = "/changelog"

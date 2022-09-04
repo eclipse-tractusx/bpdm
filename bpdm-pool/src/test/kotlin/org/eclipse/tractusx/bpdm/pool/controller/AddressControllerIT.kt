@@ -357,5 +357,5 @@ class AddressControllerIT @Autowired constructor(
         webTestClient.invokeGetEndpoint<AddressPartnerSearchResponse>(EndpointValues.CATENA_ADDRESSES_PATH + "/${bpnAddress}")
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
-        webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX)
+        webTestClient.invokeGetEndpoint<PageResponse<AddressBpnResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}" + EndpointValues.CATENA_ADDRESSES_PATH_POSTFIX)
 }

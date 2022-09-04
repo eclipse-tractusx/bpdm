@@ -43,7 +43,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 )
 @ActiveProfiles(value = ["test"])
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
-class BusinessPartnerControllerSearchIT @Autowired constructor(
+class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers
 ) {
@@ -157,7 +157,7 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
 
     private fun searchBusinessPartnerBySiteName(siteName: String, page: Int? = null, size: Int? = null): PageResponse<LegalEntityMatchResponse> {
         return webTestClient.invokeGetEndpoint(
-            EndpointValues.CATENA_BUSINESS_PARTNER_PATH,
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             *(listOfNotNull(
                 SitePropertiesSearchRequest::siteName.name to siteName,
                 if (page != null) PaginationRequest::page.name to page.toString() else null,

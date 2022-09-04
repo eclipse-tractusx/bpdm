@@ -82,7 +82,7 @@ class ValidIndexStartupIT @Autowired constructor(
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)
     }
@@ -95,7 +95,7 @@ class ValidIndexStartupIT @Autowired constructor(
     @Test
     @Order(1)
     fun acceptValidIndexOnStartup() {
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
 
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)

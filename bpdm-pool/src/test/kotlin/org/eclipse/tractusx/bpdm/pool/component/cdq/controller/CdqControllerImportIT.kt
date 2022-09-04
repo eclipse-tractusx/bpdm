@@ -217,7 +217,7 @@ class CdqControllerImportIT @Autowired constructor(
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
 
-        val savedBusinessPartners = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val savedBusinessPartners = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
         assertLegalEntityResponseEquals(savedBusinessPartners.content.map { it.legalEntity }, expectedPartners)
     }
 

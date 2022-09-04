@@ -121,7 +121,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
         assertThat(searchResult.content).isNotEmpty
         assertThat(searchResult.contentSize).isEqualTo(1)
     }

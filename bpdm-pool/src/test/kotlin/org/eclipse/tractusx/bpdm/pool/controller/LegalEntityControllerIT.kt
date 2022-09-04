@@ -45,7 +45,7 @@ import java.time.Instant
 )
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-class BusinessPartnerControllerIT @Autowired constructor(
+class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
 ) {
@@ -225,7 +225,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         assertThat(initialCurrentness).isBeforeOrEqualTo(instantBeforeCurrentnessUpdate)
 
-        webTestClient.invokePostEndpointWithoutResponse(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpnL}" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
+        webTestClient.invokePostEndpointWithoutResponse(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpnL}" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
 
         val updatedCurrentness = retrieveCurrentness(bpnL)
         assertThat(updatedCurrentness).isBetween(instantBeforeCurrentnessUpdate, Instant.now())
@@ -238,7 +238,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
      */
     @Test
     fun `set business partner currentness using nonexistent bpn`() {
-        webTestClient.post().uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/NONEXISTENT_BPN" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
+        webTestClient.post().uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/NONEXISTENT_BPN" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
             .exchange()
             .expectStatus()
             .isNotFound
@@ -246,7 +246,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     private fun retrieveCurrentness(bpn: String) = webTestClient
         .get()
-        .uri(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}")
+        .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
         .exchange().expectStatus().isOk
         .returnResult<LegalEntityPartnerResponse>()
         .responseBody

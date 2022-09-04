@@ -189,7 +189,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
     private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
         return webTestClient.get().uri { builder ->
-            builder.path(EndpointValues.CATENA_BUSINESS_PARTNER_PATH)
+            builder.path(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
                 .queryParam(LegalEntityPropertiesSearchRequest::name.name, name)
                 .build()
         }

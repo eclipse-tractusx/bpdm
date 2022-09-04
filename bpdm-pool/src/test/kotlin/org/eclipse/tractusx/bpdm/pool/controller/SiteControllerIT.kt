@@ -315,5 +315,5 @@ class SiteControllerIT @Autowired constructor(
         webTestClient.invokeGetEndpoint<SitePartnerSearchResponse>(EndpointValues.CATENA_SITES_PATH + "/${bpnSite}")
 
     private fun requestSitesOfLegalEntity(bpn: String) =
-        webTestClient.invokeGetEndpoint<PageResponse<SitePartnerResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
+        webTestClient.invokeGetEndpoint<PageResponse<SitePartnerResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
 }
