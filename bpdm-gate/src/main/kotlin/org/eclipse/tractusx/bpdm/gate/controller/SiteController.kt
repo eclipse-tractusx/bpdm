@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.request.ExternalIdsRequest
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
@@ -35,7 +36,6 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -106,26 +106,11 @@ class SiteController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping("/output/sites")
+    @PostMapping("/output/sites")
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show sites that were updated after the specified ISO-8601 timestamp") from: Instant?
+        @RequestBody(required = false) externalIdsRequest: ExternalIdsRequest?
     ): PageStartAfterResponse<SiteGateOutput> {
-        TODO()
-    }
-
-    @Operation(
-        summary = "Get site by external identifier",
-        description = "Get site by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found site with external identifier"),
-            ApiResponse(responseCode = "404", description = "No site found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/output/sites/{externalId}")
-    fun getSiteByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateOutput {
         TODO()
     }
 }

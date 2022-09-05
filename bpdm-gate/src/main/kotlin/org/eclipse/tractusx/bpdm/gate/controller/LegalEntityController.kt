@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.request.ExternalIdsRequest
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -35,7 +36,6 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -110,23 +110,8 @@ class LegalEntityController(
     @GetMapping("/output/legal-entities")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
+        @RequestBody(required = false) externalIdsRequest: ExternalIdsRequest?
     ): PageStartAfterResponse<LegalEntityGateOutput> {
-        return legalEntityService.getLegalEntitiesOutput(paginationRequest.limit, paginationRequest.startAfter, from)
-    }
-
-    @Operation(
-        summary = "Get legal entity by external identifier",
-        description = "Get legal entity by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found legal entity with external identifier"),
-            ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/output/legal-entities/{externalId}")
-    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateOutput {
-        return legalEntityService.getLegalEntityByExternalIdOutput(externalId)
+        TODO()
     }
 }
