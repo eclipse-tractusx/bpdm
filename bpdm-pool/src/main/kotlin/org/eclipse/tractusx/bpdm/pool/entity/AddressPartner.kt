@@ -17,16 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
+import javax.persistence.*
 
-@Schema(name = "Address With Reference Response", description = "Address with bpn references")
-data class AddressWithReferenceResponse(
-    val address: AddressBpnResponse,
-    @Schema(description = "Business Partner Number of the related legal entity")
-    val bpnLegalEntity: String?,
-    @Schema(description = "Business Partner Number of the related site")
-    val bpnSite: String?,
+@Entity
+@Table(
+    name = "address_partners",
+    indexes = [
+        Index(columnList = "legal_entity_id"),
+        Index(columnList = "site_id"),
+    ]
 )
+class AddressPartner(
+    @Column(name = "bpn", nullable = true, unique = true)
+    var bpn: String,
+    @ManyToOne
+    @JoinColumn(name = "legal_entity_id")
+    var legalEntity: LegalEntity?,
+    @ManyToOne
+    @JoinColumn(name = "site_id")
+    var site: Site?,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "address_id")
+    var address: Address
+) : BaseEntity()

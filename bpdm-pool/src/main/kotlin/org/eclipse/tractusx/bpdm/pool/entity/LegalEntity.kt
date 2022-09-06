@@ -25,50 +25,53 @@ import javax.persistence.*
 
 @Entity
 @Table(
-    name = "business_partners",
+    name = "legal_entities",
     indexes = [Index(columnList = "legal_form_id")]
 )
-class BusinessPartner(
+class LegalEntity(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
-    @JoinTable(name = "business_partner_types", joinColumns = [JoinColumn(name = "partner_id")], indexes = [Index(columnList = "partner_id")])
+    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     var types: Set<BusinessPartnerType>,
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
-        name = "business_partners_roles",
-        joinColumns = [JoinColumn(name = "partner_id")],
+        name = "legal_entity_roles",
+        joinColumns = [JoinColumn(name = "legal_entity_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")],
-        indexes = [Index(columnList = "partner_id")]
+        indexes = [Index(columnList = "legal_entity_id")]
     )
     val roles: Set<Role>,
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant
+    var currentness: Instant,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "legal_address_id", nullable = false)
+    var legalAddress: Address
 ) : BaseEntity() {
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val names: MutableSet<Name> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<Address> = mutableSetOf()
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val addresses: MutableSet<AddressPartner> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val classification: MutableSet<Classification> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
 
     @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)

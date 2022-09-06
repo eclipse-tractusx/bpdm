@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.core.JsonParser
@@ -26,22 +26,28 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-@JsonDeserialize(using = AddressBpnDtoDeserializer::class)
-data class AddressBpnDto(
-    @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
+@JsonDeserialize(using = AddressPartnerCreateResponse.CustomDeserializer::class)
+@Schema(name = "Address Partner Create Response", description = "Created business partners of type address")
+data class AddressPartnerCreateResponse(
+    @Schema(description = "Business Partner Number of this address")
+    val bpn: String,
     @JsonUnwrapped
-    val address: AddressDto
-)
-
-class AddressBpnDtoDeserializer(vc: Class<AddressBpnDto>?) : StdDeserializer<AddressBpnDto>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressBpnDto {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressBpnDto(
-            node.get(AddressBpnDto::bpn.name)?.textValue(),
-            ctxt.readTreeAsValue(node, AddressDto::class.java)
-        )
+    val properties: AddressResponse,
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    val index: String?
+) {
+    class CustomDeserializer(vc: Class<AddressPartnerCreateResponse>?) : StdDeserializer<AddressPartnerCreateResponse>(vc) {
+        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerCreateResponse {
+            val node = parser.codec.readTree<JsonNode>(parser)
+            return AddressPartnerCreateResponse(
+                node.get(AddressPartnerCreateResponse::bpn.name).textValue(),
+                ctxt.readTreeAsValue(node, AddressResponse::class.java),
+                node.get(AddressPartnerCreateResponse::index.name)?.textValue(),
+            )
+        }
     }
 }
+
 

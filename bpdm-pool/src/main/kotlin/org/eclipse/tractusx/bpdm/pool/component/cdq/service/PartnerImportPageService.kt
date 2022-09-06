@@ -20,19 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameUrlCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportResponsePage
-import org.eclipse.tractusx.bpdm.pool.dto.BusinessPartnerUpdateDto
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
+import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
-import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,11 +39,11 @@ import java.time.format.DateTimeFormatter
 class PartnerImportPageService(
     private val webClient: WebClient,
     private val adapterProperties: CdqAdapterConfigProperties,
-    private val cdqIdConfigProperties: CdqIdentifierConfigProperties,
+    cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: CdqToRequestMapper,
-    private val businessPartnerFetchService: BusinessPartnerFetchService,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val cdqIdentifierType = TypeKeyNameUrlCdq(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
     private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
@@ -79,14 +73,32 @@ class PartnerImportPageService(
 
         logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }
 
-        addNewMetadata( partnerCollection.values)
-        val (createRequests, updateRequests) = partitionCreateAndUpdateRequests(partnerCollection.values)
-        val upsertedPartners = businessPartnerBuildService.upsertBusinessPartners(createRequests, updateRequests).map { it.toDto() }
+        addNewMetadata(partnerCollection.values)
+
+        val partnersToUpsert = partnerCollection.values.map {
+            it.copy(
+                identifiers = it.identifiers.plus(
+                    IdentifierCdq(
+                        cdqIdentifierType,
+                        it.id!!,
+                        cdqIssuer,
+                        cdqIdentifierStatus
+                    )
+                )
+            )
+        }
+
+        val (hasBpn, hasNoBpn) = partnersToUpsert.partition { it.identifiers.any { id -> id.type?.technicalKey == bpnConfigProperties.id } }
+        val legalEntitiesToCreate = hasNoBpn.map { mappingService.toCreateRequest(it) }
+        val legalEntitiesToUpdate = hasBpn.map { mappingService.toUpdateRequest(it) }
+
+        val createdLegalEntities = businessPartnerBuildService.createLegalEntities(legalEntitiesToCreate)
+        val updatedLegalEntities = businessPartnerBuildService.updateLegalEntities(legalEntitiesToUpdate)
 
         return ImportResponsePage(
             partnerCollection.total,
             partnerCollection.nextStartAfter,
-            upsertedPartners
+            createdLegalEntities + updatedLegalEntities
         )
     }
 
@@ -131,17 +143,6 @@ class PartnerImportPageService(
 
     private fun toModifiedAfterFormat(dateTime: Instant): String {
         return DateTimeFormatter.ISO_INSTANT.format(dateTime)
-    }
-
-    private fun partitionCreateAndUpdateRequests(cdqPartners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerRequest>, Collection<BusinessPartnerUpdateDto>>{
-        val partnersToUpdate = businessPartnerFetchService.fetchByIdentifierValues(cdqIdConfigProperties.typeKey, cdqPartners.map { it.id!! })
-        val cdqIdToPartnerMap = partnersToUpdate.associateBy { it.identifiers.find { id -> id.type.technicalKey == cdqIdConfigProperties.typeKey }!!.value }
-        val (knownPartners, unknownPartners) = cdqPartners.partition { cdqIdToPartnerMap.containsKey(it.id) }
-
-        return Pair(
-            unknownPartners.map { mappingService.toRequest(it) },
-            knownPartners.map { BusinessPartnerUpdateDto(cdqIdToPartnerMap.getValue(it.id!!), mappingService.toRequest(it)) }
-        )
     }
 
 

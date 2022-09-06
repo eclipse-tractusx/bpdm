@@ -21,12 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,22 +43,39 @@ import org.springframework.test.web.reactive.server.WebTestClient
 )
 @ActiveProfiles(value = ["test"])
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
-class BusinessPartnerControllerSearchIT @Autowired constructor(
+class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val openSearchSyncStarterService: OpenSearchSyncStarterService,
-    val testHelpers: TestHelpers,
-    val businessPartnerBuildService: BusinessPartnerBuildService
+    val testHelpers: TestHelpers
 ) {
+
+    private val partnerStructure1 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate1,
+        siteStructures = listOf(
+            SiteStructureRequest(RequestValues.siteCreate1)
+        )
+    )
+    private val partnerStructure2 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate2,
+        siteStructures = listOf(
+            SiteStructureRequest(RequestValues.siteCreate2),
+            SiteStructureRequest(RequestValues.siteCreate1) //same site here to attain multiple results when needed
+        )
+    )
+
+    private lateinit var givenPartner1: LegalEntityPartnerResponse
+    private lateinit var givenPartner2: LegalEntityPartnerResponse
+
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        openSearchSyncStarterService.clearOpenSearch()
+        webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        businessPartnerBuildService.upsertBusinessPartners(
-            listOf(RequestValues.businessPartnerRequest1, RequestValues.businessPartnerRequest2)
-        )
+        testHelpers.createTestMetadata(webTestClient)
+        val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2), webTestClient)
+        givenPartner1 = with(givenStructure[0].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
+        givenPartner2 = with(givenStructure[1].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
 
-        openSearchSyncStarterService.export()
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
 
     /**
@@ -69,17 +85,18 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner with pagination, multiple items in page`() {
-        // insert partner again, so we get multiple search results
-        businessPartnerBuildService.upsertBusinessPartners(
-            listOf(RequestValues.businessPartnerRequest1)
-        )
-        openSearchSyncStarterService.export()
 
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name, page = 0, size = 100)
-        assertThat(pageResponse.contentSize).isEqualTo(2)
-        assertThat(pageResponse.page).isEqualTo(0)
-        assertThat(pageResponse.totalElements).isEqualTo(2)
-        assertThat(pageResponse.totalPages).isEqualTo(1)
+        val expected = PageResponse(
+            2, 1, 0, 2,
+            listOf(
+                LegalEntityMatchResponse(0f, givenPartner1),
+                LegalEntityMatchResponse(0f, givenPartner2)
+            )
+        )
+
+        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 0, size = 100)
+
+        assertPageEquals(pageResponse, expected)
     }
 
     /**
@@ -89,23 +106,23 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner with pagination, multiple pages`() {
-        // insert partner again, so we get multiple search results
-        businessPartnerBuildService.upsertBusinessPartners(
-            listOf(RequestValues.businessPartnerRequest1)
+
+        val expectedFirstPage = PageResponse(
+            2, 2, 0, 1, listOf(
+                LegalEntityMatchResponse(0f, givenPartner1)
+            )
         )
-        openSearchSyncStarterService.export()
+        val expectedSecondPage = PageResponse(
+            2, 2, 1, 1, listOf(
+                LegalEntityMatchResponse(0f, givenPartner2)
+            )
+        )
 
-        val firstPage = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name, page = 0, size = 1)
-        assertThat(firstPage.contentSize).isEqualTo(1)
-        assertThat(firstPage.page).isEqualTo(0)
-        assertThat(firstPage.totalElements).isEqualTo(2)
-        assertThat(firstPage.totalPages).isEqualTo(2)
+        val firstPage = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 0, size = 1)
+        val secondPage = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 1, size = 1)
 
-        val secondPage = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name, page = 1, size = 1)
-        assertThat(secondPage.contentSize).isEqualTo(1)
-        assertThat(secondPage.page).isEqualTo(1)
-        assertThat(secondPage.totalElements).isEqualTo(2)
-        assertThat(secondPage.totalPages).isEqualTo(2)
+        assertPageEquals(firstPage, expectedFirstPage)
+        assertPageEquals(secondPage, expectedSecondPage)
     }
 
     /**
@@ -115,9 +132,16 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner by site name, result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName(RequestValues.businessPartnerRequest1.sites.first().name).content
-        assertThat(foundPartners).hasSize(1)
-        assertThat(foundPartners.single().businessPartner.names.first().value).isEqualTo(RequestValues.businessPartnerRequest1.names.first().value)
+
+        val expected = PageResponse(
+            1, 1, 0, 1, listOf(
+                LegalEntityMatchResponse(0f, givenPartner2)
+            )
+        )
+
+        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name)
+
+        assertPageEquals(pageResponse, expected)
     }
 
     /**
@@ -131,14 +155,20 @@ class BusinessPartnerControllerSearchIT @Autowired constructor(
         assertThat(foundPartners).isEmpty()
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int? = null, size: Int? = null): PageResponse<BusinessPartnerSearchResponse> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int? = null, size: Int? = null): PageResponse<LegalEntityMatchResponse> {
         return webTestClient.invokeGetEndpoint(
-            EndpointValues.CATENA_BUSINESS_PARTNER_PATH,
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             *(listOfNotNull(
                 SitePropertiesSearchRequest::siteName.name to siteName,
                 if (page != null) PaginationRequest::page.name to page.toString() else null,
                 if (size != null) PaginationRequest::size.name to size.toString() else null
             ).toTypedArray())
         )
+    }
+
+    private fun assertPageEquals(actual: PageResponse<LegalEntityMatchResponse>, expected: PageResponse<LegalEntityMatchResponse>) {
+        testHelpers.assertRecursively(actual)
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchResponse::score.name}")
+            .isEqualTo(expected)
     }
 }

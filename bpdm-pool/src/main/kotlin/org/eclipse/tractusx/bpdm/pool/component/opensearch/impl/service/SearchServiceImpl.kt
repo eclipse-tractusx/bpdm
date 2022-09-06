@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.Busin
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
@@ -64,7 +64,7 @@ class SearchServiceImpl(
     override fun searchBusinessPartners(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<BusinessPartnerSearchResponse> {
+    ): PageResponse<LegalEntityMatchResponse> {
 
         logger.debug { "Search index for business partners" }
 

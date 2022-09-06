@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.stereotype.Service
 
 /**
- * Service for fetching and mapping metadata entities referenced by [BusinessPartnerRequest]
+ * Service for fetching and mapping metadata entities referenced by [LegalEntityDto]
  */
 @Service
 class MetadataMappingService(
@@ -46,7 +46,7 @@ class MetadataMappingService(
     /**
      * Fetch metadata entities referenced in [partners] and map them by their referenced keys
      */
-    fun mapRequests(partners: Collection<BusinessPartnerRequest>): MetadataMappingDto {
+    fun mapRequests(partners: Collection<LegalEntityDto>): MetadataMappingDto {
         return MetadataMappingDto(
             mapIdentifierTypes(partners),
             mapIdentifierStatuses(partners),
@@ -58,28 +58,28 @@ class MetadataMappingService(
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierTypes(partners: Collection<BusinessPartnerRequest>): Map<String, IdentifierType>{
+    fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
         return mapIdentifierTypes(partners.flatMap { it.identifiers.map { id -> id.type } }.toSet())
     }
 
     /**
      * Fetch [IdentifierStatus] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierStatuses(partners: Collection<BusinessPartnerRequest>): Map<String, IdentifierStatus>{
+    fun mapIdentifierStatuses(partners: Collection<LegalEntityDto>): Map<String, IdentifierStatus>{
         return mapIdentifierStatuses(partners.flatMap { it.identifiers.mapNotNull { id -> id.status } }.toSet())
     }
 
     /**
      * Fetch [IssuingBody] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIssuingBodies(partners: Collection<BusinessPartnerRequest>): Map<String, IssuingBody>{
+    fun mapIssuingBodies(partners: Collection<LegalEntityDto>): Map<String, IssuingBody>{
         return mapIssuingBodies(partners.flatMap { it.identifiers.mapNotNull{  id -> id.issuingBody } }.toSet())
     }
 
     /**
      * Fetch [LegalForm] referenced in [partners] and map them by their referenced keys
      */
-    fun mapLegalForms(partners: Collection<BusinessPartnerRequest>): Map<String, LegalForm>{
+    fun mapLegalForms(partners: Collection<LegalEntityDto>): Map<String, LegalForm>{
         return mapLegalForms(partners.mapNotNull { it.legalForm }.toSet())
     }
 

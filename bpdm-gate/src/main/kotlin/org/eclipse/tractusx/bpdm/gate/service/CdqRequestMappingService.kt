@@ -38,41 +38,33 @@ class CdqRequestMappingService(
     private val cdqConfigProperties: CdqConfigProperties
 ) {
     fun toCdqModel(legalEntity: LegalEntityGateInput): BusinessPartnerCdq {
-        return toCdqModel(legalEntity.legalEntity, legalEntity.externalId)
+        return toCdqModel(legalEntity.legalEntity, legalEntity.externalId, legalEntity.bpn)
     }
 
     fun toCdqModel(site: SiteGateInput): BusinessPartnerCdq {
-        return toCdqModel(site.site, site.externalId)
+        return BusinessPartnerCdq(
+            externalId = site.externalId,
+            dataSource = cdqConfigProperties.datasourceSite,
+            names = listOf(NameCdq(value = site.site.name)),
+            addresses = listOf(toCdqModel(site.site.mainAddress)),
+            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn)) else emptyList()
+        )
     }
 
     fun toCdqModel(address: AddressGateInput): BusinessPartnerCdq {
-        return toCdqModel(address.address, address.externalId)
-    }
-
-    private fun toCdqModel(address: AddressBpnDto, externalId: String): BusinessPartnerCdq {
         return BusinessPartnerCdq(
-            externalId = externalId,
+            externalId = address.externalId,
             dataSource = cdqConfigProperties.datasourceAddress,
             addresses = listOf(toCdqModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn!!)) else emptyList()
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList()
         )
     }
 
-    private fun toCdqModel(site: SiteDto, externalId: String): BusinessPartnerCdq {
-        return BusinessPartnerCdq(
-            externalId = externalId,
-            dataSource = cdqConfigProperties.datasourceSite,
-            names = listOf(NameCdq(value = site.name)),
-            addresses = listOf(toCdqModel(site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn!!)) else emptyList()
-        )
-    }
-
-    private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String): BusinessPartnerCdq {
+    private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String, bpn: String?): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = externalId,
             dataSource = cdqConfigProperties.datasourceLegalEntity,
-            identifiers = toIdentifiersCdq(legalEntity.identifiers, legalEntity.bpn),
+            identifiers = toIdentifiersCdq(legalEntity.identifiers, bpn),
             names = legalEntity.names.map { it.toCdqModel() },
             legalForm = toLegalFormCdq(legalEntity.legalForm),
             status = legalEntity.status?.toCdqModel(),

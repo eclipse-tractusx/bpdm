@@ -19,19 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -39,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -56,13 +52,11 @@ import java.util.stream.Stream
 )
 @ActiveProfiles(value = ["test"])
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
-class BusinessPartnerControllerSuggestionIT @Autowired constructor(
+@AutoConfigureWebTestClient(timeout = "10000")
+class SuggestionControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val importService: ImportStarterService,
     val openSearchSyncService: OpenSearchSyncStarterService,
-    val objectMapper: ObjectMapper,
     val testHelpers: TestHelpers,
-    val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
 
     companion object {
@@ -70,6 +64,15 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
+
+        private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.properties
+        private val expectedLegalEntityName = expectedLegalEntity.names.first().value
+        private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
+        private val expectedSite = ResponseValues.siteUpsert2
+
+        private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.properties
+        private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
+        private val nonlatinSite = ResponseValues.siteUpsert3
 
         @JvmStatic
         @DynamicPropertySource
@@ -80,115 +83,115 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         @JvmStatic
         fun argumentsSuggestPropertyValues(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(CdqValues.businessPartner1.names.first().value, EndpointValues.CATENA_NAME_PATH, CdqValues.businessPartner1.names.first().value),
                 Arguments.of(
-                    CdqValues.businessPartner1.legalForm!!.name,
-                    EndpointValues.CATENA_LEGAL_FORM_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalEntityName,
+                    EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.status!!.officialDenotation,
-                    EndpointValues.CATENA_STATUS_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalEntity.legalForm!!.name,
+                    EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH,
+                    expectedLegalEntity.names.first().value
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.profile!!.classifications.first().value,
-                    EndpointValues.CATENA_CLASSIFICATION_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalEntity.status!!.officialDenotation,
+                    EndpointValues.CATENA_SUGGESTION_LE_STATUS_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    RequestValues.businessPartnerRequest1.sites.first().name,
-                    EndpointValues.CATENA_SITE_PATH,
-                    RequestValues.businessPartnerRequest1.names.first().value
+                    expectedLegalEntity.profileClassifications.first().value,
+                    EndpointValues.CATENA_SUGGESTION_LE_CLASSIFICATION_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().administrativeAreas.first().value,
-                    EndpointValues.CATENA_ADMIN_AREA_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedSite.name,
+                    EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().postCodes.first().value,
-                    EndpointValues.CATENA_POST_CODE_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalAddress.administrativeAreas.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().localities.first().value,
-                    EndpointValues.CATENA_LOCALITY_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalAddress.postCodes.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().thoroughfares.first().value,
-                    EndpointValues.CATENA_THOROUGHFARE_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalAddress.localities.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().premises.first().value,
-                    EndpointValues.CATENA_PREMISE_PATH,
-                    CdqValues.businessPartner1.names.first().value
-                ),
-                // search for some property of address of site, not directly on business partner
-                Arguments.of(
-                    RequestValues.businessPartnerRequest1.sites.first().addresses.first().premises.first().value,
-                    EndpointValues.CATENA_PREMISE_PATH,
-                    RequestValues.businessPartnerRequest1.names.first().value
+                    expectedLegalAddress.thoroughfares.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
+                    expectedLegalEntityName
                 ),
                 Arguments.of(
-                    CdqValues.businessPartner1.addresses.first().postalDeliveryPoints.first().value,
-                    EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH,
-                    CdqValues.businessPartner1.names.first().value
+                    expectedLegalAddress.premises.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
+                    expectedLegalEntityName
+                ),
+                Arguments.of(
+                    expectedLegalAddress.postalDeliveryPoints.first().value,
+                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
+                    expectedLegalEntityName
                 )
             )
 
         @JvmStatic
         fun argumentsSuggestPropertyValuesNonLatin(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(CdqValues.businessPartner3.names.first().value, EndpointValues.CATENA_NAME_PATH),
-                Arguments.of(CdqValues.businessPartner3.legalForm!!.name, EndpointValues.CATENA_LEGAL_FORM_PATH),
-                Arguments.of(RequestValues.businessPartnerRequest3.sites.first().name, EndpointValues.CATENA_SITE_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().administrativeAreas.first().value, EndpointValues.CATENA_ADMIN_AREA_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().postCodes.first().value, EndpointValues.CATENA_POST_CODE_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().localities.first().value, EndpointValues.CATENA_LOCALITY_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().thoroughfares.first().value, EndpointValues.CATENA_THOROUGHFARE_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().premises.first().value, EndpointValues.CATENA_PREMISE_PATH),
-                Arguments.of(CdqValues.businessPartner3.addresses.first().postalDeliveryPoints.first().value, EndpointValues.CATENA_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinLegalEntity.names.first().value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
+                Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
+                Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
+                Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.postCodes.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.localities.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.thoroughfares.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.premises.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.postalDeliveryPoints.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 
+    val partnerStructure1 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate1,
+        siteStructures = listOf(
+            SiteStructureRequest(
+                site = RequestValues.siteCreate2,
+                addresses = listOf(RequestValues.addressPartnerCreate3)
+            )
+        )
+    )
+
+    val partnerStructure2 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate2,
+        siteStructures = listOf(
+            SiteStructureRequest(
+                site = RequestValues.siteCreate3,
+                addresses = listOf(RequestValues.addressPartnerCreate1)
+            )
+        )
+    )
+
+    val partnerStructure3 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate3,
+        siteStructures = listOf(
+            SiteStructureRequest(
+                site = RequestValues.siteCreate1,
+                addresses = listOf(RequestValues.addressPartnerCreate2)
+            )
+        )
+    )
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
-        val partnerDocs = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2,
-            CdqValues.businessPartner3
-        )
-
-        val importCollection = PagedResponseCdq(
-            partnerDocs.size,
-            null,
-            null,
-            partnerDocs.size,
-            partnerDocs
-        )
-
-        wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withBody(objectMapper.writeValueAsString(importCollection))
-            )
-        )
-
-        importService.import()
-
-        // import partners with sites via service since they can't be imported from cdq data model
-        businessPartnerBuildService.upsertBusinessPartners(
-            listOf(RequestValues.businessPartnerRequest1, RequestValues.businessPartnerRequest2)
-        )
-
+        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2, partnerStructure3), webTestClient)
         openSearchSyncService.export()
     }
 
@@ -320,7 +323,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
         val page = webTestClient.get()
             .uri { builder ->
                 builder.path(endpointPath)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()
@@ -344,7 +347,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()
@@ -370,7 +373,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(BusinessPartnerPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
                     .build()
             }
             .exchange()
@@ -394,7 +397,7 @@ class BusinessPartnerControllerSuggestionIT @Autowired constructor(
 
         val page = webTestClient.get()
             .uri { builder ->
-                builder.path(EndpointValues.CATENA_NAME_PATH)
+                builder.path(EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedName)
                     .build()
             }

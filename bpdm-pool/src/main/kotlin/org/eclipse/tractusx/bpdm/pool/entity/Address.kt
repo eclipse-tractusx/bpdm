@@ -25,14 +25,9 @@ import javax.persistence.*
 
 @Entity
 @Table(
-    name = "addresses",
-    indexes = [
-        Index(columnList = "partner_id")
-    ]
+    name = "addresses"
 )
-class Address (
-    @Column(name = "bpn", nullable = false, unique = true)
-    var bpn: String,
+class Address(
     @Column(name = "care_of")
     var careOf: String?,
     @ElementCollection(targetClass = String::class)
@@ -58,13 +53,7 @@ class Address (
     @Embedded
     var version: AddressVersion,
     @Embedded
-    var geoCoordinates: GeographicCoordinate?,
-    @ManyToOne
-    @JoinColumn(name = "partner_id")
-    var partner: BusinessPartner?,
-    @ManyToOne
-    @JoinColumn(name = "site_id")
-    var site: Site?
+    var geoCoordinates: GeographicCoordinate?
 ) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val administrativeAreas: MutableSet<AdministrativeArea> = mutableSetOf()

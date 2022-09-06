@@ -47,6 +47,17 @@ object CdqValues {
     val name4 = NameCdq(CommonValues.name4)
     val name5 = NameCdq(CommonValues.name5)
 
+    val identifierType1 = TypeKeyNameUrlCdq(CommonValues.identifierTypeTechnicalKey1, CommonValues.identiferTypeName1, CommonValues.identifierTypeUrl1)
+
+    val issuingBody1 = TypeKeyNameUrlCdq(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
+
+    val identifierStatus1 = TypeKeyNameCdq(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
+
+    val identifier1 = IdentifierCdq(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
+    val identifier2 = IdentifierCdq(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
+    val identifier3 = IdentifierCdq(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
+
+
     val legalForm1 = LegalFormCdq(
         CommonValues.legalFormName1,
         CommonValues.legalFormUrl1,
@@ -69,15 +80,15 @@ object CdqValues {
         language3
     )
 
-    val statusType1 = TypeKeyNameUrlCdq(CommonValues.statusType1)
-    val statusType2 = TypeKeyNameUrlCdq(CommonValues.statusType2)
-    val statusType3 = TypeKeyNameUrlCdq(CommonValues.statusType3)
+    val statusType1 = TypeKeyNameUrlCdq(CommonValues.statusType1.name)
+    val statusType2 = TypeKeyNameUrlCdq(CommonValues.statusType2.name)
+    val statusType3 = TypeKeyNameUrlCdq(CommonValues.statusType3.name)
 
     val status1 = BusinessPartnerStatusCdq(statusType1, CommonValues.statusDenotation1, CommonValues.statusValidFrom1)
     val status2 = BusinessPartnerStatusCdq(statusType2, CommonValues.statusDenotation2, CommonValues.statusValidFrom2)
     val status3 = BusinessPartnerStatusCdq(statusType3, CommonValues.statusDenotation3, CommonValues.statusValidFrom3)
 
-    val classificationType = TypeKeyNameUrlCdq(CommonValues.classificationType)
+    val classificationType = TypeKeyNameUrlCdq(CommonValues.classificationType.name)
 
     val classification1 = ClassificationCdq(value = CommonValues.classification1, type = classificationType)
     val classification2 = ClassificationCdq(value = CommonValues.classification2, type = classificationType)
@@ -173,6 +184,7 @@ object CdqValues {
         externalId = partnerId1,
         dataSource = datasource1,
         names = listOf(name1, name2),
+        identifiers = listOf(identifier1),
         legalForm = legalForm1,
         status = status1,
         profile = profile1,
@@ -186,6 +198,7 @@ object CdqValues {
         externalId = partnerId2,
         dataSource = datasource1,
         names = listOf(name3, name4),
+        identifiers = listOf(identifier2),
         legalForm = legalForm2,
         status = status2,
         profile = profile2,
@@ -199,6 +212,7 @@ object CdqValues {
         externalId = partnerId3,
         dataSource = datasource1,
         names = listOf(name5),
+        identifiers = listOf(identifier3),
         legalForm = legalForm3,
         status = status3,
         profile = profile3,

@@ -23,8 +23,8 @@ import org.apache.lucene.search.join.ScoreMode
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePropertiesSearchRequest
 import org.opensearch.common.unit.Fuzziness
 import org.opensearch.index.query.BoolQueryBuilder
@@ -86,7 +86,7 @@ class BpdmOpenSearchQueryBuilder {
      * Converts a [bpSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
-    fun toFieldTextPairs(bpSearch: BusinessPartnerPropertiesSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
             Pair(BusinessPartnerDoc::names.name, bpSearch.name),
             Pair(BusinessPartnerDoc::legalForm.name, bpSearch.legalForm),
@@ -151,8 +151,8 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerPropertiesSearchRequest): BusinessPartnerPropertiesSearchRequest {
-        return BusinessPartnerPropertiesSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: LegalEntityPropertiesSearchRequest): LegalEntityPropertiesSearchRequest {
+        return LegalEntityPropertiesSearchRequest(
             searchRequest.name?.lowercase(),
             searchRequest.legalForm?.lowercase(),
             searchRequest.status?.lowercase(),

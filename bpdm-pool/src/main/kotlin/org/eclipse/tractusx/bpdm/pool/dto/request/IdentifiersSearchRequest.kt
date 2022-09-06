@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Identifiers Search Request", description = "Contains identifiers to search business partners by")
+@Schema(name = "Identifiers Search Request", description = "Contains identifiers to search legal entities by")
 data class IdentifiersSearchRequest(
     @Schema(description = "Technical key of the type to which the identifiers belongs to")
     val idType: String,

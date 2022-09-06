@@ -141,8 +141,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
             RequestValues.legalEntityGateInput1,
-            LegalEntityGateInput("external-1", RequestValues.legalEntityGateInput1.legalEntity.copy()),
-            LegalEntityGateInput("external-2", RequestValues.legalEntityGateInput1.legalEntity.copy())
+            RequestValues.legalEntityGateInput1.copy(externalId = "external-1"),
+            RequestValues.legalEntityGateInput1.copy(externalId = "external-2")
         )
 
         webTestClient.put().uri(CATENA_INPUT_LEGAL_ENTITIES_PATH)
@@ -161,7 +161,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     fun `upsert legal entities, duplicate external id`() {
         val legalEntities = listOf(
             RequestValues.legalEntityGateInput1,
-            LegalEntityGateInput(RequestValues.legalEntityGateInput1.externalId, RequestValues.legalEntityGateInput1.legalEntity.copy())
+            RequestValues.legalEntityGateInput1.copy()
         )
 
         webTestClient.put().uri(CATENA_INPUT_LEGAL_ENTITIES_PATH)

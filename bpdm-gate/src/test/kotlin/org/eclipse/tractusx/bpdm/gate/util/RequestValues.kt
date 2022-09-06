@@ -192,7 +192,6 @@ object RequestValues {
 
 
     val legalEntity1 = LegalEntityDto(
-        bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         names = listOf(name1, name2),
         legalForm = CommonValues.legalFormTechnicalKey1,
@@ -204,7 +203,6 @@ object RequestValues {
     )
 
     val legalEntity2 = LegalEntityDto(
-        bpn = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         names = listOf(name3, name4),
         legalForm = CommonValues.legalFormTechnicalKey2,
@@ -216,55 +214,50 @@ object RequestValues {
     )
 
     val legalEntityGateInput1 = LegalEntityGateInput(
+        bpn = CommonValues.bpn1,
         externalId = CommonValues.externalId1,
         legalEntity = legalEntity1
     )
 
     val legalEntityGateInput2 = LegalEntityGateInput(
+        bpn = CommonValues.bpn2,
         externalId = CommonValues.externalId2,
         legalEntity = legalEntity2
     )
 
     val site1 = SiteDto(
-        bpn = CommonValues.bpnSite1,
         name = CommonValues.nameSite1,
         mainAddress = address1
     )
 
     val site2 = SiteDto(
-        bpn = CommonValues.bpnSite2,
         name = CommonValues.nameSite2,
         mainAddress = address2
     )
 
     val siteGateInput1 = SiteGateInput(
         site = site1,
+        bpn = CommonValues.bpnSite1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1
     )
 
     val siteGateInput2 = SiteGateInput(
         site = site2,
+        bpn = CommonValues.bpnSite2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2
     )
 
-    val addressWithBpn1 = AddressBpnDto(
-        bpn = CommonValues.bpnAddress1,
-        address = address1
-    )
-    val addressWithBpn2 = AddressBpnDto(
-        bpn = CommonValues.bpnAddress2,
-        address = address2
-    )
-
     val addressGateInput1 = AddressGateInput(
-        address = addressWithBpn1,
+        bpn = CommonValues.bpnAddress1,
+        address = address1,
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1
     )
     val addressGateInput2 = AddressGateInput(
-        address = addressWithBpn2,
+        bpn = CommonValues.bpnAddress2,
+        address = address2,
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1
     )

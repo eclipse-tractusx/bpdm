@@ -27,7 +27,7 @@ import javax.persistence.*
 @Table(
     name = "business_stati",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "legal_entity_id")
     ]
 )
 class BusinessStatus (
@@ -40,6 +40,6 @@ class BusinessStatus (
     @Column(name = "type", nullable = false)
     val type: BusinessStatusType,
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
-    var partner: BusinessPartner
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
 ) : BaseEntity()

@@ -25,7 +25,7 @@ import javax.persistence.*
 @Table(
     name = "identifiers",
     indexes = [
-        Index(columnList = "partner_id"),
+        Index(columnList = "legal_entity_id"),
         Index(columnList = "type_id"),
         Index(columnList = "status"),
         Index(columnList = "issuing_body_id")
@@ -44,6 +44,6 @@ class Identifier(
     @JoinColumn(name = "issuing_body_id")
     var issuingBody: IssuingBody?,
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
-    var partner: BusinessPartner
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
 ) : BaseEntity()

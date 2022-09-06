@@ -26,7 +26,7 @@ import javax.persistence.*
 @Table(
     name = "bank_accounts",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "legal_entity_id")
     ])
 class BankAccount (
     @ElementCollection(targetClass = Float::class)
@@ -46,6 +46,6 @@ class BankAccount (
     val nationalBankIdentifier: String?,
 
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
-    var partner: BusinessPartner
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
 ) : BaseEntity()

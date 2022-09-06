@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.repository.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class PartnerChangelogService(
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
-    val businessPartnerRepository: BusinessPartnerRepository
+    val legalEntityRepository: LegalEntityRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -67,7 +67,7 @@ class PartnerChangelogService(
     }
 
     fun getChangelogEntriesByBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
-        if (!businessPartnerRepository.existsByBpn(bpn)) {
+        if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
         val page = partnerChangelogEntryRepository.findAllByBpn(bpn, PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::id.name).ascending()))

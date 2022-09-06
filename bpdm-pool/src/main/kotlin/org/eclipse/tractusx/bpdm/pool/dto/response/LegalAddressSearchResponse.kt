@@ -17,20 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.util
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
-import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressWithReferenceResponse
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-object AssertionHelper {
-
-    fun assertAddressWithReferenceEquals(actual: AddressWithReferenceResponse, expected: AddressWithReferenceResponse) {
-        assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringFieldsMatchingRegexes(".*uuid")
-            .ignoringAllOverriddenEquals()
-            .ignoringCollectionOrder()
-            .isEqualTo(expected)
-    }
-
-}
+@Schema(name = "Legal Address Search Response", description = "Legal address record with parent BPN")
+data class LegalAddressSearchResponse(
+    @Schema(description = "BPNL of the legal entity this legal address belongs to")
+    val legalEntity: String,
+    @Schema(description = "Address properties")
+    val legalAddress: AddressResponse
+)

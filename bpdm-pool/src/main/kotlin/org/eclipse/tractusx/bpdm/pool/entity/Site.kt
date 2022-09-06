@@ -29,9 +29,13 @@ class Site(
     @Column(name = "name", nullable = false)
     var name: String,
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
-    var partner: BusinessPartner,
-    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<Address> = mutableSetOf()
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity,
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "main_address_id", nullable = false)
+    var mainAddress: Address
 ) : BaseEntity() {
+
+    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val addresses: MutableSet<AddressPartner> = mutableSetOf()
 }

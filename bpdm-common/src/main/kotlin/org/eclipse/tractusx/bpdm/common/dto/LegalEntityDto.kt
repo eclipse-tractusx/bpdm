@@ -25,20 +25,18 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
 @Schema(name = "Legal Entity")
 data class LegalEntityDto(
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<IdentifierDto> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
     val names: Collection<NameDto>,
     @Schema(description = "Technical key of the legal form")
-    val legalForm: String?,
+    val legalForm: String? = null,
     @Schema(description = "Current business status")
     val status: BusinessStatusDto?,
     @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
     val profileClassifications: Collection<ClassificationDto> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[\"UNKNOWN\"]"))
-    val types: Collection<BusinessPartnerType> = listOf(BusinessPartnerType.UNKNOWN),
+    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[]"))
+    val types: Collection<BusinessPartnerType> = emptyList(),
     @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
     val bankAccounts: Collection<BankAccountDto> = emptyList(),
     @Schema(description = "Address of the official seat of this legal entity")

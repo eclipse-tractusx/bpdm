@@ -24,6 +24,10 @@ import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
 
 
+/**
+ * Helper method for invoking a post endpoint on [path] with a request [body] and an expected response body
+ * Only works for response bodies that are serialized as Json Objects
+ */
 inline fun <reified T : Any> WebTestClient.invokePostEndpoint(path: String, body: Any): T {
     return post().uri(path)
         .body(BodyInserters.fromValue(body))
@@ -34,16 +38,74 @@ inline fun <reified T : Any> WebTestClient.invokePostEndpoint(path: String, body
         .blockFirst()!!
 }
 
+/**
+ * Helper method for invoking a post endpoint on [path] with a request [body] and an expected array response body
+ */
+inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: String, body: Any): Collection<T> {
+    return post().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBodyList(T::class.java)
+        .returnResult()
+        .responseBody!!
+}
+
 fun WebTestClient.invokePostEndpointWithoutResponse(path: String) {
     post().uri(path)
         .exchange()
         .expectStatus().is2xxSuccessful
+        .expectBody()
+        .returnResult()
+    /*
+    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
+    */
+}
+
+
+fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
+    post().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBody()
+        .returnResult()
+    /*
+    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
+     */
+}
+
+inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: String, body: Any): Collection<T> {
+    return put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBodyList(T::class.java)
+        .returnResult()
+        .responseBody!!
+}
+
+fun WebTestClient.invokePutWithoutResponse(path: String, body: Any) {
+    put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBody()
+        .returnResult()
+    /*
+    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
+    */
 }
 
 fun WebTestClient.invokeDeleteEndpointWithoutResponse(path: String) {
     delete().uri(path)
         .exchange()
         .expectStatus().is2xxSuccessful
+        .expectBody()
+        .returnResult()
+    /*
+   Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
+   */
 }
 
 

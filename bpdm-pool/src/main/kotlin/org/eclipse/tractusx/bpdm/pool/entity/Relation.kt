@@ -41,10 +41,10 @@ class Relation (
     val type: RelationType,
     @ManyToOne
     @JoinColumn(name = "start_node_id", nullable = false)
-    val startNode: BusinessPartner,
+    val startNode: LegalEntity,
     @ManyToOne
     @JoinColumn(name = "end_node_id", nullable = false)
-    val endNode: BusinessPartner,
+    val endNode: LegalEntity,
     @Column(name = "started_at")
     val startedAt: LocalDateTime?,
     @Column(name = "ended_at")

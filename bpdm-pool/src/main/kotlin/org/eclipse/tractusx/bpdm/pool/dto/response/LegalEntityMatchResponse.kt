@@ -17,12 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerRequest
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessPartner
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class BusinessPartnerUpdateDto(
-    val businessPartner: BusinessPartner,
-    val updateRequest: BusinessPartnerRequest
+@Schema(name = "Legal Entity Match Response", description = "Match with score for a business partner record of type legal entity")
+data class LegalEntityMatchResponse(
+    @Schema(description = "Relative quality score of the match. The higher the better")
+    val score: Float,
+    @Schema(description = "Matched legal entity business partner record")
+    val legalEntity: LegalEntityPartnerResponse
 )

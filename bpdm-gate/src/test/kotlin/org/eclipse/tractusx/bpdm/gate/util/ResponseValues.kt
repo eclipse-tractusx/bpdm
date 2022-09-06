@@ -430,36 +430,36 @@ object ResponseValues {
     )
 
     val legalEntityResponse1 = LegalEntityResponse(
-        bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         names = listOf(name1, name2),
         legalForm = legalForm1,
         status = businessStatus1,
         profileClassifications = listOf(classification1, classification2),
         types = listOf(businessPartnerTypeLegalEntity),
-        bankAccounts = listOf(bankAccount1, bankAccount2),
-        legalAddress = legalAddress1
+        bankAccounts = listOf(bankAccount1, bankAccount2)
     )
 
     val legalEntityResponse2 = LegalEntityResponse(
-        bpn = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         names = listOf(name3, name4),
         legalForm = legalForm2,
         status = businessStatus2,
         profileClassifications = listOf(classification3, classification4),
         types = listOf(businessPartnerTypeLegalEntity),
-        bankAccounts = listOf(bankAccount3, bankAccount4),
-        legalAddress = legalAddress2
+        bankAccounts = listOf(bankAccount3, bankAccount4)
     )
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
+        bpn = CommonValues.bpn1,
         legalEntity = legalEntityResponse1,
-        CommonValues.externalId1
+        externalId = CommonValues.externalId1,
+        legalAddress = legalAddress1
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
+        bpn = CommonValues.bpn2,
         legalEntity = legalEntityResponse2,
-        CommonValues.externalId2
+        externalId = CommonValues.externalId2,
+        legalAddress = legalAddress2
     )
 }
