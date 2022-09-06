@@ -123,6 +123,24 @@ class LegalEntityController(
     }
 
     @Operation(
+        summary = "Search legal entity partners by BPNLs",
+        description = "Search business partners of type legal entity by their BPNLs"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Found legal entites"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @PostMapping("/search")
+    fun searchSites(
+        @RequestBody bpnLs: Collection<String>,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): Collection<LegalEntityPartnerResponse> {
+        TODO()
+    }
+
+    @Operation(
         summary = "Get site partners of a legal entity",
         description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpn."
     )

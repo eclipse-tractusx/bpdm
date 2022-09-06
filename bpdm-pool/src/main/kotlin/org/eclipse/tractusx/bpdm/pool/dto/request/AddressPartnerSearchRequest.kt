@@ -26,5 +26,7 @@ data class AddressPartnerSearchRequest(
     @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
     val legalEntities: Collection<String> = emptyList(),
     @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
-    val sites: Collection<String> = emptyList()
+    val sites: Collection<String> = emptyList(),
+    @Schema(description = "Filter by BPNA of addresses")
+    val addresses: Collection<String> = emptyList()
 )

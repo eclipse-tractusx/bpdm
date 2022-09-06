@@ -62,6 +62,7 @@ class AddressService(
 
         val addressPage = addressPartnerRepository.findByLegalEntityInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
+        // TODO: use [searchRequest.addresses]
         return addressPage.toDto(addressPage.content.map { it.toDtoWithReference() })
     }
 
