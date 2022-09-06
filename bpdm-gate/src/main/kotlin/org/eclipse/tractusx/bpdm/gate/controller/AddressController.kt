@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.request.ExternalIdsRequest
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -103,7 +102,7 @@ class AddressController(
 
     @Operation(
         summary = "Get page of addresses",
-        description = "Get page of addresses."
+        description = "Get page of addresses. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -114,7 +113,7 @@ class AddressController(
     @GetMapping("/output/addresses")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @RequestBody(required = false) externalIdsRequest: ExternalIdsRequest?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<AddressGateOutput> {
         TODO()
     }

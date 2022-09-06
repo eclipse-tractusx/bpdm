@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.request.ExternalIdsRequest
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -99,7 +98,7 @@ class LegalEntityController(
 
     @Operation(
         summary = "Get page of legal entities",
-        description = "Get page of legal entities."
+        description = "Get page of legal entities. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -110,7 +109,7 @@ class LegalEntityController(
     @GetMapping("/output/legal-entities")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @RequestBody(required = false) externalIdsRequest: ExternalIdsRequest?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<LegalEntityGateOutput> {
         TODO()
     }

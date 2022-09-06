@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.request.ExternalIdsRequest
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
@@ -98,7 +97,7 @@ class SiteController(
 
     @Operation(
         summary = "Get page of sites",
-        description = "Get page of sites."
+        description = "Get page of sites. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -109,7 +108,7 @@ class SiteController(
     @PostMapping("/output/sites")
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @RequestBody(required = false) externalIdsRequest: ExternalIdsRequest?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<SiteGateOutput> {
         TODO()
     }
