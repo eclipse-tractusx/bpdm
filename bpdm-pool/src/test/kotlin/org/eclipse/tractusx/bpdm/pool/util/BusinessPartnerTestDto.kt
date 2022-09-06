@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
@@ -29,12 +29,12 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 data class LegalEntityStructureRequest(
     val legalEntity: LegalEntityPartnerCreateRequest,
     val siteStructures: List<SiteStructureRequest> = emptyList(),
-    val addresses: List<AddessPartnerCreateRequest> = emptyList()
+    val addresses: List<AddressPartnerCreateRequest> = emptyList()
 )
 
 data class SiteStructureRequest(
     val site: SitePartnerCreateRequest,
-    val addresses: List<AddessPartnerCreateRequest> = emptyList()
+    val addresses: List<AddressPartnerCreateRequest> = emptyList()
 )
 
 data class LegalEntityStructureResponse(

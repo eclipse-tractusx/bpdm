@@ -269,19 +269,19 @@ object RequestValues {
         site = siteCreate3.site
     )
 
-    val addressPartnerCreate1 = AddessPartnerCreateRequest(
+    val addressPartnerCreate1 = AddressPartnerCreateRequest(
         properties = address1,
         parent = legalEntityUpdate1.bpn,
         index = CommonValues.index1
     )
 
-    val addressPartnerCreate2 = AddessPartnerCreateRequest(
+    val addressPartnerCreate2 = AddressPartnerCreateRequest(
         properties = address2,
         parent = legalEntityUpdate2.bpn,
         index = CommonValues.index2
     )
 
-    val addressPartnerCreate3 = AddessPartnerCreateRequest(
+    val addressPartnerCreate3 = AddressPartnerCreateRequest(
         properties = address3,
         parent = legalEntityUpdate3.bpn,
         index = CommonValues.index3

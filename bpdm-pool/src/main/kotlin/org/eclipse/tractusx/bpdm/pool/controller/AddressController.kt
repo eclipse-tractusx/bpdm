@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddessPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
@@ -96,7 +96,7 @@ class AddressController(
     @PostMapping
     fun createAddresses(
         @RequestBody
-        requests: Collection<AddessPartnerCreateRequest>
+        requests: Collection<AddressPartnerCreateRequest>
     ): Collection<AddressPartnerCreateResponse> {
         return businessPartnerBuildService.createAddresses(requests)
     }

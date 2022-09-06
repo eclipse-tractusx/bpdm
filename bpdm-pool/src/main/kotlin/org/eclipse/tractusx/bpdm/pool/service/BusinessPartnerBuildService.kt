@@ -107,7 +107,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<AddressPartnerCreateResponse> {
+    fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): Collection<AddressPartnerCreateResponse> {
         logger.info { "Create ${requests.size} new addresses" }
 
         val (bpnlRequests, otherAddresses) = requests.partition { it.parent.startsWith(bpnIssuingService.bpnlPrefix) }
@@ -193,7 +193,7 @@ class BusinessPartnerBuildService(
         partner.currentness = Instant.now()
     }
 
-    private fun createLegalEntityAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
+    private fun createLegalEntityAddresses(requests: Collection<AddressPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
         val bpnLsToFetch = requests.map { it.parent }
         val legalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
         val bpnlMap = legalEntities.associateBy { it.bpn }
@@ -211,7 +211,7 @@ class BusinessPartnerBuildService(
             .map { (request, bpna) -> Pair(createPartnerAddress(request.properties, bpna, bpnlMap[request.parent], null), request.index) }
     }
 
-    private fun createSiteAddresses(requests: Collection<AddessPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
+    private fun createSiteAddresses(requests: Collection<AddressPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
         val bpnsToFetch = requests.map { it.parent }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
         val bpnsMap = sites.associateBy { it.bpn }
