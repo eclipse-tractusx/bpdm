@@ -42,7 +42,7 @@ class SiteService(
             throw BpdmNotFoundException("Business Partner", bpn)
         }
 
-        val page = siteRepository.findByPartnerBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        val page = siteRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
         fetchSiteDependencies(page.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -50,7 +50,7 @@ class SiteService(
     fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
-        val sitePage = siteRepository.findByPartnerIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val sitePage = siteRepository.findByLegalEntityIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
         return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })
     }

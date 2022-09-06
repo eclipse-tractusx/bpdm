@@ -53,25 +53,25 @@ class LegalEntity(
     @JoinColumn(name = "legal_address_id", nullable = false)
     var legalAddress: Address
 ) : BaseEntity() {
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val names: MutableSet<Name> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val stati: MutableSet<BusinessStatus> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<AddressPartner> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val classification: MutableSet<Classification> = mutableSetOf()
 
-    @OneToMany(mappedBy = "partner", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
 
     @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)

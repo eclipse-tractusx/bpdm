@@ -43,6 +43,6 @@ class Name(
     val language: LanguageCode,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    var partner: LegalEntity
+    var legalEntity: LegalEntity
 ) : BaseEntity()
 

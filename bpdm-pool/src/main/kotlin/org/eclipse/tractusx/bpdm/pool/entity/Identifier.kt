@@ -45,5 +45,5 @@ class Identifier(
     var issuingBody: IssuingBody?,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    var partner: LegalEntity
+    var legalEntity: LegalEntity
 ) : BaseEntity()

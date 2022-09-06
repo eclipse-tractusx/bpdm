@@ -45,7 +45,7 @@ class AddressService(
             throw BpdmNotFoundException("Business Partner", bpn)
         }
 
-        val page = addressPartnerRepository.findByPartnerBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        val page = addressPartnerRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
         fetchPartnerAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -60,7 +60,7 @@ class AddressService(
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
-        val addressPage = addressPartnerRepository.findByPartnerInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val addressPage = addressPartnerRepository.findByLegalEntityInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
         return addressPage.toDto(addressPage.content.map { it.toDtoWithReference() })
     }

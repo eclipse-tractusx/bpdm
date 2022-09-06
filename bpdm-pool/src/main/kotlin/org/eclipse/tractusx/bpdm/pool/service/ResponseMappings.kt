@@ -163,7 +163,7 @@ fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateRespons
 fun AddressPartner.toDtoWithReference(): AddressPartnerSearchResponse {
     return AddressPartnerSearchResponse(
         toDto(),
-        partner?.bpn,
+        legalEntity?.bpn,
         site?.bpn
     )
 }
@@ -188,7 +188,7 @@ fun Site.toDto(): SitePartnerResponse {
 fun Site.toWithReferenceDto(): SitePartnerSearchResponse {
     return SitePartnerSearchResponse(
         toDto(),
-        partner.bpn
+        legalEntity.bpn
     )
 }
 

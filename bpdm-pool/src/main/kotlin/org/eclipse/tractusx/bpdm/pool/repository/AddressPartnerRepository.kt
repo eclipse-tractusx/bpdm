@@ -29,16 +29,16 @@ import org.springframework.data.repository.PagingAndSortingRepository
 
 interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, Long> {
 
-    @Query("SELECT a FROM AddressPartner a join a.partner p where p.bpn=:bpn")
-    fun findByPartnerBpn(bpn: String, pageable: Pageable): Page<AddressPartner>
+    @Query("SELECT a FROM AddressPartner a join a.legalEntity p where p.bpn=:bpn")
+    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<AddressPartner>
 
-    fun findByPartnerInOrSiteIn(partners: Collection<LegalEntity>, sites: Collection<Site>, pageable: Pageable): Page<AddressPartner>
+    fun findByLegalEntityInOrSiteIn(partners: Collection<LegalEntity>, sites: Collection<Site>, pageable: Pageable): Page<AddressPartner>
 
     fun findByBpn(bpn: String): AddressPartner?
 
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<AddressPartner>
 
-    @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.partner WHERE a IN :addresses")
+    @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.legalEntity WHERE a IN :addresses")
     fun joinLegalEntities(addresses: Set<AddressPartner>): Set<AddressPartner>
 
     @Query("SELECT DISTINCT a FROM AddressPartner a LEFT JOIN FETCH a.site WHERE a IN :addresses")

@@ -30,7 +30,7 @@ class Site(
     var name: String,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    var partner: LegalEntity,
+    var legalEntity: LegalEntity,
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     var mainAddress: Address

@@ -34,7 +34,7 @@ class AddressPartner(
     var bpn: String,
     @ManyToOne
     @JoinColumn(name = "partner_id")
-    var partner: LegalEntity?,
+    var legalEntity: LegalEntity?,
     @ManyToOne
     @JoinColumn(name = "site_id")
     var site: Site?,

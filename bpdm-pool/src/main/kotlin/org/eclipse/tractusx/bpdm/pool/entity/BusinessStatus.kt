@@ -41,5 +41,5 @@ class BusinessStatus (
     val type: BusinessStatusType,
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    var partner: LegalEntity
+    var legalEntity: LegalEntity
 ) : BaseEntity()
