@@ -41,7 +41,7 @@ data class LegalEntityPartnerCreateRequest(
             val node = parser.codec.readTree<JsonNode>(parser)
             return LegalEntityPartnerCreateRequest(
                 ctxt.readTreeAsValue(node, LegalEntityDto::class.java),
-                node.get(LegalEntityPartnerCreateRequest::index.name).textValue(),
+                node.get(LegalEntityPartnerCreateRequest::index.name)?.textValue(),
             )
         }
     }

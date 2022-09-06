@@ -44,7 +44,7 @@ data class AddessPartnerCreateRequest(
             return AddessPartnerCreateRequest(
                 ctxt.readTreeAsValue(node, AddressDto::class.java),
                 node.get(AddessPartnerCreateRequest::parent.name).textValue(),
-                node.get(AddessPartnerCreateRequest::index.name).textValue()
+                node.get(AddessPartnerCreateRequest::index.name)?.textValue()
             )
         }
     }

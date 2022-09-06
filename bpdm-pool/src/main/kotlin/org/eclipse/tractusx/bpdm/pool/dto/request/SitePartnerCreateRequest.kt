@@ -44,7 +44,7 @@ data class SitePartnerCreateRequest(
             return SitePartnerCreateRequest(
                 ctxt.readTreeAsValue(node, SiteDto::class.java),
                 node.get(SitePartnerCreateRequest::legalEntity.name).textValue(),
-                node.get(SitePartnerCreateRequest::index.name).textValue(),
+                node.get(SitePartnerCreateRequest::index.name)?.textValue(),
             )
         }
     }

@@ -44,7 +44,7 @@ data class AddressPartnerCreateResponse(
             return AddressPartnerCreateResponse(
                 node.get(AddressPartnerCreateResponse::bpn.name).textValue(),
                 ctxt.readTreeAsValue(node, AddressResponse::class.java),
-                node.get(AddressPartnerCreateResponse::index.name).textValue(),
+                node.get(AddressPartnerCreateResponse::index.name)?.textValue(),
             )
         }
     }

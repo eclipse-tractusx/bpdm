@@ -52,7 +52,7 @@ data class LegalEntityPartnerCreateResponse(
                 ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
                 ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::currentness.name), Instant::class.java),
                 ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::legalAddress.name), AddressResponse::class.java),
-                node.get(LegalEntityPartnerCreateResponse::index.name).textValue(),
+                node.get(LegalEntityPartnerCreateResponse::index.name)?.textValue(),
             )
         }
     }
