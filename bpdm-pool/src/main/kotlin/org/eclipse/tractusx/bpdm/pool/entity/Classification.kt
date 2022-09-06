@@ -26,7 +26,7 @@ import javax.persistence.*
 @Table(
     name = "classifications",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "legal_entity_id")
     ]
 )
 class Classification (
@@ -38,7 +38,7 @@ class Classification (
     @Enumerated(EnumType.STRING)
     val type: ClassificationType?,
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
+    @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity
 ) : BaseEntity()
 

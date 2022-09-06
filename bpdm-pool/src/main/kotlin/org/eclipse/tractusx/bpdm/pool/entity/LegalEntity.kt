@@ -35,16 +35,16 @@ class LegalEntity(
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
     @ElementCollection(targetClass = BusinessPartnerType::class)
-    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "partner_id")], indexes = [Index(columnList = "partner_id")])
+    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     var types: Set<BusinessPartnerType>,
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "legal_entity_roles",
-        joinColumns = [JoinColumn(name = "partner_id")],
+        joinColumns = [JoinColumn(name = "legal_entity_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")],
-        indexes = [Index(columnList = "partner_id")]
+        indexes = [Index(columnList = "legal_entity_id")]
     )
     val roles: Set<Role>,
     @Column(name = "currentness", nullable = false)

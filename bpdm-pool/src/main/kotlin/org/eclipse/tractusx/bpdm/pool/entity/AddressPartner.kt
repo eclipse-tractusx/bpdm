@@ -25,7 +25,7 @@ import javax.persistence.*
 @Table(
     name = "address_partners",
     indexes = [
-        Index(columnList = "partner_id"),
+        Index(columnList = "legal_entity_id"),
         Index(columnList = "site_id"),
     ]
 )
@@ -33,7 +33,7 @@ class AddressPartner(
     @Column(name = "bpn", nullable = true, unique = true)
     var bpn: String,
     @ManyToOne
-    @JoinColumn(name = "partner_id")
+    @JoinColumn(name = "legal_entity_id")
     var legalEntity: LegalEntity?,
     @ManyToOne
     @JoinColumn(name = "site_id")

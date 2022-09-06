@@ -27,7 +27,7 @@ import javax.persistence.*
 @Table(
     name = "names",
     indexes = [
-        Index(columnList = "partner_id")
+        Index(columnList = "legal_entity_id")
     ]
 )
 class Name(
@@ -42,7 +42,7 @@ class Name(
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,
     @ManyToOne
-    @JoinColumn(name = "partner_id", nullable = false)
+    @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity
 ) : BaseEntity()
 
