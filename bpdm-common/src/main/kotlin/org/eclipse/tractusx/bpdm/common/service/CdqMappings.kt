@@ -92,13 +92,6 @@ object CdqMappings {
         )
     }
 
-    fun BusinessPartnerCdq.toAddressBpnDto(): AddressBpnDto {
-        return AddressBpnDto(
-            bpn = identifiers.find { it.type?.technicalKey == "BPN" }?.value,
-            address = toDto(addresses.single())
-        )
-    }
-
     fun toDto(identifier: IdentifierCdq): IdentifierDto {
         return IdentifierDto(
             identifier.value,

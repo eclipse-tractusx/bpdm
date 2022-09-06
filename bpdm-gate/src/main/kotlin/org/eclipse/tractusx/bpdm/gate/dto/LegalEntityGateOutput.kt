@@ -49,7 +49,7 @@ class LegalEntityGateOutputDeserializer(vc: Class<LegalEntityGateOutput>?) : Std
         return LegalEntityGateOutput(
             ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
             ctxt.readTreeAsValue(node.get(LegalEntityGateOutput::legalAddress.name), AddressResponse::class.java),
-            node.get(LegalEntityGateOutput::bpn.name).textValue(),
+            node.get(LegalEntityGateOutput::bpn.name)?.textValue(),
             node.get(LegalEntityGateOutput::externalId.name).textValue()
         )
     }

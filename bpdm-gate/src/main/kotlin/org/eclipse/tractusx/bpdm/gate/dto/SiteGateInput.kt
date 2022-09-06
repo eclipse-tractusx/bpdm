@@ -47,7 +47,7 @@ class SiteGateInputDeserializer(vc: Class<SiteGateInput>?) : StdDeserializer<Sit
     override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteGateInput {
         val node = parser.codec.readTree<JsonNode>(parser)
         return SiteGateInput(
-            node.get(SiteGateInput::bpn.name).textValue(),
+            node.get(SiteGateInput::bpn.name)?.textValue(),
             ctxt.readTreeAsValue(node, SiteDto::class.java),
             node.get(SiteGateInput::externalId.name).textValue(),
             node.get(SiteGateInput::legalEntityExternalId.name)?.textValue()!!

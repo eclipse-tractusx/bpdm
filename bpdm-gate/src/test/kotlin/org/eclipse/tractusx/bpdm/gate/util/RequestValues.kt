@@ -249,22 +249,15 @@ object RequestValues {
         legalEntityExternalId = CommonValues.externalId2
     )
 
-    val addressWithBpn1 = AddressBpnDto(
-        bpn = CommonValues.bpnAddress1,
-        address = address1
-    )
-    val addressWithBpn2 = AddressBpnDto(
-        bpn = CommonValues.bpnAddress2,
-        address = address2
-    )
-
     val addressGateInput1 = AddressGateInput(
-        address = addressWithBpn1,
+        bpn = CommonValues.bpnAddress1,
+        address = address1,
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1
     )
     val addressGateInput2 = AddressGateInput(
-        address = addressWithBpn2,
+        bpn = CommonValues.bpnAddress2,
+        address = address2,
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1
     )

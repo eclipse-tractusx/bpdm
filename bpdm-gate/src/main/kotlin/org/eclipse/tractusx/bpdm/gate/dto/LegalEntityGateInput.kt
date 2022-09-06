@@ -44,7 +44,7 @@ class LegalEntityGateInputDeserializer(vc: Class<LegalEntityGateInput>?) : StdDe
         val node = parser.codec.readTree<JsonNode>(parser)
         return LegalEntityGateInput(
             node.get(LegalEntityGateInput::externalId.name).textValue(),
-            node.get(LegalEntityGateInput::bpn.name).textValue(),
+            node.get(LegalEntityGateInput::bpn.name)?.textValue(),
             ctxt.readTreeAsValue(node, LegalEntityDto::class.java)
         )
     }

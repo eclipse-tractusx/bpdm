@@ -52,15 +52,11 @@ class CdqRequestMappingService(
     }
 
     fun toCdqModel(address: AddressGateInput): BusinessPartnerCdq {
-        return toCdqModel(address.address, address.externalId)
-    }
-
-    private fun toCdqModel(address: AddressBpnDto, externalId: String): BusinessPartnerCdq {
         return BusinessPartnerCdq(
-            externalId = externalId,
+            externalId = address.externalId,
             dataSource = cdqConfigProperties.datasourceAddress,
             addresses = listOf(toCdqModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn!!)) else emptyList()
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList()
         )
     }
 

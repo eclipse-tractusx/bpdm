@@ -21,9 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.RelationCdq
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toAddressBpnDto
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
@@ -32,7 +33,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class InputCdqMappingService(
-    private val cdqConfigProperties: CdqConfigProperties
+    private val cdqConfigProperties: CdqConfigProperties,
+    private val bpnConfigProperties: BpnConfigProperties
 ) {
 
     fun toInputLegalEntity(businessPartner: BusinessPartnerCdq): LegalEntityGateInput {
@@ -45,7 +47,8 @@ class InputCdqMappingService(
 
     fun toInputAddress(businessPartner: BusinessPartnerCdq): AddressGateInput {
         return AddressGateInput(
-            address = businessPartner.toAddressBpnDto(),
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
+            address = toDto(businessPartner.addresses.single()),
             externalId = businessPartner.externalId!!,
             legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations),
             siteExternalId = toParentSiteExternalId(businessPartner.relations)
@@ -54,7 +57,7 @@ class InputCdqMappingService(
 
     fun toInputSite(businessPartner: BusinessPartnerCdq): SiteGateInput {
         return SiteGateInput(
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             site = businessPartner.toSiteDto(),
             externalId = businessPartner.externalId!!,
             legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations)!!
