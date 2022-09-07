@@ -20,32 +20,28 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.http.codec.ClientCodecConfigurer
-import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-class CdqConfig(
-    val cdqProperties: CdqConfigProperties
+@ConditionalOnProperty(
+    value = ["bpdm.gate-security.pool-security-enabled"],
+    havingValue = "false",
+    matchIfMissing = true
+)
+class PoolWebClientConfigNoAuth(
+    private val poolConfigProperties: PoolConfigProperties
 ) {
-    companion object {
-        const val memorySize = 1 * 1024 * 1024 // 1mb
-    }
-
     @Bean
-    @Qualifier("cdqClient")
+    @Qualifier("poolClient")
     fun adapterClient(): WebClient {
         return WebClient.builder()
-            .exchangeStrategies(ExchangeStrategies.builder()
-                .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
-                .build())
-            .baseUrl(cdqProperties.host)
+            .baseUrl(poolConfigProperties.baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader("x-api-key", cdqProperties.apiKey)
             .build()
     }
 }

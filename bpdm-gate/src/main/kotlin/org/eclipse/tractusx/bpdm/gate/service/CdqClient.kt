@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -38,6 +39,7 @@ private const val RELATION_TYPE_KEY = "PARENT"
 
 @Service
 class CdqClient(
+    @Qualifier("cdqClient")
     private val webClient: WebClient,
     private val cdqConfigProperties: CdqConfigProperties,
     private val objectMapper: ObjectMapper

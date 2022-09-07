@@ -101,5 +101,9 @@ applicationSecret:
   enabled: true
   cdq: <path:bpdm/data/dev/gate/cdq#api-key>
 
-applicationConfig: # |
-# property=value
+applicationConfig: |
+  # oauth2 client configuration
+  #TODO: add correct client id and secret
+  spring.security.oauth2.client.registration.gate-client.client-id=TODO
+  spring.security.oauth2.client.registration.gate-client.client-secret=xxxx-xxxx-xxxx-xxxx-xxxx
+  spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.dev.demo.catena-x.net/auth/realms/CX-Central

@@ -17,3 +17,10 @@ ingress:
 
 applicationSecret:
   cdq: <path:bpdm/data/int/gate/cdq#api-key>
+
+applicationConfig: |
+  # oauth2 client configuration
+  #TODO: add correct client id and secret
+  spring.security.oauth2.client.registration.gate-client.client-id=TODO
+  spring.security.oauth2.client.registration.gate-client.client-secret=xxxx-xxxx-xxxx-xxxx-xxxx
+  spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.demo.catena-x.net/auth/realms/CX-Central
