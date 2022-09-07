@@ -27,6 +27,7 @@ import io.swagger.v3.oas.models.security.OAuthFlows
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import mu.KotlinLogging
+import org.springdoc.core.GroupedOpenApi
 import org.springdoc.core.customizers.OpenApiCustomiser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -41,25 +42,41 @@ class OpenApiConfig(
     private val logger = KotlinLogging.logger { }
 
     @Bean
-    fun bpdmOpenApiDefinition(): OpenAPI{
-        val definition = OpenAPI()
-            .info(Info().title(infoProperties.name).description(infoProperties.description).version(infoProperties.version))
-
-        return if(securityProperties.enabled) addSecurity(definition) else definition
+    fun openApiDefinition(): GroupedOpenApi {
+        return GroupedOpenApi.builder()
+            .addOpenApiCustomiser(bpdmOpenApiCustomiser())
+            .group("docs")
+            .pathsToMatch("/**")
+            .displayName("Docs")
+            .build()
     }
 
-    private fun addSecurity(definition: OpenAPI): OpenAPI{
+    fun bpdmOpenApiCustomiser(): OpenApiCustomiser {
+        return OpenApiCustomiser { openApi: OpenAPI ->
+            openApi.info(Info().title(infoProperties.name).description(infoProperties.description).version(infoProperties.version))
+                .components(with(openApi.components) { schemas(schemas.values.sortedBy { it.name }.associateBy { it.name }) })
+                .also { if (securityProperties.enabled) it.withSecurity() }
+        }
+    }
+
+    private fun OpenAPI.withSecurity(): OpenAPI {
         logger.info { "Add security schemes to OpenAPI definition" }
-        return definition
-            .components(Components()
-                .addSecuritySchemes("open_id_scheme",
+        return this.components(
+            Components()
+                .addSecuritySchemes(
+                    "open_id_scheme",
                     SecurityScheme().type(SecurityScheme.Type.OAUTH2).flows(
                         OAuthFlows().authorizationCode(
                             OAuthFlow().authorizationUrl(securityProperties.authUrl)
                                 .tokenUrl(securityProperties.tokenUrl)
-                                .refreshUrl(securityProperties.refreshUrl)))))
+                                .refreshUrl(securityProperties.refreshUrl)
+                        )
+                    )
+                )
+        )
             .addSecurityItem(SecurityRequirement().addList("open_id_scheme", emptyList()))
     }
+
 
 }
 
