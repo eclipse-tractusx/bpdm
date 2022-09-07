@@ -1,44 +1,61 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "bpdm.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
-  name: {{ include "bpdm.fullname" . }}
+  name: {{ $fullName }}
   labels:
-      {{- include "bpdm.labels" . | nindent 4 }}
+    {{- include "bpdm.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    {{- if .Values.ingress.subPath }}
-    nginx.ingress.kubernetes.io/x-forwarded-prefix: {{ .Values.ingress.subPath }}
-    {{- end}}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
   tls:
+    {{- range .Values.ingress.tls }}
     - hosts:
-        {{- range .Values.ingress.hosts }}
-        - {{ . }}
-        {{- end}}
-      secretName: tls-secret
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ . }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          {{- if $.Values.ingress.subPath }}
-          - path: {{ $.Values.ingress.subPath }}(/|$)(.*)
-            pathType: Prefix
+          {{- range .paths }}
+          - path: {{ .path }}
+            {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+            pathType: {{ .pathType }}
+            {{- end }}
             backend:
+              {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ include "bpdm.fullname" $ }}
+                name: {{ $fullName }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  number: {{ $svcPort }}
+              {{- else }}
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcPort }}
+              {{- end }}
           {{- end }}
-          {{- if or ($.Values.ingress.createRootPath) (not $.Values.ingress.subPath)  }}
-          - path: /()(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ include "bpdm.fullname" $ }}
-                port:
-                  number: {{ $.Values.service.port }}
-          {{- end}}
-    {{- end}}
+    {{- end }}
+{{- end }}
