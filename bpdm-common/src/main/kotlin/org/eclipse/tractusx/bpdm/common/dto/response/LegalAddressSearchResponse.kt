@@ -17,10 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
 @Schema(name = "Legal Address Search Response", description = "Legal address record with parent BPN")
 data class LegalAddressSearchResponse(
