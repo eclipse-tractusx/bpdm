@@ -29,11 +29,15 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.Busin
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.toSearchDto
+import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
+import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -46,6 +50,7 @@ import kotlin.math.ceil
 @Primary
 class SearchServiceImpl(
     val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,
+    val legalEntityRepository: LegalEntityRepository,
     val textDocSearchRepository: TextDocSearchRepository,
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val objectMapper: ObjectMapper
@@ -61,35 +66,33 @@ class SearchServiceImpl(
      * adapted accordingly from the OpenSearch page information
      *
      */
-    override fun searchBusinessPartners(
+    override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse> {
 
-        logger.debug { "Search index for business partners" }
+        val legalEntityPage = searchAndPreparePage(searchRequest, paginationRequest)
+        businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
-        val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(
-            searchRequest,
-            PageRequest.of(paginationRequest.page, paginationRequest.size)
-        )
+        return with(legalEntityPage) {
+            PageResponse(totalElements, totalPages, page, contentSize,
+                content.map { (score, legalEntity) -> legalEntity.toMatchDto(score) })
+        }
+    }
 
-        logger.debug { "Found ${searchResult.hits.size} business partners in OpenSearch. (${searchResult.totalHits} in total)" }
 
-        val bpnHitMap = searchResult.associateBy { it.id }
+    override fun searchBusinessPartners(
+        searchRequest: BusinessPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<BusinessPartnerMatchResponse> {
 
-        val businessPartners = businessPartnerFetchService.fetchByBpns(bpnHitMap.keys)
-        val missingPartners = bpnHitMap.keys.minus(businessPartners.map { it.bpn }.toSet())
+        val legalEntityPage = searchAndPreparePage(searchRequest, paginationRequest)
+        businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
-        if (missingPartners.isNotEmpty())
-            logger.warn { "Some BPNs could not be found in the database: ${missingPartners.joinToString()}" }
-
-        val responseContent =
-            businessPartners.map { it.toSearchDto(bpnHitMap[it.bpn]!!.score) }.sortedByDescending { it.score }
-
-        val totalHits = searchResult.totalHits!!.value - missingPartners.size
-        val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
-
-        return PageResponse(totalHits, totalPages, paginationRequest.page, responseContent.size, responseContent)
+        return with(legalEntityPage) {
+            PageResponse(totalElements, totalPages, page, contentSize,
+                content.map { (score, legalEntity) -> legalEntity.toBusinessPartnerMatchDto(score) })
+        }
     }
 
     /**
@@ -129,5 +132,33 @@ class SearchServiceImpl(
     private fun extractTextDocText(textDocJson: String): String {
         val textDoc: TextDoc = objectMapper.readValue(textDocJson)
         return textDoc.text
+    }
+
+    private fun searchAndPreparePage(
+        searchRequest: BusinessPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<Pair<Float, LegalEntity>> {
+        logger.debug { "Search index for legal entities" }
+
+        val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(
+            searchRequest,
+            PageRequest.of(paginationRequest.page, paginationRequest.size)
+        )
+
+        logger.debug { "Found ${searchResult.hits.size} business partners in OpenSearch. (${searchResult.totalHits} in total)" }
+
+        val bpnHitMap = searchResult.associateBy { it.id }
+
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnHitMap.keys)
+        val missingPartners = bpnHitMap.keys.minus(legalEntities.map { it.bpn }.toSet())
+
+        if (missingPartners.isNotEmpty())
+            logger.warn { "Some BPNs could not be found in the database: ${missingPartners.joinToString()}" }
+
+        val scoreLegalEntityPairs = legalEntities.map { Pair(bpnHitMap[it.bpn]!!.score, it) }.sortedByDescending { it.first }
+
+        val totalHits = searchResult.totalHits!!.value - missingPartners.size
+        val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
+        return PageResponse(totalHits, totalPages, paginationRequest.page, legalEntities.size, scoreLegalEntityPairs)
     }
 }

@@ -31,12 +31,16 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>) : PageResponse<T> {
+fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun LegalEntity.toSearchDto(score: Float): LegalEntityMatchResponse {
+fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
     return LegalEntityMatchResponse(score, this.toPoolDto())
+}
+
+fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchResponse {
+    return BusinessPartnerMatchResponse(score, this.toBusinessPartnerDto())
 }
 
 fun LegalEntity.toPoolDto(): LegalEntityPartnerResponse {
@@ -68,6 +72,17 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         bankAccounts.map { it.toDto() },
         roles.map { it.toDto() },
         startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
+    )
+}
+
+fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
+    return BusinessPartnerResponse(
+        uuid = "",
+        bpn = bpn,
+        properties = toDto(),
+        addresses = listOf(AddressPartnerResponse("", legalAddress.toDto())),
+        sites = emptyList(),
+        currentness = currentness
     )
 }
 

@@ -24,12 +24,14 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
 import org.eclipse.tractusx.bpdm.pool.service.toDto
-import org.eclipse.tractusx.bpdm.pool.service.toSearchDto
+import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -48,7 +50,7 @@ class SearchServiceMock(
      * Ignores [searchRequest] and returns an unfiltered result of business partners in the database,
      * adding a default relevancy score to each entry
      */
-    override fun searchBusinessPartners(
+    override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse> {
@@ -57,7 +59,19 @@ class SearchServiceMock(
 
         logger.info { "Mock search: Returning ${resultPage.size} business partners from database" }
 
-        return resultPage.toDto(resultPage.content.map { it.toSearchDto(1f) })
+        return resultPage.toDto(resultPage.content.map { it.toMatchDto(1f) })
+    }
+
+    override fun searchBusinessPartners(
+        searchRequest: BusinessPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<BusinessPartnerMatchResponse> {
+        val resultPage =
+            legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        logger.info { "Mock search: Returning ${resultPage.size} business partners from database" }
+
+        return resultPage.toDto(resultPage.content.map { it.toBusinessPartnerMatchDto(1f) })
     }
 
     /**
