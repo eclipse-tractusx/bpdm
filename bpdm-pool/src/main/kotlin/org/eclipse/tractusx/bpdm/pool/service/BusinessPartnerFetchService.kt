@@ -76,6 +76,14 @@ class BusinessPartnerFetchService(
     }
 
     /**
+     * Fetch business partners by BPN in [bpns] and map to dtos
+     */
+    @Transactional
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> {
+        return fetchByBpns(bpns).map { it.toPoolDto() }
+    }
+
+    /**
      * Find bpn to identifier value mappings by [idValues] of [identifierType]
      */
     @Transactional

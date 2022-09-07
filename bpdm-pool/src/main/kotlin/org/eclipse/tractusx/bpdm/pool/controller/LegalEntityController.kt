@@ -34,6 +34,8 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springdoc.api.annotations.ParameterObject
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -124,20 +126,28 @@ class LegalEntityController(
 
     @Operation(
         summary = "Search legal entity partners by BPNLs",
-        description = "Search business partners of type legal entity by their BPNLs"
+        description = "Search legal entity partners by their BPNLs. " +
+                "The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. " +
+                "For a single request, the maximum number of BPNLs to search for is limited to \${bpdm.bpn.search-request-limit} entries."
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Found legal entites"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+            ApiResponse(
+                responseCode = "400",
+                description = "On malformed request parameters or if number of requested bpns exceeds limit",
+                content = [Content()]
+            )
         ]
     )
     @PostMapping("/search")
     fun searchSites(
-        @RequestBody bpnLs: Collection<String>,
-        @ParameterObject paginationRequest: PaginationRequest
-    ): Collection<LegalEntityPartnerResponse> {
-        TODO()
+        @RequestBody bpnLs: Collection<String>
+    ): ResponseEntity<Collection<LegalEntityPartnerResponse>> {
+        if (bpnLs.size > bpnConfigProperties.searchRequestLimit) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        return ResponseEntity(businessPartnerFetchService.fetchDtosByBpns(bpnLs), HttpStatus.OK)
     }
 
     @Operation(
