@@ -110,7 +110,7 @@ class AddressController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping("/output/addresses")
+    @PostMapping("/output/addresses")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?

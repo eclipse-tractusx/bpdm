@@ -9,6 +9,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import java.time.Instant
 
 object ResponseValues {
     val language1 = TypeKeyNameDto(
@@ -460,6 +461,26 @@ object ResponseValues {
         bpn = CommonValues.bpn2,
         legalEntity = legalEntityResponse2,
         externalId = CommonValues.externalId2,
+        legalAddress = legalAddress2
+    )
+
+    val legalEntityPartnerResponse1 = LegalEntityPartnerResponse(
+        bpn = CommonValues.bpn1,
+        properties = legalEntityResponse1,
+        currentness = Instant.ofEpochMilli(0)
+    )
+    val legalEntityPartnerResponse2 = LegalEntityPartnerResponse(
+        bpn = CommonValues.bpn2,
+        properties = legalEntityResponse2,
+        currentness = Instant.ofEpochMilli(0)
+    )
+
+    val legalAddressSearchResponse1 = LegalAddressSearchResponse(
+        legalEntity = CommonValues.bpn1,
+        legalAddress = legalAddress1
+    )
+    val legalAddressSearchResponse2 = LegalAddressSearchResponse(
+        legalEntity = CommonValues.bpn2,
         legalAddress = legalAddress2
     )
 }

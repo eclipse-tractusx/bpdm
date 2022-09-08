@@ -65,7 +65,7 @@ class CdqClient(
                     if (limit != null) builder.queryParam("limit", limit)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (from != null) builder.queryParam("from", from)
-                    if (externalIds != null) builder.queryParam(externalIds.joinToString(","))
+                    if (externalIds != null) builder.queryParam("externalIds", externalIds.joinToString(","))
                     builder.build()
                 }
                 .retrieve()

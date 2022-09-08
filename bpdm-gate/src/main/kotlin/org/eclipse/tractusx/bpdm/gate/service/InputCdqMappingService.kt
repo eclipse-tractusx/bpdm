@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.RelationCdq
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
@@ -40,7 +41,7 @@ class InputCdqMappingService(
     fun toInputLegalEntity(businessPartner: BusinessPartnerCdq): LegalEntityGateInput {
         return LegalEntityGateInput(
             businessPartner.externalId!!,
-            businessPartner.identifiers.find { it.type?.technicalKey == "BPN" }?.value,
+            businessPartner.identifiers.find { it.type?.technicalKey == CdqMappings.BPN_TECHNICAL_KEY }?.value,
             businessPartner.toLegalEntityDto()
         )
     }

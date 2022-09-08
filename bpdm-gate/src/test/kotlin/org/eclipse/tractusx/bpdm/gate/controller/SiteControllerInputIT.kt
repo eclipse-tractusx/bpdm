@@ -31,10 +31,10 @@ import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.eclipse.tractusx.bpdm.gate.util.deserializeMatchedRequests
 import org.junit.jupiter.api.Test
@@ -93,7 +93,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val site = webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+        val site = webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
@@ -127,7 +127,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri("${CATENA_INPUT_SITES_PATH}/nonexistent-externalid123")
+        webTestClient.get().uri("${GATE_API_INPUT_SITES_PATH}/nonexistent-externalid123")
             .exchange()
             .expectStatus()
             .isNotFound
@@ -144,7 +144,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -176,7 +176,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(CATENA_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -226,7 +226,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val pageResponse = webTestClient.get()
             .uri { builder ->
-                builder.path(CATENA_INPUT_SITES_PATH)
+                builder.path(GATE_API_INPUT_SITES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -295,7 +295,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val pageResponse = webTestClient.get()
             .uri { builder ->
-                builder.path(CATENA_INPUT_SITES_PATH)
+                builder.path(GATE_API_INPUT_SITES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -328,7 +328,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(CATENA_INPUT_SITES_PATH)
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH)
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -341,7 +341,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites, pagination limit exceeded`() {
         webTestClient.get().uri { builder ->
-            builder.path(CATENA_INPUT_SITES_PATH)
+            builder.path(GATE_API_INPUT_SITES_PATH)
                 .queryParam(PaginationStartAfterRequest::limit.name, 999999)
                 .build()
         }
@@ -493,7 +493,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_SITES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(sites))
             .exchange()
@@ -548,7 +548,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_SITES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_SITES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(sites))
             .exchange()

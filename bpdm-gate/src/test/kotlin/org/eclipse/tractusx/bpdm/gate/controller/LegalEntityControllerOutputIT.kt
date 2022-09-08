@@ -11,14 +11,17 @@ import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_OUTPUT_LEGAL_ENTITIES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_LEGAL_ENTITIES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -33,121 +36,27 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        private val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServerCdq: WireMockExtension = WireMockExtension.newInstance()
+            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
+            .build()
+
+        @RegisterExtension
+        private val wireMockServerBpdmPool: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.cdq.host") { wireMockServerCdq.baseUrl() }
+            registry.add("bpdm.pool.baseUrl") { wireMockServerBpdmPool.baseUrl() }
         }
     }
 
     /**
-     * Given legal entity exists in cdq
-     * When getting legal entity by external id via output route
-     * Then legal entity mapped to the catena data model should be returned
-     */
-    @Test
-    fun `get legal entity by external id`() {
-        val expectedLegalEntity = ResponseValues.legalEntityGateOutput1
-
-        wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                AugmentedBusinessPartnerResponseCdq(CdqValues.legalEntity1Response)
-                            )
-                        )
-                )
-        )
-
-        val legalEntity = webTestClient.get().uri(CATENA_OUTPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1Response.externalId}")
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBody(LegalEntityGateOutput::class.java)
-            .returnResult()
-            .responseBody
-
-        assertThat(legalEntity).usingRecursiveComparison().isEqualTo(expectedLegalEntity)
-    }
-
-    /**
-     * Given legal entity does not exist in cdq
-     * When getting legal entity by external id via output route
-     * Then "not found" response is sent
-     */
-    @Test
-    fun `get legal entity by external id, not found`() {
-        wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{}")
-                )
-        )
-
-        webTestClient.get().uri("$CATENA_OUTPUT_LEGAL_ENTITIES_PATH/nonexistent-externalid123")
-            .exchange()
-            .expectStatus()
-            .isNotFound
-    }
-
-    /**
-     * When cdq api responds with an error status code while fetching legal entity by external id
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get legal entity by external id, cdq error`() {
-        wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
-                .willReturn(badRequest())
-        )
-
-        webTestClient.get().uri("$CATENA_OUTPUT_LEGAL_ENTITIES_PATH/some-externalid123")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
-
-    /**
-     * Given legal entity without legal address in CDQ
-     * When query by its external ID
-     * Then server error is returned
-     */
-    @Test
-    fun `get legal entity without legal address, expect error`() {
-        val invalidPartner = CdqValues.legalEntity1.copy(addresses = emptyList())
-
-        wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                AugmentedBusinessPartnerResponseCdq(invalidPartner)
-                            )
-                        )
-                )
-        )
-
-        webTestClient.get().uri(CATENA_OUTPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1Response.externalId}")
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
-
-    /**
-     * Given legal entities exists in cdq
+     * Given legal entities exists in cdq and bpdm pool
      * When getting legal entities page via output route
-     * Then legal entities page mapped to the catena data model should be returned
+     * Then legal entities page should be returned
      */
     @Test
     fun `get legal entities`() {
@@ -161,13 +70,21 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityGateOutput2
         )
 
+        val legalEntitiesPool = listOf(
+            ResponseValues.legalEntityPartnerResponse1,
+            ResponseValues.legalEntityPartnerResponse2
+        )
+        val legalAddressesPool = listOf(
+            ResponseValues.legalAddressSearchResponse1,
+            ResponseValues.legalAddressSearchResponse2
+        )
+
         val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
         val total = 10
-        val invalidEntries = 0
 
-        wireMockServer.stubFor(
+        wireMockServerCdq.stubFor(
             get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
@@ -176,7 +93,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
                                     limit = limit,
-                                    startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
@@ -186,9 +102,30 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val pageResponse = webTestClient.get()
+        wireMockServerBpdmPool.stubFor(
+            post(urlPathMatching(POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(legalEntitiesPool)
+                        )
+                )
+        )
+        wireMockServerBpdmPool.stubFor(
+            post(urlPathMatching(POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(legalAddressesPool)
+                        )
+                )
+        )
+
+        val pageResponse = webTestClient.post()
             .uri { builder ->
-                builder.path(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
+                builder.path(GATE_API_OUTPUT_LEGAL_ENTITIES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -205,22 +142,21 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedLegalEntities,
-                invalidEntries = invalidEntries
+                invalidEntries = 0
             )
         )
     }
 
     /**
-     * Given legal entity without legal address in CDQ
-     * When getting legal entities page via output route
-     * Then only valid legal entities on page returned
+     * Given legal entities exists in cdq and bpdm pool
+     * When getting legal entities page via output route filtering by external ids
+     * Then legal entities page should be returned
      */
     @Test
-    fun `filter legal entities without legal address`() {
+    fun `get legal entities, filter by external ids`() {
         val legalEntitiesCdq = listOf(
             CdqValues.legalEntity1Response,
-            CdqValues.legalEntity2Response,
-            CdqValues.legalEntity1Response.copy(addresses = emptyList())
+            CdqValues.legalEntity2Response
         )
 
         val expectedLegalEntities = listOf(
@@ -228,14 +164,23 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityGateOutput2
         )
 
-        val limit = 3
+        val legalEntitiesPool = listOf(
+            ResponseValues.legalEntityPartnerResponse1,
+            ResponseValues.legalEntityPartnerResponse2
+        )
+        val legalAddressesPool = listOf(
+            ResponseValues.legalAddressSearchResponse1,
+            ResponseValues.legalAddressSearchResponse2
+        )
+
+        val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
         val total = 10
-        val invalidEntries = 1
 
-        wireMockServer.stubFor(
+        wireMockServerCdq.stubFor(
             get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalId1, CommonValues.externalId2).joinToString(",")))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -243,7 +188,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                             objectMapper.writeValueAsString(
                                 PagedResponseCdq(
                                     limit = limit,
-                                    startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
@@ -253,13 +197,36 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val pageResponse = webTestClient.get()
+        wireMockServerBpdmPool.stubFor(
+            post(urlPathMatching(POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(legalEntitiesPool)
+                        )
+                )
+        )
+        wireMockServerBpdmPool.stubFor(
+            post(urlPathMatching(POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(legalAddressesPool)
+                        )
+                )
+        )
+
+        val pageResponse = webTestClient.post()
             .uri { builder ->
-                builder.path(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
+                builder.path(GATE_API_OUTPUT_LEGAL_ENTITIES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
             }
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(objectMapper.writeValueAsString(listOf(CommonValues.externalId1, CommonValues.externalId2)))
             .exchange()
             .expectStatus()
             .isOk
@@ -272,41 +239,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedLegalEntities,
-                invalidEntries = invalidEntries
+                invalidEntries = 0
             )
         )
-    }
-
-    /**
-     * When cdq api responds with an error status code while getting legal entities
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get legal entities, cdq error`() {
-        wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        webTestClient.get().uri(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
-    }
-
-    /**
-     * When requesting too many legal entities
-     * Then a bad request response should be sent
-     */
-    @Test
-    fun `get legal entities, pagination limit exceeded`() {
-        webTestClient.get().uri { builder ->
-            builder.path(CATENA_OUTPUT_LEGAL_ENTITIES_PATH)
-                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
-                .build()
-        }
-            .exchange()
-            .expectStatus()
-            .isBadRequest
     }
 }

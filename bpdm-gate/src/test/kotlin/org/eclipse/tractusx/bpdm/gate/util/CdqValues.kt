@@ -22,13 +22,14 @@ package org.eclipse.tractusx.bpdm.gate.util
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 
 /**
  * Test values for CDQ DTOs
  * Numbered values should match with RequestValues numbered values for easier testing
  */
 object CdqValues {
-    val idTypeBpn = TypeKeyNameUrlCdq("BPN", "Business Partner Number")
+    val idTypeBpn = TypeKeyNameUrlCdq(CdqMappings.BPN_TECHNICAL_KEY, "Business Partner Number")
     val issuerBpn = TypeKeyNameUrlCdq("CATENAX", "Catena-X")
 
     val language1 = LanguageCdq(technicalKey = CommonValues.language1)

@@ -39,6 +39,8 @@ data class LegalEntityPartnerResponse(
     val currentness: Instant
 ) {
     class CustomDeserializer(vc: Class<LegalEntityPartnerResponse>?) : StdDeserializer<LegalEntityPartnerResponse>(vc) {
+        constructor() : this(null) // for some reason jackson needs this explicit default constructor
+
         override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerResponse {
             val node = parser.codec.readTree<JsonNode>(parser)
             return LegalEntityPartnerResponse(
@@ -49,5 +51,3 @@ data class LegalEntityPartnerResponse(
         }
     }
 }
-
-
