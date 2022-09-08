@@ -38,7 +38,7 @@ class PoolWebClientConfigNoAuth(
 ) {
     @Bean
     @Qualifier("poolClient")
-    fun adapterClient(): WebClient {
+    fun webClientPool(): WebClient {
         return WebClient.builder()
             .baseUrl(poolConfigProperties.baseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

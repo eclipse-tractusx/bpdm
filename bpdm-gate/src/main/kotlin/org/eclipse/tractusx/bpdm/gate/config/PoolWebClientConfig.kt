@@ -55,7 +55,7 @@ class PoolWebClientConfig(
 
     @Bean
     @Qualifier("poolClient")
-    fun webClient(authorizedClientManager: ReactiveOAuth2AuthorizedClientManager?): WebClient {
+    fun webClientPool(authorizedClientManager: ReactiveOAuth2AuthorizedClientManager?): WebClient {
         val oauth = ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
         oauth.setDefaultClientRegistrationId(gateSecurityConfigProperties.oauth2ClientRegistration)
         return WebClient.builder()

@@ -38,7 +38,7 @@ class CdqConfig(
 
     @Bean
     @Qualifier("cdqClient")
-    fun adapterClient(): WebClient {
+    fun webClientCdq(): WebClient {
         return WebClient.builder()
             .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
