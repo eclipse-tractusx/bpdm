@@ -31,7 +31,6 @@ import org.springdoc.core.GroupedOpenApi
 import org.springdoc.core.customizers.OpenApiCustomiser
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.stereotype.Component
 
 
 @Configuration
@@ -42,20 +41,24 @@ class OpenApiConfig(
     private val logger = KotlinLogging.logger { }
 
     @Bean
+    fun customOpenAPI(): OpenAPI? {
+        return OpenAPI().info(Info().title(infoProperties.name).description(infoProperties.description).version(infoProperties.version))
+            .also { if (securityProperties.enabled) it.withSecurity() }
+    }
+
+    @Bean
     fun openApiDefinition(): GroupedOpenApi {
         return GroupedOpenApi.builder()
-            .addOpenApiCustomiser(bpdmOpenApiCustomiser())
             .group("docs")
             .pathsToMatch("/**")
             .displayName("Docs")
+            .addOpenApiCustomiser(sortSchemaCustomiser())
             .build()
     }
 
-    fun bpdmOpenApiCustomiser(): OpenApiCustomiser {
+    fun sortSchemaCustomiser(): OpenApiCustomiser {
         return OpenApiCustomiser { openApi: OpenAPI ->
-            openApi.info(Info().title(infoProperties.name).description(infoProperties.description).version(infoProperties.version))
-                .components(with(openApi.components) { schemas(schemas.values.sortedBy { it.name }.associateBy { it.name }) })
-                .also { if (securityProperties.enabled) it.withSecurity() }
+            openApi.components(with(openApi.components) { schemas(schemas.values.sortedBy { it.name }.associateBy { it.name }) })
         }
     }
 
@@ -76,15 +79,4 @@ class OpenApiConfig(
         )
             .addSecurityItem(SecurityRequirement().addList("open_id_scheme", emptyList()))
     }
-
-
 }
-
-@Component
-class SortSchemasCustomiser : OpenApiCustomiser {
-    override fun customise(openApi: OpenAPI) {
-        val sortedSchemas = openApi.components.schemas.values.sortedBy { it.name }
-        openApi.components.schemas = sortedSchemas.associateBy { it.name }
-    }
-}
-
