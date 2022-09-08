@@ -29,6 +29,7 @@ object EndpointValues {
     const val CATENA_PATH = "/api/catena"
 
     const val CATENA_BUSINESS_PARTNERS_PATH = "$CATENA_PATH/business-partners"
+    const val CATENA_BUSINESS_PARTNER_LEGACY_PATH = "$CATENA_PATH/business-partner"
 
     const val CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX = "/confirm-up-to-date"
     const val CATENA_CHANGELOG_PATH_POSTFIX = "/changelog"

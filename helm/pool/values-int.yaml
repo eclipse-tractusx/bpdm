@@ -4,9 +4,24 @@ image:
 springProfiles:
   - int
 
+
 ingress:
   hosts:
-    - partners-pool.demo.catena-x.net
+    - host: partners-pool.int.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: catenax-bpdm-int.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - partners-pool.int.demo.catena-x.net
+    - secretName: bpdm-int-tls
+      hosts:
+        - catenax-bpdm-int.demo.catena-x.net
 
 applicationSecret:
   keycloak: <path:bpdm/data/int/pool/keycloak#credentials-secret>

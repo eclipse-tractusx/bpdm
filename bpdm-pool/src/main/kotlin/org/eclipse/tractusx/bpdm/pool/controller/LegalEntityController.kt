@@ -29,7 +29,10 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.service.*
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
+import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 
@@ -63,7 +66,7 @@ class LegalEntityController(
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse> {
-        return searchService.searchBusinessPartners(
+        return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
             paginationRequest
         )
@@ -96,8 +99,8 @@ class LegalEntityController(
         idType: String?
     ): LegalEntityPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findPartner(idValue)
-        else businessPartnerFetchService.findPartnerByIdentifier(actualType, idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntity(idValue)
+        else businessPartnerFetchService.findLegalEntity(actualType, idValue)
     }
 
     @Operation(

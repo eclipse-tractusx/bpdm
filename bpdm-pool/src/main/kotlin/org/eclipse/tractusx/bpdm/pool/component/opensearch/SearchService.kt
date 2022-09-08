@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
@@ -34,17 +35,25 @@ interface SearchService {
     /**
      * Find business partners by matching their field values to [searchRequest] field query texts
      */
-    fun searchBusinessPartners(
+    fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse>
 
+    fun searchBusinessPartners(
+        searchRequest: BusinessPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<BusinessPartnerMatchResponse>
+
+
     /**
      * In business partners matching the [filters], find [field] values matching [text].
      */
-    fun getSuggestion(field: SuggestionType,
-                      text: String?,
-                      filters: BusinessPartnerSearchRequest,
-                      paginationRequest: PaginationRequest
+    fun getSuggestion(
+        field: SuggestionType,
+        text: String?,
+        filters: BusinessPartnerSearchRequest,
+        paginationRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
+
 }

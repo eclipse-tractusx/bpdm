@@ -6,7 +6,14 @@ springProfiles:
 
 ingress:
   hosts:
-    - partners-gate.demo.catena-x.net
+    - host: partners-gate.int.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - partners-gate.int.demo.catena-x.net
 
 applicationSecret:
   cdq: <path:bpdm/data/int/gate/cdq#api-key>
