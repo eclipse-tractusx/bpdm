@@ -30,6 +30,10 @@ import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object CdqMappings {
 
+    fun findBpn(identifiers: Collection<IdentifierCdq>): String? {
+        return identifiers.find { it.type?.technicalKey == "CX_BPN" }?.value
+    }
+
     private fun toReference(type: TypeKeyNameUrlCdq?): String {
         return type!!.technicalKey!!
     }

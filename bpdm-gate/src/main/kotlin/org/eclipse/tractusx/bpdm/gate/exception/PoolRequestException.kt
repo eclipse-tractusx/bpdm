@@ -17,11 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate
+package org.eclipse.tractusx.bpdm.gate.exception
 
-fun <T> List<T>.containsDuplicates(): Boolean = size != distinct().size
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-fun <K, V> Map<K, V?>.filterNotNullValues(): Map<K, V> =
-    filterValues { it != null }.mapValues { it.value ?: throw IllegalStateException("This can never happen") }
-
-fun <K, V> Map<K?, V>.filterNotNullKeys(): Map<K, V> = filterKeys { it != null }.mapKeys { it.key ?: throw IllegalStateException("This can never happen") }
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+class PoolRequestException : RuntimeException {
+    constructor(message: String, cause: Throwable) : super(message, cause)
+    constructor(message: String) : super(message)
+}

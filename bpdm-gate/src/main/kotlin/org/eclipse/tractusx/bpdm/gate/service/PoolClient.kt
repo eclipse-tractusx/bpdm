@@ -19,13 +19,48 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.gate.exception.PoolRequestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Service
 class PoolClient(
     @Qualifier("poolClient")
-    private val webClient: WebClient
+    private val webClient: WebClient,
+    private val objectMapper: ObjectMapper
 ) {
+    fun searchLegalEntities(bpnLs: Collection<String>): Collection<LegalEntityPartnerResponse> {
+        val legalEntities = try {
+            webClient
+                .post()
+                .uri("/legal-entities/search")
+                .bodyValue(objectMapper.writeValueAsString(bpnLs))
+                .retrieve()
+                .bodyToMono<Collection<LegalEntityPartnerResponse>>()
+                .block()!!
+        } catch (e: Exception) {
+            throw PoolRequestException("Request to search legal entities failed.", e)
+        }
+        return legalEntities
+    }
+
+    fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressSearchResponse> {
+        val legalAddresses = try {
+            webClient
+                .post()
+                .uri("/legal-entities/legal-addresses/search")
+                .bodyValue(objectMapper.writeValueAsString(bpnLs))
+                .retrieve()
+                .bodyToMono<Collection<LegalAddressSearchResponse>>()
+                .block()!!
+        } catch (e: Exception) {
+            throw PoolRequestException("Request to search legal addresses failed.", e)
+        }
+        return legalAddresses
+    }
 }

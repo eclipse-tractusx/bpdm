@@ -45,14 +45,14 @@ class CdqClient(
     private val objectMapper: ObjectMapper
 ) {
 
-    fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: List<String>? = null) =
+    fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
         getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceLegalEntity)
 
     private fun getAugmentedBusinessPartners(
         limit: Int?,
         startAfter: String?,
         from: Instant?,
-        externalIds: List<String>?,
+        externalIds: Collection<String>?,
         datasource: String
     ): PagedResponseCdq<AugmentedBusinessPartnerResponseCdq> {
         val partnerCollection = try {

@@ -111,6 +111,6 @@ class LegalEntityController(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<LegalEntityGateOutput> {
-        TODO()
+        return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }
