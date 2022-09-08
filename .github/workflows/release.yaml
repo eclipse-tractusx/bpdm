@@ -52,5 +52,5 @@ jobs:
           context: .
           push: true
           file: ${{ inputs.dockerfilePath }}
-          tags: ${{ steps.meta.outputs.tags }}, ${{ github.repository }}/${{ inputs.imageName }}:latest
+          tags: ${{ steps.meta.outputs.tags }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
