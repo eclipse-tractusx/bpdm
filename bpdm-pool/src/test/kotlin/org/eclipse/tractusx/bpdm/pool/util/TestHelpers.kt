@@ -27,6 +27,7 @@ import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
@@ -46,6 +47,7 @@ class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
     private val objectMapper: ObjectMapper,
     private val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties,
+    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
@@ -182,7 +184,7 @@ class TestHelpers(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
+            WireMock.get(WireMock.urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withBody(objectMapper.writeValueAsString(importCollection))

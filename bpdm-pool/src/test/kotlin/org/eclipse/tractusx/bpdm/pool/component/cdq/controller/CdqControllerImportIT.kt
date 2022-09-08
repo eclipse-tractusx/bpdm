@@ -31,9 +31,12 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,9 +59,10 @@ class CdqControllerImportIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     bpnConfigProperties: BpnConfigProperties,
     private val objectMapper: ObjectMapper,
-    private val testHelpers: TestHelpers
+    private val testHelpers: TestHelpers,
+    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties
 ) {
-    private val idTypeBpn = TypeKeyNameUrlCdq(CdqMappings.BPN_TECHNICAL_KEY, bpnConfigProperties.name, "")
+    private val idTypeBpn = TypeKeyNameUrlCdq(cdqAdapterConfigProperties.bpnKey, bpnConfigProperties.name, "")
     private val issuerBpn = TypeKeyNameUrlCdq(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName, "")
     private val statusBpn = TypeKeyNameCdq("UNKNOWN", "Unknown")
 
@@ -94,17 +98,17 @@ class CdqControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given new partners in CDQ
+     * Given new partners of type legal entity in CDQ
      * When Import from CDQ
      * Then partners imported
      */
     @Test
-    fun importNewPartners() {
+    fun `import new legal entity partners`() {
 
         val partnersToImport = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2,
-            CdqValues.businessPartner3
+            CdqValues.legalEntity1,
+            CdqValues.legalEntity2,
+            CdqValues.legalEntity3
         )
 
         val partnersExpected = listOf(
@@ -119,6 +123,87 @@ class CdqControllerImportIT @Autowired constructor(
     }
 
     /**
+     * Given new partners of type site in CDQ
+     * When Import from CDQ
+     * Then partners imported
+     */
+    @Test
+    fun `import new site partners`() {
+
+        val cxPoolIdType = TypeKeyNameUrlCdq("CX_POOL")
+        val parentIdentifier1 = "p1"
+        val parentIdentifier2 = "p2"
+        val parentIdentifier3 = "p3"
+
+        val parentToCreate1 = with(CdqValues.legalEntity1) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier1))) }
+        val parentToCreate2 = with(CdqValues.legalEntity2) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier2))) }
+        val parentToCreate3 = with(CdqValues.legalEntity3) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier3))) }
+
+        val parentsToCreate = listOf(
+            parentToCreate1,
+            parentToCreate2,
+            parentToCreate3
+        )
+
+        val bpns = importLegalEntities(parentsToCreate)
+
+        val parentBpn1 = bpns[0]
+        val parentBpn2 = bpns[1]
+        val parentBpn3 = bpns[2]
+
+        val mockedRequest = FetchBatchRequest(listOf(parentIdentifier1, parentIdentifier2, parentIdentifier3))
+
+        val mockedFetchBatchResponse = listOf(
+            FetchBatchRecord(
+                parentIdentifier1,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn1)))
+            ),
+            FetchBatchRecord(
+                parentIdentifier2,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn2)))
+            ),
+            FetchBatchRecord(
+                parentIdentifier3,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn3)))
+            )
+        )
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(cdqAdapterConfigProperties.fetchBusinessPartnersBatchUrl))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(mockedRequest)))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockedFetchBatchResponse))
+                )
+        )
+
+
+        val sitesToImport = listOf(
+            with(CdqValues.site1) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier1))) },
+            with(CdqValues.site2) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier2))) },
+            with(CdqValues.site3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
+        )
+
+        //Import sites
+        testHelpers.importAndGetResponse(sitesToImport, webTestClient, wireMockServer)
+
+        val actualSites = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(
+            EndpointValues.CATENA_SITE_SEARCH_PATH,
+            SiteSearchRequest(legalEntities = bpns)
+        )
+
+
+        val expectedSites = listOf(
+            SitePartnerSearchResponse(ResponseValues.site1, parentBpn1),
+            SitePartnerSearchResponse(ResponseValues.site2, parentBpn2),
+            SitePartnerSearchResponse(ResponseValues.site3, parentBpn3)
+        )
+
+        testHelpers.assertRecursively(actualSites.content).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expectedSites)
+    }
+
+    /**
      * Given new partners
      * When Import partners multiple times
      * Then no duplicate partners
@@ -126,9 +211,9 @@ class CdqControllerImportIT @Autowired constructor(
     @Test
     fun importPartnersMultipleTimes() {
         val partnersToImport = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2,
-            CdqValues.businessPartner3
+            CdqValues.legalEntity1,
+            CdqValues.legalEntity2,
+            CdqValues.legalEntity3
         )
 
         val partnersExpected = listOf(
@@ -164,11 +249,11 @@ class CdqControllerImportIT @Autowired constructor(
             null,
             CdqValues.partnerId2,
             1,
-            listOf(CdqValues.businessPartner1)
+            listOf(CdqValues.legalEntity1)
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
+            get(urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
                 .withQueryParam("startAfter", absent())
                 .willReturn(
@@ -183,11 +268,11 @@ class CdqControllerImportIT @Autowired constructor(
             null,
             CdqValues.partnerId3,
             1,
-            listOf(CdqValues.businessPartner2)
+            listOf(CdqValues.legalEntity2)
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
+            get(urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
                 .withQueryParam("startAfter", equalTo(CdqValues.partnerId2))
                 .willReturn(
@@ -202,11 +287,11 @@ class CdqControllerImportIT @Autowired constructor(
             null,
             null,
             1,
-            listOf(CdqValues.businessPartner3)
+            listOf(CdqValues.legalEntity3)
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching("$CDQ_MOCK_URL/businesspartners"))
+            get(urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
                 .withQueryParam("featuresOn", equalTo("USE_NEXT_START_AFTER"))
                 .withQueryParam("startAfter", equalTo(CdqValues.partnerId3))
                 .willReturn(
@@ -231,9 +316,9 @@ class CdqControllerImportIT @Autowired constructor(
     @Test
     fun updateModifiedPartners_names(){
         val partnersToImport = listOf(
-            CdqValues.businessPartner1,
-            CdqValues.businessPartner2,
-            CdqValues.businessPartner3
+            CdqValues.legalEntity1,
+            CdqValues.legalEntity2,
+            CdqValues.legalEntity3
         )
 
         val partnersExpected = listOf(
@@ -248,19 +333,19 @@ class CdqControllerImportIT @Autowired constructor(
 
         //retrieve BPNs for update
         val cdqIdBpnPairs = response.content.map { Pair(testHelpers.extractCdqId(it.legalEntity.properties), it.legalEntity.bpn) }
-        val bpnL1 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.businessPartner1.id }!!.second
-        val bpnL2 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.businessPartner2.id }!!.second
-        val bpnL3 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.businessPartner3.id }!!.second
+        val bpnL1 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.legalEntity1.id }!!.second
+        val bpnL2 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.legalEntity2.id }!!.second
+        val bpnL3 = cdqIdBpnPairs.find { (cdqId, _) -> cdqId == CdqValues.legalEntity3.id }!!.second
 
 
         //Prepare modified partners to import
-        val modifiedName1 = CdqValues.name1.copy(value = "${CdqValues.name1.value}_mod")
-        val modifiedName2 = CdqValues.name2.copy(value = "${CdqValues.name2.value}_mod")
-        val modifiedName3 = CdqValues.name3.copy(value = "${CdqValues.name3.value}_mod")
+        val modifiedName1 = CdqValues.legalEntityName1.copy(value = "${CdqValues.legalEntityName1.value}_mod")
+        val modifiedName2 = CdqValues.legalEntityName2.copy(value = "${CdqValues.legalEntityName2.value}_mod")
+        val modifiedName3 = CdqValues.legalEntityName3.copy(value = "${CdqValues.legalEntityName3.value}_mod")
 
-        val updatedBusinessPartner1 = plusBpn(CdqValues.businessPartner1.copy(names = listOf(modifiedName1)), bpnL1)
-        val updatedBusinessPartner2 = plusBpn(CdqValues.businessPartner2.copy(names = listOf(modifiedName2)), bpnL2)
-        val updatedBusinessPartner3 = plusBpn(CdqValues.businessPartner3.copy(names = listOf(modifiedName3)), bpnL3)
+        val updatedBusinessPartner1 = plusBpn(CdqValues.legalEntity1.copy(names = listOf(modifiedName1)), bpnL1)
+        val updatedBusinessPartner2 = plusBpn(CdqValues.legalEntity2.copy(names = listOf(modifiedName2)), bpnL2)
+        val updatedBusinessPartner3 = plusBpn(CdqValues.legalEntity3.copy(names = listOf(modifiedName3)), bpnL3)
 
         val modifiedNameResponse1 = ResponseValues.name1.copy(value = modifiedName1.value)
         val modifiedNameResponse2 = ResponseValues.name2.copy(value = modifiedName2.value)
@@ -300,7 +385,7 @@ class CdqControllerImportIT @Autowired constructor(
     @Test
     fun updateModifiedPartner() {
         val partnersToImport = listOf(
-            CdqValues.businessPartner1
+            CdqValues.legalEntity1
         )
 
         val partnersExpected = listOf(
@@ -314,7 +399,7 @@ class CdqControllerImportIT @Autowired constructor(
         //Prepare modified partner to import
         val bpn = response.content.single().legalEntity.bpn
         val modifiedPartnersToImport = listOf(
-            plusBpn(CdqValues.businessPartner3, bpn)
+            plusBpn(CdqValues.legalEntity3, bpn)
         )
 
         val modifiedExpectedPartners = listOf(
@@ -339,5 +424,19 @@ class CdqControllerImportIT @Autowired constructor(
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
             .isEqualTo(expectedPartners)
+    }
+
+
+    private fun importLegalEntities(partners: List<BusinessPartnerCdq>): List<String> {
+        val partnerIds = partners.map { partner -> partner.identifiers.first().value }
+        val response = testHelpers.importAndGetResponse(partners, webTestClient, wireMockServer)
+        return partnerIds.map { response.content.find { entry -> entry.legalEntity.properties.identifiers.any { id -> id.value == it } }!!.legalEntity.bpn }
+    }
+
+    /**
+     * Matches entries in [legalEntities] having  and orders the result by order of [uniqueIds]
+     */
+    private fun matchToBpn(legalEntities: Collection<LegalEntityPartnerResponse>, uniqueIds: List<String>): List<String> {
+        return uniqueIds.map { uid -> legalEntities.find { l -> l.properties.identifiers.any { id -> id.value == uid } }!!.bpn }
     }
 }

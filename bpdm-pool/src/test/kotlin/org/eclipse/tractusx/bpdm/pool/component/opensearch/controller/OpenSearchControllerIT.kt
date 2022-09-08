@@ -26,6 +26,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
@@ -54,11 +55,12 @@ import org.springframework.test.web.reactive.server.returnResult
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class OpenSearchControllerIT @Autowired constructor(
-    val webTestClient: WebTestClient,
-    val importService: ImportStarterService,
-    val openSearchSyncService: OpenSearchSyncStarterService,
-    val objectMapper: ObjectMapper,
-    val testHelpers: TestHelpers
+    private val webTestClient: WebTestClient,
+    private val importService: ImportStarterService,
+    private val openSearchSyncService: OpenSearchSyncStarterService,
+    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties,
+    private val objectMapper: ObjectMapper,
+    private val testHelpers: TestHelpers
 ) {
 
     companion object {
@@ -75,9 +77,9 @@ class OpenSearchControllerIT @Autowired constructor(
     }
 
     val partnerDocs = listOf(
-        CdqValues.businessPartner1,
-        CdqValues.businessPartner2,
-        CdqValues.businessPartner3
+        CdqValues.legalEntity1,
+        CdqValues.legalEntity2,
+        CdqValues.legalEntity3
     )
 
     @BeforeEach
@@ -94,7 +96,7 @@ class OpenSearchControllerIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            WireMock.get(WireMock.urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")

@@ -87,7 +87,6 @@ object CdqMappings {
             legalForm = toOptionalReference(legalForm),
             status = if (status != null) toDto(status) else null,
             profileClassifications = toDto(profile),
-            types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
             bankAccounts = bankAccounts.map { toDto(it) },
             legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )

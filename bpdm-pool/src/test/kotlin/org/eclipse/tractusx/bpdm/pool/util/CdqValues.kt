@@ -32,6 +32,13 @@ object CdqValues {
     val partnerId1 = "cdq-1"
     val partnerId2 = "cdq-2"
     val partnerId3 = "cdq-3"
+    val partnerId4 = "cdq-4"
+    val partnerId5 = "cdq-5"
+    val partnerId6 = "cdq-6"
+    val partnerId7 = "cdq-7"
+    val partnerId8 = "cdq-8"
+    val partnerId9 = "cdq-9"
+
 
     val datasource1 = "datasource-1"
 
@@ -41,13 +48,19 @@ object CdqValues {
     val language2 = LanguageCdq(LanguageCode.de, LanguageCode.de.getName())
     val language3 = LanguageCdq(LanguageCode.zh, LanguageCode.zh.getName())
 
-    val name1 = NameCdq(CommonValues.name1)
-    val name2 = NameCdq(CommonValues.name2)
-    val name3 = NameCdq(CommonValues.name3)
-    val name4 = NameCdq(CommonValues.name4)
-    val name5 = NameCdq(CommonValues.name5)
+    val legalEntityName1 = NameCdq(CommonValues.name1)
+    val legalEntityName2 = NameCdq(CommonValues.name2)
+    val legalEntityName3 = NameCdq(CommonValues.name3)
+    val legalEntityName4 = NameCdq(CommonValues.name4)
+    val legalEntityName5 = NameCdq(CommonValues.name5)
+
+    val siteName1 = NameCdq(CommonValues.siteName1)
+    val siteName2 = NameCdq(CommonValues.siteName2)
+    val siteName3 = NameCdq(CommonValues.siteName3)
 
     val identifierType1 = TypeKeyNameUrlCdq(CommonValues.identifierTypeTechnicalKey1, CommonValues.identiferTypeName1, CommonValues.identifierTypeUrl1)
+
+    val bpnIdentifiertype = TypeKeyNameUrlCdq("CX_BPN", null, null)
 
     val issuingBody1 = TypeKeyNameUrlCdq(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
 
@@ -56,6 +69,14 @@ object CdqValues {
     val identifier1 = IdentifierCdq(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
     val identifier2 = IdentifierCdq(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
     val identifier3 = IdentifierCdq(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
+
+    val bpnL1 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL1, null, null)
+    val bpnL2 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL2, null, null)
+    val bpnL3 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL3, null, null)
+
+    val bpnS1 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS1, null, null)
+    val bpnS2 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS2, null, null)
+    val bpnS3 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS3, null, null)
 
 
     val legalForm1 = LegalFormCdq(
@@ -140,6 +161,20 @@ object CdqValues {
     val postalDeliveryPoint4 = PostalDeliveryPointCdq(value = CommonValues.postalDeliveryPoint4)
     val postalDeliveryPoint5 = PostalDeliveryPointCdq(value = CommonValues.postalDeliveryPoint5)
 
+    val parentRelationType = TypeKeyNameCdq("PARENT")
+
+    val legalEntityType = TypeKeyNameUrlCdq("LEGAL_ENTITY")
+    val siteType = TypeKeyNameUrlCdq("ORGANIZATIONAL_UNIT")
+    val addressType = TypeKeyNameUrlCdq("BP_ADDRESS")
+
+    val parentRelation = RelationCdq(
+        type = parentRelationType,
+        startNode = CommonValues.bpnL1,
+        endNode = CommonValues.bpnS1,
+        startNodeDataSource = datasource1,
+        endNodeDataSource = datasource1
+    )
+
     val address1 = AddressCdq(
         id = addressId1,
         externalId = addressId1,
@@ -177,45 +212,165 @@ object CdqValues {
     )
 
 
-    val businessPartner1 = BusinessPartnerCdq(
+    val legalEntity1 = BusinessPartnerCdq(
         id = partnerId1,
         createdAt = createdTime1,
         lastModifiedAt = createdTime1,
         externalId = partnerId1,
         dataSource = datasource1,
-        names = listOf(name1, name2),
+        names = listOf(legalEntityName1, legalEntityName2),
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
         status = status1,
         profile = profile1,
-        addresses = listOf(address1)
+        addresses = listOf(address1),
+        types = listOf(legalEntityType)
     )
 
-    val businessPartner2 = BusinessPartnerCdq(
+    val legalEntity2 = BusinessPartnerCdq(
         id = partnerId2,
         createdAt = createdTime1,
         lastModifiedAt = createdTime1,
         externalId = partnerId2,
         dataSource = datasource1,
-        names = listOf(name3, name4),
+        names = listOf(legalEntityName3, legalEntityName4),
         identifiers = listOf(identifier2),
         legalForm = legalForm2,
         status = status2,
         profile = profile2,
-        addresses = listOf(address2)
+        addresses = listOf(address2),
+        types = listOf(legalEntityType)
     )
 
-    val businessPartner3 = BusinessPartnerCdq(
+    val legalEntity3 = BusinessPartnerCdq(
         id = partnerId3,
         createdAt = createdTime1,
         lastModifiedAt = createdTime1,
         externalId = partnerId3,
         dataSource = datasource1,
-        names = listOf(name5),
+        names = listOf(legalEntityName5),
         identifiers = listOf(identifier3),
         legalForm = legalForm3,
         status = status3,
         profile = profile3,
-        addresses = listOf(address3)
+        addresses = listOf(address3),
+        types = listOf(legalEntityType)
+    )
+
+    val site1 = BusinessPartnerCdq(
+        id = partnerId4,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId4,
+        dataSource = datasource1,
+        names = listOf(siteName1),
+        addresses = listOf(address1),
+        types = listOf(siteType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL1,
+                endNode = CommonValues.bpnS1,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val site2 = BusinessPartnerCdq(
+        id = partnerId5,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId5,
+        dataSource = datasource1,
+        names = listOf(siteName2),
+        addresses = listOf(address2),
+        types = listOf(siteType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL2,
+                endNode = CommonValues.bpnS2,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val site3 = BusinessPartnerCdq(
+        id = partnerId6,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId6,
+        dataSource = datasource1,
+        names = listOf(siteName3),
+        addresses = listOf(address3),
+        types = listOf(siteType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL3,
+                endNode = CommonValues.bpnS3,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val addressPartner1 = BusinessPartnerCdq(
+        id = partnerId7,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId7,
+        dataSource = datasource1,
+        addresses = listOf(address1),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL1,
+                endNode = CommonValues.bpnA1,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val addressPartner2 = BusinessPartnerCdq(
+        id = partnerId8,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId8,
+        dataSource = datasource1,
+        addresses = listOf(address2),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL2,
+                endNode = CommonValues.bpnA2,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val addressPartner3 = BusinessPartnerCdq(
+        id = partnerId9,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId9,
+        dataSource = datasource1,
+        addresses = listOf(address3),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationCdq(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL3,
+                endNode = CommonValues.bpnA3,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
     )
 }

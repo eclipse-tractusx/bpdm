@@ -27,12 +27,19 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class CdqAdapterConfigProperties(
     val enabled: Boolean = true,
     val host: String = "https://api.cdq.com",
-    val api: String = "data-exchange/rest/v4",
+    val exchangeApi: String = "data-exchange/rest/v4",
+    val referenceApi: String = "referencedata/rest/v3",
     val storage: String = "8888865cc59a3b4aa079b8e00313cf53",
     val datasource: String = "61c096613b4b824755a62641",
     val apiKey: String = "",
-    val timestampKey: String = "last-import",
     val importLimit: Int = 100,
     val importSchedulerCronExpr: String = "-",
-    val exportPageSize: Int = 100
-)
+    val legalEntityType: String = "LEGAL_ENTITY",
+    val siteType: String = "ORGANIZATIONAL_UNIT",
+    val addressType: String = "BP_ADDRESS",
+    val parentRelationType: String = "PARENT",
+    val bpnKey: String = "CX_BPN"
+) {
+    val readBusinessPartnerUrl = "/$exchangeApi/storages/$storage/businesspartners"
+    val fetchBusinessPartnersBatchUrl = "/$referenceApi/businesspartners/fetch-batch"
+}
