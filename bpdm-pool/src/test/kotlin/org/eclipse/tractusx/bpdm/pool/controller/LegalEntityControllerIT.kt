@@ -212,6 +212,70 @@ class LegalEntityControllerIT @Autowired constructor(
     }
 
     /**
+     * Given legal entities
+     * When retrieving those legal entities via BPNLs
+     * Then get those legal entities
+     */
+    @Test
+    fun `find legal entities by BPN`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.take(2) // only search for a subset of the existing legal entities
+
+        val bpnsToSearch = expected.map { it.bpn }
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving legal entities via BPNLs where some BPNLs exist and others don't
+     * Then get those legal entities that could be found
+     */
+    @Test
+    fun `find legal entities by BPN, some BPNs not found`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.take(2) // only search for a subset of the existing legal entities
+
+        val bpnsToSearch = expected.map { it.bpn }.plus("NONEXISTENT") // also search for nonexistent BPN
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
      * Given business partner
      * When updating currentness of an imported business partner
      * Then currentness timestamp is updated
