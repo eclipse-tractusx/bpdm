@@ -111,6 +111,45 @@ class AddressControllerIT @Autowired constructor(
     }
 
     /**
+     * Given multiple address partners
+     * When searching addresses with BPNA
+     * Then return those addresses
+     */
+    @Test
+    fun `search addresses by BPNA`() {
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2, RequestValues.addressPartnerCreate3)
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnA1 = createdStructures[0].addresses[0].bpn
+        val bpnA2 = createdStructures[0].addresses[1].bpn
+        val bpnL = createdStructures[0].legalEntity.bpn
+
+        val searchRequest = AddressPartnerSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
+        val searchResult =
+            webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
+
+        val expectedAddress1 = ResponseValues.addressPartner1
+        val expectedAddress2 = ResponseValues.addressPartner2
+
+        val expectedAddressWithReferences1 = AddressPartnerSearchResponse(expectedAddress1, bpnL, null)
+        val expectedAddressWithReferences2 = AddressPartnerSearchResponse(expectedAddress2, bpnL, null)
+
+        assertThat(searchResult.content)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*uuid", ".*${AddressBpnResponse::bpn.name}")
+            .ignoringAllOverriddenEquals()
+            .ignoringCollectionOrder()
+            .isEqualTo(listOf(expectedAddressWithReferences1, expectedAddressWithReferences2))
+    }
+
+    /**
      * Given multiple addresses of business partners
      * When searching addresses with BPNL
      * Then return addresses belonging to those legal entities

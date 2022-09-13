@@ -83,6 +83,41 @@ class SiteControllerIT @Autowired constructor(
     }
 
     /**
+     * Given sites
+     * When searching for sites via BPNS
+     * Then return those sites
+     */
+    @Test
+    fun `search sites by BPNS`() {
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(site = RequestValues.siteCreate1),
+                        SiteStructureRequest(site = RequestValues.siteCreate2),
+                        SiteStructureRequest(site = RequestValues.siteCreate3)
+                    )
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
+        val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
+        val bpnL = createdStructures[0].legalEntity.bpn
+
+        val siteSearchRequest = SiteSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
+        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
+
+        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
+        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
+
+        testHelpers.assertRecursively(searchResult.content)
+            .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
+    }
+
+    /**
      * Given sites of business partners
      * When searching for sites via BPNL
      * Then return sites that belong to those legal entities
