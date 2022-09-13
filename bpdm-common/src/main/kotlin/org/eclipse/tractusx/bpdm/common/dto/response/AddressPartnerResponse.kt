@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.core.JsonParser
@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
 @JsonDeserialize(using = AddressPartnerResponse.CustomDeserializer::class)
 @Schema(name = "Address Partner Response", description = "Business partner of type address")

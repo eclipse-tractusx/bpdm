@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
