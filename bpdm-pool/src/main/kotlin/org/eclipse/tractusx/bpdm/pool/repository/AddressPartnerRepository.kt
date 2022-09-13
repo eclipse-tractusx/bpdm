@@ -32,7 +32,12 @@ interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, 
     @Query("SELECT a FROM AddressPartner a join a.legalEntity p where p.bpn=:bpn")
     fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<AddressPartner>
 
-    fun findByLegalEntityInOrSiteIn(partners: Collection<LegalEntity>, sites: Collection<Site>, pageable: Pageable): Page<AddressPartner>
+    fun findByLegalEntityInOrSiteInOrBpnIn(
+        partners: Collection<LegalEntity>,
+        sites: Collection<Site>,
+        bpns: Collection<String>,
+        pageable: Pageable
+    ): Page<AddressPartner>
 
     fun findByBpn(bpn: String): AddressPartner?
 

@@ -50,9 +50,9 @@ class SiteService(
     fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
-        val sitePage = siteRepository.findByLegalEntityIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val sitePage =
+            siteRepository.findByLegalEntityInOrBpnIn(partners, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
-        // TODO: use [siteSearchRequest.sites]
         return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })
     }
 
