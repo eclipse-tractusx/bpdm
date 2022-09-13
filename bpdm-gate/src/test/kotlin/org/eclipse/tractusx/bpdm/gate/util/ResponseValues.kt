@@ -9,6 +9,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import java.time.Instant
 
 object ResponseValues {
@@ -483,4 +484,38 @@ object ResponseValues {
         legalEntity = CommonValues.bpn2,
         legalAddress = legalAddress2
     )
+
+    val siteResponse1 = SiteResponse(
+        name = CommonValues.nameSite1
+    )
+    val siteResponse2 = SiteResponse(
+        name = CommonValues.nameSite2
+    )
+
+    val mainAddress1 = legalAddress1.copy()
+    val mainAddress2 = legalAddress2.copy()
+
+    val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = mainAddress1)
+    val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = mainAddress2)
+
+    val siteGateOutput1 = SiteGateOutput(
+        site = siteResponse1,
+        mainAddress = mainAddress1,
+        externalId = CommonValues.externalIdSite1,
+        bpn = CommonValues.bpnSite1,
+        legalEntityBpn = CommonValues.bpn1
+    )
+    val siteGateOutput2 = SiteGateOutput(
+        site = siteResponse2,
+        mainAddress = mainAddress2,
+        externalId = CommonValues.externalIdSite2,
+        bpn = CommonValues.bpnSite2,
+        legalEntityBpn = CommonValues.bpn2
+    )
+
+    val sitePartnerResponse1 = SitePartnerResponse(bpn = CommonValues.bpnSite1, name = CommonValues.nameSite1)
+    val sitePartnerResponse2 = SitePartnerResponse(bpn = CommonValues.bpnSite2, name = CommonValues.nameSite2)
+
+    val sitePartnerSearchResponse1 = SitePartnerSearchResponse(site = sitePartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
+    val sitePartnerSearchResponse2 = SitePartnerSearchResponse(site = sitePartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
 }

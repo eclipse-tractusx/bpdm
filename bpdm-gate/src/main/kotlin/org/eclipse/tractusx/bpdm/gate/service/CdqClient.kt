@@ -48,6 +48,9 @@ class CdqClient(
     fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
         getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceLegalEntity)
 
+    fun getAugmentedSites(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceSite)
+
     private fun getAugmentedBusinessPartners(
         limit: Int?,
         startAfter: String?,

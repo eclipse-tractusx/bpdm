@@ -110,6 +110,6 @@ class SiteController(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<SiteGateOutput> {
-        TODO()
+        return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }

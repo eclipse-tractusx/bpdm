@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.gate.exception.PoolRequestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -62,5 +65,35 @@ class PoolClient(
             throw PoolRequestException("Request to search legal addresses failed.", e)
         }
         return legalAddresses
+    }
+
+    fun searchSites(bpnSs: Collection<String>): Collection<SitePartnerSearchResponse> {
+        val sites = try {
+            webClient
+                .post()
+                .uri("/sites/search")
+                .bodyValue(objectMapper.writeValueAsString(SiteSearchRequest(sites = bpnSs)))
+                .retrieve()
+                .bodyToMono<Collection<SitePartnerSearchResponse>>()
+                .block()!!
+        } catch (e: Exception) {
+            throw PoolRequestException("Request to search sites failed.", e)
+        }
+        return sites
+    }
+
+    fun searchMainAddresses(bpnSs: Collection<String>): Collection<MainAddressSearchResponse> {
+        val mainAddresses = try {
+            webClient
+                .post()
+                .uri("/sites/main-addresses/search")
+                .bodyValue(objectMapper.writeValueAsString(bpnSs))
+                .retrieve()
+                .bodyToMono<Collection<MainAddressSearchResponse>>()
+                .block()!!
+        } catch (e: Exception) {
+            throw PoolRequestException("Request to main addresses of sites failed.", e)
+        }
+        return mainAddresses
     }
 }
