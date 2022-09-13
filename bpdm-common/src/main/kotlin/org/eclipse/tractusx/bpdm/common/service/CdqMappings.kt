@@ -80,7 +80,7 @@ object CdqMappings {
 
     fun BusinessPartnerCdq.toLegalEntityDto(): LegalEntityDto {
         return LegalEntityDto(
-            identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
+            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             names = names.map { toDto(it) },
             legalForm = toOptionalReference(legalForm),
             status = if (status != null) toDto(status) else null,

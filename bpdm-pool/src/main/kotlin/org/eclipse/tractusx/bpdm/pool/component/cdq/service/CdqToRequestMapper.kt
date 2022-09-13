@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service
 class CdqToRequestMapper {
     fun toUpdateRequest(partner: BusinessPartnerCdq): LegalEntityPartnerUpdateRequest {
         return LegalEntityPartnerUpdateRequest(
-            partner.identifiers.find { it.type?.technicalKey == "BPN" }?.value!!,
+            partner.identifiers.find { it.type?.technicalKey == CdqMappings.BPN_TECHNICAL_KEY }?.value!!,
             partner.toLegalEntityDto()
         )
     }
