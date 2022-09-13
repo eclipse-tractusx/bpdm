@@ -115,6 +115,6 @@ class AddressController(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<AddressGateOutput> {
-        TODO()
+        return addressService.getAddressesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }

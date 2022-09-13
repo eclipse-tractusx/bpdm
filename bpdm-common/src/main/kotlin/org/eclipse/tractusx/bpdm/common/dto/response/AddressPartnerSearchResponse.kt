@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class AddressPartnerSearchResponse(
     val address: AddressPartnerResponse,
     @Schema(description = "Business Partner Number of the related legal entity")
-    val bpnLegalEntity: String?,
+    val bpnLegalEntity: String? = null,
     @Schema(description = "Business Partner Number of the related site")
-    val bpnSite: String?,
+    val bpnSite: String? = null,
 )

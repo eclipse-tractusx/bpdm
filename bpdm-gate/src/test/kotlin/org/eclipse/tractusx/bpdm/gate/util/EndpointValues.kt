@@ -41,9 +41,11 @@ object EndpointValues {
     const val GATE_API_OUTPUT_PATH = "${GATE_API_PATH}/output"
     const val GATE_API_OUTPUT_LEGAL_ENTITIES_PATH = "${GATE_API_OUTPUT_PATH}/legal-entities"
     const val GATE_API_OUTPUT_SITES_PATH = "${GATE_API_OUTPUT_PATH}/sites"
+    const val GATE_API_OUTPUT_ADDRESSES_PATH = "${GATE_API_OUTPUT_PATH}/addresses"
 
     const val POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities/search"
     const val POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH = "/legal-entities/legal-addresses/search"
     const val POOL_API_MOCK_SITES_SEARCH_PATH = "/sites/search"
     const val POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH = "/sites/main-addresses/search"
+    const val POOL_API_MOCK_ADDRESSES_SEARCH_PATH = "/addresses/search"
 }

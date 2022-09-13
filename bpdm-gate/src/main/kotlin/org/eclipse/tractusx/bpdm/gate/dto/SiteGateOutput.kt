@@ -40,7 +40,7 @@ data class SiteGateOutput(
     val externalId: String,
     @Schema(description = "Business Partner Number, main identifier value for sites")
     val bpn: String?,
-    @Schema(description = "External id of the related legal entity")
+    @Schema(description = "Bpn of the related legal entity")
     val legalEntityBpn: String,
 )
 

@@ -8,6 +8,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import java.time.Instant
@@ -401,7 +402,7 @@ object ResponseValues {
         url = AddressType.LEGAL.getUrl()
     )
 
-    val legalAddress1 = AddressResponse(
+    val address1 = AddressResponse(
         version = addressVersion1,
         careOf = CommonValues.careOf1,
         contexts = listOf(CommonValues.context1),
@@ -416,7 +417,7 @@ object ResponseValues {
         types = listOf(addressType1)
     )
 
-    val legalAddress2 = AddressResponse(
+    val address2 = AddressResponse(
         version = addressVersion2,
         careOf = CommonValues.careOf2,
         contexts = listOf(CommonValues.context2),
@@ -455,14 +456,14 @@ object ResponseValues {
         bpn = CommonValues.bpn1,
         legalEntity = legalEntityResponse1,
         externalId = CommonValues.externalId1,
-        legalAddress = legalAddress1
+        legalAddress = address1
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
         bpn = CommonValues.bpn2,
         legalEntity = legalEntityResponse2,
         externalId = CommonValues.externalId2,
-        legalAddress = legalAddress2
+        legalAddress = address2
     )
 
     val legalEntityPartnerResponse1 = LegalEntityPartnerResponse(
@@ -478,11 +479,11 @@ object ResponseValues {
 
     val legalAddressSearchResponse1 = LegalAddressSearchResponse(
         legalEntity = CommonValues.bpn1,
-        legalAddress = legalAddress1
+        legalAddress = address1
     )
     val legalAddressSearchResponse2 = LegalAddressSearchResponse(
         legalEntity = CommonValues.bpn2,
-        legalAddress = legalAddress2
+        legalAddress = address2
     )
 
     val siteResponse1 = SiteResponse(
@@ -492,22 +493,19 @@ object ResponseValues {
         name = CommonValues.nameSite2
     )
 
-    val mainAddress1 = legalAddress1.copy()
-    val mainAddress2 = legalAddress2.copy()
-
-    val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = mainAddress1)
-    val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = mainAddress2)
+    val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = address1)
+    val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = address2)
 
     val siteGateOutput1 = SiteGateOutput(
         site = siteResponse1,
-        mainAddress = mainAddress1,
+        mainAddress = address1,
         externalId = CommonValues.externalIdSite1,
         bpn = CommonValues.bpnSite1,
         legalEntityBpn = CommonValues.bpn1
     )
     val siteGateOutput2 = SiteGateOutput(
         site = siteResponse2,
-        mainAddress = mainAddress2,
+        mainAddress = address2,
         externalId = CommonValues.externalIdSite2,
         bpn = CommonValues.bpnSite2,
         legalEntityBpn = CommonValues.bpn2
@@ -518,4 +516,23 @@ object ResponseValues {
 
     val sitePartnerSearchResponse1 = SitePartnerSearchResponse(site = sitePartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
     val sitePartnerSearchResponse2 = SitePartnerSearchResponse(site = sitePartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
+
+    val addressGateOutput1 = AddressGateOutput(
+        bpn = CommonValues.bpnAddress1,
+        address = address1,
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityBpn = CommonValues.bpn1
+    )
+    val addressGateOutput2 = AddressGateOutput(
+        bpn = CommonValues.bpnAddress2,
+        address = address2,
+        externalId = CommonValues.externalIdAddress2,
+        legalEntityBpn = CommonValues.bpn2
+    )
+
+    val addressPartnerResponse1 = AddressPartnerResponse(bpn = CommonValues.bpnAddress1, properties = address1)
+    val addressPartnerResponse2 = AddressPartnerResponse(bpn = CommonValues.bpnAddress2, properties = address2)
+
+    val addressPartnerSearchResponse1 = AddressPartnerSearchResponse(address = addressPartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
+    val addressPartnerSearchResponse2 = AddressPartnerSearchResponse(address = addressPartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
 }

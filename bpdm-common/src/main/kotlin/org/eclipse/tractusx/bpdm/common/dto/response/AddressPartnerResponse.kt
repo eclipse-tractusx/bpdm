@@ -36,6 +36,8 @@ data class AddressPartnerResponse(
     val properties: AddressResponse
 ) {
     class CustomDeserializer(vc: Class<AddressPartnerResponse>?) : StdDeserializer<AddressPartnerResponse>(vc) {
+        constructor() : this(null) // for some reason jackson needs this explicit default constructor
+
         override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerResponse {
             val node = parser.codec.readTree<JsonNode>(parser)
             return AddressPartnerResponse(

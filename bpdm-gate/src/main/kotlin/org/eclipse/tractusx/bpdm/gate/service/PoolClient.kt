@@ -20,11 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.gate.exception.PoolRequestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -95,5 +93,20 @@ class PoolClient(
             throw PoolRequestException("Request to main addresses of sites failed.", e)
         }
         return mainAddresses
+    }
+
+    fun searchAddresses(bpnAs: Collection<String>): Collection<AddressPartnerSearchResponse> {
+        val addresses = try {
+            webClient
+                .post()
+                .uri("/addresses/search")
+                .bodyValue(objectMapper.writeValueAsString(AddressPartnerSearchRequest(addresses = bpnAs)))
+                .retrieve()
+                .bodyToMono<Collection<AddressPartnerSearchResponse>>()
+                .block()!!
+        } catch (e: Exception) {
+            throw PoolRequestException("Request to search addresses failed.", e)
+        }
+        return addresses
     }
 }
