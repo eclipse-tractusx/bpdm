@@ -27,8 +27,6 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class CdqAdapterConfigProperties(
     val enabled: Boolean = true,
     val host: String = "https://api.cdq.com",
-    val exchangeApi: String = "data-exchange/rest/v4",
-    val referenceApi: String = "referencedata/rest/v3",
     val storage: String = "8888865cc59a3b4aa079b8e00313cf53",
     val datasource: String = "61c096613b4b824755a62641",
     val apiKey: String = "",
@@ -40,6 +38,10 @@ class CdqAdapterConfigProperties(
     val parentRelationType: String = "PARENT",
     val bpnKey: String = "CX_BPN"
 ) {
-    val readBusinessPartnerUrl = "/$exchangeApi/storages/$storage/businesspartners"
-    val fetchBusinessPartnersBatchUrl = "/$referenceApi/businesspartners/fetch-batch"
+    private val exchangeApiUrl: String = "data-exchange/rest/v4"
+    private val referenceApiUrl: String = "referencedata/rest/v3"
+
+    val readBusinessPartnerUrl = "/${exchangeApiUrl}/storages/${storage}/businesspartners"
+    val fetchBusinessPartnersBatchUrl = "/${referenceApiUrl}/businesspartners/fetch-batch"
+
 }

@@ -48,12 +48,9 @@ class PartnerImportPageService(
     cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: CdqToRequestMapper,
-    private val businessPartnerBuildService: BusinessPartnerBuildService
+    private val businessPartnerBuildService: BusinessPartnerBuildService,
 ) {
     private val logger = KotlinLogging.logger { }
-
-    private val readBusinessPartnersEndpoint = "${adapterProperties.exchangeApi}/storages/${adapterProperties.storage}/businesspartners"
-    private val fetchBusinessPartnerBatchEndpoint = "${adapterProperties.referenceApi}/businesspartners/fetch-batch"
 
     private val cdqIdentifierType = TypeKeyNameUrlCdq(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
     private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
@@ -69,7 +66,7 @@ class PartnerImportPageService(
             .get()
             .uri { builder ->
                 builder
-                    .path(readBusinessPartnersEndpoint)
+                    .path(adapterProperties.readBusinessPartnerUrl)
                     .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
                     .queryParam("limit", adapterProperties.importLimit)
                     .queryParam("datasource", adapterProperties.datasource)
@@ -187,7 +184,7 @@ class PartnerImportPageService(
 
         val batchRecords = webClient
             .post()
-            .uri(fetchBusinessPartnerBatchEndpoint)
+            .uri(adapterProperties.fetchBusinessPartnersBatchUrl)
             .body(BodyInserters.fromValue(requestBody))
             .retrieve()
             .bodyToMono<Collection<FetchBatchRecord>>()
