@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Schema(name = "Site Response", description = "Site of a legal entity")
-data class SiteResponse(
-    @Schema(description = "Site name")
-    val name: String
-)
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+class PoolRequestException : RuntimeException {
+    constructor(message: String, cause: Throwable) : super(message, cause)
+    constructor(message: String) : super(message)
+}

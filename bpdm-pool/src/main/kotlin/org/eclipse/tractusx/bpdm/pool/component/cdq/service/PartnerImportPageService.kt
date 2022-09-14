@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportResponsePage
@@ -88,7 +89,7 @@ class PartnerImportPageService(
             )
         }
 
-        val (hasBpn, hasNoBpn) = partnersToUpsert.partition { it.identifiers.any { id -> id.type?.technicalKey == bpnConfigProperties.id } }
+        val (hasBpn, hasNoBpn) = partnersToUpsert.partition { CdqMappings.findBpn(it.identifiers) != null }
         val legalEntitiesToCreate = hasNoBpn.map { mappingService.toCreateRequest(it) }
         val legalEntitiesToUpdate = hasBpn.map { mappingService.toUpdateRequest(it) }
 

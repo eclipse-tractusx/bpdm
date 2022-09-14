@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -50,7 +50,8 @@ class SiteService(
     fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
-        val sitePage = siteRepository.findByLegalEntityIn(partners, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val sitePage =
+            siteRepository.findByLegalEntityInOrBpnIn(partners, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
         return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })
     }

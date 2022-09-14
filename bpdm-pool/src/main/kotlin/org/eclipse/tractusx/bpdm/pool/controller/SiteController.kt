@@ -24,14 +24,14 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -83,8 +83,8 @@ class SiteController(
     }
 
     @Operation(
-        summary = "Search site partners by BPNLs",
-        description = "Search business partners of type site by the BPNLs of their parent legal entities"
+        summary = "Search site partners by BPNs and/or parent BPNs",
+        description = "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities"
     )
     @ApiResponses(
         value = [

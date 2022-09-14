@@ -30,6 +30,12 @@ import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object CdqMappings {
 
+    const val BPN_TECHNICAL_KEY = "CX_BPN"
+
+    fun findBpn(identifiers: Collection<IdentifierCdq>): String? {
+        return identifiers.find { it.type?.technicalKey == BPN_TECHNICAL_KEY }?.value
+    }
+
     private fun toReference(type: TypeKeyNameUrlCdq?): String {
         return type!!.technicalKey!!
     }
@@ -74,7 +80,7 @@ object CdqMappings {
 
     fun BusinessPartnerCdq.toLegalEntityDto(): LegalEntityDto {
         return LegalEntityDto(
-            identifiers = identifiers.filter { it.type?.technicalKey != "BPN" }.map { toDto(it) },
+            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             names = names.map { toDto(it) },
             legalForm = toOptionalReference(legalForm),
             status = if (status != null) toDto(status) else null,

@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
@@ -73,6 +73,14 @@ class BusinessPartnerFetchService(
     @Transactional
     fun fetchByBpns(bpns: Collection<String>): Set<LegalEntity> {
         return fetchLegalEntityDependencies(legalEntityRepository.findDistinctByBpnIn(bpns))
+    }
+
+    /**
+     * Fetch business partners by BPN in [bpns] and map to dtos
+     */
+    @Transactional
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> {
+        return fetchByBpns(bpns).map { it.toPoolDto() }
     }
 
     /**

@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Site Response", description = "Site of a legal entity")
-data class SiteResponse(
-    @Schema(description = "Site name")
-    val name: String
+@Schema(name = "Legal Address Search Response", description = "Legal address record with parent BPN")
+data class LegalAddressSearchResponse(
+    @Schema(description = "BPNL of the legal entity this legal address belongs to")
+    val legalEntity: String,
+    @Schema(description = "Address properties")
+    val legalAddress: AddressResponse
 )

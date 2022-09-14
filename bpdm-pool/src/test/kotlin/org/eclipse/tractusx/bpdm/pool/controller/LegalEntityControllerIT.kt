@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -203,6 +203,70 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val bpnsToSearch = expected.map { it.legalEntity }.plus("NONEXISTENT")
         val response = webTestClient.invokePostWithArrayResponse<LegalAddressSearchResponse>(EndpointValues.CATENA_LEGAL_ADDRESS_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving those legal entities via BPNLs
+     * Then get those legal entities
+     */
+    @Test
+    fun `find legal entities by BPN`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.take(2) // only search for a subset of the existing legal entities
+
+        val bpnsToSearch = expected.map { it.bpn }
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving legal entities via BPNLs where some BPNLs exist and others don't
+     * Then get those legal entities that could be found
+     */
+    @Test
+    fun `find legal entities by BPN, some BPNs not found`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.take(2) // only search for a subset of the existing legal entities
+
+        val bpnsToSearch = expected.map { it.bpn }.plus("NONEXISTENT") // also search for nonexistent BPN
+        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
 
         assertThat(response)
             .usingRecursiveComparison()

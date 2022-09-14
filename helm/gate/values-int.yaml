@@ -17,3 +17,13 @@ ingress:
 
 applicationSecret:
   cdq: <path:bpdm/data/int/gate/cdq#api-key>
+
+applicationConfig: |
+  # oauth2 client configuration
+  spring.security.oauth2.client.registration.gate-client.client-id=sa-cl16-cx-1
+  spring.security.oauth2.client.registration.gate-client.client-secret=<path:bpdm/data/int/gate/service-account#client-secret>
+  spring.security.oauth2.client.registration.gate-client.authorization-grant-type=client_credentials
+  spring.security.oauth2.client.registration.gate-client.provider=catena-keycloak-provider
+  spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.demo.catena-x.net/auth/realms/CX-Central
+  # Connection to pool
+  bpdm.pool.base-url=http://pool-v2-bpdm:8080/api/catena

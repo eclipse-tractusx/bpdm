@@ -22,10 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -108,6 +112,45 @@ class AddressControllerIT @Autowired constructor(
         webTestClient.get()
             .uri(EndpointValues.CATENA_ADDRESSES_PATH + "/NONEXISTENT_BPN")
             .exchange().expectStatus().isNotFound
+    }
+
+    /**
+     * Given multiple address partners
+     * When searching addresses with BPNA
+     * Then return those addresses
+     */
+    @Test
+    fun `search addresses by BPNA`() {
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2, RequestValues.addressPartnerCreate3)
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnA1 = createdStructures[0].addresses[0].bpn
+        val bpnA2 = createdStructures[0].addresses[1].bpn
+        val bpnL = createdStructures[0].legalEntity.bpn
+
+        val searchRequest = AddressPartnerSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
+        val searchResult =
+            webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
+
+        val expectedAddress1 = ResponseValues.addressPartner1
+        val expectedAddress2 = ResponseValues.addressPartner2
+
+        val expectedAddressWithReferences1 = AddressPartnerSearchResponse(expectedAddress1, bpnL, null)
+        val expectedAddressWithReferences2 = AddressPartnerSearchResponse(expectedAddress2, bpnL, null)
+
+        assertThat(searchResult.content)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*uuid", ".*${AddressBpnResponse::bpn.name}")
+            .ignoringAllOverriddenEquals()
+            .ignoringCollectionOrder()
+            .isEqualTo(listOf(expectedAddressWithReferences1, expectedAddressWithReferences2))
     }
 
     /**

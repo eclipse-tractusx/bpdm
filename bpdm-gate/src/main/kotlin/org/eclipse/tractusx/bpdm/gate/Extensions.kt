@@ -20,3 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate
 
 fun <T> List<T>.containsDuplicates(): Boolean = size != distinct().size
+
+fun <K, V> Map<K, V?>.filterNotNullValues(): Map<K, V> =
+    filterValues { it != null }.mapValues { it.value ?: throw IllegalStateException("This can never happen") }
+
+fun <K, V> Map<K?, V>.filterNotNullKeys(): Map<K, V> = filterKeys { it != null }.mapKeys { it.key ?: throw IllegalStateException("This can never happen") }

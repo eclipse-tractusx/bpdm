@@ -35,7 +35,6 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -103,7 +102,7 @@ class AddressController(
 
     @Operation(
         summary = "Get page of addresses",
-        description = "Get page of addresses."
+        description = "Get page of addresses. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -111,26 +110,11 @@ class AddressController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping("/output/addresses")
+    @PostMapping("/output/addresses/search")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show addresses that were updated after the specified ISO-8601 timestamp") from: Instant?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<AddressGateOutput> {
-        TODO()
-    }
-
-    @Operation(
-        summary = "Get address by external identifier",
-        description = "Get address by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found address with external identifier"),
-            ApiResponse(responseCode = "404", description = "No address found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/output/addresses/{externalId}")
-    fun getAddressByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateOutput {
-        TODO()
+        return addressService.getAddressesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }

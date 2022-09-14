@@ -17,12 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.gate.config
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 
-@Schema(name = "Site Response", description = "Site of a legal entity")
-data class SiteResponse(
-    @Schema(description = "Site name")
-    val name: String
+@ConfigurationProperties(prefix = "bpdm.gate-security")
+@ConstructorBinding
+data class GateSecurityConfigProperties(
+    val oauth2ClientRegistration: String = "gate-client",
+    val poolSecurityEnabled: Boolean = false
 )

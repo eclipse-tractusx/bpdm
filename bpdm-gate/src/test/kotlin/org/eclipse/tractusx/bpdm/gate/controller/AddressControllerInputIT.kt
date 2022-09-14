@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CATENA_INPUT_ADDRESSES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -89,7 +89,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val address = webTestClient.get().uri(CATENA_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
+        val address = webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
@@ -123,7 +123,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri("${CATENA_INPUT_ADDRESSES_PATH}/nonexistent-externalid123")
+        webTestClient.get().uri("${GATE_API_INPUT_ADDRESSES_PATH}/nonexistent-externalid123")
             .exchange()
             .expectStatus()
             .isNotFound
@@ -140,7 +140,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(CATENA_INPUT_ADDRESSES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -172,7 +172,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(CATENA_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -222,7 +222,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val pageResponse = webTestClient.get()
             .uri { builder ->
-                builder.path(CATENA_INPUT_ADDRESSES_PATH)
+                builder.path(GATE_API_INPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -289,7 +289,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val pageResponse = webTestClient.get()
             .uri { builder ->
-                builder.path(CATENA_INPUT_ADDRESSES_PATH)
+                builder.path(GATE_API_INPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -322,7 +322,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -335,7 +335,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get addresses, pagination limit exceeded`() {
         webTestClient.get().uri { builder ->
-            builder.path(CATENA_INPUT_ADDRESSES_PATH)
+            builder.path(GATE_API_INPUT_ADDRESSES_PATH)
                 .queryParam(PaginationStartAfterRequest::limit.name, 999999)
                 .build()
         }
@@ -507,7 +507,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
@@ -555,7 +555,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
@@ -593,7 +593,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
@@ -614,7 +614,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
@@ -635,7 +635,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             )
         )
 
-        webTestClient.put().uri(CATENA_INPUT_ADDRESSES_PATH)
+        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()

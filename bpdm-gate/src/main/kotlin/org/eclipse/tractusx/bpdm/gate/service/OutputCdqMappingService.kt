@@ -84,7 +84,7 @@ class OutputCdqMappingService(
 
     private fun toDto(thoroughfareCdq: ThoroughfareCdq): ThoroughfareResponse {
         return ThoroughfareResponse(
-            value = thoroughfareCdq.value ?: "",
+            value = thoroughfareCdq.value,
             name = thoroughfareCdq.name,
             shortName = thoroughfareCdq.shortName,
             number = thoroughfareCdq.number,

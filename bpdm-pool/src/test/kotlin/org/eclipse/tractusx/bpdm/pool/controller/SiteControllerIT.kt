@@ -20,9 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.SiteSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -75,6 +80,41 @@ class SiteControllerIT @Autowired constructor(
         webTestClient.get()
             .uri(EndpointValues.CATENA_SITES_PATH + "/NONEXISTENT_BPN")
             .exchange().expectStatus().isNotFound
+    }
+
+    /**
+     * Given sites
+     * When searching for sites via BPNS
+     * Then return those sites
+     */
+    @Test
+    fun `search sites by BPNS`() {
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(site = RequestValues.siteCreate1),
+                        SiteStructureRequest(site = RequestValues.siteCreate2),
+                        SiteStructureRequest(site = RequestValues.siteCreate3)
+                    )
+                )
+            ),
+            webTestClient
+        )
+
+        val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
+        val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
+        val bpnL = createdStructures[0].legalEntity.bpn
+
+        val siteSearchRequest = SiteSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
+        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
+
+        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
+        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
+
+        testHelpers.assertRecursively(searchResult.content)
+            .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
 
     /**

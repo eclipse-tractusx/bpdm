@@ -26,12 +26,13 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.dto.response.IdentifierResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -57,7 +58,7 @@ class CdqControllerImportIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers
 ) {
-    private val idTypeBpn = TypeKeyNameUrlCdq(bpnConfigProperties.id, bpnConfigProperties.name, "")
+    private val idTypeBpn = TypeKeyNameUrlCdq(CdqMappings.BPN_TECHNICAL_KEY, bpnConfigProperties.name, "")
     private val issuerBpn = TypeKeyNameUrlCdq(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName, "")
     private val statusBpn = TypeKeyNameCdq("UNKNOWN", "Unknown")
 

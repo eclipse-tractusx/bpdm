@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.CdqRequestException
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -38,19 +39,26 @@ private const val RELATION_TYPE_KEY = "PARENT"
 
 @Service
 class CdqClient(
+    @Qualifier("cdqClient")
     private val webClient: WebClient,
     private val cdqConfigProperties: CdqConfigProperties,
     private val objectMapper: ObjectMapper
 ) {
 
-    fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: List<String>? = null) =
+    fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
         getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceLegalEntity)
+
+    fun getAugmentedSites(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceSite)
+
+    fun getAugmentedAddresses(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceAddress)
 
     private fun getAugmentedBusinessPartners(
         limit: Int?,
         startAfter: String?,
         from: Instant?,
-        externalIds: List<String>?,
+        externalIds: Collection<String>?,
         datasource: String
     ): PagedResponseCdq<AugmentedBusinessPartnerResponseCdq> {
         val partnerCollection = try {
@@ -63,7 +71,7 @@ class CdqClient(
                     if (limit != null) builder.queryParam("limit", limit)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (from != null) builder.queryParam("from", from)
-                    if (externalIds != null) builder.queryParam(externalIds.joinToString(","))
+                    if (externalIds != null) builder.queryParam("externalIds", externalIds.joinToString(","))
                     builder.build()
                 }
                 .retrieve()

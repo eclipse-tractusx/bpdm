@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.core.JsonParser
@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import java.time.Instant
 
 @JsonDeserialize(using = LegalEntityPartnerResponse.CustomDeserializer::class)
@@ -40,6 +39,8 @@ data class LegalEntityPartnerResponse(
     val currentness: Instant
 ) {
     class CustomDeserializer(vc: Class<LegalEntityPartnerResponse>?) : StdDeserializer<LegalEntityPartnerResponse>(vc) {
+        constructor() : this(null) // for some reason jackson needs this explicit default constructor
+
         override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerResponse {
             val node = parser.codec.readTree<JsonNode>(parser)
             return LegalEntityPartnerResponse(
@@ -50,5 +51,3 @@ data class LegalEntityPartnerResponse(
         }
     }
 }
-
-

@@ -24,13 +24,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -63,8 +63,8 @@ class AddressController(
     }
 
     @Operation(
-        summary = "Search address partners by site and/or legal entity BPNs",
-        description = "Search business partners of type address by their parent partners BPN (BPNLs or BPNS)."
+        summary = "Search address partners by BPNs and/or parent BPNs",
+        description = "Search business partners of type address by their BPN or their parent partners BPN (BPNLs or BPNS)."
     )
     @ApiResponses(
         value = [

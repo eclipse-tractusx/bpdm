@@ -17,14 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Site Partner Response", description = "Business partner of type site")
-data class SitePartnerResponse(
-    @Schema(description = "Business Partner Number, main identifier value for sites")
-    val bpn: String,
-    @Schema(description = "Site name")
-    val name: String
+@Schema(name = "Address Partner Search Response", description = "Business partner of type address with parent reference")
+data class AddressPartnerSearchResponse(
+    val address: AddressPartnerResponse,
+    @Schema(description = "Business Partner Number of the related legal entity")
+    val bpnLegalEntity: String? = null,
+    @Schema(description = "Business Partner Number of the related site")
+    val bpnSite: String? = null,
 )

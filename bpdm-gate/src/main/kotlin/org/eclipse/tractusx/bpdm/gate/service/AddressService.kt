@@ -22,13 +22,17 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
+import org.eclipse.tractusx.bpdm.gate.filterNotNullValues
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,6 +40,7 @@ class AddressService(
     private val cdqRequestMappingService: CdqRequestMappingService,
     private val inputCdqMappingService: InputCdqMappingService,
     private val cdqClient: CdqClient,
+    private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
@@ -60,6 +65,65 @@ class AddressService(
             FetchResponse.Status.OK -> return toValidAddressInput(fetchResponse.businessPartner!!)
             FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Address", externalId)
         }
+    }
+
+    /**
+     * Get addresses by first fetching addresses from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * which is then used to fetch the data for the addresses from the bpdm pool.
+     */
+    fun getAddressesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateOutput> {
+        val partnerCollection = cdqClient.getAugmentedAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
+
+        val bpnToExternalIdMapNullable =
+            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ CdqMappings.findBpn(it.identifiers) }, { it.externalId })
+        val numAddressesWithoutBpn = bpnToExternalIdMapNullable.filter { it.key == null }.size
+        val numAddressesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
+
+        if (numAddressesWithoutBpn > 0) {
+            logger.warn { "Encountered $numAddressesWithoutBpn addresses without BPN in CDQ. Can't retrieve data from pool for these." }
+        }
+        if (numAddressesWithoutExternalId > 0) {
+            logger.warn { "Encountered $numAddressesWithoutExternalId addresses without external id in CDQ." }
+        }
+
+        val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
+
+        val bpnAs = bpnToExternalIdMap.keys
+        val addresses = poolClient.searchAddresses(bpnAs)
+
+        if (bpnAs.size > addresses.size) {
+            logger.warn { "Requested ${bpnAs.size} addresses from pool, but only ${addresses.size} were found." }
+        }
+
+        val addressesOutput = toAddressesOutput(addresses, bpnToExternalIdMap)
+
+        return PageStartAfterResponse(
+            total = partnerCollection.total,
+            nextStartAfter = partnerCollection.nextStartAfter,
+            content = addressesOutput,
+            invalidEntries = partnerCollection.values.size - addressesOutput.size // difference of what gate can return to values in cdq
+        )
+    }
+
+    private fun toAddressesOutput(
+        addresses: Collection<AddressPartnerSearchResponse>,
+        bpnToExternalIdMap: Map<String, String>
+    ): List<AddressGateOutput> {
+        val addressesByBpn = addresses.associateBy { it.address.bpn }
+        return bpnToExternalIdMap.mapNotNull { toAddressOutput(it.value, addressesByBpn[it.key]) }
+    }
+
+    fun toAddressOutput(externalId: String, address: AddressPartnerSearchResponse?): AddressGateOutput? {
+        if (address == null) {
+            return null
+        }
+        return AddressGateOutput(
+            bpn = address.address.bpn,
+            address = address.address.properties,
+            externalId = externalId,
+            legalEntityBpn = address.bpnLegalEntity,
+            siteBpn = address.bpnSite
+        )
     }
 
     /**

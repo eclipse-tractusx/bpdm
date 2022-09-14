@@ -22,21 +22,26 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.AddressType
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
+import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
+import org.eclipse.tractusx.bpdm.gate.filterNotNullValues
 import org.springframework.stereotype.Service
-import java.time.Instant
 
 @Service
 class LegalEntityService(
     private val cdqRequestMappingService: CdqRequestMappingService,
     private val inputCdqMappingService: InputCdqMappingService,
     private val outputCdqMappingService: OutputCdqMappingService,
-    private val cdqClient: CdqClient
+    private val cdqClient: CdqClient,
+    private val poolClient: PoolClient
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -68,16 +73,68 @@ class LegalEntityService(
         )
     }
 
-    fun getLegalEntitiesOutput(limit: Int, startAfter: String?, from: Instant?): PageStartAfterResponse<LegalEntityGateOutput> {
-        val partnerCollection = cdqClient.getAugmentedLegalEntities(limit, startAfter, from)
+    /**
+     * Get legal entities by first fetching legal entities from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * which is then used to fetch the data for the legal entities from the bpdm pool.
+     */
+    fun getLegalEntitiesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateOutput> {
+        val partnerCollection = cdqClient.getAugmentedLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
 
-        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it.augmentedBusinessPartner!!) }
+        val bpnToExternalIdMapNullable =
+            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ CdqMappings.findBpn(it.identifiers) }, { it.externalId })
+        val numLegalEntitiesWithoutBpn = bpnToExternalIdMapNullable.filter { it.key == null }.size
+        val numLegalEntitiesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
+
+        if (numLegalEntitiesWithoutBpn > 0) {
+            logger.warn { "Encountered $numLegalEntitiesWithoutBpn legal entities without BPN in CDQ. Can't retrieve data from pool for these." }
+        }
+        if (numLegalEntitiesWithoutExternalId > 0) {
+            logger.warn { "Encountered $numLegalEntitiesWithoutExternalId legal entities without external id in CDQ." }
+        }
+
+        val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
+
+        val bpnLs = bpnToExternalIdMap.keys
+        val legalEntities = poolClient.searchLegalEntities(bpnLs)
+        val legalAddresses = poolClient.searchLegalAddresses(bpnLs)
+
+        if (bpnLs.size > legalEntities.size) {
+            logger.warn { "Requested ${bpnLs.size} legal entities from pool, but only ${legalEntities.size} were found." }
+        }
+        if (bpnLs.size > legalAddresses.size) {
+            logger.warn { "Requested ${bpnLs.size} legal addresses from pool, but only ${legalAddresses.size} were found." }
+        }
+
+        val legalEntitiesOutput = toLegalEntitiesOutput(legalEntities, legalAddresses, bpnToExternalIdMap)
 
         return PageStartAfterResponse(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
-            content = validEntries.map { outputCdqMappingService.toOutput(it.augmentedBusinessPartner!!) },
-            invalidEntries = partnerCollection.values.size - validEntries.size
+            content = legalEntitiesOutput,
+            invalidEntries = partnerCollection.values.size - legalEntitiesOutput.size // difference of what gate can return to values in cdq
+        )
+    }
+
+    private fun toLegalEntitiesOutput(
+        legalEntities: Collection<LegalEntityPartnerResponse>,
+        legalAddresses: Collection<LegalAddressSearchResponse>,
+        bpnToExternalIdMap: Map<String, String>
+    ): List<LegalEntityGateOutput> {
+        val legalEntitiesByBpn = legalEntities.associateBy { it.bpn }
+        val legalAddressesByBpn = legalAddresses.associateBy { it.legalEntity }
+        return bpnToExternalIdMap.mapNotNull { toLegalEntityOutput(it.value, legalEntitiesByBpn[it.key], legalAddressesByBpn[it.key]) }
+    }
+
+    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityPartnerResponse?, legalAddress: LegalAddressSearchResponse?): LegalEntityGateOutput? {
+        if (legalEntity == null || legalAddress == null) {
+            return null
+        }
+
+        return LegalEntityGateOutput(
+            legalEntity = legalEntity.properties,
+            legalAddress = legalAddress.legalAddress,
+            bpn = legalEntity.bpn,
+            externalId = externalId
         )
     }
 

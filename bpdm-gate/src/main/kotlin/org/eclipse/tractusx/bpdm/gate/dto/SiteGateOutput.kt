@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 
 @JsonDeserialize(using = SiteGateOutputDeserializer::class)
@@ -33,10 +34,14 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 data class SiteGateOutput(
     @JsonUnwrapped
     val site: SiteResponse,
+    @Schema(description = "Main address where this site resides")
+    val mainAddress: AddressResponse,
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
-    @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String?,
+    @Schema(description = "Business Partner Number, main identifier value for sites")
+    val bpn: String?,
+    @Schema(description = "Bpn of the related legal entity")
+    val legalEntityBpn: String,
 )
 
 class SiteGateOutputDeserializer(vc: Class<SiteGateOutput>?) : StdDeserializer<SiteGateOutput>(vc) {
@@ -44,8 +49,10 @@ class SiteGateOutputDeserializer(vc: Class<SiteGateOutput>?) : StdDeserializer<S
         val node = parser.codec.readTree<JsonNode>(parser)
         return SiteGateOutput(
             ctxt.readTreeAsValue(node, SiteResponse::class.java),
+            ctxt.readTreeAsValue(node.get(SiteGateOutput::mainAddress.name), AddressResponse::class.java),
             node.get(SiteGateOutput::externalId.name).textValue(),
-            node.get(SiteGateOutput::legalEntityExternalId.name)?.textValue()
+            node.get(SiteGateOutput::bpn.name)?.textValue(),
+            node.get(SiteGateOutput::legalEntityBpn.name).textValue()
         )
     }
 }

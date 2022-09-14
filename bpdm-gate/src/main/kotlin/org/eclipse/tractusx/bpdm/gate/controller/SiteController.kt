@@ -35,7 +35,6 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -98,7 +97,7 @@ class SiteController(
 
     @Operation(
         summary = "Get page of sites",
-        description = "Get page of sites."
+        description = "Get page of sites. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -106,26 +105,11 @@ class SiteController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping("/output/sites")
+    @PostMapping("/output/sites/search")
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show sites that were updated after the specified ISO-8601 timestamp") from: Instant?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<SiteGateOutput> {
-        TODO()
-    }
-
-    @Operation(
-        summary = "Get site by external identifier",
-        description = "Get site by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found site with external identifier"),
-            ApiResponse(responseCode = "404", description = "No site found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/output/sites/{externalId}")
-    fun getSiteByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateOutput {
-        TODO()
+        return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }

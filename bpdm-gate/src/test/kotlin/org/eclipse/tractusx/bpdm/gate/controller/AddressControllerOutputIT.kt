@@ -7,15 +7,14 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_LEGAL_ENTITIES_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_ADDRESSES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -30,7 +29,7 @@ import org.springframework.test.web.reactive.server.returnResult
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-internal class LegalEntityControllerOutputIT @Autowired constructor(
+internal class AddressControllerOutputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper
 ) {
@@ -54,29 +53,25 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
-     * When getting legal entities page via output route
-     * Then legal entities page should be returned
+     * Given addresses exists in cdq and bpdm pool
+     * When getting addresses page via output route
+     * Then addresses page should be returned
      */
     @Test
-    fun `get legal entities`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1Response,
-            CdqValues.legalEntity2Response
+    fun `get addresses`() {
+        val addressesCdq = listOf(
+            CdqValues.addressBusinessPartner1,
+            CdqValues.addressBusinessPartner2
         )
 
-        val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateOutput1,
-            ResponseValues.legalEntityGateOutput2
+        val expectedAddresses = listOf(
+            ResponseValues.addressGateOutput1,
+            ResponseValues.addressGateOutput2
         )
 
-        val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityPartnerResponse1,
-            ResponseValues.legalEntityPartnerResponse2
-        )
-        val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+        val addressesPool = listOf(
+            ResponseValues.addressPartnerSearchResponse1,
+            ResponseValues.addressPartnerSearchResponse2
         )
 
         val limit = 2
@@ -95,7 +90,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
                                 )
                             )
                         )
@@ -103,29 +98,19 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH))
+            post(urlPathMatching(POOL_API_MOCK_ADDRESSES_SEARCH_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(legalEntitiesPool)
-                        )
-                )
-        )
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(legalAddressesPool)
+                            objectMapper.writeValueAsString(addressesPool)
                         )
                 )
         )
 
         val pageResponse = webTestClient.post()
             .uri { builder ->
-                builder.path(GATE_API_OUTPUT_LEGAL_ENTITIES_PATH)
+                builder.path(GATE_API_OUTPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
@@ -133,7 +118,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateOutput>>()
+            .returnResult<PageStartAfterResponse<AddressGateOutput>>()
             .responseBody
             .blockFirst()!!
 
@@ -141,36 +126,32 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             PageStartAfterResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
+                content = expectedAddresses,
                 invalidEntries = 0
             )
         )
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
-     * When getting legal entities page via output route filtering by external ids
-     * Then legal entities page should be returned
+     * Given addresses exists in cdq and bpdm pool
+     * When getting addresses page via output route filtering by external ids
+     * Then addresses page should be returned
      */
     @Test
-    fun `get legal entities, filter by external ids`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1Response,
-            CdqValues.legalEntity2Response
+    fun `get addresses, filter by external ids`() {
+        val addressesCdq = listOf(
+            CdqValues.addressBusinessPartner1,
+            CdqValues.addressBusinessPartner2
         )
 
-        val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateOutput1,
-            ResponseValues.legalEntityGateOutput2
+        val expectedAddresses = listOf(
+            ResponseValues.addressGateOutput1,
+            ResponseValues.addressGateOutput2
         )
 
-        val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityPartnerResponse1,
-            ResponseValues.legalEntityPartnerResponse2
-        )
-        val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+        val addressesPool = listOf(
+            ResponseValues.addressPartnerSearchResponse1,
+            ResponseValues.addressPartnerSearchResponse2
         )
 
         val limit = 2
@@ -180,7 +161,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
         wireMockServerCdq.stubFor(
             get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalId1, CommonValues.externalId2).joinToString(",")))
+                .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2).joinToString(",")))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -190,7 +171,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
                                 )
                             )
                         )
@@ -198,39 +179,29 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH))
+            post(urlPathMatching(POOL_API_MOCK_ADDRESSES_SEARCH_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(legalEntitiesPool)
-                        )
-                )
-        )
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(legalAddressesPool)
+                            objectMapper.writeValueAsString(addressesPool)
                         )
                 )
         )
 
         val pageResponse = webTestClient.post()
             .uri { builder ->
-                builder.path(GATE_API_OUTPUT_LEGAL_ENTITIES_PATH)
+                builder.path(GATE_API_OUTPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
                     .queryParam(PaginationStartAfterRequest::limit.name, limit)
                     .build()
             }
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(listOf(CommonValues.externalId1, CommonValues.externalId2)))
+            .bodyValue(objectMapper.writeValueAsString(listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2)))
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateOutput>>()
+            .returnResult<PageStartAfterResponse<AddressGateOutput>>()
             .responseBody
             .blockFirst()!!
 
@@ -238,7 +209,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             PageStartAfterResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
+                content = expectedAddresses,
                 invalidEntries = 0
             )
         )

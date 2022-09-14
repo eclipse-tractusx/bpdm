@@ -35,7 +35,6 @@ import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.Instant
 import javax.validation.Valid
 
 @RestController
@@ -99,7 +98,7 @@ class LegalEntityController(
 
     @Operation(
         summary = "Get page of legal entities",
-        description = "Get page of legal entities."
+        description = "Get page of legal entities. Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -107,26 +106,11 @@ class LegalEntityController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @GetMapping("/output/legal-entities")
+    @PostMapping("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @Parameter(description = "Only show legal entities that were updated after the specified ISO-8601 timestamp") from: Instant?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<LegalEntityGateOutput> {
-        return legalEntityService.getLegalEntitiesOutput(paginationRequest.limit, paginationRequest.startAfter, from)
-    }
-
-    @Operation(
-        summary = "Get legal entity by external identifier",
-        description = "Get legal entity by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found legal entity with external identifier"),
-            ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/output/legal-entities/{externalId}")
-    fun getLegalEntityByExternalIdOutput(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateOutput {
-        return legalEntityService.getLegalEntityByExternalIdOutput(externalId)
+        return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 }

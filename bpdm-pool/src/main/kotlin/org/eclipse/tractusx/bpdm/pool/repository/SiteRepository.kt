@@ -33,7 +33,7 @@ interface SiteRepository : PagingAndSortingRepository<Site, Long> {
     @Query("SELECT s FROM Site s join s.legalEntity p where p.bpn=:bpn")
     fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<Site>
 
-    fun findByLegalEntityIn(partners: Collection<LegalEntity>, pageable: Pageable): Page<Site>
+    fun findByLegalEntityInOrBpnIn(partners: Collection<LegalEntity>, bpns: Collection<String>, pageable: Pageable): Page<Site>
 
     fun findByBpn(bpn: String): Site?
 

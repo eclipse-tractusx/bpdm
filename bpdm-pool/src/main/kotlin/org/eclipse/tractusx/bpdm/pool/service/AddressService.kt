@@ -19,10 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Address
 import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
@@ -60,7 +64,12 @@ class AddressService(
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
-        val addressPage = addressPartnerRepository.findByLegalEntityInOrSiteIn(partners, sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val addressPage = addressPartnerRepository.findByLegalEntityInOrSiteInOrBpnIn(
+            partners,
+            sites,
+            searchRequest.addresses,
+            PageRequest.of(paginationRequest.page, paginationRequest.size)
+        )
         fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
         return addressPage.toDto(addressPage.content.map { it.toDtoWithReference() })
     }
