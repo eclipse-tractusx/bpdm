@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
 
 
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 
