@@ -49,7 +49,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             registry.add("bpdm.cdq.host") { wireMockServerCdq.baseUrl() }
-            registry.add("bpdm.pool.baseUrl") { wireMockServerBpdmPool.baseUrl() }
+            registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }
 
