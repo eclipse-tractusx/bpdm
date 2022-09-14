@@ -25,3 +25,5 @@ applicationConfig: |
   spring.security.oauth2.client.registration.gate-client.authorization-grant-type=client_credentials
   spring.security.oauth2.client.registration.gate-client.provider=catena-keycloak-provider
   spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.demo.catena-x.net/auth/realms/CX-Central
+  # Connection to pool
+  bpdm.pool.base-url=http://pool-v2-bpdm:8080/api/catena
