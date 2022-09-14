@@ -23,7 +23,6 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
@@ -47,7 +46,8 @@ class CdqRequestMappingService(
             dataSource = cdqConfigProperties.datasourceSite,
             names = listOf(NameCdq(value = site.site.name)),
             addresses = listOf(toCdqModel(site.site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn)) else emptyList()
+            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn)) else emptyList(),
+            types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.ORGANIZATIONAL_UNIT.name))
         )
     }
 
@@ -56,7 +56,8 @@ class CdqRequestMappingService(
             externalId = address.externalId,
             dataSource = cdqConfigProperties.datasourceAddress,
             addresses = listOf(toCdqModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList()
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList(),
+            types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.BP_ADDRESS.name))
         )
     }
 
@@ -69,7 +70,7 @@ class CdqRequestMappingService(
             legalForm = toLegalFormCdq(legalEntity.legalForm),
             status = legalEntity.status?.toCdqModel(),
             profile = toPartnerProfileCdq(legalEntity.profileClassifications),
-            types = legalEntity.types.map { it.toCdqModel() },
+            types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.LEGAL_ENTITY.name)),
             bankAccounts = legalEntity.bankAccounts.map { it.toCdqModel() },
             addresses = listOf(toCdqModel(legalEntity.legalAddress))
         )
@@ -82,10 +83,6 @@ class CdqRequestMappingService(
             nationalBankAccountIdentifier = nationalBankAccountIdentifier,
             nationalBankIdentifier = nationalBankIdentifier
         )
-    }
-
-    private fun BusinessPartnerType.toCdqModel(): TypeKeyNameUrlCdq {
-        return TypeKeyNameUrlCdq(name)
     }
 
     private fun toPartnerProfileCdq(profileClassifications: Collection<ClassificationDto>): PartnerProfileCdq? {
