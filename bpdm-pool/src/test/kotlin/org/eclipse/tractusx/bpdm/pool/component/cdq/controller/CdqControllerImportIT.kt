@@ -53,8 +53,6 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
 
-private const val CDQ_MOCK_URL = "/test-cdq-api/storages/test-cdq-storage"
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
@@ -193,7 +191,7 @@ class CdqControllerImportIT @Autowired constructor(
             ),
             BusinessPartnerWithParent(
                 with(CdqValues.site3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
-                parentBpn2
+                parentBpn3
             ),
         )
 
@@ -267,18 +265,21 @@ class CdqControllerImportIT @Autowired constructor(
 
 
         val addressesToImport = listOf(
-            with(CdqValues.addressPartner1) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier1))) },
-            with(CdqValues.addressPartner2) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier2))) },
-            with(CdqValues.addressPartner3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner1) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier1))) },
+                parentBpn1
+            ),
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner2) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier2))) },
+                parentBpn2
+            ),
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
+                parentBpn3
+            ),
         )
 
-        //Import address partners
-        testHelpers.importAndGetResponse(addressesToImport, webTestClient, wireMockServer)
-
-        val actualAddresses = webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(
-            EndpointValues.CATENA_ADDRESSES_SEARCH_PATH,
-            AddressPartnerSearchRequest(legalEntities = bpns)
-        )
+        val createdAddresses = importAddressPartners(addressesToImport)
 
         val expectedAddresses = listOf(
             AddressPartnerSearchResponse(ResponseValues.addressPartner1, parentBpn1, null),
@@ -286,7 +287,7 @@ class CdqControllerImportIT @Autowired constructor(
             AddressPartnerSearchResponse(ResponseValues.addressPartner3, parentBpn3, null)
         )
 
-        testHelpers.assertRecursively(actualAddresses.content).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expectedAddresses)
+        testHelpers.assertRecursively(createdAddresses).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expectedAddresses)
     }
 
     /**
@@ -565,11 +566,11 @@ class CdqControllerImportIT @Autowired constructor(
             ),
             BusinessPartnerWithParent(
                 with(CdqValues.site3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
-                parentBpn2
+                parentBpn3
             ),
         )
 
-        val siteBpns = importSites(sitesToImport).map { it.bpn }
+        val siteBpns = importSites(sitesToImport).map { it.site.bpn }
 
         val sitesToUpdate = listOf(
             BusinessPartnerWithParent(plusBpn(CdqValues.site1, siteBpns[1]), parentBpn1),
@@ -580,12 +581,103 @@ class CdqControllerImportIT @Autowired constructor(
         val updatedSites = importSites(sitesToUpdate)
 
         val expectedSites = listOf(
-            ResponseValues.site1.copy(bpn = siteBpns[1]),
-            ResponseValues.site2.copy(bpn = siteBpns[2]),
-            ResponseValues.site3.copy(bpn = siteBpns[0])
+            SitePartnerSearchResponse(ResponseValues.site1.copy(bpn = siteBpns[1]), parentBpn2),
+            SitePartnerSearchResponse(ResponseValues.site2.copy(bpn = siteBpns[2]), parentBpn3),
+            SitePartnerSearchResponse(ResponseValues.site3.copy(bpn = siteBpns[0]), parentBpn1)
         )
 
         testHelpers.assertRecursively(updatedSites).isEqualTo(expectedSites)
+    }
+
+    /**
+     * Given updated partners of type address in CDQ
+     * When Import from CDQ
+     * Then partners imported
+     */
+    @Test
+    fun `import updated address partners`() {
+
+        val cxPoolIdType = TypeKeyNameUrlCdq("CX_POOL")
+        val parentIdentifier1 = "p1"
+        val parentIdentifier2 = "p2"
+        val parentIdentifier3 = "p3"
+
+        val parentToCreate1 = with(CdqValues.legalEntity1) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier1))) }
+        val parentToCreate2 = with(CdqValues.legalEntity2) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier2))) }
+        val parentToCreate3 = with(CdqValues.legalEntity3) { copy(identifiers = listOf(IdentifierCdq(cxPoolIdType, parentIdentifier3))) }
+
+        val parentsToCreate = listOf(
+            parentToCreate1,
+            parentToCreate2,
+            parentToCreate3
+        )
+
+        val bpns = importLegalEntities(parentsToCreate).map { it.bpn }
+
+        val parentBpn1 = bpns[0]
+        val parentBpn2 = bpns[1]
+        val parentBpn3 = bpns[2]
+
+        val mockedRequest = FetchBatchRequest(listOf(parentIdentifier1, parentIdentifier2, parentIdentifier3))
+
+        val mockedFetchBatchResponse = listOf(
+            FetchBatchRecord(
+                parentIdentifier1,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn1)))
+            ),
+            FetchBatchRecord(
+                parentIdentifier2,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn2)))
+            ),
+            FetchBatchRecord(
+                parentIdentifier3,
+                BusinessPartnerBatchCdq(parentToCreate1.identifiers.plus(IdentifierCdq(CdqValues.bpnIdentifiertype, parentBpn3)))
+            )
+        )
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(cdqAdapterConfigProperties.fetchBusinessPartnersBatchUrl))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(mockedRequest)))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockedFetchBatchResponse))
+                )
+        )
+
+
+        val addressesToImport = listOf(
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner1) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier1))) },
+                parentBpn1
+            ),
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner2) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier2))) },
+                parentBpn2
+            ),
+            BusinessPartnerWithParent(
+                with(CdqValues.addressPartner3) { copy(relations = listOf(CdqValues.parentRelation.copy(startNode = parentIdentifier3))) },
+                parentBpn3
+            ),
+        )
+
+        val addressBpns = importAddressPartners(addressesToImport).map { it.address.bpn }
+
+        val addressesToUpdate = listOf(
+            BusinessPartnerWithParent(plusBpn(CdqValues.addressPartner1, addressBpns[1]), parentBpn1),
+            BusinessPartnerWithParent(plusBpn(CdqValues.addressPartner1, addressBpns[2]), parentBpn2),
+            BusinessPartnerWithParent(plusBpn(CdqValues.addressPartner1, addressBpns[0]), parentBpn3)
+        )
+
+        val updatedAddresses = importAddressPartners(addressesToUpdate)
+
+        val expectedAddresses = listOf(
+            AddressPartnerSearchResponse(ResponseValues.addressPartner1.copy(bpn = addressBpns[1]), parentBpn2, null),
+            AddressPartnerSearchResponse(ResponseValues.addressPartner1.copy(bpn = addressBpns[2]), parentBpn3, null),
+            AddressPartnerSearchResponse(ResponseValues.addressPartner1.copy(bpn = addressBpns[0]), parentBpn1, null),
+        )
+
+        testHelpers.assertRecursively(updatedAddresses).isEqualTo(expectedAddresses)
     }
 
     private fun plusBpn(partner: BusinessPartnerCdq, bpn: String) =
@@ -617,14 +709,28 @@ class CdqControllerImportIT @Autowired constructor(
     /**
      * Import the given sites and return them as response in the same order
      */
-    private fun importSites(partners: List<BusinessPartnerWithParent>): List<SitePartnerResponse> {
+    private fun importSites(partners: List<BusinessPartnerWithParent>): List<SitePartnerSearchResponse> {
         val parentIds = partners.map { it.parentBpn }
         testHelpers.importAndGetResponse(partners.map { it.partner }, webTestClient, wireMockServer)
         val createdSites = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(
             EndpointValues.CATENA_SITE_SEARCH_PATH,
             SiteSearchRequest(legalEntities = parentIds)
         )
-        return partners.map { createdSites.content.find { site -> site.bpnLegalEntity == it.parentBpn }!!.site }
+        return partners.map { createdSites.content.find { site -> site.bpnLegalEntity == it.parentBpn }!! }
+    }
+
+    /**
+     * Import the given address partners and return them as response in the same order.
+     * Only works for address partners with legal entities as parents
+     */
+    private fun importAddressPartners(partners: List<BusinessPartnerWithParent>): List<AddressPartnerSearchResponse> {
+        val parentIds = partners.map { it.parentBpn }
+        testHelpers.importAndGetResponse(partners.map { it.partner }, webTestClient, wireMockServer)
+        val createdAddresses = webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(
+            EndpointValues.CATENA_ADDRESSES_SEARCH_PATH,
+            AddressPartnerSearchRequest(legalEntities = parentIds)
+        )
+        return partners.map { createdAddresses.content.find { address -> address.bpnLegalEntity == it.parentBpn }!! }
     }
 
 }
