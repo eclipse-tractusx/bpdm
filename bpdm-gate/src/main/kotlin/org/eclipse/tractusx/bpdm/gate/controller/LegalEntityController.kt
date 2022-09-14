@@ -106,7 +106,7 @@ class LegalEntityController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/output/legal-entities")
+    @PostMapping("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?

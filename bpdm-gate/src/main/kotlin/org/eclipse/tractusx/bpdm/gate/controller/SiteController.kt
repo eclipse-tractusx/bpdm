@@ -105,7 +105,7 @@ class SiteController(
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/output/sites")
+    @PostMapping("/output/sites/search")
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
