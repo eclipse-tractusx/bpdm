@@ -30,7 +30,7 @@ dependencies:
     alias: opensearch
     condition: opensearch.enabled
   - name: postgresql
-    version:  11.*.*
+    version: 11.9.1
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
