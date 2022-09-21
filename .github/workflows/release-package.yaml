@@ -6,6 +6,8 @@ on:
       - main
       - develop
       - 'release/**'
+    tags:
+      - '*'
 
 jobs:
   call-sonar-scan:
