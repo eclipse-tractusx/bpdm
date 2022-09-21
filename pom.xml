@@ -50,7 +50,7 @@
         <neo.version>1.29</neo.version>
         <jacoco.version>0.8.7</jacoco.version>
         <kotlinlogging.version>2.1.23</kotlinlogging.version>
-        <wiremock.version>2.33.2</wiremock.version>
+        <wiremock.version>2.34.0</wiremock.version>
         <springmockk.version>3.1.1</springmockk.version>
         <assertj.version>3.23.1</assertj.version>
         <spring-boot.version>2.7.0</spring-boot.version>
@@ -98,12 +98,6 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-spring-boot-starter</artifactId>
                 <version>${keycloak.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgres.version}</version>
-                <scope>runtime</scope>
             </dependency>
             <!-- Contains country and language codes per ISO 3166-1 alpha-2 and ISO 639-1 -->
             <dependency>
