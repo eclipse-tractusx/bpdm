@@ -35,7 +35,7 @@
     </parent>
 
     <properties>
-        <postgres.version>42.3.6</postgres.version>
+        <postgres.version>42.5.0</postgres.version>
         <flyway.version>8.5.12</flyway.version>
         <testcontainers.version>1.17.2</testcontainers.version>
         <opensearch.version>2.1.0</opensearch.version>
