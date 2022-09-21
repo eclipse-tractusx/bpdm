@@ -221,8 +221,8 @@ In order to update the Helm release you need the Helm upgrade command: `helm upg
 === Different environments
 
 The instructions above deploys an application configured for the dev environment.
-There is also helm configuration available for the int environment, defined int the `int-values.yaml`.
-You would install the application for int environment with: `helm install release_name ./helm/bpdm -n your_namespace -v ./helm/bpdm/int-values.yaml`.
+There is also helm configuration available for the int environment, defined in the `values-int.yaml`.
+You would install the application for int environment with: `helm install release_name ./charts/pool -n your_namespace -v ./charts/pool/values-int.yaml`.
 
 If you want to create a new helm release for a different environment you can create your own values file and adjust the values accordingly.
 One of the most important values you want to adjust is in which profile (or profiles) the bpdm service application should run.
@@ -237,7 +237,7 @@ springProfiles:
 === Secrets
 
 Be aware that you may also want to replace placeholder passwords for the deployment.
-This can be done by giving a values file  overriding the password placeholders like so: `helm install release_name ./helm/bpdm -n your_namespace -v secret-values.yaml`
+This can be done by giving a values file overriding the password placeholders like so: `helm install release_name ./charts/pool -n your_namespace -v secret-values.yaml`
 
 secret-values.yaml:
 
@@ -257,7 +257,7 @@ You may want to set those secrets on the command line during install or update.
 
 [source,bash]
 ----
-helm install release_name ./helm/bpdm \
+helm install release_name ./charts/pool \
 --namespace your_namespace \
 --set applicationSecret.keycloak=$BPDM_DB_USER \
 --set applicationSecret.cdq=$BPDM_DB_PASS \
