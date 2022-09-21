@@ -19,5 +19,7 @@ target
 #local database data
 /db
 #Helm dependencies
-/helm/pool/charts
-/helm/pool/Chart.lock
+/charts/pool/charts
+/charts/pool/Chart.lock
+/charts/gate/charts
+/charts/gate/Chart.lock
