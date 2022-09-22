@@ -71,6 +71,14 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- added because of transitive dependency to snakeyaml 1.31 with CVE through spring-boot-starter (and opensearch-rest-high-level-client in pool) -->
+            <!-- remove this when there is a newer version of our direct dependencies where snakeyaml 1.31 is not used anymore -->
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.32</version>
+                <scope>compile</scope>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
