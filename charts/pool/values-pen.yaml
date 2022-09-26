@@ -1,0 +1,43 @@
+image:
+  tag: "main"
+
+springProfiles: [ ]
+
+
+ingress:
+  hosts:
+    - host: partners-pool.pen-dev.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - partners-pool.pen-dev.demo.catena-x.net
+
+applicationSecret:
+  keycloak: <path:bpdm/data/pen-dev/pool/keycloak#credentials-secret>
+  cdq: "xxxxx"
+
+applicationConfig: |
+  # every hour at minute 30
+  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
+  # every hour at minute 0
+  bpdm.cdq.import-scheduler-cron-expr=-
+  # auth properties
+  bpdm.security.enabled=true
+  keycloak.enabled=true
+  keycloak.auth-server-url=https://centralidp-pen.dev.demo.catena-x.net/auth
+  springdoc.swagger-ui.oauth.client-id=Cl2-CX-Portal
+  # opensearch properties
+  bpdm.opensearch.enabled=true
+  bpdm.opensearch.host=${BPDM_OPENSEARCH_HOST}
+  # persist properties
+  bpdm.datasource.host=${BPDM_DB_HOST}
+  spring.datasource.url=jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm
+  spring.datasource.password=${BPDM_DB_PASS}
+
+postgres:
+  auth:
+    postgresPassword: <path:bpdm/data/pen-dev/pool/postgresql#postgres-password>
+    password: <path:bpdm/data/pen-dev/pool/postgresql#password>
