@@ -1,11 +1,11 @@
 image:
   tag: "v2.0.2"
 
-springProfiles:
-  - int
-
-
 ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
   hosts:
     - host: partners-pool.int.demo.catena-x.net
       paths:
@@ -24,14 +24,33 @@ ingress:
         - catenax-bpdm-int.demo.catena-x.net
 
 applicationSecret:
+  enabled: true
   keycloak: <path:bpdm/data/int/pool/keycloak#credentials-secret>
   cdq: <path:bpdm/data/int/pool/cdq#api-key>
 
 applicationConfig: |
-  # every hour at minute 30
-  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
+  # auth properties
+  bpdm.security.enabled=true
+  keycloak.enabled=true
+  keycloak.auth-server-url=https://centralidp.demo.catena-x.net/auth
+  keycloak.realm=CX-Central
+  keycloak.resource=Cl7-CX-BPDM
+  #Springdoc configuration
+  springdoc.swagger-ui.oauth.client-id=Cl2-CX-Portal
+  # CDQ config
+  bpdm.cdq.enabled=true
+  bpdm.cdq.storage=af3e668806c1360498774117b6180772
+  bpdm.cdq.datasource=6218e2bd4b43902250893a54
   # every hour at minute 0
   bpdm.cdq.import-scheduler-cron-expr=0 0 * * * *
+  # opensearch properties
+  bpdm.opensearch.enabled=true
+  bpdm.opensearch.host=${BPDM_OPENSEARCH_HOST}
+  # every hour at minute 30
+  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
+  # persist properties
+  bpdm.datasource.host=${BPDM_DB_HOST}
+  spring.datasource.password=${BPDM_DB_PASS}
 
 postgres:
   auth:
