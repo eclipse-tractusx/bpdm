@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 @JsonDeserialize(using = LegalEntityPartnerResponse.CustomDeserializer::class)
-@Schema(name = "Legal Entity Partner Response", description = "Business partner of type legal entity with currentness")
+@Schema(name = "LegalEntityPartnerResponse", description = "Business partner of type legal entity with currentness")
 data class LegalEntityPartnerResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,

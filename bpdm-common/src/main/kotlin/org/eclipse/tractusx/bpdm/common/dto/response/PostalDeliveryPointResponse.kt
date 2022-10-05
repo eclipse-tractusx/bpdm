@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
-@Schema(name = "Postal Delivery Point Response", description = "Postal delivery point record of an address")
+@Schema(name = "PostalDeliveryPointResponse", description = "Postal delivery point record of an address")
 data class PostalDeliveryPointResponse(
     @Schema(description = "Full denotation of the delivery point")
     val value: String,

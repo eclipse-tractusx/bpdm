@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.RelationClass
 import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
 
-@Schema(name = "Relation Response", description = "Directed relation between two business partners")
+@Schema(name = "RelationResponse", description = "Directed relation between two business partners")
 data class RelationResponse (
     @Schema(description = "Class of relation like Catena, LEI or DNB relation")
     val relationClass: TypeKeyNameDto<RelationClass>,

@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.boot.context.properties.ConstructorBinding
 
-@Schema(name = "Legal Entity Properties Search Request", description = "Contains keywords used for searching in legal entity properties")
+@Schema(name = "LegalEntityPropertiesSearchRequest", description = "Contains keywords used for searching in legal entity properties")
 data class LegalEntityPropertiesSearchRequest @ConstructorBinding constructor(
     @field:Parameter(description = "Filter legal entities by name")
     val name: String?,

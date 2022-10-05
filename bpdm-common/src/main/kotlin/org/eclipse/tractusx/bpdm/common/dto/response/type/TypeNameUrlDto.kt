@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response.type
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Named Type With Link", description = "General type with name and URL link for further information")
+@Schema(name = "NamedTypeWithLink", description = "General type with name and URL link for further information")
 data class TypeNameUrlDto(
     @Schema(description = "Name of the type")
     val name: String,

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 
 @JsonDeserialize(using = AddressBpnResponseDeserializer::class)
-@Schema(name = "Address Bpn Response", description = "Localized address record of a business partner")
+@Schema(name = "AddressBpnResponse", description = "Localized address record of a business partner")
 data class AddressBpnResponse(
     @Schema(description = "Business Partner Number, main identifier value for addresses")
     val bpn: String,

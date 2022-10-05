@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 
-@Schema(name = "Administrative Area Response", description = "Area of an address such as country region or county")
+@Schema(name = "AdministrativeAreaResponse", description = "Area of an address such as country region or county")
 data class AdministrativeAreaResponse (
     @Schema(description = "Full name of the area")
     val value: String,

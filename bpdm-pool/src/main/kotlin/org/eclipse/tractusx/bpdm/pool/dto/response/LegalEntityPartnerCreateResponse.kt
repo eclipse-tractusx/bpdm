@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import java.time.Instant
 
 @JsonDeserialize(using = LegalEntityPartnerCreateResponse.CustomDeserializer::class)
-@Schema(name = "Legal Entity Partner Create Response", description = "Created business partner of type legal entity")
+@Schema(name = "LegalEntityPartnerCreateResponse", description = "Created business partner of type legal entity")
 data class LegalEntityPartnerCreateResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,

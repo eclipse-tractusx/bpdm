@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Main Address Search Response", description = "Main address record with parent BPN")
+@Schema(name = "MainAddressSearchResponse", description = "Main address record with parent BPN")
 data class MainAddressSearchResponse(
     @Schema(description = "BPNS of the site this main address belongs to")
     val site: String,

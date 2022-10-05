@@ -23,7 +23,7 @@ import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 
-@Schema(name = "Legal Form Request", description = "New legal form record to be referenced by business partners")
+@Schema(name = "LegalFormRequest", description = "New legal form record to be referenced by business partners")
 data class LegalFormRequest(
     @Schema(description = "Unique key to be used for reference")
     val technicalKey: String,

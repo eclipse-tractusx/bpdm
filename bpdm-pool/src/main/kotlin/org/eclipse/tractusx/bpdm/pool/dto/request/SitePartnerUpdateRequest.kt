@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
 @JsonDeserialize(using = SitePartnerUpdateRequest.CustomDeserializer::class)
-@Schema(name = "Site Partner Update Request", description = "Request for updating a business partner record of type site")
+@Schema(name = "SitePartnerUpdateRequest", description = "Request for updating a business partner record of type site")
 data class SitePartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this site")
     val bpn: String,

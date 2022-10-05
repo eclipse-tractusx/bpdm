@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Address Partner Search Response", description = "Business partner of type address with parent reference")
+@Schema(name = "AddressPartnerSearchResponse", description = "Business partner of type address with parent reference")
 data class AddressPartnerSearchResponse(
     val address: AddressPartnerResponse,
     @Schema(description = "Business Partner Number of the related legal entity")

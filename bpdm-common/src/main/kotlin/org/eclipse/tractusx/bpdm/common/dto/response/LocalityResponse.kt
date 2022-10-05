@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.LocalityType
 
-@Schema(name = "Locality Response", description = "Locality record of an address such as city, block or district")
+@Schema(name = "LocalityResponse", description = "Locality record of an address such as city, block or district")
 data class LocalityResponse (
     @Schema(description = "Full name of the locality")
     val value: String,

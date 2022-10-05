@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 
-@Schema(name = "Address Version Response", description = "Localization record of an address")
+@Schema(name = "AddressVersionResponse", description = "Localization record of an address")
 data class AddressVersionResponse(
     @Schema(description = "Character set in which the address is written")
     val characterSet: TypeKeyNameDto<CharacterSet>,

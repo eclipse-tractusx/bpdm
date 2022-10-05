@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import java.time.Instant
 
 @JsonDeserialize(using = BusinessPartnerResponse.CustomDeserializer::class)
-@Schema(name = "Business Partner Response", description = "Business Partner of type legal entity in deprecated response format", deprecated = true)
+@Schema(name = "BusinessPartnerResponse", description = "Business Partner of type legal entity in deprecated response format", deprecated = true)
 data class BusinessPartnerResponse(
     val uuid: String,
     @Schema(description = "Business Partner Number, main identifier value for business partners")

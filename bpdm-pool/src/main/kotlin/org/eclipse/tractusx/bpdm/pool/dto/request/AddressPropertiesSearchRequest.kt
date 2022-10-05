@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.boot.context.properties.ConstructorBinding
 
-@Schema(name = "Address Properties Search Request", description = "Contains keywords used for searching in business partner properties")
+@Schema(name = "AddressPropertiesSearchRequest", description = "Contains keywords used for searching in business partner properties")
 data class AddressPropertiesSearchRequest @ConstructorBinding constructor(
     @field:Parameter(description = "Filter business partners by administrative area name")
     var administrativeArea: String? = null,

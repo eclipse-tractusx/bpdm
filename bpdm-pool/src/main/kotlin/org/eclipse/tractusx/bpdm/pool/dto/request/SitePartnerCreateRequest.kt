@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
 @JsonDeserialize(using = SitePartnerCreateRequest.CustomDeserializer::class)
-@Schema(name = "Site Partner Create Request", description = "Request for creating new business partner record of type site")
+@Schema(name = "SitePartnerCreateRequest", description = "Request for creating new business partner record of type site")
 data class SitePartnerCreateRequest(
     @JsonUnwrapped
     val site: SiteDto,

@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
-@Schema(name = "Legal Entity Response", description = "Legal entity record")
+@Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<IdentifierResponse> = emptyList(),

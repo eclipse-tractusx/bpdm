@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
-@Schema(name = "Legal Entity")
+@Schema(name = "LegalEntity")
 data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<IdentifierDto> = emptyList(),

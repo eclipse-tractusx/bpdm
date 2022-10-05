@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 
-@Schema(name = "Address Response", description = "Localized address record of a business partner")
+@Schema(name = "AddressResponse", description = "Localized address record of a business partner")
 data class AddressResponse(
     @Schema(description = "Language and character set the address is written in")
     val version: AddressVersionResponse,
