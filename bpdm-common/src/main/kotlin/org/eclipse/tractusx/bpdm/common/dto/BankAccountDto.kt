@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 import com.neovisionaries.i18n.CurrencyCode
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Bank Account", description = "Bank account record of a business partner")
+@Schema(name = "BankAccount", description = "Bank account record of a business partner")
 data class BankAccountDto(
     @Schema(description = "Trust scores for the account", defaultValue = "[]")
     val trustScores: Collection<Float> = emptyList(),

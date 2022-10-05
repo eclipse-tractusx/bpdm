@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Site Partner Search Response", description = "Business partner of type site with parent BPN")
+@Schema(name = "SitePartnerSearchResponse", description = "Business partner of type site with parent BPN")
 data class SitePartnerSearchResponse(
     @Schema(description = "Site properties")
     val site: SitePartnerResponse,

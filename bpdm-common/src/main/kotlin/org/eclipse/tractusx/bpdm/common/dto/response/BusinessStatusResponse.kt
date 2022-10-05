@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import java.time.LocalDateTime
 
-@Schema(name = "Business Status Response", description = "Status of a business partner")
+@Schema(name = "BusinessStatusResponse", description = "Status of a business partner")
 data class BusinessStatusResponse(
     @Schema(description = "Exact, official denotation of the status")
     val officialDenotation: String?,

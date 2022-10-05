@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 
 @JsonDeserialize(using = LegalEntityPartnerCreateRequest.CustomDeserializer::class)
-@Schema(name = "Legal Entity Partner Create Request", description = "Request for creating new business partner record of type legal entity")
+@Schema(name = "LegalEntityPartnerCreateRequest", description = "Request for creating new business partner record of type legal entity")
 data class LegalEntityPartnerCreateRequest(
     @JsonUnwrapped
     val properties: LegalEntityDto,

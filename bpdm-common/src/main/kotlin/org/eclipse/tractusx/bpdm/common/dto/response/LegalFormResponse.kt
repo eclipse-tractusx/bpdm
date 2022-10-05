@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 
-@Schema(name = "Legal Form Response", description = "Legal form a business partner can have")
+@Schema(name = "LegalFormResponse", description = "Legal form a business partner can have")
 data class LegalFormResponse(
     @Schema(description = "Unique key to be used for reference")
     val technicalKey: String,

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Address Partner Search Request", description = "Request for searching business partners of type address by parent BPNs")
+@Schema(name = "AddressPartnerSearchRequest", description = "Request for searching business partners of type address by parent BPNs")
 data class AddressPartnerSearchRequest(
     @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
     val legalEntities: Collection<String> = emptyList(),

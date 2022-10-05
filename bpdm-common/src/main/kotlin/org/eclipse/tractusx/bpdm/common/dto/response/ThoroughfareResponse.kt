@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ThoroughfareType
 
-@Schema(name = "Thoroughfare Response", description = "Thoroughfare record of an address such as street, square or industrial zone")
+@Schema(name = "ThoroughfareResponse", description = "Thoroughfare record of an address such as street, square or industrial zone")
 data class ThoroughfareResponse(
     @Schema(description = "Full denotation of the thoroughfare")
     val value: String,

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
-@Schema(name = "Site Partner Create Response", description = "Created business partner record of type site")
+@Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
 data class SitePartnerCreateResponse(
     @Schema(description = "Business Partner Number, main identifier value for sites")
     val bpn: String,

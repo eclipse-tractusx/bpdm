@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import java.time.LocalDateTime
 
-@Schema(name = "Business Status", description = "Status record for a business partner")
+@Schema(name = "BusinessStatus", description = "Status record for a business partner")
 data class BusinessStatusDto(
     @Schema(description = "Exact, official denotation of the status")
     val officialDenotation: String?,

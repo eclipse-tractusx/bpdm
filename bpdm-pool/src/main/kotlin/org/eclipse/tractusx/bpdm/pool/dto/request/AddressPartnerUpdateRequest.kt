@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 
 @JsonDeserialize(using = AddressPartnerUpdateRequest.CustomDeserializer::class)
-@Schema(name = "Address Partner Update Request", description = "Request for updating a business partner record of type address")
+@Schema(name = "AddressPartnerUpdateRequest", description = "Request for updating a business partner record of type address")
 data class AddressPartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,

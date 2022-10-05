@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 
 @JsonDeserialize(using = AddressPartnerCreateRequest.CustomDeserializer::class)
-@Schema(name = "Address Partner Create Request", description = "Request for creating new business partner record of type address")
+@Schema(name = "AddressPartnerCreateRequest", description = "Request for creating new business partner record of type address")
 data class AddressPartnerCreateRequest(
     @JsonUnwrapped
     val properties: AddressDto,

@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 
-@Schema(name = "Identifier Response", description = "Identifier record of a business partner")
+@Schema(name = "IdentifierResponse", description = "Identifier record of a business partner")
 data class IdentifierResponse(
     @Schema(description = "Value of the identifier")
     val value: String,

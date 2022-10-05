@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
 @JsonDeserialize(using = AddressPartnerCreateResponse.CustomDeserializer::class)
-@Schema(name = "Address Partner Create Response", description = "Created business partners of type address")
+@Schema(name = "AddressPartnerCreateResponse", description = "Created business partners of type address")
 data class AddressPartnerCreateResponse(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,

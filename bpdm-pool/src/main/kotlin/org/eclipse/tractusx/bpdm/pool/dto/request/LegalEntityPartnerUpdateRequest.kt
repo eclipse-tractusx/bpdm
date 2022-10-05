@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 
 @JsonDeserialize(using = LegalEntityPartnerUpdateRequest.CustomDeserializer::class)
-@Schema(name = "Legal Entity Update Request", description = "Request for updating a business partner record of type legal entity")
+@Schema(name = "LegalEntityUpdateRequest", description = "Request for updating a business partner record of type legal entity")
 data class LegalEntityPartnerUpdateRequest(
     @Schema(description = "Business Partner Number")
     val bpn: String,
