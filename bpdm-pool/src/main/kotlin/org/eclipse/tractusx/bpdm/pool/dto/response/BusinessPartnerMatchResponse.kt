@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(
-    name = "Business Partner Match Response",
+    name = "BusinessPartnerMatchResponse",
     description = "Match with score for a business partner of type legal entity in legacy format",
     deprecated = true
 )

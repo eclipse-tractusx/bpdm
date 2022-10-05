@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 
 @JsonDeserialize(using = AddressGateInputDeserializer::class)
 @Schema(
-    name = "Address Gate Input", description = "Address with legal entity or site references. " +
+    name = "AddressGateInput", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
 )
 data class AddressGateInput(

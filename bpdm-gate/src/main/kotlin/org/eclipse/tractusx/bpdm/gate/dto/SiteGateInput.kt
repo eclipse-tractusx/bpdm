@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 
 @JsonDeserialize(using = SiteGateInputDeserializer::class)
 @Schema(
-    name = "Site Gate Input", description = " Site with legal entity reference ."
+    name = "SiteGateInput", description = " Site with legal entity reference ."
 )
 data class SiteGateInput(
     @Schema(description = "Business Partner Number")
