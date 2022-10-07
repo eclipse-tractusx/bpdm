@@ -58,6 +58,8 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>bptm</sonar.projectKey>
         <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
+        <!-- Added because of CVE-2022-42003 in jackson-databind. Remove as soon as direct dependencies can be updated instead. -->
+        <jackson-bom.version>2.14.0-rc1</jackson-bom.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
@@ -78,12 +80,6 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>1.32</version>
                 <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <!-- Added because of CVE-2022-42003 in jackson-databind. Remove as soon as direct dependencies can be updated instead. -->
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>2.14.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
