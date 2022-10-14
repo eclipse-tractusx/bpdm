@@ -237,7 +237,7 @@ class BusinessPartnerBuildService(
         val legalForm = if (dto.legalForm != null) metadataMap.legalForms[dto.legalForm]!! else null
 
         val legalAddress = createAddress(dto.legalAddress)
-        val partner = LegalEntity(bpnL, legalForm, dto.types.toSet(), emptySet(), Instant.now(), legalAddress)
+        val partner = LegalEntity(bpnL, legalForm, dto.types.toMutableSet(), mutableSetOf(), Instant.now(), legalAddress)
 
         return updateLegalEntity(partner, dto, metadataMap)
     }
@@ -350,7 +350,7 @@ class BusinessPartnerBuildService(
 
     private fun toEntity(dto: BankAccountDto, partner: LegalEntity): BankAccount {
         return BankAccount(
-            dto.trustScores.toSet(),
+            dto.trustScores.toMutableSet(),
             dto.currency,
             dto.internationalBankAccountIdentifier,
             dto.internationalBankIdentifier,
