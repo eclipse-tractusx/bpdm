@@ -32,7 +32,7 @@ class BankAccount (
     @ElementCollection(targetClass = Float::class)
     @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")], indexes = [Index(columnList = "account_id")])
     @Column(name = "score", nullable = false)
-    val trustScores: Set<Float>,
+    val trustScores: MutableSet<Float>,
     @Column(name = "currency", nullable = false)
     @Enumerated(EnumType.STRING)
     val currency: CurrencyCode,

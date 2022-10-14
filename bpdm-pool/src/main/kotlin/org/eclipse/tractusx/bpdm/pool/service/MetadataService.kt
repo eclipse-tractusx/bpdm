@@ -96,7 +96,7 @@ class MetadataService(
             throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.technicalKey)
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey}, name ${request.name} and ${request.category.size} categories" }
-        val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toSet()
+        val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toMutableSet()
         val legalForm = LegalForm(request.name, request.url, request.language, request.mainAbbreviation, categories, request.technicalKey)
 
         return legalFormRepository.save(legalForm).toDto()

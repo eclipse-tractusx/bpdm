@@ -38,7 +38,7 @@ class LegalEntity(
     @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    var types: Set<BusinessPartnerType>,
+    var types: MutableSet<BusinessPartnerType>,
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "legal_entity_roles",
@@ -46,7 +46,7 @@ class LegalEntity(
         inverseJoinColumns = [JoinColumn(name = "role_id")],
         indexes = [Index(columnList = "legal_entity_id")]
     )
-    val roles: Set<Role>,
+    val roles: MutableSet<Role>,
     @Column(name = "currentness", nullable = false)
     var currentness: Instant,
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
