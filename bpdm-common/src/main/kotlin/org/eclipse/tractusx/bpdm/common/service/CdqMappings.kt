@@ -24,6 +24,7 @@ import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
@@ -184,7 +185,12 @@ object CdqMappings {
 
     fun toDto(thoroughfare: ThoroughfareCdq): ThoroughfareDto {
         return ThoroughfareDto(
-            thoroughfare.value,
+            thoroughfare.value ?: throw BpdmMappingException(
+                ThoroughfareCdq::class,
+                ThoroughfareDto::class,
+                "Unknown",
+                "Field ${thoroughfare::value.name} is null"
+            ),
             thoroughfare.name,
             thoroughfare.shortName,
             thoroughfare.number,

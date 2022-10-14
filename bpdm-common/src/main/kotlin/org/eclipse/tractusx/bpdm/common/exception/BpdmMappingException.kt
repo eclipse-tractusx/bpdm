@@ -17,14 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.cdq
+package org.eclipse.tractusx.bpdm.common.exception
 
-data class ThoroughfareCdq(
-    var type: TypeKeyNameUrlCdq? = null,
-    val shortName: String? = null,
-    val number: String? = null,
-    val value: String? = null,
-    val name: String? = null,
-    val direction: String? = null,
-    var language: LanguageCdq? = null
-)
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+import kotlin.reflect.KClass
+
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+class BpdmMappingException(
+    fromType: String,
+    toType: String,
+    objectIdentifier: String,
+    reason: String
+) : RuntimeException("Exception mapping object '$objectIdentifier' from type $fromType to $toType: $reason") {
+    constructor(fromType: KClass<*>, toType: KClass<*>, objectIdentifier: String, reason: String) :
+            this(fromType.simpleName ?: fromType.toString(), toType.simpleName ?: toType.toString(), objectIdentifier, reason)
+}
