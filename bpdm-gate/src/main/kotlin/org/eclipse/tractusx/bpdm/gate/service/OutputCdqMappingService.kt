@@ -8,6 +8,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
@@ -84,7 +85,12 @@ class OutputCdqMappingService(
 
     private fun toDto(thoroughfareCdq: ThoroughfareCdq): ThoroughfareResponse {
         return ThoroughfareResponse(
-            value = thoroughfareCdq.value,
+            value = thoroughfareCdq.value ?: throw BpdmMappingException(
+                ThoroughfareCdq::class,
+                ThoroughfareResponse::class,
+                "Unknown",
+                "Field ${ThoroughfareCdq::value.name} is null"
+            ),
             name = thoroughfareCdq.name,
             shortName = thoroughfareCdq.shortName,
             number = thoroughfareCdq.number,

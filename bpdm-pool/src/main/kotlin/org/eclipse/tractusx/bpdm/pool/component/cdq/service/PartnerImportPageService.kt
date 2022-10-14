@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportResponsePage
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.Pageable
@@ -43,8 +42,7 @@ class PartnerImportPageService(
     cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: CdqToRequestMapper,
-    private val businessPartnerBuildService: BusinessPartnerBuildService,
-    private val bpnConfigProperties: BpnConfigProperties
+    private val businessPartnerBuildService: BusinessPartnerBuildService
 ) {
     private val cdqIdentifierType = TypeKeyNameUrlCdq(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
     private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
@@ -76,7 +74,9 @@ class PartnerImportPageService(
 
         addNewMetadata(partnerCollection.values)
 
-        val partnersToUpsert = partnerCollection.values.map {
+        val validPartners = partnerCollection.values.filter { isValid(it) }
+
+        val partnersToUpsert = validPartners.map {
             it.copy(
                 identifiers = it.identifiers.plus(
                     IdentifierCdq(
@@ -144,6 +144,15 @@ class PartnerImportPageService(
 
     private fun toModifiedAfterFormat(dateTime: Instant): String {
         return DateTimeFormatter.ISO_INSTANT.format(dateTime)
+    }
+
+    private fun isValid(partner: BusinessPartnerCdq): Boolean {
+        if (partner.addresses.any { address -> address.thoroughfares.any { thoroughfare -> thoroughfare.value == null } }) {
+            logger.warn { "CDQ Partner with id ${partner.id} is invalid: Contains thoroughfare without ${ThoroughfareCdq::value.name} field specified." }
+            return false
+        }
+
+        return true
     }
 
 
