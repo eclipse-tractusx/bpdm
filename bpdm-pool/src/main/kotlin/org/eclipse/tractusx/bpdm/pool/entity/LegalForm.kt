@@ -40,7 +40,7 @@ class LegalForm(
         inverseJoinColumns = [JoinColumn(name = "category_id")],
         indexes = [Index(columnList = "form_id"), Index(columnList = "category_id")]
     )
-    val categories: Set<LegalFormCategory>,
+    val categories: MutableSet<LegalFormCategory>,
     @Column(name = "technical_key", nullable = false)
     val technicalKey: String
 ) : BaseEntity()
