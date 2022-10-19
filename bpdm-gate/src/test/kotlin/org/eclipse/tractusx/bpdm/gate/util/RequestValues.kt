@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
@@ -198,7 +197,6 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey1,
         status = businessStatus1,
         profileClassifications = listOf(classification1, classification2),
-        types = listOf(BusinessPartnerType.LEGAL_ENTITY),
         bankAccounts = listOf(bankAccount1, bankAccount2),
         legalAddress = address1
     )
@@ -209,7 +207,6 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey2,
         status = businessStatus2,
         profileClassifications = listOf(classification3, classification4),
-        types = listOf(BusinessPartnerType.LEGAL_ENTITY),
         bankAccounts = listOf(bankAccount3, bankAccount4),
         legalAddress = address2
     )
