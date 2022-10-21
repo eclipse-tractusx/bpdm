@@ -44,6 +44,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "bpdm.applicationSecret.name" . }}
                   key: cdq-key
+            - name: BPDM_KEYCLOAK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bpdm.applicationSecret.name" . }}
+                  key: keycloak-secret
           ports:
             - name: http
               containerPort: 8080

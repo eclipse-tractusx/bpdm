@@ -17,6 +17,7 @@ ingress:
 
 applicationSecret:
   cdq: <path:bpdm/data/int/gate/cdq#api-key>
+  keycloak: <path:bpdm/data/int/gate/keycloak#client-secret>
 
 applicationConfig: |
   # oauth2 client configuration
