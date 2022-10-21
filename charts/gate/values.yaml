@@ -100,6 +100,7 @@ readinessProbe:
 applicationSecret:
   enabled: true
   cdq: <path:bpdm/data/dev/gate/cdq#api-key>
+  keycloak: <path:bpdm/data/dev/gate/keycloak#client-secret>
 
 applicationConfig: |
   # oauth2 client configuration
