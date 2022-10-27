@@ -35,7 +35,6 @@ class BpdmSecurityConfigurerAdapterImpl : BpdmSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
             .antMatchers("/v3/api-docs/**").permitAll()
             .antMatchers("/api/swagger-ui/**").permitAll()
-            .antMatchers(HttpMethod.GET, "/api/**").authenticated()
-            .antMatchers("/api/**").hasRole("update_company_data")
+            .antMatchers("/api/**").authenticated()
     }
 }
