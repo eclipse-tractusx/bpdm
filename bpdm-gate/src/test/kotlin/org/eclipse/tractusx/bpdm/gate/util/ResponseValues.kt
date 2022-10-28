@@ -397,9 +397,9 @@ object ResponseValues {
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
     val addressType1 = TypeKeyNameUrlDto(
-        technicalKey = AddressType.LEGAL,
-        name = AddressType.LEGAL.getTypeName(),
-        url = AddressType.LEGAL.getUrl()
+        technicalKey = AddressType.HEADQUARTER,
+        name = AddressType.HEADQUARTER.getTypeName(),
+        url = AddressType.HEADQUARTER.getUrl()
     )
 
     val address1 = AddressResponse(

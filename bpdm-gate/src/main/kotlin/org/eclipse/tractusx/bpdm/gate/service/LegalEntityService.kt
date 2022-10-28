@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
@@ -162,11 +161,16 @@ class LegalEntityService(
     }
 
     private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
-        if (!partner.addresses.any { address -> address.types.any { type -> type.technicalKey == AddressType.LEGAL.name } }) {
-            logger.warn { "CDQ business partner for legal entity with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId} does not have a legal address" }
+        val logMessageStart =
+            "CDQ business partner for legal entity with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
+
+        if (partner.addresses.size > 1) {
+            logger.warn { "$logMessageStart has multiple legal addresses" }
+        }
+        if (partner.addresses.isEmpty()) {
+            logger.warn { "$logMessageStart does not have a legal address" }
             return false
         }
-
         return true
     }
 }

@@ -172,7 +172,7 @@ object RequestValues {
         listOf(premise1),
         listOf(postalDeliveryPoint1),
         geoCoordinate1,
-        listOf(AddressType.LEGAL)
+        listOf(AddressType.HEADQUARTER)
     )
 
     val address2 = AddressDto(
@@ -187,7 +187,7 @@ object RequestValues {
         listOf(premise2),
         listOf(postalDeliveryPoint2),
         geoCoordinate2,
-        listOf(AddressType.LEGAL)
+        listOf(AddressType.HEADQUARTER)
     )
 
 

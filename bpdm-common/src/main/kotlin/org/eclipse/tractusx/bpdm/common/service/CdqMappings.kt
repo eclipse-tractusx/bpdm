@@ -88,14 +88,14 @@ object CdqMappings {
             profileClassifications = toDto(profile),
             types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
             bankAccounts = bankAccounts.map { toDto(it) },
-            legalAddress = toDto(addresses.single())
+            legalAddress = toDto(addresses.first())
         )
     }
 
     fun BusinessPartnerCdq.toSiteDto(): SiteDto {
         return SiteDto(
-            name = names.single().value,
-            mainAddress = toDto(addresses.single())
+            name = names.first().value,
+            mainAddress = toDto(addresses.first())
         )
     }
 

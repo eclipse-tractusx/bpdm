@@ -23,7 +23,6 @@ enum class AddressType(private val typeName: String, private val url: String) : 
     BRANCH_OFFICE("Branch Office", ""),
     CARE_OF("Care of (c/o) Address", ""),
     HEADQUARTER("Headquarter", ""),
-    LEGAL("Legal", ""),
     LEGAL_ALTERNATIVE("Legal Alternative", ""),
     PO_BOX("Post Office Box", ""),
     REGISTERED("Registered", ""),
