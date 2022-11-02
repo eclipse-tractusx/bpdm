@@ -28,7 +28,7 @@ class OutputCdqMappingService(
             bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             externalId = businessPartner.externalId!!,
             legalEntity = toDto(businessPartner),
-            legalAddress = toDto(businessPartner.addresses.single())
+            legalAddress = toDto(businessPartner.addresses.first())
         )
     }
 

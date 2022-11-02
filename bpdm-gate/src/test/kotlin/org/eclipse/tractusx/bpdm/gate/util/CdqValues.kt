@@ -304,7 +304,7 @@ object CdqValues {
     val context1 = WrappedValueCdq(CommonValues.context1)
     val context2 = WrappedValueCdq(CommonValues.context2)
 
-    val addressType1 = TypeKeyNameUrlCdq(technicalKey = AddressType.LEGAL.name)
+    val addressType1 = TypeKeyNameUrlCdq(technicalKey = AddressType.HEADQUARTER.name)
 
     val adminAreaType1 = TypeKeyNameUrlCdq(CommonValues.adminAreaType1.name)
     val adminAreaType2 = TypeKeyNameUrlCdq(CommonValues.adminAreaType2.name)

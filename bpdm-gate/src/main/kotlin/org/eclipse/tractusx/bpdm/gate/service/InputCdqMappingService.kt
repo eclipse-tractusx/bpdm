@@ -49,7 +49,7 @@ class InputCdqMappingService(
     fun toInputAddress(businessPartner: BusinessPartnerCdq): AddressGateInput {
         return AddressGateInput(
             bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
-            address = toDto(businessPartner.addresses.single()),
+            address = toDto(businessPartner.addresses.first()),
             externalId = businessPartner.externalId!!,
             legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations),
             siteExternalId = toParentSiteExternalId(businessPartner.relations)
