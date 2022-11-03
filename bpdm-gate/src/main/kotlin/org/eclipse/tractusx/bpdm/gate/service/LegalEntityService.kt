@@ -137,15 +137,6 @@ class LegalEntityService(
         )
     }
 
-    fun getLegalEntityByExternalIdOutput(externalId: String): LegalEntityGateOutput {
-        val response = cdqClient.getAugmentedBusinessPartner(externalId)
-
-        if (response.augmentedBusinessPartner == null) {
-            throw BpdmNotFoundException("Legal Entity", externalId)
-        }
-        return toValidLegalEntityOutput(response.augmentedBusinessPartner!!)
-    }
-
     private fun toValidLegalEntityOutput(partner: BusinessPartnerCdq): LegalEntityGateOutput {
         if (!validateBusinessPartner(partner)) {
             throw CdqInvalidRecordException(partner.id)
@@ -171,6 +162,12 @@ class LegalEntityService(
             logger.warn { "$logMessageStart does not have a legal address" }
             return false
         }
+
+        if (partner.addresses.first().thoroughfares.any { it.value == null }) {
+            logger.warn { "$logMessageStart has legal address with empty thoroughfare values" }
+            return false
+        }
+
         return true
     }
 }
