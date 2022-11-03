@@ -5,8 +5,16 @@ metadata:
   labels:
      {{- include "bpdm.labels" . | nindent 4 }}
 data:
-  external.properties: |-
+  dependency.yml: |-
+    # Configures the application to connect to dependent services
+    # These properties may be overwritten in the external.yml which is loaded afterwards
+    bpdm:
+        datasource:
+                host: {{ include "bpdm.postgresDependency" . }}
+        opensearch:
+                host: {{ include "bpdm.opensearchDependency" . }}
+  external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}
-    {{- .Values.applicationConfig | nindent 4 }}
+    {{- .Values.applicationConfig | toYaml | nindent 4 }}
     {{- end }}

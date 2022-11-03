@@ -16,28 +16,28 @@ ingress:
       hosts:
         - partners-pool-pen.dev.demo.catena-x.net
 
-applicationSecret:
-  enabled: true
-  keycloak: <path:bpdm/data/pen-dev/pool/keycloak#credentials-secret>
-  cdq: "xxxxx"
+applicationConfig:
+  bpdm:
+    security:
+      enabled: true
+    opensearch:
+      enabled: true
+      export-scheduler-cron-expr: 0 30 * * * *
+  keycloak:
+    enabled: true
+    auth-server-url: https://centralidp-pen.dev.demo.catena-x.net/auth
+    realm: CX-Central
+    resource: Cl7-CX-BPDM
+  springdoc:
+    swagger-ui:
+      oauth:
+        client-id: Cl2-CX-Portal
 
-applicationConfig: |
-  # auth properties
-  bpdm.security.enabled=true
-  keycloak.enabled=true
-  keycloak.auth-server-url=https://centralidp-pen.dev.demo.catena-x.net/auth
-  keycloak.realm=CX-Central
-  keycloak.resource=Cl7-CX-BPDM
-  #Springdoc configuration
-  springdoc.swagger-ui.oauth.client-id=Cl2-CX-Portal
-  # opensearch properties
-  bpdm.opensearch.enabled=true
-  bpdm.opensearch.host=${BPDM_OPENSEARCH_HOST}
-  # every hour at minute 30
-  bpdm.opensearch.export-scheduler-cron-expr=0 30 * * * *
-  # persist properties
-  bpdm.datasource.host=${BPDM_DB_HOST}
-  spring.datasource.password=${BPDM_DB_PASS}
+applicationSecrets:
+  spring:
+    datasource:
+      password: <path:bpdm/data/pen-dev/pool/postgresql#password>
+
 
 postgres:
   auth:

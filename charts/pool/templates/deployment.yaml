@@ -35,31 +35,8 @@ spec:
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
-              value: /etc/conf/external.properties
-            - name: BPDM_DB_HOST
-              value: {{ include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
-            - name: BPDM_OPENSEARCH_HOST
-              value: {{ include "includeWithOpensearchContext" (list $ "opensearch.masterService") }}
-            - name: BPDM_KEYCLOAK_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "bpdm.applicationSecret.name" . }}
-                  key: keycloak-secret
-            - name: BPDM_CDQ_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "bpdm.applicationSecret.name" . }}
-                  key: cdq-key
-            - name: BPDM_DB_USER
-              value: {{ .Values.postgres.auth.username }}
-            - name: BPDM_DB_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "includeWithPostgresContext" (list $ "postgresql.secretName") }}
-                  key: password
+              value: "optional:/etc/conf/dependency.yml,optional:/etc/conf/external.yml,optional:/etc/conf/secrets.yml"
           ports:
             - name: http
               containerPort: 8080
@@ -106,5 +83,9 @@ spec:
       {{- end }}
       volumes:
         - name: config
-          configMap:
-            name: {{ include "bpdm.fullname" . }}
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "bpdm.fullname" . }}
+              - secret:
+                  name: {{ include "bpdm.fullname" . }}

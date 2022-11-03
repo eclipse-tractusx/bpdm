@@ -58,6 +58,13 @@ Create name of application secret
 {{- end }}
 
 {{/*
+Determine postgres service/host name to connect to
+*/}}
+{{- define "bpdm.postgresDependency" -}}
+        {{- include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
+{{- end }}}
+
+{{/*
 Invoke include on given definition with postgresql dependency context
 Usage: include "includeWithPostgresContext" (list $ "your_include_function_here")
 */}}
@@ -66,6 +73,13 @@ Usage: include "includeWithPostgresContext" (list $ "your_include_function_here"
 {{- $function := index . 1 }}
 {{- include $function (dict "Values" $.Values.postgres "Chart" (dict "Name" "postgres") "Release" $.Release) }}
 {{- end }}
+
+{{/*
+Determine opensearch service/host name to connect to
+*/}}
+{{- define "bpdm.opensearchDependency" -}}
+     {{- include "includeWithOpensearchContext" (list $ "opensearch.masterService") }}
+{{- end }}}
 
 {{/*
 Invoke include on given definition with opensearch dependency context

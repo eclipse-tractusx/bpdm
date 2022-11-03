@@ -84,13 +84,19 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
-applicationSecret:
-  enabled: false
-  keycloak:
-  cdq:
+# Use this to overwrite the default property values of the application configuration
+applicationConfig:
+#  bpdm:
+#    datasource:
+#      host: ...
 
-applicationConfig: # |
-# property=value
+
+# Use this to overwrite the secret property values of the application configuration
+applicationSecrets:
+  spring:
+    datasource:
+      # overwrite for security reasons
+      password: bpdm
 
 opensearch:
   enabled: true
@@ -136,6 +142,8 @@ postgres:
   enabled: true
   auth:
     database: bpdm
-    postgresPassword:
+    # overwrite for security reasons
+    postgresPassword: bpdm
     username: bpdm
-    password:
+    # overwrite for security reasons
+    password: bpdm
