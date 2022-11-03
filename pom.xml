@@ -33,7 +33,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.5</version>
     </parent>
     <modules>
         <module>bpdm-pool</module>
@@ -53,7 +53,7 @@
         <wiremock.version>2.34.0</wiremock.version>
         <springmockk.version>3.1.1</springmockk.version>
         <assertj.version>3.23.1</assertj.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
+        <spring-boot.version>2.7.5</spring-boot.version>
         <sonar.organization>catenax</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectKey>bptm</sonar.projectKey>

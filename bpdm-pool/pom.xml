@@ -126,7 +126,7 @@
             <artifactId>opensearch-java</artifactId>
             <version>${opensearch-java.version}</version>
         </dependency>
-        <!-- Needed for opensearch, since org.springframework.boot:spring-boot-dependencies:2.7.0 defines jakarta.json:jakarta.json-api:1.1.6. -->
+        <!-- Needed for opensearch, since org.springframework.boot:spring-boot-dependencies:2.7.5 defines jakarta.json:jakarta.json-api:1.1.6. -->
         <!-- This has javax.json packages instead of jakarta.json. -->
         <!-- see https://www.elastic.co/guide/en/elasticsearch/client/java-api-client/current/installation.html#class-not-found-jsonprovider -->
         <dependency>
