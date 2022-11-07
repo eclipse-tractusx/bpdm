@@ -1,0 +1,34 @@
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: portal-gate.dev.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - portal-gate.dev.demo.catena-x.net
+
+applicationSecret:
+  enabled: true
+  cdq: <path:bpdm/data/dev/portal-gate/cdq#api-key>
+  keycloak: <path:bpdm/data/dev/portal-gate/keycloak#client-secret>
+
+
+applicationConfig: |
+  bpdm.cdq.storage=b3c0ad440d67350ba6f89a031375ec6b
+  bpdm.cdq.datasource-legal-entity=62ce5d4c9f1e1e3886fdd720
+  keycloak.resource=Cl16-CX-BPDMGate-Portal
+  # oauth2 client configuration
+  spring.security.oauth2.client.registration.gate-client.client-id=Cl16-CX-BPDMGate-Portal
+  spring.security.oauth2.client.registration.gate-client.client-secret=<path:bpdm/data/dev/portal-gate/keycloak#client-secret>
+  spring.security.oauth2.client.registration.gate-client.authorization-grant-type=client_credentials
+  spring.security.oauth2.client.registration.gate-client.provider=catena-keycloak-provider
+  spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.dev.demo.catena-x.net/auth/realms/CX-Central
+  # Connection to pool
+  bpdm.pool.base-url=http://pool-bpdm:8080/api/catena
+  
