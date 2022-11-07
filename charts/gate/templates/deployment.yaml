@@ -35,20 +35,8 @@ spec:
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
-              value: /etc/conf/external.properties
-            - name: BPDM_CDQ_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "bpdm.applicationSecret.name" . }}
-                  key: cdq-key
-            - name: BPDM_KEYCLOAK_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "bpdm.applicationSecret.name" . }}
-                  key: keycloak-secret
+              value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
           ports:
             - name: http
               containerPort: 8080
@@ -95,5 +83,9 @@ spec:
       {{- end }}
       volumes:
         - name: config
-          configMap:
-            name: {{ include "bpdm.fullname" . }}
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "bpdm.fullname" . }}
+              - secret:
+                  name: {{ include "bpdm.fullname" . }}
