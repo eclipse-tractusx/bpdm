@@ -39,7 +39,7 @@ applicationConfig:
       export-scheduler-cron-expr: 0 30 * * * *
   keycloak:
     enabled: true
-    auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
+    auth-server-url: https://centralidp.int.demo.catena-x.net/auth
     realm: CX-Central
     resource: Cl7-CX-BPDM
   springdoc:
