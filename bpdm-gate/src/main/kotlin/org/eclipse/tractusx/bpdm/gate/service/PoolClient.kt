@@ -36,6 +36,8 @@ class PoolClient(
     private val objectMapper: ObjectMapper
 ) {
     fun searchLegalEntities(bpnLs: Collection<String>): Collection<LegalEntityPartnerResponse> {
+        if (bpnLs.isEmpty()) return emptyList()
+
         val legalEntities = try {
             webClient
                 .post()
@@ -51,6 +53,8 @@ class PoolClient(
     }
 
     fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressSearchResponse> {
+        if (bpnLs.isEmpty()) return emptyList()
+
         val legalAddresses = try {
             webClient
                 .post()
@@ -66,6 +70,8 @@ class PoolClient(
     }
 
     fun searchSites(bpnSs: Collection<String>): Collection<SitePartnerSearchResponse> {
+        if (bpnSs.isEmpty()) return emptyList()
+
         val sites = try {
             webClient
                 .post()
@@ -81,6 +87,8 @@ class PoolClient(
     }
 
     fun searchMainAddresses(bpnSs: Collection<String>): Collection<MainAddressSearchResponse> {
+        if (bpnSs.isEmpty()) return emptyList()
+
         val mainAddresses = try {
             webClient
                 .post()
@@ -96,6 +104,8 @@ class PoolClient(
     }
 
     fun searchAddresses(bpnAs: Collection<String>): Collection<AddressPartnerSearchResponse> {
+        if (bpnAs.isEmpty()) return emptyList()
+
         val addresses = try {
             webClient
                 .post()
