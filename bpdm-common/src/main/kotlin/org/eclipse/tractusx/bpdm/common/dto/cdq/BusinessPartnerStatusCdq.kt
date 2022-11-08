@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.cdq
 import java.time.LocalDateTime
 
 data class BusinessPartnerStatusCdq(
-    val type: TypeKeyNameUrlCdq,
+    val type: TypeKeyNameUrlCdq?,
     val officialDenotation: String? = null,
     val validFrom: LocalDateTime? = null,
     val validUntil: LocalDateTime? = null,

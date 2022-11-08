@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class PostCodeCdq(
-    val value: String,
+    val value: String? = null,
     val type: TypeKeyNameUrlCdq? = null
 )

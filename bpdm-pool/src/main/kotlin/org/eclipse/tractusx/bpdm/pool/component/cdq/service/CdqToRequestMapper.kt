@@ -59,7 +59,7 @@ class CdqToRequestMapper {
 
     fun toRequest(legalForm: LegalFormCdq, partner: BusinessPartnerCdq): LegalFormRequest {
         return LegalFormRequest(
-            legalForm.technicalKey,
+            legalForm.technicalKey!!,
             legalForm.name,
             legalForm.url,
             legalForm.mainAbbreviation,

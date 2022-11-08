@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class AdministrativeAreaCdq(
-    val value: String,
+    val value: String? = null,
     val shortName: String? = null,
     val type: TypeKeyNameUrlCdq? = null,
     val language: LanguageCdq? = null

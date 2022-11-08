@@ -25,6 +25,7 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
@@ -88,7 +89,7 @@ object CdqMappings {
             profileClassifications = toDto(profile),
             types = types.map { toTypeOrDefault<BusinessPartnerType>(it) }.toSet(),
             bankAccounts = bankAccounts.map { toDto(it) },
-            legalAddress = toDto(addresses.first())
+            legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )
     }
 
@@ -101,7 +102,7 @@ object CdqMappings {
 
     fun toDto(identifier: IdentifierCdq): IdentifierDto {
         return IdentifierDto(
-            identifier.value,
+            identifier.value ?: throw BpdmNullMappingException(IdentifierCdq::class, IdentifierDto::class, IdentifierCdq::value),
             toReference(identifier.type),
             toOptionalReference(identifier.issuingBody),
             toOptionalReference(identifier.status)
@@ -168,7 +169,7 @@ object CdqMappings {
 
     fun toDto(area: AdministrativeAreaCdq): AdministrativeAreaDto {
         return AdministrativeAreaDto(
-            area.value,
+            area.value ?: throw BpdmNullMappingException(area::class, AdministrativeAreaDto::class, area::value),
             area.shortName,
             null,
             toTypeOrDefault(area.type)
@@ -176,21 +177,23 @@ object CdqMappings {
     }
 
     fun toDto(postcode: PostCodeCdq): PostCodeDto {
-        return PostCodeDto(postcode.value, toTypeOrDefault(postcode.type))
+        return PostCodeDto(
+            postcode.value ?: throw BpdmNullMappingException(postcode::class, PostCodeDto::class, postcode::value),
+            toTypeOrDefault(postcode.type)
+        )
     }
 
     fun toDto(locality: LocalityCdq): LocalityDto {
-        return LocalityDto(locality.value, locality.shortName, toTypeOrDefault(locality.type))
+        return LocalityDto(
+            locality.value ?: throw BpdmNullMappingException(locality::class, LocalityDto::class, locality::value),
+            locality.shortName,
+            toTypeOrDefault(locality.type)
+        )
     }
 
     fun toDto(thoroughfare: ThoroughfareCdq): ThoroughfareDto {
         return ThoroughfareDto(
-            thoroughfare.value ?: throw BpdmMappingException(
-                ThoroughfareCdq::class,
-                ThoroughfareDto::class,
-                "Unknown",
-                "Field ${thoroughfare::value.name} is null"
-            ),
+            thoroughfare.value ?: throw BpdmNullMappingException(thoroughfare::class, ThoroughfareDto::class, thoroughfare::value),
             thoroughfare.name,
             thoroughfare.shortName,
             thoroughfare.number,
@@ -201,7 +204,7 @@ object CdqMappings {
 
     fun toDto(premise: PremiseCdq): PremiseDto {
         return PremiseDto(
-            premise.value,
+            premise.value ?: throw BpdmNullMappingException(premise::class, PremiseDto::class, premise::value),
             premise.shortName,
             premise.number,
             toTypeOrDefault(premise.type)
@@ -210,7 +213,7 @@ object CdqMappings {
 
     fun toDto(deliveryPoint: PostalDeliveryPointCdq): PostalDeliveryPointDto {
         return PostalDeliveryPointDto(
-            deliveryPoint.value,
+            deliveryPoint.value ?: throw BpdmNullMappingException(deliveryPoint::class, PostalDeliveryPointDto::class, deliveryPoint::value),
             deliveryPoint.shortName,
             deliveryPoint.number,
             toTypeOrDefault(deliveryPoint.type)
