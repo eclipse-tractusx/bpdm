@@ -1,5 +1,5 @@
 image:
-  tag: "main"
+  tag: "dev"
 
 ingress:
   hosts:
