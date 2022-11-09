@@ -24,7 +24,7 @@ import java.time.LocalDateTime
 data class RelationCdq(
     val startedAt: LocalDateTime? = null,
     val endedAt: LocalDateTime? = null,
-    val type: TypeKeyNameCdq,
+    val type: TypeKeyNameCdq? = null,
     val relationClass: TypeKeyNameCdq? = null,
     val startNode: String,
     val startNodeDataSource: String,

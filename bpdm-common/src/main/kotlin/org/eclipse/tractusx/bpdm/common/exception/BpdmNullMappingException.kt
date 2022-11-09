@@ -17,11 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.cdq
+package org.eclipse.tractusx.bpdm.common.exception
 
-data class PhoneNumberCdq(
-    val countryPrefix: String? = null,
-    val number: String? = null,
-    val type: TypeKeyNameUrlCdq? = null,
-    val value: String? = null
-)
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
+
+class BpdmNullMappingException(
+    fromType: KClass<*>,
+    toType: KClass<*>,
+    nullField: KProperty<*>,
+    objectIdentifier: String = "Unknown"
+) : BpdmMappingException(fromType, toType, "${nullField.name} is null.", objectIdentifier)

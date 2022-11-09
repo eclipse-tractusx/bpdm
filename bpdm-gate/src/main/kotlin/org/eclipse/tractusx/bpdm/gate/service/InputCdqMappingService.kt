@@ -75,13 +75,13 @@ class InputCdqMappingService(
 
     fun toParentLegalEntityExternalIds(relations: Collection<RelationCdq>): Collection<String> {
         return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceLegalEntity }
-            .filter { it.type.technicalKey == "PARENT" }
+            .filter { it.type?.technicalKey == "PARENT" }
             .map { it.startNode }
     }
 
     fun toParentSiteExternalIds(relations: Collection<RelationCdq>): Collection<String> {
         return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceSite }
-            .filter { it.type.technicalKey == "PARENT" }
+            .filter { it.type?.technicalKey == "PARENT" }
             .map { it.startNode }
     }
 }

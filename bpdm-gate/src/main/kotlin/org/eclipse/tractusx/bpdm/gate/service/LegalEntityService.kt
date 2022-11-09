@@ -24,12 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
 import org.eclipse.tractusx.bpdm.gate.filterNotNullValues
 import org.springframework.stereotype.Service
@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service
 class LegalEntityService(
     private val cdqRequestMappingService: CdqRequestMappingService,
     private val inputCdqMappingService: InputCdqMappingService,
-    private val outputCdqMappingService: OutputCdqMappingService,
     private val cdqClient: CdqClient,
     private val poolClient: PoolClient
 ) {
@@ -54,7 +53,7 @@ class LegalEntityService(
         val fetchResponse = cdqClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return toValidLegalEntityInput(fetchResponse.businessPartner!!)
+            FetchResponse.Status.OK -> return inputCdqMappingService.toInputLegalEntity(fetchResponse.businessPartner!!)
             FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
         }
     }
@@ -62,12 +61,12 @@ class LegalEntityService(
     fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInput> {
         val partnerCollection = cdqClient.getLegalEntities(limit, startAfter)
 
-        val validEntries = partnerCollection.values.filter { validateBusinessPartner(it) }
+        val validEntries = toValidLegalEntities(partnerCollection.values)
 
         return PageStartAfterResponse(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
-            content = validEntries.map { inputCdqMappingService.toInputLegalEntity(it) },
+            content = validEntries,
             invalidEntries = partnerCollection.values.size - validEntries.size
         )
     }
@@ -137,37 +136,21 @@ class LegalEntityService(
         )
     }
 
-    private fun toValidLegalEntityOutput(partner: BusinessPartnerCdq): LegalEntityGateOutput {
-        if (!validateBusinessPartner(partner)) {
-            throw CdqInvalidRecordException(partner.id)
-        }
-        return outputCdqMappingService.toOutput(partner)
-    }
+    private fun toValidLegalEntities(partners: Collection<BusinessPartnerCdq>): Collection<LegalEntityGateInput> {
+        return partners.mapNotNull {
+            val logMessageStart =
+                "CDQ business partner for legal entity with ID ${it.id ?: "Unknown"}"
 
-    private fun toValidLegalEntityInput(partner: BusinessPartnerCdq): LegalEntityGateInput {
-        if (!validateBusinessPartner(partner)) {
-            throw CdqInvalidRecordException(partner.id)
-        }
-        return inputCdqMappingService.toInputLegalEntity(partner)
-    }
+            try {
+                if (it.addresses.size > 1) {
+                    logger.warn { "$logMessageStart has multiple legal addresses." }
+                }
 
-    private fun validateBusinessPartner(partner: BusinessPartnerCdq): Boolean {
-        val logMessageStart =
-            "CDQ business partner for legal entity with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
-
-        if (partner.addresses.size > 1) {
-            logger.warn { "$logMessageStart has multiple legal addresses" }
+                inputCdqMappingService.toInputLegalEntity(it)
+            } catch (e: BpdmMappingException) {
+                logger.warn { "$logMessageStart will be ignored: ${e.message}" }
+                null
+            }
         }
-        if (partner.addresses.isEmpty()) {
-            logger.warn { "$logMessageStart does not have a legal address" }
-            return false
-        }
-
-        if (partner.addresses.first().thoroughfares.any { it.value == null }) {
-            logger.warn { "$logMessageStart has legal address with empty thoroughfare values" }
-            return false
-        }
-
-        return true
     }
 }

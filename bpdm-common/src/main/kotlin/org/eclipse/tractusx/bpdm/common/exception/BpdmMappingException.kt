@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import kotlin.reflect.KClass
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-class BpdmMappingException(
+open class BpdmMappingException(
     fromType: String,
     toType: String,
-    objectIdentifier: String,
-    reason: String
+    reason: String,
+    objectIdentifier: String = "Unknown"
 ) : RuntimeException("Exception mapping object '$objectIdentifier' from type $fromType to $toType: $reason") {
-    constructor(fromType: KClass<*>, toType: KClass<*>, objectIdentifier: String, reason: String) :
-            this(fromType.simpleName ?: fromType.toString(), toType.simpleName ?: toType.toString(), objectIdentifier, reason)
+    constructor(fromType: KClass<*>, toType: KClass<*>, reason: String, objectIdentifier: String = "Unknown") :
+            this(fromType.simpleName ?: fromType.toString(), toType.simpleName ?: toType.toString(), reason, objectIdentifier)
 }

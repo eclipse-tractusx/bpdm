@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class AddressCdq(
-    val id: String = "0",
+    val id: String? = "0",
     val externalId: String? = null,
     val cdqId: String? = null,
     val version: AddressVersionCdq? = null,

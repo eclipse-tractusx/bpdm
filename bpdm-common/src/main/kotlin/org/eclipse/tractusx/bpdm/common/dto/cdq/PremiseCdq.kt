@@ -23,6 +23,6 @@ data class PremiseCdq(
     val type: TypeKeyNameUrlCdq? = null,
     val shortName: String? = null,
     val number: String? = null,
-    val value: String,
+    val value: String? = null,
     val language: LanguageCdq? = null
 )

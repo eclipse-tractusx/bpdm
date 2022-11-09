@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.cdq
 
 data class WebsiteCdq(
-    val url: String,
-    val type: TypeKeyNameUrlCdq?
+    val url: String? = null,
+    val type: TypeKeyNameUrlCdq? = null
 )
