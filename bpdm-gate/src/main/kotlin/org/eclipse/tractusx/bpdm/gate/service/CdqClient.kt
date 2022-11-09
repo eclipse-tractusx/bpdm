@@ -37,6 +37,8 @@ private const val DELETE_RELATIONS_PATH = "$RELATIONS_PATH/delete"
 
 private const val RELATION_TYPE_KEY = "PARENT"
 
+private const val LOOKUP_PATH = "/businesspartners/lookup"
+
 @Service
 class CdqClient(
     @Qualifier("cdqClient")
@@ -172,6 +174,20 @@ class CdqClient(
 
     fun getAddresses(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceAddress, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
+
+    fun lookUpReferenceData(lookupRequest: ReferenceDataLookupRequestCdq): ReferenceDataLookupResponseCdq {
+        return try {
+            webClient
+                .post()
+                .uri(cdqConfigProperties.referenceDataApiUrl + LOOKUP_PATH)
+                .bodyValue(objectMapper.writeValueAsString(lookupRequest))
+                .retrieve()
+                .bodyToMono<ReferenceDataLookupResponseCdq>()
+                .block()!!
+        } catch (e: Throwable) {
+            throw CdqRequestException("Lookup reference data request failed.", e)
+        }
+    }
 
     private fun getBusinessPartners(
         limit: Int?,

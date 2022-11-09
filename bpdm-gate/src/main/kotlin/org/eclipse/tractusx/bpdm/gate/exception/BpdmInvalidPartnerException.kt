@@ -17,21 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@ConfigurationProperties(prefix = "bpdm.cdq")
-@ConstructorBinding
-class CdqConfigProperties(
-    val host: String = "https://api.cdq.com",
-    val storage: String = "38d2277e20c730b4b8e8f182adcef7ca",
-    val datasourceLegalEntity: String = "621338451197b7667a5fbda4",
-    val datasourceSite: String = "62c301de2b9abd437140b704",
-    val datasourceAddress: String = "62c30bdb84160a51f6bb227a",
-    val apiKey: String = "",
-    val dataExchangeApiUrl: String = "/data-exchange/rest/v4/storages/${storage}",
-    val referenceDataApiUrl: String = "referencedata/rest/v3",
-    val dataClinicApiUrl: String = "/data-clinic/rest/storages/${storage}"
-)
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmInvalidPartnerException(
+    partnerId: String,
+    reason: String
+) : RuntimeException("Partner with ID '$partnerId' is invalid: $reason") {
+}
