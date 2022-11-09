@@ -19,6 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
+import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogType
 
-data class ChangelogEntryDto(val bpn: String, val changelogType: ChangelogType)
+data class ChangelogEntryDto(
+    val bpn: String,
+    val changelogType: ChangelogType,
+    val changelogSubject: ChangelogSubject
+)

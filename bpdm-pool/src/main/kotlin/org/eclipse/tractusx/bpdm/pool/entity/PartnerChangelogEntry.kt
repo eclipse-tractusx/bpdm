@@ -28,10 +28,19 @@ class PartnerChangelogEntry(
     @Column(name = "changelog_type", nullable = false, updatable = false)
     val changelogType: ChangelogType,
     @Column(name = "bpn", nullable = false, updatable = false)
-    val bpn: String
+    val bpn: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "changelog_subject", nullable = false, updatable = false)
+    val changelogSubject: ChangelogSubject
 ) : BaseEntity()
 
 enum class ChangelogType() {
     CREATE,
     UPDATE
+}
+
+enum class ChangelogSubject {
+    LEGAL_ENTITY,
+    ADDRESS,
+    SITE
 }

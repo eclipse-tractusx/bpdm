@@ -75,6 +75,6 @@ class PartnerChangelogService(
     }
 
     private fun ChangelogEntryDto.toEntity(): PartnerChangelogEntry {
-        return PartnerChangelogEntry(this.changelogType, this.bpn)
+        return PartnerChangelogEntry(this.changelogType, this.bpn, this.changelogSubject)
     }
 }
