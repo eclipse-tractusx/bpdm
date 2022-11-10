@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/catena/business-partner")
+@RequestMapping("/api/catena/business-partners")
 class BusinessPartnerController(
     private val typeMatchingService: TypeMatchingService
 ) {
