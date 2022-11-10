@@ -52,7 +52,7 @@ class TypeMatchingService(
             TypeMatchResponse(bestOverall, LsaType.LegalEntity)
         else
 
-            TypeMatchResponse(1.0f, LsaType.None)
+            TypeMatchResponse(1f - bestOverall, LsaType.None)
 
     }
 
