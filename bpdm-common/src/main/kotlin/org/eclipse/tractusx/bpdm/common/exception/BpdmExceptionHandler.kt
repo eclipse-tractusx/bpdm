@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.common.exception
 import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.context.request.WebRequest
@@ -30,8 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import kotlin.reflect.full.findAnnotations
 
 
-@ControllerAdvice
-class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
+open class BpdmExceptionHandler : ResponseEntityExceptionHandler() {
 
     private val kotlinLogger = KotlinLogging.logger { }
 
@@ -39,8 +37,12 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
     protected fun logException(
         ex: Exception, request: WebRequest
     ): ResponseEntity<Any>? {
-        val annotations = ex::class.findAnnotations(ResponseStatus::class)
+        logException(ex)
+        return handleException(ex, request)
+    }
 
+    private fun logException(ex: Throwable) {
+        val annotations = ex::class.findAnnotations(ResponseStatus::class)
         if (annotations.isEmpty() || annotations.any { it.value == HttpStatus.INTERNAL_SERVER_ERROR }) {
             //Prints with stack trace
             kotlinLogger.error(ex) { "Caught internal server error" }
@@ -49,7 +51,6 @@ class RestResponseEntityExceptionHandler : ResponseEntityExceptionHandler() {
             logger.debug(ex)
         }
 
-        return handleException(ex, request)
     }
 
 }
