@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 
@@ -260,5 +261,14 @@ object RequestValues {
         address = address2,
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1
+    )
+
+    val candidate1 = BusinessPartnerCandidateDto(
+        identifiers = listOf(identifier1),
+        names = listOf(name1),
+        status = businessStatus1,
+        profileClassifications = listOf(classification1),
+        bankAccounts = listOf(bankAccount1),
+        address = address1
     )
 }
