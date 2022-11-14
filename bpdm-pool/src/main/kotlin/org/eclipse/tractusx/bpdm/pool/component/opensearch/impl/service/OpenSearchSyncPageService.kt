@@ -20,12 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocRepository
+import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -33,18 +34,35 @@ import java.time.Instant
 @Service
 class OpenSearchSyncPageService(
     val legalEntityRepository: LegalEntityRepository,
+    val addressPartnerRepository: AddressPartnerRepository,
     val businessPartnerDocRepository: BusinessPartnerDocRepository,
-    val documentMappingService: DocumentMappingService
+    val documentMappingService: DocumentMappingService,
+    val changelogService: PartnerChangelogService
 ) {
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun exportPartnersToOpenSearch(fromTime: Instant, pageRequest: PageRequest): Page<BusinessPartnerDoc> {
-        logger.debug { "Export page ${pageRequest.pageNumber}" }
-        val partnersToExport = legalEntityRepository.findByUpdatedAtAfter(fromTime, pageRequest)
-        logger.debug { "Exporting ${partnersToExport.size} records" }
-        val partnerDocs = partnersToExport.map { documentMappingService.toDocument(it) }.toList()
-        businessPartnerDocRepository.saveAll(partnerDocs)
-        return PageImpl(partnerDocs, partnersToExport.pageable, partnersToExport.totalElements)
+    fun exportPartnersToOpenSearch(fromTime: Instant, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
+        logger.debug { "Export page $pageIndex" }
+        val changelogEntriesPage =
+            changelogService.getChangelogEntriesCreatedAfter(fromTime, listOf(ChangelogSubject.LEGAL_ENTITY, ChangelogSubject.ADDRESS), pageIndex, pageSize)
+        val changelogEntriesBySubject = changelogEntriesPage.groupBy { it.changelogSubject }
+
+        val legalEntityBpns = changelogEntriesBySubject[ChangelogSubject.LEGAL_ENTITY]?.map { it.bpn }?.toSet()
+        if (!legalEntityBpns.isNullOrEmpty()) {
+            val legalEntitiesToExport = legalEntityRepository.findDistinctByBpnIn(legalEntityBpns)
+            logger.debug { "Exporting ${legalEntitiesToExport.size} legal entity records" }
+            val partnerDocs = legalEntitiesToExport.map { documentMappingService.toDocument(it) }.toList()
+            businessPartnerDocRepository.saveAll(partnerDocs)
+        }
+
+        val addressBpns = changelogEntriesBySubject[ChangelogSubject.ADDRESS]?.map { it.bpn }?.toSet()
+        if (!addressBpns.isNullOrEmpty()) {
+            val addressesToExport = addressPartnerRepository.findDistinctByBpnIn(addressBpns)
+            logger.debug { "Exporting ${addressesToExport.size} address records" }
+            // TODO: map to address doc and export to OpenSearch
+        }
+
+        return changelogEntriesPage
     }
 }
