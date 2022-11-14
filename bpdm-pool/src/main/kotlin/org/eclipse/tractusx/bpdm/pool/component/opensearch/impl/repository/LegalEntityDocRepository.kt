@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchException
 import org.opensearch.client.opensearch.OpenSearchClient
@@ -30,23 +30,23 @@ import org.opensearch.client.opensearch.core.BulkResponse
 import org.springframework.stereotype.Repository
 
 @Repository
-class BusinessPartnerDocRepository(
+class LegalEntityDocRepository(
     private val openSearchClient: OpenSearchClient,
     private val openSearchConfigProperties: OpenSearchConfigProperties
 ) {
-    fun saveAll(businessPartnerDocs: Collection<BusinessPartnerDoc>) {
-        if (businessPartnerDocs.isEmpty()) {
+    fun saveAll(legalEntityDocs: Collection<LegalEntityDoc>) {
+        if (legalEntityDocs.isEmpty()) {
             return
         }
 
         val builder: BulkRequest.Builder = BulkRequest.Builder()
 
-        for (businessPartnerDoc in businessPartnerDocs) {
+        for (legalEntityDoc in legalEntityDocs) {
             builder.operations { op ->
                 op.index { idx ->
                     idx.index(LEGAL_ENTITIES_INDEX_NAME)
-                        .id(businessPartnerDoc.bpn)
-                        .document(businessPartnerDoc)
+                        .id(legalEntityDoc.bpn)
+                        .document(legalEntityDoc)
                 }
             }
 

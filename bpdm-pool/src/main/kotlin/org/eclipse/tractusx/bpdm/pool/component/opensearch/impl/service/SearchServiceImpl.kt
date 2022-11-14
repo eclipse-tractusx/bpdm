@@ -25,7 +25,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
@@ -49,7 +49,7 @@ import kotlin.math.ceil
 @Service
 @Primary
 class SearchServiceImpl(
-    val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,
+    val legalEntityDocSearchRepository: LegalEntityDocSearchRepository,
     val legalEntityRepository: LegalEntityRepository,
     val textDocSearchRepository: TextDocSearchRepository,
     val businessPartnerFetchService: BusinessPartnerFetchService,
@@ -140,7 +140,7 @@ class SearchServiceImpl(
     ): PageResponse<Pair<Float, LegalEntity>> {
         logger.debug { "Search index for legal entities" }
 
-        val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(
+        val searchResult = legalEntityDocSearchRepository.findBySearchRequest(
             searchRequest,
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )

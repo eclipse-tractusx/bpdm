@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.opensearch.action.search.SearchRequest
@@ -32,18 +32,18 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 /**
- * Creates and executes OpenSearch queries for querying [BusinessPartnerDoc] entries
+ * Creates and executes OpenSearch queries for querying [LegalEntityDoc] entries
  */
 @Repository
-class BusinessPartnerDocSearchRepository(
+class LegalEntityDocSearchRepository(
     val restHighLevelClient: RestHighLevelClient,
     val bpdmQueryBuilder: BpdmOpenSearchQueryBuilder
 ) {
 
     /**
-     * Find [BusinessPartnerDoc] entries by [partnerSearchRequest] field query texts.
+     * Find [LegalEntityDoc] entries by [partnerSearchRequest] field query texts.
      *
-     * Query semantic:  For every non-null [partnerSearchRequest] field query text: the corresponding [BusinessPartnerDoc] field value needs to
+     * Query semantic:  For every non-null [partnerSearchRequest] field query text: the corresponding [LegalEntityDoc] field value needs to
      * either contain the whole query text exactly, or contain some words of it or has matching prefixes.
      *
      * Quality of the result is determined by the type of match: full phrase match > word match > prefix match.

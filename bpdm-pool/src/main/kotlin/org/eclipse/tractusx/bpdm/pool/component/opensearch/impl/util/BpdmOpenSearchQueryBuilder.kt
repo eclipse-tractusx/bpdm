@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util
 
 import org.apache.lucene.search.join.ScoreMode
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
@@ -40,10 +40,10 @@ import org.springframework.stereotype.Component
 class BpdmOpenSearchQueryBuilder {
 
     /**
-     * Returns an OpenSearch nested query object model for searching a [queryText] in the [BusinessPartnerDoc] [fieldName].
+     * Returns an OpenSearch nested query object model for searching a [queryText] in the [LegalEntityDoc] [fieldName].
      * In case [queryText] is not null it is matched by phrase, word or prefix with the [fieldName] values.
      * Otherwise, the query just returns possible values for [fieldName].
-     * [withHitInfo] the query result not only contains the hit [BusinessPartnerDoc] but also the exact [fieldName] values hit.
+     * [withHitInfo] the query result not only contains the hit [LegalEntityDoc] but also the exact [fieldName] values hit.
      */
     fun buildNestedQuery(fieldName: String, queryText: String?, withHitInfo: Boolean): NestedQueryBuilder {
         val innerQuery = if (queryText == null) QueryBuilders.matchAllQuery() else buildInnerShouldQuery(
@@ -60,7 +60,7 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
-     * Returns an OpenSearch boolean should query object model for searching a [queryText] in the [BusinessPartnerDoc] [fieldName].
+     * Returns an OpenSearch boolean should query object model for searching a [queryText] in the [LegalEntityDoc] [fieldName].
      * [queryText] is not null it is matched by phrase, word or prefix with the [fieldName] values.
      */
     fun buildInnerShouldQuery(fieldName: String, queryText: String): BoolQueryBuilder {
@@ -75,7 +75,7 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
-     * Converts a [searchRequest] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * Converts a [searchRequest] into pairs of [LegalEntityDoc] field name to query text for that field.
      * Fields with no query text are omitted.
      */
     fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
@@ -83,15 +83,15 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
-     * Converts a [bpSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * Converts a [bpSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
     fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
-            Pair(BusinessPartnerDoc::names.name, bpSearch.name),
-            Pair(BusinessPartnerDoc::legalForm.name, bpSearch.legalForm),
-            Pair(BusinessPartnerDoc::classifications.name, bpSearch.classification),
-            Pair(BusinessPartnerDoc::status.name, bpSearch.status)
+            Pair(LegalEntityDoc::names.name, bpSearch.name),
+            Pair(LegalEntityDoc::legalForm.name, bpSearch.legalForm),
+            Pair(LegalEntityDoc::classifications.name, bpSearch.classification),
+            Pair(LegalEntityDoc::status.name, bpSearch.status)
         )
 
         return bpParamPairs
@@ -100,23 +100,23 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
-     * Converts a [addressSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * Converts a [addressSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
     fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
+            Pair("${LegalEntityDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
             Pair(
-                "${BusinessPartnerDoc::addresses.name}.${AddressDoc::administrativeAreas.name}",
+                "${LegalEntityDoc::addresses.name}.${AddressDoc::administrativeAreas.name}",
                 addressSearch.administrativeArea
             ),
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::postCodes.name}", addressSearch.postCode),
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::premises.name}", addressSearch.premise),
+            Pair("${LegalEntityDoc::addresses.name}.${AddressDoc::postCodes.name}", addressSearch.postCode),
+            Pair("${LegalEntityDoc::addresses.name}.${AddressDoc::premises.name}", addressSearch.premise),
             Pair(
-                "${BusinessPartnerDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}",
+                "${LegalEntityDoc::addresses.name}.${AddressDoc::postalDeliveryPoints.name}",
                 addressSearch.postalDeliveryPoint
             ),
-            Pair("${BusinessPartnerDoc::addresses.name}.${AddressDoc::thoroughfares.name}", addressSearch.thoroughfare),
+            Pair("${LegalEntityDoc::addresses.name}.${AddressDoc::thoroughfares.name}", addressSearch.thoroughfare),
         )
 
         return addressParamPairs.filter { (_, query) -> query != null }
@@ -124,12 +124,12 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
-     * Converts a [siteSearch] into pairs of [BusinessPartnerDoc] field name to query text for that field.
+     * Converts a [siteSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
     fun toFieldTextPairs(siteSearch: SitePropertiesSearchRequest): Collection<Pair<String, String>> {
         val siteParamPairs = listOf(
-            Pair(BusinessPartnerDoc::sites.name, siteSearch.siteName)
+            Pair(LegalEntityDoc::sites.name, siteSearch.siteName)
         )
 
         return siteParamPairs

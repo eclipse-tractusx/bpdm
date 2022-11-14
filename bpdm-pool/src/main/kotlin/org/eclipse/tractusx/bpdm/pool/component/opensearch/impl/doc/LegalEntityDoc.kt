@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 const val LEGAL_ENTITIES_INDEX_NAME = "legal-entities"
 const val MAPPINGS_FILE_PATH_LEGAL_ENTITIES = "opensearch/index-mappings-legal-entities.json"
 
-data class BusinessPartnerDoc(
+data class LegalEntityDoc(
     @JsonIgnore // ignore since this is the id and does not need to be in the document source
     val bpn: String,
     val names: Collection<TextDoc>,
