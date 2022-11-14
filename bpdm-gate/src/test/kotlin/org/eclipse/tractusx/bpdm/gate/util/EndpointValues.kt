@@ -29,8 +29,9 @@ object EndpointValues {
 
     const val CDQ_MOCK_DATA_CLINIC_API_PATH = "/test-cdq-data-clinic-api/test-cdq-storage"
     const val CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_DATA_CLINIC_API_PATH/augmentedbusinesspartners"
-    const val CDQ_MOCK_FETCH_AUGMENTED_LEGAL_ENTITY_PATH =
-        "$CDQ_MOCK_DATA_CLINIC_API_PATH/datasources/test-cdq-datasource-legal-entity/augmentedbusinesspartners/fetch"
+
+    const val CDQ_MOCK_REFERENCE_DATA_API_PATH = "/test-cdq-reference-data-api"
+    const val CDQ_MOCK_REFERENCE_DATA_LOOKUP_PATH = "$CDQ_MOCK_REFERENCE_DATA_API_PATH/businesspartners/lookup"
 
     const val GATE_API_PATH = "/api/catena"
     const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"
@@ -43,9 +44,12 @@ object EndpointValues {
     const val GATE_API_OUTPUT_SITES_PATH = "${GATE_API_OUTPUT_PATH}/sites/search"
     const val GATE_API_OUTPUT_ADDRESSES_PATH = "${GATE_API_OUTPUT_PATH}/addresses/search"
 
+    const val GATE_API_TYPE_MATCH_PATH = "${GATE_API_PATH}/business-partners/type-match"
+
     const val POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities/search"
     const val POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH = "/legal-entities/legal-addresses/search"
     const val POOL_API_MOCK_SITES_SEARCH_PATH = "/sites/search"
     const val POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH = "/sites/main-addresses/search"
     const val POOL_API_MOCK_ADDRESSES_SEARCH_PATH = "/addresses/search"
+
 }
