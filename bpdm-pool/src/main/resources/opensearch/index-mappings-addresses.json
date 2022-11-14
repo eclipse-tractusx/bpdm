@@ -1,0 +1,26 @@
+{
+  "dynamic": "strict",
+  "properties": {
+    "administrativeAreas": {
+      "type": "search_as_you_type"
+    },
+    "postCodes": {
+      "type": "search_as_you_type"
+    },
+    "localities": {
+      "type": "search_as_you_type"
+    },
+    "thoroughfares": {
+      "type": "search_as_you_type"
+    },
+    "premises": {
+      "type": "search_as_you_type"
+    },
+    "postalDeliveryPoints": {
+      "type": "search_as_you_type"
+    },
+    "countryCode": {
+      "type": "keyword"
+    }
+  }
+}

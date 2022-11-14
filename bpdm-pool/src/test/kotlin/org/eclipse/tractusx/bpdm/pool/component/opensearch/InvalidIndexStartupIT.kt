@@ -23,7 +23,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -80,9 +80,9 @@ class InvalidIndexStartupIT @Autowired constructor(
     fun setupIndexForNextTest() {
         testHelpers.truncateDbTables()
         //Clear and set up an invalid OpenSearch context
-        openSearchClient.indices().delete { it.index(BUSINESS_PARTNER_INDEX_NAME) }
+        openSearchClient.indices().delete { it.index(LEGAL_ENTITIES_INDEX_NAME) }
         openSearchClient.indices().create { createRequestIndex ->
-            createRequestIndex.index(BUSINESS_PARTNER_INDEX_NAME).mappings { mapping ->
+            createRequestIndex.index(LEGAL_ENTITIES_INDEX_NAME).mappings { mapping ->
                 mapping.properties("outdatedField") { property ->
                     property.searchAsYouType { it }
                 }
@@ -93,12 +93,12 @@ class InvalidIndexStartupIT @Autowired constructor(
         val invalidBp = InvalidBusinessPartnerDoc("outdated")
 
         openSearchClient.index { indexRequest ->
-            indexRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument).document(invalidBp).refresh(Refresh.True)
+            indexRequest.index(LEGAL_ENTITIES_INDEX_NAME).id(bpnBogusDocument).document(invalidBp).refresh(Refresh.True)
         }
 
         //Check whether it really is inside the index
         val getResponse =
-            openSearchClient.get({ getRequest -> getRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
+            openSearchClient.get({ getRequest -> getRequest.index(LEGAL_ENTITIES_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
         assertThat(getResponse.found()).isTrue
     }
 
@@ -112,7 +112,7 @@ class InvalidIndexStartupIT @Autowired constructor(
     fun recreateOutdatedIndexOnStartup() {
         // bogus document should not be in index anymore
         val getResponse =
-            openSearchClient.get({ getRequest -> getRequest.index(BUSINESS_PARTNER_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
+            openSearchClient.get({ getRequest -> getRequest.index(LEGAL_ENTITIES_INDEX_NAME).id(bpnBogusDocument) }, InvalidBusinessPartnerDoc::class.java)
         assertThat(getResponse.found()).isFalse
 
         //import a business partner to DB

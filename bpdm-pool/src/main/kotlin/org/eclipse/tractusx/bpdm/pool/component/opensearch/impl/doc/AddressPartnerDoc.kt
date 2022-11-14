@@ -21,16 +21,17 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
-const val LEGAL_ENTITIES_INDEX_NAME = "legal-entities"
-const val MAPPINGS_FILE_PATH_LEGAL_ENTITIES = "opensearch/index-mappings-legal-entities.json"
+const val ADDRESS_PARTNER_INDEX_NAME = "address-partner"
+const val MAPPINGS_FILE_PATH_ADDRESSES = "opensearch/index-mappings-addresses.json"
 
-data class BusinessPartnerDoc(
+data class AddressPartnerDoc(
     @JsonIgnore // ignore since this is the id and does not need to be in the document source
     val bpn: String,
-    val names: Collection<TextDoc>,
-    val legalForm: TextDoc?,
-    val status: TextDoc?,
-    val addresses: Collection<AddressDoc>,
-    val classifications: Collection<TextDoc>,
-    val sites: Collection<TextDoc>
+    val administrativeAreas: Collection<String>,
+    val postCodes: Collection<String>,
+    val localities: Collection<String>,
+    val thoroughfares: Collection<String>,
+    val premises: Collection<String>,
+    val postalDeliveryPoints: Collection<String>,
+    val countryCode: Collection<String>
 )
