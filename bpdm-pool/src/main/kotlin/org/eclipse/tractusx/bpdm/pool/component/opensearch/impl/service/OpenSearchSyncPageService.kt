@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocRepository
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
@@ -36,6 +37,7 @@ class OpenSearchSyncPageService(
     val legalEntityRepository: LegalEntityRepository,
     val addressPartnerRepository: AddressPartnerRepository,
     val legalEntityDocRepository: LegalEntityDocRepository,
+    val addressPartnerDocRepository: AddressPartnerDocRepository,
     val documentMappingService: DocumentMappingService,
     val changelogService: PartnerChangelogService
 ) {
@@ -60,7 +62,8 @@ class OpenSearchSyncPageService(
         if (!addressBpns.isNullOrEmpty()) {
             val addressesToExport = addressPartnerRepository.findDistinctByBpnIn(addressBpns)
             logger.debug { "Exporting ${addressesToExport.size} address records" }
-            // TODO: map to address doc and export to OpenSearch
+            val addressPartnerDocs = addressesToExport.map { documentMappingService.toDocument(it) }
+            addressPartnerDocRepository.saveAll(addressPartnerDocs)
         }
 
         return changelogEntriesPage

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 
-const val ADDRESS_PARTNER_INDEX_NAME = "address-partner"
+const val ADDRESS_PARTNER_INDEX_NAME = "address-partners"
 const val MAPPINGS_FILE_PATH_ADDRESSES = "opensearch/index-mappings-addresses.json"
 
 data class AddressPartnerDoc(
@@ -33,5 +33,5 @@ data class AddressPartnerDoc(
     val thoroughfares: Collection<String>,
     val premises: Collection<String>,
     val postalDeliveryPoints: Collection<String>,
-    val countryCode: Collection<String>
+    val countryCode: String
 )

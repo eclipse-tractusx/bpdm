@@ -20,9 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.entity.Address
+import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.springframework.stereotype.Service
 
@@ -59,6 +61,22 @@ class DocumentMappingService {
             address.thoroughfares.map { TextDoc(it.value) },
             address.premises.map { TextDoc(it.value) },
             address.postalDeliveryPoints.map { TextDoc(it.value) }
+        )
+    }
+
+    /**
+     * Maps [addressPartner] to [AddressPartnerDoc] representation
+     */
+    fun toDocument(addressPartner: AddressPartner): AddressPartnerDoc {
+        return AddressPartnerDoc(
+            bpn = addressPartner.bpn,
+            administrativeAreas = addressPartner.address.administrativeAreas.map { it.value },
+            postCodes = addressPartner.address.postCodes.map { it.value },
+            localities = addressPartner.address.localities.map { it.value },
+            thoroughfares = addressPartner.address.thoroughfares.map { it.value },
+            premises = addressPartner.address.premises.map { it.value },
+            postalDeliveryPoints = addressPartner.address.postalDeliveryPoints.map { it.value },
+            countryCode = addressPartner.address.country.name
         )
     }
 
