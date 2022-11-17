@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
@@ -135,6 +136,7 @@ class TextDocSearchRepository(
             .from(pageable.pageNumber * pageable.pageSize)
             .size(pageable.pageSize)
             .highlighter(HighlightBuilder().field(HighlightBuilder.Field(field.docName)))
+        searchRequest.indices(LEGAL_ENTITIES_INDEX_NAME)
         searchRequest.source(searchSourceBuilder)
 
         val searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT)

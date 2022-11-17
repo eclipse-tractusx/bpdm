@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
@@ -96,6 +97,7 @@ class AddressDocSearchRepository(
             .query(boolQuery)
             .from(pageable.pageNumber * pageable.pageSize)
             .size(pageable.pageSize)
+        searchRequest.indices(ADDRESS_PARTNER_INDEX_NAME)
         searchRequest.source(searchSourceBuilder)
 
         val searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT)
