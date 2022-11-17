@@ -2,7 +2,7 @@ project: project-bpdm
 source:
   repoURL: 'https://github.com/catenax-ng/product-bpdm.git'
   path: charts/pool
-  targetRevision: v2.0.1
+  targetRevision: v2.0.2
   plugin:
     name: argocd-vault-plugin-helm-args
     env:
