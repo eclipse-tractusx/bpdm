@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.opensearch.action.search.SearchRequest
@@ -33,7 +33,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 /**
- * Creates and executes OpenSearch queries for querying [LegalEntityDoc] entries
+ * Creates and executes OpenSearch queries for querying [AddressPartnerDoc] entries
  */
 @Repository
 class AddressDocSearchRepository(
@@ -42,12 +42,14 @@ class AddressDocSearchRepository(
 ) {
 
     /**
-     * Find [LegalEntityDoc] entries by [partnerSearchRequest] field query texts.
+     * Find [AddressPartnerDoc] entries by [partnerSearchRequest] field query texts.
      *
-     * Query semantic:  For every non-null [partnerSearchRequest] field query text: the corresponding [LegalEntityDoc] field value needs to
-     * either contain the whole query text exactly, or contain some words of it or has matching prefixes.
+     * Query semantic:  For every non-null [partnerSearchRequest] field query text (except country code):
+     * the corresponding [AddressPartnerDoc] field value needs to either contain the whole query text exactly, or contain some words of it or
+     * has matching prefixes.
      *
      * Quality of the result is determined by the type of match: full phrase match > word match > prefix match.
+     * If the request contains a country code, it needs to match exactly or the record will be filtered out.
      *
      * OpenSearch query structure:
      *  {

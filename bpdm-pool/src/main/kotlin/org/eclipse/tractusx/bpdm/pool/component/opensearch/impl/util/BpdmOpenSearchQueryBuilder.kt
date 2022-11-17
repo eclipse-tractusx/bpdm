@@ -198,6 +198,9 @@ class BpdmOpenSearchQueryBuilder {
         )
     }
 
+    /**
+     * Returns a lowercase representation of [searchRequest]
+     */
     fun toLowerCaseSearchRequest(searchRequest: AddressPartnerSearchRequest): AddressPartnerSearchRequest {
         return AddressPartnerSearchRequest(
             searchRequest.administrativeArea?.lowercase(),

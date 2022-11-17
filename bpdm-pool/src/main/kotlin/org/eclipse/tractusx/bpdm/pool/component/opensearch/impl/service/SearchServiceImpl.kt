@@ -85,6 +85,9 @@ class SearchServiceImpl(
         }
     }
 
+    /**
+     * @see SearchServiceImpl.searchLegalEntities
+     */
     override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchResponse> {
         val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
 
