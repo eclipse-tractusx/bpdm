@@ -160,6 +160,10 @@ fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
     )
 }
 
+fun AddressPartner.toMatchDto(score: Float): AddressMatchResponse {
+    return AddressMatchResponse(score, this.toPoolDto())
+}
+
 fun AddressPartner.toPoolDto(): AddressPartnerResponse {
     return AddressPartnerResponse(
         bpn,

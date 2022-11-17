@@ -21,11 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util
 
 import org.apache.lucene.search.join.ScoreMode
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.opensearch.common.unit.Fuzziness
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.InnerHitBuilder
@@ -138,6 +136,23 @@ class BpdmOpenSearchQueryBuilder {
     }
 
     /**
+     * Converts a [addressSearch] into pairs of [AddressPartnerDoc] field name to query text for that field.
+     */
+    fun toFieldTextPairs(addressSearch: AddressPartnerSearchRequest): Collection<Pair<String, String>> {
+        val addressParamPairs = listOf(
+            Pair(AddressPartnerDoc::localities.name, addressSearch.locality),
+            Pair(AddressPartnerDoc::administrativeAreas.name, addressSearch.administrativeArea),
+            Pair(AddressPartnerDoc::postCodes.name, addressSearch.postCode),
+            Pair(AddressPartnerDoc::premises.name, addressSearch.premise),
+            Pair(AddressPartnerDoc::postalDeliveryPoints.name, addressSearch.postalDeliveryPoint),
+            Pair(AddressPartnerDoc::thoroughfares.name, addressSearch.thoroughfare)
+        )
+
+        return addressParamPairs.filter { (_, query) -> query != null }
+            .map { (fieldName, query) -> Pair(fieldName, query!!) }
+    }
+
+    /**
      * Returns a lowercase representation of [searchRequest]
      */
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
@@ -180,6 +195,18 @@ class BpdmOpenSearchQueryBuilder {
     fun toLowerCaseSearchRequest(searchRequest: SitePropertiesSearchRequest): SitePropertiesSearchRequest {
         return SitePropertiesSearchRequest(
             searchRequest.siteName?.lowercase()
+        )
+    }
+
+    fun toLowerCaseSearchRequest(searchRequest: AddressPartnerSearchRequest): AddressPartnerSearchRequest {
+        return AddressPartnerSearchRequest(
+            searchRequest.administrativeArea?.lowercase(),
+            searchRequest.postCode?.lowercase(),
+            searchRequest.locality?.lowercase(),
+            searchRequest.thoroughfare?.lowercase(),
+            searchRequest.premise?.lowercase(),
+            searchRequest.postalDeliveryPoint?.lowercase(),
+            searchRequest.countryCode
         )
     }
 }

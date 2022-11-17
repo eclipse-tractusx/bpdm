@@ -22,12 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.mock.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
 import org.eclipse.tractusx.bpdm.pool.service.toDto
@@ -41,13 +40,14 @@ import org.springframework.stereotype.Service
  */
 @Service
 class SearchServiceMock(
-    val legalEntityRepository: LegalEntityRepository
+    val legalEntityRepository: LegalEntityRepository,
+    val addressPartnerRepository: AddressPartnerRepository
 ) : SearchService {
 
     private val logger = KotlinLogging.logger { }
 
     /**
-     * Ignores [searchRequest] and returns an unfiltered result of business partners in the database,
+     * Ignores [searchRequest] and returns an unfiltered result of legal entities in the database,
      * adding a default relevancy score to each entry
      */
     override fun searchLegalEntities(
@@ -58,6 +58,19 @@ class SearchServiceMock(
             legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         logger.info { "Mock search: Returning ${resultPage.size} business partners from database" }
+
+        return resultPage.toDto(resultPage.content.map { it.toMatchDto(1f) })
+    }
+
+    /**
+     * Ignores [searchRequest] and returns an unfiltered result of addresses in the database,
+     * adding a default relevancy score to each entry
+     */
+    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchResponse> {
+        val resultPage =
+            addressPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        logger.info { "Mock search: Returning ${resultPage.size} addresses from database" }
 
         return resultPage.toDto(resultPage.content.map { it.toMatchDto(1f) })
     }
