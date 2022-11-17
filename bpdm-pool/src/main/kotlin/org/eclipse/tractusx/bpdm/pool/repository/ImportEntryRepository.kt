@@ -17,9 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.cdq
+package org.eclipse.tractusx.bpdm.pool.repository
 
-data class FetchBatchRecord(
-    val cdqId: String,
-    val businessPartner: BusinessPartnerCdq
-)
+import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
+import org.springframework.data.repository.CrudRepository
+
+interface ImportEntryRepository : CrudRepository<ImportEntry, Long> {
+
+    fun findByImportIdentifierIn(importIdentifier: Collection<String>): Set<ImportEntry>
+}

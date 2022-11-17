@@ -30,55 +30,55 @@ import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithBpn
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithImportId
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithParent
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.springframework.stereotype.Service
 
 @Service
-class CdqToRequestMapper(
-    val cdqAdapterConfigProperties: CdqAdapterConfigProperties
-) {
-    fun toLegalEntityCreateRequest(partner: BusinessPartnerCdq, index: String? = null): LegalEntityPartnerCreateRequest {
+class CdqToRequestMapper {
+    fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerWithImportId): LegalEntityPartnerCreateRequest {
         return LegalEntityPartnerCreateRequest(
-            partner.toLegalEntityDto(),
-            index
+            partnerWithImportId.partner.toLegalEntityDto(),
+            partnerWithImportId.importId
         )
     }
 
-    fun toLegalEntityUpdateRequest(partner: BusinessPartnerCdq): LegalEntityPartnerUpdateRequest {
+    fun toLegalEntityUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest {
         return LegalEntityPartnerUpdateRequest(
-            extractBpn(partner),
-            partner.toLegalEntityDto()
+            partnerWithBpn.bpn,
+            partnerWithBpn.partner.toLegalEntityDto()
         )
     }
 
-    fun toSiteCreateRequest(partner: BusinessPartnerCdq, legalEntityBpn: String, index: String? = null): SitePartnerCreateRequest {
+    fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParent): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
-            site = partner.toSiteDto(),
-            legalEntity = legalEntityBpn,
-            index = index
+            site = partnerWithParent.partner.toSiteDto(),
+            legalEntity = partnerWithParent.parentBpn,
+            index = partnerWithParent.importId
         )
     }
 
-    fun toSiteUpdateRequest(partner: BusinessPartnerCdq): SitePartnerUpdateRequest {
+    fun toSiteUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest {
         return SitePartnerUpdateRequest(
-            bpn = extractBpn(partner),
-            site = partner.toSiteDto()
+            partnerWithBpn.bpn,
+            partnerWithBpn.partner.toSiteDto()
         )
     }
 
-    fun toAddressCreateRequest(partner: BusinessPartnerCdq, parentBpn: String, index: String? = null): AddressPartnerCreateRequest {
+    fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParent): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            properties = toDto(partner.addresses.first()),
-            parent = parentBpn,
-            index = index
+            properties = toDto(partnerWithParent.partner.addresses.first()),
+            parent = partnerWithParent.parentBpn,
+            index = partnerWithParent.importId
         )
     }
 
-    fun toAddressUpdateRequest(partner: BusinessPartnerCdq): AddressPartnerUpdateRequest {
+    fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
-            bpn = extractBpn(partner),
-            properties = toDto(partner.addresses.first())
+            partnerWithBpn.bpn,
+            properties = toDto(partnerWithBpn.partner.addresses.first())
         )
     }
 
@@ -104,10 +104,6 @@ class CdqToRequestMapper(
 
     fun toCategoryRequest(category: TypeKeyNameUrlCdq): TypeNameUrlDto {
         return TypeNameUrlDto(category.name!!, category.url)
-    }
-
-    private fun extractBpn(partner: BusinessPartnerCdq): String {
-        return partner.identifiers.find { it.type?.technicalKey == cdqAdapterConfigProperties.bpnKey }?.value!!
     }
 
 }

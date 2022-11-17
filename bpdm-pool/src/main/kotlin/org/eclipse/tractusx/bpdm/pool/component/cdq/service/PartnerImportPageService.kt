@@ -20,35 +20,35 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.ThoroughfareCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
+import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameUrlCdq
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithParent
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportResponsePage
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.UpsertCollection
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
+import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.Instant
-import java.time.format.DateTimeFormatter
 
 @Service
 class PartnerImportPageService(
-    private val webClient: WebClient,
     private val adapterProperties: CdqAdapterConfigProperties,
     cdqIdConfigProperties: CdqIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: CdqToRequestMapper,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val importEntryRepository: ImportEntryRepository,
+    private val cdqClient: CdqClient
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -56,40 +56,31 @@ class PartnerImportPageService(
     private val cdqIdentifierStatus = TypeKeyNameCdq(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
     private val cdqIssuer = TypeKeyNameUrlCdq(cdqIdConfigProperties.issuerKey, cdqIdConfigProperties.issuerName, "")
 
-    private val validTypes = setOf(adapterProperties.legalEntityType, adapterProperties.siteType, adapterProperties.addressType)
+    private val validChildParentRelations = listOf(
+        Pair(LsaType.ADDRESS, LsaType.SITE),
+        Pair(LsaType.ADDRESS, LsaType.LEGAL_ENTITY),
+        Pair(LsaType.SITE, LsaType.LEGAL_ENTITY)
+    )
 
     @Transactional
     fun import(modifiedAfter: Instant, startAfter: String?): ImportResponsePage {
         logger.debug { "Import new business partner starting after ID '$startAfter'" }
 
-        val partnerCollection = webClient
-            .get()
-            .uri { builder ->
-                builder
-                    .path(adapterProperties.readBusinessPartnerUrl)
-                    .queryParam("modifiedAfter", toModifiedAfterFormat(modifiedAfter))
-                    .queryParam("limit", adapterProperties.importLimit)
-                    .queryParam("datasource", adapterProperties.datasource)
-                    .queryParam("featuresOn", "USE_NEXT_START_AFTER", "FETCH_RELATIONS")
-                if (startAfter != null) builder.queryParam("startAfter", startAfter)
-                builder.build()
-            }
-            .retrieve()
-            .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
-            .block()!!
+        val partnerCollection = cdqClient.readBusinessPartners(modifiedAfter, startAfter)
 
         logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }
+
+        val asFetch = cdqClient.fetchBusinessPartnersInBatch(partnerCollection.values.mapNotNull { it.extractId(adapterProperties.importIdKey) })
 
         addNewMetadata(partnerCollection.values)
 
         val validPartners = partnerCollection.values.filter { isValid(it) }
+        val partnersWithId = determineImportId(validPartners)
 
-        val partnersToUpsert = validPartners.map { addCdqIdentifier(it) }
+        val (partnersWithBpn, partnersWithoutBpn) = determineBpn(partnersWithId)
 
-        val (hasBpn, hasNoBpn) = partnersToUpsert.partition { it.identifiers.any { id -> id.type?.technicalKey == adapterProperties.bpnKey } }
-
-        val (createdLegalEntities, createdSites, createdAddresses) = createPartners(hasNoBpn)
-        val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(hasBpn)
+        val (createdLegalEntities, createdSites, createdAddresses) = createPartners(partnersWithoutBpn)
+        val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(partnersWithBpn)
 
         return ImportResponsePage(
             partnerCollection.total,
@@ -138,27 +129,33 @@ class PartnerImportPageService(
             .forEach { metadataService.createLegalForm(it) }
     }
 
-    private fun createPartners(partners: Collection<BusinessPartnerCdq>):
+    private fun createPartners(partners: Collection<BusinessPartnerWithImportId>):
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerCreateResponse>> {
-        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners)
+        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
-        val sitesWithParent = matchParentBpns(sitesCdq)
-        val addressesWithParent = matchParentBpns(addressesCdq)
+        val partnersWithParent = determineParent(sitesCdq + addressesCdq)
+        val (_, sitesWithParent, addressesWithParent) = partitionIntoLSA(partnersWithParent) { it.partner.extractLsaType() }
 
         val legalEntities = legalEntitiesCdq.map { mappingService.toLegalEntityCreateRequest(it) }
-        val sites = sitesWithParent.map { mappingService.toSiteCreateRequest(it.partner, it.parentBpn) }
-        val addresses = addressesWithParent.map { mappingService.toAddressCreateRequest(it.partner, it.parentBpn) }
+        val sites = sitesWithParent.map { mappingService.toSiteCreateRequest(it) }
+        val addresses = addressesWithParent.map { mappingService.toAddressCreateRequest(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities) else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites) else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses) else emptyList()
 
+        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
+        val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
+        val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
+
+        importEntryRepository.saveAll(legalEntityImportEntries + siteImportEntries + addressImportEntries)
+
         return Triple(createdLegalEntities, createdSites, createdAddresses)
     }
 
-    private fun updatePartners(partners: Collection<BusinessPartnerCdq>):
+    private fun updatePartners(partners: Collection<BusinessPartnerWithBpn>):
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerResponse>> {
-        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners)
+        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
         val legalEntities = legalEntitiesCdq.map { mappingService.toLegalEntityUpdateRequest(it) }
         val sites = sitesCdq.map { mappingService.toSiteUpdateRequest(it) }
@@ -171,34 +168,46 @@ class PartnerImportPageService(
         return Triple(createdLegalEntities, createdSites, createdAddresses)
     }
 
-    private fun matchParentBpns(partners: Collection<BusinessPartnerCdq>): Collection<BusinessPartnerWithParent> {
-        val parentIdGroups = partners
-            .groupBy { it.relations.firstOrNull { id -> id.type.technicalKey == adapterProperties.parentRelationType }?.startNode }
-            .filter { it.key != null }
+    private fun determineParent(children: Collection<BusinessPartnerWithImportId>): Collection<BusinessPartnerWithParent> {
+        if (children.isEmpty()) return emptyList()
+
+        val childrenWithParentId = determineParentId(children)
+
+        val parents = cdqClient.fetchBusinessPartnersInBatch(childrenWithParentId.map { it.parentId }).map { it.businessPartner }
+        val parentsWithId = determineImportId(parents)
+        val validParentsWithId = filterValidParents(parentsWithId, childrenWithParentId)
+
+        val (parentsWithBpn, parentsWithoutBpn) = determineBpn(validParentsWithId)
+
+        val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
+
+        val parentIdToBpn = newLegalEntities.map { Pair(it.index, it.bpn) }
+            .plus(newSites.map { Pair(it.index, it.bpn) })
+            .plus(parentsWithBpn.map { Pair(it.importId, it.bpn) })
+            .toMap()
 
 
-        if (parentIdGroups.isEmpty())
-            return emptyList()
-
-        val requestBody = FetchBatchRequest(parentIdGroups.keys.mapNotNull { it })
-
-        val batchRecords = webClient
-            .post()
-            .uri(adapterProperties.fetchBusinessPartnersBatchUrl)
-            .body(BodyInserters.fromValue(requestBody))
-            .retrieve()
-            .bodyToMono<Collection<FetchBatchRecord>>()
-            .block()!!
-
-        return batchRecords
-            .flatMap { record -> parentIdGroups[record.cdqId]?.map { child -> Pair(record.businessPartner, child) } ?: emptyList() }
-            .map { (parent, child) -> Pair(extractId(parent.identifiers, adapterProperties.bpnKey), child) }
-            .filter { (parentBpn, _) -> parentBpn != null }
-            .map { (parentBpn, child) -> BusinessPartnerWithParent(child, parentBpn!!) }
+        return childrenWithParentId.mapNotNull { childWithParentId ->
+            val parentBpn = parentIdToBpn[childWithParentId.parentId]
+            if (parentBpn != null) {
+                BusinessPartnerWithParent(childWithParentId.partner, childWithParentId.importId, parentBpn)
+            } else {
+                logger.warn { "Can not resolve parent with Import-ID ${childWithParentId.parentId} for CDQ record with ID ${childWithParentId.partner.id}" }
+                null
+            }
+        }
     }
 
-    private fun toModifiedAfterFormat(dateTime: Instant): String {
-        return DateTimeFormatter.ISO_INSTANT.format(dateTime)
+    private fun determineParentId(children: Collection<BusinessPartnerWithImportId>): Collection<BusinessPartnerWithParentId> {
+        return children.mapNotNull { childWithId ->
+            val parentId = childWithId.partner.relations.firstOrNull { id -> id.type?.technicalKey == adapterProperties.parentRelationType }?.startNode
+            if (parentId != null) {
+                BusinessPartnerWithParentId(childWithId.partner, childWithId.importId, parentId)
+            } else {
+                logger.warn { "Can not resolve parent CDQ record for child with ID ${childWithId.partner.id}: Record has no identifier of type ${adapterProperties.importIdKey}" }
+                null
+            }
+        }
     }
 
     private fun isValid(partner: BusinessPartnerCdq): Boolean {
@@ -210,49 +219,98 @@ class PartnerImportPageService(
         return true
     }
 
-    private fun addCdqIdentifier(partner: BusinessPartnerCdq) =
-        partner.copy(
-            identifiers = partner.identifiers.plus(
-                IdentifierCdq(
-                    cdqIdentifierType,
-                    partner.id!!,
-                    cdqIssuer,
-                    cdqIdentifierStatus
-                )
-            )
-        )
+    private fun <T> partitionIntoLSA(partners: Collection<T>, determineTypeFunction: (T) -> LsaType?):
+            Triple<Collection<T>, Collection<T>, Collection<T>> {
 
-    private fun extractId(identifiers: Collection<IdentifierCdq>, idType: String): String? {
-        return identifiers.find { it.type?.technicalKey == idType }?.value
-    }
+        val lsaGroups = partners.groupBy { determineTypeFunction(it) }.filter { it.key != null }
 
-    private fun partitionIntoLSA(partners: Collection<BusinessPartnerCdq>):
-            Triple<Collection<BusinessPartnerCdq>, Collection<BusinessPartnerCdq>, Collection<BusinessPartnerCdq>> {
-        val lsaGroups = partners.groupBy { extractLsaTypes(it) }.filter { it.key != null }
-
-        val legalEntities = lsaGroups[adapterProperties.legalEntityType] ?: emptyList()
-        val sites = lsaGroups[adapterProperties.siteType] ?: emptyList()
-        val addresses = lsaGroups[adapterProperties.addressType] ?: emptyList()
+        val legalEntities = lsaGroups[LsaType.LEGAL_ENTITY] ?: emptyList()
+        val sites = lsaGroups[LsaType.SITE] ?: emptyList()
+        val addresses = lsaGroups[LsaType.ADDRESS] ?: emptyList()
 
         return Triple(legalEntities, sites, addresses)
     }
 
-    private fun extractLsaTypes(partner: BusinessPartnerCdq): String? {
-        val validTypes = partner.types.map { it.technicalKey }.intersect(validTypes)
+    private fun BusinessPartnerCdq.extractLsaType(): LsaType? {
+        val validTypes = types.mapNotNull {
+            when (it.technicalKey) {
+                adapterProperties.legalEntityType -> LsaType.LEGAL_ENTITY
+                adapterProperties.siteType -> LsaType.SITE
+                adapterProperties.addressType -> LsaType.ADDRESS
+                else -> null
+            }
+        }
 
         if (validTypes.isEmpty()) {
-            logger.warn { "CDQ Business partner with id ${partner.id} does not contain any LSA type. Partner will be ignored" }
+            logger.warn { "CDQ Business partner with id $id does not contain any LSA type. Partner will be ignored" }
             return null
         }
 
         val type = validTypes.first()
 
         if (validTypes.size > 1) {
-            logger.warn { "CDQ Business partner with id ${partner.id} contains more than one LSA type. Taking first encountered type $type" }
+            logger.warn { "CDQ Business partner with id $id contains more than one LSA type. Taking first encountered type $type" }
         }
 
         return type
     }
+
+    private fun determineBpn(partners: Collection<BusinessPartnerWithImportId>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerWithImportId>> {
+        val (hasStorageBpn, noStorageBpn) = partners
+            .map { Pair(it, it.partner.extractId(adapterProperties.bpnKey)) }
+            .partition { (_, bpn) -> bpn != null }
+
+        val (hasImportedBpn, noBpn) = determineImportedBpn(noStorageBpn.map { (partnerWithId, _) -> partnerWithId })
+
+        return Pair(
+            hasStorageBpn.map { (partnerWithId, id) -> BusinessPartnerWithBpn(partnerWithId.partner, partnerWithId.importId, id!!) } + hasImportedBpn,
+            noBpn)
+    }
+
+    private fun determineImportedBpn(partners: Collection<BusinessPartnerWithImportId>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerWithImportId>> {
+        val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.importId })
+            .associateBy { it.importIdentifier }
+
+        val (hasImportedBpn, noBpn) = partners
+            .map { Pair(it, importEntries[it.importId]?.bpn) }
+            .partition { (_, bpn) -> bpn != null }
+
+        return Pair(
+            hasImportedBpn.map { (partnerWithId, bpn) -> BusinessPartnerWithBpn(partnerWithId.partner, partnerWithId.importId, bpn!!) },
+            noBpn.map { (partnerWithId, _) -> partnerWithId }
+        )
+    }
+
+    private fun determineImportId(partners: Collection<BusinessPartnerCdq>): Collection<BusinessPartnerWithImportId> {
+        return partners.mapNotNull { partner ->
+            val importId = partner.extractId(adapterProperties.importIdKey)
+            if (importId != null) {
+                BusinessPartnerWithImportId(partner, importId)
+            } else {
+                logger.warn { "CDQ record with ID ${partner.id} has no import ID" }
+                null
+            }
+        }
+    }
+
+    private fun filterValidParents(
+        parents: Collection<BusinessPartnerWithImportId>,
+        children: Collection<BusinessPartnerWithParentId>
+    ): Collection<BusinessPartnerWithImportId> {
+        val parentIdToChild = children.associateBy { it.parentId }
+
+        return parents.filter { parent ->
+            val parentType = parent.partner.extractLsaType()
+            val childType = parentIdToChild[parent.importId]?.partner?.extractLsaType()
+
+            val childParentRelation = Pair(childType, parentType)
+
+            validChildParentRelations.contains(childParentRelation)
+        }
+    }
+
+    private fun BusinessPartnerCdq.extractId(idKey: String): String? =
+        identifiers.find { it.type?.technicalKey == idKey }?.value
 
 
 }

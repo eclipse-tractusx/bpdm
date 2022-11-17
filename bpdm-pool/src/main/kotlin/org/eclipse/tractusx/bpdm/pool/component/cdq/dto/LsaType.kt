@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.cdq
+package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
 
-data class FetchBatchRecord(
-    val cdqId: String,
-    val businessPartner: BusinessPartnerCdq
-)
+enum class LsaType {
+    LEGAL_ENTITY,
+    SITE,
+    ADDRESS
+}

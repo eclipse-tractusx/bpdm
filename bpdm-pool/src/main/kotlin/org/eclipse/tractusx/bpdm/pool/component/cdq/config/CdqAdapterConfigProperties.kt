@@ -36,7 +36,8 @@ class CdqAdapterConfigProperties(
     val siteType: String = "ORGANIZATIONAL_UNIT",
     val addressType: String = "BP_ADDRESS",
     val parentRelationType: String = "PARENT",
-    val bpnKey: String = "CX_BPN"
+    val bpnKey: String = "CX_BPN",
+    val importIdKey: String = "CX_POOL_ID"
 ) {
     private val exchangeApiUrl: String = "data-exchange/rest/v4"
     private val referenceApiUrl: String = "referencedata/rest/v3"

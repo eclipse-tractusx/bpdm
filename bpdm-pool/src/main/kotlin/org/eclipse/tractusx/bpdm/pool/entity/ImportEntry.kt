@@ -17,9 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.cdq
+package org.eclipse.tractusx.bpdm.pool.entity
 
-data class FetchBatchRecord(
-    val cdqId: String,
-    val businessPartner: BusinessPartnerCdq
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Index
+import javax.persistence.Table
+
+@Entity
+@Table(
+    name = "import_entries",
+    indexes = [
+        Index(columnList = "import_id"),
+        Index(columnList = "bpn")
+    ]
 )
+class ImportEntry(
+    @Column(name = "import_id", nullable = false)
+    var importIdentifier: String,
+    @Column(name = "bpn", nullable = false)
+    var bpn: String
+) : BaseEntity()
