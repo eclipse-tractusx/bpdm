@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
@@ -60,7 +60,10 @@ class AddressService(
     }
 
     @Transactional
-    fun findByPartnerAndSiteBpns(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressPartnerSearchResponse> {
+    fun findByPartnerAndSiteBpns(
+        searchRequest: AddressPartnerBpnSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<AddressPartnerSearchResponse> {
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 

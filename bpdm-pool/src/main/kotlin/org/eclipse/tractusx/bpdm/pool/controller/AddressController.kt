@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -58,7 +58,7 @@ class AddressController(
     )
     @GetMapping
     fun getAddresses(
-        @ParameterObject addressSearchRequest: org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse> {
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
@@ -94,7 +94,7 @@ class AddressController(
     )
     @PostMapping("/search")
     fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressPartnerSearchRequest,
+        @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<AddressPartnerSearchResponse> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)

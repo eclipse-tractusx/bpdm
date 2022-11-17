@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
@@ -107,7 +107,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
         val bpnL = createdStructures[0].legalEntity.bpn
 
-        val siteSearchRequest = SiteSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
+        val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
 
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
@@ -144,7 +144,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.bpn
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
-        val siteSearchRequest = SiteSearchRequest(listOf(bpnL1, bpnL2))
+        val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
         val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
 
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)

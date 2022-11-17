@@ -21,9 +21,12 @@ package org.eclipse.tractusx.bpdm.common.dto.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class SiteSearchRequest(
-    @Schema(description = "Filter sites that should belong to legal entities (specified by BPNL)")
+@Schema(name = "AddressPartnerBpnSearchRequest", description = "Request for searching business partners of type address by parent BPNs")
+data class AddressPartnerBpnSearchRequest(
+    @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
     val legalEntities: Collection<String> = emptyList(),
-    @Schema(description = "Filter sites by BPNS of sites")
+    @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
     val sites: Collection<String> = emptyList(),
+    @Schema(description = "Filter by BPNA of addresses")
+    val addresses: Collection<String> = emptyList()
 )

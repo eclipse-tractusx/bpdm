@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
@@ -135,7 +135,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnA2 = createdStructures[0].addresses[1].bpn
         val bpnL = createdStructures[0].legalEntity.bpn
 
-        val searchRequest = AddressPartnerSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
+        val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
@@ -177,7 +177,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.bpn
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
-        val searchRequest = AddressPartnerSearchRequest(listOf(bpnL1, bpnL2), emptyList())
+        val searchRequest = AddressPartnerBpnSearchRequest(listOf(bpnL1, bpnL2), emptyList())
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
@@ -231,7 +231,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
         val bpnS2 = createdStructures[1].siteStructures[0].site.bpn
 
-        val searchRequest = AddressPartnerSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
+        val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult =
             webTestClient.invokePostEndpoint<PageResponse<AddressPartnerSearchResponse>>(EndpointValues.CATENA_ADDRESSES_SEARCH_PATH, searchRequest)
 
