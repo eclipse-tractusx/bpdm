@@ -56,7 +56,9 @@ object CommonValues {
 
     val characterSet1 = CharacterSet.UNDEFINED
 
-    val country1 = CountryCode.UNDEFINED
+    val country1 = CountryCode.DE
+    val country2 = CountryCode.FR
+    val country3 = CountryCode.PL
 
     val nameType1 = NameType.OTHER
 

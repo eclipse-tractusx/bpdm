@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 @JsonDeserialize(using = AddressPartnerResponse.CustomDeserializer::class)
 @Schema(name = "AddressPartnerResponse", description = "Business partner of type address")
 data class AddressPartnerResponse(
-    @Schema(description = "Business Partner Number of this legal entity")
+    @Schema(description = "Business Partner Number of this address")
     val bpn: String,
     @JsonUnwrapped
     val properties: AddressResponse
