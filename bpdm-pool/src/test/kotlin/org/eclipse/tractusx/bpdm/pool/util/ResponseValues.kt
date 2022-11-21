@@ -23,7 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import java.time.ZoneOffset
 
 /**
@@ -42,6 +44,8 @@ object ResponseValues {
     val characterSet1 = TypeKeyNameDto(CommonValues.characterSet1, CommonValues.characterSet1.getTypeName())
 
     val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
+    val country2 = TypeKeyNameDto(CommonValues.country2, CommonValues.country2.getName())
+    val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
 
     val identifier1 =
         IdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
@@ -167,7 +171,7 @@ object ResponseValues {
 
     val address2 = AddressResponse(
         version = version1,
-        country = country1,
+        country = country2,
         administrativeAreas = listOf(adminArea3, adminArea4),
         postCodes = listOf(postCode3, postCode4),
         localities = listOf(locality3, locality4),
@@ -178,7 +182,7 @@ object ResponseValues {
 
     val address3 = AddressResponse(
         version = version1,
-        country = country1,
+        country = country3,
         administrativeAreas = listOf(adminArea5),
         postCodes = listOf(postCode5),
         localities = listOf(locality5),

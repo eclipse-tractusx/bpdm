@@ -20,14 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
-import org.eclipse.tractusx.bpdm.pool.entity.BaseEntity
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -60,14 +57,13 @@ class OpenSearchSyncService(
      */
     fun exportPaginated(fromTime: Instant, saveState: String?) {
         var page = saveState?.toIntOrNull() ?: 0
-        var docsPage: Page<BusinessPartnerDoc>
+        var docsPage: Page<PartnerChangelogEntry>
 
         logger.info { "Start OpenSearch export from time '$fromTime' and page '$page'" }
 
         do {
             try {
-                val pageRequest = PageRequest.of(page, configProperties.exportPageSize, Sort.by(BaseEntity::updatedAt.name).ascending())
-                docsPage = openSearchSyncPageService.exportPartnersToOpenSearch(fromTime, pageRequest)
+                docsPage = openSearchSyncPageService.exportPartnersToOpenSearch(fromTime, page, configProperties.exportPageSize)
                 page++
                 val record = syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH)
                 val newCount = record.count + docsPage.content.size

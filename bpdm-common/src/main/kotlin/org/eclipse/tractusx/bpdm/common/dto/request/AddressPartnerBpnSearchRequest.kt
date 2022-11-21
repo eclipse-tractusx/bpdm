@@ -17,30 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.common.dto.request
 
-import javax.persistence.*
+import io.swagger.v3.oas.annotations.media.Schema
 
-@Entity
-@Table(name = "partner_changelog_entries")
-class PartnerChangelogEntry(
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogType,
-    @Column(name = "bpn", nullable = false, updatable = false)
-    val bpn: String,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_subject", nullable = false, updatable = false)
-    val changelogSubject: ChangelogSubject
-) : BaseEntity()
-
-enum class ChangelogType() {
-    CREATE,
-    UPDATE
-}
-
-enum class ChangelogSubject {
-    LEGAL_ENTITY,
-    ADDRESS,
-    SITE
-}
+@Schema(name = "AddressPartnerBpnSearchRequest", description = "Request for searching business partners of type address by parent BPNs")
+data class AddressPartnerBpnSearchRequest(
+    @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
+    val legalEntities: Collection<String> = emptyList(),
+    @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
+    val sites: Collection<String> = emptyList(),
+    @Schema(description = "Filter by BPNA of addresses")
+    val addresses: Collection<String> = emptyList()
+)

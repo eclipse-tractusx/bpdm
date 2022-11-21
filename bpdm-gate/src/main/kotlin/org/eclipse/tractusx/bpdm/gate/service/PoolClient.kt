@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.gate.exception.PoolRequestException
 import org.springframework.beans.factory.annotation.Qualifier
@@ -76,7 +76,7 @@ class PoolClient(
             webClient
                 .post()
                 .uri("/sites/search")
-                .bodyValue(objectMapper.writeValueAsString(SiteSearchRequest(sites = bpnSs)))
+                .bodyValue(objectMapper.writeValueAsString(SiteBpnSearchRequest(sites = bpnSs)))
                 .retrieve()
                 .bodyToMono<Collection<SitePartnerSearchResponse>>()
                 .block()!!
@@ -110,7 +110,7 @@ class PoolClient(
             webClient
                 .post()
                 .uri("/addresses/search")
-                .bodyValue(objectMapper.writeValueAsString(AddressPartnerSearchRequest(addresses = bpnAs)))
+                .bodyValue(objectMapper.writeValueAsString(AddressPartnerBpnSearchRequest(addresses = bpnAs)))
                 .retrieve()
                 .bodyToMono<Collection<AddressPartnerSearchResponse>>()
                 .block()!!

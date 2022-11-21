@@ -24,12 +24,12 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
@@ -41,8 +41,28 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/catena/addresses")
 class AddressController(
     private val addressService: AddressService,
-    private val businessPartnerBuildService: BusinessPartnerBuildService
+    private val businessPartnerBuildService: BusinessPartnerBuildService,
+    private val searchService: SearchService
 ) {
+    @Operation(
+        summary = "Get page of addresses matching the search criteria",
+        description = "This endpoint tries to find matches among all existing business partners of type address, " +
+                "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
+                "The match of a partner is better the higher its relevancy score."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of addresses matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed search or pagination request", content = [Content()])
+        ]
+    )
+    @GetMapping
+    fun getAddresses(
+        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageResponse<AddressMatchResponse> {
+        return searchService.searchAddresses(addressSearchRequest, paginationRequest)
+    }
 
     @Operation(
         summary = "Get address partners by bpn",
@@ -74,7 +94,7 @@ class AddressController(
     )
     @PostMapping("/search")
     fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressPartnerSearchRequest,
+        @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<AddressPartnerSearchResponse> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)

@@ -19,7 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BusinessPartnerDoc
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
@@ -35,7 +36,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 /**
- * Creates and executes OpenSearch queries for querying [BusinessPartnerDoc] properties of type [TextDoc]
+ * Creates and executes OpenSearch queries for querying [LegalEntityDoc] properties of type [TextDoc]
  */
 @Repository
 class TextDocSearchRepository(
@@ -48,7 +49,7 @@ class TextDocSearchRepository(
      *
      * [queryText] and [filters] are converted to lowercase representation in order to work correctly with the case-sensitive prefix query.
      *
-     * Query semantic: Return [BusinessPartnerDoc] [field] values that either match [queryText] exactly, or contain words in [queryText]
+     * Query semantic: Return [LegalEntityDoc] [field] values that either match [queryText] exactly, or contain words in [queryText]
      * or have matching prefixes of [queryText]. Only look in [field] values that belong to business partners that
      * match the [filters]: For every non-null filter set the corresponding business partner field value needs to
      * either match [queryText] exactly, or contain words in [queryText], or have matching prefixes of [queryText]
@@ -56,7 +57,7 @@ class TextDocSearchRepository(
      * Results are only ranked by the quality of matches from the [field], and not by the [filters].
      * Quality is also determined by the type of match: full phrase match > word match > prefix match.
      *
-     * OpenSearch always returns the whole [BusinessPartnerDoc] as a result. Therefore, we extract the inner
+     * OpenSearch always returns the whole [LegalEntityDoc] as a result. Therefore, we extract the inner
      * [TextDoc] hits and create a custom [SearchHits] collection based on the extracted hits.
      *
      * OpenSearch query structure:
@@ -135,6 +136,7 @@ class TextDocSearchRepository(
             .from(pageable.pageNumber * pageable.pageSize)
             .size(pageable.pageSize)
             .highlighter(HighlightBuilder().field(HighlightBuilder.Field(field.docName)))
+        searchRequest.indices(LEGAL_ENTITIES_INDEX_NAME)
         searchRequest.source(searchSourceBuilder)
 
         val searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT)

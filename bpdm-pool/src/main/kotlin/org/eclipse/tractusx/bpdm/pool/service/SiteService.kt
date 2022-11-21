@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -47,7 +47,7 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByPartnerBpns(siteSearchRequest: SiteSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
+    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage =

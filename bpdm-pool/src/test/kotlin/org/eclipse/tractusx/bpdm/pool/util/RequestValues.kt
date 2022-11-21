@@ -155,7 +155,7 @@ object RequestValues {
 
     val address2 = AddressDto(
         version = version1,
-        country = CommonValues.country1,
+        country = CommonValues.country2,
         administrativeAreas = listOf(adminArea3, adminArea4),
         postCodes = listOf(postCode3, postCode4),
         localities = listOf(locality3, locality4),
@@ -166,7 +166,7 @@ object RequestValues {
 
     val address3 = AddressDto(
         version = version1,
-        country = CommonValues.country1,
+        country = CommonValues.country3,
         administrativeAreas = listOf(adminArea5),
         postCodes = listOf(postCode5),
         localities = listOf(locality5),

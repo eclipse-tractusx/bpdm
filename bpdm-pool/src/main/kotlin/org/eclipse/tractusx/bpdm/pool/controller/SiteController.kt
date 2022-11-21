@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
@@ -94,7 +94,7 @@ class SiteController(
     )
     @PostMapping("/search")
     fun searchSites(
-        @RequestBody siteSearchRequest: SiteSearchRequest,
+        @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerSearchResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)

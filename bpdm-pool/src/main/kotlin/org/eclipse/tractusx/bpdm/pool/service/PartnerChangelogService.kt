@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
@@ -32,6 +33,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 /**
  * Provides access to changelog entries of business partners. Changelog entries must be created manually via this service, when business partner (including
@@ -59,6 +61,19 @@ class PartnerChangelogService(
         return partnerChangelogEntryRepository.saveAll(entities)
     }
 
+    fun getChangelogEntriesCreatedAfter(
+        fromTime: Instant,
+        changelogSubjectsFilter: Collection<ChangelogSubject> = ChangelogSubject.values().asList(),
+        pageIndex: Int,
+        pageSize: Int
+    ): Page<PartnerChangelogEntry> {
+        return partnerChangelogEntryRepository.findByCreatedAtAfterAndChangelogSubjectIn(
+            fromTime,
+            changelogSubjectsFilter,
+            PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::createdAt.name).ascending())
+        )
+    }
+
     fun getChangelogEntriesStartingAfterId(startId: Long = -1, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
         return partnerChangelogEntryRepository.findAllByIdGreaterThan(
             startId,
@@ -75,6 +90,6 @@ class PartnerChangelogService(
     }
 
     private fun ChangelogEntryDto.toEntity(): PartnerChangelogEntry {
-        return PartnerChangelogEntry(this.changelogType, this.bpn)
+        return PartnerChangelogEntry(this.changelogType, this.bpn, this.changelogSubject)
     }
 }

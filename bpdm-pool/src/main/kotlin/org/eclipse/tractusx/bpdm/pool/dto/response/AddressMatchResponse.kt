@@ -17,16 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.request
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 
-@Schema(name = "AddressPartnerSearchRequest", description = "Request for searching business partners of type address by parent BPNs")
-data class AddressPartnerSearchRequest(
-    @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
-    val legalEntities: Collection<String> = emptyList(),
-    @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
-    val sites: Collection<String> = emptyList(),
-    @Schema(description = "Filter by BPNA of addresses")
-    val addresses: Collection<String> = emptyList()
+@Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
+data class AddressMatchResponse(
+    @Schema(description = "Relative quality score of the match. The higher the better")
+    val score: Float,
+    @Schema(description = "Matched address business partner record")
+    val address: AddressPartnerSearchResponse
 )

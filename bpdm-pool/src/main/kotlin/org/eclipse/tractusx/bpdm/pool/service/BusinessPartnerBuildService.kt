@@ -73,7 +73,7 @@ class BusinessPartnerBuildService(
             .associateBy { (legalEntity, _) -> legalEntity.bpn }
         val legalEntities = bpnMap.values.map { (legalEntity, _) -> legalEntity }
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
         legalEntityRepository.saveAll(legalEntities)
 
         return legalEntities.map { it.toUpsertDto(bpnMap[it.bpn]!!.second) }
@@ -100,7 +100,7 @@ class BusinessPartnerBuildService(
             .associateBy { (site, _) -> site.bpn }
         val sites = bpnsMap.values.map { (site, _) -> site }
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
         siteRepository.saveAll(sites)
 
         return sites.map { it.toUpsertDto(bpnsMap[it.bpn]!!.second) }
@@ -120,7 +120,7 @@ class BusinessPartnerBuildService(
             .associateBy { (address, _) -> address.bpn }
         val addresses = bpnaMap.values.map { (address, _) -> address }
 
-        changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE) })
+        changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
         return addressPartnerRepository.saveAll(addresses).map { it.toCreateResponse(bpnaMap[it.bpn]!!.second) }
     }
@@ -145,7 +145,7 @@ class BusinessPartnerBuildService(
         val requestMap = requests.associateBy { it.bpn }
         legalEntities.forEach { updateLegalEntity(it, requestMap.get(it.bpn)!!.properties, metadataMap) }
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
 
         return legalEntityRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
     }
@@ -161,7 +161,7 @@ class BusinessPartnerBuildService(
             notFetched.forEach { logger.warn { "Site $it could not be updated: not found" } }
         }
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
 
         val requestMap = requests.associateBy { it.bpn }
         sites.forEach { updateSite(it, requestMap[it.bpn]!!.site) }
@@ -181,7 +181,7 @@ class BusinessPartnerBuildService(
         val requestMap = requests.associateBy { it.bpn }
         addresses.forEach { updateAddress(it.address, requestMap[it.bpn]!!.properties) }
 
-        changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE) })
+        changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         return addressPartnerRepository.saveAll(addresses).map { it.toPoolDto() }
     }

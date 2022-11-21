@@ -17,30 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc
 
-import javax.persistence.*
+import com.fasterxml.jackson.annotation.JsonIgnore
 
-@Entity
-@Table(name = "partner_changelog_entries")
-class PartnerChangelogEntry(
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogType,
-    @Column(name = "bpn", nullable = false, updatable = false)
+const val LEGAL_ENTITIES_INDEX_NAME = "legal-entities"
+const val MAPPINGS_FILE_PATH_LEGAL_ENTITIES = "opensearch/index-mappings-legal-entities.json"
+
+data class LegalEntityDoc(
+    @JsonIgnore // ignore since this is the id and does not need to be in the document source
     val bpn: String,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_subject", nullable = false, updatable = false)
-    val changelogSubject: ChangelogSubject
-) : BaseEntity()
-
-enum class ChangelogType() {
-    CREATE,
-    UPDATE
-}
-
-enum class ChangelogSubject {
-    LEGAL_ENTITY,
-    ADDRESS,
-    SITE
-}
+    val names: Collection<TextDoc>,
+    val legalForm: TextDoc?,
+    val status: TextDoc?,
+    val addresses: Collection<AddressDoc>,
+    val classifications: Collection<TextDoc>,
+    val sites: Collection<TextDoc>
+)

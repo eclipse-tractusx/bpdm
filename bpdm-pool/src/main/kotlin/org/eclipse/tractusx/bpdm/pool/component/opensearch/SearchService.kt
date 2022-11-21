@@ -20,12 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
@@ -33,12 +31,20 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 interface SearchService {
 
     /**
-     * Find business partners by matching their field values to [searchRequest] field query texts
+     * Find legal entities by matching their field values to [searchRequest] field query texts
      */
     fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse>
+
+    /**
+     * Find addresses by matching their field values to [searchRequest] field query texts
+     */
+    fun searchAddresses(
+        searchRequest: AddressPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<AddressMatchResponse>
 
     fun searchBusinessPartners(
         searchRequest: BusinessPartnerSearchRequest,

@@ -20,7 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.BUSINESS_PARTNER_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_ADDRESSES
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_LEGAL_ENTITIES
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
@@ -34,11 +37,10 @@ import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch.indices.DeleteIndexRequest
 import org.opensearch.cluster.metadata.MappingMetadata
 import org.opensearch.common.xcontent.XContentType
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationContextException
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
-import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,12 +50,10 @@ class OpenSearchSyncStarterService(
     private val syncRecordService: SyncRecordService,
     private val openSearchSyncService: OpenSearchSyncService,
     private val openSearchClient: OpenSearchClient,
-    private val restHighLevelClient: RestHighLevelClient
+    private val restHighLevelClient: RestHighLevelClient,
+    private val resourceLoader: ResourceLoader
 ) {
     private val logger = KotlinLogging.logger { }
-
-    @Value("classpath:opensearch/index-mappings.json")
-    private lateinit var indexResource: Resource
 
     /**
      * Checks for changed records since the last export and exports those changes to OpenSearch
@@ -82,50 +82,64 @@ class OpenSearchSyncStarterService(
      */
     @Transactional
     fun clearOpenSearch() {
-        logger.info { "Recreating the OpenSearch index" }
+        logger.info { "Recreating the OpenSearch indexes" }
 
-        deleteIndexIfExists(BUSINESS_PARTNER_INDEX_NAME)
-        createIndex(BUSINESS_PARTNER_INDEX_NAME)
+        deleteIndexesIfExists(LEGAL_ENTITIES_INDEX_NAME, ADDRESS_PARTNER_INDEX_NAME)
+        createIndexes(
+            IndexDefinition(LEGAL_ENTITIES_INDEX_NAME, MAPPINGS_FILE_PATH_LEGAL_ENTITIES),
+            IndexDefinition(ADDRESS_PARTNER_INDEX_NAME, MAPPINGS_FILE_PATH_ADDRESSES)
+        )
 
         syncRecordService.reset(SyncType.OPENSEARCH)
     }
 
     /**
-     * Checks whether the existing business partner index is up-to-date with the current index mappings and recreates the index if necessary
+     * Checks whether the existing indexes are up-to-date with the current index mappings and recreates the indexes if necessary
      *
      * @throws [ApplicationContextException] shutting down the application on exception
      */
     @EventListener(ContextRefreshedEvent::class)
     fun updateOnInit() {
-
-        logger.info { "Checking whether OpenSearch index needs to be recreated..." }
+        logger.info { "Checking whether OpenSearch indexes need to be recreated..." }
         try {
-            val indexAlreadyExists = openSearchClient.indices().exists { it.index(BUSINESS_PARTNER_INDEX_NAME) }.value()
+            var recreateIndexes = false
 
-            if (!indexAlreadyExists) {
-                logger.info { "Create index as it does not exist yet" }
-                createIndex(BUSINESS_PARTNER_INDEX_NAME)
+            recreateIndexes = updateOnInit(IndexDefinition(LEGAL_ENTITIES_INDEX_NAME, MAPPINGS_FILE_PATH_LEGAL_ENTITIES)) || recreateIndexes
+            recreateIndexes = updateOnInit(IndexDefinition(ADDRESS_PARTNER_INDEX_NAME, MAPPINGS_FILE_PATH_ADDRESSES)) || recreateIndexes
+
+            if (recreateIndexes) {
+                clearOpenSearch()
             } else {
-                val tempIndexName = "temp-business-partner"
-                deleteIndexIfExists(tempIndexName)
-                createIndex(tempIndexName)
-
-                val existingMappingMetadata = getIndexMappings(BUSINESS_PARTNER_INDEX_NAME).sourceAsMap()
-                val requiredMappingMetadata = getIndexMappings(tempIndexName).sourceAsMap()
-
-                if (requiredMappingMetadata != existingMappingMetadata) {
-                    clearOpenSearch()
-                } else {
-                    logger.info { "Index mappings still up-to-date" }
-                }
-
-                deleteIndexIfExists(tempIndexName)
+                logger.info { "Index mappings still up-to-date" }
             }
         } catch (e: Throwable) {
             // make sure Application exits when exception is thrown
-            throw ApplicationContextException("Exception when updating OpenSearch index during initialization", e)
+            throw ApplicationContextException("Exception when updating OpenSearch indexes during initialization", e)
         }
+    }
 
+    /**
+     * @return true if index mapping changed, false otherwise
+     */
+    private fun updateOnInit(indexDefinition: IndexDefinition): Boolean {
+        val indexAlreadyExists = openSearchClient.indices().exists { it.index(indexDefinition.indexName) }.value()
+
+        if (!indexAlreadyExists) {
+            logger.info { "Create index '${indexDefinition.indexName}' as it does not exist yet" }
+            createIndex(indexDefinition)
+            return false
+        } else {
+            val tempIndexName = "temp-${indexDefinition.indexName}"
+            deleteIndexIfExists(tempIndexName)
+            createIndex(IndexDefinition(tempIndexName, indexDefinition.mappingsFilePath))
+
+            val existingMappingMetadata = getIndexMappings(indexDefinition.indexName).sourceAsMap()
+            val requiredMappingMetadata = getIndexMappings(tempIndexName).sourceAsMap()
+
+            deleteIndexIfExists(tempIndexName)
+
+            return requiredMappingMetadata != existingMappingMetadata
+        }
     }
 
     private fun getIndexMappings(indexName: String): MappingMetadata {
@@ -152,6 +166,12 @@ class OpenSearchSyncStarterService(
         return response
     }
 
+    private fun deleteIndexesIfExists(vararg indexNames: String) {
+        for (indexName in indexNames) {
+            deleteIndexIfExists(indexName)
+        }
+    }
+
     private fun deleteIndexIfExists(indexName: String) {
         val indexExists = openSearchClient.indices().exists { it.index(indexName) }.value()
         if (indexExists) {
@@ -160,11 +180,19 @@ class OpenSearchSyncStarterService(
         }
     }
 
-    private fun createIndex(indexName: String) {
-        val indexMappings = String(indexResource.inputStream.readAllBytes())
-        val request = CreateIndexRequest(indexName)
+    private fun createIndexes(vararg indexDefinitions: IndexDefinition) {
+        for (indexDefinition in indexDefinitions) {
+            createIndex(indexDefinition)
+        }
+    }
+
+    private fun createIndex(indexDefinition: IndexDefinition) {
+        val indexMappings = String(resourceLoader.getResource("classpath:${indexDefinition.mappingsFilePath}").inputStream.readAllBytes())
+        val request = CreateIndexRequest(indexDefinition.indexName)
         request.mapping(indexMappings, XContentType.JSON)
 
         restHighLevelClient.indices().create(request, RequestOptions.DEFAULT)
     }
 }
+
+private data class IndexDefinition(val indexName: String, val mappingsFilePath: String)

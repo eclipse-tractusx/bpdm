@@ -25,16 +25,18 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.BusinessPartnerDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
+import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
 import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
@@ -49,8 +51,11 @@ import kotlin.math.ceil
 @Service
 @Primary
 class SearchServiceImpl(
-    val businessPartnerDocSearchRepository: BusinessPartnerDocSearchRepository,
+    val legalEntityDocSearchRepository: LegalEntityDocSearchRepository,
+    val addressDocSearchRepository: AddressDocSearchRepository,
     val legalEntityRepository: LegalEntityRepository,
+    val addressPartnerRepository: AddressPartnerRepository,
+    val addressService: AddressService,
     val textDocSearchRepository: TextDocSearchRepository,
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val objectMapper: ObjectMapper
@@ -80,6 +85,19 @@ class SearchServiceImpl(
         }
     }
 
+    /**
+     * @see SearchServiceImpl.searchLegalEntities
+     */
+    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchResponse> {
+        val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
+
+        addressService.fetchPartnerAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
+
+        return with(addressPage) {
+            PageResponse(totalElements, totalPages, page, contentSize,
+                content.map { (score, address) -> address.toMatchDto(score) })
+        }
+    }
 
     override fun searchBusinessPartners(
         searchRequest: BusinessPartnerSearchRequest,
@@ -140,7 +158,7 @@ class SearchServiceImpl(
     ): PageResponse<Pair<Float, LegalEntity>> {
         logger.debug { "Search index for legal entities" }
 
-        val searchResult = businessPartnerDocSearchRepository.findBySearchRequest(
+        val searchResult = legalEntityDocSearchRepository.findBySearchRequest(
             searchRequest,
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
@@ -160,5 +178,33 @@ class SearchServiceImpl(
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
         return PageResponse(totalHits, totalPages, paginationRequest.page, legalEntities.size, scoreLegalEntityPairs)
+    }
+
+    private fun searchAndPreparePage(
+        searchRequest: AddressPartnerSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<Pair<Float, AddressPartner>> {
+        logger.debug { "Search index for addresses" }
+
+        val searchResult = addressDocSearchRepository.findBySearchRequest(
+            searchRequest,
+            PageRequest.of(paginationRequest.page, paginationRequest.size)
+        )
+
+        logger.debug { "Found ${searchResult.hits.size} addresses in OpenSearch. (${searchResult.totalHits} in total)" }
+
+        val bpnHitMap = searchResult.associateBy { it.id }
+
+        val addresses = addressPartnerRepository.findDistinctByBpnIn(bpnHitMap.keys)
+        val missingPartners = bpnHitMap.keys.minus(addresses.map { it.bpn }.toSet())
+
+        if (missingPartners.isNotEmpty())
+            logger.warn { "Some BPNs could not be found in the database: ${missingPartners.joinToString()}" }
+
+        val scoreAddressPairs = addresses.map { Pair(bpnHitMap[it.bpn]!!.score, it) }.sortedByDescending { it.first }
+
+        val totalHits = searchResult.totalHits!!.value - missingPartners.size
+        val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
+        return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
     }
 }
