@@ -636,7 +636,7 @@ class CdqControllerImportIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
                 .inScenario(importScenario)
-                .whenScenarioStateIs(queriedNewState)
+                .whenScenarioStateIs(firstCallParentState)
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

@@ -48,6 +48,10 @@ object CdqValues {
     val language2 = LanguageCdq(LanguageCode.de, LanguageCode.de.getName())
     val language3 = LanguageCdq(LanguageCode.zh, LanguageCode.zh.getName())
 
+    val country1 = CountryCdq(CommonValues.country1, CommonValues.country1.getName())
+    val country2 = CountryCdq(CommonValues.country2, CommonValues.country2.getName())
+    val country3 = CountryCdq(CommonValues.country3, CommonValues.country3.getName())
+
     val legalEntityName1 = NameCdq(CommonValues.name1)
     val legalEntityName2 = NameCdq(CommonValues.name2)
     val legalEntityName3 = NameCdq(CommonValues.name3)
@@ -60,8 +64,6 @@ object CdqValues {
 
     val identifierType1 = TypeKeyNameUrlCdq(CommonValues.identifierTypeTechnicalKey1, CommonValues.identiferTypeName1, CommonValues.identifierTypeUrl1)
 
-    val bpnIdentifiertype = TypeKeyNameUrlCdq("CX_BPN", null, null)
-
     val issuingBody1 = TypeKeyNameUrlCdq(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
 
     val identifierStatus1 = TypeKeyNameCdq(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
@@ -69,15 +71,6 @@ object CdqValues {
     val identifier1 = IdentifierCdq(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
     val identifier2 = IdentifierCdq(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
     val identifier3 = IdentifierCdq(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
-
-    val bpnL1 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL1, null, null)
-    val bpnL2 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL2, null, null)
-    val bpnL3 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnL3, null, null)
-
-    val bpnS1 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS1, null, null)
-    val bpnS2 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS2, null, null)
-    val bpnS3 = IdentifierCdq(bpnIdentifiertype, CommonValues.bpnS3, null, null)
-
 
     val legalForm1 = LegalFormCdq(
         CommonValues.legalFormName1,
@@ -179,6 +172,7 @@ object CdqValues {
         id = addressId1,
         externalId = addressId1,
         cdqId = addressId1,
+        country = country1,
         administrativeAreas = listOf(adminArea1, adminArea2),
         postCodes = listOf(postCode1, postCode2),
         localities = listOf(locality1, locality2),
@@ -191,6 +185,7 @@ object CdqValues {
         id = addressId2,
         externalId = addressId2,
         cdqId = addressId2,
+        country = country2,
         administrativeAreas = listOf(adminArea3, adminArea4),
         postCodes = listOf(postCode3, postCode4),
         localities = listOf(locality3, locality4),
@@ -203,6 +198,7 @@ object CdqValues {
         id = addressId3,
         externalId = addressId3,
         cdqId = addressId3,
+        country = country3,
         administrativeAreas = listOf(adminArea5),
         postCodes = listOf(postCode5),
         localities = listOf(locality5),
