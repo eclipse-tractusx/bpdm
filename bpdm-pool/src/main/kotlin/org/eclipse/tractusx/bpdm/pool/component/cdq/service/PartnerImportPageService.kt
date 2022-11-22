@@ -70,14 +70,11 @@ class PartnerImportPageService(
 
         logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }
 
-        val asFetch = cdqClient.fetchBusinessPartnersInBatch(partnerCollection.values.mapNotNull { it.extractId(adapterProperties.importIdKey) })
-
         addNewMetadata(partnerCollection.values)
 
         val validPartners = partnerCollection.values.filter { isValid(it) }
-        val partnersWithId = determineImportId(validPartners)
 
-        val (partnersWithBpn, partnersWithoutBpn) = determineBpn(partnersWithId)
+        val (partnersWithBpn, partnersWithoutBpn) = determineBpn(validPartners)
 
         val (createdLegalEntities, createdSites, createdAddresses) = createPartners(partnersWithoutBpn)
         val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(partnersWithBpn)
@@ -129,11 +126,11 @@ class PartnerImportPageService(
             .forEach { metadataService.createLegalForm(it) }
     }
 
-    private fun createPartners(partners: Collection<BusinessPartnerWithImportId>):
+    private fun createPartners(partners: Collection<BusinessPartnerCdq>):
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerCreateResponse>> {
-        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
+        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.extractLsaType() }
 
-        val partnersWithParent = determineParent(sitesCdq + addressesCdq)
+        val partnersWithParent = determineParents(sitesCdq + addressesCdq)
         val (_, sitesWithParent, addressesWithParent) = partitionIntoLSA(partnersWithParent) { it.partner.extractLsaType() }
 
         val legalEntities = legalEntitiesCdq.map { mappingService.toLegalEntityCreateRequest(it) }
@@ -168,29 +165,28 @@ class PartnerImportPageService(
         return Triple(createdLegalEntities, createdSites, createdAddresses)
     }
 
-    private fun determineParent(children: Collection<BusinessPartnerWithImportId>): Collection<BusinessPartnerWithParent> {
+    private fun determineParents(children: Collection<BusinessPartnerCdq>): Collection<BusinessPartnerWithParentBpn> {
         if (children.isEmpty()) return emptyList()
 
         val childrenWithParentId = determineParentId(children)
 
-        val parents = cdqClient.fetchBusinessPartnersInBatch(childrenWithParentId.map { it.parentId }).map { it.businessPartner }
-        val parentsWithId = determineImportId(parents)
-        val validParentsWithId = filterValidParents(parentsWithId, childrenWithParentId)
+        val parents = cdqClient.readBusinessPartnersByExternalIds(childrenWithParentId.map { it.parentId }).values
+        val validParents = filterValidRelations(parents.filter { isValid(it) }, childrenWithParentId)
 
-        val (parentsWithBpn, parentsWithoutBpn) = determineBpn(validParentsWithId)
+        val (parentsWithBpn, parentsWithoutBpn) = determineBpn(validParents)
 
         val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
 
         val parentIdToBpn = newLegalEntities.map { Pair(it.index, it.bpn) }
             .plus(newSites.map { Pair(it.index, it.bpn) })
-            .plus(parentsWithBpn.map { Pair(it.importId, it.bpn) })
+            .plus(parentsWithBpn.map { Pair(it.partner.externalId!!, it.bpn) })
             .toMap()
 
 
         return childrenWithParentId.mapNotNull { childWithParentId ->
             val parentBpn = parentIdToBpn[childWithParentId.parentId]
             if (parentBpn != null) {
-                BusinessPartnerWithParent(childWithParentId.partner, childWithParentId.importId, parentBpn)
+                BusinessPartnerWithParentBpn(childWithParentId.partner, parentBpn)
             } else {
                 logger.warn { "Can not resolve parent with Import-ID ${childWithParentId.parentId} for CDQ record with ID ${childWithParentId.partner.id}" }
                 null
@@ -198,13 +194,13 @@ class PartnerImportPageService(
         }
     }
 
-    private fun determineParentId(children: Collection<BusinessPartnerWithImportId>): Collection<BusinessPartnerWithParentId> {
-        return children.mapNotNull { childWithId ->
-            val parentId = childWithId.partner.relations.firstOrNull { id -> id.type?.technicalKey == adapterProperties.parentRelationType }?.startNode
+    private fun determineParentId(children: Collection<BusinessPartnerCdq>): Collection<BusinessPartnerWithParentId> {
+        return children.mapNotNull { child ->
+            val parentId = child.relations.firstOrNull { id -> id.type?.technicalKey == adapterProperties.parentRelationType }?.startNode
             if (parentId != null) {
-                BusinessPartnerWithParentId(childWithId.partner, childWithId.importId, parentId)
+                BusinessPartnerWithParentId(child, parentId)
             } else {
-                logger.warn { "Can not resolve parent CDQ record for child with ID ${childWithId.partner.id}: Record has no identifier of type ${adapterProperties.importIdKey}" }
+                logger.warn { "Can not resolve parent CDQ record for child with ID ${child.id}: Record contains no parent ID" }
                 null
             }
         }
@@ -213,6 +209,11 @@ class PartnerImportPageService(
     private fun isValid(partner: BusinessPartnerCdq): Boolean {
         if (partner.addresses.any { address -> address.thoroughfares.any { thoroughfare -> thoroughfare.value == null } }) {
             logger.warn { "CDQ Partner with id ${partner.id} is invalid: Contains thoroughfare without ${ThoroughfareCdq::value.name} field specified." }
+            return false
+        }
+
+        if (partner.externalId == null) {
+            logger.warn { "CDQ record with ID ${partner.id} has no external ID that can be used as import ID" }
             return false
         }
 
@@ -255,53 +256,41 @@ class PartnerImportPageService(
         return type
     }
 
-    private fun determineBpn(partners: Collection<BusinessPartnerWithImportId>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerWithImportId>> {
+    private fun determineBpn(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
         val (hasStorageBpn, noStorageBpn) = partners
-            .map { Pair(it, it.partner.extractId(adapterProperties.bpnKey)) }
+            .map { Pair(it, it.extractId(adapterProperties.bpnKey)) }
             .partition { (_, bpn) -> bpn != null }
 
-        val (hasImportedBpn, noBpn) = determineImportedBpn(noStorageBpn.map { (partnerWithId, _) -> partnerWithId })
+        val (hasImportedBpn, noBpn) = determineImportedBpn(noStorageBpn.map { (partner, _) -> partner })
 
         return Pair(
-            hasStorageBpn.map { (partnerWithId, id) -> BusinessPartnerWithBpn(partnerWithId.partner, partnerWithId.importId, id!!) } + hasImportedBpn,
+            hasStorageBpn.map { (partner, id) -> BusinessPartnerWithBpn(partner, id!!) } + hasImportedBpn,
             noBpn)
     }
 
-    private fun determineImportedBpn(partners: Collection<BusinessPartnerWithImportId>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerWithImportId>> {
-        val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.importId })
+    private fun determineImportedBpn(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
+        val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.externalId!! })
             .associateBy { it.importIdentifier }
 
         val (hasImportedBpn, noBpn) = partners
-            .map { Pair(it, importEntries[it.importId]?.bpn) }
+            .map { Pair(it, importEntries[it.externalId]?.bpn) }
             .partition { (_, bpn) -> bpn != null }
 
         return Pair(
-            hasImportedBpn.map { (partnerWithId, bpn) -> BusinessPartnerWithBpn(partnerWithId.partner, partnerWithId.importId, bpn!!) },
-            noBpn.map { (partnerWithId, _) -> partnerWithId }
+            hasImportedBpn.map { (partner, bpn) -> BusinessPartnerWithBpn(partner, bpn!!) },
+            noBpn.map { (partner, _) -> partner }
         )
     }
 
-    private fun determineImportId(partners: Collection<BusinessPartnerCdq>): Collection<BusinessPartnerWithImportId> {
-        return partners.mapNotNull { partner ->
-            val importId = partner.extractId(adapterProperties.importIdKey)
-            if (importId != null) {
-                BusinessPartnerWithImportId(partner, importId)
-            } else {
-                logger.warn { "CDQ record with ID ${partner.id} has no import ID" }
-                null
-            }
-        }
-    }
-
-    private fun filterValidParents(
-        parents: Collection<BusinessPartnerWithImportId>,
+    private fun filterValidRelations(
+        parents: Collection<BusinessPartnerCdq>,
         children: Collection<BusinessPartnerWithParentId>
-    ): Collection<BusinessPartnerWithImportId> {
+    ): Collection<BusinessPartnerCdq> {
         val parentIdToChild = children.associateBy { it.parentId }
 
         return parents.filter { parent ->
-            val parentType = parent.partner.extractLsaType()
-            val childType = parentIdToChild[parent.importId]?.partner?.extractLsaType()
+            val parentType = parent.extractLsaType()
+            val childType = parentIdToChild[parent.externalId]?.partner?.extractLsaType()
 
             val childParentRelation = Pair(childType, parentType)
 
@@ -311,6 +300,4 @@ class PartnerImportPageService(
 
     private fun BusinessPartnerCdq.extractId(idKey: String): String? =
         identifiers.find { it.type?.technicalKey == idKey }?.value
-
-
 }

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 
-data class BusinessPartnerWithImportId(
+data class BusinessPartnerWithParentBpn(
     val partner: BusinessPartnerCdq,
-    val importId: String
+    val parentBpn: String
 )

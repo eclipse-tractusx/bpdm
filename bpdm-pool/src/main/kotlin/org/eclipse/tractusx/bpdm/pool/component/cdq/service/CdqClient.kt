@@ -20,12 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchBatchRecord
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchBatchRequest
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
 import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.Instant
@@ -55,15 +52,22 @@ class CdqClient(
             .block()!!
     }
 
-    fun fetchBusinessPartnersInBatch(idValues: Collection<String>): Collection<FetchBatchRecord> {
-        if (idValues.isEmpty()) return emptyList()
+    fun readBusinessPartnersByExternalIds(idValues: Collection<String>): PagedResponseCdq<BusinessPartnerCdq> {
+        if (idValues.isEmpty()) return PagedResponseCdq(limit = 0, total = 0, values = emptyList())
 
         return webClient
-            .post()
-            .uri(adapterProperties.fetchBusinessPartnersBatchUrl)
-            .body(BodyInserters.fromValue(FetchBatchRequest(idValues)))
+            .get()
+            .uri { builder ->
+                builder
+                    .path(adapterProperties.readBusinessPartnerUrl)
+                    .queryParam("limit", idValues.size)
+                    .queryParam("datasource", adapterProperties.datasource)
+                    .queryParam("featuresOn", "USE_NEXT_START_AFTER", "FETCH_RELATIONS")
+                    .queryParam("externalId", idValues.joinToString(","))
+                builder.build()
+            }
             .retrieve()
-            .bodyToMono<Collection<FetchBatchRecord>>()
+            .bodyToMono<PagedResponseCdq<BusinessPartnerCdq>>()
             .block()!!
     }
 

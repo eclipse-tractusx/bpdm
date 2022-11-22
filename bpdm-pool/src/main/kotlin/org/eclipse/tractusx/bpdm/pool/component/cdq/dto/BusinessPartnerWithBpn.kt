@@ -23,6 +23,5 @@ import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 
 data class BusinessPartnerWithBpn(
     val partner: BusinessPartnerCdq,
-    val importId: String,
     val bpn: String
 )

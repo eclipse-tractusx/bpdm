@@ -31,17 +31,16 @@ import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithBpn
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithImportId
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithParent
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithParentBpn
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.springframework.stereotype.Service
 
 @Service
 class CdqToRequestMapper {
-    fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerWithImportId): LegalEntityPartnerCreateRequest {
+    fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerCdq): LegalEntityPartnerCreateRequest {
         return LegalEntityPartnerCreateRequest(
-            partnerWithImportId.partner.toLegalEntityDto(),
-            partnerWithImportId.importId
+            partnerWithImportId.toLegalEntityDto(),
+            partnerWithImportId.externalId
         )
     }
 
@@ -52,11 +51,11 @@ class CdqToRequestMapper {
         )
     }
 
-    fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParent): SitePartnerCreateRequest {
+    fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             site = partnerWithParent.partner.toSiteDto(),
             legalEntity = partnerWithParent.parentBpn,
-            index = partnerWithParent.importId
+            index = partnerWithParent.partner.externalId
         )
     }
 
@@ -67,11 +66,11 @@ class CdqToRequestMapper {
         )
     }
 
-    fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParent): AddressPartnerCreateRequest {
+    fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
             properties = toDto(partnerWithParent.partner.addresses.first()),
             parent = partnerWithParent.parentBpn,
-            index = partnerWithParent.importId
+            index = partnerWithParent.partner.externalId
         )
     }
 
