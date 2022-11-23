@@ -27,9 +27,10 @@ import org.springframework.boot.context.properties.ConstructorBinding
 class CdqConfigProperties(
     val host: String = "https://api.cdq.com",
     val storage: String = "38d2277e20c730b4b8e8f182adcef7ca",
-    val datasourceLegalEntity: String = "621338451197b7667a5fbda4",
-    val datasourceSite: String = "62c301de2b9abd437140b704",
-    val datasourceAddress: String = "62c30bdb84160a51f6bb227a",
+    val datasource: String = "621338451197b7667a5fbda4",
+    val legalEntityType: String = "LEGAL_ENTITY",
+    val siteType: String = "ORGANIZATIONAL_UNIT",
+    val addressType: String = "BP_ADDRESS",
     val apiKey: String = "",
     val dataExchangeApiUrl: String = "/data-exchange/rest/v4/storages/${storage}",
     val referenceDataApiUrl: String = "referencedata/rest/v3",

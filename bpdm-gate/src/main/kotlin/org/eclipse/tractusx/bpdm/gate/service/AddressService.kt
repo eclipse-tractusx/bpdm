@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.common.service.CdqMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
@@ -41,20 +42,39 @@ class AddressService(
     private val inputCdqMappingService: InputCdqMappingService,
     private val cdqClient: CdqClient,
     private val poolClient: PoolClient,
-    private val bpnConfigProperties: BpnConfigProperties
+    private val bpnConfigProperties: BpnConfigProperties,
+    private val typeMatchingService: TypeMatchingService
 ) {
     private val logger = KotlinLogging.logger { }
 
     fun getAddresses(limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateInput> {
         val addressesPage = cdqClient.getAddresses(limit, startAfter)
-
         val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
+
+        val addressesWithParent = validEntries.map { Pair(it, inputCdqMappingService.toParentLegalEntityExternalId(it.relations)!!) }
+
+        val parents =
+            if (addressesWithParent.isNotEmpty()) cdqClient.getBusinessPartners(externalIds = addressesWithParent.map { (_, parentId) -> parentId }).values else emptyList()
+        val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
+        val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
+        val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
+
+        val inputAddresses = addressesWithParent.mapNotNull { (address, parentId) ->
+            when {
+                legalEntityParentIds.contains(parentId) -> inputCdqMappingService.toInputAddress(address, parentId, null)
+                siteParentIds.contains(parentId) -> inputCdqMappingService.toInputAddress(address, null, parentId)
+                else -> {
+                    logger.warn { "Could not fetch parent for CDQ address record with ID ${address.id}" }
+                    null
+                }
+            }
+        }
 
         return PageStartAfterResponse(
             total = addressesPage.total,
             nextStartAfter = addressesPage.nextStartAfter,
-            content = validEntries.map { inputCdqMappingService.toInputAddress(it) },
-            invalidEntries = addressesPage.values.size - validEntries.size
+            content = inputAddresses,
+            invalidEntries = addressesPage.values.size - inputAddresses.size
         )
     }
 
@@ -228,7 +248,15 @@ class AddressService(
         if (!validateAddressBusinessPartner(partner)) {
             throw CdqInvalidRecordException(partner.id)
         }
-        return inputCdqMappingService.toInputAddress(partner)
+
+        val parentId = inputCdqMappingService.toParentLegalEntityExternalId(partner.relations)
+        val parentType = parentId?.let { cdqClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
+
+        return when (parentType) {
+            LsaType.LegalEntity -> inputCdqMappingService.toInputAddress(partner, parentId, null)
+            LsaType.Site -> inputCdqMappingService.toInputAddress(partner, null, parentId)
+            else -> throw CdqInvalidRecordException(parentId)
+        }
     }
 
     private fun validateAddressBusinessPartner(partner: BusinessPartnerCdq): Boolean {
@@ -242,21 +270,14 @@ class AddressService(
             return false
         }
 
-        val numLegalEntityParents = inputCdqMappingService.toParentLegalEntityExternalIds(partner.relations).size
-        if (numLegalEntityParents > 1) {
-            logger.warn { "$logMessageStart has multiple parent legal entities." }
-        }
-        val numSiteParents = inputCdqMappingService.toParentSiteExternalIds(partner.relations).size
-        if (numSiteParents > 1) {
-            logger.warn { "$logMessageStart has multiple parent sites." }
+        val numParents = inputCdqMappingService.toParentLegalEntityExternalIds(partner.relations).size
+        if (numParents > 1) {
+            logger.warn { "$logMessageStart has multiple parents." }
         }
 
-        if (numLegalEntityParents == 0 && numSiteParents == 0) {
+        if (numParents == 0) {
             logger.warn { "$logMessageStart does not have a parent legal entity or site." }
-        }
-
-        if (numLegalEntityParents > 0 && numSiteParents > 0) {
-            logger.warn { "$logMessageStart has both a parent legal entity and a parent site." }
+            return false
         }
 
         return true

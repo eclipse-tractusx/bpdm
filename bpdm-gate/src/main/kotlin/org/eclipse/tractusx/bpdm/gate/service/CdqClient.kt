@@ -48,20 +48,20 @@ class CdqClient(
 ) {
 
     fun getAugmentedLegalEntities(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
-        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceLegalEntity)
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.legalEntityType)
 
     fun getAugmentedSites(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
-        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceSite)
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.siteType)
 
     fun getAugmentedAddresses(limit: Int? = null, startAfter: String? = null, from: Instant? = null, externalIds: Collection<String>? = null) =
-        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.datasourceAddress)
+        getAugmentedBusinessPartners(limit, startAfter, from, externalIds, cdqConfigProperties.addressType)
 
     private fun getAugmentedBusinessPartners(
         limit: Int?,
         startAfter: String?,
         from: Instant?,
         externalIds: Collection<String>?,
-        datasource: String
+        type: String
     ): PagedResponseCdq<AugmentedBusinessPartnerResponseCdq> {
         val partnerCollection = try {
             webClient
@@ -69,7 +69,8 @@ class CdqClient(
                 .uri { builder ->
                     builder
                         .path(cdqConfigProperties.dataClinicApiUrl + "/augmentedbusinesspartners")
-                        .queryParam("dataSourceId", datasource)
+                        .queryParam("dataSourceId", cdqConfigProperties.datasource)
+                        .queryParam("typeTechnicalKeys", type)
                     if (limit != null) builder.queryParam("limit", limit)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (from != null) builder.queryParam("from", from)
@@ -83,23 +84,6 @@ class CdqClient(
             throw CdqRequestException("Read augmented business partners request failed.", e)
         }
         return partnerCollection
-    }
-
-    fun getAugmentedBusinessPartner(externalId: String): AugmentedBusinessPartnerResponseCdq {
-        val fetchRequest = ReadAugmentedBusinessPartnerRequestCdq(externalId)
-
-        val response = try {
-            webClient
-                .post()
-                .uri(cdqConfigProperties.dataClinicApiUrl + "/datasources/${cdqConfigProperties.datasourceLegalEntity}/augmentedbusinesspartners/fetch")
-                .bodyValue(objectMapper.writeValueAsString(fetchRequest))
-                .retrieve()
-                .bodyToMono<AugmentedBusinessPartnerResponseCdq>()
-                .block()!!
-        } catch (e: Exception) {
-            throw CdqRequestException("Read augmented business partner request failed.", e)
-        }
-        return response
     }
 
     fun deleteRelations(relations: Collection<DeleteRelationsRequestCdq.RelationToDeleteCdq>) {
@@ -117,21 +101,21 @@ class CdqClient(
     }
 
     fun upsertLegalEntities(legalEntities: List<BusinessPartnerCdq>) {
-        return upsertBusinessPartners(legalEntities, cdqConfigProperties.datasourceLegalEntity)
+        return upsertBusinessPartners(legalEntities)
     }
 
     fun upsertSites(sites: List<BusinessPartnerCdq>) {
-        return upsertBusinessPartners(sites, cdqConfigProperties.datasourceSite)
+        return upsertBusinessPartners(sites)
     }
 
-    fun upsertAddresses(sites: List<BusinessPartnerCdq>) {
-        return upsertBusinessPartners(sites, cdqConfigProperties.datasourceAddress)
+    fun upsertAddresses(addresses: List<BusinessPartnerCdq>) {
+        return upsertBusinessPartners(addresses)
     }
 
-    private fun upsertBusinessPartners(businessPartners: List<BusinessPartnerCdq>, datasource: String) {
+    private fun upsertBusinessPartners(businessPartners: List<BusinessPartnerCdq>) {
         val upsertRequest =
             UpsertRequest(
-                datasource,
+                cdqConfigProperties.datasource,
                 businessPartners,
                 listOf(UpsertRequest.CdqFeatures.UPSERT_BY_EXTERNAL_ID, UpsertRequest.CdqFeatures.API_ERROR_ON_FAILURES)
             )
@@ -150,7 +134,7 @@ class CdqClient(
     }
 
     fun getBusinessPartner(externalId: String): FetchResponse {
-        val fetchRequest = FetchRequest(cdqConfigProperties.datasourceLegalEntity, externalId)
+        val fetchRequest = FetchRequest(cdqConfigProperties.datasource, externalId, featuresOn = listOf(FetchRequest.CdqFeatures.FETCH_RELATIONS))
 
         val fetchResponse = try {
             webClient
@@ -167,13 +151,13 @@ class CdqClient(
     }
 
     fun getLegalEntities(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
-        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceLegalEntity, listOf("USE_NEXT_START_AFTER"))
+        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.legalEntityType, listOf("USE_NEXT_START_AFTER"))
 
     fun getSites(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
-        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceSite, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
+        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.siteType, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
 
     fun getAddresses(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
-        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.datasourceAddress, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
+        getBusinessPartners(limit, startAfter, externalIds, cdqConfigProperties.addressType, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
 
     fun lookUpReferenceData(lookupRequest: ReferenceDataLookupRequestCdq): ReferenceDataLookupResponseCdq {
         return try {
@@ -189,12 +173,12 @@ class CdqClient(
         }
     }
 
-    private fun getBusinessPartners(
-        limit: Int?,
-        startAfter: String?,
-        externalIds: List<String>?,
-        datasource: String,
-        featuresOn: List<String>?
+    fun getBusinessPartners(
+        limit: Int? = null,
+        startAfter: String? = null,
+        externalIds: Collection<String>? = null,
+        type: String? = null,
+        featuresOn: Collection<String>? = null
     ): PagedResponseCdq<BusinessPartnerCdq> {
         val partnerCollection = try {
             webClient
@@ -202,7 +186,8 @@ class CdqClient(
                 .uri { builder ->
                     builder
                         .path(cdqConfigProperties.dataExchangeApiUrl + BUSINESS_PARTNER_PATH)
-                        .queryParam("dataSource", datasource)
+                        .queryParam("dataSource", cdqConfigProperties.datasource)
+                    if (type != null) builder.queryParam("typeTechnicalKeys", type)
                     if (startAfter != null) builder.queryParam("startAfter", startAfter)
                     if (limit != null) builder.queryParam("limit", limit)
                     if (!featuresOn.isNullOrEmpty()) builder.queryParam("featuresOn", featuresOn.joinToString(","))
@@ -223,9 +208,9 @@ class CdqClient(
         val relationsCdq = relations.map {
             RelationCdq(
                 startNode = it.legalEntityExternalId,
-                startNodeDataSource = cdqConfigProperties.datasourceLegalEntity,
+                startNodeDataSource = cdqConfigProperties.datasource,
                 endNode = it.siteExternalId,
-                endNodeDataSource = cdqConfigProperties.datasourceSite,
+                endNodeDataSource = cdqConfigProperties.datasource,
                 type = TypeKeyNameCdq(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()
@@ -236,18 +221,18 @@ class CdqClient(
         val legalEntityRelationsCdq = legalEntityRelations.map {
             RelationCdq(
                 startNode = it.legalEntityExternalId,
-                startNodeDataSource = cdqConfigProperties.datasourceLegalEntity,
+                startNodeDataSource = cdqConfigProperties.datasource,
                 endNode = it.addressExternalId,
-                endNodeDataSource = cdqConfigProperties.datasourceAddress,
+                endNodeDataSource = cdqConfigProperties.datasource,
                 type = TypeKeyNameCdq(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()
         val siteRelationsCdq = siteRelations.map {
             RelationCdq(
                 startNode = it.siteExternalId,
-                startNodeDataSource = cdqConfigProperties.datasourceSite,
+                startNodeDataSource = cdqConfigProperties.datasource,
                 endNode = it.addressExternalId,
-                endNodeDataSource = cdqConfigProperties.datasourceAddress,
+                endNodeDataSource = cdqConfigProperties.datasource,
                 type = TypeKeyNameCdq(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()

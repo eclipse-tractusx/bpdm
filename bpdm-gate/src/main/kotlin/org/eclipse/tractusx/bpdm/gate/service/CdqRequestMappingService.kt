@@ -43,7 +43,7 @@ class CdqRequestMappingService(
     fun toCdqModel(site: SiteGateInput): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = site.externalId,
-            dataSource = cdqConfigProperties.datasourceSite,
+            dataSource = cdqConfigProperties.datasource,
             names = listOf(NameCdq(value = site.site.name)),
             addresses = listOf(toCdqModel(site.site.mainAddress)),
             identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn)) else emptyList(),
@@ -54,7 +54,7 @@ class CdqRequestMappingService(
     fun toCdqModel(address: AddressGateInput): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = address.externalId,
-            dataSource = cdqConfigProperties.datasourceAddress,
+            dataSource = cdqConfigProperties.datasource,
             addresses = listOf(toCdqModel(address.address)),
             identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList(),
             types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.BP_ADDRESS.name))
@@ -64,7 +64,7 @@ class CdqRequestMappingService(
     private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String, bpn: String?): BusinessPartnerCdq {
         return BusinessPartnerCdq(
             externalId = externalId,
-            dataSource = cdqConfigProperties.datasourceLegalEntity,
+            dataSource = cdqConfigProperties.datasource,
             identifiers = toIdentifiersCdq(legalEntity.identifiers, bpn),
             names = legalEntity.names.map { it.toCdqModel() },
             legalForm = toLegalFormCdq(legalEntity.legalForm),

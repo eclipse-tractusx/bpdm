@@ -380,21 +380,21 @@ internal class SiteControllerInputIT @Autowired constructor(
         val expectedDeletedRelations = listOf(
             DeleteRelationsRequestCdq.RelationToDeleteCdq(
                 startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().startNode
                 ),
                 endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().endNode
                 ),
             ),
             DeleteRelationsRequestCdq.RelationToDeleteCdq(
                 startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().startNode
                 ),
                 endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().endNode
                 ),
             ),
@@ -404,7 +404,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -441,7 +441,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
                 .willReturn(
                     aResponse()
@@ -532,7 +532,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

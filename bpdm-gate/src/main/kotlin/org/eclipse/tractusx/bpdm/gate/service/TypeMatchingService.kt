@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.ReferenceDataLookupRequestCdq
+import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
@@ -30,13 +33,16 @@ import org.springframework.stereotype.Service
 class TypeMatchingService(
     private val cdqClient: CdqClient,
     private val cdqLookupMappingService: CdqLookupMappingService,
-    private val typeMatchConfigProperties: TypeMatchConfigProperties
+    private val typeMatchConfigProperties: TypeMatchConfigProperties,
+    private val cdqConfigProperties: CdqConfigProperties
 ) {
+    private val logger = KotlinLogging.logger { }
+
     /**
      * For a candidate DTO determines its likely LSA type
      * Currently can only distinguish between legal entity or nothing
      */
-    fun determineType(partner: BusinessPartnerCandidateDto): TypeMatchResponse {
+    fun determineCandidateType(partner: BusinessPartnerCandidateDto): TypeMatchResponse {
         val request = ReferenceDataLookupRequestCdq(
             matchingThreshold = typeMatchConfigProperties.legalEntityThreshold,
             pageSize = 1,
@@ -56,4 +62,40 @@ class TypeMatchingService(
 
     }
 
+    /**
+     * Partitions the input into legal entities and sites for a given collection.
+     * Filters out any addresses with a warning since they can't be parents
+     */
+    fun partitionIntoParentTypes(parents: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerCdq>, Collection<BusinessPartnerCdq>> {
+        val typeGroups = parents.groupBy { determineType(it) }
+
+        typeGroups.keys
+            .filterNot { it == LsaType.LegalEntity || it == LsaType.Site }
+            .forEach { invalidGroup ->
+                typeGroups[invalidGroup]!!.forEach {
+                    logger.warn { "Business Partner with ID ${it.id} is parent with invalid type $invalidGroup" }
+                }
+            }
+
+        return Pair(typeGroups[LsaType.LegalEntity] ?: emptyList(), typeGroups[LsaType.Site] ?: emptyList())
+    }
+
+    fun determineType(partner: BusinessPartnerCdq): LsaType {
+        if (partner.types.isEmpty()) {
+            logger.warn { "Partner with ID ${partner.id} does not have any type" }
+            return LsaType.None
+        }
+
+        if (partner.types.size > 1) {
+            logger.warn { "Partner with ID ${partner.id} has several types" }
+        }
+
+        val partnerType = partner.types.first()
+        return when (partnerType.technicalKey) {
+            cdqConfigProperties.legalEntityType -> LsaType.LegalEntity
+            cdqConfigProperties.siteType -> LsaType.Site
+            cdqConfigProperties.addressType -> LsaType.Address
+            else -> LsaType.None
+        }
+    }
 }

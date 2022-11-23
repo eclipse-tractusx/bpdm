@@ -55,6 +55,6 @@ class BusinessPartnerController(
         if (candidate.names.isEmpty() && candidate.identifiers.isEmpty())
             throw BpdmInvalidPartnerException("Candidate", "Business partner candidate needs to specify either a name or identifier.")
 
-        return typeMatchingService.determineType(candidate)
+        return typeMatchingService.determineCandidateType(candidate)
     }
 }

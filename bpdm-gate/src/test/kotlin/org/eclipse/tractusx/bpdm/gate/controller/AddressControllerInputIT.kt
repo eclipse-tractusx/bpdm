@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,6 +65,11 @@ internal class AddressControllerInputIT @Autowired constructor(
         }
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        wireMockServer.resetAll()
+    }
+
     /**
      * Given address exists in cdq
      * When getting address by external id
@@ -71,10 +77,13 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get address by external id`() {
+        val externalIdToQuery = CdqValues.addressBusinessPartnerWithRelations1.externalId!!
         val expectedAddress = RequestValues.addressGateInput1
 
+        val addressRequest = FetchRequest(dataSource = cdqConfigProperties.datasource, externalId = externalIdToQuery)
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(addressRequest)))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -89,7 +98,26 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val address = webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
+        val parentRequest = FetchRequest(dataSource = cdqConfigProperties.datasource, externalId = CdqValues.legalEntity1.externalId!!)
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+                .withRequestBody(equalToJson(objectMapper.writeValueAsString(parentRequest)))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                FetchResponse(
+                                    businessPartner = CdqValues.legalEntity1,
+                                    status = FetchResponse.Status.OK
+                                )
+                            )
+                        )
+                )
+        )
+
+
+        val address = webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${externalIdToQuery}")
             .exchange()
             .expectStatus()
             .isOk
@@ -190,6 +218,11 @@ internal class AddressControllerInputIT @Autowired constructor(
             CdqValues.addressBusinessPartnerWithRelations2
         )
 
+        val parentsCdq = listOf(
+            CdqValues.legalEntity1,
+            CdqValues.siteBusinessPartner1
+        )
+
         val expectedAddresses = listOf(
             RequestValues.addressGateInput1,
             RequestValues.addressGateInput2
@@ -203,6 +236,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -214,6 +248,26 @@ internal class AddressControllerInputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = addressesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", matching(".*"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = parentsCdq.size,
+                                    startAfter = null,
+                                    nextStartAfter = null,
+                                    total = parentsCdq.size,
+                                    values = parentsCdq
                                 )
                             )
                         )
@@ -257,6 +311,11 @@ internal class AddressControllerInputIT @Autowired constructor(
             CdqValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList()), // address without address data
         )
 
+        val parentsCdq = listOf(
+            CdqValues.legalEntity1,
+            CdqValues.siteBusinessPartner1
+        )
+
         val expectedAddresses = listOf(
             RequestValues.addressGateInput1,
             RequestValues.addressGateInput2
@@ -270,6 +329,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -281,6 +341,26 @@ internal class AddressControllerInputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = addressesCdq
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", matching(".*"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseCdq(
+                                    limit = parentsCdq.size,
+                                    startAfter = null,
+                                    nextStartAfter = null,
+                                    total = parentsCdq.size,
+                                    values = parentsCdq
                                 )
                             )
                         )
@@ -377,21 +457,21 @@ internal class AddressControllerInputIT @Autowired constructor(
         val expectedDeletedRelations = listOf(
             DeleteRelationsRequestCdq.RelationToDeleteCdq(
                 startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceLegalEntity,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().startNode
                 ),
                 endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceAddress,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().endNode
                 ),
             ),
             DeleteRelationsRequestCdq.RelationToDeleteCdq(
                 startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceSite,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().startNode
                 ),
                 endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasourceAddress,
+                    dataSourceId = cdqConfigProperties.datasource,
                     externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().endNode
                 ),
             ),
@@ -401,7 +481,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -420,7 +500,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -457,7 +537,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceAddress))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
                 .willReturn(
                     aResponse()
@@ -539,7 +619,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceLegalEntity))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -577,7 +657,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasourceSite))
+                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

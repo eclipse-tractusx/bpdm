@@ -46,13 +46,13 @@ class InputCdqMappingService(
         )
     }
 
-    fun toInputAddress(businessPartner: BusinessPartnerCdq): AddressGateInput {
+    fun toInputAddress(businessPartner: BusinessPartnerCdq, legalEntityExternalId: String?, siteExternalId: String?): AddressGateInput {
         return AddressGateInput(
             bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             address = toDto(businessPartner.addresses.first()),
             externalId = businessPartner.externalId!!,
-            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations),
-            siteExternalId = toParentSiteExternalId(businessPartner.relations)
+            legalEntityExternalId = legalEntityExternalId,
+            siteExternalId = siteExternalId
         )
     }
 
@@ -69,18 +69,9 @@ class InputCdqMappingService(
         return toParentLegalEntityExternalIds(relations).firstOrNull()
     }
 
-    fun toParentSiteExternalId(relations: Collection<RelationCdq>): String? {
-        return toParentSiteExternalIds(relations).firstOrNull()
-    }
 
     fun toParentLegalEntityExternalIds(relations: Collection<RelationCdq>): Collection<String> {
-        return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceLegalEntity }
-            .filter { it.type?.technicalKey == "PARENT" }
-            .map { it.startNode }
-    }
-
-    fun toParentSiteExternalIds(relations: Collection<RelationCdq>): Collection<String> {
-        return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasourceSite }
+        return relations.filter { it.startNodeDataSource == cdqConfigProperties.datasource }
             .filter { it.type?.technicalKey == "PARENT" }
             .map { it.startNode }
     }
