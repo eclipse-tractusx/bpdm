@@ -385,7 +385,7 @@ object CdqValues {
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerTypeCdq.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount1, bankAccount2),
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource-legal-entity"
+        dataSource = "test-cdq-datasource"
     )
 
     val legalEntity2 = BusinessPartnerCdq(
@@ -398,7 +398,7 @@ object CdqValues {
         types = listOf(TypeKeyNameUrlCdq(technicalKey = BusinessPartnerTypeCdq.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource-legal-entity"
+        dataSource = "test-cdq-datasource"
     )
 
     val siteBusinessPartner1 = BusinessPartnerCdq(
@@ -406,7 +406,7 @@ object CdqValues {
         identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
         names = listOf(nameSite1),
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource-site",
+        dataSource = "test-cdq-datasource",
         types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.ORGANIZATIONAL_UNIT.name))
     )
     val siteBusinessPartner2 = BusinessPartnerCdq(
@@ -414,7 +414,7 @@ object CdqValues {
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource-site",
+        dataSource = "test-cdq-datasource",
         types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.ORGANIZATIONAL_UNIT.name))
     )
 
@@ -422,17 +422,17 @@ object CdqValues {
 
     val relationSite1ToLegalEntity = RelationCdq(
         startNode = legalEntity1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource-legal-entity",
+        startNodeDataSource = "test-cdq-datasource",
         endNode = siteBusinessPartner1.externalId!!,
-        endNodeDataSource = "test-cdq-datasource-site",
+        endNodeDataSource = "test-cdq-datasource",
         type = relationType
     )
 
     val relationSite2ToLegalEntity = RelationCdq(
         startNode = legalEntity2.externalId!!,
-        startNodeDataSource = "test-cdq-datasource-legal-entity",
+        startNodeDataSource = "test-cdq-datasource",
         endNode = siteBusinessPartner2.externalId!!,
-        endNodeDataSource = "test-cdq-datasource-site",
+        endNodeDataSource = "test-cdq-datasource",
         type = relationType
     )
 
@@ -448,7 +448,7 @@ object CdqValues {
         externalId = CommonValues.externalIdAddress1,
         identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource-address",
+        dataSource = "test-cdq-datasource",
         types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.BP_ADDRESS.name))
     )
 
@@ -456,23 +456,23 @@ object CdqValues {
         externalId = CommonValues.externalIdAddress2,
         identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource-address",
+        dataSource = "test-cdq-datasource",
         types = listOf(TypeKeyNameUrlCdq(BusinessPartnerTypeCdq.BP_ADDRESS.name))
     )
 
     val relationAddress1ToLegalEntity = RelationCdq(
         startNode = legalEntity1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource-legal-entity",
+        startNodeDataSource = "test-cdq-datasource",
         endNode = addressBusinessPartner1.externalId!!,
-        endNodeDataSource = "test-cdq-datasource-address",
+        endNodeDataSource = "test-cdq-datasource",
         type = relationType
     )
 
     val relationAddress2ToSite = RelationCdq(
         startNode = siteBusinessPartner1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource-site",
+        startNodeDataSource = "test-cdq-datasource",
         endNode = addressBusinessPartner2.externalId!!,
-        endNodeDataSource = "test-cdq-datasource-address",
+        endNodeDataSource = "test-cdq-datasource",
         type = relationType
     )
 

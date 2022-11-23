@@ -33,7 +33,7 @@ class CdqConfig(
     val cdqProperties: CdqConfigProperties
 ) {
     companion object {
-        const val memorySize = 1 * 1024 * 1024 // 1mb
+        const val memorySize = 16 * 1024 * 1024 // 16mb
     }
 
     @Bean
