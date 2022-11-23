@@ -80,7 +80,11 @@ internal class AddressControllerInputIT @Autowired constructor(
         val externalIdToQuery = CdqValues.addressBusinessPartnerWithRelations1.externalId!!
         val expectedAddress = RequestValues.addressGateInput1
 
-        val addressRequest = FetchRequest(dataSource = cdqConfigProperties.datasource, externalId = externalIdToQuery)
+        val addressRequest = FetchRequest(
+            dataSource = cdqConfigProperties.datasource,
+            externalId = externalIdToQuery,
+            featuresOn = listOf(FetchRequest.CdqFeatures.FETCH_RELATIONS)
+        )
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(addressRequest)))
@@ -98,7 +102,11 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val parentRequest = FetchRequest(dataSource = cdqConfigProperties.datasource, externalId = CdqValues.legalEntity1.externalId!!)
+        val parentRequest = FetchRequest(
+            dataSource = cdqConfigProperties.datasource,
+            externalId = CdqValues.legalEntity1.externalId!!,
+            featuresOn = listOf(FetchRequest.CdqFeatures.FETCH_RELATIONS)
+        )
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(parentRequest)))
