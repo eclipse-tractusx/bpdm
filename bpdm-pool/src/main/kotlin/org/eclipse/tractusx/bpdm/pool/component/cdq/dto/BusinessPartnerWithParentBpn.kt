@@ -19,16 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
 
+import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
-
-data class ImportResponsePage(
-    val totalElements: Int,
-    val nextStartAfter: String?,
-    val legalEntities: UpsertCollection<LegalEntityPartnerCreateResponse, LegalEntityPartnerCreateResponse>,
-    val sites: UpsertCollection<SitePartnerCreateResponse, SitePartnerCreateResponse>,
-    val addresses: UpsertCollection<AddressPartnerCreateResponse, AddressPartnerResponse>
+data class BusinessPartnerWithParentBpn(
+    val partner: BusinessPartnerCdq,
+    val parentBpn: String
 )

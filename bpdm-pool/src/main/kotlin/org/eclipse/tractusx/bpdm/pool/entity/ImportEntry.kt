@@ -17,18 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
+package org.eclipse.tractusx.bpdm.pool.entity
 
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Index
+import javax.persistence.Table
 
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
-
-data class ImportResponsePage(
-    val totalElements: Int,
-    val nextStartAfter: String?,
-    val legalEntities: UpsertCollection<LegalEntityPartnerCreateResponse, LegalEntityPartnerCreateResponse>,
-    val sites: UpsertCollection<SitePartnerCreateResponse, SitePartnerCreateResponse>,
-    val addresses: UpsertCollection<AddressPartnerCreateResponse, AddressPartnerResponse>
+@Entity
+@Table(
+    name = "import_entries",
+    indexes = [
+        Index(columnList = "import_id"),
+        Index(columnList = "bpn")
+    ]
 )
+class ImportEntry(
+    @Column(name = "import_id", nullable = false)
+    var importIdentifier: String,
+    @Column(name = "bpn", nullable = false)
+    var bpn: String
+) : BaseEntity()

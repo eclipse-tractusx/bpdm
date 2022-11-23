@@ -61,7 +61,9 @@ class PartnerImportService(
             try {
                 val response = partnerImportPageService.import(fromTime, startAfter)
                 startAfter = response.nextStartAfter
-                importedCount += response.partners.size
+                val createdCount = response.legalEntities.created.size + response.sites.created.size + response.addresses.created.size
+                val updatedCount = response.legalEntities.updated.size + response.sites.updated.size + response.addresses.updated.size
+                importedCount += createdCount + updatedCount
                 val progress = importedCount / response.totalElements.toFloat()
                 syncRecordService.setProgress(SyncType.CDQ_IMPORT, importedCount, progress)
             } catch (exception: RuntimeException) {

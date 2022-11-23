@@ -26,8 +26,7 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqIdentifierConfigProperties
+import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
@@ -45,7 +44,7 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
     private val objectMapper: ObjectMapper,
-    private val cdqIdentifierConfigProperties: CdqIdentifierConfigProperties,
+    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
@@ -148,6 +147,14 @@ class TestHelpers(
 
 
     fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncResponse {
+        return startSyncAndAwaitResult(client, syncPath, SyncStatus.SUCCESS)
+    }
+
+    fun startSyncAndAwaitError(client: WebTestClient, syncPath: String): SyncResponse {
+        return startSyncAndAwaitResult(client, syncPath, SyncStatus.ERROR)
+    }
+
+    private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
         client.invokePostEndpointWithoutResponse(syncPath)
 
         //check for async import to finish several times
@@ -158,12 +165,12 @@ class TestHelpers(
 
             syncResponse = client.invokeGetEndpoint(syncPath)
 
-            if (syncResponse.status == SyncStatus.SUCCESS)
+            if (syncResponse.status == status)
                 break
 
         } while (Instant.now().isBefore(timeOutAt))
 
-        Assertions.assertThat(syncResponse.status).isEqualTo(SyncStatus.SUCCESS)
+        Assertions.assertThat(syncResponse.status).isEqualTo(status)
 
         return syncResponse
     }
@@ -182,7 +189,7 @@ class TestHelpers(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH)).willReturn(
+            WireMock.get(WireMock.urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withBody(objectMapper.writeValueAsString(importCollection))
@@ -204,6 +211,4 @@ class TestHelpers(
     private fun createBpnPattern(typeId: Char): String {
         return "${bpnConfigProperties.id}$typeId[${bpnConfigProperties.alphabet}]{${bpnConfigProperties.counterDigits + 2}}"
     }
-
-    fun extractCdqId(it: LegalEntityResponse) = it.identifiers.find { id -> id.type.technicalKey == cdqIdentifierConfigProperties.typeKey }!!.value
 }

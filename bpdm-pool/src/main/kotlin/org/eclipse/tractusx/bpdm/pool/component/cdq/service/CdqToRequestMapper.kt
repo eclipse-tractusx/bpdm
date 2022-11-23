@@ -27,27 +27,60 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toLegalEntityDto
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.common.service.CdqMappings.toSiteDto
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithBpn
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.BusinessPartnerWithParentBpn
+import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.springframework.stereotype.Service
 
 @Service
 class CdqToRequestMapper {
-    fun toUpdateRequest(partner: BusinessPartnerCdq): LegalEntityPartnerUpdateRequest {
-        return LegalEntityPartnerUpdateRequest(
-            partner.identifiers.find { it.type?.technicalKey == CdqMappings.BPN_TECHNICAL_KEY }?.value!!,
-            partner.toLegalEntityDto()
+    fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerCdq): LegalEntityPartnerCreateRequest {
+        return LegalEntityPartnerCreateRequest(
+            partnerWithImportId.toLegalEntityDto(),
+            partnerWithImportId.externalId
         )
     }
 
-    fun toCreateRequest(partner: BusinessPartnerCdq, index: String? = null): LegalEntityPartnerCreateRequest {
-        return LegalEntityPartnerCreateRequest(
-            partner.toLegalEntityDto(),
-            index
+    fun toLegalEntityUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest {
+        return LegalEntityPartnerUpdateRequest(
+            partnerWithBpn.bpn,
+            partnerWithBpn.partner.toLegalEntityDto()
         )
     }
+
+    fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
+        return SitePartnerCreateRequest(
+            site = partnerWithParent.partner.toSiteDto(),
+            legalEntity = partnerWithParent.parentBpn,
+            index = partnerWithParent.partner.externalId
+        )
+    }
+
+    fun toSiteUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest {
+        return SitePartnerUpdateRequest(
+            partnerWithBpn.bpn,
+            partnerWithBpn.partner.toSiteDto()
+        )
+    }
+
+    fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
+        return AddressPartnerCreateRequest(
+            properties = toDto(partnerWithParent.partner.addresses.first()),
+            parent = partnerWithParent.parentBpn,
+            index = partnerWithParent.partner.externalId
+        )
+    }
+
+    fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
+        return AddressPartnerUpdateRequest(
+            partnerWithBpn.bpn,
+            properties = toDto(partnerWithBpn.partner.addresses.first())
+        )
+    }
+
 
     fun toRequest(idType: TypeKeyNameUrlCdq): TypeKeyNameUrlDto<String> {
         return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name ?: "", idType.url)
@@ -71,4 +104,5 @@ class CdqToRequestMapper {
     fun toCategoryRequest(category: TypeKeyNameUrlCdq): TypeNameUrlDto {
         return TypeNameUrlDto(category.name!!, category.url)
     }
+
 }

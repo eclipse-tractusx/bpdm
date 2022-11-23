@@ -17,18 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.cdq.dto
+package org.eclipse.tractusx.bpdm.common.dto.cdq
 
+data class FetchBatchRequest(
+    val cdqIds: Collection<String>,
+    val featuresOn: Collection<Features> = emptyList(),
+    val featuresOff: Collection<Features> = emptyList()
 
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
-
-data class ImportResponsePage(
-    val totalElements: Int,
-    val nextStartAfter: String?,
-    val legalEntities: UpsertCollection<LegalEntityPartnerCreateResponse, LegalEntityPartnerCreateResponse>,
-    val sites: UpsertCollection<SitePartnerCreateResponse, SitePartnerCreateResponse>,
-    val addresses: UpsertCollection<AddressPartnerCreateResponse, AddressPartnerResponse>
-)
+) {
+    enum class Features {
+        ENABLE_SETTINGS,
+        SHOW_DEBUG_INFO,
+        SHOW_RAW_DATA,
+        SHOW_RAW_DATA_JSON,
+        FORCE_EXTERNAL_CALL,
+        SCREEN_BUSINESS_NAMES,
+        ACTIVATE_DATASOURCE_BVD,
+        ACTIVATE_DATASOURCE_DNB,
+        ACTIVATE_MASTER_DATA_BASIC,
+        ACTIVATE_MASTER_DATA_EXTENDED,
+        ACTIVATE_LINKAGE_LNKELI
+    }
+}

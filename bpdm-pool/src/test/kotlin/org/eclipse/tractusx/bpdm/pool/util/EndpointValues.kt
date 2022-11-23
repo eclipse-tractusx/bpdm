@@ -21,9 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 object EndpointValues {
 
-    const val CDQ_MOCK_STORAGE_PATH = "/test-cdq-api/storages/test-cdq-storage"
-    const val CDQ_MOCK_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_STORAGE_PATH/businesspartners"
-
     const val TEXT_PARAM_NAME = "text"
 
     const val CATENA_PATH = "/api/catena"

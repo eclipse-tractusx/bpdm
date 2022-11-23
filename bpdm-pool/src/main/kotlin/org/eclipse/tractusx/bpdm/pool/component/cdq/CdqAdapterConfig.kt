@@ -39,7 +39,7 @@ import javax.annotation.PostConstruct
 @ComponentScan
 @ConfigurationPropertiesScan
 class CdqAdapterConfig(
-    val adapterProperties: CdqAdapterConfigProperties
+    private val adapterProperties: CdqAdapterConfigProperties
 ) {
 
     companion object {
@@ -59,7 +59,7 @@ class CdqAdapterConfig(
             .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
                 .build())
-            .baseUrl("${adapterProperties.host}/${adapterProperties.api}/storages/${adapterProperties.storage}")
+            .baseUrl(adapterProperties.host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader("x-api-key", adapterProperties.apiKey)
             .build()
