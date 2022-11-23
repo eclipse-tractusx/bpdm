@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -103,7 +104,15 @@ internal class AddressControllerOutputIT @Autowired constructor(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(addressesPool)
+                            objectMapper.writeValueAsString(
+                                PageResponse(
+                                    totalElements = addressesPool.size.toLong(),
+                                    totalPages = 1,
+                                    page = 0,
+                                    contentSize = addressesPool.size,
+                                    content = addressesPool
+                                )
+                            )
                         )
                 )
         )
@@ -184,7 +193,15 @@ internal class AddressControllerOutputIT @Autowired constructor(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(addressesPool)
+                            objectMapper.writeValueAsString(
+                                PageResponse(
+                                    totalElements = addressesPool.size.toLong(),
+                                    totalPages = 1,
+                                    page = 0,
+                                    contentSize = addressesPool.size,
+                                    content = addressesPool
+                                )
+                            )
                         )
                 )
         )
