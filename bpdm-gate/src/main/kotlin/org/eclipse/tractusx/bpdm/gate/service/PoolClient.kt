@@ -78,12 +78,12 @@ class PoolClient(
                 .uri("/sites/search")
                 .bodyValue(objectMapper.writeValueAsString(SiteBpnSearchRequest(sites = bpnSs)))
                 .retrieve()
-                .bodyToMono<Collection<SitePartnerSearchResponse>>()
+                .bodyToMono<PageResponse<SitePartnerSearchResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search sites failed.", e)
         }
-        return sites
+        return sites.content
     }
 
     fun searchMainAddresses(bpnSs: Collection<String>): Collection<MainAddressSearchResponse> {
@@ -112,11 +112,11 @@ class PoolClient(
                 .uri("/addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(AddressPartnerBpnSearchRequest(addresses = bpnAs)))
                 .retrieve()
-                .bodyToMono<Collection<AddressPartnerSearchResponse>>()
+                .bodyToMono<PageResponse<AddressPartnerSearchResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search addresses failed.", e)
         }
-        return addresses
+        return addresses.content
     }
 }

@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -108,7 +109,16 @@ internal class SiteControllerOutputIT @Autowired constructor(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(sitesPool)
+                            objectMapper.writeValueAsString(
+                                PageResponse(
+                                    totalElements = sitesPool.size.toLong(),
+                                    totalPages = 1,
+                                    page = 0,
+                                    contentSize = sitesPool.size,
+                                    content = sitesPool
+                                )
+
+                            )
                         )
                 )
         )
@@ -203,7 +213,15 @@ internal class SiteControllerOutputIT @Autowired constructor(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
-                            objectMapper.writeValueAsString(sitesPool)
+                            objectMapper.writeValueAsString(
+                                PageResponse(
+                                    totalElements = sitesPool.size.toLong(),
+                                    totalPages = 1,
+                                    page = 0,
+                                    contentSize = sitesPool.size,
+                                    content = sitesPool
+                                )
+                            )
                         )
                 )
         )
