@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
@@ -29,6 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.data.domain.PageRequest
@@ -65,15 +68,34 @@ class MetadataController(
         return metadataService.createIdentifierType(type)
     }
 
-    @Operation(summary = "Get page of identifier types",
-        description = "Lists all currently known identifier types in a paginated result")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Page of existing identifier types, may be empty"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-    ])
+    @Operation(
+        summary = "Get page of identifier types",
+        description = "Lists all currently known identifier types in a paginated result"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing identifier types, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
     @GetMapping("/identifier-type")
     fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
+    }
+
+    @Operation(
+        summary = "Get valid identifier types for a country",
+        description = "Returns which identifier types are valid and which ones are mandatory for a country specified by its ISO 3166-1 alpha-2 country code."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The identifier types"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/identifier-types/for-country")
+    fun getValidIdentifierTypesForCountry(@Parameter @RequestParam country: CountryCode): Collection<CountryIdentifierTypeResponse> {
+        return metadataService.getValidIdentifierTypesForCountry(country)
     }
 
     @Operation(
@@ -82,9 +104,10 @@ class MetadataController(
                 "A status further distinguishes an identifier by adding current status information such as active or revoked." +
                 "The actual name of the identifier status is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
     )
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "New identifier status successfully created"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New identifier status successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
         ApiResponse(responseCode = "409", description = "Identifier status with specified technical key already exists", content = [Content()])
     ])
     @PostMapping("/identifier-status")

@@ -17,12 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.pool.dto.response
 
-import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.pool.entity.CountryIdentifierType
-import org.springframework.data.jpa.repository.JpaRepository
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 
-interface CountryIdentifierTypeRepository : JpaRepository<CountryIdentifierType, Long> {
-    fun findByCountryCodeIn(countryCodes: Set<CountryCode?>): Set<CountryIdentifierType>
-}
+data class CountryIdentifierTypeResponse(
+    val identifierType: TypeKeyNameUrlDto<String>,
+    val mandatory: Boolean
+)

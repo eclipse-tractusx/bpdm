@@ -19,18 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierStatusRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IssuingBodyRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
+import org.eclipse.tractusx.bpdm.pool.repository.*
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,7 +42,8 @@ class MetadataService(
     val identifierTypeRepository: IdentifierTypeRepository,
     val issuingBodyRepository: IssuingBodyRepository,
     val legalFormRepository: LegalFormRepository,
-    val identifierStatusRepository: IdentifierStatusRepository
+    val identifierStatusRepository: IdentifierStatusRepository,
+    val countryIdentifierTypeRepository: CountryIdentifierTypeRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -59,7 +59,12 @@ class MetadataService(
 
     fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameUrlDto<String>> {
         val page = identifierTypeRepository.findAll(pageRequest)
-        return page.toDto( page.content.map { it.toDto() } )
+        return page.toDto(page.content.map { it.toDto() })
+    }
+
+    fun getValidIdentifierTypesForCountry(countryCode: CountryCode): Collection<CountryIdentifierTypeResponse> {
+        val countryIdentifierTypes = countryIdentifierTypeRepository.findByCountryCodeIn(setOf(countryCode, null))
+        return countryIdentifierTypes.map { CountryIdentifierTypeResponse(it.identifierType.toDto(), it.mandatory) }
     }
 
     @Transactional
