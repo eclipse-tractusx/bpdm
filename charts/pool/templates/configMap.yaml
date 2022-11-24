@@ -10,8 +10,8 @@ data:
     bpdm:
       datasource:
         host: {{ include "bpdm.postgresDependency" . }}
-        opensearch:
-                host: {{ include "bpdm.opensearchDependency" . }}
+      opensearch:
+        host: {{ include "bpdm.opensearchDependency" . }}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}

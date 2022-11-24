@@ -35,7 +35,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 8080
-  targetPort: http
+  targetPort: 8081
 
 autoscaling:
   enabled: false

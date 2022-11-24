@@ -1,20 +1,18 @@
-image:
-  tag: "dev"
-
 springProfiles:
   - auth
   - pool-auth
 
 ingress:
+  enabled: true
   hosts:
-    - host: partners-gate.dev.demo.catena-x.net
+    - host: test-gate.dev.demo.catena-x.net
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: tls-secret
       hosts:
-        - partners-gate.dev.demo.catena-x.net
+        - test-gate.dev.demo.catena-x.net
 
 applicationConfig:
   bpdm:
