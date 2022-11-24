@@ -1,3 +1,7 @@
+springProfiles:
+  - auth
+  - pool-auth
+
 ingress:
   enabled: true
   annotations:
@@ -15,33 +19,15 @@ ingress:
 
 applicationConfig:
   bpdm:
-    security:
-      enabled: true
-    gate-security:
-      pool-security-enabled: true
-      oauth2-client-registration: gate-client
+    pool:
+      base-url: http://pool-bpdm:8080/api/catena
     cdq:
       storage: b3c0ad440d67350ba6f89a031375ec6b
-      datasource-legal-entity: 62ce5d4c9f1e1e3886fdd720
-      datasource-address: 62ce5d4c9f1e1e3886fdd720
-      datasource-site: 62ce5d4c9f1e1e3886fdd720
+      datasource: 62ce5d4c9f1e1e3886fdd720
   keycloak:
-    enabled: true
     auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
     realm: CX-Central
     resource: Cl16-CX-BPDMGate-Portal
-  spring:
-    security:
-      oauth2:
-        client:
-          registration:
-            gate-client:
-              client-id: Cl16-CX-BPDMGate-Portal
-              authorization-grant-type: client_credentials
-              provider: catena-keycloak-provider
-          provider:
-            catena-keycloak-provider:
-              issuer-uri: https://centralidp.dev.demo.catena-x.net/auth/realms/CX-Central
   springdoc:
     swagger-ui:
       oauth:

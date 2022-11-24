@@ -35,6 +35,8 @@ spec:
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
           ports:

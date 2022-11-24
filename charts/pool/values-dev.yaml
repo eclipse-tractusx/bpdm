@@ -1,5 +1,6 @@
-image:
-  tag: "main"
+springProfiles:
+  - auth
+  - cdq
 
 ingress:
   enabled: true
@@ -18,20 +19,15 @@ ingress:
 
 applicationConfig:
   bpdm:
-    security:
-      enabled: true
     cdq:
-      enabled: true
       # every hour at minute 0
       import-scheduler-cron-expr: 0 0 * * * *
       storage: af3e668806c1360498774117b6180772
       datasource: 6218e2bd4b43902250893a54
     opensearch:
-      enabled: true
       # every hour at minute 30
       export-scheduler-cron-expr: 0 30 * * * *
   keycloak:
-    enabled: true
     auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
     realm: CX-Central
     resource: Cl7-CX-BPDM

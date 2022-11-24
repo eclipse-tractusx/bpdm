@@ -1,6 +1,9 @@
 image:
   tag: "main"
 
+springProfiles:
+  - auth
+
 ingress:
   enabled: true
   annotations:
@@ -18,13 +21,9 @@ ingress:
 
 applicationConfig:
   bpdm:
-    security:
-      enabled: true
     opensearch:
-      enabled: true
       export-scheduler-cron-expr: 0 30 * * * *
   keycloak:
-    enabled: true
     auth-server-url: https://centralidp-pen.dev.demo.catena-x.net/auth
     realm: CX-Central
     resource: Cl7-CX-BPDM
