@@ -63,7 +63,7 @@ class MetadataService(
     }
 
     fun getValidIdentifierTypesForCountry(countryCode: CountryCode): Collection<CountryIdentifierTypeResponse> {
-        val countryIdentifierTypes = countryIdentifierTypeRepository.findByCountryCodeIn(setOf(countryCode, null))
+        val countryIdentifierTypes = countryIdentifierTypeRepository.findByCountryCodeInOrCountryCodeIsNull(setOf(countryCode))
         return countryIdentifierTypes.map { CountryIdentifierTypeResponse(it.identifierType.toDto(), it.mandatory) }
     }
 

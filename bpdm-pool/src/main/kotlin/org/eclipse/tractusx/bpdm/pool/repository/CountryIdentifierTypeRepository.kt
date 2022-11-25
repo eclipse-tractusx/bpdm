@@ -24,5 +24,5 @@ import org.eclipse.tractusx.bpdm.pool.entity.CountryIdentifierType
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface CountryIdentifierTypeRepository : JpaRepository<CountryIdentifierType, Long> {
-    fun findByCountryCodeIn(countryCodes: Set<CountryCode?>): Set<CountryIdentifierType>
+    fun findByCountryCodeInOrCountryCodeIsNull(countryCodes: Set<CountryCode>): Set<CountryIdentifierType>
 }
