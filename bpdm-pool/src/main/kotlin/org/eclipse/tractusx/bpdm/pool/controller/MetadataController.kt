@@ -63,7 +63,7 @@ class MetadataController(
             ApiResponse(responseCode = "409", description = "Identifier type with specified technical key already exists", content = [Content()])
         ]
     )
-    @PostMapping("/identifier-type")
+    @PostMapping("/identifier-types")
     fun createIdentifierType(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
         return metadataService.createIdentifierType(type)
     }
@@ -78,7 +78,7 @@ class MetadataController(
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
-    @GetMapping("/identifier-type")
+    @GetMapping("/identifier-types")
     fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
@@ -132,23 +132,27 @@ class MetadataController(
                 "An issuing body should be an entity which the Catena organisation trusts to issue identifiers." +
                 "The actual name of the issuing body is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
     )
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "New issuing body successfully created"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ApiResponse(responseCode = "409", description = "Issuing body with specified technical key already exists", content = [Content()])
-    ])
-    @PostMapping("/issuing-body")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New issuing body successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "409", description = "Issuing body with specified technical key already exists", content = [Content()])
+        ]
+    )
+    @PostMapping("/issuing-bodies")
     fun createIssuingBody(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
         return metadataService.createIssuingBody(type)
     }
 
     @Operation(summary = "Get page of issuing bodies",
         description = "Lists all currently known issuing bodies in a paginated result")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Page of existing issuing bodies, may be empty"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-    ])
-    @GetMapping("/issuing-body")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing issuing bodies, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/issuing-bodies")
     fun getIssuingBodies(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
         return metadataService.getIssuingBodies(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
@@ -158,12 +162,14 @@ class MetadataController(
         description = "Create a new legal form which can be referenced by business partner records. " +
                 "The actual name of the legal form is free to choose and doesn't need to be unique. " + technicalKeyDisclaimer
     )
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "New legal form successfully created"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-        ApiResponse(responseCode = "409", description = "Legal form with specified technical key already exists", content = [Content()])
-    ])
-    @PostMapping("/legal-form")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New legal form successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+            ApiResponse(responseCode = "409", description = "Legal form with specified technical key already exists", content = [Content()])
+        ]
+    )
+    @PostMapping("/legal-forms")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormResponse {
         return metadataService.createLegalForm(type)
     }
@@ -171,11 +177,13 @@ class MetadataController(
 
     @Operation(summary = "Get page of legal forms",
         description = "Lists all currently known legal forms in a paginated result")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Page of existing legal forms, may be empty"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-    ])
-    @GetMapping("/legal-form")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing legal forms, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/legal-forms")
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
