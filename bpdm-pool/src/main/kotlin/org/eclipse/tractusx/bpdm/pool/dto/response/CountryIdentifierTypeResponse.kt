@@ -19,9 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 
+@Schema(name = "CountryIdentifierTypeResponse", description = "Valid identifiers for a country")
 data class CountryIdentifierTypeResponse(
+    @Schema(description = "Type of the identifier")
     val identifierType: TypeKeyNameUrlDto<String>,
+    @Schema(description = "True if identifier is mandatory")
     val mandatory: Boolean
 )
