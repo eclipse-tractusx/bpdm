@@ -36,7 +36,7 @@ import javax.persistence.*
 class CountryIdentifierType(
     @Column(name = "country_code", nullable = true) // null for "common" identifiers
     @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode,
+    var countryCode: CountryCode?,
     @ManyToOne
     @JoinColumn(name = "identifier_type_id", nullable = false)
     var identifierType: IdentifierType,

@@ -62,7 +62,7 @@ object CdqValues {
     val siteName2 = NameCdq(CommonValues.siteName2)
     val siteName3 = NameCdq(CommonValues.siteName3)
 
-    val identifierType1 = TypeKeyNameUrlCdq(CommonValues.identifierTypeTechnicalKey1, CommonValues.identiferTypeName1, CommonValues.identifierTypeUrl1)
+    val identifierType1 = TypeKeyNameUrlCdq(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
 
     val issuingBody1 = TypeKeyNameUrlCdq(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
 
