@@ -1,30 +1,28 @@
-image:
-  tag: "v2.0.2"
-
 springProfiles:
   - auth
   - pool-auth
 
 ingress:
+  enabled: true
   hosts:
-    - host: partners-gate.int.demo.catena-x.net
+    - host: test-gate.dev.demo.catena-x.net
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: tls-secret
       hosts:
-        - partners-gate.int.demo.catena-x.net
+        - test-gate.dev.demo.catena-x.net
 
 applicationConfig:
   bpdm:
     pool:
-      base-url: http://poolv2-bpdm:8080/api/catena
+      base-url: http://pool-bpdm:8080/api/catena
     cdq:
       storage: 38d2277e20c730b4b8e8f182adcef7ca
       datasource: 621338451197b7667a5fbda4
   keycloak:
-    auth-server-url: https://centralidp.int.demo.catena-x.net/auth
+    auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
     realm: CX-Central
     resource: Cl16-CX-BPDMGate
   spring:
@@ -36,6 +34,11 @@ applicationConfig:
               # Client ID used for getting token different from own Client to validate tokens
               client-id: sa-cl16-cx-1
 
+  springdoc:
+    swagger-ui:
+      oauth:
+        client-id: Cl2-CX-Portal
+
 applicationSecrets:
   spring:
     security:
@@ -43,7 +46,7 @@ applicationSecrets:
         client:
           registration:
             gate-client:
-              client-secret: <path:bpdm/data/int/gate/service-account#client-secret>
+              client-secret: <path:bpdm/data/dev/gate/service-account#client-secret>
   bpdm:
     cdq:
-      api-key: <path:bpdm/data/int/gate/cdq#api-key>
+      api-key: <path:bpdm/data/dev/gate/cdq#api-key>

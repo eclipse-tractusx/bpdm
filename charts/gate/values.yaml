@@ -19,8 +19,7 @@ imagePullSecrets: [ ]
 podAnnotations: { }
 
 #Spring profiles under which the application should run
-springProfiles:
-  - dev
+springProfiles: [ ]
 
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
 # @url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
@@ -36,24 +35,16 @@ securityContext:
 service:
   type: ClusterIP
   port: 8080
+  targetPort: 8081
 
 autoscaling:
   enabled: false
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  hosts:
-    - host: partners-gate.dev.demo.catena-x.net
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: tls-secret
-      hosts:
-        - partners-gate.dev.demo.catena-x.net
+  enabled: false
+  annotations: { }
+  hosts: [ ]
+  tls: [ ]
 
 # Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
 # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-resource-requests-and-limits
@@ -97,17 +88,15 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
 
-applicationSecret:
-  enabled: true
-  cdq: <path:bpdm/data/dev/gate/cdq#api-key>
-  keycloak: <path:bpdm/data/dev/gate/keycloak#client-secret>
 
-applicationConfig: |
-  # oauth2 client configuration
-  spring.security.oauth2.client.registration.gate-client.client-id=sa-cl16-cx-1
-  spring.security.oauth2.client.registration.gate-client.client-secret=<path:bpdm/data/dev/gate/service-account#client-secret>
-  spring.security.oauth2.client.registration.gate-client.authorization-grant-type=client_credentials
-  spring.security.oauth2.client.registration.gate-client.provider=catena-keycloak-provider
-  spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=https://centralidp.dev.demo.catena-x.net/auth/realms/CX-Central
-  # Connection to pool
-  bpdm.pool.base-url=http://pool-bpdm:8080/api/catena
+# Used to overwrite the default property values of the application configuration
+applicationConfig:
+#  bpdm:
+#    pool:
+#      base-url: ...
+
+# Used to overwrite the secret property values of the application configuration
+applicationSecrets:
+#  bpdm:
+#    cdq:
+#     api-key: ...

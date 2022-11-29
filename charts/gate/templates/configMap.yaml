@@ -5,8 +5,13 @@ metadata:
   labels:
      {{- include "bpdm.labels" . | nindent 4 }}
 data:
-  external.properties: |-
+  deployment.yml: |-
+    # Place for putting standard deployment configuration which can be overwritten by external.yml
+    bpdm:
+      pool:
+        base-url: http://pool-bpdm:8080/api/catena
+  external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}
-    {{- .Values.applicationConfig | nindent 4 }}
+    {{- .Values.applicationConfig | toYaml | nindent 4 }}
     {{- end }}
