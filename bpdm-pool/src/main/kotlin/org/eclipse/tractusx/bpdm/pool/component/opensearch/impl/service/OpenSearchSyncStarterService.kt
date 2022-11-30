@@ -124,10 +124,8 @@ class OpenSearchSyncStarterService(
     private fun updateOnInit(indexDefinition: IndexDefinition): Boolean {
         val indexAlreadyExists = openSearchClient.indices().exists { it.index(indexDefinition.indexName) }.value()
 
-        if (!indexAlreadyExists) {
-            logger.info { "Create index '${indexDefinition.indexName}' as it does not exist yet" }
-            createIndex(indexDefinition)
-            return false
+        return if (!indexAlreadyExists) {
+            true
         } else {
             val tempIndexName = "temp-${indexDefinition.indexName}"
             deleteIndexIfExists(tempIndexName)
@@ -138,7 +136,7 @@ class OpenSearchSyncStarterService(
 
             deleteIndexIfExists(tempIndexName)
 
-            return requiredMappingMetadata != existingMappingMetadata
+            requiredMappingMetadata != existingMappingMetadata
         }
     }
 
