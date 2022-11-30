@@ -11,6 +11,7 @@ on:
   #   - "**/*.txt"
   schedule:
     - cron: "0 0 * * *"
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -22,34 +23,31 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: KICS scan
         uses: checkmarx/kics-github-action@master
         with:
           # Scanning directory .
           path: "."
+          # Exclude paths from scan by providing the paths as comma separated list
+          # exclude_paths: "postgres-init.yaml,templates/sharedidp.yaml"
+          # Exclude queries by providing the query / rule ID as comma separated list
+          # exclude_queries: "b9c83569-459b-4110-8f79-6305aa33cb37"
           # Fail on HIGH severity results
           fail_on: high
           # Disable secrets detection - we use GitGuardian
           disable_secrets: true
-          # when provided with a directory on output_path
+          # When provided with a directory on output_path
           # it will generate the specified reports file named 'results.{extension}'
           # in this example it will generate:
-          # - results-dir/results.json
-          # - results-dir/results.sarif
+          # - results-dir/results.json and results-dir/results.sarif
           output_path: kicsResults/
           output_formats: "json,sarif"
-          # If you want KICS to ignore the results and return exit status code 0 unless a KICS engine error happens
-          # ignore_on_exit: results
-          # GITHUB_TOKEN enables this github action to access github API and post comments in a pull request
-          # token: ${{ secrets.GITHUB_TOKEN }}
-          # enable_comments: true
 
       # Upload findings to GitHub Advanced Security Dashboard
       - name: Upload SARIF file for GitHub Advanced Security Dashboard
         if: always()
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: kicsResults/results.sarif
-          
