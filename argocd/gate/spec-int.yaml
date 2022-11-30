@@ -2,7 +2,7 @@ project: project-bpdm
 source:
   repoURL: 'https://github.com/catenax-ng/product-bpdm.git'
   path: charts/gate
-  targetRevision: v2.0.2
+  targetRevision: v3.0.0
   plugin:
     name: argocd-vault-plugin-helm-args
     env:
