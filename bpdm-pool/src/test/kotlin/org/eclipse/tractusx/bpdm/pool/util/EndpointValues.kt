@@ -51,10 +51,12 @@ object EndpointValues {
 
     const val OPENSEARCH_SYNC_PATH = "api/opensearch/business-partner"
 
-    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-type"
+    const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-types"
     const val CATENA_METADATA_IDENTIFIER_STATUS_PATH = "$CATENA_PATH/identifier-status"
-    const val CATENA_METADATA_ISSUING_BODY_PATH = "$CATENA_PATH/issuing-body"
-    const val CATENA_METADATA_LEGAL_FORM_PATH = "$CATENA_PATH/legal-form"
+    const val CATENA_METADATA_ISSUING_BODY_PATH = "$CATENA_PATH/issuing-bodies"
+    const val CATENA_METADATA_LEGAL_FORM_PATH = "$CATENA_PATH/legal-forms"
+
+    const val CATENA_METADATA_IDENTIFIER_TYPES_FOR_COUNTRY_PATH = "$CATENA_METADATA_IDENTIFIER_TYPE_PATH/for-country"
 
     const val CATENA_SUGGESTION_PATH = "$CATENA_PATH/suggestions"
     const val CATENA_SUGGESTION_LEGAL_ENTITIES_PATH = "$CATENA_SUGGESTION_PATH/legal-entities"

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
@@ -27,8 +28,14 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.dto.response.CountryIdentifierTypeResponse
+import org.eclipse.tractusx.bpdm.pool.entity.CountryIdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.repository.CountryIdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -53,7 +60,9 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class MetadataControllerIT @Autowired constructor(
     private val testHelpers: TestHelpers,
-    private val webTestClient: WebTestClient
+    private val webTestClient: WebTestClient,
+    private val countryIdentifierTypeRepository: CountryIdentifierTypeRepository,
+    private val identifierTypeRepository: IdentifierTypeRepository
 ) {
     companion object {
 
@@ -336,5 +345,38 @@ class MetadataControllerIT @Autowired constructor(
         val expectedPage = PageResponse(expected.size.toLong(), expected.size, expected.size, 0, emptyList<Any>())
 
         assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
+    }
+
+    /**
+     * Given identifier types in db, some "common", others for specific countries
+     * When requesting the identifiers for a country
+     * Then the "common" identifiers and the identifiers of the requested country are returned
+     */
+    @Test
+    fun getValidIdentifiersForCountry() {
+        val identifierType1 = IdentifierType(name = CommonValues.identifierTypeName1, technicalKey = CommonValues.identifierTypeTechnicalKey1, url = null)
+        val identifierType2 = IdentifierType(name = CommonValues.identifierTypeName2, technicalKey = CommonValues.identifierTypeTechnicalKey2, url = null)
+        val identifierType3 = IdentifierType(name = CommonValues.identifierTypeName3, technicalKey = CommonValues.identifierTypeTechnicalKey3, url = null)
+        val givenIdentifierTypes = listOf(identifierType1, identifierType2, identifierType3)
+
+        val countryIdentifierType1 = CountryIdentifierType(null, identifierType1, true)
+        val countryIdentifierType2 = CountryIdentifierType(CountryCode.UK, identifierType2, false)
+        val countryIdentifierType3 = CountryIdentifierType(CountryCode.PL, identifierType3, false)
+        val givenCountryIdentifierTypes = listOf(countryIdentifierType1, countryIdentifierType2, countryIdentifierType3)
+
+        val expected = listOf(
+            CountryIdentifierTypeResponse(TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, null), true),
+            CountryIdentifierTypeResponse(TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3, null), false)
+        )
+
+        identifierTypeRepository.saveAll(givenIdentifierTypes)
+        countryIdentifierTypeRepository.saveAll(givenCountryIdentifierTypes)
+
+        val resultCountryIdentifierTypes = webTestClient.invokeGetEndpointWithArrayResponse<CountryIdentifierTypeResponse>(
+            EndpointValues.CATENA_METADATA_IDENTIFIER_TYPES_FOR_COUNTRY_PATH,
+            Pair("country", CountryCode.PL.alpha2)
+        )
+
+        assertThat(resultCountryIdentifierTypes).containsExactlyInAnyOrderElementsOf(expected)
     }
 }

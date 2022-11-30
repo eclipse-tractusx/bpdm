@@ -34,9 +34,9 @@ object RequestValues {
     val name4 = NameDto(value = CommonValues.name4, type = CommonValues.nameType1, shortName = null)
     val name5 = NameDto(value = CommonValues.name5, type = CommonValues.nameType1, shortName = null)
 
-    val identifierType1 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identiferTypeName1, CommonValues.identifierTypeUrl1)
-    val identifierType2 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identiferTypeName2, CommonValues.identifierTypeUrl2)
-    val identifierType3 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identiferTypeName3, CommonValues.identifierTypeUrl3)
+    val identifierType1 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
+    val identifierType2 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2, CommonValues.identifierTypeUrl2)
+    val identifierType3 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3, CommonValues.identifierTypeUrl3)
 
     val identifierStatus1 = TypeKeyNameDto(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
     val identifierStatus2 = TypeKeyNameDto(CommonValues.identifierStatusKey2, CommonValues.identifierStatusName2)

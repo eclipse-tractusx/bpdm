@@ -122,5 +122,15 @@ inline fun <reified T : Any> WebTestClient.invokeGetEndpoint(path: String, varar
         .blockFirst()!!
 }
 
-
-
+inline fun <reified T : Any> WebTestClient.invokeGetEndpointWithArrayResponse(path: String, vararg params: Pair<String, String>): Collection<T> {
+    return get().uri { builder ->
+        var b = builder.path(path)
+        params.forEach { p -> b = b.queryParam(p.first, p.second) }
+        b.build()
+    }
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBodyList(T::class.java)
+        .returnResult()
+        .responseBody!!
+}

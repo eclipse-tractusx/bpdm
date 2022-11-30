@@ -103,9 +103,9 @@ object CommonValues {
     val identifierTypeTechnicalKey2 = "VAT_US"
     val identifierTypeTechnicalKey3 = "VAT_FR"
 
-    val identiferTypeName1 = "Steuernummer"
-    val identiferTypeName2 = "VAT USA"
-    val identiferTypeName3 = "VAT France"
+    val identifierTypeName1 = "Steuernummer"
+    val identifierTypeName2 = "VAT USA"
+    val identifierTypeName3 = "VAT France"
 
     val identifierTypeUrl1 = "http://catenax-host/id-type1"
     val identifierTypeUrl2 = "http://catenax-host/id-type2"
