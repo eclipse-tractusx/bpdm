@@ -6,6 +6,7 @@ springProfiles:
   - pool-auth
 
 ingress:
+  enabled: true
   hosts:
     - host: partners-gate.int.demo.catena-x.net
       paths:
