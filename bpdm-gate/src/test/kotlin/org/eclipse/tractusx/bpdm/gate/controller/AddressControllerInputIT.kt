@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
@@ -729,5 +731,106 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isBadRequest
+    }
+
+    /**
+     * Given valid address partner
+     * When validate that address partner
+     * Then response is OK and no errors
+     */
+    @Test
+    fun `validate a valid address partner`() {
+        val address = RequestValues.addressGateInput2
+
+        val mockParent = CdqValues.siteBusinessPartner1
+        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockParentResponse))
+                )
+        )
+
+        val mockDefects = listOf(
+            DataDefectCdq(ViolationLevel.INFO, "Info"),
+            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+        )
+        val mockResponse = ValidationResponseCdq(mockDefects)
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockResponse))
+                )
+        )
+
+        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_ADDRESSES_VALIDATION_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(address)
+            .exchange().expectStatus().is2xxSuccessful
+            .returnResult<ValidationResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
+
+        assertThat(actualResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * Given invalid address partner
+     * When validate that address partner
+     * Then response is ERROR and contain error description
+     */
+    @Test
+    fun `validate an invalid site`() {
+        val address = RequestValues.addressGateInput2
+
+
+        val mockParent = CdqValues.siteBusinessPartner1
+        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        wireMockServer.stubFor(
+            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockParentResponse))
+                )
+        )
+
+
+        val mockErrorMessage = "Validation error"
+        val mockDefects = listOf(
+            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectCdq(ViolationLevel.INFO, "Info"),
+            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+        )
+
+        val mockResponse = ValidationResponseCdq(mockDefects)
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockResponse))
+                )
+        )
+
+        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_ADDRESSES_VALIDATION_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(address)
+            .exchange().expectStatus().is2xxSuccessful
+            .returnResult<ValidationResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
+
+        assertThat(actualResponse).isEqualTo(expectedResponse)
     }
 }

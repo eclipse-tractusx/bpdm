@@ -33,11 +33,17 @@ object EndpointValues {
     const val CDQ_MOCK_REFERENCE_DATA_API_PATH = "/test-cdq-reference-data-api"
     const val CDQ_MOCK_REFERENCE_DATA_LOOKUP_PATH = "$CDQ_MOCK_REFERENCE_DATA_API_PATH/businesspartners/lookup"
 
+    const val CDQ_MOCK_DATA_VALIDATION_API_PATH = "/test-cdq-data-validation-api"
+    const val CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH = "$CDQ_MOCK_DATA_VALIDATION_API_PATH/businesspartners/validate"
+
     const val GATE_API_PATH = "/api/catena"
     const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"
     const val GATE_API_INPUT_LEGAL_ENTITIES_PATH = "${GATE_API_INPUT_PATH}/legal-entities"
     const val GATE_API_INPUT_SITES_PATH = "${GATE_API_INPUT_PATH}/sites"
     const val GATE_API_INPUT_ADDRESSES_PATH = "${GATE_API_INPUT_PATH}/addresses"
+    const val GATE_API_INPUT_LEGAL_ENTITIES_VALIDATION_PATH = "$GATE_API_INPUT_LEGAL_ENTITIES_PATH/validation"
+    const val GATE_API_INPUT_SITES_VALIDATION_PATH = "$GATE_API_INPUT_SITES_PATH/validation"
+    const val GATE_API_INPUT_ADDRESSES_VALIDATION_PATH = "$GATE_API_INPUT_ADDRESSES_PATH/validation"
 
     const val GATE_API_OUTPUT_PATH = "${GATE_API_PATH}/output"
     const val GATE_API_OUTPUT_LEGAL_ENTITIES_PATH = "${GATE_API_OUTPUT_PATH}/legal-entities/search"

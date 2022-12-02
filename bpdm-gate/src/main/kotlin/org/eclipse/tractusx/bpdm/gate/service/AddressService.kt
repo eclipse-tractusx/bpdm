@@ -155,30 +155,28 @@ class AddressService(
      * - Upserting the new relations
      */
     fun upsertAddresses(addresses: Collection<AddressGateInput>) {
-        val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq> = getParentLegalEntities(addresses)
-        val parentSitesByExternalId: Map<String, BusinessPartnerCdq> = getParentSites(addresses)
-
-        doUpsertAddresses(addresses, parentLegalEntitiesByExternalId, parentSitesByExternalId)
+        val addressesCdq = toCdqModels(addresses)
+        cdqClient.upsertAddresses(addressesCdq)
 
         deleteRelationsOfAddresses(addresses)
 
         upsertRelations(addresses)
     }
 
+    /**
+     * Fetches parent information and converts the given [addresses] to their corresponding CDQ models
+     */
+    fun toCdqModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerCdq> {
+        val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq> = getParentLegalEntities(addresses)
+        val parentSitesByExternalId: Map<String, BusinessPartnerCdq> = getParentSites(addresses)
+
+        return addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
+    }
+
     private fun upsertRelations(addresses: Collection<AddressGateInput>) {
         val legalEntityRelations = toLegalEntityRelations(addresses)
         val siteRelations = toSiteRelations(addresses)
         cdqClient.upsertAddressRelations(legalEntityRelations, siteRelations)
-    }
-
-    private fun doUpsertAddresses(
-        addresses: Collection<AddressGateInput>,
-        parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq>,
-        parentSitesByExternalId: Map<String, BusinessPartnerCdq>
-    ) {
-        val addressesCdq =
-            addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
-        cdqClient.upsertAddresses(addressesCdq)
     }
 
     private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInput>) {

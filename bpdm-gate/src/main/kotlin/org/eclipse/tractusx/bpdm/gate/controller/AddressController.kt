@@ -30,7 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
+import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -40,8 +42,9 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api/catena")
 class AddressController(
-    val addressService: AddressService,
-    val apiConfigProperties: ApiConfigProperties
+    private val addressService: AddressService,
+    private val apiConfigProperties: ApiConfigProperties,
+    private val validationService: ValidationService
 ) {
     @Operation(
         summary = "Create or update addresses.",
@@ -116,5 +119,22 @@ class AddressController(
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<AddressGateOutput> {
         return addressService.getAddressesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
+    }
+
+    @Operation(
+        summary = "Validate an address partner",
+        description = "Determines errors in an address partner record which keep it from entering the sharing process"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity requests", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/addresses/validation")
+    fun validateSite(
+        @RequestBody addressInput: AddressGateInput
+    ): ValidationResponse {
+        return validationService.validate(addressInput)
     }
 }
