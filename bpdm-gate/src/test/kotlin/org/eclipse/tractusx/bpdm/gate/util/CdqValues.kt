@@ -446,6 +446,7 @@ object CdqValues {
 
     val addressBusinessPartner1 = BusinessPartnerCdq(
         externalId = CommonValues.externalIdAddress1,
+        names = legalEntity1.names,
         identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
         addresses = listOf(address1),
         dataSource = "test-cdq-datasource",
@@ -454,6 +455,7 @@ object CdqValues {
 
     val addressBusinessPartner2 = BusinessPartnerCdq(
         externalId = CommonValues.externalIdAddress2,
+        names = siteBusinessPartner1.names,
         identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
         addresses = listOf(address2),
         dataSource = "test-cdq-datasource",
