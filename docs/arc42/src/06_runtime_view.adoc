@@ -1,9 +1,0 @@
-ifndef::imagesdir[]
-:imagesdir: ../images
-endif::[]
-
-[[section-runtime-view]]
-== Runtime View
-
-image::API_RUNTIME_1.png[]
-image::API_RUNTIME_2.png[]
