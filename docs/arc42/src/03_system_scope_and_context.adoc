@@ -1,0 +1,14 @@
+[[section-system-scope-and-context]]
+== System Scope and Context
+
+ifndef::imagesdir[]
+:imagesdir: ../images
+endif::[]
+
+The BPN Generator and data pool is the transhipment point for the incoming data from the service provider and for the outgoing data to the consumers. Consumers are mostly other apps that participate in the Catena-X network.
+
+=== Business Context
+
+All communication partners within CX Environment.
+
+image::IMG_ARC_42_BPDM_2.png[]

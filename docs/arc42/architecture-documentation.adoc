@@ -1,0 +1,54 @@
+// header file for arc42-template,
+// including all help texts
+//
+// ====================================
+
+// configure EN settings for asciidoc
+// asciidoc settings for EN (English)
+// ==================================
+:toc-title: table of contents
+
+// enable table-of-contents
+:toc:
+
+ifndef::imagesdir[]
+:imagesdir: images
+endif::[]
+
+= BPDM
+// toc-title definition MUST follow document title without blank line!
+:toc-title: Table of Contents
+
+// horizontal line
+***
+
+// numbering from here on
+:numbered:
+
+<<<<
+// 1. Introduction and Goals
+include::src/01_introduction_and_goals.adoc[]
+
+<<<<
+// 2. Architecture Constraints
+include::src/02_architecture_constraints.adoc[]
+
+<<<<
+// 3. System Scope and Context
+include::src/03_system_scope_and_context.adoc[]
+
+<<<<
+// 4. Solution Strategy
+include::src/04_solution_strategy.adoc[]
+
+<<<<
+// 5. Building Block View
+include::src/05_building_block_view.adoc[]
+
+<<<<
+// 6. Runtime View
+include::src/06_runtime_view.adoc[]
+
+<<<<
+// 7. Deployment View
+include::src/07_deployment_view.adoc[]

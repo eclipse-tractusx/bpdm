@@ -1,0 +1,78 @@
+ifndef::imagesdir[]
+:imagesdir: ../images
+endif::[]
+
+[[section-introduction-and-goals]]
+== Introduction and Goals
+
+Every participant in the CX network shall be equipped with a unique business partner identification number (BPN) according to the concept defined by the CX BPN concept.
+The task of the BPN Generator is to issue such a BPN for a presented Business Partner data object. In that, the BPN Generator serves as the central issuing authority for BPNs within Catena-X. Technically, it constitutes a service that is available as a singleton within the network.
+
+The CX datapool aims at collecting the business partner data objects from the service provider and giving the opportunity for other use cases and services to consume the data via an interface. The CX datapool is the central instance for business partner data within Catena-X.
+
+In general, we have implemented most of the adapter based on the Interface to a SaaS (Software as a Service) Provider, which is has currently the responsibility to clean up the data.
+
+=== Requirements Overview
+
+Essentially constituting a service-oriented architecture running distributedly on distinct CX Nodes, there can - in principle - be multiple consumers submitting business partner data objects for identification. To fulfil this purpose, the following requirements shall apply:
+
+
+|===
+|Req.# |Requirements
+
+|BPNG-R1
+|Column 2, The BPN Generator shall fit into the BPDM Architectural Framework.
+
+|BPNG-R2
+|Column 2, The BPN Generator shall support the modes of operation as described in BPN Generator: Modes of Operation
+
+|BPNG-R3
+|Column 2, Regarding implementation technologies the BPN Generator shall follow the overall guidelines for Catena-X
+
+|BPNG-R4
+|Column 2, The datapool should follow the business partner data model BPDM Data Model Business Partner
+
+|BPNG-R5
+|Column 2, The data should be available via API
+|===
+
+=== Quality Goals
+
+|===
+|Priority |Quality Goal |Scenario
+
+|1
+|Security
+|The BPN Generator should be safe and can´t be compromised to use of thirds without permission. The service and datapool needs to be tested and shall fit to the overall Catena-X guidelines.
+
+|1
+|Integrity
+|Consumers need to be authenticated and authorised to use the service.
+
+|2
+|Reliability
+|The BPN Generator aswell as the datapool and API need a high availability and easy recoverability.
+
+|2
+|Performance
+|The BPN Generator aswell as the datapool should handle the expected amount of data objects.
+
+|3
+|Functional Suitability
+|The API should suit the requirements of the main stakeholders and shall support a homogenous API design.
+|===
+
+=== Stakeholders
+
+
+|===
+|Role/Name |Expectations |Example
+
+|Company
+|Company wants to have cleaned and enriched data objects with a BPN.
+|
+
+|Apps
+|Other apps and their use cases want to use the business partner data objects and the BPN for their processes.
+|The CX Portal will use the BPN for on-boarding new companies  into the network. Traceability Apps will use BPN to describe business partners
+|===

@@ -1,0 +1,11 @@
+ifndef::imagesdir[]
+:imagesdir: ../images
+endif::[]
+
+[[section-deployment-view]]
+
+== Deployment View
+
+How to run the service: README.adoc
+
+image::BPDM_DV_Shared_Service.png[]

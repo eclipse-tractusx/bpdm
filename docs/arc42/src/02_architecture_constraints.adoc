@@ -1,0 +1,10 @@
+ifndef::imagesdir[]
+:imagesdir: ../images
+endif::[]
+
+[[section-architecture-constraints]]
+== Architecture Constraints
+
+
+
+Follows the framework: BPDM Architectural Framework.
