@@ -240,8 +240,9 @@ class AddressService(
             throw CdqNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
         }
         val addressCdq = cdqRequestMappingService.toCdqModel(address)
+        val parentNames = (parentLegalEntity ?: parentSite!!).names
         val parentIdentifiersWithoutBpn = (parentLegalEntity ?: parentSite!!).identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
-        return addressCdq.copy(identifiers = addressCdq.identifiers.plus(parentIdentifiersWithoutBpn))
+        return addressCdq.copy(identifiers = addressCdq.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
     private fun toValidAddressInput(partner: BusinessPartnerCdq): AddressGateInput {
