@@ -123,7 +123,7 @@ class SiteController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
-            ApiResponse(responseCode = "400", description = "On malformed legal entity requests", content = [Content()]),
+            ApiResponse(responseCode = "400", description = "On malformed site requests", content = [Content()]),
         ]
     )
     @PostMapping("/input/sites/validation")
