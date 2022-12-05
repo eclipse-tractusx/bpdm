@@ -9,7 +9,7 @@ image:
   repository: catenax-ng/product-bpdm/pool
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "main"
+  tag: "v3.0.0"
 
 imagePullSecrets: [ ]
 
