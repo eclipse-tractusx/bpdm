@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "partner_changelog_entries")

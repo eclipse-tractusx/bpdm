@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import java.time.Instant
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(

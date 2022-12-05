@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import org.eclipse.tractusx.bpdm.common.model.RelationClass
 import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(

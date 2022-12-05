@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.mock
 import mu.KotlinLogging
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 @Configuration
 @ComponentScan

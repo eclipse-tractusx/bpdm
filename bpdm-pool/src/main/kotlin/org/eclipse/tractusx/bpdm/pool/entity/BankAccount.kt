@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CurrencyCode
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(

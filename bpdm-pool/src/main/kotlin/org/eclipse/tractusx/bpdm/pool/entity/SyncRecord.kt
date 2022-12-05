@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import java.time.Instant
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "sync_records")
