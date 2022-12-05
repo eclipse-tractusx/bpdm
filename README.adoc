@@ -3,284 +3,421 @@
 :toc:
 :toclevels: 2
 
-== Description
+== Project Description
 
-This repository is part of the overarching CatenaX project.
+This repository is part of the overarching Catena-X project.
 
-BPDM stands for business partner data management.
-This project lets other CatenaX services query, add and change base information on CatenaX business partners.
+BPDM is an acronym for business partner data management.
+This project provides core services for querying, adding and changing business partner base information in the Catena-X landscape.
 
-== Running environments
+Currently, BPDM consists of the Pool and Gate services.
 
-The BPDM application is released in multiple stages. Currently, these are the available environments:
+== BPDM Pool
 
-[%header,cols="h,1,1"]
-|===
-|
-|Description
-|Link
+The BPDM Pool is the single source of truth in Catena-X for business partner base information such as addresses and official identifiers.
+Each record in the Pool has a unique identifier with which it can be referenced across the entire Catena-X landscape, the business partner number.
+Business partner records are divided into legal entities, sites and partner addresses.
+Self-explanatory, a legal entity record represents the legal entity information about a business partner.
+A site may represent legal entity's plant or campus which is big enough to contain several contact/delivery addresses.
+Finally, an address partner is a location of legal entity or site with a single contact/delivery address.
+A legal entity may have several sites and address partner.
+Further, a site may have several address partners.
 
-|dev
-|Environment for testing newly developed BPDM features
-|https://catenax-bpdm-dev.demo.catena-x.net/
+The Pool offers an API to query these business partner records by BPN, other identifier or by text search.
 
-|int
-|Environment for running integration tests with other CatenaX services
-|https://catenax-bpdm-int.demo.catena-x.net/
-|===
+=== How to run
 
+==== Prerequisites
 
-== How to run
+. Maven
+. JDK11
+. PostgreSQL 14.2
+. OpenSearch 2.1.0
+. Keycloak 17.0.0 (with enabled `auth` profile)
+. Connection to CDQ API v4.0 (with enabled `cdq` profile)
 
 BPDM is a SpringBoot Kotlin software project managed by Maven.
 
 The project can be run with the following command: `mvn clean spring-boot:run`
 
-When running, the project requires a postgresql database to be available to connect to.
+When running, the project requires a Postgresql database and an Opensearch instance to be available to connect to.
 Per default configuration the application expects postgres to run on `localhost` on port `5432`.
+Opensearch needs to run on `localhost` on port `9200` on default.
 
-You can find the standard credentials as well as further database configurations int the `application-persist.properties` file in the resource folder.
+You can find and edit the default configuration for the Pool in the `application.properties`,  `application-auth.properties` and  `application-cdq.properties` files in the `resources` folder.
 
 The REST API documentation can be accessed at `+http://localhost:8080/api/swagger-ui+`.
 
-=== Prerequisites
-
-. Maven
-. JDK11
-. PostgreSQL 14.2
-. Keycloak 17.0.0 (with enabled authentication)
-. Connection to CDQ API v4.0 (with enabled CDQ component)
-. OpenSearch 2.1.0 (with enabled OpenSearch component)
-
 === Profiles
 
-The project offers a variety of different Spring profiles for configuration purposes.
-What profiles are available and what effect they have configuration properties is described in the application properties files in the resources folder.
-Application properties files are separated by concern to increase readability.
-`application.properties` file contains general basic properties while the other files manage properties for major application components that usually can also be enabled or disabled.
-Each of the application properties files are multi-documents containing default values for their component as well as value overrides for different environments.
-Currently, the application can be run in the following environment profiles:
+The default configuration of the application is determined by the `application.properties` file.
+Here you can find core application configuration such as Swagger documentation, BPN generation and Actuator.
+Furthermore, here you can find the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL) and Opensearch.
 
-* default: when no environment specified
-* local: for the execution on local machine (developer profile)
-* dev: for execution in remote dev environment
-* int: for execution in remote int environment
+You can also run the project with Spring profiles to enable additional components on top of the default configuration.
+Currently, the BPDM Pool offers the profiles `auth` and `cdq`.
+In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
 
-The following sections detail the configuration properties for each component.
+For example, the command `mvn clean spring-boot:run -Dspring.profiles.active=auth` starts the application with additional `auth` configuration enabled.
+You can also run several profiles at once, of course: `mvn clean spring-boot:run -Dspring.profiles.active=auth,cdq`.
 
-==== Persist
-
-The file `application-persist.properties` contains the configuration for general persistence and the database connection.
-A running Postgres database instance is required (Tested and working on version 14.2), available either locally or remotely depending on the environment.
-User credentials need to be provided as environment variable `BPDM_DB_PASS`.
-For environments like `int` and `dev` you also have to specify the host on where the postgres database is located in the environment variable  `BPDM_DB_HOST`.
+The following sections detail the configuration properties for each profile.
 
 ==== Auth
 
-`application-auth.properties` enables authorization of endpoints and configures the connection to an external Keycloak instance on which the authorization relies on.
+`application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
+The application expects the Keycloak to run on `localhost` on port `8180` and needs a client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
+However, as with the Spring datasource and Opensearch connections, the connection to the Keycloak can be freely configured.
 Besides the URL of the Keycloak the configuration determines the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
-The client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
+
+For authorization purposes the application checks incoming token's permissions:
+
+add_company_data:: For endpoints creating or updating business partner records including triggering imports from CDQ/exports to Opensearch
+view_company_data:: For read-only endpoints of business partner data
+
+The BPDM Pool looks for these permissions in the client/resource and not on the realm level.
 
 This profile also enables/disables the login form in the auto-generated Swagger documentation.
 The Swagger login uses the client specified in the property `springdoc.swagger-ui.oauth.client-id`.
 
 ==== Cdq
 
-The file `application-cdq.properties` enables and configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] with which the application can exchange business partner information.
+The file `application-cdq.properties` enables and configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] from which the application can import business partner records.
 Depending on whether this component is enabled, the application offers endpoints to import records from and to export Business Partner Numbers to CDQ.
 When enabled the application requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges for accessing the specified storage.
+Further, you need to provide a CDQ storage ID (`BPDM_CDQ_STORAGE`) and datasource ID `BPDM_CDQ_DATASOURCE` from where the records should be imported by the application.
 
-==== OpenSearch
+=== Helm Deployment
 
-`application-opensearch.properties` enables/disables and configures the connection to an external OpenSearch instance.
-When enabled a running OpenSearch instance is required (Tested on version 2.1.0).
-Then the application is able to search and filter business partners by their properties other than identifiers.
-Additionally, suggestions for autocompletion can be obtained for each business partner property.
-With the activation of the OpenSearch component the application also features new endpoints for exporting business partner records to the OpenSearch instance as well as clearing the current OpenSearch index.
+This repository contains Helm files for deploying the BPDM Pool to a Kubernetes environment.
 
-You can specify the URL to connect to over the `bpdm.opensearch` properties.
-On `dev` and `int` environment you need to specify the host of the OpenSearch instance with the variable `BPDM_OPENSEARCH_HOST`.
-
-Without the OpenSearch component enabled the suggestions are always empty and search requests do not filter any business partners.
-
-==== Activating profiles
-
-On default, with no profiles activated, the application persists on a postgresql database with no further dependencies needed.
-In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
-When specifying an environment all components and properties will be configured for that particular environment.
-For development purposes you can also fine tune which component should run in which environment configuration by using the profile of pattern `environment_component`, e.g. `dev_persist`.
-
-.Expected dependencies on each environment
-[%header,cols="h,1,1,1,1"]
-|===
-|
-|Persist
-|Auth
-|CDQ
-|OpenSearch
-
-|default
-|Localhost
-|Disabled
-|Disabled
-|Disabled
-
-|local
-|Localhost
-|Disabled
-|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] Test Storage
-|Localhost
-
-|dev
-|Host defined in  `BPDM_DB_HOST`
-|https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
-|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
-|Host defined in  `BPDM_OPENSEARCH_HOST`
-
-|int
-|Host defined in  `BPDM_DB_HOST`
-|https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com[CatenaX Dev Keycloak]
-|https://developer.cdq.com/reference-docs/data-exchange/V4/tag/Business-Partners[CDQ API v4] CatenaX Storage
-|Host defined in  `BPDM_OPENSEARCH_HOST`
-|===
-
-==== Examples
-
-. Run application on default configuration: `mvn clean spring-boot:run`
-. Run on local environment: `mvn clean spring-boot:run -Dspring.profiles.active=local`
-. Run in general default environment against dev environment CDQ Api: `mvn clean spring-boot:run -Dspring.profiles.active=dev_cdq`
-. Run in general local environment against dev environment CDQ Api:  `mvn clean spring-boot:run -Dspring.profiles.active=local,dev_cdq`
-. Configure each component's environment separately: `mvn clean spring-boot:run -Dspring.profiles.active=local_opensearch,dev_auth,int_cdq`
-
-== Project Structure
-
-The root of the project is reserved for basic repository files and the Maven project file (pom.xml).
-The source folder is split between test and application files.
-Source code files are in the kotlin subdirectory (analogous to java source folders).
-Additional files such as configuration files can be found in the resources subdirectory.
-
-As per Spring framework's default structure the domain model and persistence object information is encapsulated in entities.
-Each entity in the project derives from the `BaseEntity` type which contains standard fields/columns such as identifier and timestamps.
-
-Services describe the business logic of the application.
-They primarily work on entities but may also map such entities to data transfer objects (DTOs) which are needed for communication with outside systems.
-Most important DTOs are request and response objects which describe the model of the application's API.
-
-Repositories describe the interface with the persistence layer and should be used by the services to gather and save records from the database.
-Where possible repositories should be defined as interfaces and auto-implemented by Spring Data JPA.
-In cases when that is not feasible custom repositories can be defined.
-
-Configuration classes configure the services and components in the application.
-Such configuration classes enable or disable component logic on startup.
-They are supplemented by the configuration properties.
-These property classes contain values obtained from the application.properties files and are available via dependency injection.
-When possible, configuration classes services and components should use configuration properties instead of accessing property values from the application.properties directly.
-However, in some cases such as conditional activation on configurations by annotation such an approach is not possible and direct access is permissible.
-
-Optional components which require more logic than just simple configuration files are placed in the `component` package such as the cdq and opensearch component subpackages.
-Such a component package is structured again like a mirror of the project structure.
-That is, a component package can contain its own repository, service, configuration packages and so on.
-By default, the application component scan ignores the component packages.
-By enabling the corresponding properties component packages can be included in the component scan.
-
-== Kubernetes Deployment
-
-This repository contains Docker and Helm files for deploying the application to a Kubernetes environment.
-In order to deploy the application to a Kubernetes Cluster you need to containerize the application, push the resulting image to a container registry and deploy a Helm release on the prepared cluster.
-
-=== Prerequisites
+==== Prerequisites
 
 . https://kubernetes.io/[Kubernetes Cluster]
-. https://docs.docker.com/[Docker]
 . https://helm.sh/docs/[Helm]
-. A Container Registry (Currently https://docs.microsoft.com/en-us/azure/container-registry/[ACR])
-. Kubernetes Ingress Controller (Tested with https://kubernetes.github.io/ingress-nginx/[Ingress-Nginx])
-. https://cert-manager.io/docs/[Kubernetes Certmanager]
-. https://cert-manager.io/docs/concepts/issuer/[Kubernetes Cluster Issuer]
 
-The kubernetes deployment expects a kubernetes environment which already has an Ingress Controller installed in order to be available over ingress routing.
-Additionally, the ingress works over SSH and expects a Certmanager and Cluster Issuer to be present for obtaining a trustworthy certificate.
-When the Kubernetes cluster is configured with these components, the application can be deployed with the following steps:
+In an existing Kubernetes cluster the application can be deployed with the following command:
 
-. Specify your container registry in the Helm values.yaml:
-+
+[source,bash]
+----
+helm install release_name ./charts/pool --namespace your_namespace
+----
+
+This will install a new release of the BPDM Pool in the given namespace.
+On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
+The application is run on default profile (without authorization and CDQ connection).
+Additionally, the Helm deployment contains a PostgreSQL database and Opensearch instance which the BPDM Pool connects to.
+
+On the default values deployment no further action is needed to make the BPDM Pool deployment run.
+However, per default ingress is disabled, as well as no authentication for endpoints and no import from CDQ.
+
+By giving your own values file you can configure the Helm deployment of the BPDM Pool freely:
+
+[source,bash]
+----
+helm install release_name ./charts/pool --namespace your_namespace -f ./path/to/your/values.yaml
+----
+
+In the following sections you can have a look at the most important configuration options.
+
+==== Image Tag
+
+Per default, the Helm deployment references a certain BPDM Pool release version where the newest Helm release points to the newest Pool version.
+This is a stable tag pointing to a fixed release version of the BPDM Pool.
+For your deployment you might want to follow the latest application releases instead.
+
+In your values file you can overwrite the default tag:
+
 [source,yaml]
 ----
 image:
-   registry: your_registry.io
+     tag: "latest"
 ----
 
-. Package the application as a jar file: `mvn clean package`
-. Containerize the packaged application: `docker build -f kubernetes/Dockerfile -t your_container_registry.io/catena-x/bpdm:version .`
-. Push the image to your registry: `docker push your_container_registry.io/catena-x/bpdm:version`
-. Install the Helm release on the cluster: `helm install release_name ./kubernetes/bpdm -n your_namespace`
+==== Profiles
 
-When the deployment needs to be updated you can follow the same steps above, except for the last.
-In order to update the Helm release you need the Helm upgrade command: `helm upgrade release_name ./kubernetes/bpdm -n your_namespace`
-
-=== Different environments
-
-The instructions above deploys an application configured for the dev environment.
-There is also helm configuration available for the int environment, defined in the `values-int.yaml`.
-You would install the application for int environment with: `helm install release_name ./charts/pool -n your_namespace -v ./charts/pool/values-int.yaml`.
-
-If you want to create a new helm release for a different environment you can create your own values file and adjust the values accordingly.
-One of the most important values you want to adjust is in which profile (or profiles) the bpdm service application should run.
-This is determined by the `springProfiles` value:
+You can also activate Spring profiles in which the BPDM Pool should be run.
+In case you want to run the Pool with authorization and CDQ connection enabled you can write the following:
 
 [source,yaml]
 ----
 springProfiles:
-  - dev
+  - auth
+  - cdq
 ----
 
-=== Secrets
+==== Ingress
 
-Be aware that you may also want to replace placeholder passwords for the deployment.
-This can be done by giving a values file overriding the password placeholders like so: `helm install release_name ./charts/pool -n your_namespace -v secret-values.yaml`
-
-secret-values.yaml:
+You can specify your own ingress configuration for the Helm deployment to make the BPDM Pool available over Ingress.
+Note that you need to have the appropriate Ingress controller installed in your cluster first.
+For example, consider a Kubernetes cluster with an https://kubernetes.github.io/ingress-nginx/[Ingress-Nginx] installed.
+An Ingress configuration for the Pool deployment could look like this:
 
 [source,yaml]
 ----
-applicationSecret:
-  keycloak: your_keycloak_secret
-  cdq: your_cdq_api_key
-postgres:
-  auth:
-    postgresPassword: your_postgres_user_password
-    password: your_bpdm_user_password
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: partners-pool.your-domain.net
+      paths:
+        - path: /
+          pathType: Prefix
 ----
 
-In order to avoid pushing secrets to the Github repository it's a good practice to pass secret values over command line when deploying a helm release via the set flag like `--set applicationSecrets.db-user.secret=some_secret`.
-You may want to set those secrets on the command line during install or update.
+==== Pool Configuration
+
+The Helm deployment comes with the ability to configure the BPDM Pool application directly over the values file.
+This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-cdq.properties` files.
+Consider that you would need to turn on `auth` and `cdq` profile first before overwriting any property in the corresponding properties file could take effect.
+Overwriting configuration properties can be useful to connect to a remote service:
+
+[source,yaml]
+----
+applicationConfig:
+  bpdm:
+      keycloak:
+        auth-server-url: https://remote.keycloak.domain.com
+        realm: CUSTOM_REALM
+        resource: POOL_CLIENT
+----
+
+In this example above a Pool with authenticated activated connects to a remote Keycloak instance and uses its custom realm and resource.
+
+Entries in the "applicationConfig" value are written directly to a configMap that is part of the Helm deployment.
+This can be a problem if you want to overwrite configuration properties with secrets.
+Therefore, you can specify secret configuration values in a different Helm value `applicationSecrets`.
+Content of this value is written in a Kubernetes secret instead.
+If you want to specify a custom database password for example:
+
+[source,yaml]
+----
+applicationSecrets:
+    spring:
+      datasource:
+        password: your_database_secret
+----
+
+==== Helm Dependencies
+
+On default, the Helm deployment also contains a PostgreSQL and Opensearch deployment.
+You can configure these deployments in your value file as well.
+For this, consider the documentation of the correspondent dependency https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13[PostgreSQL] or https://opensearch.org/docs/latest/dashboards/install/helm/[Opensearch].
+In case you want to use an already deployed database or Opensearch instance you can also disable the respective dependency and overwrite the default host address in the `applicationConfig`:
+
+[source,yaml]
+----
+applicationConfig:
+    spring:
+      datasource:
+        url: jdbc:postgresql://remote.host.net:5432/bpdm
+postgres:
+  enabled: false
+----
+
+== BPDM Gate
+
+The BPDM Gate offers an API for Catena-X members to share their own business partner data with Catena-X. Such members are called sharing members.
+Via the Gate service they can add their own business partner records but also retrieve cleaned and enhanced data back in return over the sharing process.
+Shared business partner records that have successfully gone through the sharing process end up in the BPDM Pool and will receive a BPN there (or merge with an existing record).
+
+=== How to run
+
+BPDM is a SpringBoot Kotlin software project managed by Maven and can be run with the following command: `mvn clean spring-boot:run`
+
+==== Prerequisites
+
+. Maven
+. JDK11
+. Connection to CDQ API v4.0
+. Connection to BPDM Pool API
+. Keycloak 17.0.0 (with enabled `auth` or `pool-auth` profile)
+
+When running, the BPDM Gate requires a remote CDQ storage and datasource to exchange data with.
+Per default configuration the application connects to the host address `https://api.cdq.com`
+and expects the environment variables `BPDM_CDQ_STORAGE` and `BPDM_CDQ_DATASOURCE` to contain the identifiers for the storage and datasource respectively.
+
+The Gate also requires a connection to a BPDM Pool instance which is expected at `localhost` with port `8080` on default configuration.
+
+You can find and edit the default configuration for the Gate in the `application.properties`,  `application-auth.properties` and  `application-pool-auth.properties` files in the `resources` folder.
+
+The REST API documentation can be accessed at `+http://localhost:8081/api/swagger-ui+`.
+
+=== Profiles
+
+The default configuration of the application is determined by the `application.properties` file.
+Here you can find core application configuration such as Swagger documentation, CDQ and BPDM Pool connection.
+
+You can also run the project with Spring profiles to enable additional components on top of the default configuration.
+Currently, the BPDM Gate offers the profiles `auth` and `auth-pool`.
+In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
+
+For example, the command `mvn clean spring-boot:run -Dspring.profiles.active=auth` starts the application with additional `auth` configuration enabled.
+You can also run several profiles at once, of course: `mvn clean spring-boot:run -Dspring.profiles.active=auth,auth-pool`.
+
+The following sections detail the configuration properties for each profile.
+
+==== Auth
+
+`application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
+The application expects the Keycloak to run on `localhost` on port `8180` and needs a client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
+But keep in mind that the connection to the Keycloak can be freely configured.
+Besides the URL of the Keycloak the configuration determines the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
+
+For authorization purposes the application checks incoming token's permissions:
+
+. change_company_data: For endpoints adding or updating business partner data
+. view_company_data: For endpoints reading the original unrefined business partner data
+. view_shared_data: For endpoints reading the business partner data which has been cleaned and refined through the sharing process
+
+The BPDM Pool looks for these permissions in the client/resource and not on the realm level.
+
+This profile also enables/disables the login form in the auto-generated Swagger documentation.
+The Swagger login uses the client specified in the property `springdoc.swagger-ui.oauth.client-id`.
+
+==== Pool-Auth
+
+On default configuration, the BPDM Gate expects the API of the BPDM Pool to be accessible without authorization requirements.
+In case the Pool instance to connect to have authorization activated, you need to activate this profile.
+The file `application-pool-auth.properties` configures the oAuth2 client for connecting to a secured BPDM Pool.
+Per default, the client will try to acquire a token via client credentials flow and expects the environment variable `BPDM_KEYCLOAK_SECRET` to contain the secret for the client.
+
+=== Helm Deployment
+
+This repository contains Helm files for deploying the BPDM Gate to a Kubernetes environment.
+
+==== Prerequisites
+
+. https://kubernetes.io/[Kubernetes Cluster]
+. https://helm.sh/docs/[Helm]
+. CDQ Storage and datasource
+. Running BPDM Pool instance
+
+For the default deployment you need to specify a valid CDQ storage, datasource and API key for the application to connect with.
+The easiest way to provide this information is by creating your own values files and overwrite the default `applicationConfig` and `applicationSecrets` values.
+
+.my_release-values.yaml
+[source,yaml]
+----
+applicationConfig:
+  bpdm:
+      cdq:
+        storage: your_storage_id
+        datasource: your_datasource_id
+applicationSecrets:
+  bpdm:
+    cdq:
+      api-key: your_api_key
+----
+
+Given such a values file you can deploy the application via the following command:
 
 [source,bash]
 ----
-helm install release_name ./charts/pool \
---namespace your_namespace \
---set applicationSecret.keycloak=$BPDM_DB_USER \
---set applicationSecret.cdq=$BPDM_DB_PASS \
---set postgres.auth.postgresPassword=$BPDM_KEYCLOAK_SECRET \
---set postgres.auth.password=$BPDM_CDQ_KEY
+helm install release_name ./charts/gate --namespace your_namespace -f /path/to/my_release-values.yaml
 ----
 
+This will install a new release of the BPDM Gate in the given namespace.
+On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
+The application is run on default profile (without authorization for its own endpoints or BPDM Pool endpoints).
+This deployment requires a BPDM Pool deployment to be reachable under host name `bpdm-pool` on port `8080`.
 
-==== Pull Secrets
+By giving your own values file you can configure the Helm deployment of the BPDM Gate freely.
+In the following sections you can have a look at the most important configuration options.
 
-Private container registries may require authentication in order to be accessed.
-In this case the Helm deployment needs to be given pull secrets to pull the image from such a registry.
-Pull secrets are specified in the values.yaml like so:
+==== Image Tag
+
+Per default, the Helm deployment references the latest BPDM gate release tagged as `main`.
+This tag follows the latest version of the Gate and contains the newest features and bug fixes.
+You might want to switch to a more stable release tag instead for your deployment.
+In your values file you can overwrite the default tag:
 
 [source,yaml]
 ----
-imagePullSecrets:
-    mail: your_email@your_org.com
-    user: your_user
-    password: your_pass
+image:
+     tag: "v2.0.2"
 ----
 
-As with application secrets instead of writing your credentials directly into a value.yaml you better pass them via command line when deploying the helm release: `--set imagePullSecret.user=your_user`
+==== Profiles
+
+You can also activate Spring profiles in which the BPDM Gate should be run.
+In case you want to run the Gate with authorization and oAuth Pool client enabled you can write the following:
+
+[source,yaml]
+----
+springProfiles:
+  - auth
+  - pool-auth
+----
+
+==== Ingress
+
+You can specify your own ingress configuration for the Helm deployment to make the BPDM Gate available over Ingress.
+Note that you need to have the appropriate Ingress controller installed in your cluster first.
+For example, consider a Kubernetes cluster with an https://kubernetes.github.io/ingress-nginx/[Ingress-Nginx] installed.
+An Ingress configuration for the Gate deployment could look like this:
+
+[source,yaml]
+----
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: partners-gate.your-domain.net
+      paths:
+        - path: /
+          pathType: Prefix
+----
+
+==== Gate Configuration
+
+For the default deployment you already need to overwrite the configuration properties of the application.
+The Helm deployment comes with the ability to configure the BPDM Gate application directly over the values file.
+This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-pool-auth.properties` files.
+Consider that you would need to turn on `auth` and `pool-auth` profile first before overwriting any property in the corresponding properties file could take effect.
+Overwriting configuration properties can be useful for connecting to a remotely hosted BPDM Pool instance:
+
+[source,yaml]
+----
+applicationConfig:
+    bpdm:
+      pool:
+        base-url: http://remote.domain.net/api/catena
+----
+
+Entries in the "applicationConfig" value are written directly to a configMap that is part of the Helm deployment.
+This can be a problem if you want to overwrite configuration properties with secrets.
+Therefore, you can specify secret configuration values in a different Helm value `applicationSecrets`.
+Content of this value is written in a Kubernetes secret instead.
+If you want to specify a keycloak client secret for example:
+
+[source,yaml]
+----
+applicationSecrets:
+    keycloak:
+      credentials:
+        secret: your_client_secret
+----
+
+== GitHub Workflows
+
+For releasing new Docker images of the BPDM Pool and Gate we use GitHub Actions/Workflows, by convention found in the `.github/workflows` folder.
+On pushing to the main branch or creating a new Git tag the applications are containerized and pushed to the repository's GitHub Container Registry.
+The containerization of the applications is based on the Dockerfiles found in the root folders of the Pool and Gate modules.
+Released images are tagged according to the main branch or Git tag name.
+
+In addition to the release of the applications' Docker images, there is also a workflow to release a corresponding Helm chart on Git tag creation.
+Helm charts are released via the https://github.com/helm/chart-releaser-action[helm/chart-releaser-action] and are stored in the `gh-pages` branch of the repository.
+
+Furthermore, apart from the release workflows there also exists code scanning workflows for quality assurance:
+
+1. Before any release of Docker images GitHub executes a SonarCloud workflow responsible for executing unit and integration tests as well as code quality validation.
+2. Periodically, workflows execute a KICS and Trivy scan to ensure quality standards of the Docker images and Helm charts.
+3. For a more thorough security check the packaged applications are send to a VeraCode scan, which happens periodically and after a push to main
 
 == License Check
 
