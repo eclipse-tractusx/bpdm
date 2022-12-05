@@ -16,7 +16,13 @@ Currently, BPDM consists of the Pool and Gate services.
 
 The BPDM Pool is the single source of truth in Catena-X for business partner base information such as addresses and official identifiers.
 Each record in the Pool has a unique identifier with which it can be referenced across the entire Catena-X landscape, the business partner number.
-Business partner records are divided into legal entities, sites and partner addresses, where a legal entity may have several sites and a site several partner addresses.
+Business partner records are divided into legal entities, sites and partner addresses.
+Self-explanatory, a legal entity record represents the legal entity information about a business partner.
+A site may represent legal entity's plant or campus which is big enough to contain several contact/delivery addresses.
+Finally, an address partner is a location of legal entity or site with a single contact/delivery address.
+A legal entity may have several sites and address partner.
+Further, a site may have several address partners.
+
 The Pool offers an API to query these business partner records by BPN, other identifier or by text search.
 
 === How to run
@@ -46,7 +52,7 @@ The REST API documentation can be accessed at `+http://localhost:8080/api/swagge
 
 The default configuration of the application is determined by the `application.properties` file.
 Here you can find core application configuration such as Swagger documentation, BPN generation and Actuator.
-Furthermore, you can find here the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL) and Opensearch.
+Furthermore, here you can find the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL) and Opensearch.
 
 You can also run the project with Spring profiles to enable additional components on top of the default configuration.
 Currently, the BPDM Pool offers the profiles `auth` and `cdq`.
@@ -66,8 +72,8 @@ Besides the URL of the Keycloak the configuration determines the client credenti
 
 For authorization purposes the application checks incoming token's permissions:
 
-. add_company_data: For endpoints creating or updating business partner records including triggering imports from CDQ/exports to Opensearch
-. view_company_data: For read-only endpoints of business partner data
+add_company_data:: For endpoints creating or updating business partner records including triggering imports from CDQ/exports to Opensearch
+view_company_data:: For read-only endpoints of business partner data
 
 The BPDM Pool looks for these permissions in the client/resource and not on the realm level.
 
@@ -76,14 +82,14 @@ The Swagger login uses the client specified in the property `springdoc.swagger-u
 
 ==== Cdq
 
-The file `application-cdq.properties` enables and configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] form which the application can import business partner records.
+The file `application-cdq.properties` enables and configures the connection to a remote https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-started[CDQ API] from which the application can import business partner records.
 Depending on whether this component is enabled, the application offers endpoints to import records from and to export Business Partner Numbers to CDQ.
 When enabled the application requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges for accessing the specified storage.
 Further, you need to provide a CDQ storage ID (`BPDM_CDQ_STORAGE`) and datasource ID `BPDM_CDQ_DATASOURCE` from where the records should be imported by the application.
 
 === Helm Deployment
 
-This repository contains a Helm files for deploying the BPDM Pool to a Kubernetes environment.
+This repository contains Helm files for deploying the BPDM Pool to a Kubernetes environment.
 
 ==== Prerequisites
 
@@ -116,15 +122,16 @@ In the following sections you can have a look at the most important configuratio
 
 ==== Image Tag
 
-Per default, the Helm deployment references the latest BPDM Pool release tagged as `main`.
-This tag follows the latest version of the Pool and contains the newest features and bug fixes.
-You might want to switch to a more stable release tag instead for your deployment.
+Per default, the Helm deployment references a certain BPDM Pool release version where the newest Helm release points to the newest Pool version.
+This is a stable tag pointing to a fixed release version of the BPDM Pool.
+For your deployment you might want to follow the latest application releases instead.
+
 In your values file you can overwrite the default tag:
 
 [source,yaml]
 ----
 image:
-     tag: "v2.0.2"
+     tag: "latest"
 ----
 
 ==== Profiles
@@ -196,7 +203,7 @@ applicationSecrets:
 ==== Helm Dependencies
 
 On default, the Helm deployment also contains a PostgreSQL and Opensearch deployment.
-You can configure the these deployments in your value file as well.
+You can configure these deployments in your value file as well.
 For this, consider the documentation of the correspondent dependency https://artifacthub.io/packages/helm/bitnami/postgresql/11.9.13[PostgreSQL] or https://opensearch.org/docs/latest/dashboards/install/helm/[Opensearch].
 In case you want to use an already deployed database or Opensearch instance you can also disable the respective dependency and overwrite the default host address in the `applicationConfig`:
 
@@ -279,7 +286,7 @@ Per default, the client will try to acquire a token via client credentials flow 
 
 === Helm Deployment
 
-This repository contains a Helm files for deploying the BPDM Gate to a Kubernetes environment.
+This repository contains Helm files for deploying the BPDM Gate to a Kubernetes environment.
 
 ==== Prerequisites
 
@@ -350,7 +357,7 @@ springProfiles:
 You can specify your own ingress configuration for the Helm deployment to make the BPDM Gate available over Ingress.
 Note that you need to have the appropriate Ingress controller installed in your cluster first.
 For example, consider a Kubernetes cluster with an https://kubernetes.github.io/ingress-nginx/[Ingress-Nginx] installed.
-An Ingress configuration for the GAte deployment could look like this:
+An Ingress configuration for the Gate deployment could look like this:
 
 [source,yaml]
 ----
@@ -371,7 +378,7 @@ ingress:
 For the default deployment you already need to overwrite the configuration properties of the application.
 The Helm deployment comes with the ability to configure the BPDM Gate application directly over the values file.
 This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-pool-auth.properties` files.
-Consider that you would need to turn on `auth` and `pool-uath` profile first before overwriting any property in the corresponding properties file could take effect.
+Consider that you would need to turn on `auth` and `pool-auth` profile first before overwriting any property in the corresponding properties file could take effect.
 Overwriting configuration properties can be useful for connecting to a remotely hosted BPDM Pool instance:
 
 [source,yaml]
