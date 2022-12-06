@@ -1,0 +1,36 @@
+apiVersion: v1
+entries:
+  bpdm:
+  - apiVersion: v2
+    appVersion: 2.0.0
+    created: "2022-12-06T10:11:57.381173028Z"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM service
+    digest: 70317fb8b837f37f3b2bac2c202ecab2a5187a27d901e64b34922296781a8d1e
+    name: bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-2.0.0/bpdm-2.0.0.tgz
+    version: 2.0.0
+  bpdm-gate:
+  - apiVersion: v2
+    appVersion: 2.0.0
+    created: "2022-12-06T10:11:57.501867851Z"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: 099aa94f3ec321d9588c9134b8c3f2938d1b9ec6697dde99e86c7d60c3d056d3
+    name: bpdm-gate
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-2.0.0/bpdm-gate-2.0.0.tgz
+    version: 2.0.0
+generated: "2022-12-06T10:11:57.501876052Z"
