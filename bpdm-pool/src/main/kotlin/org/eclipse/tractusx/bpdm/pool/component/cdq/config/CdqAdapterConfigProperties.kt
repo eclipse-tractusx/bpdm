@@ -20,10 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+
 
 @ConfigurationProperties(prefix = "bpdm.cdq")
-@ConstructorBinding
 class CdqAdapterConfigProperties(
     val enabled: Boolean = true,
     val host: String = "https://api.cdq.com",

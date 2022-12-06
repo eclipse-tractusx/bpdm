@@ -20,10 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+
 
 @ConfigurationProperties(prefix = "bpdm.gate-security")
-@ConstructorBinding
 data class GateSecurityConfigProperties(
     val oauth2ClientRegistration: String = "gate-client",
     val poolSecurityEnabled: Boolean = false

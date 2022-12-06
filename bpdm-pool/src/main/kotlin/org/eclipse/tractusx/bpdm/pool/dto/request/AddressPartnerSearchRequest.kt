@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.dto.request
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.boot.context.properties.ConstructorBinding
+
 
 @Schema(name = "AddressPartnerSearchRequest", description = "Contains keywords used for searching in address properties")
-data class AddressPartnerSearchRequest @ConstructorBinding constructor(
+data class AddressPartnerSearchRequest constructor(
     @field:Parameter(description = "Filter business partners by administrative area name")
     var administrativeArea: String? = null,
     @field:Parameter(description = "Filter business partners by postcode or postcodes")

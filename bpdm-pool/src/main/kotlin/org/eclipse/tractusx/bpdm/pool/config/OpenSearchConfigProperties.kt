@@ -20,10 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
+
 
 @ConfigurationProperties(prefix = "bpdm.opensearch")
-@ConstructorBinding
 class OpenSearchConfigProperties(
     val enabled: Boolean = false,
     val host: String = "localhost",

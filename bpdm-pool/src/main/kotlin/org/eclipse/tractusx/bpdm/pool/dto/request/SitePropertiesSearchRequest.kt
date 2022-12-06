@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.boot.context.properties.ConstructorBinding
+
 
 @Schema(name = "SitePropertiesSearchRequest", description = "Contains keywords used for searching in site properties")
-data class SitePropertiesSearchRequest @ConstructorBinding constructor(
+data class SitePropertiesSearchRequest constructor(
     @field:Parameter(description = "Filter sites by name")
     val siteName: String?
 )
