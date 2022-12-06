@@ -39,6 +39,8 @@ private const val RELATION_TYPE_KEY = "PARENT"
 
 private const val LOOKUP_PATH = "/businesspartners/lookup"
 
+private const val VALIDATE_BUSINESS_PARTNER_PATH = "/businesspartners/validate"
+
 @Service
 class CdqClient(
     @Qualifier("cdqClient")
@@ -104,15 +106,15 @@ class CdqClient(
         return upsertBusinessPartners(legalEntities)
     }
 
-    fun upsertSites(sites: List<BusinessPartnerCdq>) {
+    fun upsertSites(sites: Collection<BusinessPartnerCdq>) {
         return upsertBusinessPartners(sites)
     }
 
-    fun upsertAddresses(addresses: List<BusinessPartnerCdq>) {
+    fun upsertAddresses(addresses: Collection<BusinessPartnerCdq>) {
         return upsertBusinessPartners(addresses)
     }
 
-    private fun upsertBusinessPartners(businessPartners: List<BusinessPartnerCdq>) {
+    private fun upsertBusinessPartners(businessPartners: Collection<BusinessPartnerCdq>) {
         val upsertRequest =
             UpsertRequest(
                 cdqConfigProperties.datasource,
@@ -237,6 +239,20 @@ class CdqClient(
             )
         }.toList()
         upsertBusinessPartnerRelations(legalEntityRelationsCdq.plus(siteRelationsCdq))
+    }
+
+    fun validateBusinessPartner(validationRequest: ValidationRequestCdq): ValidationResponseCdq {
+        return try {
+            webClient
+                .post()
+                .uri(cdqConfigProperties.dataValidationApiUrl + VALIDATE_BUSINESS_PARTNER_PATH)
+                .bodyValue(objectMapper.writeValueAsString(validationRequest))
+                .retrieve()
+                .bodyToMono<ValidationResponseCdq>()
+                .block()!!
+        } catch (e: Exception) {
+            throw CdqRequestException("Validate business partner request failed.", e)
+        }
     }
 
     private fun upsertBusinessPartnerRelations(relations: Collection<RelationCdq>) {

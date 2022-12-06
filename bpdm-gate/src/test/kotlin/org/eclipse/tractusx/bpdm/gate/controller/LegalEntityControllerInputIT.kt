@@ -26,14 +26,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertRequest
-import org.eclipse.tractusx.bpdm.common.dto.cdq.UpsertResponse
+import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
@@ -475,5 +475,83 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isBadRequest
+    }
+
+    /**
+     * Given valid legal entity
+     * When validate that legal entity
+     * Then response is OK and no errors
+     */
+    @Test
+    fun `validate a valid legal entity`() {
+        val legalEntity = RequestValues.legalEntityGateInput1
+
+        val mockDefects = listOf(
+            DataDefectCdq(ViolationLevel.INFO, "Info"),
+            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+        )
+        val mockResponse = ValidationResponseCdq(mockDefects)
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockResponse))
+                )
+        )
+
+        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_VALIDATION_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(legalEntity)
+            .exchange().expectStatus().is2xxSuccessful
+            .returnResult<ValidationResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
+
+        assertThat(actualResponse).isEqualTo(expectedResponse)
+    }
+
+    /**
+     * Given invalid legal entity
+     * When validate that legal entity
+     * Then response is ERROR and contain error description
+     */
+    @Test
+    fun `validate an invalid legal entity`() {
+        val legalEntity = RequestValues.legalEntityGateInput1
+
+        val mockErrorMessage = "Validation error"
+        val mockDefects = listOf(
+            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectCdq(ViolationLevel.INFO, "Info"),
+            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+        )
+
+        val mockResponse = ValidationResponseCdq(mockDefects)
+        wireMockServer.stubFor(
+            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(mockResponse))
+                )
+        )
+
+        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_VALIDATION_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(legalEntity)
+            .exchange().expectStatus().is2xxSuccessful
+            .returnResult<ValidationResponse>()
+            .responseBody
+            .blockFirst()!!
+
+        val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
+
+        assertThat(actualResponse).isEqualTo(expectedResponse)
+
     }
 }

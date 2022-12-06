@@ -30,7 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
+import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,7 +43,8 @@ import javax.validation.Valid
 @RequestMapping("/api/catena")
 class LegalEntityController(
     val legalEntityService: LegalEntityService,
-    val apiConfigProperties: ApiConfigProperties
+    val apiConfigProperties: ApiConfigProperties,
+    val validationService: ValidationService
 ) {
 
     @Operation(
@@ -113,4 +116,22 @@ class LegalEntityController(
     ): PageStartAfterResponse<LegalEntityGateOutput> {
         return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
+
+    @Operation(
+        summary = "Validate a legal entity",
+        description = "Determines errors in a legal entity record which keep it from entering the sharing process"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity requests", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/legal-entities/validation")
+    fun validateLegalEntity(
+        @RequestBody legalEntityInput: LegalEntityGateInput
+    ): ValidationResponse {
+        return validationService.validate(legalEntityInput)
+    }
+
 }

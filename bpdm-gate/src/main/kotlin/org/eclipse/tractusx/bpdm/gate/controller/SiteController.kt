@@ -30,7 +30,9 @@ import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
+import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springdoc.api.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -41,7 +43,8 @@ import javax.validation.Valid
 @RequestMapping("/api/catena")
 class SiteController(
     val siteService: SiteService,
-    val apiConfigProperties: ApiConfigProperties
+    val apiConfigProperties: ApiConfigProperties,
+    val validationService: ValidationService
 ) {
     @Operation(
         summary = "Create or update sites.",
@@ -111,5 +114,22 @@ class SiteController(
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<SiteGateOutput> {
         return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
+    }
+
+    @Operation(
+        summary = "Validate a site",
+        description = "Determines errors in a site record which keep it from entering the sharing process"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
+            ApiResponse(responseCode = "400", description = "On malformed site requests", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/sites/validation")
+    fun validateSite(
+        @RequestBody siteInput: SiteGateInput
+    ): ValidationResponse {
+        return validationService.validate(siteInput)
     }
 }

@@ -145,13 +145,20 @@ class SiteService(
      * - Upserting the new relations
      */
     fun upsertSites(sites: Collection<SiteGateInput>) {
-        val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
-
-        doUpsertSites(sites, parentLegalEntitiesByExternalId)
+        val sitesCdq = toCdqModels(sites)
+        cdqClient.upsertSites(sitesCdq)
 
         deleteRelationsOfSites(sites)
 
         upsertRelations(sites)
+    }
+
+    /**
+     * Fetches parent information and converts the given [sites] to their corresponding CDQ models
+     */
+    fun toCdqModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerCdq> {
+        val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
+        return sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
     }
 
     private fun upsertRelations(sites: Collection<SiteGateInput>) {
@@ -162,14 +169,6 @@ class SiteService(
             )
         }.toList()
         cdqClient.upsertSiteRelations(relations)
-    }
-
-    private fun doUpsertSites(
-        sites: Collection<SiteGateInput>,
-        parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq>
-    ) {
-        val sitesCdq = sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
-        cdqClient.upsertSites(sitesCdq)
     }
 
     private fun deleteRelationsOfSites(sites: Collection<SiteGateInput>) {
