@@ -1,10 +1,13 @@
-name: Release core Chart
+name: Release Charts
 
 on:
   workflow_dispatch:
   push:
-    tags:
-      - '*'
+    # prevent unnecessary GH action runs for files outside of charts folder
+    paths:
+      - 'charts/**'
+    branches:
+      - main
 
 jobs:
   release:
@@ -25,11 +28,18 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        uses: azure/setup-helm@v1
+        uses: azure/setup-helm@v3
         with:
-          version: v3.9.1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update helm dependencies for bpdm-pool
+        run: |
+          cd charts/pool
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add opensearch https://opensearch-project.github.io/helm-charts/
+          helm dependency update
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.0
+        uses: helm/chart-releaser-action@v1.4.1
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
