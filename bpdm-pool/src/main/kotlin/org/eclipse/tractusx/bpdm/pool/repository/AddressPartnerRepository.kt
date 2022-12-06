@@ -25,9 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, Long> {
+interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, Long>, CrudRepository<AddressPartner, Long> {
 
     @Query("SELECT a FROM AddressPartner a join a.legalEntity p where p.bpn=:bpn")
     fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<AddressPartner>

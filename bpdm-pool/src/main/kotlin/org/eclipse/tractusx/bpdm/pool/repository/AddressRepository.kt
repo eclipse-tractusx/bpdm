@@ -21,9 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.Address
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface AddressRepository : PagingAndSortingRepository<Address, Long> {
+interface AddressRepository : PagingAndSortingRepository<Address, Long>, CrudRepository<Address, Long> {
 
     @Query("SELECT DISTINCT a FROM Address a LEFT JOIN FETCH a.contexts WHERE a IN :addresses")
     fun joinContexts(addresses: Set<Address>): Set<Address>

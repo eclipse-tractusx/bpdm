@@ -21,9 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface LegalFormRepository : PagingAndSortingRepository<LegalForm, Long> {
+interface LegalFormRepository : PagingAndSortingRepository<LegalForm, Long>, CrudRepository<LegalForm, Long> {
     fun findByTechnicalKey(key: String): LegalForm?
     fun findByTechnicalKeyIn(keys: Set<String>): Set<LegalForm>
 

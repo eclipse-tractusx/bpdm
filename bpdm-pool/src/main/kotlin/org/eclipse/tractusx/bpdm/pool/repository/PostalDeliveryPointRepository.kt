@@ -20,7 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.PostalDeliveryPoint
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface PostalDeliveryPointRepository : PagingAndSortingRepository<PostalDeliveryPoint, Long> {
+interface PostalDeliveryPointRepository : PagingAndSortingRepository<PostalDeliveryPoint, Long>, CrudRepository<PostalDeliveryPoint, Long> {
 }

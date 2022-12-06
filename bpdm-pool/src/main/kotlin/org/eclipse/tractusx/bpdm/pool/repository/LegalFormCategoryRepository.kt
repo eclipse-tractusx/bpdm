@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.LegalFormCategory
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface LegalFormCategoryRepository : PagingAndSortingRepository<LegalFormCategory, Long> {
+interface LegalFormCategoryRepository : PagingAndSortingRepository<LegalFormCategory, Long>, CrudRepository<LegalFormCategory, Long> {
     fun findByName(name: String): LegalFormCategory?
 }
