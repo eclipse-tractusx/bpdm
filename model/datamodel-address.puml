@@ -1,0 +1,276 @@
+@startuml
+
+'--------------------- Entities ------------------------'
+
+class Language {
+	{field} Name: ISO 639-1
+	{field} Technical_Key: ISO 639-1 two-letters
+}
+
+class Address {
+    Country
+    ..
+    Administrative_Areas
+    ..
+    Localities
+    ..
+    Street
+    ..
+    Thoroughfares
+    ..
+    Premises
+    ..
+    Post_Codes
+    ..
+    Postal_Delivery_Points
+    ..
+	Geographic_Coordinates
+	..
+    Types
+}
+
+class Country {
+	{field} Name
+	{field} Technical_Key:  ISO 3166 (Two letters)
+}
+
+note as Country_Key_Note
+	<b>Example:</b>
+	ISO 3166 Standard
+	AT
+	CH
+	DE
+	...
+end note
+
+class Administrative_Area {
+    Value
+    Short_Name
+	FipsCode
+	..
+	Language
+	..
+	Type
+}
+
+class Administrative_Area_Type {
+	Name
+	..
+	Technical_Key
+}
+
+enum Administrative_Area_Type_Key {
+	COUNTRY
+	REGION
+	OTHER
+}
+
+note as Administrative_Area_Fips_Note
+	<b>Example:</b>
+	FIPS
+	ISO 3166
+	...
+end note
+
+class Locality {
+    Value
+    Short_Name
+    ..
+    Type
+    ..
+    Language
+}
+
+class Locality_Type {
+	Name
+	..
+	Technical_Key
+}
+
+enum Locality_Type_Key {
+	BLOCK
+	CITY
+	DISTRICT
+	POST_OFFICE
+	QUARTER
+	OTHER
+}
+
+class Street {
+    Value
+	Name
+	Short_Name
+	Number
+	Milestone
+	Direction
+	..
+	Language
+}
+
+class Thoroughfare {
+    Value
+    Short_Name
+    Number
+    Direction
+    ..
+    Type
+    ..
+	Language
+}
+
+
+class Thoroughfare_Type {
+		Name
+    	..
+    	Technical_Key
+}
+
+enum Thoroughfare_Type_Key {
+	INDUSTRIAL_ZONE
+	RIVER
+	SQUARE
+	OTHER
+}
+
+class Premise {
+	Value
+	Short_Name
+	Number
+	..
+	Type
+	..
+	Language
+}
+
+class Premise_Type {
+		Name
+    	..
+    	Technical_Key
+}
+
+enum Premise_Type_Key {
+	BUILDING
+	HARBOUR
+	LEVEL
+	ROOM
+	SUITE
+	UNIT
+	WAREHOUSE
+	OTHER
+}
+
+class Post_Code {
+    Value
+    ..
+	Type
+}
+
+class Post_Code_Type {
+	Name
+	..
+	Technical_Key
+}
+
+enum Post_Code_Type_Key {
+	CEDEX
+	LARGE_MAIL_USER
+	POST_BOX
+	REGULAR
+	OTHER
+}
+
+
+class Postal_Delivery_Point {
+    Value
+    Short_Name
+    Number
+    ..
+    Type
+    ..
+	Language
+}
+
+class Postal_Delivery_Point_Type {
+	Name
+	..
+	Technical_Key
+}
+
+enum Postal_Delivery_Point_Type_Key {
+	INTERURBAN_DELIVERY_POINT
+	MAIL_STATION
+	MAILBOX
+	POST_OFFICE_BOX
+	OTHER
+}
+
+
+class Geographic_Coordinates {
+	{field} latitude
+	{field} longitude
+	{field} altitude
+}
+
+class Address_Type {
+	Name
+	..
+	Technical_Key
+}
+
+enum Address_Type_Key {
+	BRANCH_OFFICE
+	CARE_OF
+	HEADQUARTER
+	LEGAL_ALTERNATIVE
+	PO_BOX
+	REGISTERED
+	REGISTERED_AGENT_MAIL
+	REGISTERED_AGENT_PHYSICAL
+	VAT_REGISTERED
+}
+
+'--------------------- Relationships ------------------------'
+
+Address::Country "*" --> "0..1" Country
+Address::Administrative_Areas "1" --> "*" Administrative_Area
+Address::Localities "1" --> "*" Locality
+Address::Street "1" --> "1" Street
+Address::Thoroughfares "1" --> "*" Thoroughfare
+Address::Premises "1" --> "*" Premise
+Address::Post_Codes "1" --> "*" Post_Code
+Address::Postal_Delivery_Points "1" --> "*" Postal_Delivery_Point
+Address::Geographic_Coordinates "*" --> "0..1" Geographic_Coordinates
+
+Address::Types "*" --> "0..1" Address_Type
+
+Country_Key_Note .. Country
+
+Administrative_Area::Type "*" --> "1" Administrative_Area_Type
+Administrative_Area::Language "*" --> "1" Language
+Administrative_Area_Type::Technical_Key .. Administrative_Area_Type_Key
+Administrative_Area_Fips_Note .. Administrative_Area
+
+Locality::Type "*" --> "1" Locality_Type
+Locality::Language "*" --> "1" Language
+Locality_Type::Technical_Key .. Locality_Type_Key
+
+Street::Language "*" --> "1" Language
+
+Thoroughfare::Type "*" --> "1" Thoroughfare_Type
+Thoroughfare_Type::Technical_Key .. Thoroughfare_Type_Key
+Thoroughfare::Language "*" --> "1" Language
+
+Premise::Type "*" --> "1" Premise_Type
+Premise_Type::Technical_Key .. Premise_Type_Key
+Premise::Language "*" --> "1" Language
+
+Post_Code::Type "*" --> "1" Post_Code_Type
+Post_Code_Type::Technical_Key .. Post_Code_Type_Key
+
+Postal_Delivery_Point::Language "*" --> "1" Language
+Postal_Delivery_Point::Type "*" --> "1" Postal_Delivery_Point_Type
+Postal_Delivery_Point_Type::Technical_Key .. Postal_Delivery_Point_Type_Key
+
+Address_Type .. Address_Type_Key
+
+@enduml

@@ -1,0 +1,5 @@
+== Data Models
+
+This subfolder contains the data models for the business partner records.
+The models are not meant to be class diagrams matching the implemented classes one to one.
+Rather, the models represent the overall concept of the business partner data.

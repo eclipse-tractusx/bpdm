@@ -1,0 +1,263 @@
+@startuml
+
+'--------------------- Entities ------------------------'
+
+class Legal_Entity {
+	BPN: BPN-L
+	Legal_Address: Address
+	..
+	Identifiers
+	..
+	Names
+	..
+	Legal_Form
+	..
+	Status
+	..
+	Profile_Classifications
+	..
+	Bank_Accounts
+	..
+    Roles
+	..
+	Relations
+}
+
+class Identifier {
+    Value
+    ..
+    Type
+    ..
+    Issuing_Body
+}
+
+class Identifier_Type {
+	Name
+	Technical_Key
+}
+
+note as Identifier_Type_Key
+	<b>Example:</b>
+	CX ID - CDQ Identifier
+	DE BNUM
+	DUNS ID
+	EU_VAT_ID_DE
+	EU_VAT_ID_FR
+	SIREN
+	SIRET
+	SSI ID
+	...
+end note
+
+class Issuing_Body {
+	Name
+	Technical_Key
+}
+
+class Name {
+    Value
+    Short_Name
+    ..
+    Type
+    ..
+    Language
+}
+
+class Name_Type{
+    Name
+    ..
+    Technical_Key
+}
+
+enum Name_Type_Key{
+    REGISTERED
+    ACRONYM
+    DOING_BUSINESS_AS
+    ESTABLISHMENT
+    INTERNATIONAL
+    LOCAL
+    OTHER
+    REGISTERED
+    TRANSLITERATED
+    VAT_REGISTERED
+}
+
+class Legal_Form {
+	Name
+	Main_Abbreviation
+	..
+	Technical_Key
+	..
+	Language
+}
+
+note as Legal_Form_Abbr
+    An unique identifier for CDL)
+end note
+
+note as Legal_Form_Key
+	<b>Example:</b>
+	AT_7461 (AG in Austria)
+	DE_9866 (AG in Germany)
+	CH_0680 (AG in Switzerland)
+	CN_1659 (Joint-Stock Company in China)
+	...
+end note
+
+class Business_Status {
+	Official_Denotation
+	Valid_From
+	Valid_Until
+	..
+	Type
+}
+
+class Business_Status_Type {
+	Name
+    Technical_Key
+}
+
+enum Business_Status_Type_Key {
+	ACTIVE
+	DISSOLVED
+	IN_LIQUIDATION
+	INACTIVE
+	INSOLVENCY
+}
+
+class Classification {
+    Value
+    Code
+    ..
+    Type
+}
+
+class Classification_Type {
+	Name
+	Technical_Key
+}
+
+enum Classification_Type_Key {
+	NACE
+	NAF
+	NAICS
+	SIC
+}
+
+class Bank_Account {
+	National_Bank_Identifier
+	National_Bank_Account_Identifier
+	International_Bank_Identifier: BIC/SWIFT
+    International_Bank_Account_Identifier: IBAN
+    Trust_Scores
+..
+    Currency
+}
+
+class Currency {
+    Name
+    Technical_Key: ISO 4217
+}
+
+class Role {
+    Name
+    Technical_Key
+}
+
+class Relation {
+	Started_At: ISO 8601 Timestamp
+	Ended_At: ISO 8601 Timestamp
+	Start_Node: BPN
+    End_Node: BPN
+..
+    Type
+..
+	Relation_Class
+}
+
+class Relation_Type {
+	Name
+	Technical_Key
+}
+
+enum Relation_Type_Key {
+	CX_LEGAL_SUCCESSOR_OF
+	CX_LEGAL_PREDECESSOR_OF
+	CX_ADDRESS_OF
+	CX_SITE_OF
+	CX_OWNED_BY
+	DIRECT_LEGALRELATION
+	COMMERCIAL_ULTIMATE
+	DOMMESTIC_BRANCH_RELATION
+	INTERNATIONALBRANCH_RELATION
+	DOMESTIC_LEGAL_ULTIMATE_RELATION
+	GLOBAL_LEGAL_ULTIMATE_RELATION
+	LEGAL_PREDECESSOR
+	LEGAL_SUCCESSOR
+	DNB_PARENT
+	DNB_HEADQUARTER
+	DNB_DOMESTIC_ULTIMATE
+	DNB_GLOBAL_ULTIMATE
+	LEI_DIREcT_PARENT
+	LEI_INTERNATIONAl_BRANCH
+	LEI_ULTIMATE_PARENT
+}
+
+class Relation_Class {
+    Name
+    Technical_Key
+}
+
+enum Relation_Class_Key{
+    CDQ_HIERARCHY
+    CDQ_TRANSITION
+    CX_HIERARCHY
+    DNB_HIERARCHY
+    LEI_HIERARCHY
+}
+
+
+class Language {
+	{field} name ISO 639-1 (German)
+	{field} technicalKey ISO 639-1 two-letters
+}
+
+'--------------------- Relationships ------------------------'
+
+Legal_Entity::Identifiers "1" --> "*" Identifier
+Legal_Entity::Names "1" --> "*" Name
+Legal_Entity::Legal_Form "*" --> "0..1" Legal_Form
+Legal_Entity::Status "1" --> "0..1" Business_Status
+Legal_Entity::Profile_Classifications "1" --> "*" Classification
+Legal_Entity::Bank_Accounts "1" --> "*" Bank_Account
+Legal_Entity::Roles "*" --> "*" Role
+Legal_Entity::Relations "*" --> "*" Relation
+
+Identifier::Type "*" --> "1" Identifier_Type
+Identifier::Issuing_Body "*" --> "1" Issuing_Body
+
+Identifier_Type_Key .. Identifier_Type::Technical_Key
+
+Name::Language "*" --> "1" Language
+Name::Type "*" --> "1" Name_Type
+
+Name_Type::Technical_Key .. Name_Type_Key
+
+Legal_Form::Language "*" --> "1" Language
+Legal_Form_Abbr .. Legal_Form::Main_Abbreviation
+Legal_Form_Key .. Legal_Form::Technical_Key
+
+Business_Status::Type "*" --> "1" Business_Status_Type
+Business_Status_Type::Technical_Key .. Business_Status_Type_Key
+
+Classification::Type "*" --> "1" Classification_Type
+Classification_Type::Technical_Key .. Classification_Type_Key
+
+Bank_Account::Currency "*" --> "1" Currency
+
+Relation::Type "*" --> "1" Relation_Type
+Relation::Relation_Class "*" --> "1" Relation_Class
+Relation_Type::Technical_Key .. Relation_Type_Key
+Relation_Class::Technical_Key .. Relation_Class_Key
+
+@enduml
