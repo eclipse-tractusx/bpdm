@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.eclipse.tractusx.bpdm.common.config.BpdmCommonAutoConfiguration
