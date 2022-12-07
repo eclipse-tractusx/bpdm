@@ -106,15 +106,11 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-kotlin</artifactId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
         </dependency>
         <!-- Manage database migrations -->
         <dependency>
@@ -135,6 +131,10 @@
             <groupId>org.opensearch.client</groupId>
             <artifactId>opensearch-java</artifactId>
             <version>${opensearch-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
 
         <dependency>

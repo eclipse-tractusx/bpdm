@@ -46,7 +46,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <keycloak.version>19.0.2</keycloak.version>
         <kotlin.version>1.7.21</kotlin.version>
-        <springdoc.version>1.6.9</springdoc.version>
+        <springdoc.version>2.0.0</springdoc.version>
         <neo.version>1.29</neo.version>
         <jacoco.version>0.8.7</jacoco.version>
         <kotlinlogging.version>2.1.23</kotlinlogging.version>
@@ -108,24 +108,12 @@
             <!-- OpenAPI 3 auto API documentation library for Spring Boot -->
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-            <!-- OpenAPI 3 support for spring security features -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-security</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-            <!-- Better support for Kotlin with OpenAPI generation -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-kotlin</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-common</artifactId>
+                <artifactId>springdoc-openapi-starter-common</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
             <!-- Kotlin wrapper for slf4j (Logging)-->
