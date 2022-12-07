@@ -32,13 +32,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update helm dependencies for bpdm-pool
-        run: |
-          cd charts/pool
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo add opensearch https://opensearch-project.github.io/helm-charts/
-          helm dependency update
-
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         env:
