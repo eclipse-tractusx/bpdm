@@ -20,21 +20,29 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.eclipse.tractusx.bpdm.common.config.BpdmSecurityConfigurerAdapter
+import org.eclipse.tractusx.bpdm.common.config.CustomJwtAuthenticationConverter
+import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @Configuration
-class BpdmSecurityConfigurerAdapterImpl : BpdmSecurityConfigurerAdapter {
+class BpdmSecurityConfigurerAdapterImpl(
+    val securityConfigProperties: SecurityConfigProperties
+) : BpdmSecurityConfigurerAdapter {
     override fun configure(http: HttpSecurity) {
         http.csrf().disable()
             .cors()
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().authorizeRequests()
-            .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
-            .antMatchers("/v3/api-docs/**").permitAll()
-            .antMatchers("/api/swagger-ui/**").permitAll()
-            .antMatchers("/api/**").authenticated()
+            .and().authorizeHttpRequests()
+            .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/api/**")).authenticated()
+            .and().oauth2ResourceServer()
+            .jwt()
+            .jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
     }
 }

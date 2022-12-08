@@ -44,7 +44,6 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <keycloak.version>19.0.2</keycloak.version>
         <kotlin.version>1.7.21</kotlin.version>
         <springdoc.version>2.0.0</springdoc.version>
         <neo.version>1.29</neo.version>
@@ -77,14 +76,6 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.keycloak.bom</groupId>
-                <artifactId>keycloak-adapter-bom</artifactId>
-                <version>${keycloak.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>${kotlin.version}</version>
@@ -93,11 +84,6 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-reflect</artifactId>
                 <version>${kotlin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-spring-boot-starter</artifactId>
-                <version>${keycloak.version}</version>
             </dependency>
             <!-- Contains country and language codes per ISO 3166-1 alpha-2 and ISO 639-1 -->
             <dependency>

@@ -24,8 +24,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.security")
 data class SecurityConfigProperties(
     val enabled: Boolean = false,
+    val clientId: String = "",
     val authUrl: String = "",
-    val tokenUrl:String = "",
+    val tokenUrl: String = "",
     val refreshUrl: String = "",
     val corsOrigins: Collection<String> = emptyList()
 )
