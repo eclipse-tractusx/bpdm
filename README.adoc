@@ -30,7 +30,7 @@ The Pool offers an API to query these business partner records by BPN, other ide
 ==== Prerequisites
 
 . Maven
-. JDK11
+. JDK17
 . PostgreSQL 14.2
 . OpenSearch 2.1.0
 . Keycloak 17.0.0 (with enabled `auth` profile)
@@ -230,7 +230,7 @@ BPDM is a SpringBoot Kotlin software project managed by Maven and can be run wit
 ==== Prerequisites
 
 . Maven
-. JDK11
+. JDK17
 . Connection to CDQ API v4.0
 . Connection to BPDM Pool API
 . Keycloak 17.0.0 (with enabled `auth` or `pool-auth` profile)
