@@ -21,10 +21,10 @@ applicationConfig:
     cdq:
       storage: 38d2277e20c730b4b8e8f182adcef7ca
       datasource: 621338451197b7667a5fbda4
-  keycloak:
-    auth-server-url: https://centralidp.int.demo.catena-x.net/auth
-    realm: CX-Central
-    resource: Cl16-CX-BPDMGate
+    security:
+      auth-server-url: https://centralidp.int.demo.catena-x.net/auth
+      realm: CX-Central
+      client-id: Cl16-CX-BPDMGate
   spring:
     security:
       oauth2:
