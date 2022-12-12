@@ -35,13 +35,9 @@ applicationConfig:
               client-id: sa-cl16-cx-1
 
 applicationSecrets:
-  spring:
-    security:
-      oauth2:
-        client:
-          registration:
-            gate-client:
-              client-secret: <path:bpdm/data/int/gate/service-account#client-secret>
   bpdm:
     cdq:
       api-key: <path:bpdm/data/int/gate/cdq#api-key>
+    security:
+      credentials:
+        secret: <path:bpdm/data/int/gate/service-account#client-secret>

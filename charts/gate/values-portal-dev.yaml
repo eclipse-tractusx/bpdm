@@ -37,14 +37,9 @@ applicationConfig:
         client-id: Cl2-CX-Portal
 
 applicationSecrets:
-  spring:
-    security:
-      oauth2:
-        client:
-          registration:
-            gate-client:
-              client-secret: <path:bpdm/data/dev/portal-gate/keycloak#client-secret>
   bpdm:
     cdq:
       api-key: <path:bpdm/data/dev/portal-gate/cdq#api-key>
-  
+    security:
+      credentials:
+        secret: <path:bpdm/data/dev/portal-gate/keycloak#client-secret>
