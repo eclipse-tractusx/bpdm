@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
-import jakarta.persistence.*
 
 @MappedSuperclass
 abstract class BaseEntity(
@@ -38,9 +39,9 @@ abstract class BaseEntity(
 
     @Column(updatable = false, nullable = false, name = "CREATED_AT")
     @CreationTimestamp
-    val createdAt: Instant = Instant.now(),
+    val createdAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS),
 
     @Column(nullable = false, name = "UPDATED_AT")
     @UpdateTimestamp
-    val updatedAt: Instant = Instant.now()
+    val updatedAt: Instant = Instant.now().truncatedTo(ChronoUnit.MICROS)
 )
