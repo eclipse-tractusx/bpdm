@@ -38,6 +38,7 @@ class BpdmSecurityConfigurerAdapterImpl(
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeHttpRequests()
             .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/")).permitAll() // forwards to swagger
             .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
