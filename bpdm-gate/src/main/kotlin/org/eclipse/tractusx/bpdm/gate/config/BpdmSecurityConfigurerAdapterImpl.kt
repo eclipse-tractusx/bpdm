@@ -40,6 +40,7 @@ class BpdmSecurityConfigurerAdapterImpl(
             .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
             .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/api/**")).authenticated()
             .and().oauth2ResourceServer()
             .jwt()

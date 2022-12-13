@@ -40,6 +40,7 @@ class BpdmSecurityConfigurerAdapterImpl(
             .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
             .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
+            .requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.GET.name())).authenticated()
             .requestMatchers(AntPathRequestMatcher("/api/catena/**/search", HttpMethod.POST.name())).authenticated()
             .requestMatchers(AntPathRequestMatcher("/api/**")).hasRole("add_company_data")
