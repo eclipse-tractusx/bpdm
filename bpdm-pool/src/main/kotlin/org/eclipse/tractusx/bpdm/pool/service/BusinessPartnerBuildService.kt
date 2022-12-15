@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * Service for creating and updating business partner records
@@ -190,7 +191,7 @@ class BusinessPartnerBuildService(
     fun setBusinessPartnerCurrentness(bpn: String) {
         logger.info { "Updating currentness of business partner $bpn" }
         val partner = legalEntityRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Business Partner", bpn)
-        partner.currentness = Instant.now()
+        partner.currentness = Instant.now().truncatedTo(ChronoUnit.MICROS)
     }
 
     private fun createLegalEntityAddresses(requests: Collection<AddressPartnerCreateRequest>): Collection<Pair<AddressPartner, String?>> {
@@ -237,7 +238,7 @@ class BusinessPartnerBuildService(
         val legalForm = if (dto.legalForm != null) metadataMap.legalForms[dto.legalForm]!! else null
 
         val legalAddress = createAddress(dto.legalAddress)
-        val partner = LegalEntity(bpnL, legalForm, dto.types.toMutableSet(), mutableSetOf(), Instant.now(), legalAddress)
+        val partner = LegalEntity(bpnL, legalForm, dto.types.toMutableSet(), mutableSetOf(), Instant.now().truncatedTo(ChronoUnit.MICROS), legalAddress)
 
         return updateLegalEntity(partner, dto, metadataMap)
     }

@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
-import org.springdoc.api.annotations.ParameterObject
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.*
 

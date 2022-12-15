@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CurrencyCode
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(
@@ -29,7 +29,7 @@ import javax.persistence.*
         Index(columnList = "legal_entity_id")
     ])
 class BankAccount (
-    @ElementCollection(targetClass = Float::class)
+    @ElementCollection
     @JoinTable(name = "bank_account_trust_scores", joinColumns = [JoinColumn(name = "account_id")], indexes = [Index(columnList = "account_id")])
     @Column(name = "score", nullable = false)
     val trustScores: MutableSet<Float>,

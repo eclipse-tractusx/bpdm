@@ -21,9 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.BankAccount
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface BankAccountRepository : PagingAndSortingRepository<BankAccount, Long> {
+interface BankAccountRepository : PagingAndSortingRepository<BankAccount, Long>, CrudRepository<BankAccount, Long> {
 
     @Query("SELECT DISTINCT b FROM BankAccount b LEFT JOIN FETCH b.trustScores WHERE b IN :bankAccounts")
     fun joinTrustScores(bankAccounts: Set<BankAccount>): Set<BankAccount>

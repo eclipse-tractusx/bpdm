@@ -30,7 +30,7 @@ The Pool offers an API to query these business partner records by BPN, other ide
 ==== Prerequisites
 
 . Maven
-. JDK11
+. JDK17
 . PostgreSQL 14.2
 . OpenSearch 2.1.0
 . Keycloak 17.0.0 (with enabled `auth` profile)
@@ -66,9 +66,9 @@ The following sections detail the configuration properties for each profile.
 ==== Auth
 
 `application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
-The application expects the Keycloak to run on `localhost` on port `8180` and needs a client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
+The application expects the Keycloak to run on `localhost` on port `8180`.
 However, as with the Spring datasource and Opensearch connections, the connection to the Keycloak can be freely configured.
-Besides the URL of the Keycloak the configuration determines the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
+The application uses the configured auth server URL to validate incoming tokens.
 
 For authorization purposes the application checks incoming token's permissions:
 
@@ -178,10 +178,10 @@ Overwriting configuration properties can be useful to connect to a remote servic
 ----
 applicationConfig:
   bpdm:
-      keycloak:
+      security:
         auth-server-url: https://remote.keycloak.domain.com
         realm: CUSTOM_REALM
-        resource: POOL_CLIENT
+        client-id: POOL_CLIENT
 ----
 
 In this example above a Pool with authenticated activated connects to a remote Keycloak instance and uses its custom realm and resource.
@@ -230,7 +230,7 @@ BPDM is a SpringBoot Kotlin software project managed by Maven and can be run wit
 ==== Prerequisites
 
 . Maven
-. JDK11
+. JDK17
 . Connection to CDQ API v4.0
 . Connection to BPDM Pool API
 . Keycloak 17.0.0 (with enabled `auth` or `pool-auth` profile)
@@ -264,7 +264,7 @@ The following sections detail the configuration properties for each profile.
 `application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
 The application expects the Keycloak to run on `localhost` on port `8180` and needs a client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
 But keep in mind that the connection to the Keycloak can be freely configured.
-Besides the URL of the Keycloak the configuration determines the client credentials to validate incoming tokens (Standard behaviour of this application is bearer-only).
+The application uses the configured auth server URL to validate incoming tokens.
 
 For authorization purposes the application checks incoming token's permissions:
 
@@ -398,9 +398,10 @@ If you want to specify a keycloak client secret for example:
 [source,yaml]
 ----
 applicationSecrets:
-    keycloak:
-      credentials:
-        secret: your_client_secret
+    bpdm:
+        security:
+          credentials:
+            secret: your_client_secret
 ----
 
 == GitHub Workflows

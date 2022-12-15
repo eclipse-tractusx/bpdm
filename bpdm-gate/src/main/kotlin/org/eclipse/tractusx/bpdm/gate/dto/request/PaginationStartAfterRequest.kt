@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.gate.dto.request
 
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 
 @Schema(name = "PaginationStartAfterRequest", description = "Defines pagination information for requesting collection results")
 data class PaginationStartAfterRequest(

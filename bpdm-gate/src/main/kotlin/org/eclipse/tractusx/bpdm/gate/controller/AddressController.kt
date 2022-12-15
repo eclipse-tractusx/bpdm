@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
@@ -33,11 +34,10 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
 import org.eclipse.tractusx.bpdm.gate.service.ValidationService
-import org.springdoc.api.annotations.ParameterObject
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/catena")

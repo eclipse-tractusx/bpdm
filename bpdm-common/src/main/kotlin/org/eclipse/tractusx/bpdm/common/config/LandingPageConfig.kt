@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.config
 
 import mu.KotlinLogging
-import org.springdoc.core.SwaggerUiConfigProperties
+import org.springdoc.core.properties.SwaggerUiConfigProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer

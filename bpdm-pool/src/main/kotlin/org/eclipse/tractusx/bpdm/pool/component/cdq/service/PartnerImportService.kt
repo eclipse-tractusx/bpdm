@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.Instant
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 /**
  * Imports business partner entries from CDQ

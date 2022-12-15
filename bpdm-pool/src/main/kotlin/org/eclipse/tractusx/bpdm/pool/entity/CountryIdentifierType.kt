@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CountryCode
-import javax.persistence.*
+import jakarta.persistence.*
 
 /**
  * Represents valid identifier types for a country

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.LanguageCode
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "legal_forms")

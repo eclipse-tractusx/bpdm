@@ -34,8 +34,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
-import javax.persistence.EntityManager
-import javax.persistence.EntityManagerFactory
+import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200

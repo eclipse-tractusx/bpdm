@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 
 /**
  * Uses transaction isolation level "serializable" in order to make sure that in case of parallel execution on different spring boot instances,
@@ -75,7 +76,7 @@ class SyncRecordService(
             record.fromTime = record.startedAt ?: syncStartTime
             record.errorDetails = null
             record.errorSave = null
-            record.startedAt = Instant.now()
+            record.startedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
             record.finishedAt = null
             record.count = 0
             record.progress = 0f
@@ -93,7 +94,7 @@ class SyncRecordService(
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.SUCCESS}" }
 
-        record.finishedAt = Instant.now()
+        record.finishedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
         record.progress = 1f
         record.status = SyncStatus.SUCCESS
         record.errorDetails = null
@@ -107,7 +108,7 @@ class SyncRecordService(
         val record = getOrCreateRecord(type)
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.ERROR} with message $errorMessage" }
 
-        record.finishedAt = Instant.now()
+        record.finishedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
         record.status = SyncStatus.ERROR
         record.errorDetails = errorMessage.take(255)
         record.errorSave = saveState

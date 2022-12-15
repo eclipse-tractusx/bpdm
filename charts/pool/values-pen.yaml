@@ -23,10 +23,10 @@ applicationConfig:
   bpdm:
     opensearch:
       export-scheduler-cron-expr: 0 30 * * * *
-  keycloak:
-    auth-server-url: https://centralidp-pen.dev.demo.catena-x.net/auth
-    realm: CX-Central
-    resource: Cl7-CX-BPDM
+    security:
+      auth-server-url: https://centralidp-pen.dev.demo.catena-x.net/auth
+      realm: CX-Central
+      client-id: Cl7-CX-BPDM
   springdoc:
     swagger-ui:
       oauth:

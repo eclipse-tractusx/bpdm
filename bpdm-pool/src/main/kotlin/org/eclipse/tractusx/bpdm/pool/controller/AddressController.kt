@@ -37,7 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
-import org.springdoc.api.annotations.ParameterObject
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 
 @RestController

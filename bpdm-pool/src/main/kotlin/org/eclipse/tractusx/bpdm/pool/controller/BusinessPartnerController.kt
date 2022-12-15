@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.springdoc.api.annotations.ParameterObject
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping

@@ -20,9 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface IdentifierTypeRepository : PagingAndSortingRepository<IdentifierType, Long> {
+interface IdentifierTypeRepository : PagingAndSortingRepository<IdentifierType, Long>, CrudRepository<IdentifierType, Long> {
     fun findByTechnicalKey(key: String): IdentifierType?
     fun findByTechnicalKeyIn(technicalKeys: Set<String>): Set<IdentifierType>
 }

@@ -27,24 +27,19 @@ applicationConfig:
     cdq:
       storage: b3c0ad440d67350ba6f89a031375ec6b
       datasource: 62ce5d4c9f1e1e3886fdd720
-  keycloak:
-    auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
-    realm: CX-Central
-    resource: Cl16-CX-BPDMGate-Portal
+    security:
+      auth-server-url: https://centralidp.dev.demo.catena-x.net/auth
+      realm: CX-Central
+      client-id: Cl16-CX-BPDMGate-Portal
   springdoc:
     swagger-ui:
       oauth:
         client-id: Cl2-CX-Portal
 
 applicationSecrets:
-  spring:
-    security:
-      oauth2:
-        client:
-          registration:
-            gate-client:
-              client-secret: <path:bpdm/data/dev/portal-gate/keycloak#client-secret>
   bpdm:
     cdq:
       api-key: <path:bpdm/data/dev/portal-gate/cdq#api-key>
-  
+    security:
+      credentials:
+        secret: <path:bpdm/data/dev/portal-gate/keycloak#client-secret>

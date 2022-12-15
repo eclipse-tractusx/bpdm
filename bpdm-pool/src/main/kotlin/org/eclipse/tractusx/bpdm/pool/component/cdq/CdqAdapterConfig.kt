@@ -31,7 +31,7 @@ import org.springframework.http.codec.ClientCodecConfigurer
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 
 @EnableAsync

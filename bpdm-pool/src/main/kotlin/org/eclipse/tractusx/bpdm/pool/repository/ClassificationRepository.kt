@@ -20,7 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.Classification
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface ClassificationRepository : PagingAndSortingRepository<Classification, Long> {
+interface ClassificationRepository : PagingAndSortingRepository<Classification, Long>, CrudRepository<Classification, Long> {
 }

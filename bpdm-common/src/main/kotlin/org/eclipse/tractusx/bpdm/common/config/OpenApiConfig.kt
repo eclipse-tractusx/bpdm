@@ -27,8 +27,8 @@ import io.swagger.v3.oas.models.security.OAuthFlows
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
 import mu.KotlinLogging
-import org.springdoc.core.GroupedOpenApi
-import org.springdoc.core.customizers.OpenApiCustomiser
+import org.springdoc.core.customizers.OpenApiCustomizer
+import org.springdoc.core.models.GroupedOpenApi
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -52,12 +52,12 @@ class OpenApiConfig(
             .group("docs")
             .pathsToMatch("/**")
             .displayName("Docs")
-            .addOpenApiCustomiser(sortSchemaCustomiser())
+            .addOpenApiCustomizer(sortSchemaCustomiser())
             .build()
     }
 
-    fun sortSchemaCustomiser(): OpenApiCustomiser {
-        return OpenApiCustomiser { openApi: OpenAPI ->
+    fun sortSchemaCustomiser(): OpenApiCustomizer {
+        return OpenApiCustomizer { openApi: OpenAPI ->
             openApi.components(with(openApi.components) { schemas(schemas.values.sortedBy { it.name }.associateBy { it.name }) })
         }
     }
