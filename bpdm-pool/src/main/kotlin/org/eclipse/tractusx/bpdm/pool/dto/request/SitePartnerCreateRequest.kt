@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 @JsonDeserialize(using = SitePartnerCreateRequest.CustomDeserializer::class)
 @Schema(name = "SitePartnerCreateRequest", description = "Request for creating new business partner record of type site")
 data class SitePartnerCreateRequest(
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val site: SiteDto,
     @Schema(description = "Business Partner Number of the legal entity this site belongs to")
     val legalEntity: String,

@@ -37,7 +37,7 @@ data class BusinessPartnerResponse(
     val uuid: String,
     @Schema(description = "Business Partner Number, main identifier value for business partners")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: LegalEntityResponse,
     val addresses: Collection<AddressPartnerResponse>,
     val sites: Collection<SitePartnerResponse>,

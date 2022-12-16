@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class AddressBpnResponse(
     @Schema(description = "Business Partner Number, main identifier value for addresses")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val address: AddressResponse
 )
 
