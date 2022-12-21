@@ -37,8 +37,8 @@ interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>,
 
     fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<LegalEntity>
 
-    @Query("SELECT DISTINCT i.legalEntity FROM Identifier i WHERE i.type = ?1 AND i.value = ?2")
-    fun findByIdentifierTypeAndValue(type: IdentifierType, idValue: String): LegalEntity?
+    @Query("SELECT DISTINCT i.legalEntity FROM Identifier i WHERE i.type = :type AND upper(i.value) = upper(:idValue)")
+    fun findByIdentifierTypeAndValueIgnoreCase(type: IdentifierType, idValue: String): LegalEntity?
 
     @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.legalForm WHERE p IN :partners")
     fun joinLegalForm(partners: Set<LegalEntity>): Set<LegalEntity>

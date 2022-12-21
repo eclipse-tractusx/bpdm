@@ -103,8 +103,8 @@ class LegalEntityController(
         idType: String?
     ): LegalEntityPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntity(idValue)
-        else businessPartnerFetchService.findLegalEntity(actualType, idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
+        else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
     }
 
     @Operation(

@@ -245,6 +245,137 @@ class LegalEntityControllerIT @Autowired constructor(
 
     /**
      * Given legal entities
+     * When retrieving a legal entity via identifier
+     * Then the legal entity is returned
+     */
+    @Test
+    fun `find legal entities by identifier`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.first() // search for first
+
+        val identifierToFind = expected.properties.identifiers.first()
+        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>(
+            "${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${identifierToFind.value}",
+            "idType" to identifierToFind.type.technicalKey
+        )
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving a legal entity via identifier using a different case
+     * Then the legal entity is returned
+     */
+    @Test
+    fun `find legal entities by identifier case insensitive`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.first() // search for first
+
+        var identifierToFind = expected.properties.identifiers.first()
+        identifierToFind = identifierToFind.copy(value = changeCase(identifierToFind.value))
+        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>(
+            "${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${identifierToFind.value}",
+            "idType" to identifierToFind.type.technicalKey
+        )
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving a legal entity via bpn identifier
+     * Then the legal entity is returned
+     */
+    @Test
+    fun `find legal entities by bpn identifier`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.first() // search for first
+
+        val bpnToFind = expected.bpn
+        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>("${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${bpnToFind}")
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
+     * When retrieving a legal entity via bpn identifier using a different case
+     * Then the legal entity is returned
+     */
+    @Test
+    fun `find legal entities by bpn identifier case insensitive`() {
+        val givenStructures = listOf(
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
+            LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
+        )
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+
+        val expected = givenLegalEntities.map {
+            LegalEntityPartnerResponse(
+                bpn = it.bpn,
+                properties = it.properties,
+                currentness = it.currentness
+            )
+        }.first() // search for first
+
+        val bpnToFind = changeCase(expected.bpn)
+        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>("${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${bpnToFind}")
+
+        assertThat(response)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .isEqualTo(expected)
+    }
+
+    /**
+     * Given legal entities
      * When retrieving legal entities via BPNLs where some BPNLs exist and others don't
      * Then get those legal entities that could be found
      */
@@ -337,4 +468,12 @@ class LegalEntityControllerIT @Autowired constructor(
         .responseBody
         .blockFirst()!!.currentness
 
+    private fun changeCase(value: String): String {
+        return if (value.uppercase() != value)
+            value.uppercase()
+        else if (value.lowercase() != value)
+            value.lowercase()
+        else
+            throw IllegalArgumentException("Can't change case of string $value")
+    }
 }
