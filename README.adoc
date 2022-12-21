@@ -416,7 +416,7 @@ Helm charts are released via the https://github.com/helm/chart-releaser-action[h
 
 Furthermore, apart from the release workflows there also exists code scanning workflows for quality assurance:
 
-1. Before any release of Docker images GitHub executes a SonarCloud workflow responsible for executing unit and integration tests as well as code quality validation.
+1. Before any release of Docker images GitHub executes unit and integration tests.
 2. Periodically, workflows execute a KICS and Trivy scan to ensure quality standards of the Docker images and Helm charts.
 3. For a more thorough security check the packaged applications are send to a VeraCode scan, which happens periodically and after a push to main
 
