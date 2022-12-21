@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 data class LegalEntityPartnerUpdateRequest(
     @Schema(description = "Business Partner Number")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: LegalEntityDto
 ) {
     class CustomDeserializer(vc: Class<LegalEntityPartnerUpdateRequest>?) : StdDeserializer<LegalEntityPartnerUpdateRequest>(vc) {

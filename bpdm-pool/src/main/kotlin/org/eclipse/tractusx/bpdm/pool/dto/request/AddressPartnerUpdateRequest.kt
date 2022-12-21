@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 data class AddressPartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: AddressDto
 ) {
     class CustomDeserializer(vc: Class<AddressPartnerUpdateRequest>?) : StdDeserializer<AddressPartnerUpdateRequest>(vc) {

@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 @JsonDeserialize(using = AddressPartnerCreateRequest.CustomDeserializer::class)
 @Schema(name = "AddressPartnerCreateRequest", description = "Request for creating new business partner record of type address")
 data class AddressPartnerCreateRequest(
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: AddressDto,
     @Schema(description = "Business Partner Number of the legal entity or site this address belongs to")
     val parent: String,

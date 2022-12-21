@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 @JsonDeserialize(using = LegalEntityPartnerCreateRequest.CustomDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateRequest", description = "Request for creating new business partner record of type legal entity")
 data class LegalEntityPartnerCreateRequest(
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: LegalEntityDto,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?

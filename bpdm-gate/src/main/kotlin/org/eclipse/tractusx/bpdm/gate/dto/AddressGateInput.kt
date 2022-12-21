@@ -36,7 +36,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 data class AddressGateInput(
     @Schema(description = "Business Partner Number")
     val bpn: String? = null,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val address: AddressDto,
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,

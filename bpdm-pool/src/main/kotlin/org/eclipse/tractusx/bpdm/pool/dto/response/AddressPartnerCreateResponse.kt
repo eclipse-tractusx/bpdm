@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 data class AddressPartnerCreateResponse(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val properties: AddressResponse,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?

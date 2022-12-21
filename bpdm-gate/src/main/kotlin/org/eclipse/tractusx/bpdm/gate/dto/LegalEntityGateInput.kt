@@ -35,7 +35,7 @@ data class LegalEntityGateInput(
     val externalId: String,
     @Schema(description = "Business Partner Number")
     val bpn: String?,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityDto
 )
 

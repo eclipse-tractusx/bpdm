@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 data class SitePartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this site")
     val bpn: String,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val site: SiteDto
 ) {
     class CustomDeserializer(vc: Class<SitePartnerUpdateRequest>?) : StdDeserializer<SitePartnerUpdateRequest>(vc) {

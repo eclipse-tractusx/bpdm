@@ -35,7 +35,7 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 data class SiteGateInput(
     @Schema(description = "Business Partner Number")
     val bpn: String?,
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val site: SiteDto,
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,

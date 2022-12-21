@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 @JsonDeserialize(using = SiteGateOutputDeserializer::class)
 @Schema(name = "SiteGateOutput", description = "Site with legal entity reference.")
 data class SiteGateOutput(
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val site: SiteResponse,
     @Schema(description = "Main address where this site resides")
     val mainAddress: AddressResponse,

@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 @JsonDeserialize(using = LegalEntityGateOutputDeserializer::class)
 @Schema(name = "LegalEntityGateOutput", description = "Legal entity with references")
 data class LegalEntityGateOutput(
-    @JsonUnwrapped
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
     @Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: AddressResponse,
