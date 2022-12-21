@@ -41,7 +41,7 @@ class BusinessPartnerController(
 ) {
     @Operation(
         summary = "Get business partner changelog entries by bpn",
-        description = "Get business partner changelog entries by bpn."
+        description = "Get business partner changelog entries by bpn ignoring case."
     )
     @ApiResponses(
         value = [
@@ -55,6 +55,6 @@ class BusinessPartnerController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
-        return partnerChangelogService.getChangelogEntriesByBpn(bpn, paginationRequest.page, paginationRequest.size)
+        return partnerChangelogService.getChangelogEntriesByBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 }

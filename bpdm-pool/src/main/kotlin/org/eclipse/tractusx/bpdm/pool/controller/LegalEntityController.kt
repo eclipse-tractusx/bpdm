@@ -103,14 +103,14 @@ class LegalEntityController(
         idType: String?
     ): LegalEntityPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntity(idValue)
-        else businessPartnerFetchService.findLegalEntity(actualType, idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
+        else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
     }
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
         description = "Confirms that the data of a business partner is still up to date " +
-                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\"."
+                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\". Ignores case of bpn."
     )
     @ApiResponses(
         value = [
@@ -123,7 +123,7 @@ class LegalEntityController(
     fun setLegalEntityCurrentness(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ) {
-        businessPartnerBuildService.setBusinessPartnerCurrentness(bpn)
+        businessPartnerBuildService.setBusinessPartnerCurrentness(bpn.uppercase())
     }
 
     @Operation(
@@ -154,7 +154,7 @@ class LegalEntityController(
 
     @Operation(
         summary = "Get site partners of a legal entity",
-        description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpn."
+        description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpn ignoring case."
     )
     @ApiResponses(
         value = [
@@ -168,12 +168,12 @@ class LegalEntityController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerResponse> {
-        return siteService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
+        return siteService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @Operation(
         summary = "Get address partners of a legal entity",
-        description = "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's bpn."
+        description = "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's bpn ignoring case."
     )
     @ApiResponses(
         value = [
@@ -187,7 +187,7 @@ class LegalEntityController(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerResponse> {
-        return addressService.findByPartnerBpn(bpn, paginationRequest.page, paginationRequest.size)
+        return addressService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
     @Operation(

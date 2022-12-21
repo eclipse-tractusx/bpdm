@@ -66,7 +66,7 @@ class SiteController(
 
     @Operation(
         summary = "Get site partners by bpn",
-        description = "Get business partners of type site by bpn-s."
+        description = "Get business partners of type site by bpn-s ignoring case."
     )
     @ApiResponses(
         value = [
@@ -79,7 +79,7 @@ class SiteController(
     fun getSite(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): SitePartnerSearchResponse {
-        return siteService.findByBpn(bpn)
+        return siteService.findByBpn(bpn.uppercase())
     }
 
     @Operation(

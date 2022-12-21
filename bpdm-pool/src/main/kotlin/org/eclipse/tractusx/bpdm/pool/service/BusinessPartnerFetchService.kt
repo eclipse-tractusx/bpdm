@@ -46,24 +46,24 @@ class BusinessPartnerFetchService(
     /**
      * Fetch a business partner by [bpn] and return as [LegalEntityPartnerResponse]
      */
-    fun findLegalEntity(bpn: String): LegalEntityPartnerResponse {
+    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityPartnerResponse {
         return findOrThrow(bpn).toPoolDto()
     }
 
-    fun findBusinessPartner(bpn: String): BusinessPartnerResponse {
+    fun findBusinessPartnerIgnoreCase(bpn: String): BusinessPartnerResponse {
         return findOrThrow(bpn).toBusinessPartnerDto()
     }
 
     /**
-     * Fetch a business partner by [identifierValue] of [identifierType] and return as [LegalEntityPartnerResponse]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityPartnerResponse]
      */
     @Transactional
-    fun findLegalEntity(identifierType: String, identifierValue: String): LegalEntityPartnerResponse {
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityPartnerResponse {
         return findOrThrow(identifierType, identifierValue).toPoolDto()
     }
 
     @Transactional
-    fun findBusinessPartner(identifierType: String, identifierValue: String): BusinessPartnerResponse {
+    fun findBusinessPartnerIgnoreCase(identifierType: String, identifierValue: String): BusinessPartnerResponse {
         return findOrThrow(identifierType, identifierValue).toBusinessPartnerDto()
     }
 
@@ -141,7 +141,10 @@ class BusinessPartnerFetchService(
     fun findOrThrow(identifierType: String, identifierValue: String): LegalEntity {
         val type =
             identifierTypeRepository.findByTechnicalKey(identifierType) ?: throw BpdmNotFoundException(IdentifierType::class.simpleName!!, identifierType)
-        return legalEntityRepository.findByIdentifierTypeAndValue(type, identifierValue) ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
+        return legalEntityRepository.findByIdentifierTypeAndValueIgnoreCase(type, identifierValue) ?: throw BpdmNotFoundException(
+            "Identifier Value",
+            identifierValue
+        )
     }
 
 }

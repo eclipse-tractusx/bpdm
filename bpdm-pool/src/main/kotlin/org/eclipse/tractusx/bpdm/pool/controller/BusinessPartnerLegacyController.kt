@@ -99,7 +99,7 @@ class BusinessPartnerLegacyController(
         idType: String?
     ): BusinessPartnerResponse {
         val actualType = idType ?: bpnConfigProperties.id
-        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findBusinessPartner(idValue)
-        else businessPartnerFetchService.findBusinessPartner(actualType, idValue)
+        return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findBusinessPartnerIgnoreCase(idValue)
+        else businessPartnerFetchService.findBusinessPartnerIgnoreCase(actualType, idValue)
     }
 }

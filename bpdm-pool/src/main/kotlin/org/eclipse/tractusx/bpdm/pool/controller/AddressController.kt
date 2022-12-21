@@ -69,7 +69,7 @@ class AddressController(
 
     @Operation(
         summary = "Get address partners by bpn",
-        description = "Get business partners of type address by bpn-a."
+        description = "Get business partners of type address by bpn-a ignoring case."
     )
     @ApiResponses(
         value = [
@@ -82,7 +82,7 @@ class AddressController(
     fun getAddress(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): AddressPartnerSearchResponse {
-        return addressService.findByBpn(bpn)
+        return addressService.findByBpn(bpn.uppercase())
     }
 
     @Operation(
