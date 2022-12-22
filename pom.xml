@@ -47,16 +47,11 @@
         <kotlin.version>1.7.21</kotlin.version>
         <springdoc.version>2.0.0</springdoc.version>
         <neo.version>1.29</neo.version>
-        <jacoco.version>0.8.7</jacoco.version>
         <kotlinlogging.version>2.1.23</kotlinlogging.version>
         <wiremock.version>2.35.0</wiremock.version>
         <springmockk.version>3.1.1</springmockk.version>
         <assertj.version>3.23.1</assertj.version>
         <spring-boot.version>3.0.0</spring-boot.version>
-        <sonar.organization>catenax</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>bptm</sonar.projectKey>
-        <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
     </properties>
     <pluginRepositories>
         <pluginRepository>
@@ -218,37 +213,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <version>3.9.1.2184</version>
-            </plugin>
-            <!-- Creates test coverage report -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <formats>
-                                <format>XML</format>
-                            </formats>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>

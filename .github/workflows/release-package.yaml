@@ -10,19 +10,19 @@ on:
       - '*'
 
 jobs:
-  call-sonar-scan:
-    uses: ./.github/workflows/sonar-scan.yaml
+  call-execute-tests:
+    uses: ./.github/workflows/execute-tests.yaml
     secrets: inherit
 
   call-release-pool:
-    needs: [ call-sonar-scan ]
+    needs: [ call-execute-tests ]
     uses: ./.github/workflows/release.yaml
     with:
       imageName: pool
       dockerfilePath: ./bpdm-pool/Dockerfile
 
   call-release-gate:
-    needs: [ call-sonar-scan ]
+    needs: [ call-execute-tests ]
     uses: ./.github/workflows/release.yaml
     with:
       imageName: gate
