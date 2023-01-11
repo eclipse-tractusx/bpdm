@@ -24,6 +24,16 @@ entries:
     version: 2.0.0
   bpdm-gate:
   - apiVersion: v2
+    appVersion: 3.0.0
+    created: "2023-01-11T09:34:53.763114121Z"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: 02cbf96aa5fdc372c0fcc9cfaa2dea47a78d851852ff658baa23a12a9fac4611
+    name: bpdm-gate
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.1/bpdm-gate-3.0.1.tgz
+    version: 3.0.1
+  - apiVersion: v2
     appVersion: 2.0.0
     created: "2022-12-06T10:11:57.501867851Z"
     description: A Helm chart for deploying the BPDM gate service
@@ -33,4 +43,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-2.0.0/bpdm-gate-2.0.0.tgz
     version: 2.0.0
-generated: "2022-12-06T10:11:57.501876052Z"
+generated: "2023-01-11T09:34:53.763123021Z"
