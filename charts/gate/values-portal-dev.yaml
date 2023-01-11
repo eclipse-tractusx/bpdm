@@ -23,7 +23,7 @@ ingress:
 applicationConfig:
   bpdm:
     pool:
-      base-url: http://pool-bpdm:8080/api/catena
+      base-url: http://pool-bpdm-pool:8080/api/catena
     cdq:
       storage: b3c0ad440d67350ba6f89a031375ec6b
       datasource: 62ce5d4c9f1e1e3886fdd720
