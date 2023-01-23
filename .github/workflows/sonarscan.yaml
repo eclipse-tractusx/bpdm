@@ -1,6 +1,8 @@
 name: Execute SonarCloud Scan with Test Execution
 on:
   push:
+    branches:
+      - main
   workflow_call:
 
 jobs:
