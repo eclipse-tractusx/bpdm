@@ -1,6 +1,9 @@
 name: Deploy Maven
 on:
   push:
+    paths:
+      - 'bpdm-common/**'
+      - 'pom.xml'
     branches:
       - main
 
