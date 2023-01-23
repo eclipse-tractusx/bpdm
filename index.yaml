@@ -24,6 +24,27 @@ entries:
   bpdm-pool:
   - apiVersion: v2
     appVersion: 3.0.0
+    created: "2023-01-23T12:37:29.880584952Z"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM service
+    digest: d0e58c441fd93b55754fee59ffdaf1a69f8774eb2daf81bf0fb93ea07b8d9c57
+    name: bpdm-pool
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.2/bpdm-pool-4.0.2.tgz
+    version: 4.0.2
+  - apiVersion: v2
+    appVersion: 3.0.0
     created: "2023-01-23T08:47:16.908870423Z"
     dependencies:
     - alias: opensearch
@@ -64,4 +85,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-01-23T08:47:16.908882624Z"
+generated: "2023-01-23T12:37:29.880599352Z"
