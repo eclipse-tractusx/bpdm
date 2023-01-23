@@ -9,7 +9,7 @@ replicaCount: 1
 
 image:
   registry: ghcr.io
-  repository: catenax-ng/product-bpdm/gate
+  repository: catenax-ng/tx-bpdm/gate
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v3.0.0"
