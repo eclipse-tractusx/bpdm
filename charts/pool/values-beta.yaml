@@ -1,0 +1,44 @@
+image:
+  tag: "v3.0.0"
+
+springProfiles:
+  - auth
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+    - host: partners-pool.beta.demo.catena-x.net
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - partners-pool.beta.demo.catena-x.net
+
+applicationConfig:
+  bpdm:
+    opensearch:
+      # every hour at minute 30
+      export-scheduler-cron-expr: 0 30 * * * *
+    security:
+      auth-server-url: https://centralidp.beta.demo.catena-x.net/auth
+      realm: CX-Central
+      client-id: Cl7-CX-BPDM
+  springdoc:
+    swagger-ui:
+      oauth:
+        client-id: Cl2-CX-Portal
+
+applicationSecrets:
+  spring:
+    datasource:
+      password: <path:bpdm/data/beta/pool/postgresql#password>
+
+postgres:
+  auth:
+    postgresPassword: <path:bpdm/data/beta/pool/postgresql#postgres-password>
+    password: <path:bpdm/data/beta/pool/postgresql#password>
