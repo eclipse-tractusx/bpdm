@@ -1,5 +1,5 @@
 image:
-  tag: "v3.0.0"
+  tag: "v3.0.1"
 
 springProfiles:
   - auth
