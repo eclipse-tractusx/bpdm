@@ -12,7 +12,7 @@ image:
   repository: catenax-ng/tx-bpdm/gate
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v3.0.0"
+  tag: "v3.0.1"
 
 imagePullSecrets: [ ]
 
