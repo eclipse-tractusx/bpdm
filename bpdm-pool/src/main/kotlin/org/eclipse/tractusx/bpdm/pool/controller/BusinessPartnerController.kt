@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
 
 @RestController
 @RequestMapping("/api/catena/business-partners")
@@ -46,15 +46,15 @@ class BusinessPartnerController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "The changelog entries for the specified bpn"),
-            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+            ApiResponse(responseCode = "400", description = "On malformed request", content = [Content()]),
         ]
     )
-    @GetMapping("/{bpn}/changelog")
+    @GetMapping("/changelog")
     fun getChangelogEntries(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @Parameter(description = "BPN values") bpn: Array<String>?,      // TODO limit 100
+        @Parameter(description = "Modified after") modifiedAfter: Instant?,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
-        return partnerChangelogService.getChangelogEntriesByBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
+        return partnerChangelogService.getChangelogEntriesByBpn(bpn, modifiedAfter, paginationRequest.page, paginationRequest.size)
     }
 }

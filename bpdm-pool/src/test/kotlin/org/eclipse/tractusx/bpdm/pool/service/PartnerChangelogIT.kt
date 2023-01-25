@@ -40,6 +40,8 @@ import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
+import java.time.Instant
+import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
@@ -79,7 +81,8 @@ class PartnerChangelogIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2)
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
+                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3)
             ),
             webTestClient
         )
@@ -91,37 +94,51 @@ class PartnerChangelogIT @Autowired constructor(
             RequestValues.legalEntityUpdate3.copy(bpn = bpnL1)
         )
 
+        val afterAllEntitiesCreated = Instant.now();
+
         // update partner with modified values
         webTestClient.invokePutWithoutResponse(EndpointValues.CATENA_LEGAL_ENTITY_PATH, modifiedPartnersToImport)
 
+
+        // no restrictions for BPNs and timestamp
+        retrieveChangelog(null, null).content
+            .also(checkNumberCreatedAndUpdated(3, 1))
+            .also(checkTimestampAscending())
+
+        // no restrictions for timestamp, but limited to multiple BPNs
+        retrieveChangelog(null, listOf(bpnL1, bpnL2)).content
+            .let(checkNumberCreatedAndUpdated(2, 1))
+
         // check changelog entries were created
         // first business partner was created and updated
-        retrieveChangelog(bpnL1).content
-            .let { changelogEntries ->
-                assertThat(changelogEntries)
-                    .filteredOn { it.changelogType == ChangelogType.CREATE }
-                    .hasSize(1)
-                assertThat(changelogEntries)
-                    .filteredOn { it.changelogType == ChangelogType.UPDATE }
-                    .hasSize(1)
-            }
+        retrieveChangelog(null, listOf(bpnL1)).content
+            .let(checkNumberCreatedAndUpdated(1, 1))
 
         // second business partner was only created
-        retrieveChangelog(bpnL2).content
-            .let { changelogEntries ->
-                assertThat(changelogEntries)
-                    .filteredOn { it.changelogType == ChangelogType.CREATE }
-                    .hasSize(1)
-                assertThat(changelogEntries)
-                    .filteredOn { it.changelogType == ChangelogType.UPDATE }
-                    .isEmpty()
-            }
+        retrieveChangelog(null, listOf(bpnL2)).content
+            .let(checkNumberCreatedAndUpdated(1, 0))
+
+        // filter out CREATED changelogs, only return one UPDATED changelog for BPNL1
+        retrieveChangelog(afterAllEntitiesCreated, null).content
+            .let(checkNumberCreatedAndUpdated(0, 1))
+
+        // filter out all changelogs
+        retrieveChangelog(Instant.now(), null).content
+            .let(checkNumberCreatedAndUpdated(0, 0))
+
+        // filter out CREATED changelogs, restrict to BPNL1
+        retrieveChangelog(afterAllEntitiesCreated, listOf(bpnL1)).content
+            .let(checkNumberCreatedAndUpdated(0, 1))
+
+        // filter out CREATED changelogs, restrict to BPNL2, resulting in no entries
+        retrieveChangelog(afterAllEntitiesCreated, listOf(bpnL2)).content
+            .let(checkNumberCreatedAndUpdated(0, 0))
     }
 
     /**
      * Given some business partners imported
      * When trying to retrieve changelog entries using a nonexistent bpn
-     * Then a "not found" response is sent
+     * Then an empty response is sent
      */
     @Test
     fun `get changelog entries by nonexistent bpn`() {
@@ -132,9 +149,27 @@ class PartnerChangelogIT @Autowired constructor(
         )
 
         val bpn = "NONEXISTENT_BPN"
-        webTestClient.get()
-            .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}" + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
-            .exchange().expectStatus().isNotFound
+        assertThat(retrieveChangelog(null, listOf(bpn)).contentSize).isEqualTo(0);
+    }
+
+    /**
+     * Given some business partners imported
+     * When trying to retrieve changelog entries using an invalid timestamp
+     * Then a "bad request" response is sent
+     */
+    @Test
+    fun `get changelog entries by invalid timestamp`() {
+        // import partners
+        webTestClient.invokePostEndpointWithoutResponse(
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+            listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
+        )
+
+        getChangelogResponse("NO_VALID_TIME", null)
+            .expectStatus().isBadRequest
+
+        getChangelogResponse("2023-15-99T08:22:54.986733Z", null)
+            .expectStatus().isBadRequest
     }
 
     /**
@@ -154,11 +189,41 @@ class PartnerChangelogIT @Autowired constructor(
         assertThat(changelogEntryPage.content[0].bpn).isEqualTo("testBpn2")
     }
 
-    private fun retrieveChangelog(bpn: String) = webTestClient
-        .get()
-        .uri(EndpointValues.CATENA_BUSINESS_PARTNERS_PATH + "/${bpn}" + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
-        .exchange().expectStatus().isOk
-        .returnResult<PageResponse<ChangelogEntryResponse>>()
-        .responseBody
-        .blockFirst()!!
+    private fun checkNumberCreatedAndUpdated(created: Int, updated: Int) =
+        { changelogEntries: Collection<ChangelogEntryResponse> ->
+            assertThat(changelogEntries)
+                .filteredOn { it.changelogType == ChangelogType.CREATE }
+                .hasSize(created)
+            assertThat(changelogEntries)
+                .filteredOn { it.changelogType == ChangelogType.UPDATE }
+                .hasSize(updated)
+            Unit
+        }
+
+    private fun checkTimestampAscending() =
+        { changelogEntries: Collection<ChangelogEntryResponse> ->
+            var lastTimestamp = Instant.MIN
+            for (changelogEntry in changelogEntries) {
+                assertThat(changelogEntry.timestamp).isAfterOrEqualTo(lastTimestamp)
+                lastTimestamp = changelogEntry.timestamp
+            }
+        }
+
+    private fun retrieveChangelog(modifiedAfter: Instant?, bpn: Collection<String>?): PageResponse<ChangelogEntryResponse> =
+        getChangelogResponse(modifiedAfter, bpn)
+            .expectStatus().isOk
+            .returnResult<PageResponse<ChangelogEntryResponse>>()
+            .responseBody
+            .blockFirst()!!
+
+    private fun getChangelogResponse(modifiedAfter: Any?, bpn: Collection<String>?) =
+        webTestClient
+            .get()
+            .uri {
+                it.path(EndpointValues.CATENA_BUSINESS_PARTNERS_PATH + EndpointValues.CATENA_CHANGELOG_PATH_POSTFIX)
+                    .queryParamIfPresent("modifiedAfter", Optional.ofNullable(modifiedAfter))
+                    .queryParamIfPresent("bpn", Optional.ofNullable(bpn))
+                    .build()
+            }
+            .exchange()
 }

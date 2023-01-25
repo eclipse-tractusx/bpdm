@@ -21,16 +21,17 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
+import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpns
+import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byModifiedAfter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -44,7 +45,6 @@ import java.time.Instant
 @Service
 class PartnerChangelogService(
     val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
-    val legalEntityRepository: LegalEntityRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -81,11 +81,11 @@ class PartnerChangelogService(
         )
     }
 
-    fun getChangelogEntriesByBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
-        if (!legalEntityRepository.existsByBpn(bpn)) {
-            throw BpdmNotFoundException("Business Partner", bpn)
-        }
-        val page = partnerChangelogEntryRepository.findAllByBpn(bpn, PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::id.name).ascending()))
+    fun getChangelogEntriesByBpn(bpns: Array<String>?, modifiedAfter: Instant?, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
+        val spec = Specification.allOf(byBpns(bpns), byModifiedAfter(modifiedAfter))
+        val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
+//        val pageRequest = PageRequest.of(pageIndex, pageSize, JpaSort.of(PartnerChangelogEntry_.updatedAt).ascending())        // TODO: JPA metamodel
+        val page = partnerChangelogEntryRepository.findAll(spec, pageRequest);
         return page.toDto(page.content.map { it.toDto() })
     }
 
