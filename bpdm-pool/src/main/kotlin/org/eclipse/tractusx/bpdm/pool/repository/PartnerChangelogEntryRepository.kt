@@ -23,13 +23,37 @@ import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
-interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long> {
-    fun findAllByIdGreaterThan(id: Long, pageable: Pageable): Page<PartnerChangelogEntry>
+interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long>, JpaSpecificationExecutor<PartnerChangelogEntry> {
+    companion object Specs {
+        /**
+         * Restrict to entries with any one of the given BPNs; ignore if null
+         */
+        fun byBpns(bpns: Array<String>?) =
+            Specification<PartnerChangelogEntry> { root, _, _ ->
+                bpns?.let {
+                    root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
+//                    bpns -> root.get(PartnerChangelogEntry_.bpn).`in`(bpns.map { bpn -> bpn.uppercase() })        // TODO: JPA metamodel
+                }
+            }
 
-    fun findAllByBpn(bpn: String, pageable: Pageable): Page<PartnerChangelogEntry>
+        /**
+         * Restrict to entries updated after the given instant; ignore if null
+         */
+        fun byModifiedAfter(modifiedAfter: Instant?) =
+            Specification<PartnerChangelogEntry> { root, _, builder ->
+                modifiedAfter?.let {
+                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
+//                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry_.updatedAt), modifiedAfter)        // TODO: JPA metamodel
+                }
+            }
+    }
+
+    fun findAllByIdGreaterThan(id: Long, pageable: Pageable): Page<PartnerChangelogEntry>
 
     fun findByCreatedAtAfterAndChangelogSubjectIn(
         createdAt: Instant,
