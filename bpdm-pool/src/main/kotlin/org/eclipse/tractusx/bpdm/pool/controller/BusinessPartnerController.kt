@@ -24,16 +24,22 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.Instant
 
 @RestController
+@RequestMapping("/api/catena/business-partners")
 class BusinessPartnerController(
     private val partnerChangelogService: PartnerChangelogService
-) : PoolBusinessPartnerApi {
+): PoolBusinessPartnerApi {
     override fun getChangelogEntries(
-        bpn: String,
-        paginationRequest: PaginationRequest
+       bpn: Array<String>?,      // TODO limit 100
+       modifiedAfter: Instant?,
+       @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
-        return partnerChangelogService.getChangelogEntriesByBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
+        return partnerChangelogService.getChangelogEntriesByBpn(bpn, modifiedAfter, paginationRequest.page, paginationRequest.size)
     }
 }
