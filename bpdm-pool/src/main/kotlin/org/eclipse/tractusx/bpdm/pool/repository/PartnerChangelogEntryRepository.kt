@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
+import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry_
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -33,22 +34,20 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         /**
          * Restrict to entries with any one of the given BPNs; ignore if null
          */
-        fun byBpns(bpns: Array<String>?) =
+        fun byBpnsIn(bpns: Array<String>?) =
             Specification<PartnerChangelogEntry> { root, _, _ ->
                 bpns?.let {
-                    root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
-//                    bpns -> root.get(PartnerChangelogEntry_.bpn).`in`(bpns.map { bpn -> bpn.uppercase() })        // TODO: JPA metamodel
+                    root.get(PartnerChangelogEntry_.bpn).`in`(bpns.map { bpn -> bpn.uppercase() })
                 }
             }
 
         /**
          * Restrict to entries updated after the given instant; ignore if null
          */
-        fun byModifiedAfter(modifiedAfter: Instant?) =
+        fun byUpdatedGreaterThan(modifiedAfter: Instant?) =
             Specification<PartnerChangelogEntry> { root, _, builder ->
                 modifiedAfter?.let {
-                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
-//                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry_.updatedAt), modifiedAfter)        // TODO: JPA metamodel
+                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry_.updatedAt), modifiedAfter)
                 }
             }
     }
