@@ -1,14 +1,15 @@
-name: Deploy Maven
+name: Maven Deploy
 on:
   push:
+    # only execute when source specific files change
     paths:
-      - 'bpdm-common/**'
-      - 'pom.xml'
+      - pom.xml
+      - bpdm-common/**
     branches:
       - main
 
 jobs:
-  deploy:
+  deploy-maven:
     runs-on: ubuntu-latest
     permissions:
       packages: write

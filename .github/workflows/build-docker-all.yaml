@@ -1,0 +1,33 @@
+name: Build All - Docker images (SemVer)
+on:
+  push:
+    # only execute when source specific files change
+    paths:
+      - pom.xml
+      - bpdm-pool/**
+      - bpdm-gate/**
+      - bpdm-common/**
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-*'
+    push:
+      branches:
+        - main
+    pull_request:
+      branches:
+        - main
+jobs:
+  build-docker-pool:
+    uses: ./.github/workflows/build-docker.yaml
+    with:
+      imageName: pool
+      dockerfilePath: ./bpdm-pool/Dockerfile
+      push: ${{ github.event_name != 'pull_request' }}
+
+  build-docker-gate:
+    needs: [ call-sonar-scan ]
+    uses: ./.github/workflows/build-docker.yaml
+    with:
+      imageName: gate
+      dockerfilePath: ./bpdm-gate/Dockerfile
+      push: ${{ github.event_name != 'pull_request' }}

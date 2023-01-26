@@ -1,4 +1,4 @@
-name: Execute Tests
+name: Maven Test Execution
 on:
   pull_request:
     types: [ opened, reopened, synchronize ]

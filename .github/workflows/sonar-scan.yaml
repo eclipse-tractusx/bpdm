@@ -1,12 +1,9 @@
-name: Execute SonarCloud Scan with Test Execution
+name: SonarCloud Scan
 on:
-  push:
-    branches:
-      - main
   workflow_call:
 
 jobs:
-  analyze:
+  sonar-scan:
     runs-on: ubuntu-latest
     permissions:
       actions: read
