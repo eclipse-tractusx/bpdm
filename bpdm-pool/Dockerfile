@@ -3,7 +3,7 @@ COPY . /home/app
 WORKDIR /home/app
 RUN mvn -B -U clean package -pl bpdm-pool -am -DskipTests
 
-FROM amazoncorretto:17-alpine-jdk
+FROM eclipse-temurin:17-jre-alpine
 COPY --from=build /home/app/bpdm-pool/target/bpdm-pool.jar /usr/local/lib/bpdm/app.jar
 RUN addgroup -S bpdm && adduser -S bpdm -G bpdm
 USER bpdm
