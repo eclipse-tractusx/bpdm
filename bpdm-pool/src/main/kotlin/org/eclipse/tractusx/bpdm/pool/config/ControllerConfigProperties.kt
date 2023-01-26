@@ -21,21 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
-
-@ConfigurationProperties(prefix = "bpdm.bpn")
-data class BpnConfigProperties(
-    val agencyName: String = "Catena-X",
-    val agencyKey: String = "CATENAX",
-    var name: String = "Business Partner Number",
-    val id: String = "BPN",
-    val legalEntityChar: Char = 'L',
-    val siteChar: Char = 'S',
-    val addressChar: Char = 'A',
-    val counterKeyLegalEntities: String = "bpn-l-counter",
-    val counterKeySites: String = "bpn-s-counter",
-    val counterKeyAddresses: String = "bpn-a-counter",
-    val counterDigits: Int = 10,
-    val checksumModulus: Int = 1271,
-    val checksumRadix: Int = 36,
-    val alphabet: String = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+@ConfigurationProperties(prefix = "bpdm.controller")
+class ControllerConfigProperties(
+    /**
+     * Maximum number of values in a search parameter, used in multiple search endpoints.
+     */
+    val searchRequestLimit: Int = 100
 )

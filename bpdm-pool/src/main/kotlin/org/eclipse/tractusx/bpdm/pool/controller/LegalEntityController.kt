@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
@@ -47,6 +48,7 @@ class LegalEntityController(
     val businessPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties,
+    val controllerConfigProperties: ControllerConfigProperties,
     val siteService: SiteService,
     val addressService: AddressService
 ) {
@@ -130,7 +132,7 @@ class LegalEntityController(
         summary = "Search legal entity partners by BPNLs",
         description = "Search legal entity partners by their BPNLs. " +
                 "The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. " +
-                "For a single request, the maximum number of BPNLs to search for is limited to \${bpdm.bpn.search-request-limit} entries."
+                "For a single request, the maximum number of BPNLs to search for is limited to \${bpdm.controller.search-request-limit} entries."
     )
     @ApiResponses(
         value = [
@@ -146,7 +148,7 @@ class LegalEntityController(
     fun searchSites(
         @RequestBody bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityPartnerResponse>> {
-        if (bpnLs.size > bpnConfigProperties.searchRequestLimit) {
+        if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         return ResponseEntity(businessPartnerFetchService.fetchDtosByBpns(bpnLs), HttpStatus.OK)
