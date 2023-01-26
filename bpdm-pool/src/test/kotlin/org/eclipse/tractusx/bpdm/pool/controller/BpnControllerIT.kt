@@ -41,7 +41,7 @@ import org.springframework.test.context.DynamicPropertySource
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
-    properties = ["bpdm.bpn.search-request-limit=2"]
+    properties = ["bpdm.controller.search-request-limit=2"]
 )
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
