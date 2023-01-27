@@ -90,7 +90,7 @@ Further, you need to provide a CDQ storage ID (`BPDM_CDQ_STORAGE`) and datasourc
 === Helm Deployment
 
 This repository contains Helm files for deploying the BPDM Pool to a Kubernetes environment.
-See the xref:charts/pool/README.adoc[BPDM Pool Helm README] for details.
+See the xref:charts/pool/README.md[BPDM Pool Helm README] for details.
 
 == BPDM Gate
 
@@ -162,7 +162,7 @@ Per default, the client will try to acquire a token via client credentials flow 
 === Helm Deployment
 
 This repository contains Helm files for deploying the BPDM Gate to a Kubernetes environment.
-See the xref:charts/gate/README.adoc[BPDM Gate Helm README] for details.
+See the xref:charts/gate/README.md[BPDM Gate Helm README] for details.
 
 == Container images
 
