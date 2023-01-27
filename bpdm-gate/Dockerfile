@@ -1,4 +1,4 @@
-FROM maven:3.8.5-openjdk-17-slim AS build
+FROM maven:3.8.7-eclipse-temurin-17 AS build
 COPY . /home/app
 WORKDIR /home/app
 RUN mvn -B -U clean package -pl bpdm-gate -am -DskipTests
