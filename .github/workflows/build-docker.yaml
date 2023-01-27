@@ -59,5 +59,5 @@ jobs:
           context: .
           push: ${{ inputs.push }}
           file: ${{ inputs.dockerfilePath }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest #add 'latest' tag to image
           labels: ${{ steps.meta.outputs.labels }}
