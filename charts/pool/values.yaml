@@ -68,7 +68,7 @@ resources:
     memory: 2Gi
   requests:
     cpu: 300m
-    memory: 1Gi
+    memory: 2Gi
 
 nodeSelector: { }
 
@@ -91,16 +91,19 @@ affinity:
 # @url: https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L210
 livenessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 60
-  periodSeconds: 10
+  initialDelaySeconds: 5
+  periodSeconds: 5
   successThreshold: 1
   timeoutSeconds: 1
 readinessProbe:
   failureThreshold: 3
-  initialDelaySeconds: 60
-  periodSeconds: 10
+  initialDelaySeconds: 5
+  periodSeconds: 5
   successThreshold: 1
   timeoutSeconds: 1
+startupProbe:
+  failureThreshold: 20
+  periodSeconds: 10
 
 # Use this to overwrite the default property values of the application configuration
 applicationConfig:
