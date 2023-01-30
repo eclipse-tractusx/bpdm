@@ -1,3 +1,4 @@
+---
 ################################################################################
 # Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
 #
@@ -29,15 +30,13 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v3.0.1"
 
-imagePullSecrets: [ ]
+imagePullSecrets: []
 
-podAnnotations: { }
+podAnnotations: {}
 
-#Spring profiles under which the application should run
-springProfiles: [ ]
+# Spring profiles under which the application should run
+springProfiles: []
 
-# Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
-# @url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
@@ -57,12 +56,10 @@ autoscaling:
 
 ingress:
   enabled: false
-  annotations: { }
-  hosts: [ ]
-  tls: [ ]
+  annotations: {}
+  hosts: []
+  tls: []
 
-# Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
-# @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-resource-requests-and-limits
 resources:
   limits:
     cpu: 800m
@@ -71,12 +68,10 @@ resources:
     cpu: 300m
     memory: 2Gi
 
-nodeSelector: { }
+nodeSelector: {}
 
-tolerations: [ ]
+tolerations: []
 
-# Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
-# @url: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
@@ -88,8 +83,6 @@ affinity:
                 operator: DoesNotExist
           topologyKey: kubernetes.io/hostname
 
-# Following Catena-X Helm Best Practices @url: https://catenax-ng.github.io/docs/kubernetes-basics/helm
-# @url: https://github.com/helm/charts/blob/master/stable/nginx-ingress/values.yaml#L210
 livenessProbe:
   failureThreshold: 3
   initialDelaySeconds: 5

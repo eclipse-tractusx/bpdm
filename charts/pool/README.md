@@ -76,7 +76,8 @@ ingress:
 ## Pool Configuration
 
 The Helm deployment comes with the ability to configure the BPDM Pool application directly over the values file.
-This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-cdq.properties` files.
+This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-cdq.properties`
+files.
 Consider that you would need to turn on `auth` and `cdq` profile first before overwriting any property in the corresponding properties file could take effect.
 Overwriting configuration properties can be useful to connect to a remote service:
 
