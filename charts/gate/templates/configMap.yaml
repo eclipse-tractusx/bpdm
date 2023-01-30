@@ -1,3 +1,4 @@
+---
 ################################################################################
 # Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
 #
@@ -20,12 +21,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "bpdm.fullname" . }}
+  name: {{include "bpdm.fullname" .}}
   labels:
-     {{- include "bpdm.labels" . | nindent 4 }}
+    {{- include "bpdm.labels" . | nindent 4 }}
 data:
   deployment.yml: |-
-    # Place for putting standard deployment configuration which can be overwritten by external.yml
+    # Place for putting standard deployment configuration
+    # which can be overwritten by external.yml
     bpdm:
       pool:
         base-url: http://pool-bpdm:8080/api/catena
