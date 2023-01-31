@@ -27,13 +27,13 @@
     <artifactId>bpdm-parent</artifactId>
     <name>Business Partner Data Management Parent</name>
     <description>Parent pom of Business Partner Data Management</description>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
     </parent>
     <modules>
         <module>bpdm-pool</module>
