@@ -6,6 +6,10 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [4.0.0] - tbd
 
+### Changed
+
+- Endpoint for retrieving changelog entries has now improved filtering (breaking API change)
+
 ## [3.1.0] - tbd
 
 ### Changed
