@@ -3,11 +3,11 @@
   "info": {
     "title": "Business Partner Data Management Gate",
     "description": "A gate for a member to share business partner data with CatenaX",
-    "version": "3.0.0"
+    "version": "4.0.0-SNAPSHOT"
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:8081",
+      "url": "http://localhost:8081",
       "description": "Generated server url"
     }
   ],
@@ -128,9 +128,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed pagination request"
-          },
           "200": {
             "description": "The requested page of legal entities",
             "content": {
@@ -140,6 +137,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       },
@@ -164,9 +164,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed legal entity request"
-          },
           "200": {
             "description": "Legal entities were successfully updated or created",
             "content": {
@@ -176,6 +173,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed legal entity request"
           }
         }
       }
@@ -212,9 +212,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed pagination request"
-          },
           "200": {
             "description": "The requested page of addresses",
             "content": {
@@ -224,6 +221,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       },
@@ -248,9 +248,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed address request"
-          },
           "200": {
             "description": "Addresses were successfully updated or created",
             "content": {
@@ -260,6 +257,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed address request"
           }
         }
       }
@@ -368,9 +368,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "On malformed pagination request"
-          },
           "200": {
             "description": "The requested page of legal entities",
             "content": {
@@ -380,6 +377,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       }
@@ -428,9 +428,6 @@
           }
         },
         "responses": {
-          "400": {
-            "description": "On malformed pagination request"
-          },
           "200": {
             "description": "The requested page of addresses",
             "content": {
@@ -440,6 +437,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       }
@@ -463,9 +463,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed site requests"
-          },
           "200": {
             "description": "A validation response with possible errors",
             "content": {
@@ -475,6 +472,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed site requests"
           }
         }
       }
@@ -533,9 +533,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed address requests"
-          },
           "200": {
             "description": "A validation response with possible errors",
             "content": {
@@ -545,6 +542,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed address requests"
           }
         }
       }
@@ -568,9 +568,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "No name and no identifier given, or malformed request"
-          },
           "200": {
             "description": "Records were successfully processed.",
             "content": {
@@ -580,6 +577,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "No name and no identifier given, or malformed request"
           }
         }
       }
@@ -676,9 +676,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No address found under specified external identifier"
-          },
           "200": {
             "description": "Found address with external identifier",
             "content": {
@@ -688,6 +685,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "No address found under specified external identifier"
           }
         }
       }

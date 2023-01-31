@@ -3,11 +3,11 @@
   "info": {
     "title": "Business Partner Data Management Pool",
     "description": "Service that manages and shares business partner data with other CatenaX services",
-    "version": "3.0.0"
+    "version": "4.0.0-SNAPSHOT"
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:8080",
+      "url": "http://localhost:8080",
       "description": "Generated server url"
     }
   ],
@@ -34,9 +34,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed requests"
-          },
           "200": {
             "description": "The successfully updated records",
             "content": {
@@ -49,6 +46,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed requests"
           }
         }
       },
@@ -225,9 +225,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed search or pagination request"
-          },
           "200": {
             "description": "Page of business partners matching the search criteria, may be empty",
             "content": {
@@ -237,6 +234,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
           }
         }
       },
@@ -261,12 +261,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed requests"
-          },
-          "404": {
-            "description": "Metadata referenced by technical key not found"
-          },
           "200": {
             "description": "The successfully updated records",
             "content": {
@@ -279,6 +273,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed requests"
+          },
+          "404": {
+            "description": "Metadata referenced by technical key not found"
           }
         }
       },
@@ -696,9 +696,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed search or pagination request"
-          },
           "200": {
             "description": "Page of addresses matching the search criteria, may be empty",
             "content": {
@@ -708,6 +705,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
           }
         }
       },
@@ -732,9 +732,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed requests"
-          },
           "200": {
             "description": "The successfully updated records",
             "content": {
@@ -747,6 +744,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed requests"
           }
         }
       },
@@ -822,9 +822,6 @@
         "description": "Triggers an asynchronous export of business partner records from BPDM to OpenSearch. Only exports records which have been updated since the last export. ",
         "operationId": "export",
         "responses": {
-          "500": {
-            "description": "Export failed (no connection to OpenSearch or database)"
-          },
           "200": {
             "description": "Export of records successfully",
             "content": {
@@ -834,6 +831,9 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Export failed (no connection to OpenSearch or database)"
           }
         }
       },
@@ -850,6 +850,64 @@
           },
           "500": {
             "description": "Clearing failed (no connection to OpenSearch or database)"
+          }
+        }
+      }
+    },
+    "/api/cdq/business-partner/sync": {
+      "get": {
+        "tags": [
+          "cdq-controller"
+        ],
+        "summary": "Fetch information about the CDQ synchronization",
+        "description": "Fetch information about the latest import (either ongoing or already finished)",
+        "operationId": "getSyncStatus",
+        "responses": {
+          "200": {
+            "description": "Import information found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Fetching failed (no connection to database)"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "cdq-controller"
+        ],
+        "summary": "Import new business partner records from CDQ",
+        "description": "Triggers an asynchronous import of new business partner records from CDQ. A CDQ record counts as new when it does not have a BPN and the BPDM service does not already have a record with the same CDQ ID. This import only regards records with a modifiedAfter timestamp since the last import.",
+        "operationId": "importBusinessPartners",
+        "responses": {
+          "200": {
+            "description": "Import successfully started",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Import already running",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Import couldn't start to unexpected error"
           }
         }
       }
@@ -1022,9 +1080,6 @@
           "required": true
         },
         "responses": {
-          "409": {
-            "description": "Legal form with specified technical key already exists"
-          },
           "200": {
             "description": "New legal form successfully created",
             "content": {
@@ -1037,6 +1092,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "409": {
+            "description": "Legal form with specified technical key already exists"
           }
         }
       }
@@ -1061,14 +1119,14 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No business partner found for specified bpn"
-          },
           "200": {
             "description": "Business partner's \"currentness\" successfully updated"
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "404": {
+            "description": "No business partner found for specified bpn"
           }
         }
       }
@@ -1079,7 +1137,7 @@
           "legal-entity-controller"
         ],
         "summary": "Search legal entity partners by BPNLs",
-        "description": "Search legal entity partners by their BPNLs. The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. For a single request, the maximum number of BPNLs to search for is limited to 5000 entries.",
+        "description": "Search legal entity partners by their BPNLs. The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. For a single request, the maximum number of BPNLs to search for is limited to 100 entries.",
         "operationId": "searchSites_1",
         "requestBody": {
           "content": {
@@ -1095,9 +1153,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed request parameters or if number of requested bpns exceeds limit"
-          },
           "200": {
             "description": "Found legal entites",
             "content": {
@@ -1110,6 +1165,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed request parameters or if number of requested bpns exceeds limit"
           }
         }
       }
@@ -1222,9 +1280,6 @@
           "required": true
         },
         "responses": {
-          "409": {
-            "description": "Issuing body with specified technical key already exists"
-          },
           "200": {
             "description": "New issuing body successfully created",
             "content": {
@@ -1237,6 +1292,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "409": {
+            "description": "Issuing body with specified technical key already exists"
           }
         }
       }
@@ -1275,9 +1333,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed request parameters"
-          },
           "200": {
             "description": "Page of existing identifier types, may be empty",
             "content": {
@@ -1287,6 +1342,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed request parameters"
           }
         }
       },
@@ -1308,12 +1366,6 @@
           "required": true
         },
         "responses": {
-          "409": {
-            "description": "Identifier type with specified technical key already exists"
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          },
           "200": {
             "description": "New identifier type successfully created",
             "content": {
@@ -1323,6 +1375,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed request parameters"
+          },
+          "409": {
+            "description": "Identifier type with specified technical key already exists"
           }
         }
       }
@@ -1361,9 +1419,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed request parameters"
-          },
           "200": {
             "description": "Page of existing identifier statuses, may be empty",
             "content": {
@@ -1373,6 +1428,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed request parameters"
           }
         }
       },
@@ -1394,9 +1452,6 @@
           "required": true
         },
         "responses": {
-          "409": {
-            "description": "Identifier status with specified technical key already exists"
-          },
           "200": {
             "description": "New identifier status successfully created",
             "content": {
@@ -1409,6 +1464,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "409": {
+            "description": "Identifier status with specified technical key already exists"
           }
         }
       }
@@ -1419,7 +1477,7 @@
           "bpn-controller"
         ],
         "summary": "Find business partner numbers by identifiers",
-        "description": "Find business partner numbers by identifiers. The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. For a single request, the maximum number of identifier values to search for is limited to 5000 entries.",
+        "description": "Find business partner numbers by identifiers. The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. For a single request, the maximum number of identifier values to search for is limited to 100 entries.",
         "operationId": "findBpnsByIdentifiers",
         "requestBody": {
           "content": {
@@ -1499,9 +1557,6 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "On malformed pagination request"
-          },
           "200": {
             "description": "Found sites for the specified sites and legal entities",
             "content": {
@@ -1511,6 +1566,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed pagination request"
           }
         }
       }
@@ -3240,12 +3298,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No site found under specified bpn"
-          },
-          "400": {
-            "description": "On malformed request parameters"
-          },
           "200": {
             "description": "Found site with specified bpn",
             "content": {
@@ -3255,6 +3307,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed request parameters"
+          },
+          "404": {
+            "description": "No site found under specified bpn"
           }
         }
       }
@@ -3289,9 +3347,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No business partner found under specified identifier or specified identifier type not found"
-          },
           "200": {
             "description": "Found business partner with specified identifier",
             "content": {
@@ -3304,6 +3359,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "404": {
+            "description": "No business partner found under specified identifier or specified identifier type not found"
           }
         }
       }
@@ -3361,11 +3419,11 @@
               }
             }
           },
-          "404": {
-            "description": "No business partner found for specified bpn"
-          },
           "400": {
             "description": "On malformed pagination request"
+          },
+          "404": {
+            "description": "No business partner found for specified bpn"
           }
         }
       }
@@ -3423,11 +3481,11 @@
               }
             }
           },
-          "404": {
-            "description": "No business partner found for specified bpn"
-          },
           "400": {
             "description": "On malformed pagination request"
+          },
+          "404": {
+            "description": "No business partner found for specified bpn"
           }
         }
       }
@@ -3744,22 +3802,35 @@
         }
       }
     },
-    "/api/catena/business-partners/{bpn}/changelog": {
+    "/api/catena/business-partners/changelog": {
       "get": {
         "tags": [
           "business-partner-controller"
         ],
-        "summary": "Get business partner changelog entries by bpn",
-        "description": "Get business partner changelog entries by bpn ignoring case.",
+        "summary": "Get business partner changelog entries",
+        "description": "Get business partner changelog entries by BPNs ignoring case and/or modification timestamp. For a single request, the maximum number of BPN values to search for is limited to 100 entries.",
         "operationId": "getChangelogEntries",
         "parameters": [
           {
             "name": "bpn",
-            "in": "path",
-            "description": "Bpn value",
-            "required": true,
+            "in": "query",
+            "description": "BPN values (ignored if missing)",
+            "required": false,
             "schema": {
-              "type": "string"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "modifiedAfter",
+            "in": "query",
+            "description": "Modified after (ignored if missing)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           },
           {
@@ -3797,11 +3868,8 @@
               }
             }
           },
-          "404": {
-            "description": "No business partner found for specified bpn"
-          },
           "400": {
-            "description": "On malformed pagination request"
+            "description": "On malformed request"
           }
         }
       }
@@ -3939,9 +4007,6 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "On malformed search or pagination request"
-          },
           "200": {
             "description": "Page of business partners matching the search criteria, may be empty",
             "content": {
@@ -3951,6 +4016,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "On malformed search or pagination request"
           }
         },
         "deprecated": true
@@ -3986,9 +4054,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No business partner found under specified identifier or specified identifier type not found"
-          },
           "200": {
             "description": "Found business partner with specified identifier",
             "content": {
@@ -4001,6 +4066,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "404": {
+            "description": "No business partner found under specified identifier or specified identifier type not found"
           }
         },
         "deprecated": true
@@ -4026,9 +4094,6 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "No address found under specified bpn"
-          },
           "200": {
             "description": "Found address with specified bpn",
             "content": {
@@ -4041,6 +4106,9 @@
           },
           "400": {
             "description": "On malformed request parameters"
+          },
+          "404": {
+            "description": "No address found under specified bpn"
           }
         }
       }
