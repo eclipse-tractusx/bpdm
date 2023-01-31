@@ -24,7 +24,7 @@ jobs:
         uses: checkmarx/kics-github-action@master
         with:
           # Scanning directory .
-          path: "."
+          path: "./charts"
           # Exclude paths from scan by providing the paths as comma separated list
           # exclude_paths: "postgres-init.yaml,templates/sharedidp.yaml"
           # Exclude queries by providing the query / rule ID as comma separated list
