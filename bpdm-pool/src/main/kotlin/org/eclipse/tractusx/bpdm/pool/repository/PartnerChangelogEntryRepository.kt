@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
 interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long>, JpaSpecificationExecutor<PartnerChangelogEntry> {
-    companion object Specs {
+    object Specs {
         /**
          * Restrict to entries with any one of the given BPNs; ignore if null
          */
