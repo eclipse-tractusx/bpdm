@@ -25,14 +25,12 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry_
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.JpaSort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -85,7 +83,7 @@ class PartnerChangelogService(
 
     fun getChangelogEntriesByBpn(bpns: Array<String>?, modifiedAfter: Instant?, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
         val spec = Specification.allOf(byBpnsIn(bpns), byUpdatedGreaterThan(modifiedAfter))
-        val pageRequest = PageRequest.of(pageIndex, pageSize, JpaSort.of(PartnerChangelogEntry_.updatedAt).ascending())
+        val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }

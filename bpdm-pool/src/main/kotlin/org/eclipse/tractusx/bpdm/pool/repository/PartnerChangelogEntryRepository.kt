@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry_
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
@@ -37,7 +36,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         fun byBpnsIn(bpns: Array<String>?) =
             Specification<PartnerChangelogEntry> { root, _, _ ->
                 bpns?.let {
-                    root.get(PartnerChangelogEntry_.bpn).`in`(bpns.map { bpn -> bpn.uppercase() })
+                    root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
                 }
             }
 
@@ -47,7 +46,7 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         fun byUpdatedGreaterThan(modifiedAfter: Instant?) =
             Specification<PartnerChangelogEntry> { root, _, builder ->
                 modifiedAfter?.let {
-                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry_.updatedAt), modifiedAfter)
+                    builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
                 }
             }
     }
