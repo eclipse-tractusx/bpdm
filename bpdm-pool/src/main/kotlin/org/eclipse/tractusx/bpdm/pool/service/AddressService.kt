@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -31,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import jakarta.transaction.Transactional
 
 @Service
 class AddressService(

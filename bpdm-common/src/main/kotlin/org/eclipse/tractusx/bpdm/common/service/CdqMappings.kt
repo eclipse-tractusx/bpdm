@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.cdq.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 

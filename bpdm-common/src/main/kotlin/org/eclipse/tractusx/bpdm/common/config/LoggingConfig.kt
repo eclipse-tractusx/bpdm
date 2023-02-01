@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.common.config
 
+import jakarta.servlet.FilterChain
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import mu.withLoggingContext
 import org.slf4j.MDC
 import org.springframework.core.task.TaskDecorator
@@ -26,9 +29,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.util.HtmlUtils
 import java.util.*
-import jakarta.servlet.FilterChain
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 
 @Component
 class UserLoggingFilter(

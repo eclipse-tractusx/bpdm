@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
@@ -34,8 +36,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
