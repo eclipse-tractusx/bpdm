@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -178,9 +180,10 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = bpnL2)
         )
-        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostGenericResponse(EndpointValues.CATENA_SITES_PATH, toCreate,
+             object: ParameterizedTypeReference<EntitiesWithErrorsResponse<SitePartnerCreateResponse>>() {})
 
-        assertThatCreatedSitesEqual(response, expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
     }
 
     /**
@@ -206,9 +209,10 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
-        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostGenericResponse(EndpointValues.CATENA_SITES_PATH, toCreate,
+            object: ParameterizedTypeReference<EntitiesWithErrorsResponse<SitePartnerCreateResponse>>() {})
 
-        assertThatCreatedSitesEqual(response, expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
     }
 
     /**

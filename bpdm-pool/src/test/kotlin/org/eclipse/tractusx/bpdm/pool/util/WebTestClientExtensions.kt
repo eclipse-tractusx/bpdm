@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
@@ -51,6 +52,15 @@ inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: Str
         .responseBody!!
 }
 
+inline fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, bodyType: ParameterizedTypeReference<B> ): B {
+    return post().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBody(bodyType)
+        .returnResult()
+        .responseBody!!
+}
 fun WebTestClient.invokePostEndpointWithoutResponse(path: String) {
     post().uri(path)
         .exchange()
