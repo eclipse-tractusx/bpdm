@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
+import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
@@ -28,7 +29,6 @@ import org.springframework.data.domain.Page
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.time.Instant
-import jakarta.persistence.EntityManager
 
 /**
  * Provides functionality for managing the OpenSearch index

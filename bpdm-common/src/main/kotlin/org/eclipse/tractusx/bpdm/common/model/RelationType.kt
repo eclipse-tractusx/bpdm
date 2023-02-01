@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -39,7 +39,7 @@ enum class RelationType(private val typeName: String) : NamedType {
     DNB_GLOBAL_ULTIMATE("End is globally highest organization in hierarchy of Start"),
     LEI_DIRECT_PARENT("Start legally owns End"),
     LEI_INTERNATIONAL_BRANCH("Start is international branch of End"),
-    LEI_ULTIMATE_PARENT("End is globally highest organization in hierarchy of Start");
+    LEI_ULTIMATE_PARENT(DNB_GLOBAL_ULTIMATE.typeName);
 
     override fun getTypeName(): String {
         return typeName

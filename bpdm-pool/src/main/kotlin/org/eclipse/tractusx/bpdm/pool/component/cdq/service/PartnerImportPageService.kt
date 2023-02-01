@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -292,9 +292,12 @@ class PartnerImportPageService(
             val parentType = parent.extractLsaType()
             val childType = parentIdToChild[parent.externalId]?.partner?.extractLsaType()
 
-            val childParentRelation = Pair(childType, parentType)
-
-            validChildParentRelations.contains(childParentRelation)
+            if (parentType != null && childType != null) {
+                val childParentRelation = Pair(childType, parentType)
+                validChildParentRelations.contains(childParentRelation)
+            } else {
+                false
+            }
         }
     }
 

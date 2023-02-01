@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021,2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -22,15 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntry
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
 import org.eclipse.tractusx.bpdm.pool.exception.BpnMaxNumberReachedException
 import org.eclipse.tractusx.bpdm.pool.repository.ConfigurationEntryRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierStatusRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IssuingBodyRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.math.pow
@@ -38,9 +32,6 @@ import kotlin.math.pow
 
 @Service
 class BpnIssuingService(
-    private val issuingBodyRepository: IssuingBodyRepository,
-    private val identifierTypeRepository: IdentifierTypeRepository,
-    private val identifierStatusRepository: IdentifierStatusRepository,
     private val configurationEntryRepository: ConfigurationEntryRepository,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
@@ -99,33 +90,6 @@ class BpnIssuingService(
             val newEntry = ConfigurationEntry(bpnCounterKey, 0.toString())
             configurationEntryRepository.save(newEntry)
         }
-    }
-
-    private fun getOrCreateAgency(): IssuingBody {
-        return issuingBodyRepository.findByTechnicalKey(bpnConfigProperties.agencyKey) ?: run {
-            val catenaIssuingBody = IssuingBody(bpnConfigProperties.agencyName, "", bpnConfigProperties.agencyKey)
-            logger.info { "Create Catena Issuing-Body with technical key ${catenaIssuingBody.technicalKey} and name ${catenaIssuingBody.name}" }
-            issuingBodyRepository.save(catenaIssuingBody)
-        }
-
-    }
-
-    private fun getOrCreateIdentifierType(): IdentifierType {
-        return identifierTypeRepository.findByTechnicalKey(bpnConfigProperties.id) ?: run{
-            val catenaIdentifierType =  IdentifierType(bpnConfigProperties.name, "", bpnConfigProperties.id)
-            logger.info { "Create Catena Identifier-Type with technical key ${catenaIdentifierType.technicalKey} and name ${catenaIdentifierType.name}" }
-            identifierTypeRepository.save(catenaIdentifierType)
-        }
-
-    }
-
-    private fun getOrCreateIdentifierStatus(): IdentifierStatus {
-        return identifierStatusRepository.findByTechnicalKey("UNKNOWN") ?: run{
-            val catenaIdentifierStatus=  IdentifierStatus("Unknown", "UNKNOWN")
-            logger.info { "Create Catena Identifier-Status with technical key ${catenaIdentifierStatus.technicalKey} and name ${catenaIdentifierStatus.name}" }
-            identifierStatusRepository.save(catenaIdentifierStatus)
-        }
-
     }
 
     private fun toBpnCode(count: Long): String{
