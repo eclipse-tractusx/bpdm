@@ -153,7 +153,7 @@ class PartnerImportPageService(
         val addresses = addressesSaas.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities) else emptyList()
-        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites) else emptyList()
+        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.updateAddresses(addresses) else emptyList()
 
         return Triple(createdLegalEntities, createdSites, createdAddresses)

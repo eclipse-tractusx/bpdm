@@ -136,7 +136,7 @@ class SiteController(
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
-    ): Collection<SitePartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
         return businessPartnerBuildService.updateSites(requests)
     }
 }

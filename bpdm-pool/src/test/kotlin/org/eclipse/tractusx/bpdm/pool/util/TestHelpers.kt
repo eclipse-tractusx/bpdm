@@ -97,8 +97,7 @@ class TestHelpers(
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sitesWithErrorsResponse = client.invokePostGenericResponse(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests,
-            object: ParameterizedTypeReference<EntitiesWithErrorsResponse<SitePartnerCreateResponse>>() {})
+        val sitesWithErrorsResponse = client.invokePostEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
         val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
