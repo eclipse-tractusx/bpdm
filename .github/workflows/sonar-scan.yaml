@@ -1,6 +1,9 @@
 name: SonarCloud Scan
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   sonar-scan:
