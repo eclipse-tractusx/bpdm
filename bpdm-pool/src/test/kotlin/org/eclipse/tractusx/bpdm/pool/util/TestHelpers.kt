@@ -89,10 +89,10 @@ class TestHelpers(
         client: WebTestClient
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities =
-            client.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
+        val legalEntities = client.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
                 EndpointValues.CATENA_LEGAL_ENTITY_PATH,
                 partnerStructures.map { it.legalEntity })
+            .entities
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =

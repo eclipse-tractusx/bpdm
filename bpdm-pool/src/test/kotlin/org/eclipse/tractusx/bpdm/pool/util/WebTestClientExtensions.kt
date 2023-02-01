@@ -53,7 +53,7 @@ inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: Str
         .responseBody!!
 }
 
-inline fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
+fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
     return post().uri(path)
         .body(BodyInserters.fromValue(body))
         .exchange()
@@ -100,7 +100,7 @@ inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: Stri
         .responseBody!!
 }
 
-inline fun <B> WebTestClient.invokePutGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
+fun <B> WebTestClient.invokePutGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
     return put().uri(path)
         .body(BodyInserters.fromValue(body))
         .exchange()

@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
@@ -216,7 +217,7 @@ class LegalEntityController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "200", description = "New legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
             ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
@@ -225,7 +226,7 @@ class LegalEntityController(
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
@@ -236,7 +237,7 @@ class LegalEntityController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "200", description = "Update legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
             ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
@@ -245,7 +246,7 @@ class LegalEntityController(
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
 
