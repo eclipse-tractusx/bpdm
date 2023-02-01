@@ -68,7 +68,7 @@ class SiteController(
 
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
-    ): Collection<SitePartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
         return businessPartnerBuildService.updateSites(requests)
     }
 }

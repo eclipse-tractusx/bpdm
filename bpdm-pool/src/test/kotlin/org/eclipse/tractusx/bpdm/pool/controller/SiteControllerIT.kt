@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -195,7 +196,14 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
+
+        // 2 entities okay
         assertThatCreatedSitesEqual(response.entities, expected)
+        // 1 error
+        assertThat(response.errorCount).isEqualTo(1)
+        val firstError = response.errors.first()
+        assertThat(firstError.key).isEqualTo(CommonValues.index3)       // index
+        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.legalEntityNotFound)
     }
 
     /**
@@ -235,7 +243,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val response = poolClient.sites().updateSite(toUpdate)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+
     }
 
     /**
@@ -268,7 +278,14 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
         val response = poolClient.sites().updateSite(toUpdate)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+
+        // 2 entities okay
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        // 1 error
+        assertThat(response.errorCount).isEqualTo(1)
+        val firstError = response.errors.first()
+        assertThat(firstError.key).isEqualTo("NONEXISTENT")
+        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.siteNotFound)
     }
 
     /**

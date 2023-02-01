@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
@@ -52,15 +53,19 @@ inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: Str
         .responseBody!!
 }
 
-inline fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, bodyType: ParameterizedTypeReference<B> ): B {
+inline fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
     return post().uri(path)
         .body(BodyInserters.fromValue(body))
         .exchange()
         .expectStatus().is2xxSuccessful
-        .expectBody(bodyType)
+        .expectBody(responseBodyType)
         .returnResult()
         .responseBody!!
 }
+
+inline fun <reified E : Any> WebTestClient.invokePostEntitiesWithErrorsResponse(path: String, body: Any): EntitiesWithErrorsResponse<E> =
+    this.invokePostGenericResponse(path, body, object : ParameterizedTypeReference<EntitiesWithErrorsResponse<E>>() {})
+
 fun WebTestClient.invokePostEndpointWithoutResponse(path: String) {
     post().uri(path)
         .exchange()
@@ -94,6 +99,19 @@ inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: Stri
         .returnResult()
         .responseBody!!
 }
+
+inline fun <B> WebTestClient.invokePutGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
+    return put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .expectBody(responseBodyType)
+        .returnResult()
+        .responseBody!!
+}
+
+inline fun <reified E : Any> WebTestClient.invokePutEntitiesWithErrorsResponse(path: String, body: Any): EntitiesWithErrorsResponse<E> =
+    this.invokePutGenericResponse(path, body, object : ParameterizedTypeReference<EntitiesWithErrorsResponse<E>>() {})
 
 fun WebTestClient.invokePutWithoutResponse(path: String, body: Any) {
     put().uri(path)

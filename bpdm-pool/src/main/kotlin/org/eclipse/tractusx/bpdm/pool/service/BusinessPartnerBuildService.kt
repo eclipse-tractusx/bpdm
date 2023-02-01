@@ -105,9 +105,9 @@ class BusinessPartnerBuildService(
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
         siteRepository.saveAll(sites)
 
-        val validResponses = sites.map { it.toUpsertDto(bpnsMap[it.bpn]!!.second) }
+        val validEntities = sites.map { it.toUpsertDto(bpnsMap[it.bpn]!!.second) }
 
-        return EntitiesWithErrorsResponse(validResponses, errors)
+        return EntitiesWithErrorsResponse(validEntities, errors)
     }
 
     @Transactional
@@ -158,22 +158,23 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): Collection<SitePartnerCreateResponse> {
+    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
         logger.info { "Update ${requests.size} sites" }
+
         val errorTemplate = "Site %s could not be updated: not found"
         val bpnsToFetch = requests.map { it.bpn }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
 
-        if (sites.size != bpnsToFetch.size) {
-            val notFetched = bpnsToFetch.minus(sites.map { it.bpn }.toSet())
-            val errors = notFetched.map { ErrorMessageResponse(it, String.format(errorTemplate,it), PoolErrorCode.siteNotFound) }
-        }
+        val notFetched = bpnsToFetch.minus(sites.map { it.bpn }.toSet())
+        val errors = notFetched.map { ErrorMessageResponse(it, String.format(errorTemplate, it), PoolErrorCode.siteNotFound) }
 
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
 
-        val requestMap = requests.associateBy { it.bpn }
-        sites.forEach { updateSite(it, requestMap[it.bpn]!!.site) }
-        return siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
+        val requestByBpnMap = requests.associateBy { it.bpn }
+        sites.forEach { updateSite(it, requestByBpnMap[it.bpn]!!.site) }
+        val validEntities = siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
+
+        return EntitiesWithErrorsResponse(validEntities, errors)
     }
 
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPartnerResponse> {
