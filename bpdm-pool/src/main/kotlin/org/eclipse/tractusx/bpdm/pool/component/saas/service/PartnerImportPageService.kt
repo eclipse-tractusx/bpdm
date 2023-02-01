@@ -132,7 +132,7 @@ class PartnerImportPageService(
         val addresses = addressesWithParent.mapNotNull { mappingService.toAddressCreateRequestOrNull(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities) else emptyList()
-        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites) else emptyList()
+        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses) else emptyList()
 
         val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }

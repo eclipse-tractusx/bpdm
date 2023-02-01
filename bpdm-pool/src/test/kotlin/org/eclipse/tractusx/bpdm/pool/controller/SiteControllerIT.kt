@@ -169,7 +169,7 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val response = poolClient.sites().createSite(toCreate)
-        assertThatCreatedSitesEqual(response, expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
     }
 
     /**
@@ -195,7 +195,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
-        assertThatCreatedSitesEqual(response, expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
     }
 
     /**

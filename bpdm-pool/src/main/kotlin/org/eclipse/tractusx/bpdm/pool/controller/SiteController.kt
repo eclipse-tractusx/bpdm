@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -61,7 +62,7 @@ class SiteController(
 
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
-    ): Collection<SitePartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
         return businessPartnerBuildService.createSites(requests)
     }
 

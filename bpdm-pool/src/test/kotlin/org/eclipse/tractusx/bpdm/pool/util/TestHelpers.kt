@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
+import org.springframework.core.ParameterizedTypeReference
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -102,8 +103,8 @@ class TestHelpers(
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = poolClient.sites().createSite(assignedSiteRequests);
-        val indexedSites = sites.associateBy { it.index }
+        val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)
+        val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
             partnerStructures.flatMap { it.addresses.map { address -> address.copy(parent = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
@@ -139,7 +140,7 @@ class TestHelpers(
     fun `find bpns by identifiers, bpn request limit exceeded`( identifiersSearchRequest: IdentifiersSearchRequest){
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
-           
+
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
@@ -219,7 +220,6 @@ class TestHelpers(
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
             syncResponse = client.invokeGetEndpoint(syncPath)
-           // syncResponse = poolClient.opensearch().getBusinessPartners()
 
             if (syncResponse.status == status)
                 break
