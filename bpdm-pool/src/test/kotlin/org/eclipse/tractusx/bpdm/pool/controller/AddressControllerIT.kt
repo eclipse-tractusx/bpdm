@@ -291,10 +291,10 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create addresses with non-existent parent`() {
-        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
+        val bpnL = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1)
-        ).single().bpn
+        ).entities.single().bpn
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,

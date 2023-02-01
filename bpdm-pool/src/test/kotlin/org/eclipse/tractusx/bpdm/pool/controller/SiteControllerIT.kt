@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
@@ -35,7 +34,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -166,10 +164,10 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create new sites`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
+        val givenLegalEntities = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        )
+        ).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -184,6 +182,7 @@ class SiteControllerIT @Autowired constructor(
         val response = webTestClient.invokePostEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
         assertThatCreatedSitesEqual(response.entities, expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -193,10 +192,10 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create sites with non-existing parent`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
+        val givenLegalEntities = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        )
+        ).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -259,6 +258,7 @@ class SiteControllerIT @Autowired constructor(
         val response = webTestClient.invokePutEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -298,7 +298,7 @@ class SiteControllerIT @Autowired constructor(
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
-        assertThat(firstError.key).isEqualTo("NONEXISTENT")
+        assertThat(firstError.key).isEqualTo("NONEXISTENT")     // BPN
         assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.siteNotFound)
     }
 
