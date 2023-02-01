@@ -292,9 +292,12 @@ class PartnerImportPageService(
             val parentType = parent.extractLsaType()
             val childType = parentIdToChild[parent.externalId]?.partner?.extractLsaType()
 
-            val childParentRelation = Pair(childType, parentType)
-
-            validChildParentRelations.contains(childParentRelation)
+            if (parentType != null && childType != null) {
+                val childParentRelation = Pair(childType, parentType)
+                validChildParentRelations.contains(childParentRelation)
+            } else {
+                false
+            }
         }
     }
 
