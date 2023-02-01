@@ -32,19 +32,24 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 class BpdmSecurityConfigurerAdapterImpl(
     val securityConfigProperties: SecurityConfigProperties
 ) : BpdmSecurityConfigurerAdapter {
+
+    companion object {
+        const val ALL_API_PATHS = "/api/**"
+    }
+
     override fun configure(http: HttpSecurity) {
         http.csrf().disable()
             .cors()
             .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and().authorizeHttpRequests()
-            .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
+            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS, HttpMethod.OPTIONS.name())).permitAll()
             .requestMatchers(AntPathRequestMatcher("/")).permitAll() // forwards to swagger
             .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
             .requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
-            .requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.GET.name())).authenticated()
+            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS, HttpMethod.GET.name())).authenticated()
             .requestMatchers(AntPathRequestMatcher("/api/catena/**/search", HttpMethod.POST.name())).authenticated()
-            .requestMatchers(AntPathRequestMatcher("/api/**")).hasRole("add_company_data")
+            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS)).hasRole("add_company_data")
             .and().oauth2ResourceServer()
             .jwt()
             .jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
