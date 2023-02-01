@@ -34,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -117,7 +118,7 @@ interface PoolAddressApi {
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
-    ): Collection<AddressPartnerCreateResponse>
+    ): EntitiesWithErrorsResponse<AddressPartnerCreateResponse>
 
     @Operation(
         summary = "Update existing address business partners",
@@ -135,7 +136,7 @@ interface PoolAddressApi {
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
-    ): Collection<AddressPartnerResponse>
+    ): EntitiesWithErrorsResponse<AddressPartnerResponse>
 
 
 }

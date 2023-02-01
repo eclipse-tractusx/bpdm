@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -68,14 +69,14 @@ class AddressController(
 
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
-    ): Collection<AddressPartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<AddressPartnerCreateResponse> {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
 
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateRequest>
-    ): Collection<AddressPartnerResponse> {
+    ): EntitiesWithErrorsResponse<AddressPartnerResponse> {
         return businessPartnerBuildService.updateAddresses(requests)
     }
 }

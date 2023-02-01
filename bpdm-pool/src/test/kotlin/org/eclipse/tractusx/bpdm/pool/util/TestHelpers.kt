@@ -43,7 +43,6 @@ import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
-import org.springframework.core.ParameterizedTypeReference
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -111,7 +110,7 @@ class TestHelpers(
         val assignedSiteAddresses =
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
-        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses)
+        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
 
         val indexedAddresses = addresses.associateBy { it.index }
 

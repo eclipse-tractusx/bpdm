@@ -27,10 +27,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.config.PoolClientConfig
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -287,8 +285,8 @@ class AddressControllerIT @Autowired constructor(
         val response = poolClient.addresses().createAddresses(toCreate)
 
 
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -312,8 +310,8 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val response = poolClient.addresses().createAddresses(toCreate)
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -359,7 +357,7 @@ class AddressControllerIT @Autowired constructor(
 
         val response = poolClient.addresses().updateAddresses(toUpdate)
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
     }
 
     /**
@@ -399,7 +397,7 @@ class AddressControllerIT @Autowired constructor(
         val response = poolClient.addresses().updateAddresses(toUpdate)
 
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
     }
 
 
