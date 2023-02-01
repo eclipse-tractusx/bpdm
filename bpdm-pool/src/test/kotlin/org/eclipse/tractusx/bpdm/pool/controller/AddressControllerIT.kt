@@ -278,10 +278,10 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate2.copy(parent = bpnL),
             RequestValues.addressPartnerCreate3.copy(parent = bpnS)
         )
-        val response = webTestClient.invokePostWithArrayResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+        val response = webTestClient.invokePostEntitiesWithErrorsResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
 
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -305,10 +305,10 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate2.copy(parent = "BPNSXXXXXXXXXX"),
             RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
         )
-        val response = webTestClient.invokePostWithArrayResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
+        val response = webTestClient.invokePostEntitiesWithErrorsResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
 
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
     /**
@@ -352,9 +352,9 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate2.copy(bpn = bpnA3),
             RequestValues.addressPartnerUpdate3.copy(bpn = bpnA1)
         )
-        val response = webTestClient.invokePutWithArrayResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+        val response = webTestClient.invokePutEntitiesWithErrorsResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
     }
 
     /**
@@ -390,9 +390,9 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate2.copy(bpn = "BPNLXXXXXXXX"),
             RequestValues.addressPartnerUpdate3.copy(bpn = "BPNAXXXXXXXX")
         )
-        val response = webTestClient.invokePutWithArrayResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
+        val response = webTestClient.invokePutEntitiesWithErrorsResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
     }
 
 

@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.springdoc.core.annotations.ParameterObject
@@ -121,7 +122,7 @@ class AddressController(
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
-    ): Collection<AddressPartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<AddressPartnerCreateResponse> {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
@@ -140,7 +141,7 @@ class AddressController(
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
-    ): Collection<AddressPartnerResponse> {
+    ): EntitiesWithErrorsResponse<AddressPartnerResponse> {
         return businessPartnerBuildService.updateAddresses(requests)
     }
 }

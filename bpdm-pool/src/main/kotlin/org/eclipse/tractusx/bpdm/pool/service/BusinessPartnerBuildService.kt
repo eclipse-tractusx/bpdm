@@ -110,7 +110,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): Collection<AddressPartnerCreateResponse> {
+    fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): EntitiesWithErrorsResponse<AddressPartnerCreateResponse> {
         logger.info { "Create ${requests.size} new addresses" }
         fun isLegalEntityRequest(request: AddressPartnerCreateRequest) = request.parent.startsWith(bpnIssuingService.bpnlPrefix)
         fun isSiteRequest(request: AddressPartnerCreateRequest) = request.parent.startsWith(bpnIssuingService.bpnsPrefix)
@@ -125,10 +125,8 @@ class BusinessPartnerBuildService(
 
         changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
-        return addressResponses;
+        return EntitiesWithErrorsResponse(addressResponses, errors)
     }
-
-    private fun isbpnlAddress(it: AddressPartnerCreateRequest) = it.parent.startsWith(bpnIssuingService.bpnlPrefix)
 
     /**
      * Update existing records with [requests]
@@ -176,24 +174,21 @@ class BusinessPartnerBuildService(
         return EntitiesWithErrorsResponse(validEntities, errors)
     }
 
-    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): Collection<AddressPartnerResponse> {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): EntitiesWithErrorsResponse<AddressPartnerResponse> {
         logger.info { "Update ${requests.size} business partner addresses" }
         val errorTemplate = "Address %s could not be updated: not found"
 
-        val addresses = addressPartnerRepository.findDistinctByBpnIn(requests.map { it.bpn })
-
-
-        if (addresses.size != requests.size) {
-            val notFetched = requests.map { it.bpn }.minus(addresses.map { it.bpn }.toSet())
-            val errors = notFetched.map { ErrorMessageResponse(it, String.format(errorTemplate,it), PoolErrorCode.bpnNotValid) }
-        }
+        val validAddresses = addressPartnerRepository.findDistinctByBpnIn(requests.map { it.bpn })
+        val validBpns = validAddresses.map { it.bpn }.toHashSet()
+        val errors = requests.filter { !validBpns.contains(it.bpn) }.map { ErrorMessageResponse(it.bpn, String.format(errorTemplate,it.bpn), PoolErrorCode.bpnNotValid) }
 
         val requestMap = requests.associateBy { it.bpn }
-        addresses.forEach { updateAddress(it.address, requestMap[it.bpn]!!.properties) }
+        validAddresses.forEach { updateAddress(it.address, requestMap[it.bpn]!!.properties) }
 
-        changelogService.createChangelogEntries(addresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(validAddresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
-        return addressPartnerRepository.saveAll(addresses).map { it.toPoolDto() }
+        val addressResponses =  addressPartnerRepository.saveAll(validAddresses).map { it.toPoolDto() }
+        return EntitiesWithErrorsResponse(addressResponses, errors)
     }
 
     @Transactional

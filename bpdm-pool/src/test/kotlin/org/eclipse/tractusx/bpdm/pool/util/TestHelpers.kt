@@ -36,7 +36,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
-import org.springframework.core.ParameterizedTypeReference
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -106,11 +105,11 @@ class TestHelpers(
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
         val addresses =
-            client.invokePostWithArrayResponse<AddressPartnerCreateResponse>(
+            client.invokePostEntitiesWithErrorsResponse<AddressPartnerCreateResponse>(
                 EndpointValues.CATENA_ADDRESSES_PATH,
                 assignedSitelessAddresses + assignedSiteAddresses
             )
-        val indexedAddresses = addresses.associateBy { it.index }
+        val indexedAddresses = addresses.entities.associateBy { it.index }
 
         return partnerStructures.map { legalEntityStructure ->
             LegalEntityStructureResponse(
