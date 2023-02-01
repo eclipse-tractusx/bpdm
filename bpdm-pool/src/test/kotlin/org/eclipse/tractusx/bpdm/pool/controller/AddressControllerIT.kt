@@ -102,10 +102,6 @@ class AddressControllerIT @Autowired constructor(
      * When requesting an address by non-existent bpn-a
      * Then a "not found" response is sent
      */
-
-
-
-
     @Test
     fun `get address by bpn-a, not found`() {
         testHelpers.createBusinessPartnerStructure(
@@ -145,8 +141,6 @@ class AddressControllerIT @Autowired constructor(
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
         val searchResult =
             poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
-
-
 
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
@@ -305,7 +299,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `don't create addresses with non-existent parent`() {
 
-        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).single().bpn
+        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).entities.single().bpn
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,

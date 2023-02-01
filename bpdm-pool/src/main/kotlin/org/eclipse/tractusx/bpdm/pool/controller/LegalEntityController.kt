@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -33,6 +34,7 @@ import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -105,16 +107,15 @@ class LegalEntityController(
 
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
-
-    override fun updateBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    override fun updateBusinessPartners(businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
+
 
 
 }

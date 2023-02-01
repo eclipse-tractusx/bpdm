@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -202,7 +203,7 @@ interface PoolLegalEntityApi {
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse>
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>
 
 
     @Operation(
@@ -222,6 +223,6 @@ interface PoolLegalEntityApi {
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse>
+    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>
 
 }

@@ -99,7 +99,7 @@ class TestHelpers(
     ): List<LegalEntityStructureResponse> {
 
         val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity });
-        val indexedLegalEntities = legalEntities.associateBy { it.index }
+        val indexedLegalEntities = legalEntities.entities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }

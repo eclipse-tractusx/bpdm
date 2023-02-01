@@ -131,7 +131,7 @@ class PartnerImportPageService(
         val sites = sitesWithParent.mapNotNull { mappingService.toSiteCreateRequestOrNull(it) }
         val addresses = addressesWithParent.mapNotNull { mappingService.toAddressCreateRequestOrNull(it) }
 
-        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities) else emptyList()
+        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities).entities else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses) else emptyList()
 
@@ -152,7 +152,7 @@ class PartnerImportPageService(
         val sites = sitesSaas.mapNotNull { mappingService.toSiteUpdateRequestOrNull(it) }
         val addresses = addressesSaas.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
 
-        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities) else emptyList()
+        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities).entities else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.updateAddresses(addresses) else emptyList()
 

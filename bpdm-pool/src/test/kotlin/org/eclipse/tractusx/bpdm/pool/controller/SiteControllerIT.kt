@@ -156,7 +156,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `create new sites`() {
 
-        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -170,7 +170,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val response = poolClient.sites().createSite(toCreate)
+
         assertThatCreatedSitesEqual(response.entities, expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -182,7 +184,7 @@ class SiteControllerIT @Autowired constructor(
     fun `don't create sites with non-existing parent`() {
 
 
-        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -245,7 +247,7 @@ class SiteControllerIT @Autowired constructor(
         val response = poolClient.sites().updateSite(toUpdate)
 
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
-
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -284,7 +286,7 @@ class SiteControllerIT @Autowired constructor(
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
-        assertThat(firstError.key).isEqualTo("NONEXISTENT")
+        assertThat(firstError.key).isEqualTo("NONEXISTENT")     // BPN
         assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.siteNotFound)
     }
 
