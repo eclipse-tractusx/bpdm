@@ -52,9 +52,9 @@
         <springmockk.version>3.1.1</springmockk.version>
         <assertj.version>3.23.1</assertj.version>
         <spring-boot.version>3.0.0</spring-boot.version>
-        <sonar.organization>catenax</sonar.organization>
+        <sonar.organization>catenax-ng</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.projectKey>bptm</sonar.projectKey>
+        <sonar.projectKey>product-bpdm</sonar.projectKey>
         <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
         <sonar.version>3.9.1.2184</sonar.version>
         <jacoco.version>0.8.7</jacoco.version>
