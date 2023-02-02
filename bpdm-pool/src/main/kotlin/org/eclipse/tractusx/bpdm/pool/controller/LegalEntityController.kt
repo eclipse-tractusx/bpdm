@@ -219,7 +219,6 @@ class LegalEntityController(
         value = [
             ApiResponse(responseCode = "200", description = "New legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
     )
     @PostMapping
@@ -239,7 +238,6 @@ class LegalEntityController(
         value = [
             ApiResponse(responseCode = "200", description = "Update legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
     )
     @PutMapping
