@@ -21,10 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 enum class PoolErrorCode {
 
-    bpnNotValid,
-    legalEntityDuplicateIdentifier,
-    siteOfAddressNotFound,
-    legalEntityOfAddressNotFound,
-    legalEntityNotFound,
-    siteNotFound;
+    BpnNotValid,
+    LegalEntityDuplicateIdentifier,
+    LegalEntityNotFound,
+    SiteNotFound,
+    AddressNotFound;
 }

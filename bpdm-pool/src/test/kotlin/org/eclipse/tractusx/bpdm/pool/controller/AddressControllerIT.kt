@@ -318,8 +318,8 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertErrorCode(response.errors.first(), CommonValues.index2, PoolErrorCode.siteOfAddressNotFound)
-        testHelpers.assertErrorCode(response.errors.last(), CommonValues.index3, PoolErrorCode.legalEntityOfAddressNotFound)
+        testHelpers.assertErrorCode(response.errors.first(), CommonValues.index2, PoolErrorCode.SiteNotFound)
+        testHelpers.assertErrorCode(response.errors.last(), CommonValues.index3, PoolErrorCode.LegalEntityNotFound)
 
     }
 
@@ -412,8 +412,8 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertErrorCode(response.errors.first(), firstInvalidBpn, PoolErrorCode.bpnNotValid)
-        testHelpers.assertErrorCode(response.errors.last(), secondInvalidBpn, PoolErrorCode.bpnNotValid)
+        testHelpers.assertErrorCode(response.errors.first(), firstInvalidBpn, PoolErrorCode.AddressNotFound)
+        testHelpers.assertErrorCode(response.errors.last(), secondInvalidBpn, PoolErrorCode.AddressNotFound)
     }
 
 
