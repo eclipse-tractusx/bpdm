@@ -13,6 +13,7 @@
 - [Solution Strategy](#solution-strategy)
 - [Building Block View](#building-block-view)
   - [Whitebox Overall System](#whitebox-overall-system)
+    - [Class Diagram Pool](#class-diagram-pool)
   - [Blackbox (API Authentication)](#blackbox-api-authentication)
 - [Runtime View](#runtime-view)
 - [Deployment View](#deployment-view)
@@ -161,7 +162,6 @@ Use a microservice approach to separate the different components of the system a
 
 ## Whitebox Overall System
 
-
 | Name          | Responsibility                                                                                                                                 |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | API           | In this block the communication with other services (e.g. CX Portal) takes place.The API offers different end points, functions and data offer |
@@ -169,7 +169,8 @@ Use a microservice approach to separate the different components of the system a
 | BPN Generator | In this block for each data object a Business Partner Number will be created and assigned to the data object.                                  |
 | OpenSearch    | In this block the Open Search Component needs to interact with the Elastic Search Service to provide the search function via API. |
 
-
+### Class Diagram Pool
+![](images/class-diagram-pool.png)
 
 ## Blackbox (API Authentication)
 
