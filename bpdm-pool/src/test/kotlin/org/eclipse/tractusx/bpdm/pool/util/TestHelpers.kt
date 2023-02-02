@@ -268,7 +268,7 @@ class TestHelpers(
             .ignoringAllOverriddenEquals()
     }
 
-    fun assertErrorCode(errorResponse: ErrorMessageResponse, keyToCheck: String, codeToCheck: PoolErrorCode) {
+    fun assertErrorResponse(errorResponse: ErrorMessageResponse, codeToCheck: PoolErrorCode, keyToCheck: String) {
         Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
         Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }

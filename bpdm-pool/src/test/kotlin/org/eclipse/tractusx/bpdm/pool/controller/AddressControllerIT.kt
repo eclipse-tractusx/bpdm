@@ -307,20 +307,22 @@ class AddressControllerIT @Autowired constructor(
 
         val invalidSiteBpn = "BPNSXXXXXXXXXX"
         val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
+        val completelyInvalidBpn = "XYZ"
         val toCreate = listOf(
             RequestValues.addressPartnerCreate1.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate2.copy(parent = invalidSiteBpn),
-            RequestValues.addressPartnerCreate3.copy(parent = invalidLegalEntityBpn)
+            RequestValues.addressPartnerCreate1.copy(parent = invalidSiteBpn),
+            RequestValues.addressPartnerCreate2.copy(parent = invalidLegalEntityBpn),
+            RequestValues.addressPartnerCreate3.copy(parent = completelyInvalidBpn),
         )
 
         val response = poolClient.addresses().createAddresses(toCreate)
         response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
 
-        assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertErrorCode(response.errors.first(), CommonValues.index2, PoolErrorCode.SiteNotFound)
-        testHelpers.assertErrorCode(response.errors.last(), CommonValues.index3, PoolErrorCode.LegalEntityNotFound)
-
+        assertThat(response.errorCount).isEqualTo(3)
+        testHelpers.assertErrorResponse(response.errors.elementAt(0), PoolErrorCode.BpnNotValid, CommonValues.index3)   // BPN validity check always first
+        testHelpers.assertErrorResponse(response.errors.elementAt(1), PoolErrorCode.SiteNotFound, CommonValues.index1)
+        testHelpers.assertErrorResponse(response.errors.elementAt(2), PoolErrorCode.LegalEntityNotFound, CommonValues.index2)
     }
 
     /**
@@ -412,8 +414,8 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertErrorCode(response.errors.first(), firstInvalidBpn, PoolErrorCode.AddressNotFound)
-        testHelpers.assertErrorCode(response.errors.last(), secondInvalidBpn, PoolErrorCode.AddressNotFound)
+        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.AddressNotFound, firstInvalidBpn)
+        testHelpers.assertErrorResponse(response.errors.last(), PoolErrorCode.AddressNotFound, secondInvalidBpn)
     }
 
 
