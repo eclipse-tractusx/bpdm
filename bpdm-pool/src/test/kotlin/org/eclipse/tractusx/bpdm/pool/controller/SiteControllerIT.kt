@@ -216,7 +216,7 @@ class SiteControllerIT @Autowired constructor(
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
         assertThat(firstError.entityKey).isEqualTo(CommonValues.index3)       // index
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.legalEntityNotFound)
+        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.LegalEntityNotFound)
     }
 
     /**
@@ -299,7 +299,7 @@ class SiteControllerIT @Autowired constructor(
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
         assertThat(firstError.entityKey).isEqualTo("NONEXISTENT")     // BPN
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.siteNotFound)
+        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.SiteNotFound)
     }
 
     /**

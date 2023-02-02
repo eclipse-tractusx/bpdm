@@ -211,7 +211,7 @@ class TestHelpers(
     }
 
     fun assertErrorCode(errorResponse: ErrorMessageResponse, keyToCheck: String, codeToCheck: PoolErrorCode) {
-        Assertions.assertThat(errorResponse.key).isEqualTo(keyToCheck)
+        Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
         Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }
 
