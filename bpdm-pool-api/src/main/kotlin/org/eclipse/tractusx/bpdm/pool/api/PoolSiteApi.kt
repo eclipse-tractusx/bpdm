@@ -106,7 +106,7 @@ interface PoolSiteApi  {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "200", description = "New sites request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
@@ -124,7 +124,7 @@ interface PoolSiteApi  {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "200", description = "Update sites request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )

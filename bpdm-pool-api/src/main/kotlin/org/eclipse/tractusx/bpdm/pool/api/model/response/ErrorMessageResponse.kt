@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
 @Schema(name = "ErrorMessageResponse", description = "Holds information about failures when creating or updating an entity")
 data class ErrorMessageResponse(
 
-    @Schema(description = "Key of the entity that failed from the request object: index or bpn")
-    val key: String?,
+    @Schema(description = "Error code identifying the error")
+    val errorCode: PoolErrorCode,
     @Schema(description = "Error message that explains the error")
     val message: String,
-    @Schema(description = "Error code identifying the error")
-    val errorCode: PoolErrorCode
+    @Schema(description = "Key of the entity that failed from the request object: index or BPN")
+    val entityKey: String?
 )

@@ -131,7 +131,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
         assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.legalEntityDuplicateIdentifier)
-        assertThat(firstError.key).isEqualTo(given.index)
+        assertThat(firstError.entityKey).isEqualTo(given.index)
     }
 
     /**
@@ -177,7 +177,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThat(response.errorCount).isEqualTo(1)
         val firstError = response.errors.first()
         assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.legalEntityNotFound)
-        assertThat(firstError.key).isEqualTo("NONEXISTENT")     // BPN
+        assertThat(firstError.entityKey).isEqualTo("NONEXISTENT")     // BPN
     }
 
     /**
