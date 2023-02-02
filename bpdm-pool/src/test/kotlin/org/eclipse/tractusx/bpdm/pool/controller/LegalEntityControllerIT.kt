@@ -128,9 +128,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThatCreatedLegalEntitiesEqual(response.entities, expected)
         // 1 error because identifier already exists
         assertThat(response.errorCount).isEqualTo(1)
-        val firstError = response.errors.first()
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.LegalEntityDuplicateIdentifier)
-        assertThat(firstError.entityKey).isEqualTo(given.index)
+        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityDuplicateIdentifier, given.index!!)
     }
 
     /**
@@ -176,9 +174,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThatModifiedLegalEntitiesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        val firstError = response.errors.first()
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.LegalEntityNotFound)
-        assertThat(firstError.entityKey).isEqualTo("NONEXISTENT")     // BPN
+        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityNotFound, "NONEXISTENT")
     }
 
     /**

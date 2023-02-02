@@ -214,9 +214,7 @@ class SiteControllerIT @Autowired constructor(
         assertThatCreatedSitesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        val firstError = response.errors.first()
-        assertThat(firstError.entityKey).isEqualTo(CommonValues.index3)       // index
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.LegalEntityNotFound)
+        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityNotFound, CommonValues.index3)
     }
 
     /**
@@ -297,9 +295,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        val firstError = response.errors.first()
-        assertThat(firstError.entityKey).isEqualTo("NONEXISTENT")     // BPN
-        assertThat(firstError.errorCode).isEqualTo(PoolErrorCode.SiteNotFound)
+        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.SiteNotFound, "NONEXISTENT")
     }
 
     /**
