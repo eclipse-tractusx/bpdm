@@ -92,7 +92,7 @@ class BusinessPartnerBuildService(
 
         val (validRequests, invalidRequests) = requests.partition { legalEntityMap[it.legalEntity] != null }
         val errors = invalidRequests.map {
-            ErrorMessageResponse(legalEntityNotFound, "Site not created: parent legal entity ${it.legalEntity} not found", it.index)
+            ErrorMessageResponse(LegalEntityNotFound, "Site not created: parent legal entity ${it.legalEntity} not found", it.index)
         }
 
         val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
@@ -121,7 +121,7 @@ class BusinessPartnerBuildService(
 
         val errors = mutableListOf<ErrorMessageResponse>()
         invalidAddresses.map {
-            ErrorMessageResponse(bpnNotValid, "Address not created: parent ${it.parent} is not a valid BPNL/BPNS", it.index)
+            ErrorMessageResponse(BpnNotValid, "Address not created: parent ${it.parent} is not a valid BPNL/BPNS", it.index)
         }.forEach(errors::add)
         val addressResponses = createSiteAddressResponses(siteRequests, errors).toMutableList()
         addressResponses.addAll(createLegalEntityAddressResponses(legalEntityRequests, errors))
@@ -145,7 +145,7 @@ class BusinessPartnerBuildService(
 
         val bpnsNotFetched = bpnsToFetch.minus(legalEntities.map { it.bpn }.toSet())
         val errors = bpnsNotFetched.map {
-            ErrorMessageResponse(legalEntityNotFound, "Legal entity $it not updated: BPNL not found", it)
+            ErrorMessageResponse(LegalEntityNotFound, "Legal entity $it not updated: BPNL not found", it)
         }
 
         val requestByBpnMap = requests.associateBy { it.bpn }
@@ -167,7 +167,7 @@ class BusinessPartnerBuildService(
 
         val bpnsNotFetched = bpnsToFetch.minus(sites.map { it.bpn }.toSet())
         val errors = bpnsNotFetched.map {
-            ErrorMessageResponse(siteNotFound, "Site $it not updated: BPNS not found", it)
+            ErrorMessageResponse(SiteNotFound, "Site $it not updated: BPNS not found", it)
         }
 
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
@@ -185,7 +185,7 @@ class BusinessPartnerBuildService(
         val validAddresses = addressPartnerRepository.findDistinctByBpnIn(requests.map { it.bpn })
         val validBpns = validAddresses.map { it.bpn }.toHashSet()
         val errors = requests.filter { !validBpns.contains(it.bpn) }.map {
-            ErrorMessageResponse(bpnNotValid, "Address ${it.bpn} not updated: BPNA not found", it.bpn)
+            ErrorMessageResponse(AddressNotFound, "Address ${it.bpn} not updated: BPNA not found", it.bpn)
         }
 
         val requestMap = requests.associateBy { it.bpn }
@@ -218,7 +218,7 @@ class BusinessPartnerBuildService(
         val (validRequests, invalidRequests) = requests.partition { bpnl2LegalEntityMap[it.parent] != null }
 
         errors.addAll(invalidRequests.map {
-            ErrorMessageResponse(legalEntityOfAddressNotFound, "Address not created: parent legal entity ${it.parent} not found", it.index)
+            ErrorMessageResponse(LegalEntityNotFound, "Address not created: parent legal entity ${it.parent} not found", it.index)
         })
 
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
@@ -242,7 +242,7 @@ class BusinessPartnerBuildService(
         val bpns2SiteMap = findValidSites(requests)
         val (validRequests, invalidRequests) = requests.partition { bpns2SiteMap[it.parent] != null }
         errors.addAll(invalidRequests.map {
-            ErrorMessageResponse(siteOfAddressNotFound, "Address not created: site ${it.parent} not found", it.index)
+            ErrorMessageResponse(SiteNotFound, "Address not created: site ${it.parent} not found", it.index)
         })
 
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
@@ -452,7 +452,7 @@ class BusinessPartnerBuildService(
         }
 
         invalidRequests.map { 
-            ErrorMessageResponse(legalEntityDuplicateIdentifier, "Legal entity not created: duplicate identifier", it.index)
+            ErrorMessageResponse(LegalEntityDuplicateIdentifier, "Legal entity not created: duplicate identifier", it.index)
         }.forEach(errors::add)
 
         return validRequests
