@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -282,6 +283,7 @@ class AddressControllerIT @Autowired constructor(
 
         response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -300,15 +302,22 @@ class AddressControllerIT @Autowired constructor(
             ResponseValues.addressPartnerCreate1,
         )
 
+        val invalidSiteBpn = "BPNSXXXXXXXXXX"
+        val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
         val toCreate = listOf(
             RequestValues.addressPartnerCreate1.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate2.copy(parent = "BPNSXXXXXXXXXX"),
-            RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
+            RequestValues.addressPartnerCreate2.copy(parent = invalidSiteBpn),
+            RequestValues.addressPartnerCreate3.copy(parent = invalidLegalEntityBpn)
         )
         val response = webTestClient.invokePostEntitiesWithErrorsResponse<AddressPartnerCreateResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toCreate)
 
         response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+
+        assertThat(response.errorCount).isEqualTo(2)
+        testHelpers.assertErrorCode(response.errors.first(), CommonValues.index2, PoolErrorCode.siteOfAddressNotFound)
+        testHelpers.assertErrorCode(response.errors.last(), CommonValues.index3, PoolErrorCode.legalEntityOfAddressNotFound)
+
     }
 
     /**
@@ -355,6 +364,7 @@ class AddressControllerIT @Autowired constructor(
         val response = webTestClient.invokePutEntitiesWithErrorsResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -385,14 +395,20 @@ class AddressControllerIT @Autowired constructor(
             ResponseValues.addressPartner2.copy(bpn = bpnA1)
         )
 
+        val firstInvalidBpn = "BPNLXXXXXXXX"
+        val secondInvalidBpn = "BPNAXXXXXXXX"
         val toUpdate = listOf(
             RequestValues.addressPartnerUpdate2.copy(bpn = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpn = "BPNLXXXXXXXX"),
-            RequestValues.addressPartnerUpdate3.copy(bpn = "BPNAXXXXXXXX")
+            RequestValues.addressPartnerUpdate2.copy(bpn = firstInvalidBpn),
+            RequestValues.addressPartnerUpdate3.copy(bpn = secondInvalidBpn)
         )
         val response = webTestClient.invokePutEntitiesWithErrorsResponse<AddressPartnerResponse>(EndpointValues.CATENA_ADDRESSES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+
+        assertThat(response.errorCount).isEqualTo(2)
+        testHelpers.assertErrorCode(response.errors.first(), firstInvalidBpn, PoolErrorCode.bpnNotValid)
+        testHelpers.assertErrorCode(response.errors.last(), secondInvalidBpn, PoolErrorCode.bpnNotValid)
     }
 
 
