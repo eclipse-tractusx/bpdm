@@ -21,9 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 enum class PoolErrorCode {
 
+    // BPN format is invalid
     BpnNotValid,
+    // New legal entity could not be created because some identifiers already exist in the DB
     LegalEntityDuplicateIdentifier,
+    // Legal entity which was referenced or which should be updated was not found in DB
     LegalEntityNotFound,
+    // Site which was referenced or which should be updated was not found in DB
     SiteNotFound,
+    // Address which was referenced or which should be updated was not found in DB
     AddressNotFound;
 }
