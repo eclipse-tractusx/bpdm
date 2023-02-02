@@ -19,8 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(name = "EntitiesWithErrorsResponse", description = "Holds information about successfully and failed entities after the creating/updating of several objects")
+
 data class EntitiesWithErrorsResponse<T>(
+
+    @Schema(description = "Successfully created entities")
     val entities: Collection<T>,
+    @Schema(description = "Errors for not created entities")
     val errors: Collection<ErrorMessageResponse>
 ) {
     val errorCount: Int
