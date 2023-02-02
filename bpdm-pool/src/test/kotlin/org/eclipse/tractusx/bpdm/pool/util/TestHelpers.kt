@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
@@ -36,6 +34,9 @@ import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
+import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
+import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -207,6 +208,11 @@ class TestHelpers(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+    }
+
+    fun assertErrorCode(errorResponse: ErrorMessageResponse, keyToCheck: String, codeToCheck: PoolErrorCode) {
+        Assertions.assertThat(errorResponse.key).isEqualTo(keyToCheck)
+        Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }
 
     private fun createBpnPattern(typeId: Char): String {
