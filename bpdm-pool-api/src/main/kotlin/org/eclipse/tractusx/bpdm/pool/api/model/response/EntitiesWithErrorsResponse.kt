@@ -30,6 +30,8 @@ data class EntitiesWithErrorsResponse<T>(
     @Schema(description = "Errors for not created entities")
     val errors: Collection<ErrorMessageResponse>
 ) {
+    val entityCount: Int
+        get() = entities.size
     val errorCount: Int
         get() = errors.size
 }
