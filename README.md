@@ -40,14 +40,13 @@ The base image used, to build this demo application image is `eclipse-temurin:17
 
 Docker Hub:
 
-* https://hub.docker.com/_/eclipse-temurin[eclipse-temurin]
-* https://hub.docker.com/layers/library/eclipse-temurin/17-jre-alpine/images/sha256-02c04793fa49ad5cd193c961403223755f9209a67894622e05438598b32f210e?context=explore[17-jre-alpine
-  image]
+* [eclipse-temurin](https://hub.docker.com/_/eclipse-temurin)
+* [17-jre-alpine](https://hub.docker.com/layers/library/eclipse-temurin/17-jre-alpine/images/sha256-02c04793fa49ad5cd193c961403223755f9209a67894622e05438598b32f210e?context=explore)
 
 Source:
 
-* https://github.com/adoptium/temurin-build[temurin-build]
-* https://github.com/docker-library/repo-info/tree/master/repos/eclipse-temurin[temurin docker repo info]
+* [temurin-build](https://github.com/adoptium/temurin-build)
+* [temurin docker repo info](https://github.com/docker-library/repo-info/tree/master/repos/eclipse-temurin)
 
 ## GitHub Workflows
 

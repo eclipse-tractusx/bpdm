@@ -50,8 +50,8 @@ The application uses the configured auth server URL to validate incoming tokens.
 
 For authorization purposes the application checks incoming token's permissions:
 
-add_company_data:: For endpoints creating or updating business partner records including triggering imports from CDQ/exports to Opensearch
-view_company_data:: For read-only endpoints of business partner data
+* add_company_data: For endpoints creating or updating business partner records including triggering imports from CDQ/exports to Opensearch
+* view_company_data: For read-only endpoints of business partner data
 
 The BPDM Pool looks for these permissions in the client/resource and not on the realm level.
 
@@ -120,9 +120,9 @@ The application uses the configured auth server URL to validate incoming tokens.
 
 For authorization purposes the application checks incoming token's permissions:
 
-. change_company_data: For endpoints adding or updating business partner data
-. view_company_data: For endpoints reading the original unrefined business partner data
-. view_shared_data: For endpoints reading the business partner data which has been cleaned and refined through the sharing process
+* change_company_data: For endpoints adding or updating business partner data
+* view_company_data: For endpoints reading the original unrefined business partner data
+* view_shared_data: For endpoints reading the business partner data which has been cleaned and refined through the sharing process
 
 The BPDM Pool looks for these permissions in the client/resource and not on the realm level.
 
