@@ -26,9 +26,12 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.exception.SiteCreateError
+import org.eclipse.tractusx.bpdm.pool.exception.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -164,7 +167,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create new sites`() {
-        val givenLegalEntities = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
+        val givenLegalEntities = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
         ).entities
@@ -179,7 +182,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = bpnL2)
         )
-        val response = webTestClient.invokePostEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostEndpoint<SitePartnerCreateResponseWrapper>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
         assertThatCreatedSitesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -192,7 +195,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create sites with non-existing parent`() {
-        val givenLegalEntities = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
+        val givenLegalEntities = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(
             EndpointValues.CATENA_LEGAL_ENTITY_PATH,
             listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
         ).entities
@@ -208,13 +211,13 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
-        val response = webTestClient.invokePostEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
+        val response = webTestClient.invokePostEndpoint<SitePartnerCreateResponseWrapper>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
         // 2 entities okay
         assertThatCreatedSitesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityNotFound, CommonValues.index3)
+        testHelpers.assertErrorResponse(response.errors.first(), SiteCreateError.LegalEntityNotFound, CommonValues.index3)
     }
 
     /**
@@ -253,7 +256,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = bpnS2)
         )
-        val response = webTestClient.invokePutEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
+        val response = webTestClient.invokePutEndpoint<SitePartnerUpdateResponseWrapper>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -289,13 +292,13 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
-        val response = webTestClient.invokePutEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
+        val response = webTestClient.invokePutEndpoint<SitePartnerUpdateResponseWrapper>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
         // 2 entities okay
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.SiteNotFound, "NONEXISTENT")
+        testHelpers.assertErrorResponse(response.errors.first(), SiteUpdateError.SiteNotFound, "NONEXISTENT")
     }
 
     /**

@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.reactive.function.BodyInserters
@@ -53,34 +51,10 @@ inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: Str
         .responseBody!!
 }
 
-fun <B> WebTestClient.invokePostGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
-    return post().uri(path)
-        .body(BodyInserters.fromValue(body))
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .expectBody(responseBodyType)
-        .returnResult()
-        .responseBody!!
-}
-
-inline fun <reified E : Any> WebTestClient.invokePostEntitiesWithErrorsResponse(path: String, body: Any): EntitiesWithErrorsResponse<E> =
-    this.invokePostGenericResponse(path, body, object : ParameterizedTypeReference<EntitiesWithErrorsResponse<E>>() {})
-
-fun WebTestClient.invokePostEndpointWithoutResponse(path: String) {
+fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any? = null) {
+    val bodyInserter = body?.let { BodyInserters.fromValue(it) } ?: BodyInserters.empty()
     post().uri(path)
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .expectBody()
-        .returnResult()
-    /*
-    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
-    */
-}
-
-
-fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
-    post().uri(path)
-        .body(BodyInserters.fromValue(body))
+        .body(bodyInserter)
         .exchange()
         .expectStatus().is2xxSuccessful
         .expectBody()
@@ -88,6 +62,20 @@ fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
     /*
     Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
      */
+}
+
+/**
+ * Helper method for invoking a put endpoint on [path] with a request [body] and an expected response body
+ * Only works for response bodies that are serialized as Json Objects
+ */
+inline fun <reified T : Any> WebTestClient.invokePutEndpoint(path: String, body: Any): T {
+    return put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .returnResult<T>()
+        .responseBody
+        .blockFirst()!!
 }
 
 inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: String, body: Any): Collection<T> {
@@ -99,19 +87,6 @@ inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: Stri
         .returnResult()
         .responseBody!!
 }
-
-fun <B> WebTestClient.invokePutGenericResponse(path: String, body: Any, responseBodyType: ParameterizedTypeReference<B> ): B {
-    return put().uri(path)
-        .body(BodyInserters.fromValue(body))
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .expectBody(responseBodyType)
-        .returnResult()
-        .responseBody!!
-}
-
-inline fun <reified E : Any> WebTestClient.invokePutEntitiesWithErrorsResponse(path: String, body: Any): EntitiesWithErrorsResponse<E> =
-    this.invokePutGenericResponse(path, body, object : ParameterizedTypeReference<EntitiesWithErrorsResponse<E>>() {})
 
 fun WebTestClient.invokePutWithoutResponse(path: String, body: Any) {
     put().uri(path)

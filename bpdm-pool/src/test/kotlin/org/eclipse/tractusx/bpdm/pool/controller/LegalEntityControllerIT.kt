@@ -26,7 +26,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.exception.LegalEntityCreateError
+import org.eclipse.tractusx.bpdm.pool.exception.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -81,7 +84,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val expected = ResponseValues.legalEntityUpsert1.copy(bpn = expectedBpn)
 
         val toCreate = RequestValues.legalEntityCreate1
-        val response = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(toCreate))
+        val response = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(toCreate))
 
         assertThat(response.entities.size).isEqualTo(1)
         assertThat(response.entities.single())
@@ -103,7 +106,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.legalEntityUpsert1, ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
 
         val toCreate = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
-        val response = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
+        val response = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
 
         assertThatCreatedLegalEntitiesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -117,18 +120,18 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `don't create legal entity with same identifier`() {
         val given = with(RequestValues.legalEntityCreate1) { copy(properties = properties.copy(identifiers = listOf(RequestValues.identifier1))) }
-        webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(given))
+        webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(given))
 
         val expected = listOf(ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
 
         val toCreate = listOf(given, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
-        val response = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
+        val response = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
 
         // 2 entities created
         assertThatCreatedLegalEntitiesEqual(response.entities, expected)
         // 1 error because identifier already exists
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityDuplicateIdentifier, given.index!!)
+        testHelpers.assertErrorResponse(response.errors.first(), LegalEntityCreateError.LegalEntityDuplicateIdentifier, given.index!!)
     }
 
     /**
@@ -139,13 +142,13 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `update existing legal entities`() {
         val given = listOf(RequestValues.legalEntityCreate1)
-        val givenBpn = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
+        val givenBpn = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
             .entities.single().bpn
 
         val expected = listOf(ResponseValues.legalEntityUpsert3.copy(bpn = givenBpn))
 
         val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = givenBpn))
-        val response = webTestClient.invokePutEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
+        val response = webTestClient.invokePutEndpoint<LegalEntityPartnerUpdateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
 
         assertThatModifiedLegalEntitiesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -159,7 +162,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `ignore invalid legal entity update`() {
         val given = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
+        webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
 
         val toUpdate = listOf(
             RequestValues.legalEntityUpdate3.copy(bpn = "NONEXISTENT"),
@@ -167,14 +170,17 @@ class LegalEntityControllerIT @Autowired constructor(
         )
         val expected = listOf(ResponseValues.legalEntityUpsert3.copy(bpn = CommonValues.bpnL2))
 
-        val response = webTestClient.invokePutEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
+        val response = webTestClient.invokePutEndpoint<LegalEntityPartnerUpdateResponseWrapper>(
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+            toUpdate
+        )
 
         // 1 update okay
         assertThat(response.entities.size).isEqualTo(1)
         assertThatModifiedLegalEntitiesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityNotFound, "NONEXISTENT")
+        testHelpers.assertErrorResponse(response.errors.first(), LegalEntityUpdateError.LegalEntityNotFound, "NONEXISTENT")
     }
 
     /**
@@ -432,7 +438,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `set business partner currentness`() {
         val given = listOf(RequestValues.legalEntityCreate1)
-        val bpnL = webTestClient.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
+        val bpnL = webTestClient.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
             .entities.single().bpn
         val initialCurrentness = retrieveCurrentness(bpnL)
         val instantBeforeCurrentnessUpdate = Instant.now()

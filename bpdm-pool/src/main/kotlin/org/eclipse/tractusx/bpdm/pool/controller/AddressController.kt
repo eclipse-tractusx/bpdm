@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -33,9 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.springdoc.core.annotations.ParameterObject
@@ -121,7 +118,7 @@ class AddressController(
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
-    ): EntitiesWithErrorsResponse<AddressPartnerCreateResponse> {
+    ): AddressPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
@@ -140,7 +137,7 @@ class AddressController(
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
-    ): EntitiesWithErrorsResponse<AddressPartnerResponse> {
+    ): AddressPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateAddresses(requests)
     }
 }
