@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
@@ -30,6 +32,8 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
@@ -41,10 +45,6 @@ import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
-import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorMessageResponse
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -99,7 +99,7 @@ class TestHelpers(
         partnerStructures: List<LegalEntityStructureRequest>
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity });
+        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity })
         val indexedLegalEntities = legalEntities.entities.associateBy { it.index }
 
         val assignedSiteRequests =
@@ -212,7 +212,6 @@ class TestHelpers(
 
     private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
 
-        //poolClient.opensearch().export()
         client.invokePostEndpointWithoutResponse(syncPath)
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
@@ -268,7 +267,7 @@ class TestHelpers(
             .ignoringAllOverriddenEquals()
     }
 
-    fun assertErrorResponse(errorResponse: ErrorMessageResponse, codeToCheck: PoolErrorCode, keyToCheck: String) {
+    fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
         Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
         Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }

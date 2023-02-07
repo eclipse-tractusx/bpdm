@@ -27,9 +27,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -320,9 +321,9 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(3)
-        testHelpers.assertErrorResponse(response.errors.elementAt(0), PoolErrorCode.BpnNotValid, CommonValues.index3)   // BPN validity check always first
-        testHelpers.assertErrorResponse(response.errors.elementAt(1), PoolErrorCode.SiteNotFound, CommonValues.index1)
-        testHelpers.assertErrorResponse(response.errors.elementAt(2), PoolErrorCode.LegalEntityNotFound, CommonValues.index2)
+        testHelpers.assertErrorResponse(response.errors.elementAt(0), AddressCreateError.BpnNotValid, CommonValues.index3)   // BPN validity check always first
+        testHelpers.assertErrorResponse(response.errors.elementAt(1), AddressCreateError.SiteNotFound, CommonValues.index1)
+        testHelpers.assertErrorResponse(response.errors.elementAt(2), AddressCreateError.LegalEntityNotFound, CommonValues.index2)
     }
 
     /**
@@ -414,8 +415,8 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response.entities).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.AddressNotFound, firstInvalidBpn)
-        testHelpers.assertErrorResponse(response.errors.last(), PoolErrorCode.AddressNotFound, secondInvalidBpn)
+        testHelpers.assertErrorResponse(response.errors.first(), AddressUpdateError.AddressNotFound, firstInvalidBpn)
+        testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
 
 

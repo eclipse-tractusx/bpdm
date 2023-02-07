@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -62,13 +62,13 @@ class SiteController(
 
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
-    ): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
+    ): SitePartnerCreateResponseWrapper {
         return businessPartnerBuildService.createSites(requests)
     }
 
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
-    ): EntitiesWithErrorsResponse<SitePartnerCreateResponse> {
+    ): SitePartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateSites(requests)
     }
 }

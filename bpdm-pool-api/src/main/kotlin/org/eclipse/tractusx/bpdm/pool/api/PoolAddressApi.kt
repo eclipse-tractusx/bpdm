@@ -25,16 +25,13 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.EntitiesWithErrorsResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -118,7 +115,7 @@ interface PoolAddressApi {
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
-    ): EntitiesWithErrorsResponse<AddressPartnerCreateResponse>
+    ): AddressPartnerCreateResponseWrapper
 
     @Operation(
         summary = "Update existing address business partners",
@@ -136,7 +133,7 @@ interface PoolAddressApi {
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>
-    ): EntitiesWithErrorsResponse<AddressPartnerResponse>
+    ): AddressPartnerUpdateResponseWrapper
 
 
 }

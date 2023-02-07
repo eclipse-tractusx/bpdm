@@ -17,18 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-enum class PoolErrorCode {
+import io.swagger.v3.oas.annotations.media.Schema
 
-    // BPN format is invalid
-    BpnNotValid,
-    // New legal entity could not be created because some identifiers already exist in the DB
-    LegalEntityDuplicateIdentifier,
-    // Legal entity which was referenced or which should be updated was not found in DB
-    LegalEntityNotFound,
-    // Site which was referenced or which should be updated was not found in DB
-    SiteNotFound,
-    // Address which was referenced or which should be updated was not found in DB
-    AddressNotFound;
-}
+@Schema(title = "ErrorInfo", description = "Holds information about failures when creating or updating an entity")
+data class ErrorInfo<out ERROR : ErrorCode>(
+
+    @Schema(description = "Error code identifying the error")
+    val errorCode: ERROR,
+    @Schema(description = "Error message that explains the error")
+    val message: String,
+    @Schema(description = "Key of the entity that failed from the request object: index or BPN")
+    val entityKey: String?
+)

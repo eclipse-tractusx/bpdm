@@ -26,7 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,7 +42,6 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import java.time.Instant
-import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
@@ -129,7 +130,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThatCreatedLegalEntitiesEqual(response.entities, expected)
         // 1 error because identifier already exists
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityDuplicateIdentifier, given.index!!)
+        testHelpers.assertErrorResponse(response.errors.first(), LegalEntityCreateError.LegalEntityDuplicateIdentifier, given.index!!)
     }
 
     /**
@@ -173,7 +174,7 @@ class LegalEntityControllerIT @Autowired constructor(
         assertThatModifiedLegalEntitiesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), PoolErrorCode.LegalEntityNotFound, "NONEXISTENT")
+        testHelpers.assertErrorResponse(response.errors.first(), LegalEntityUpdateError.LegalEntityNotFound, "NONEXISTENT")
     }
 
     /**

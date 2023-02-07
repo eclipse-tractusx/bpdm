@@ -20,15 +20,41 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.PoolErrorCode
 
-@Schema(name = "ErrorMessageResponse", description = "Holds information about failures when creating or updating an entity")
-data class ErrorMessageResponse(
+/**
+ * For each endpoint a separate enum class is defined extending this marker interface.
+ * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
+ */
+interface ErrorCode
 
-    @Schema(description = "Error code identifying the error")
-    val errorCode: PoolErrorCode,
-    @Schema(description = "Error message that explains the error")
-    val message: String,
-    @Schema(description = "Key of the entity that failed from the request object: index or BPN")
-    val entityKey: String?
-)
+@Schema(description = "LegalEntityCreateError")
+enum class LegalEntityCreateError : ErrorCode {
+    LegalEntityDuplicateIdentifier
+}
+
+@Schema(description = "LegalEntityUpdateError")
+enum class LegalEntityUpdateError : ErrorCode {
+    LegalEntityNotFound
+}
+
+@Schema(description = "SiteCreateError")
+enum class SiteCreateError : ErrorCode {
+    LegalEntityNotFound
+}
+
+@Schema(description = "SiteUpdateError")
+enum class SiteUpdateError : ErrorCode {
+    SiteNotFound
+}
+
+@Schema(description = "AddressCreateError")
+enum class AddressCreateError : ErrorCode {
+    BpnNotValid,
+    SiteNotFound,
+    LegalEntityNotFound
+}
+
+@Schema(description = "AddressUpdateError")
+enum class AddressUpdateError : ErrorCode {
+    AddressNotFound
+}
