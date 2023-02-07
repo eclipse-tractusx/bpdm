@@ -19,16 +19,42 @@
 
 package org.eclipse.tractusx.bpdm.pool.exception
 
-enum class PoolErrorCode {
+import io.swagger.v3.oas.annotations.media.Schema
 
-    // BPN format is invalid
+/**
+ * For each endpoint a separate enum class is defined extending this marker interface.
+ * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
+ */
+interface ErrorCode
+
+@Schema(description = "LegalEntityCreateError")
+enum class LegalEntityCreateError : ErrorCode {
+    LegalEntityDuplicateIdentifier
+}
+
+@Schema(description = "LegalEntityUpdateError")
+enum class LegalEntityUpdateError : ErrorCode {
+    LegalEntityNotFound
+}
+
+@Schema(description = "SiteCreateError")
+enum class SiteCreateError : ErrorCode {
+    LegalEntityNotFound
+}
+
+@Schema(description = "SiteUpdateError")
+enum class SiteUpdateError : ErrorCode {
+    SiteNotFound
+}
+
+@Schema(description = "AddressCreateError")
+enum class AddressCreateError : ErrorCode {
     BpnNotValid,
-    // New legal entity could not be created because some identifiers already exist in the DB
-    LegalEntityDuplicateIdentifier,
-    // Legal entity which was referenced or which should be updated was not found in DB
-    LegalEntityNotFound,
-    // Site which was referenced or which should be updated was not found in DB
     SiteNotFound,
-    // Address which was referenced or which should be updated was not found in DB
-    AddressNotFound;
+    LegalEntityNotFound
+}
+
+@Schema(description = "AddressUpdateError")
+enum class AddressUpdateError : ErrorCode {
+    AddressNotFound
 }

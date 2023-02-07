@@ -29,9 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.EntitiesWithErrorsResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
@@ -226,7 +224,7 @@ class LegalEntityController(
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
+    ): LegalEntityPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
@@ -245,9 +243,8 @@ class LegalEntityController(
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): EntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse> {
+    ): LegalEntityPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
-
 
 }

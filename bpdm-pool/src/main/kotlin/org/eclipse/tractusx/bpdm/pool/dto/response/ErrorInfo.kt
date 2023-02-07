@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
+import org.eclipse.tractusx.bpdm.pool.exception.ErrorCode
 
-@Schema(name = "ErrorMessageResponse", description = "Holds information about failures when creating or updating an entity")
-data class ErrorMessageResponse(
+@Schema(title = "ErrorInfo", description = "Holds information about failures when creating or updating an entity")
+data class ErrorInfo<out ERROR : ErrorCode>(
 
     @Schema(description = "Error code identifying the error")
-    val errorCode: PoolErrorCode,
+    val errorCode: ERROR,
     @Schema(description = "Error message that explains the error")
     val message: String,
     @Schema(description = "Key of the entity that failed from the request object: index or BPN")

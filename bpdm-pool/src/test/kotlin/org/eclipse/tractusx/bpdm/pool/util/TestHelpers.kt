@@ -36,7 +36,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Instant
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
-import org.eclipse.tractusx.bpdm.pool.exception.PoolErrorCode
+import org.eclipse.tractusx.bpdm.pool.exception.ErrorCode
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -89,15 +89,15 @@ class TestHelpers(
         client: WebTestClient
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = client.invokePostEntitiesWithErrorsResponse<LegalEntityPartnerCreateResponse>(
-                EndpointValues.CATENA_LEGAL_ENTITY_PATH,
-                partnerStructures.map { it.legalEntity })
+        val legalEntities = client.invokePostEndpoint<LegalEntityPartnerCreateResponseWrapper>(
+            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
+            partnerStructures.map { it.legalEntity })
             .entities
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sitesWithErrorsResponse = client.invokePostEntitiesWithErrorsResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
+        val sitesWithErrorsResponse = client.invokePostEndpoint<SitePartnerCreateResponseWrapper>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
         val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
@@ -106,7 +106,7 @@ class TestHelpers(
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
         val addresses =
-            client.invokePostEntitiesWithErrorsResponse<AddressPartnerCreateResponse>(
+            client.invokePostEndpoint<AddressPartnerCreateResponseWrapper>(
                 EndpointValues.CATENA_ADDRESSES_PATH,
                 assignedSitelessAddresses + assignedSiteAddresses
             )
@@ -210,7 +210,7 @@ class TestHelpers(
             .ignoringAllOverriddenEquals()
     }
 
-    fun assertErrorResponse(errorResponse: ErrorMessageResponse, codeToCheck: PoolErrorCode, keyToCheck: String) {
+    fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
         Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
         Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }

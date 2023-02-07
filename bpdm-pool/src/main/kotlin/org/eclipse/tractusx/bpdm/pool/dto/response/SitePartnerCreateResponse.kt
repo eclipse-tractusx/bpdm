@@ -32,6 +32,4 @@ data class SitePartnerCreateResponse(
     val mainAddress: AddressResponse,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
-) {
-
-}
+)
