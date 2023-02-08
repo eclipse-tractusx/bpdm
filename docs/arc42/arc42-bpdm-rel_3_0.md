@@ -8,6 +8,8 @@
 - [Architecture Constraints](#architecture-constraints)
 - [System Scope and Context](#system-scope-and-context)
   - [Business Context](#business-context)
+    - [Clients/Consumer of the API](#clientsconsumer-of-the-api)
+    - [API Consumption](#api-consumption)
   - [Technical Context](#technical-context)
   - [Deployment Context](#deployment-context)
 - [Solution Strategy](#solution-strategy)
@@ -17,6 +19,8 @@
   - [Blackbox (API Authentication)](#blackbox-api-authentication)
 - [Runtime View](#runtime-view)
 - [Deployment View](#deployment-view)
+  - [BPDM Gate Deployment](#bpdm-gate-deployment)
+  - [Golden Record Pool Deployment](#golden-record-pool-deployment)
 - [Cross-cutting Concepts](#cross-cutting-concepts)
   - [Business Partner Domain Model](#business-partner-domain-model)
   - [What is the Business Partner Number (BPN)?](#what-is-the-business-partner-number-bpn)
@@ -58,6 +62,7 @@ Essentially constituting a service-oriented architecture running distributedly o
 | 2        | Functional Stability    | Since the Golden Record Application is a central foundation in the Catena-X Network the defined standards of the API and datamodel for the associated Release Version must be fulfilled                                                                                                                                                                                                               |
 | 1        | Sensitivity of data     | the uploaded business partner data is highly sensitive, that's why it must be ensured that no unauthorized user/system can access data which does not belong to it. More over it must be guaranteed that no one can see the business partners related to the specific Catena-X Member.  |
 
+![](images/iso_25010.png)
 
 ## Stakeholders
 | Role/Name           | Expectations                                                                                                | Example |
@@ -107,7 +112,25 @@ The Golden Record Gate and Golden Record Pool is the transhipment point for the 
 
 **External Service Provider**
 * To offer the BPDM and Golden Record Services, Catena-X uses services from external third party service providers.
+### Clients/Consumer of the API
 
+In order to inform you in a timely manner whenever breaking changes to our BPDM API are plannend, please fill in the table below. Especially the column "Contact Person" is relevant as these persons will be informed before the PI Planning in order to evaluate and plan the changes to their product. This site is just to support the collaboration.
+
+### API Consumption
+| #   | Use-Case             | BPDM API | Requirements to API and Data | Persistence Requirements         | Contact Person | Comment |
+| --- | -------------------- | -------- | ---------------------------- | -------------------------------- | -------------- | ------- |
+| 1   | Quality-Mgmt         |          |                              |                                  |                |         |
+| 2   | DCM                  | x        | BPN-L-S-A                    | Live Data                        |                |         |
+| 3   | Portal               | x        | BPN-L                        |                                  |                |         |
+| 4   | EDC                  |          |                              |                                  |                |         |
+| 5   | Traceability         |          |                              |                                  |                |         |
+| 6   | Sustainability - Co2 | x        | BPN-L-S-A                    | via Message Broker and Live Data |                |         |
+| 7   | Circular Economy     | x        |                              |                                  |                |         |
+| 8   | Marketplace          | ?        |                              |                                  |                |         |
+| 9   | OSIM                 | x        |                              |                                  |                |         |
+| 10  | ESS                  | x        | BPN-L-S-A -> Search by addresses independent to L-S-A |                                  |                |         |
+
+(X = Will be used / is used by)
 ## Technical Context
 
 ![](images/technical-context.png)
@@ -158,7 +181,7 @@ Use a microservice approach to separate the different components of the system a
 
 # Building Block View
 
-![](images/BPDM_BUILDING_BLOCK.png)
+![](images/BPDM_BUILDING_BLOCK_VIEW.png)
 
 ## Whitebox Overall System
 
@@ -167,7 +190,7 @@ Use a microservice approach to separate the different components of the system a
 | API           | In this block the communication with other services (e.g. CX Portal) takes place.The API offers different end points, functions and data offer |
 | SaaS Adapter  | In this block the received data objects from an external data source will be converted to the CX data model.                                   |
 | BPN Generator | In this block for each data object a Business Partner Number will be created and assigned to the data object.                                  |
-| OpenSearch    | In this block the Open Search Component needs to interact with the Elastic Search Service to provide the search function via API. |
+| Elastic Search Component    | In this block the Elastic Search Component needs to interact with the Elastic Search Service to provide the search function via API. |
 
 ### Class Diagram Pool
 ![](images/class-diagram-pool.png)
@@ -191,9 +214,15 @@ OAuth2
 
 # Deployment View
 
-How to run the service: README.adoc
+How to run the service: ![](../../README.adoc)
 
-![](images/BPDM_DV_Shared_Service.png)
+## BPDM Gate Deployment
+![](images/BDPM_GATE_DEPLOYMENT.png)
+
+## Golden Record Pool Deployment
+![](images/GR_POOL_DEPLOYMENT_1.png)
+![](images/GR_POOL_DEPLOYMENT_2.png)
+
 
 # Cross-cutting Concepts
 
