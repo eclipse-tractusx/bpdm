@@ -34,8 +34,8 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.junit.jupiter.api.Test
@@ -85,7 +85,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -184,7 +184,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -206,7 +206,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val expectedLegalEntity = RequestValues.legalEntityGateInput1
 
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -240,7 +240,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entity by external id, not found`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -268,7 +268,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entity by external id, cdq error`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -289,7 +289,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val invalidPartner = SaasValues.legalEntity1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -318,7 +318,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get legal entities`() {
-        val legalEntitiesCdq = listOf(
+        val legalEntitiesSaas = listOf(
             SaasValues.legalEntity1,
             SaasValues.legalEntity2
         )
@@ -335,7 +335,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val invalidEntries = 0
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -346,7 +346,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -384,7 +384,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `filter legal entities without legal address`() {
-        val legalEntitiesCdq = listOf(
+        val legalEntitiesSaas = listOf(
             SaasValues.legalEntity1,
             SaasValues.legalEntity2,
             SaasValues.legalEntity1.copy(addresses = emptyList())
@@ -402,7 +402,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val invalidEntries = 1
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -413,7 +413,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -451,7 +451,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entities, cdq error`() {
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -493,7 +493,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
         val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -533,7 +533,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

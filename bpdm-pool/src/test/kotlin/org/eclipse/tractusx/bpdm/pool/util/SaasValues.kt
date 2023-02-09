@@ -171,7 +171,7 @@ object SaasValues {
     val address1 = AddressSaas(
         id = addressId1,
         externalId = addressId1,
-        cdqId = addressId1,
+        saasId = addressId1,
         country = country1,
         administrativeAreas = listOf(adminArea1, adminArea2),
         postCodes = listOf(postCode1, postCode2),
@@ -184,7 +184,7 @@ object SaasValues {
     val address2 = AddressSaas(
         id = addressId2,
         externalId = addressId2,
-        cdqId = addressId2,
+        saasId = addressId2,
         country = country2,
         administrativeAreas = listOf(adminArea3, adminArea4),
         postCodes = listOf(postCode3, postCode4),
@@ -197,7 +197,7 @@ object SaasValues {
     val address3 = AddressSaas(
         id = addressId3,
         externalId = addressId3,
-        cdqId = addressId3,
+        saasId = addressId3,
         country = country3,
         administrativeAreas = listOf(adminArea5),
         postCodes = listOf(postCode5),

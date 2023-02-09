@@ -155,8 +155,8 @@ class AddressService(
      * - Upserting the new relations
      */
     fun upsertAddresses(addresses: Collection<AddressGateInput>) {
-        val addressesCdq = toCdqModels(addresses)
-        saasClient.upsertAddresses(addressesCdq)
+        val addressesSaas = toSaasModels(addresses)
+        saasClient.upsertAddresses(addressesSaas)
 
         deleteRelationsOfAddresses(addresses)
 
@@ -166,11 +166,11 @@ class AddressService(
     /**
      * Fetches parent information and converts the given [addresses] to their corresponding CDQ models
      */
-    fun toCdqModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerSaas> {
+    fun toSaasModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = getParentLegalEntities(addresses)
         val parentSitesByExternalId: Map<String, BusinessPartnerSaas> = getParentSites(addresses)
 
-        return addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
+        return addresses.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
     }
 
     private fun upsertRelations(addresses: Collection<AddressGateInput>) {
@@ -233,14 +233,14 @@ class AddressService(
         return parentLegalEntitiesByExternalId
     }
 
-    private fun toCdqModel(address: AddressGateInput, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
+    private fun toSaasModel(address: AddressGateInput, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null && parentSite == null) {
             throw SaasNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
         }
-        val addressCdq = saasRequestMappingService.toCdqModel(address)
+        val addressSaas = saasRequestMappingService.toSaasModel(address)
         val parentNames = (parentLegalEntity ?: parentSite!!).names
         val parentIdentifiersWithoutBpn = (parentLegalEntity ?: parentSite!!).identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
-        return addressCdq.copy(identifiers = addressCdq.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
+        return addressSaas.copy(identifiers = addressSaas.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
     private fun toValidAddressInput(partner: BusinessPartnerSaas): AddressGateInput {

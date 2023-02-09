@@ -28,7 +28,7 @@ data class ReferenceDataLookupResponseSaas(
 )
 
 data class BusinessPartnerLookupMatchSaas(
-    val cdqId: String,
+    val saasId: String,
     val dataSource: String,
     val matchingProfile: MatchingProfileSaas
 )

@@ -207,7 +207,7 @@ class SaasClient(
     }
 
     fun upsertSiteRelations(relations: Collection<SiteLegalEntityRelation>) {
-        val relationsCdq = relations.map {
+        val relationsSaas = relations.map {
             RelationSaas(
                 startNode = it.legalEntityExternalId,
                 startNodeDataSource = saasConfigProperties.datasource,
@@ -216,11 +216,11 @@ class SaasClient(
                 type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()
-        upsertBusinessPartnerRelations(relationsCdq)
+        upsertBusinessPartnerRelations(relationsSaas)
     }
 
     fun upsertAddressRelations(legalEntityRelations: Collection<AddressLegalEntityRelation>, siteRelations: Collection<AddressSiteRelation>) {
-        val legalEntityRelationsCdq = legalEntityRelations.map {
+        val legalEntityRelationsSaas = legalEntityRelations.map {
             RelationSaas(
                 startNode = it.legalEntityExternalId,
                 startNodeDataSource = saasConfigProperties.datasource,
@@ -229,7 +229,7 @@ class SaasClient(
                 type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()
-        val siteRelationsCdq = siteRelations.map {
+        val siteRelationsSaas = siteRelations.map {
             RelationSaas(
                 startNode = it.siteExternalId,
                 startNodeDataSource = saasConfigProperties.datasource,
@@ -238,7 +238,7 @@ class SaasClient(
                 type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
             )
         }.toList()
-        upsertBusinessPartnerRelations(legalEntityRelationsCdq.plus(siteRelationsCdq))
+        upsertBusinessPartnerRelations(legalEntityRelationsSaas.plus(siteRelationsSaas))
     }
 
     fun validateBusinessPartner(validationRequest: ValidationRequestSaas): ValidationResponseSaas {

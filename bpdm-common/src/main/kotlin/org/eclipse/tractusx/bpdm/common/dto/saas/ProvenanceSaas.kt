@@ -23,5 +23,5 @@ data class ProvenanceSaas(
     val technicalKey: String? = null,
     val name: String? = null,
     val url: String? = null,
-    val cdqId: String
+    val saasId: String
 )

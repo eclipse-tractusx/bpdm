@@ -66,7 +66,7 @@ class SyncRecordService(
         val record = getOrCreateRecord(type)
 
         if (record.status == SyncStatus.RUNNING)
-            throw BpdmSyncConflictException(SyncType.CDQ_IMPORT)
+            throw BpdmSyncConflictException(SyncType.SAAS_IMPORT)
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.RUNNING}" }
 

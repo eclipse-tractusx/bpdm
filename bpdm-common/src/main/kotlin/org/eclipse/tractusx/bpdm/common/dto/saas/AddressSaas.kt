@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.saas
 data class AddressSaas(
     val id: String? = "0",
     val externalId: String? = null,
-    val cdqId: String? = null,
+    val saasId: String? = null,
     val version: AddressVersionSaas? = null,
     val identifyingName: WrappedValueSaas? = null,
     val careOf: WrappedValueSaas? = null,
@@ -36,5 +36,5 @@ data class AddressSaas(
     val postalDeliveryPoints: Collection<PostalDeliveryPointSaas> = emptyList(),
     val geographicCoordinates: GeoCoordinatesSaas? = null,
     val types: Collection<TypeKeyNameUrlSaas> = emptyList(),
-    val metadataCdq: AddressMetadataSaas? = null
+    val metadataSaas: AddressMetadataSaas? = null
 )

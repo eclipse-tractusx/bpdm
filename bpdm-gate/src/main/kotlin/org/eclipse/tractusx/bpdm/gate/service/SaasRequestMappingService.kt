@@ -36,47 +36,47 @@ class SaasRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val saasConfigProperties: SaasConfigProperties
 ) {
-    fun toCdqModel(legalEntity: LegalEntityGateInput): BusinessPartnerSaas {
-        return toCdqModel(legalEntity.legalEntity, legalEntity.externalId, legalEntity.bpn)
+    fun toSaasModel(legalEntity: LegalEntityGateInput): BusinessPartnerSaas {
+        return toSaasModel(legalEntity.legalEntity, legalEntity.externalId, legalEntity.bpn)
     }
 
-    fun toCdqModel(site: SiteGateInput): BusinessPartnerSaas {
+    fun toSaasModel(site: SiteGateInput): BusinessPartnerSaas {
         return BusinessPartnerSaas(
             externalId = site.externalId,
             dataSource = saasConfigProperties.datasource,
             names = listOf(NameSaas(value = site.site.name)),
-            addresses = listOf(toCdqModel(site.site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierCdq(site.bpn)) else emptyList(),
+            addresses = listOf(toSaasModel(site.site.mainAddress)),
+            identifiers = if (site.bpn != null) listOf(createBpnIdentifierSaas(site.bpn)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
     }
 
-    fun toCdqModel(address: AddressGateInput): BusinessPartnerSaas {
+    fun toSaasModel(address: AddressGateInput): BusinessPartnerSaas {
         return BusinessPartnerSaas(
             externalId = address.externalId,
             dataSource = saasConfigProperties.datasource,
-            addresses = listOf(toCdqModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierCdq(address.bpn)) else emptyList(),
+            addresses = listOf(toSaasModel(address.address)),
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierSaas(address.bpn)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
     }
 
-    private fun toCdqModel(legalEntity: LegalEntityDto, externalId: String, bpn: String?): BusinessPartnerSaas {
+    private fun toSaasModel(legalEntity: LegalEntityDto, externalId: String, bpn: String?): BusinessPartnerSaas {
         return BusinessPartnerSaas(
             externalId = externalId,
             dataSource = saasConfigProperties.datasource,
-            identifiers = toIdentifiersCdq(legalEntity.identifiers, bpn),
-            names = legalEntity.names.map { it.toCdqModel() },
-            legalForm = toLegalFormCdq(legalEntity.legalForm),
-            status = legalEntity.status?.toCdqModel(),
-            profile = toPartnerProfileCdq(legalEntity.profileClassifications),
+            identifiers = toIdentifiersSaas(legalEntity.identifiers, bpn),
+            names = legalEntity.names.map { it.toSaasModel() },
+            legalForm = toLegalFormSaas(legalEntity.legalForm),
+            status = legalEntity.status?.toSaasModel(),
+            profile = toPartnerProfileSaas(legalEntity.profileClassifications),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-            bankAccounts = legalEntity.bankAccounts.map { it.toCdqModel() },
-            addresses = listOf(toCdqModel(legalEntity.legalAddress))
+            bankAccounts = legalEntity.bankAccounts.map { it.toSaasModel() },
+            addresses = listOf(toSaasModel(legalEntity.legalAddress))
         )
     }
 
-    private fun BankAccountDto.toCdqModel(): BankAccountSaas {
+    private fun BankAccountDto.toSaasModel(): BankAccountSaas {
         return BankAccountSaas(
             internationalBankAccountIdentifier = internationalBankAccountIdentifier,
             internationalBankIdentifier = internationalBankIdentifier,
@@ -85,14 +85,14 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toPartnerProfileCdq(profileClassifications: Collection<ClassificationDto>): PartnerProfileSaas? {
+    private fun toPartnerProfileSaas(profileClassifications: Collection<ClassificationDto>): PartnerProfileSaas? {
         if (profileClassifications.isEmpty()) {
             return null
         }
-        return PartnerProfileSaas(classifications = profileClassifications.map { it.toCdqModel() })
+        return PartnerProfileSaas(classifications = profileClassifications.map { it.toSaasModel() })
     }
 
-    private fun ClassificationDto.toCdqModel(): ClassificationSaas {
+    private fun ClassificationDto.toSaasModel(): ClassificationSaas {
         return ClassificationSaas(
             value = value,
             code = code,
@@ -100,7 +100,7 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun BusinessStatusDto.toCdqModel(): BusinessPartnerStatusSaas {
+    private fun BusinessStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
@@ -109,18 +109,18 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toLegalFormCdq(technicalKey: String?) = if (technicalKey != null) LegalFormSaas(technicalKey = technicalKey) else null
+    private fun toLegalFormSaas(technicalKey: String?) = if (technicalKey != null) LegalFormSaas(technicalKey = technicalKey) else null
 
-    private fun NameDto.toCdqModel(): NameSaas {
+    private fun NameDto.toSaasModel(): NameSaas {
         return NameSaas(
             value = value,
             shortName = shortName,
             type = TypeKeyNameUrlSaas(type.name),
-            language = toLanguageCdq(this.language)
+            language = toLanguageSaas(this.language)
         )
     }
 
-    private fun IdentifierDto.toCdqModel(): IdentifierSaas {
+    private fun IdentifierDto.toSaasModel(): IdentifierSaas {
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
             value = value,
@@ -129,85 +129,85 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toCdqModel(address: AddressDto): AddressSaas {
+    private fun toSaasModel(address: AddressDto): AddressSaas {
         return with(address) {
             AddressSaas(
-                version = toCdqModel(version),
-                careOf = toCareOfCdq(careOf),
-                contexts = contexts.map { toContextCdq(it) },
-                country = toCountryCdq(country),
-                administrativeAreas = administrativeAreas.map { toCdqModel(it, version.language) },
-                postCodes = postCodes.map { toCdqModel(it) },
-                localities = localities.map { toCdqModel(it, version.language) },
-                thoroughfares = thoroughfares.map { toCdqModel(it, version.language) },
-                postalDeliveryPoints = postalDeliveryPoints.map { toCdqModel(it, version.language) },
-                premises = premises.map { toCdqModel(it, version.language) },
-                geographicCoordinates = toCdqModel(geographicCoordinates),
-                types = types.map { toKeyNameUrlTypeCdq(it) }
+                version = toSaasModel(version),
+                careOf = toCareOfSaas(careOf),
+                contexts = contexts.map { toContextSaas(it) },
+                country = toCountrySaas(country),
+                administrativeAreas = administrativeAreas.map { toSaasModel(it, version.language) },
+                postCodes = postCodes.map { toSaasModel(it) },
+                localities = localities.map { toSaasModel(it, version.language) },
+                thoroughfares = thoroughfares.map { toSaasModel(it, version.language) },
+                postalDeliveryPoints = postalDeliveryPoints.map { toSaasModel(it, version.language) },
+                premises = premises.map { toSaasModel(it, version.language) },
+                geographicCoordinates = toSaasModel(geographicCoordinates),
+                types = types.map { toKeyNameUrlTypeSaas(it) }
             )
         }
     }
 
-    private fun toCdqModel(version: AddressVersionDto): AddressVersionSaas? {
-        val languageCdq = toLanguageCdq(version.language)
-        val characterSetCdq = toCharacterSetCdq(version.characterSet)
+    private fun toSaasModel(version: AddressVersionDto): AddressVersionSaas? {
+        val languageSaas = toLanguageSaas(version.language)
+        val characterSetSaas = toCharacterSetSaas(version.characterSet)
 
-        return if (languageCdq == null && characterSetCdq == null) null else AddressVersionSaas(languageCdq, characterSetCdq)
+        return if (languageSaas == null && characterSetSaas == null) null else AddressVersionSaas(languageSaas, characterSetSaas)
     }
 
 
-    private fun toCareOfCdq(careOf: String?): WrappedValueSaas? =
+    private fun toCareOfSaas(careOf: String?): WrappedValueSaas? =
         if (careOf != null) WrappedValueSaas(careOf) else null
 
-    private fun toContextCdq(context: String): WrappedValueSaas =
+    private fun toContextSaas(context: String): WrappedValueSaas =
         WrappedValueSaas(context)
 
-    private fun toCdqModel(adminArea: AdministrativeAreaDto, languageCode: LanguageCode): AdministrativeAreaSaas =
-        AdministrativeAreaSaas(adminArea.value, adminArea.shortName, toKeyNameUrlTypeCdq(adminArea.type), toLanguageCdq(languageCode))
+    private fun toSaasModel(adminArea: AdministrativeAreaDto, languageCode: LanguageCode): AdministrativeAreaSaas =
+        AdministrativeAreaSaas(adminArea.value, adminArea.shortName, toKeyNameUrlTypeSaas(adminArea.type), toLanguageSaas(languageCode))
 
 
-    private fun toCdqModel(postcode: PostCodeDto): PostCodeSaas =
-        PostCodeSaas(postcode.value, toKeyNameUrlTypeCdq(postcode.type))
+    private fun toSaasModel(postcode: PostCodeDto): PostCodeSaas =
+        PostCodeSaas(postcode.value, toKeyNameUrlTypeSaas(postcode.type))
 
-    private fun toCdqModel(locality: LocalityDto, languageCode: LanguageCode): LocalitySaas =
-        LocalitySaas(toKeyNameUrlTypeCdq(locality.type), locality.shortName, locality.value, toLanguageCdq(languageCode))
+    private fun toSaasModel(locality: LocalityDto, languageCode: LanguageCode): LocalitySaas =
+        LocalitySaas(toKeyNameUrlTypeSaas(locality.type), locality.shortName, locality.value, toLanguageSaas(languageCode))
 
-    private fun toCdqModel(thoroughfare: ThoroughfareDto, languageCode: LanguageCode): ThoroughfareSaas =
+    private fun toSaasModel(thoroughfare: ThoroughfareDto, languageCode: LanguageCode): ThoroughfareSaas =
         ThoroughfareSaas(
-            toKeyNameUrlTypeCdq(thoroughfare.type),
+            toKeyNameUrlTypeSaas(thoroughfare.type),
             thoroughfare.shortName,
             thoroughfare.number,
             thoroughfare.value,
             thoroughfare.name,
             thoroughfare.direction,
-            toLanguageCdq(languageCode)
+            toLanguageSaas(languageCode)
         )
 
-    private fun toCdqModel(deliveryPoint: PostalDeliveryPointDto, languageCode: LanguageCode): PostalDeliveryPointSaas =
+    private fun toSaasModel(deliveryPoint: PostalDeliveryPointDto, languageCode: LanguageCode): PostalDeliveryPointSaas =
         PostalDeliveryPointSaas(
-            toKeyNameUrlTypeCdq(deliveryPoint.type),
+            toKeyNameUrlTypeSaas(deliveryPoint.type),
             deliveryPoint.shortName,
             deliveryPoint.number,
             deliveryPoint.value,
-            toLanguageCdq(languageCode)
+            toLanguageSaas(languageCode)
         )
 
-    private fun toCdqModel(premise: PremiseDto, languageCode: LanguageCode): PremiseSaas =
-        PremiseSaas(toKeyNameUrlTypeCdq(premise.type), premise.shortName, premise.number, premise.value, toLanguageCdq(languageCode))
+    private fun toSaasModel(premise: PremiseDto, languageCode: LanguageCode): PremiseSaas =
+        PremiseSaas(toKeyNameUrlTypeSaas(premise.type), premise.shortName, premise.number, premise.value, toLanguageSaas(languageCode))
 
 
-    private fun toCdqModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =
+    private fun toSaasModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =
         geoCoordinate?.let { GeoCoordinatesSaas(it.longitude, it.latitude) }
 
-    private fun toIdentifiersCdq(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
-        var identifiersCdq = identifiers.map { it.toCdqModel() }
+    private fun toIdentifiersSaas(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
+        var identifiersSaas = identifiers.map { it.toSaasModel() }
         if (bpn != null) {
-            identifiersCdq = identifiersCdq.plus(createBpnIdentifierCdq(bpn))
+            identifiersSaas = identifiersSaas.plus(createBpnIdentifierSaas(bpn))
         }
-        return identifiersCdq
+        return identifiersSaas
     }
 
-    private fun createBpnIdentifierCdq(bpn: String): IdentifierSaas {
+    private fun createBpnIdentifierSaas(bpn: String): IdentifierSaas {
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(bpnConfigProperties.id, bpnConfigProperties.name),
             value = bpn,
@@ -215,18 +215,18 @@ class SaasRequestMappingService(
         )
     }
 
-    private inline fun <reified T> toKeyNameTypeCdq(type: Enum<T>): TypeKeyNameSaas where T : Enum<T> =
+    private inline fun <reified T> toKeyNameTypeSaas(type: Enum<T>): TypeKeyNameSaas where T : Enum<T> =
         TypeKeyNameSaas(type.name, null)
 
-    private inline fun <reified T> toKeyNameUrlTypeCdq(type: Enum<T>): TypeKeyNameUrlSaas where T : Enum<T> =
+    private inline fun <reified T> toKeyNameUrlTypeSaas(type: Enum<T>): TypeKeyNameUrlSaas where T : Enum<T> =
         TypeKeyNameUrlSaas(type.name, null)
 
-    private fun toLanguageCdq(technicalKey: LanguageCode) =
+    private fun toLanguageSaas(technicalKey: LanguageCode) =
         if (technicalKey != LanguageCode.undefined) LanguageSaas(technicalKey, null) else null
 
-    private fun toCountryCdq(countryCode: CountryCode) =
+    private fun toCountrySaas(countryCode: CountryCode) =
         if (countryCode != CountryCode.UNDEFINED) CountrySaas(countryCode, null) else null
 
-    private fun toCharacterSetCdq(characterSet: CharacterSet) =
-        if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeCdq(characterSet) else null
+    private fun toCharacterSetSaas(characterSet: CharacterSet) =
+        if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeSaas(characterSet) else null
 }

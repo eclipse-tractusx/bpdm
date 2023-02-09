@@ -45,8 +45,8 @@ class LegalEntityService(
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>) {
-        val legalEntitiesCdq = legalEntities.map { saasRequestMappingService.toCdqModel(it) }
-        saasClient.upsertLegalEntities(legalEntitiesCdq)
+        val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
+        saasClient.upsertLegalEntities(legalEntitiesSaas)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {

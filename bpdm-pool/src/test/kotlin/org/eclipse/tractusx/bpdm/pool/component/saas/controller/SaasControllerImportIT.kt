@@ -325,7 +325,7 @@ class SaasControllerImportIT @Autowired constructor(
                 )
         )
 
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.SAAS_SYNCH_PATH)
         val bpns = getImportedBpns(listOf(importReadyLegalEntity1, importReadyLegalEntity2, importReadyLegalEntity3))
         val actual = getLegalEntities(bpns)
 
@@ -418,9 +418,9 @@ class SaasControllerImportIT @Autowired constructor(
         )
 
         //First one should fail
-        testHelpers.startSyncAndAwaitError(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
+        testHelpers.startSyncAndAwaitError(webTestClient, EndpointValues.SAAS_SYNCH_PATH)
         //Second one should go through
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.SAAS_SYNCH_PATH)
 
         //Check whether all legal entities have been created
         val expectedPartners = listOf(
@@ -645,7 +645,7 @@ class SaasControllerImportIT @Autowired constructor(
         )
 
         //Start import
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.CDQ_SYNCH_PATH)
+        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.SAAS_SYNCH_PATH)
 
         //return the BPNs of imported business partners in same order as given
         return getImportedBpns(partnersToImport)

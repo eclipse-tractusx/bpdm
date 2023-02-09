@@ -47,7 +47,7 @@ class ValidationService(
      * Validates a legal entity, listing all errors which will keep it from entering the sharing process
      */
     fun validate(legalEntityInput: LegalEntityGateInput): ValidationResponse {
-        val partnerModel = saasRequestMappingService.toCdqModel(legalEntityInput)
+        val partnerModel = saasRequestMappingService.toSaasModel(legalEntityInput)
         return validate(partnerModel)
     }
 
@@ -55,7 +55,7 @@ class ValidationService(
      * Validates a lsite, listing all errors which will keep it from entering the sharing process
      */
     fun validate(siteInput: SiteGateInput): ValidationResponse {
-        val partnerModel = siteService.toCdqModels(listOf(siteInput)).first()
+        val partnerModel = siteService.toSaasModels(listOf(siteInput)).first()
         return validate(partnerModel)
     }
 
@@ -63,7 +63,7 @@ class ValidationService(
      * Validates an address, listing all errors which will keep it from entering the sharing process
      */
     fun validate(addressInput: AddressGateInput): ValidationResponse {
-        val partnerModel = addressService.toCdqModels(listOf(addressInput)).first()
+        val partnerModel = addressService.toSaasModels(listOf(addressInput)).first()
         return validate(partnerModel)
     }
 

@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 class SaasConfig(
-    val cdqProperties: SaasConfigProperties
+    val saasProperties: SaasConfigProperties
 ) {
     companion object {
         const val memorySize = 16 * 1024 * 1024 // 16mb
@@ -39,14 +39,14 @@ class SaasConfig(
 
     @Bean
     @Qualifier("cdqClient")
-    fun webClientCdq(): WebClient {
+    fun webClientSaas(): WebClient {
         return WebClient.builder()
             .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs { codecs: ClientCodecConfigurer -> codecs.defaultCodecs().maxInMemorySize(memorySize) }
                 .build())
-            .baseUrl(cdqProperties.host)
+            .baseUrl(saasProperties.host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader("x-api-key", cdqProperties.apiKey)
+            .defaultHeader("x-api-key", saasProperties.apiKey)
             .build()
     }
 

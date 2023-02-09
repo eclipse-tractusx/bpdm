@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class FetchBatchRecord(
-    val cdqId: String,
+    val saasId: String,
     val businessPartner: BusinessPartnerSaas
 )

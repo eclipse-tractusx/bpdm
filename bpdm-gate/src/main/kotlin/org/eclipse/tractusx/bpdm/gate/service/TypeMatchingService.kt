@@ -48,7 +48,7 @@ class TypeMatchingService(
             pageSize = 1,
             page = 0,
             maxCandidates = 1,
-            businessPartner = saasLookupMappingService.toCdq(partner)
+            businessPartner = saasLookupMappingService.toSaas(partner)
         )
         val response = saasClient.lookUpReferenceData(request)
 
