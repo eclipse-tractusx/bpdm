@@ -2,9 +2,9 @@ openapi: 3.0.1
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 3.0.0
+  version: 3.0.2-SNAPSHOT
 servers:
-  - url: http://127.0.0.1:8081
+  - url: http://localhost:8081
     description: Generated server url
 paths:
   /api/catena/input/sites:
@@ -3129,8 +3129,8 @@ components:
         technicalKey:
           type: string
           enum:
-            - CDQ_HIERARCHY
-            - CDQ_TRANSITION
+            - SAAS_HIERARCHY
+            - SAAS_TRANSITION
             - CX_HIERARCHY
             - DNB_HIERARCHY
             - LEI_HIERARCHY
