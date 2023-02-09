@@ -30,5 +30,6 @@ class OpenSearchConfigProperties(
     val scheme: String = "http",
     val exportPageSize: Int = 100,
     val exportSchedulerCronExpr: String = "-",
-    val refreshOnWrite: Boolean = false
+    val refreshOnWrite: Boolean = false,
+    val maxPage: Int = 20
 )

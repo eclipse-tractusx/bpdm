@@ -17,25 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.request
+package org.eclipse.tractusx.bpdm.pool.exception
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-
-@Schema(name = "LegalEntityPropertiesSearchRequest", description = "Contains keywords used for searching in legal entity properties")
-data class LegalEntityPropertiesSearchRequest constructor(
-    @field:Parameter(description = "Filter legal entities by name")
-    val name: String?,
-    @field:Parameter(description = "Filter legal entities by legal form name")
-    val legalForm: String?,
-    @field:Parameter(description = "Filter legal entities by status official denotation")
-    val status: String?,
-    @field:Parameter(description = "Filter legal entities by classification denotation")
-    val classification: String?,
-) {
-    companion object {
-        val EmptySearchRequest = LegalEntityPropertiesSearchRequest(null, null, null, null)
-    }
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmOpenSearchUserException(message: String) : RuntimeException(message) {
 }
-

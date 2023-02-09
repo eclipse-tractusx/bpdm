@@ -40,4 +40,8 @@ data class AddressPartnerSearchRequest constructor(
     var postalDeliveryPoint: String? = null,
     @field:Parameter(description = "Filter business partners by ISO 3166-1 alpha-2 country code")
     var countryCode: CountryCode? = null
-)
+) {
+    companion object {
+        val EmptySearchRequest = AddressPartnerSearchRequest()
+    }
+}

@@ -37,4 +37,8 @@ data class AddressPropertiesSearchRequest constructor(
     var premise: String? = null,
     @field:Parameter(description = "Filter business partners by postal delivery point full denotation")
     var postalDeliveryPoint: String? = null
-)
+) {
+    companion object {
+        val EmptySearchRequest = AddressPropertiesSearchRequest()
+    }
+}

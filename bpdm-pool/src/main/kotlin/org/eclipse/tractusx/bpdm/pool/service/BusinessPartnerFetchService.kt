@@ -54,6 +54,7 @@ class BusinessPartnerFetchService(
         return findOrThrow(bpn).toBusinessPartnerDto()
     }
 
+
     /**
      * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityPartnerResponse]
      */
@@ -61,6 +62,7 @@ class BusinessPartnerFetchService(
     fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityPartnerResponse {
         return findOrThrow(identifierType, identifierValue).toPoolDto()
     }
+
 
     @Transactional
     fun findBusinessPartnerIgnoreCase(identifierType: String, identifierValue: String): BusinessPartnerResponse {

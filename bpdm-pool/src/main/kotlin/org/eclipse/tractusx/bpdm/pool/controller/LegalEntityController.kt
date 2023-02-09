@@ -55,7 +55,8 @@ class LegalEntityController(
         summary = "Get page of legal entity business partners matching the search criteria",
         description = "This endpoint tries to find matches among all existing business partners of type legal entity, " +
                 "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
-                "The match of a partner is better the higher its relevancy score."
+                "The match of a partner is better the higher its relevancy score. " +
+                "Note that when using search parameters the max page is \${bpdm.opensearch.max-page}."
     )
     @ApiResponses(
         value = [
