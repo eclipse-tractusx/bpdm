@@ -65,7 +65,7 @@ spec:
           # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
           livenessProbe:
             httpGet:
-              path: "/actuator/health/readiness"
+              path: "/actuator/health/liveness"
               port: 8081
               scheme: HTTP
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
@@ -87,7 +87,7 @@ spec:
           startupProbe:
             httpGet:
               path: "/actuator/health/readiness"
-              port: 8080
+              port: 8081
               scheme: HTTP
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
