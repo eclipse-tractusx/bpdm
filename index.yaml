@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   bpdm-gate:
   - apiVersion: v2
+    appVersion: 3.0.2-alpha.1
+    created: "2023-02-09T14:57:58.275018292Z"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: 26e17daa11ceb58870bf32881169f0360fea56f734a9b1d51f0d861ae42e91cb
+    name: bpdm-gate
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.5-alpha.3/bpdm-gate-3.0.5-alpha.3.tgz
+    version: 3.0.5-alpha.3
+  - apiVersion: v2
     appVersion: 3.0.1
     created: "2023-02-07T12:11:43.124195923Z"
     description: A Helm chart for deploying the BPDM gate service
@@ -62,6 +72,27 @@ entries:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.1/bpdm-gate-3.0.1.tgz
     version: 3.0.1
   bpdm-pool:
+  - apiVersion: v2
+    appVersion: 3.0.2-alpha.1
+    created: "2023-02-09T14:57:58.511773124Z"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM pool service
+    digest: 788ff9d0d4a58b2e00bb247120d70a8a7e95d62ce53787b8f023edd5dc7ee397
+    name: bpdm-pool
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.5-alpha.2/bpdm-pool-4.0.5-alpha.2.tgz
+    version: 4.0.5-alpha.2
   - apiVersion: v2
     appVersion: 3.0.1
     created: "2023-02-07T12:11:43.379765404Z"
@@ -209,4 +240,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-02-07T12:11:43.379837509Z"
+generated: "2023-02-09T14:57:58.511854432Z"
