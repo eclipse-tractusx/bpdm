@@ -43,7 +43,7 @@ private const val VALIDATE_BUSINESS_PARTNER_PATH = "/businesspartners/validate"
 
 @Service
 class SaasClient(
-    @Qualifier("cdqClient")
+    @Qualifier("saasClient")
     private val webClient: WebClient,
     private val saasConfigProperties: SaasConfigProperties,
     private val objectMapper: ObjectMapper

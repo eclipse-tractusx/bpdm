@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.cdq.id")
+@ConfigurationProperties(prefix = "bpdm.saas.id")
 class SaasIdentifierConfigProperties(
     val typeKey: String = "CDQID",
     val typeName: String = "CDQ Identifier",

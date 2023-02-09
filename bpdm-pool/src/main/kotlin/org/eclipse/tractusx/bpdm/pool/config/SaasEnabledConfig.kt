@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import
 
 @Configuration
 @ConditionalOnProperty(
-    value = ["bpdm.cdq.enabled"],
+    value = ["bpdm.saas.enabled"],
     havingValue = "true",
     matchIfMissing = false)
 @Import(SaasAdapterConfig::class)

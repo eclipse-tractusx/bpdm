@@ -109,5 +109,5 @@ applicationConfig:
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
 #  bpdm:
-#    cdq:
+#    saas:
 #     api-key: ...

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.cdq")
+@ConfigurationProperties(prefix = "bpdm.saas")
 class SaasAdapterConfigProperties(
     val enabled: Boolean = true,
     val host: String = "https://api.cdq.com",
