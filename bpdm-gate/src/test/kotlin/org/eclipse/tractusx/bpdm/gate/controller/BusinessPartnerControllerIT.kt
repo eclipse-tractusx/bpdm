@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
@@ -199,13 +199,13 @@ class BusinessPartnerControllerIT @Autowired constructor(
     }
 
     private fun setLookupMockResponse(overallScore: Float) {
-        val mockedResponse = ReferenceDataLookupResponseCdq(
+        val mockedResponse = ReferenceDataLookupResponseSaas(
             1, 1, 0, 1,
             listOf(
-                BusinessPartnerLookupMatchCdq(
+                BusinessPartnerLookupMatchSaas(
                     "0", "0",
-                    MatchingProfileCdq(
-                        MatchingScoresCdq(MatchingScoreCdq(0.5f), MatchingScoreCdq(0.5f), MatchingScoreCdq(overallScore))
+                    MatchingProfileSaas(
+                        MatchingScoresSaas(MatchingScoreSaas(0.5f), MatchingScoreSaas(0.5f), MatchingScoreSaas(overallScore))
                     )
                 )
             )

@@ -24,13 +24,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_ADDRESSES_PATH
@@ -80,8 +80,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
     @Test
     fun `get addresses`() {
         val addressesCdq = listOf(
-            CdqValues.addressBusinessPartner1,
-            CdqValues.addressBusinessPartner2
+            SaasValues.addressBusinessPartner1,
+            SaasValues.addressBusinessPartner2
         )
 
         val expectedAddresses = listOf(
@@ -106,11 +106,11 @@ internal class AddressControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )
@@ -168,8 +168,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
     @Test
     fun `get addresses, filter by external ids`() {
         val addressesCdq = listOf(
-            CdqValues.addressBusinessPartner1,
-            CdqValues.addressBusinessPartner2
+            SaasValues.addressBusinessPartner1,
+            SaasValues.addressBusinessPartner2
         )
 
         val expectedAddresses = listOf(
@@ -195,11 +195,11 @@ internal class AddressControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = addressesCdq.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )

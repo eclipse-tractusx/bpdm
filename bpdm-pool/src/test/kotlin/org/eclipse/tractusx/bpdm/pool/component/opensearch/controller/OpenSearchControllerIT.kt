@@ -24,11 +24,11 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
+import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
+import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
@@ -58,7 +58,7 @@ class OpenSearchControllerIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val importService: ImportStarterService,
     private val openSearchSyncService: OpenSearchSyncStarterService,
-    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties,
+    private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers
 ) {
@@ -77,9 +77,9 @@ class OpenSearchControllerIT @Autowired constructor(
     }
 
     val partnerDocs = listOf(
-        CdqValues.legalEntity1,
-        CdqValues.legalEntity2,
-        CdqValues.legalEntity3
+        SaasValues.legalEntity1,
+        SaasValues.legalEntity2,
+        SaasValues.legalEntity3
     )
 
     @BeforeEach
@@ -87,7 +87,7 @@ class OpenSearchControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
-        val importCollection = PagedResponseCdq(
+        val importCollection = PagedResponseSaas(
             partnerDocs.size,
             null,
             null,
@@ -96,7 +96,7 @@ class OpenSearchControllerIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl))
+            WireMock.get(WireMock.urlPathMatching(saasAdapterConfigProperties.readBusinessPartnerUrl))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")

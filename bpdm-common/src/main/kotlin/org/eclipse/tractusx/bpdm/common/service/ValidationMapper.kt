@@ -19,38 +19,38 @@
 
 package org.eclipse.tractusx.bpdm.common.service
 
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
 
 /**
  * This class provides functions for mapping the regular Cdq Business Partner model to its corresponding validation model
  **/
 class ValidationMapper {
 
-    fun toValidation(partner: BusinessPartnerCdq) =
+    fun toValidation(partner: BusinessPartnerSaas) =
         with(partner) {
-            BusinessPartnerValidationCdq(
+            BusinessPartnerValidationSaas(
                 addresses = addresses.map { toValidation(it) },
                 identifiers = identifiers.map { toValidationCdq(it) },
-                legalForm = legalForm?.name?.let { NameValidationCdq(it) },
-                names = names.map { ValueValidationCdq(it.value) }
+                legalForm = legalForm?.name?.let { NameValidationSaas(it) },
+                names = names.map { ValueValidationSaas(it.value) }
             )
         }
 
 
-    fun toValidation(address: AddressCdq) =
+    fun toValidation(address: AddressSaas) =
         with(address) {
-            AddressValidationCdq(
-                administrativeAreas = administrativeAreas.map { ValueValidationCdq(it.value!!) },
-                country = CountryValidationCdq(country?.shortName?.alpha2!!),
-                localities = localities.map { ValueValidationCdq(it.value!!) },
-                postalDeliveryPoints = postalDeliveryPoints.map { ValueValidationCdq(it.value!!) },
-                postCodes = postCodes.map { ValueValidationCdq(it.value!!) },
-                premises = premises.map { ValueValidationCdq(it.value!!) },
-                thoroughfares = thoroughfares.map { ValueValidationCdq(it.value!!) }
+            AddressValidationSaas(
+                administrativeAreas = administrativeAreas.map { ValueValidationSaas(it.value!!) },
+                country = CountryValidationSaas(country?.shortName?.alpha2!!),
+                localities = localities.map { ValueValidationSaas(it.value!!) },
+                postalDeliveryPoints = postalDeliveryPoints.map { ValueValidationSaas(it.value!!) },
+                postCodes = postCodes.map { ValueValidationSaas(it.value!!) },
+                premises = premises.map { ValueValidationSaas(it.value!!) },
+                thoroughfares = thoroughfares.map { ValueValidationSaas(it.value!!) }
             )
         }
 
-    private fun toValidationCdq(identifier: IdentifierCdq) =
-        IdentifierValidationCdq(TechnicalKeyValidationCdq(identifier.type?.technicalKey!!), identifier.value!!)
+    private fun toValidationCdq(identifier: IdentifierSaas) =
+        IdentifierValidationSaas(TechnicalKeyValidationSaas(identifier.type?.technicalKey!!), identifier.value!!)
 
 }

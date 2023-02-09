@@ -20,27 +20,27 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
-import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
+import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
 import org.eclipse.tractusx.bpdm.gate.filterNotNullValues
 import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val cdqRequestMappingService: CdqRequestMappingService,
-    private val inputCdqMappingService: InputCdqMappingService,
-    private val cdqClient: CdqClient,
+    private val saasRequestMappingService: SaasRequestMappingService,
+    private val inputSaasMappingService: InputSaasMappingService,
+    private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val typeMatchingService: TypeMatchingService
@@ -48,21 +48,21 @@ class AddressService(
     private val logger = KotlinLogging.logger { }
 
     fun getAddresses(limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateInput> {
-        val addressesPage = cdqClient.getAddresses(limit, startAfter)
+        val addressesPage = saasClient.getAddresses(limit, startAfter)
         val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
 
-        val addressesWithParent = validEntries.map { Pair(it, inputCdqMappingService.toParentLegalEntityExternalId(it.relations)!!) }
+        val addressesWithParent = validEntries.map { Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it.relations)!!) }
 
         val parents =
-            if (addressesWithParent.isNotEmpty()) cdqClient.getBusinessPartners(externalIds = addressesWithParent.map { (_, parentId) -> parentId }).values else emptyList()
+            if (addressesWithParent.isNotEmpty()) saasClient.getBusinessPartners(externalIds = addressesWithParent.map { (_, parentId) -> parentId }).values else emptyList()
         val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
         val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
         val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
 
         val inputAddresses = addressesWithParent.mapNotNull { (address, parentId) ->
             when {
-                legalEntityParentIds.contains(parentId) -> inputCdqMappingService.toInputAddress(address, parentId, null)
-                siteParentIds.contains(parentId) -> inputCdqMappingService.toInputAddress(address, null, parentId)
+                legalEntityParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, parentId, null)
+                siteParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, null, parentId)
                 else -> {
                     logger.warn { "Could not fetch parent for CDQ address record with ID ${address.id}" }
                     null
@@ -79,7 +79,7 @@ class AddressService(
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInput {
-        val fetchResponse = cdqClient.getBusinessPartner(externalId)
+        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
             FetchResponse.Status.OK -> return toValidAddressInput(fetchResponse.businessPartner!!)
@@ -92,10 +92,10 @@ class AddressService(
      * which is then used to fetch the data for the addresses from the bpdm pool.
      */
     fun getAddressesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateOutput> {
-        val partnerCollection = cdqClient.getAugmentedAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
+        val partnerCollection = saasClient.getAugmentedAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
 
         val bpnToExternalIdMapNullable =
-            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ CdqMappings.findBpn(it.identifiers) }, { it.externalId })
+            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ SaasMappings.findBpn(it.identifiers) }, { it.externalId })
         val numAddressesWithoutBpn = bpnToExternalIdMapNullable.filter { it.key == null }.size
         val numAddressesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
@@ -156,7 +156,7 @@ class AddressService(
      */
     fun upsertAddresses(addresses: Collection<AddressGateInput>) {
         val addressesCdq = toCdqModels(addresses)
-        cdqClient.upsertAddresses(addressesCdq)
+        saasClient.upsertAddresses(addressesCdq)
 
         deleteRelationsOfAddresses(addresses)
 
@@ -166,9 +166,9 @@ class AddressService(
     /**
      * Fetches parent information and converts the given [addresses] to their corresponding CDQ models
      */
-    fun toCdqModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerCdq> {
-        val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq> = getParentLegalEntities(addresses)
-        val parentSitesByExternalId: Map<String, BusinessPartnerCdq> = getParentSites(addresses)
+    fun toCdqModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerSaas> {
+        val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = getParentLegalEntities(addresses)
+        val parentSitesByExternalId: Map<String, BusinessPartnerSaas> = getParentSites(addresses)
 
         return addresses.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
     }
@@ -176,21 +176,21 @@ class AddressService(
     private fun upsertRelations(addresses: Collection<AddressGateInput>) {
         val legalEntityRelations = toLegalEntityRelations(addresses)
         val siteRelations = toSiteRelations(addresses)
-        cdqClient.upsertAddressRelations(legalEntityRelations, siteRelations)
+        saasClient.upsertAddressRelations(legalEntityRelations, siteRelations)
     }
 
     private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInput>) {
-        val addressesPage = cdqClient.getAddresses(externalIds = addresses.map { it.externalId })
-        val relationsToDelete = addressesPage.values.flatMap { it.relations }.map { CdqMappings.toRelationToDelete(it) }
+        val addressesPage = saasClient.getAddresses(externalIds = addresses.map { it.externalId })
+        val relationsToDelete = addressesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
         if (relationsToDelete.isNotEmpty()) {
-            cdqClient.deleteRelations(relationsToDelete)
+            saasClient.deleteRelations(relationsToDelete)
         }
     }
 
     private fun toSiteRelations(addresses: Collection<AddressGateInput>) = addresses.filter {
         it.siteExternalId != null
     }.map {
-        CdqClient.AddressSiteRelation(
+        SaasClient.AddressSiteRelation(
             addressExternalId = it.externalId,
             siteExternalId = it.siteExternalId!!
         )
@@ -199,17 +199,17 @@ class AddressService(
     private fun toLegalEntityRelations(addresses: Collection<AddressGateInput>) = addresses.filter {
         it.legalEntityExternalId != null
     }.map {
-        CdqClient.AddressLegalEntityRelation(
+        SaasClient.AddressLegalEntityRelation(
             addressExternalId = it.externalId,
             legalEntityExternalId = it.legalEntityExternalId!!
         )
     }.toList()
 
-    private fun getParentSites(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerCdq> {
+    private fun getParentSites(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerSaas> {
         val parentSiteExternalIds = addresses.mapNotNull { it.siteExternalId }.distinct().toList()
-        var parentSitesByExternalId: Map<String, BusinessPartnerCdq> = HashMap()
+        var parentSitesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
         if (parentSiteExternalIds.isNotEmpty()) {
-            val parentSitesPage = cdqClient.getSites(externalIds = parentSiteExternalIds)
+            val parentSitesPage = saasClient.getSites(externalIds = parentSiteExternalIds)
             if (parentSitesPage.limit < parentSiteExternalIds.size) {
                 // should not happen as long as configured upsert limit is lower than cdq's limit
                 throw IllegalStateException("Could not fetch all parent sites in single request.")
@@ -219,11 +219,11 @@ class AddressService(
         return parentSitesByExternalId
     }
 
-    private fun getParentLegalEntities(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerCdq> {
+    private fun getParentLegalEntities(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerSaas> {
         val parentLegalEntityExternalIds = addresses.mapNotNull { it.legalEntityExternalId }.distinct().toList()
-        var parentLegalEntitiesByExternalId: Map<String, BusinessPartnerCdq> = HashMap()
+        var parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
         if (parentLegalEntityExternalIds.isNotEmpty()) {
-            val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
+            val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
             if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
                 // should not happen as long as configured upsert limit is lower than cdq's limit
                 throw IllegalStateException("Could not fetch all parent legal entities in single request.")
@@ -233,32 +233,32 @@ class AddressService(
         return parentLegalEntitiesByExternalId
     }
 
-    private fun toCdqModel(address: AddressGateInput, parentLegalEntity: BusinessPartnerCdq?, parentSite: BusinessPartnerCdq?): BusinessPartnerCdq {
+    private fun toCdqModel(address: AddressGateInput, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null && parentSite == null) {
-            throw CdqNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
+            throw SaasNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
         }
-        val addressCdq = cdqRequestMappingService.toCdqModel(address)
+        val addressCdq = saasRequestMappingService.toCdqModel(address)
         val parentNames = (parentLegalEntity ?: parentSite!!).names
         val parentIdentifiersWithoutBpn = (parentLegalEntity ?: parentSite!!).identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
         return addressCdq.copy(identifiers = addressCdq.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
-    private fun toValidAddressInput(partner: BusinessPartnerCdq): AddressGateInput {
+    private fun toValidAddressInput(partner: BusinessPartnerSaas): AddressGateInput {
         if (!validateAddressBusinessPartner(partner)) {
-            throw CdqInvalidRecordException(partner.id)
+            throw SaasInvalidRecordException(partner.id)
         }
 
-        val parentId = inputCdqMappingService.toParentLegalEntityExternalId(partner.relations)
-        val parentType = parentId?.let { cdqClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
+        val parentId = inputSaasMappingService.toParentLegalEntityExternalId(partner.relations)
+        val parentType = parentId?.let { saasClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
 
         return when (parentType) {
-            LsaType.LegalEntity -> inputCdqMappingService.toInputAddress(partner, parentId, null)
-            LsaType.Site -> inputCdqMappingService.toInputAddress(partner, null, parentId)
-            else -> throw CdqInvalidRecordException(parentId)
+            LsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
+            LsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
+            else -> throw SaasInvalidRecordException(parentId)
         }
     }
 
-    private fun validateAddressBusinessPartner(partner: BusinessPartnerCdq): Boolean {
+    private fun validateAddressBusinessPartner(partner: BusinessPartnerSaas): Boolean {
         val logMessageStart = "CDQ business partner for address with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
 
         if (partner.addresses.size > 1) {
@@ -269,7 +269,7 @@ class AddressService(
             return false
         }
 
-        val numParents = inputCdqMappingService.toParentLegalEntityExternalIds(partner.relations).size
+        val numParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner.relations).size
         if (numParents > 1) {
             logger.warn { "$logMessageStart has multiple parents." }
         }

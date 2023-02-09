@@ -26,13 +26,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH
@@ -80,8 +80,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2
         )
 
         wireMockServer.stubFor(
@@ -213,7 +213,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = CdqValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntity1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -221,7 +221,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
@@ -272,7 +272,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -286,7 +286,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entity without legal address, expect error`() {
 
-        val invalidPartner = CdqValues.legalEntity1.copy(addresses = emptyList())
+        val invalidPartner = SaasValues.legalEntity1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
             post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -304,7 +304,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -319,8 +319,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entities`() {
         val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2
         )
 
         val expectedLegalEntities = listOf(
@@ -341,7 +341,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
@@ -385,9 +385,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `filter legal entities without legal address`() {
         val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2,
-            CdqValues.legalEntity1.copy(addresses = emptyList())
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2,
+            SaasValues.legalEntity1.copy(addresses = emptyList())
         )
 
         val expectedLegalEntities = listOf(
@@ -408,7 +408,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
@@ -487,11 +487,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val legalEntity = RequestValues.legalEntityGateInput1
 
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
@@ -525,13 +525,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         val mockErrorMessage = "Validation error"
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
 
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(

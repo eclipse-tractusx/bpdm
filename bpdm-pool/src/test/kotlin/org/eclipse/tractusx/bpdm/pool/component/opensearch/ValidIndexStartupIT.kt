@@ -77,7 +77,7 @@ class ValidIndexStartupIT @Autowired constructor(
         webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
 
         //Import values to DB
-        val partnersToImport = listOf(CdqValues.legalEntity1, CdqValues.legalEntity2, CdqValues.legalEntity3)
+        val partnersToImport = listOf(SaasValues.legalEntity1, SaasValues.legalEntity2, SaasValues.legalEntity3)
         testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)

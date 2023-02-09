@@ -24,14 +24,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH
@@ -55,7 +55,7 @@ import org.springframework.test.web.reactive.server.returnResult
 internal class SiteControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
-    private val cdqConfigProperties: CdqConfigProperties
+    private val saasConfigProperties: SaasConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -87,7 +87,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = CdqValues.siteBusinessPartnerWithRelations1,
+                                    businessPartner = SaasValues.siteBusinessPartnerWithRelations1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -95,7 +95,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val site = webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+        val site = webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.siteBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
@@ -146,7 +146,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -160,7 +160,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get site without main address, expect error`() {
 
-        val invalidPartner = CdqValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList())
+        val invalidPartner = SaasValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -178,7 +178,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${CdqValues.siteBusinessPartnerWithRelations1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.siteBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -192,8 +192,8 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites`() {
         val sitesCdq = listOf(
-            CdqValues.siteBusinessPartnerWithRelations1,
-            CdqValues.siteBusinessPartnerWithRelations2
+            SaasValues.siteBusinessPartnerWithRelations1,
+            SaasValues.siteBusinessPartnerWithRelations2
         )
 
         val expectedSites = listOf(
@@ -214,7 +214,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
@@ -258,11 +258,11 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `filter invalid sites`() {
         val sitesCdq = listOf(
-            CdqValues.siteBusinessPartnerWithRelations1,
-            CdqValues.siteBusinessPartnerWithRelations2,
-            CdqValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList()), // site without address
-            CdqValues.siteBusinessPartnerWithRelations1.copy(names = listOf()), // site without names
-            CdqValues.siteBusinessPartnerWithRelations1.copy(relations = listOf()) // site without legal entity parent
+            SaasValues.siteBusinessPartnerWithRelations1,
+            SaasValues.siteBusinessPartnerWithRelations2,
+            SaasValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList()), // site without address
+            SaasValues.siteBusinessPartnerWithRelations1.copy(names = listOf()), // site without names
+            SaasValues.siteBusinessPartnerWithRelations1.copy(relations = listOf()) // site without legal entity parent
         )
 
         val expectedSites = listOf(
@@ -283,7 +283,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
@@ -365,39 +365,39 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val parentLegalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2
         )
 
         val expectedSites = listOf(
-            CdqValues.siteBusinessPartner1,
-            CdqValues.siteBusinessPartner2
+            SaasValues.siteBusinessPartner1,
+            SaasValues.siteBusinessPartner2
         )
 
         val expectedRelations = listOf(
-            CdqValues.relationSite1ToLegalEntity,
-            CdqValues.relationSite2ToLegalEntity
+            SaasValues.relationSite1ToLegalEntity,
+            SaasValues.relationSite2ToLegalEntity
         )
 
         val expectedDeletedRelations = listOf(
-            DeleteRelationsRequestCdq.RelationToDeleteCdq(
-                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().startNode
+            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.siteBusinessPartnerWithRelations1.relations.first().startNode
                 ),
-                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.siteBusinessPartnerWithRelations1.relations.first().endNode
+                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.siteBusinessPartnerWithRelations1.relations.first().endNode
                 ),
             ),
-            DeleteRelationsRequestCdq.RelationToDeleteCdq(
-                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().startNode
+            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.siteBusinessPartnerWithRelations2.relations.first().startNode
                 ),
-                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.siteBusinessPartnerWithRelations2.relations.first().endNode
+                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.siteBusinessPartnerWithRelations2.relations.first().endNode
                 ),
             ),
         )
@@ -406,13 +406,13 @@ internal class SiteControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 2,
                                     values = parentLegalEntitiesCdq
@@ -443,19 +443,19 @@ internal class SiteControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 2,
                                     values = listOf(
-                                        CdqValues.siteBusinessPartnerWithRelations1,
-                                        CdqValues.siteBusinessPartnerWithRelations2
+                                        SaasValues.siteBusinessPartnerWithRelations1,
+                                        SaasValues.siteBusinessPartnerWithRelations2
                                     )
                                 )
                             )
@@ -470,7 +470,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                DeleteRelationsResponseCdq(2)
+                                DeleteRelationsResponseSaas(2)
                             )
                         )
                 )
@@ -483,7 +483,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                UpsertRelationsResponseCdq(
+                                UpsertRelationsResponseSaas(
                                     failures = emptyList(),
                                     numberOfFailed = 0,
                                     numberOfInserts = 2,
@@ -507,11 +507,11 @@ internal class SiteControllerInputIT @Autowired constructor(
         assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
         // check that "delete relations" was called in cdq as expected
-        val deleteRelationsRequestCdq = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestCdq>(stubMappingDeleteRelations, objectMapper).single()
-        assertThat(deleteRelationsRequestCdq.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
+        val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
+        assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
         // check that "upsert relations" was called in cdq as expected
-        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
+        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
@@ -527,20 +527,20 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInput2
         )
         val parentLegalEntitiesCdq = listOf(
-            CdqValues.legalEntity1
+            SaasValues.legalEntity1
         )
 
         // mock "get parent legal entities"
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(sites.map { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 1,
                                     values = parentLegalEntitiesCdq
@@ -567,8 +567,8 @@ internal class SiteControllerInputIT @Autowired constructor(
     fun `validate a valid site`() {
         val site = RequestValues.siteGateInput1
 
-        val mockParent = CdqValues.legalEntity1
-        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        val mockParent = SaasValues.legalEntity1
+        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
@@ -579,11 +579,11 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
@@ -616,8 +616,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         val site = RequestValues.siteGateInput1
 
 
-        val mockParent = CdqValues.legalEntity1
-        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        val mockParent = SaasValues.legalEntity1
+        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
@@ -630,13 +630,13 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val mockErrorMessage = "Validation error"
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
 
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
