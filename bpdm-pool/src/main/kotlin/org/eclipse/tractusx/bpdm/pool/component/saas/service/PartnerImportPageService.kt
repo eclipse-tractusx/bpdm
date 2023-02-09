@@ -20,13 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasIdentifierConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.*
 import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
@@ -43,7 +40,6 @@ import java.time.Instant
 @Service
 class PartnerImportPageService(
     private val adapterProperties: SaasAdapterConfigProperties,
-    saasIdConfigProperties: SaasIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: SaasToRequestMapper,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
@@ -51,10 +47,6 @@ class PartnerImportPageService(
     private val saasClient: SaasClient
 ) {
     private val logger = KotlinLogging.logger { }
-
-    private val saasIdentifierType = TypeKeyNameUrlSaas(saasIdConfigProperties.typeKey, saasIdConfigProperties.typeName, "")
-    private val saasIdentifierStatus = TypeKeyNameSaas(saasIdConfigProperties.statusImportedKey, saasIdConfigProperties.statusImportedName)
-    private val saasIssuer = TypeKeyNameUrlSaas(saasIdConfigProperties.issuerKey, saasIdConfigProperties.issuerName, "")
 
     private val validChildParentRelations = listOf(
         Pair(LsaType.ADDRESS, LsaType.SITE),
@@ -92,7 +84,6 @@ class PartnerImportPageService(
     private fun addNewMetadata(partners: Collection<BusinessPartnerSaas>){
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.status?.technicalKey == null) null else id.status } }
-            .plus(saasIdentifierStatus)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
@@ -101,7 +92,6 @@ class PartnerImportPageService(
 
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
-            .plus(saasIdentifierType)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
@@ -110,7 +100,6 @@ class PartnerImportPageService(
 
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.issuingBody?.technicalKey == null) null else id.issuingBody } }
-            .plus(saasIssuer)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIssuingBodies(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
