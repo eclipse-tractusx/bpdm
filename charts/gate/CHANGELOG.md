@@ -9,6 +9,8 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - fixed bug causing missing apiVersion on Ingress resource
+- fixed port of startup probe
+- fixed liveness probe endpoint
 
 ## [3.0.4] - 2022-01-27
 
