@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.ValidationRequestCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.ValidationResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.ViolationLevel
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.ValidationRequestSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.ValidationResponseSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.ViolationLevel
 import org.eclipse.tractusx.bpdm.common.service.ValidationMapper
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
@@ -36,18 +36,18 @@ import org.springframework.stereotype.Service
  */
 @Service
 class ValidationService(
-    private val cdqClient: CdqClient,
+    private val saasClient: SaasClient,
     private val siteService: SiteService,
     private val addressService: AddressService,
     private val validationMapper: ValidationMapper,
-    private val cdqRequestMappingService: CdqRequestMappingService
+    private val saasRequestMappingService: SaasRequestMappingService
 ) {
 
     /**
      * Validates a legal entity, listing all errors which will keep it from entering the sharing process
      */
     fun validate(legalEntityInput: LegalEntityGateInput): ValidationResponse {
-        val partnerModel = cdqRequestMappingService.toCdqModel(legalEntityInput)
+        val partnerModel = saasRequestMappingService.toCdqModel(legalEntityInput)
         return validate(partnerModel)
     }
 
@@ -67,17 +67,17 @@ class ValidationService(
         return validate(partnerModel)
     }
 
-    private fun validate(partner: BusinessPartnerCdq): ValidationResponse {
+    private fun validate(partner: BusinessPartnerSaas): ValidationResponse {
         val validationModel = validationMapper.toValidation(partner)
 
-        val validationRequest = ValidationRequestCdq(validationModel)
-        val validationResponse = cdqClient.validateBusinessPartner(validationRequest)
+        val validationRequest = ValidationRequestSaas(validationModel)
+        val validationResponse = saasClient.validateBusinessPartner(validationRequest)
 
         return toGateResponse(validationResponse)
     }
 
 
-    private fun toGateResponse(validationResponse: ValidationResponseCdq): ValidationResponse {
+    private fun toGateResponse(validationResponse: ValidationResponseSaas): ValidationResponse {
         val errors = validationResponse.dataDefects
             .filter { it.violationLevel == ViolationLevel.ERROR }
             .map { it.violationMessage }

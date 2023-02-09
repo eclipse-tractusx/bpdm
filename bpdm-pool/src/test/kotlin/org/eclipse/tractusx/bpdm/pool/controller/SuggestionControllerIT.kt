@@ -367,7 +367,7 @@ class SuggestionControllerIT @Autowired constructor(
     @ParameterizedTest
     @MethodSource("argumentsSuggestPropertyValues")
     fun `don't suggest by word when filtered out`(expectedSuggestionValue: String, endpointPath: String) {
-        val filterName = CdqValues.legalEntity2.names.first().value
+        val filterName = SaasValues.legalEntity2.names.first().value
 
         val page = webTestClient.get()
             .uri { builder ->
@@ -393,7 +393,7 @@ class SuggestionControllerIT @Autowired constructor(
     @ParameterizedTest
     @MethodSource("argumentsSuggestPropertyValuesNonLatin")
     fun `suggest by non-latin characters`(expectedSuggestionValue: String, endpointPath: String) {
-        val expectedName = CdqValues.legalEntity3.names.first().value
+        val expectedName = SaasValues.legalEntity3.names.first().value
 
         val page = webTestClient.get()
             .uri { builder ->

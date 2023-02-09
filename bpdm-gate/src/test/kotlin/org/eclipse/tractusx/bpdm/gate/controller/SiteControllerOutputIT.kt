@@ -24,13 +24,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_SITES_PATH
@@ -81,8 +81,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites`() {
         val sitesCdq = listOf(
-            CdqValues.siteBusinessPartner1,
-            CdqValues.siteBusinessPartner2
+            SaasValues.siteBusinessPartner1,
+            SaasValues.siteBusinessPartner2
         )
 
         val expectedSites = listOf(
@@ -111,11 +111,11 @@ internal class SiteControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = sitesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = sitesCdq.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )
@@ -184,8 +184,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites, filter by external ids`() {
         val sitesCdq = listOf(
-            CdqValues.siteBusinessPartner1,
-            CdqValues.siteBusinessPartner2
+            SaasValues.siteBusinessPartner1,
+            SaasValues.siteBusinessPartner2
         )
 
         val expectedSites = listOf(
@@ -215,11 +215,11 @@ internal class SiteControllerOutputIT @Autowired constructor(
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = sitesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = sitesCdq.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )
