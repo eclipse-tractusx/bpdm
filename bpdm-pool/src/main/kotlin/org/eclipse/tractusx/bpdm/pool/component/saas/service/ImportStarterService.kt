@@ -45,7 +45,7 @@ class ImportStarterService(
     /**
      * Import records synchronously and return a [SyncResponse] about the import result information
      */
-    @Scheduled(cron = "\${bpdm.cdq.import-scheduler-cron-expr:-}", zone = "UTC")
+    @Scheduled(cron = "\${bpdm.saas.import-scheduler-cron-expr:-}", zone = "UTC")
     fun import(): SyncResponse {
         return startImport(true)
     }

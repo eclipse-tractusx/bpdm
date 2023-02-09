@@ -77,7 +77,7 @@ class SuggestionControllerIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
 
         @JvmStatic

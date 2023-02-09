@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.cdq")
+@ConfigurationProperties(prefix = "bpdm.saas")
 class SaasConfigProperties(
     val host: String = "https://api.cdq.com",
     val storage: String = "38d2277e20c730b4b8e8f182adcef7ca",

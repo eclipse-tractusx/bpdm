@@ -63,9 +63,9 @@ The Swagger login uses the client specified in the property `springdoc.swagger-u
 The file `application-cdq.properties` enables and configures the connection to a
 remote [CDQ API](https://www.apimatic.io/apidocs/data-exchange/v/4_0#/rest/getting-startedfrom) which the application can import business partner records.
 Depending on whether this component is enabled, the application offers endpoints to import records from and to export Business Partner Numbers to CDQ.
-When enabled the application requires the environment variable `BPDM_CDQ_KEY` to contain an API key with necessary privileges for accessing the specified
+When enabled the application requires the environment variable `BPDM_SAAS_KEY` to contain an API key with necessary privileges for accessing the specified
 storage.
-Further, you need to provide a CDQ storage ID (`BPDM_CDQ_STORAGE`) and datasource ID `BPDM_CDQ_DATASOURCE` from where the records should be imported by the
+Further, you need to provide a CDQ storage ID (`BPDM_SAAS_STORAGE`) and datasource ID `BPDM_SAAS_DATASOURCE` from where the records should be imported by the
 application.
 
 ### Helm Deployment
@@ -87,7 +87,7 @@ BPDM is a SpringBoot Kotlin software project managed by Maven and can be run wit
 
 When running, the BPDM Gate requires a remote CDQ storage and datasource to exchange data with.
 Per default configuration the application connects to the host address https://api.cdq.com
-and expects the environment variables `BPDM_CDQ_STORAGE` and `BPDM_CDQ_DATASOURCE` to contain the identifiers for the storage and datasource respectively.
+and expects the environment variables `BPDM_SAAS_STORAGE` and `BPDM_SAAS_DATASOURCE` to contain the identifiers for the storage and datasource respectively.
 
 The Gate also requires a connection to a BPDM Pool instance which is expected at `localhost` with port `8080` on default configuration.
 

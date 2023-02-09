@@ -38,7 +38,7 @@ class SaasConfig(
     }
 
     @Bean
-    @Qualifier("cdqClient")
+    @Qualifier("saasClient")
     fun webClientSaas(): WebClient {
         return WebClient.builder()
             .exchangeStrategies(ExchangeStrategies.builder()
