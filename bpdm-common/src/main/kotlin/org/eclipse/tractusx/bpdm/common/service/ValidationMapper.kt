@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.service
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 
 /**
- * This class provides functions for mapping the regular Cdq Business Partner model to its corresponding validation model
+ * This class provides functions for mapping the regular SaaS Business Partner model to its corresponding validation model
  **/
 class ValidationMapper {
 

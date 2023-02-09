@@ -73,7 +73,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
+     * Given legal entities exists in SaaS and bpdm pool
      * When getting legal entities page via output route
      * Then legal entities page should be returned
      */
@@ -167,7 +167,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
+     * Given legal entities exists in SaaS and bpdm pool
      * When getting legal entities page via output route filtering by external ids
      * Then legal entities page should be returned
      */

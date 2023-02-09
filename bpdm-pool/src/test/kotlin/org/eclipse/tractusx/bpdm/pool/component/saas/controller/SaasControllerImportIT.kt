@@ -109,8 +109,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given new partners of type legal entity in CDQ
-     * When Import from CDQ
+     * Given new partners of type legal entity in SaaS
+     * When Import from SaaS
      * Then partners imported
      */
     @Test
@@ -136,8 +136,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given new partners of type site in CDQ
-     * When Import from CDQ
+     * Given new partners of type site in SaaS
+     * When Import from SaaS
      * Then partners imported
      */
     @Test
@@ -175,8 +175,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given new partners of type address in CDQ
-     * When Import from CDQ
+     * Given new partners of type address in SaaS
+     * When Import from SaaS
      * Then partners imported
      */
     @Test
@@ -256,7 +256,7 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given new partners in CDQ
+     * Given new partners in SaaS
      * When import with pagination
      * Then partners imported
      */
@@ -473,8 +473,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given updated partners of type site in CDQ
-     * When Import from CDQ
+     * Given updated partners of type site in SaaS
+     * When Import from SaaS
      * Then partners updated
      */
     @Test
@@ -518,8 +518,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     /**
-     * Given updated partners of type address in CDQ
-     * When Import from CDQ
+     * Given updated partners of type address in SaaS
+     * When Import from SaaS
      * Then partners imported
      */
     @Test
@@ -606,7 +606,7 @@ class SaasControllerImportIT @Autowired constructor(
         val queriedNewState = "QUERIED_NEW"
         val firstCallParentState = "FIRST_CALL_PARENTS"
 
-        //Mock new CDQ business partners to import
+        //Mock new SaaS business partners to import
         wireMockServer.stubFor(
             get(urlPathMatching(saasAdapterConfigProperties.readBusinessPartnerUrl))
                 .inScenario(importScenario)

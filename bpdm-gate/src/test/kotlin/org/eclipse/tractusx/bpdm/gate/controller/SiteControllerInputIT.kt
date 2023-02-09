@@ -71,7 +71,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given site exists in cdq
+     * Given site exists in SaaS
      * When getting site by external id
      * Then site mapped to the catena data model should be returned
      */
@@ -107,7 +107,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given site does not exist in cdq
+     * Given site does not exist in SaaS
      * When getting site by external id
      * Then "not found" response is sent
      */
@@ -136,11 +136,11 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while fetching site by external id
+     * When SaaS api responds with an error status code while fetching site by external id
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get site by external id, cdq error`() {
+    fun `get site by external id, SaaS error`() {
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
@@ -153,7 +153,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given site without main address in CDQ
+     * Given site without main address in SaaS
      * When query by its external ID
      * Then server error is returned
      */
@@ -185,7 +185,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given sites exists in cdq
+     * Given sites exists in SaaS
      * When getting sites page
      * Then sites page mapped to the catena data model should be returned
      */
@@ -251,7 +251,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given invalid sites in CDQ
+     * Given invalid sites in SaaS
      * When getting sites page
      * Then only valid sites on page returned
      */
@@ -320,11 +320,11 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting sites
+     * When SaaS api responds with an error status code while getting sites
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get sites, cdq error`() {
+    fun `get sites, SaaS error`() {
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
@@ -353,9 +353,9 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities in cdq
+     * Given legal entities in SaaS
      * When upserting sites of legal entities
-     * Then upsert sites and relations in cdq api should be called with the site data mapped to the cdq data model
+     * Then upsert sites and relations in SaaS api should be called with the site data mapped to the SaaS data model
      */
     @Test
     fun `upsert sites`() {
@@ -502,21 +502,21 @@ internal class SiteControllerInputIT @Autowired constructor(
             .expectStatus()
             .isOk
 
-        // check that "upsert sites" was called in cdq as expected
+        // check that "upsert sites" was called in SaaS as expected
         val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()
         assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
-        // check that "delete relations" was called in cdq as expected
+        // check that "delete relations" was called in SaaS as expected
         val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
         assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
-        // check that "upsert relations" was called in cdq as expected
+        // check that "upsert relations" was called in SaaS as expected
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
     /**
-     * Given legal entities in cdq
+     * Given legal entities in SaaS
      * When upserting sites of legal entities using a legal entity external id that does not exist
      * Then a bad request response should be sent
      */

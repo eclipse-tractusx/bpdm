@@ -70,7 +70,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
     /**
      * When upserting legal entities
-     * Then cdq upsert api should be called with the legal entity data mapped to the cdq data model
+     * Then cdq upsert api should be called with the legal entity data mapped to the SaaS data model
      */
     @Test
     fun `upsert legal entities`() {
@@ -173,11 +173,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while upserting legal entities
+     * When SaaS api responds with an error status code while upserting legal entities
      * Then an internal server error response should be sent
      */
     @Test
-    fun `upsert legal entities, cdq error`() {
+    fun `upsert legal entities, SaaS error`() {
         val legalEntities = listOf(
             RequestValues.legalEntityGateInput1,
             RequestValues.legalEntityGateInput2
@@ -197,7 +197,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity exists in cdq
+     * Given legal entity exists in SaaS
      * When getting legal entity by external id
      * Then legal entity mapped to the catena data model should be returned
      */
@@ -233,7 +233,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity does not exist in cdq
+     * Given legal entity does not exist in SaaS
      * When getting legal entity by external id
      * Then "not found" response is sent
      */
@@ -262,11 +262,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while fetching legal entity by external id
+     * When SaaS api responds with an error status code while fetching legal entity by external id
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get legal entity by external id, cdq error`() {
+    fun `get legal entity by external id, SaaS error`() {
         wireMockServer.stubFor(
             post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
@@ -279,7 +279,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity without legal address in CDQ
+     * Given legal entity without legal address in SaaS
      * When query by its external ID
      * Then server error is returned
      */
@@ -312,7 +312,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
 
     /**
-     * Given legal entity exists in cdq
+     * Given legal entity exists in SaaS
      * When getting legal entities page
      * Then legal entities page mapped to the catena data model should be returned
      */
@@ -378,7 +378,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity without legal address in CDQ
+     * Given legal entity without legal address in SaaS
      * When getting legal entities page
      * Then only valid legal entities on page returned
      */
@@ -445,11 +445,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting legal entities
+     * When SaaS api responds with an error status code while getting legal entities
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get legal entities, cdq error`() {
+    fun `get legal entities, SaaS error`() {
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())

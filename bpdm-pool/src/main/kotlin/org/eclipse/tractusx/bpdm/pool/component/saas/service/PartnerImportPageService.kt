@@ -68,7 +68,7 @@ class PartnerImportPageService(
 
         val partnerCollection = saasClient.readBusinessPartners(modifiedAfter, startAfter)
 
-        logger.debug { "Received ${partnerCollection.values.size} to import from CDQ" }
+        logger.debug { "Received ${partnerCollection.values.size} to import from SaaS" }
 
         addNewMetadata(partnerCollection.values)
 
@@ -190,7 +190,7 @@ class PartnerImportPageService(
             if (parentBpn != null) {
                 BusinessPartnerWithParentBpn(childWithParentId.partner, parentBpn)
             } else {
-                logger.warn { "Can not resolve parent with Import-ID ${childWithParentId.parentId} for CDQ record with ID ${childWithParentId.partner.id}" }
+                logger.warn { "Can not resolve parent with Import-ID ${childWithParentId.parentId} for SaaS record with ID ${childWithParentId.partner.id}" }
                 null
             }
         }
@@ -202,7 +202,7 @@ class PartnerImportPageService(
             if (parentId != null) {
                 BusinessPartnerWithParentId(child, parentId)
             } else {
-                logger.warn { "Can not resolve parent CDQ record for child with ID ${child.id}: Record contains no parent ID" }
+                logger.warn { "Can not resolve parent SaaS record for child with ID ${child.id}: Record contains no parent ID" }
                 null
             }
         }
@@ -210,12 +210,12 @@ class PartnerImportPageService(
 
     private fun isValid(partner: BusinessPartnerSaas): Boolean {
         if (partner.addresses.any { address -> address.thoroughfares.any { thoroughfare -> thoroughfare.value == null } }) {
-            logger.warn { "CDQ Partner with id ${partner.id} is invalid: Contains thoroughfare without ${ThoroughfareSaas::value.name} field specified." }
+            logger.warn { "SaaS Partner with id ${partner.id} is invalid: Contains thoroughfare without ${ThoroughfareSaas::value.name} field specified." }
             return false
         }
 
         if (partner.externalId == null) {
-            logger.warn { "CDQ record with ID ${partner.id} has no external ID that can be used as import ID" }
+            logger.warn { "SaaS record with ID ${partner.id} has no external ID that can be used as import ID" }
             return false
         }
 
@@ -245,14 +245,14 @@ class PartnerImportPageService(
         }
 
         if (validTypes.isEmpty()) {
-            logger.warn { "CDQ Business partner with id $id does not contain any LSA type. Assume Legal Entity" }
+            logger.warn { "SaaS Business partner with id $id does not contain any LSA type. Assume Legal Entity" }
             return LsaType.LEGAL_ENTITY
         }
 
         val type = validTypes.first()
 
         if (validTypes.size > 1) {
-            logger.warn { "CDQ Business partner with id $id contains more than one LSA type. Taking first encountered type $type" }
+            logger.warn { "SaaS Business partner with id $id contains more than one LSA type. Taking first encountered type $type" }
         }
 
         return type

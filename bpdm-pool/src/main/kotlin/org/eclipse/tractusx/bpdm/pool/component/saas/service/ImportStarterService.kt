@@ -72,7 +72,7 @@ class ImportStarterService(
 
     private fun startImport(inSync: Boolean): SyncResponse {
         val record = syncRecordService.setSynchronizationStart(SyncType.SAAS_IMPORT)
-        logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '${record.fromTime}' with async: ${!inSync}" }
+        logger.debug { "Initializing SaaS import starting with ID ${record.errorSave}' for modified records from '${record.fromTime}' with async: ${!inSync}" }
 
         if (inSync)
             importService.importPaginated(record.fromTime, record.errorSave)

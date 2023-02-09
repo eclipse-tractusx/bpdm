@@ -50,7 +50,7 @@ class SaasAdapterConfig(
 
     @PostConstruct
     fun logCreation() {
-        logger.info { "Enable and configure CDQ adapter" }
+        logger.info { "Enable and configure SaaS adapter" }
     }
 
     @Bean

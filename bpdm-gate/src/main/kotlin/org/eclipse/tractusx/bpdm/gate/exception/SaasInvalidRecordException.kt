@@ -25,4 +25,4 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 class SaasInvalidRecordException(
     saasId: String?
-) : RuntimeException("Business Partner with CDQ ID ${saasId ?: "Unknown"} record in CDQ storage is invalid")
+) : RuntimeException("Business Partner with SaaS ID ${saasId ?: "Unknown"} record in SaaS storage is invalid")
