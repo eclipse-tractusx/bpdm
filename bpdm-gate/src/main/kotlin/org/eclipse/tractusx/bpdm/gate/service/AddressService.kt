@@ -64,7 +64,7 @@ class AddressService(
                 legalEntityParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, parentId, null)
                 siteParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, null, parentId)
                 else -> {
-                    logger.warn { "Could not fetch parent for CDQ address record with ID ${address.id}" }
+                    logger.warn { "Could not fetch parent for SaaS address record with ID ${address.id}" }
                     null
                 }
             }
@@ -88,7 +88,7 @@ class AddressService(
     }
 
     /**
-     * Get addresses by first fetching addresses from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * Get addresses by first fetching addresses from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the addresses from the bpdm pool.
      */
     fun getAddressesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateOutput> {
@@ -100,10 +100,10 @@ class AddressService(
         val numAddressesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
         if (numAddressesWithoutBpn > 0) {
-            logger.warn { "Encountered $numAddressesWithoutBpn addresses without BPN in CDQ. Can't retrieve data from pool for these." }
+            logger.warn { "Encountered $numAddressesWithoutBpn addresses without BPN in SaaS. Can't retrieve data from pool for these." }
         }
         if (numAddressesWithoutExternalId > 0) {
-            logger.warn { "Encountered $numAddressesWithoutExternalId addresses without external id in CDQ." }
+            logger.warn { "Encountered $numAddressesWithoutExternalId addresses without external id in SaaS." }
         }
 
         val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
@@ -121,7 +121,7 @@ class AddressService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = addressesOutput,
-            invalidEntries = partnerCollection.values.size - addressesOutput.size // difference of what gate can return to values in cdq
+            invalidEntries = partnerCollection.values.size - addressesOutput.size // difference of what gate can return to values in SaaS
         )
     }
 
@@ -164,7 +164,7 @@ class AddressService(
     }
 
     /**
-     * Fetches parent information and converts the given [addresses] to their corresponding CDQ models
+     * Fetches parent information and converts the given [addresses] to their corresponding SaaS models
      */
     fun toSaasModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = getParentLegalEntities(addresses)
@@ -211,7 +211,7 @@ class AddressService(
         if (parentSiteExternalIds.isNotEmpty()) {
             val parentSitesPage = saasClient.getSites(externalIds = parentSiteExternalIds)
             if (parentSitesPage.limit < parentSiteExternalIds.size) {
-                // should not happen as long as configured upsert limit is lower than cdq's limit
+                // should not happen as long as configured upsert limit is lower than SaaS's limit
                 throw IllegalStateException("Could not fetch all parent sites in single request.")
             }
             parentSitesByExternalId = parentSitesPage.values.associateBy { it.externalId!! }
@@ -225,7 +225,7 @@ class AddressService(
         if (parentLegalEntityExternalIds.isNotEmpty()) {
             val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
             if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
-                // should not happen as long as configured upsert limit is lower than cdq's limit
+                // should not happen as long as configured upsert limit is lower than SaaS's limit
                 throw IllegalStateException("Could not fetch all parent legal entities in single request.")
             }
             parentLegalEntitiesByExternalId = parentLegalEntitiesPage.values.associateBy { it.externalId!! }
@@ -259,7 +259,7 @@ class AddressService(
     }
 
     private fun validateAddressBusinessPartner(partner: BusinessPartnerSaas): Boolean {
-        val logMessageStart = "CDQ business partner for address with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
+        val logMessageStart = "SaaS business partner for address with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
 
         if (partner.addresses.size > 1) {
             logger.warn { "$logMessageStart has multiple addresses" }

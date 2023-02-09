@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 /**
- * Imports business partner entries from CDQ
+ * Imports business partner entries from SaaS
  */
 @Service
 class PartnerImportService(
@@ -47,12 +47,12 @@ class PartnerImportService(
     }
 
     /**
-     * Import CDQ partner records last modified after [fromTime] and with CDQ internal ID greater than [saveState]
+     * Import SaaS partner records last modified after [fromTime] and with SaaS internal ID greater than [saveState]
      *
      * Data is imported in a paginated way. On an error during a page import the latest [saveState] ID is saved so that the import can later be resumed
      */
     fun importPaginated(fromTime: Instant, saveState: String?) {
-        logger.info { "Starting CDQ import starting with ID ${saveState}' for modified records from '$fromTime'" }
+        logger.info { "Starting SaaS import starting with ID ${saveState}' for modified records from '$fromTime'" }
 
         var startAfter: String? = saveState
         var importedCount = 0
@@ -67,7 +67,7 @@ class PartnerImportService(
                 val progress = importedCount / response.totalElements.toFloat()
                 syncRecordService.setProgress(SyncType.SAAS_IMPORT, importedCount, progress)
             } catch (exception: RuntimeException) {
-                logger.error(exception) { "Exception encountered on CDQ import" }
+                logger.error(exception) { "Exception encountered on SaaS import" }
                 syncRecordService.setSynchronizationError(
                     SyncType.SAAS_IMPORT,
                     exception.message ?: "No Message",
@@ -82,6 +82,6 @@ class PartnerImportService(
 
         syncRecordService.setSynchronizationSuccess(SyncType.SAAS_IMPORT)
 
-        logger.info { "CDQ import finished successfully" }
+        logger.info { "SaaS import finished successfully" }
     }
 }

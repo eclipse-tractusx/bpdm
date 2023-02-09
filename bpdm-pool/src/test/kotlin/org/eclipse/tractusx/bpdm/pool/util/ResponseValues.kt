@@ -30,7 +30,7 @@ import java.time.ZoneOffset
 
 /**
  * Test values for response DTOs
- * Numbered values should match with @see CdqValues numbered values for easier testing
+ * Numbered values should match with @see SaasValues numbered values for easier testing
  */
 object ResponseValues {
 

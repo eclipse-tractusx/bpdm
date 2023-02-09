@@ -74,7 +74,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given sites exists in cdq and bpdm pool
+     * Given sites exists in SaaS and bpdm pool
      * When getting sites page via output route
      * Then sites page should be returned
      */
@@ -177,7 +177,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given sites exists in cdq and bpdm pool
+     * Given sites exists in SaaS and bpdm pool
      * When getting sites page via output route filtering by external ids
      * Then sites page should be returned
      */

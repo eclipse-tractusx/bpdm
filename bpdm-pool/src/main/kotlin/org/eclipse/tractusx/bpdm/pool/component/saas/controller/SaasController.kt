@@ -33,9 +33,9 @@ class SaasController(
     val partnerImportService: ImportStarterService
 ) {
     @Operation(
-        summary = "Import new business partner records from CDQ",
-        description = "Triggers an asynchronous import of new business partner records from CDQ. " +
-                "A CDQ record counts as new when it does not have a BPN and the BPDM service does not already have a record with the same CDQ ID. " +
+        summary = "Import new business partner records from SaaS",
+        description = "Triggers an asynchronous import of new business partner records from SaaS. " +
+                "A SaaS record counts as new when it does not have a BPN and the BPDM service does not already have a record with the same SaaS ID. " +
                 "This import only regards records with a modifiedAfter timestamp since the last import."
     )
     @ApiResponses(
@@ -51,7 +51,7 @@ class SaasController(
     }
 
     @Operation(
-        summary = "Fetch information about the CDQ synchronization",
+        summary = "Fetch information about the SaaS synchronization",
         description = "Fetch information about the latest import (either ongoing or already finished)"
     )
     @ApiResponses(

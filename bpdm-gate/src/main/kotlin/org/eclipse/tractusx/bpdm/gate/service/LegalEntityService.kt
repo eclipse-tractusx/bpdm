@@ -72,7 +72,7 @@ class LegalEntityService(
     }
 
     /**
-     * Get legal entities by first fetching legal entities from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * Get legal entities by first fetching legal entities from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the legal entities from the bpdm pool.
      */
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateOutput> {
@@ -84,10 +84,10 @@ class LegalEntityService(
         val numLegalEntitiesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
         if (numLegalEntitiesWithoutBpn > 0) {
-            logger.warn { "Encountered $numLegalEntitiesWithoutBpn legal entities without BPN in CDQ. Can't retrieve data from pool for these." }
+            logger.warn { "Encountered $numLegalEntitiesWithoutBpn legal entities without BPN in SaaS. Can't retrieve data from pool for these." }
         }
         if (numLegalEntitiesWithoutExternalId > 0) {
-            logger.warn { "Encountered $numLegalEntitiesWithoutExternalId legal entities without external id in CDQ." }
+            logger.warn { "Encountered $numLegalEntitiesWithoutExternalId legal entities without external id in SaaS." }
         }
 
         val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
@@ -109,7 +109,7 @@ class LegalEntityService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = legalEntitiesOutput,
-            invalidEntries = partnerCollection.values.size - legalEntitiesOutput.size // difference of what gate can return to values in cdq
+            invalidEntries = partnerCollection.values.size - legalEntitiesOutput.size // difference of what gate can return to values in SaaS
         )
     }
 
@@ -139,7 +139,7 @@ class LegalEntityService(
     private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInput> {
         return partners.mapNotNull {
             val logMessageStart =
-                "CDQ business partner for legal entity with ID ${it.id ?: "Unknown"}"
+                "SaaS business partner for legal entity with ID ${it.id ?: "Unknown"}"
 
             try {
                 if (it.addresses.size > 1) {

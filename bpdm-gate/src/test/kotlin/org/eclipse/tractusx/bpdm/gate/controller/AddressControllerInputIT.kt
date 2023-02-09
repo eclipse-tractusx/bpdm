@@ -73,7 +73,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given address exists in cdq
+     * Given address exists in SaaS
      * When getting address by external id
      * Then address mapped to the catena data model should be returned
      */
@@ -139,7 +139,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given address does not exist in cdq
+     * Given address does not exist in SaaS
      * When getting address by external id
      * Then "not found" response is sent
      */
@@ -168,11 +168,11 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while fetching address by external id
+     * When SaaS api responds with an error status code while fetching address by external id
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get address by external id, cdq error`() {
+    fun `get address by external id, SaaS error`() {
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
@@ -185,12 +185,12 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given address business partner without address data in CDQ
+     * Given address business partner without address data in SaaS
      * When query by its external ID
      * Then server error is returned
      */
     @Test
-    fun `get address for which cdq data is invalid, expect error`() {
+    fun `get address for which SaaS data is invalid, expect error`() {
 
         val invalidPartner = SaasValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList())
 
@@ -217,7 +217,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given addresses exists in cdq
+     * Given addresses exists in SaaS
      * When getting addresses page
      * Then addresses page mapped to the catena data model should be returned
      */
@@ -309,7 +309,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given invalid addresses in CDQ
+     * Given invalid addresses in SaaS
      * When getting addresses page
      * Then only valid addresses on page returned
      */
@@ -402,11 +402,11 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting addresses
+     * When SaaS api responds with an error status code while getting addresses
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get addresses, cdq error`() {
+    fun `get addresses, SaaS error`() {
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
@@ -435,9 +435,9 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities and sites in cdq
+     * Given legal entities and sites in SaaS
      * When upserting addresses of legal entities and sites
-     * Then upsert addresses and relations in cdq api should be called with the address data mapped to the cdq data model
+     * Then upsert addresses and relations in SaaS api should be called with the address data mapped to the SaaS data model
      */
     @Test
     fun `upsert addresses`() {
@@ -607,7 +607,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
         assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
 
-        // check that "delete relations" was called in cdq as expected
+        // check that "delete relations" was called in SaaS as expected
         val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
         assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 

@@ -70,7 +70,7 @@ class SiteService(
     }
 
     /**
-     * Get sites by first fetching sites from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * Get sites by first fetching sites from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the sites from the bpdm pool.
      */
     fun getSitesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateOutput> {
@@ -82,10 +82,10 @@ class SiteService(
         val numSitesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
         if (numSitesWithoutBpn > 0) {
-            logger.warn { "Encountered $numSitesWithoutBpn sites without BPN in CDQ. Can't retrieve data from pool for these." }
+            logger.warn { "Encountered $numSitesWithoutBpn sites without BPN in SaaS. Can't retrieve data from pool for these." }
         }
         if (numSitesWithoutExternalId > 0) {
-            logger.warn { "Encountered $numSitesWithoutExternalId sites without external id in CDQ." }
+            logger.warn { "Encountered $numSitesWithoutExternalId sites without external id in SaaS." }
         }
 
         val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
@@ -107,7 +107,7 @@ class SiteService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = sitesOutput,
-            invalidEntries = partnerCollection.values.size - sitesOutput.size // difference of what gate can return to values in cdq
+            invalidEntries = partnerCollection.values.size - sitesOutput.size // difference of what gate can return to values in SaaS
         )
     }
 
@@ -154,7 +154,7 @@ class SiteService(
     }
 
     /**
-     * Fetches parent information and converts the given [sites] to their corresponding CDQ models
+     * Fetches parent information and converts the given [sites] to their corresponding SaaS models
      */
     fun toSaasModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
@@ -188,7 +188,7 @@ class SiteService(
 
     private fun validateSiteBusinessPartner(partner: BusinessPartnerSaas): Boolean {
         var valid = true
-        val logMessageStart = "CDQ business partner for site with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
+        val logMessageStart = "SaaS business partner for site with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
 
         valid = valid && validateAddresses(partner, logMessageStart)
         valid = valid && validateLegalEntityParents(partner, logMessageStart)
@@ -235,7 +235,7 @@ class SiteService(
         val parentLegalEntityExternalIds = sites.map { it.legalEntityExternalId }.distinct().toList()
         val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
         if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
-            // should not happen as long as configured upsert limit is lower than cdq's limit
+            // should not happen as long as configured upsert limit is lower than SaaS's limit
             throw IllegalStateException("Could not fetch all parent legal entities in single request.")
         }
         return parentLegalEntitiesPage.values.associateBy { it.externalId!! }

@@ -73,7 +73,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given addresses exists in cdq and bpdm pool
+     * Given addresses exists in SaaS and bpdm pool
      * When getting addresses page via output route
      * Then addresses page should be returned
      */
@@ -161,7 +161,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given addresses exists in cdq and bpdm pool
+     * Given addresses exists in SaaS and bpdm pool
      * When getting addresses page via output route filtering by external ids
      * Then addresses page should be returned
      */
