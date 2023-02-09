@@ -24,9 +24,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "bpdm.saas")
 class SaasConfigProperties(
-    val host: String = "https://api.cdq.com",
-    val storage: String = "38d2277e20c730b4b8e8f182adcef7ca",
-    val datasource: String = "621338451197b7667a5fbda4",
+    val host: String = "http://localhost:1234",
+    val storage: String = "storage_id",
+    val datasource: String = "datasource_id",
     val legalEntityType: String = "LEGAL_ENTITY",
     val siteType: String = "ORGANIZATIONAL_UNIT",
     val addressType: String = "BP_ADDRESS",

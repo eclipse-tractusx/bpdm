@@ -25,9 +25,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.saas")
 class SaasAdapterConfigProperties(
     val enabled: Boolean = true,
-    val host: String = "https://api.cdq.com",
-    val storage: String = "8888865cc59a3b4aa079b8e00313cf53",
-    val datasource: String = "61c096613b4b824755a62641",
+    val host: String = "http://localhost:1234",
+    val storage: String = "storage_id",
+    val datasource: String = "datasource_id",
     val apiKey: String = "",
     val importLimit: Int = 100,
     val importSchedulerCronExpr: String = "-",
@@ -36,7 +36,6 @@ class SaasAdapterConfigProperties(
     val addressType: String = "BP_ADDRESS",
     val parentRelationType: String = "PARENT",
     val bpnKey: String = "CX_BPN",
-    val importIdKey: String = "CX_POOL_ID"
 ) {
     private val exchangeApiUrl: String = "data-exchange/rest/v4"
     private val referenceApiUrl: String = "referencedata/rest/v3"
