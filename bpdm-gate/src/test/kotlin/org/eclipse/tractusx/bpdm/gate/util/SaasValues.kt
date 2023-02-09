@@ -28,6 +28,8 @@ import org.eclipse.tractusx.bpdm.common.service.SaasMappings
  * Numbered values should match with RequestValues numbered values for easier testing
  */
 object SaasValues {
+    val testDatasource = "test-saas-datasource"
+
     val idTypeBpn = TypeKeyNameUrlSaas(SaasMappings.BPN_TECHNICAL_KEY, "Business Partner Number")
     val issuerBpn = TypeKeyNameUrlSaas("CATENAX", "Catena-X")
 
@@ -385,7 +387,7 @@ object SaasValues {
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount1, bankAccount2),
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource"
+        dataSource = testDatasource
     )
 
     val legalEntity2 = BusinessPartnerSaas(
@@ -398,7 +400,7 @@ object SaasValues {
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
         bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource"
+        dataSource = testDatasource
     )
 
     val siteBusinessPartner1 = BusinessPartnerSaas(
@@ -406,7 +408,7 @@ object SaasValues {
         identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
         names = listOf(nameSite1),
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource",
+        dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
     )
     val siteBusinessPartner2 = BusinessPartnerSaas(
@@ -414,7 +416,7 @@ object SaasValues {
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource",
+        dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
     )
 
@@ -422,17 +424,17 @@ object SaasValues {
 
     val relationSite1ToLegalEntity = RelationSaas(
         startNode = legalEntity1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource",
+        startNodeDataSource = testDatasource,
         endNode = siteBusinessPartner1.externalId!!,
-        endNodeDataSource = "test-cdq-datasource",
+        endNodeDataSource = testDatasource,
         type = relationType
     )
 
     val relationSite2ToLegalEntity = RelationSaas(
         startNode = legalEntity2.externalId!!,
-        startNodeDataSource = "test-cdq-datasource",
+        startNodeDataSource = testDatasource,
         endNode = siteBusinessPartner2.externalId!!,
-        endNodeDataSource = "test-cdq-datasource",
+        endNodeDataSource = testDatasource,
         type = relationType
     )
 
@@ -449,7 +451,7 @@ object SaasValues {
         names = legalEntity1.names,
         identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
         addresses = listOf(address1),
-        dataSource = "test-cdq-datasource",
+        dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
     )
 
@@ -458,23 +460,23 @@ object SaasValues {
         names = siteBusinessPartner1.names,
         identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
         addresses = listOf(address2),
-        dataSource = "test-cdq-datasource",
+        dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
     )
 
     val relationAddress1ToLegalEntity = RelationSaas(
         startNode = legalEntity1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource",
+        startNodeDataSource = testDatasource,
         endNode = addressBusinessPartner1.externalId!!,
-        endNodeDataSource = "test-cdq-datasource",
+        endNodeDataSource = testDatasource,
         type = relationType
     )
 
     val relationAddress2ToSite = RelationSaas(
         startNode = siteBusinessPartner1.externalId!!,
-        startNodeDataSource = "test-cdq-datasource",
+        startNodeDataSource = testDatasource,
         endNode = addressBusinessPartner2.externalId!!,
-        endNodeDataSource = "test-cdq-datasource",
+        endNodeDataSource = testDatasource,
         type = relationType
     )
 
