@@ -27,4 +27,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class SitePropertiesSearchRequest constructor(
     @field:Parameter(description = "Filter sites by name")
     val siteName: String?
-)
+) {
+    companion object {
+        val EmptySearchRequest = SitePropertiesSearchRequest(null)
+    }
+}

@@ -23,4 +23,12 @@ data class BusinessPartnerSearchRequest(
     val partnerProperties: LegalEntityPropertiesSearchRequest,
     val addressProperties: AddressPropertiesSearchRequest,
     val siteProperties: SitePropertiesSearchRequest
-)
+) {
+    companion object {
+        val EmptySearchRequest = BusinessPartnerSearchRequest(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest
+        )
+    }
+}
