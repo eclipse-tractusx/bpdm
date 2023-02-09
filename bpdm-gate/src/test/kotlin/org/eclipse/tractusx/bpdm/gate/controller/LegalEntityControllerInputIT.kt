@@ -70,7 +70,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
     /**
      * When upserting legal entities
-     * Then cdq upsert api should be called with the legal entity data mapped to the SaaS data model
+     * Then SaaS upsert api should be called with the legal entity data mapped to the SaaS data model
      */
     @Test
     fun `upsert legal entities`() {

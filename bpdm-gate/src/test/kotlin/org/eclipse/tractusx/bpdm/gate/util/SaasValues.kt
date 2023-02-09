@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 
 /**
- * Test values for CDQ DTOs
+ * Test values for SaaS DTOs
  * Numbered values should match with RequestValues numbered values for easier testing
  */
 object SaasValues {
