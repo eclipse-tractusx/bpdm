@@ -24,20 +24,20 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import java.time.LocalDateTime
 
 /**
- * Test values for CDQ DTOs
+ * Test values for SaaS DTOs
  * Numbered values should match with @see ResponseValues numbered values for easier testing
  */
 object SaasValues {
 
-    val partnerId1 = "cdq-1"
-    val partnerId2 = "cdq-2"
-    val partnerId3 = "cdq-3"
-    val partnerId4 = "cdq-4"
-    val partnerId5 = "cdq-5"
-    val partnerId6 = "cdq-6"
-    val partnerId7 = "cdq-7"
-    val partnerId8 = "cdq-8"
-    val partnerId9 = "cdq-9"
+    val partnerId1 = "saas-1"
+    val partnerId2 = "saas-2"
+    val partnerId3 = "saas-3"
+    val partnerId4 = "saas-4"
+    val partnerId5 = "saas-5"
+    val partnerId6 = "saas-6"
+    val partnerId7 = "saas-7"
+    val partnerId8 = "saas-8"
+    val partnerId9 = "saas-9"
 
 
     val datasource1 = "datasource-1"
@@ -114,9 +114,9 @@ object SaasValues {
     val profile2 = PartnerProfileSaas(classifications = listOf(classification3, classification4))
     val profile3 = PartnerProfileSaas(classifications = listOf(classification5))
 
-    val addressId1 = "address-cdq-1"
-    val addressId2 = "address-cdq-2"
-    val addressId3 = "address-cdq-3"
+    val addressId1 = "address-saas-1"
+    val addressId2 = "address-saas-2"
+    val addressId3 = "address-saas-3"
 
     val adminArea1 = AdministrativeAreaSaas(CommonValues.adminArea1)
     val adminArea2 = AdministrativeAreaSaas(CommonValues.adminArea2)
