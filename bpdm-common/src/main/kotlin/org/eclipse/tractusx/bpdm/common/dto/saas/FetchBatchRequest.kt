@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class FetchBatchRequest(
-    val cdqIds: Collection<String>,
+    val saasIds: Collection<String>,
     val featuresOn: Collection<Features> = emptyList(),
     val featuresOff: Collection<Features> = emptyList()
 

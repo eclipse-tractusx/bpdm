@@ -28,21 +28,21 @@ import org.springframework.stereotype.Service
 @Service
 class SaasLookupMappingService {
 
-    fun toCdq(candidate: BusinessPartnerCandidateDto): BusinessPartnerLookupSaas {
+    fun toSaas(candidate: BusinessPartnerCandidateDto): BusinessPartnerLookupSaas {
         return with(candidate) {
             BusinessPartnerLookupSaas(
                 names = names.map { ValueLookupSaas(it.value) },
-                identifiers = identifiers.map { toCdq(it) },
+                identifiers = identifiers.map { toSaas(it) },
                 legalForm = null, //legalForm parameter seems to have no influence on result currently
-                address = listOf(toCdq(address))
+                address = listOf(toSaas(address))
             )
         }
     }
 
-    private fun toCdq(identifier: IdentifierDto): IdentifierLookupSaas =
+    private fun toSaas(identifier: IdentifierDto): IdentifierLookupSaas =
         IdentifierLookupSaas(identifier.value, TechnicalKeyLookupSaas(identifier.type))
 
-    private fun toCdq(address: AddressDto): AddressLookupSaas =
+    private fun toSaas(address: AddressDto): AddressLookupSaas =
         with(address) {
             AddressLookupSaas(
                 administrativeAreas = administrativeAreas.map { ValueLookupSaas(it.value) },

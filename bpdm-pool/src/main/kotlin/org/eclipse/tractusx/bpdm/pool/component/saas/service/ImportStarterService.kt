@@ -61,7 +61,7 @@ class ImportStarterService(
      * Fetch a [SyncResponse] about the state of the current import
      */
     fun getImportStatus(): SyncResponse {
-        return syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT).toDto()
+        return syncRecordService.getOrCreateRecord(SyncType.SAAS_IMPORT).toDto()
     }
 
     fun getImportIdEntries(importIdentifiers: Collection<String>): ImportIdEntriesResponse {
@@ -71,7 +71,7 @@ class ImportStarterService(
     }
 
     private fun startImport(inSync: Boolean): SyncResponse {
-        val record = syncRecordService.setSynchronizationStart(SyncType.CDQ_IMPORT)
+        val record = syncRecordService.setSynchronizationStart(SyncType.SAAS_IMPORT)
         logger.debug { "Initializing CDQ import starting with ID ${record.errorSave}' for modified records from '${record.fromTime}' with async: ${!inSync}" }
 
         if (inSync)

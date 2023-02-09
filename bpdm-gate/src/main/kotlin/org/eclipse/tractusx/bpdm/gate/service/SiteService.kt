@@ -145,8 +145,8 @@ class SiteService(
      * - Upserting the new relations
      */
     fun upsertSites(sites: Collection<SiteGateInput>) {
-        val sitesCdq = toCdqModels(sites)
-        saasClient.upsertSites(sitesCdq)
+        val sitesSaas = toSaasModels(sites)
+        saasClient.upsertSites(sitesSaas)
 
         deleteRelationsOfSites(sites)
 
@@ -156,9 +156,9 @@ class SiteService(
     /**
      * Fetches parent information and converts the given [sites] to their corresponding CDQ models
      */
-    fun toCdqModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerSaas> {
+    fun toSaasModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
-        return sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
+        return sites.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
     }
 
     private fun upsertRelations(sites: Collection<SiteGateInput>) {
@@ -241,12 +241,12 @@ class SiteService(
         return parentLegalEntitiesPage.values.associateBy { it.externalId!! }
     }
 
-    private fun toCdqModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerSaas?): BusinessPartnerSaas {
+    private fun toSaasModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null) {
             throw SaasNonexistentParentException(site.legalEntityExternalId)
         }
-        val siteCdq = saasRequestMappingService.toCdqModel(site)
+        val siteSaas = saasRequestMappingService.toSaasModel(site)
         val parentIdentifiersWithoutBpn = parentLegalEntity.identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
-        return siteCdq.copy(identifiers = siteCdq.identifiers.plus(parentIdentifiersWithoutBpn))
+        return siteSaas.copy(identifiers = siteSaas.identifiers.plus(parentIdentifiersWithoutBpn))
     }
 }

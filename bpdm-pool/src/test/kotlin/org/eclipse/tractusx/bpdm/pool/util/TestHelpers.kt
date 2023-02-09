@@ -197,7 +197,7 @@ class TestHelpers(
             )
         )
 
-        startSyncAndAwaitSuccess(client, EndpointValues.CDQ_SYNCH_PATH)
+        startSyncAndAwaitSuccess(client, EndpointValues.SAAS_SYNCH_PATH)
 
         return client.invokeGetEndpoint(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
     }

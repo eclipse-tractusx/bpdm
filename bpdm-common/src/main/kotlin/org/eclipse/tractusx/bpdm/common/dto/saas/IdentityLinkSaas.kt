@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class IdentityLinkSaas(
     val linkId: String? = null,
-    val cdqId: String? = null,
+    val saasId: String? = null,
     val addressId: String? = null,
     val externalAddressId: String? = null
 )

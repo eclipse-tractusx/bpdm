@@ -43,7 +43,7 @@ import java.time.Instant
 @Service
 class PartnerImportPageService(
     private val adapterProperties: SaasAdapterConfigProperties,
-    cdqIdConfigProperties: SaasIdentifierConfigProperties,
+    saasIdConfigProperties: SaasIdentifierConfigProperties,
     private val metadataService: MetadataService,
     private val mappingService: SaasToRequestMapper,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
@@ -52,9 +52,9 @@ class PartnerImportPageService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    private val cdqIdentifierType = TypeKeyNameUrlSaas(cdqIdConfigProperties.typeKey, cdqIdConfigProperties.typeName, "")
-    private val cdqIdentifierStatus = TypeKeyNameSaas(cdqIdConfigProperties.statusImportedKey, cdqIdConfigProperties.statusImportedName)
-    private val cdqIssuer = TypeKeyNameUrlSaas(cdqIdConfigProperties.issuerKey, cdqIdConfigProperties.issuerName, "")
+    private val saasIdentifierType = TypeKeyNameUrlSaas(saasIdConfigProperties.typeKey, saasIdConfigProperties.typeName, "")
+    private val saasIdentifierStatus = TypeKeyNameSaas(saasIdConfigProperties.statusImportedKey, saasIdConfigProperties.statusImportedName)
+    private val saasIssuer = TypeKeyNameUrlSaas(saasIdConfigProperties.issuerKey, saasIdConfigProperties.issuerName, "")
 
     private val validChildParentRelations = listOf(
         Pair(LsaType.ADDRESS, LsaType.SITE),
@@ -92,7 +92,7 @@ class PartnerImportPageService(
     private fun addNewMetadata(partners: Collection<BusinessPartnerSaas>){
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.status?.technicalKey == null) null else id.status } }
-            .plus(cdqIdentifierStatus)
+            .plus(saasIdentifierStatus)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
@@ -101,7 +101,7 @@ class PartnerImportPageService(
 
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
-            .plus(cdqIdentifierType)
+            .plus(saasIdentifierType)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
@@ -110,7 +110,7 @@ class PartnerImportPageService(
 
         partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.issuingBody?.technicalKey == null) null else id.issuingBody } }
-            .plus(cdqIssuer)
+            .plus(saasIssuer)
             .associateBy { it.technicalKey }
             .minus(metadataService.getIssuingBodies(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
@@ -129,12 +129,12 @@ class PartnerImportPageService(
 
     private fun createPartners(partners: Collection<BusinessPartnerSaas>):
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerCreateResponse>> {
-        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.extractLsaType() }
+        val (legalEntitiesSaas, sitesSaas, addressesSaas) = partitionIntoLSA(partners) { it.extractLsaType() }
 
-        val partnersWithParent = determineParents(sitesCdq + addressesCdq)
+        val partnersWithParent = determineParents(sitesSaas + addressesSaas)
         val (_, sitesWithParent, addressesWithParent) = partitionIntoLSA(partnersWithParent) { it.partner.extractLsaType() }
 
-        val legalEntities = legalEntitiesCdq.mapNotNull { mappingService.toLegalEntityCreateRequestOrNull(it) }
+        val legalEntities = legalEntitiesSaas.mapNotNull { mappingService.toLegalEntityCreateRequestOrNull(it) }
         val sites = sitesWithParent.mapNotNull { mappingService.toSiteCreateRequestOrNull(it) }
         val addresses = addressesWithParent.mapNotNull { mappingService.toAddressCreateRequestOrNull(it) }
 
@@ -153,12 +153,11 @@ class PartnerImportPageService(
 
     private fun updatePartners(partners: Collection<BusinessPartnerWithBpn>):
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerResponse>> {
-        val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
+        val (legalEntitiesSaas, sitesSaas, addressesSaas) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
-
-        val legalEntities = legalEntitiesCdq.mapNotNull { mappingService.toLegalEntityUpdateRequestOrNull(it) }
-        val sites = sitesCdq.mapNotNull { mappingService.toSiteUpdateRequestOrNull(it) }
-        val addresses = addressesCdq.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
+        val legalEntities = legalEntitiesSaas.mapNotNull { mappingService.toLegalEntityUpdateRequestOrNull(it) }
+        val sites = sitesSaas.mapNotNull { mappingService.toSiteUpdateRequestOrNull(it) }
+        val addresses = addressesSaas.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities) else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites) else emptyList()

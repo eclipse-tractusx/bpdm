@@ -30,7 +30,7 @@ class ValidationMapper {
         with(partner) {
             BusinessPartnerValidationSaas(
                 addresses = addresses.map { toValidation(it) },
-                identifiers = identifiers.map { toValidationCdq(it) },
+                identifiers = identifiers.map { toValidationSaas(it) },
                 legalForm = legalForm?.name?.let { NameValidationSaas(it) },
                 names = names.map { ValueValidationSaas(it.value) }
             )
@@ -50,7 +50,7 @@ class ValidationMapper {
             )
         }
 
-    private fun toValidationCdq(identifier: IdentifierSaas) =
+    private fun toValidationSaas(identifier: IdentifierSaas) =
         IdentifierValidationSaas(TechnicalKeyValidationSaas(identifier.type?.technicalKey!!), identifier.value!!)
 
 }

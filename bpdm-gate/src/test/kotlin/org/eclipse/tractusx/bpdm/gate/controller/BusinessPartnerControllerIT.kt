@@ -212,7 +212,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            WireMock.post(WireMock.urlPathMatching(EndpointValues.CDQ_MOCK_REFERENCE_DATA_LOOKUP_PATH))
+            WireMock.post(WireMock.urlPathMatching(EndpointValues.SAAS_MOCK_REFERENCE_DATA_LOOKUP_PATH))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
