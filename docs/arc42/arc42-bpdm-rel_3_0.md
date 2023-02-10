@@ -29,7 +29,6 @@
 - [Risks and Technical Debts](#risks-and-technical-debts)
 - [Glossary](#glossary)
 
-
 # Introduction and Goals
 
 Every participant in the Catena-X (CX) network shall have a unique Business Partner Number (BPN) according to the concept defined by the Catena-X BPN concept. The task of the BPN Generator is to issue such a BPN for a presented Business Partner data object. In that, the BPN Generator serves as the central issuing authority for BPNs within Catena-X. Technically, it constitutes a service that is available as a singleton within the network.
