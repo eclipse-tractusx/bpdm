@@ -6,6 +6,11 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [3.0.2] - tbd
 
+### Changed
+
+- SaaS Sharing Service Importer now also adds missing import entries (SaaS-ID to BPN) when encountering Business Partners that already have BPNs in the SaaS
+  storage (possible due to legacy imports done before)
+
 ### Fixed
 
 - Startup of BPDM Gate without supplying any environment variables or property overwrites

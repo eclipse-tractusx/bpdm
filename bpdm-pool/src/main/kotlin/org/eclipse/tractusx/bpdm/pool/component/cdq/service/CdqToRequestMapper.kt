@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.LegalFormCdq
 import org.eclipse.tractusx.bpdm.common.dto.cdq.TypeKeyNameCdq
@@ -37,6 +38,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class CdqToRequestMapper {
+    private val logger = KotlinLogging.logger { }
+
     fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerCdq): LegalEntityPartnerCreateRequest {
         return LegalEntityPartnerCreateRequest(
             partnerWithImportId.toLegalEntityDto(),
@@ -44,11 +47,29 @@ class CdqToRequestMapper {
         )
     }
 
+    fun toLegalEntityCreateRequestOrNull(partnerWithImportId: BusinessPartnerCdq): LegalEntityPartnerCreateRequest? {
+        return try {
+            toLegalEntityCreateRequest(partnerWithImportId)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithImportId.externalId} could not be mapped to ${LegalEntityPartnerCreateRequest::class.simpleName}" }
+            null
+        }
+    }
+
     fun toLegalEntityUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest {
         return LegalEntityPartnerUpdateRequest(
             partnerWithBpn.bpn,
             partnerWithBpn.partner.toLegalEntityDto()
         )
+    }
+
+    fun toLegalEntityUpdateRequestOrNull(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest? {
+        return try {
+            toLegalEntityUpdateRequest(partnerWithBpn)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithBpn.partner.externalId} could not be mapped to ${LegalEntityPartnerUpdateRequest::class.simpleName}" }
+            null
+        }
     }
 
     fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
@@ -59,11 +80,30 @@ class CdqToRequestMapper {
         )
     }
 
+
+    fun toSiteCreateRequestOrNull(partnerWithImportId: BusinessPartnerWithParentBpn): SitePartnerCreateRequest? {
+        return try {
+            toSiteCreateRequest(partnerWithImportId)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithImportId.partner.externalId} could not be mapped to ${SitePartnerCreateRequest::class.simpleName}" }
+            null
+        }
+    }
+
     fun toSiteUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest {
         return SitePartnerUpdateRequest(
             partnerWithBpn.bpn,
             partnerWithBpn.partner.toSiteDto()
         )
+    }
+
+    fun toSiteUpdateRequestOrNull(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest? {
+        return try {
+            toSiteUpdateRequest(partnerWithBpn)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithBpn.partner.externalId} could not be mapped to ${SitePartnerUpdateRequest::class.simpleName}" }
+            null
+        }
     }
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
@@ -74,11 +114,29 @@ class CdqToRequestMapper {
         )
     }
 
+    fun toAddressCreateRequestOrNull(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest? {
+        return try {
+            toAddressCreateRequest(partnerWithParent)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithParent.partner.externalId} could not be mapped to ${AddressPartnerCreateRequest::class.simpleName}" }
+            null
+        }
+    }
+
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
             partnerWithBpn.bpn,
             properties = toDto(partnerWithBpn.partner.addresses.first())
         )
+    }
+
+    fun toAddressUpdateRequestOrNull(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest? {
+        return try {
+            toAddressUpdateRequest(partnerWithBpn)
+        } catch (_: Throwable) {
+            logger.warn { "Business Partner with ID ${partnerWithBpn.partner.externalId} could not be mapped to ${AddressPartnerUpdateRequest::class.simpleName}" }
+            null
+        }
     }
 
 
