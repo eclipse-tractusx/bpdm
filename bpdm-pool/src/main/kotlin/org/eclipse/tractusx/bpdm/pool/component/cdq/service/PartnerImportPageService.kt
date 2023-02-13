@@ -74,7 +74,8 @@ class PartnerImportPageService(
 
         val validPartners = partnerCollection.values.filter { isValid(it) }
 
-        val (partnersWithBpn, partnersWithoutBpn) = determineBpn(validPartners)
+        addMissingImportEntries(validPartners)
+        val (partnersWithBpn, partnersWithoutBpn) = partitionHasImportEntry(validPartners)
 
         val (createdLegalEntities, createdSites, createdAddresses) = createPartners(partnersWithoutBpn)
         val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(partnersWithBpn)
@@ -133,9 +134,9 @@ class PartnerImportPageService(
         val partnersWithParent = determineParents(sitesCdq + addressesCdq)
         val (_, sitesWithParent, addressesWithParent) = partitionIntoLSA(partnersWithParent) { it.partner.extractLsaType() }
 
-        val legalEntities = legalEntitiesCdq.map { mappingService.toLegalEntityCreateRequest(it) }
-        val sites = sitesWithParent.map { mappingService.toSiteCreateRequest(it) }
-        val addresses = addressesWithParent.map { mappingService.toAddressCreateRequest(it) }
+        val legalEntities = legalEntitiesCdq.mapNotNull { mappingService.toLegalEntityCreateRequestOrNull(it) }
+        val sites = sitesWithParent.mapNotNull { mappingService.toSiteCreateRequestOrNull(it) }
+        val addresses = addressesWithParent.mapNotNull { mappingService.toAddressCreateRequestOrNull(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities) else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites) else emptyList()
@@ -154,9 +155,10 @@ class PartnerImportPageService(
             Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerResponse>> {
         val (legalEntitiesCdq, sitesCdq, addressesCdq) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
-        val legalEntities = legalEntitiesCdq.map { mappingService.toLegalEntityUpdateRequest(it) }
-        val sites = sitesCdq.map { mappingService.toSiteUpdateRequest(it) }
-        val addresses = addressesCdq.map { mappingService.toAddressUpdateRequest(it) }
+
+        val legalEntities = legalEntitiesCdq.mapNotNull { mappingService.toLegalEntityUpdateRequestOrNull(it) }
+        val sites = sitesCdq.mapNotNull { mappingService.toSiteUpdateRequestOrNull(it) }
+        val addresses = addressesCdq.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
 
         val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities) else emptyList()
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites) else emptyList()
@@ -173,7 +175,8 @@ class PartnerImportPageService(
         val parents = cdqClient.readBusinessPartnersByExternalIds(childrenWithParentId.map { it.parentId }).values
         val validParents = filterValidRelations(parents.filter { isValid(it) }, childrenWithParentId)
 
-        val (parentsWithBpn, parentsWithoutBpn) = determineBpn(validParents)
+        addMissingImportEntries(validParents)
+        val (parentsWithBpn, parentsWithoutBpn) = partitionHasImportEntry(validParents)
 
         val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
 
@@ -232,7 +235,7 @@ class PartnerImportPageService(
         return Triple(legalEntities, sites, addresses)
     }
 
-    private fun BusinessPartnerCdq.extractLsaType(): LsaType? {
+    private fun BusinessPartnerCdq.extractLsaType(): LsaType {
         val validTypes = types.mapNotNull {
             when (it.technicalKey) {
                 adapterProperties.legalEntityType -> LsaType.LEGAL_ENTITY
@@ -243,8 +246,8 @@ class PartnerImportPageService(
         }
 
         if (validTypes.isEmpty()) {
-            logger.warn { "CDQ Business partner with id $id does not contain any LSA type. Partner will be ignored" }
-            return null
+            logger.warn { "CDQ Business partner with id $id does not contain any LSA type. Assume Legal Entity" }
+            return LsaType.LEGAL_ENTITY
         }
 
         val type = validTypes.first()
@@ -256,19 +259,16 @@ class PartnerImportPageService(
         return type
     }
 
-    private fun determineBpn(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
-        val (hasStorageBpn, noStorageBpn) = partners
+    private fun partitionHasBpn(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
+        val (hasBpn, nopBpn) = partners
             .map { Pair(it, it.extractId(adapterProperties.bpnKey)) }
             .partition { (_, bpn) -> bpn != null }
-
-        val (hasImportedBpn, noBpn) = determineImportedBpn(noStorageBpn.map { (partner, _) -> partner })
-
         return Pair(
-            hasStorageBpn.map { (partner, id) -> BusinessPartnerWithBpn(partner, id!!) } + hasImportedBpn,
-            noBpn)
+            hasBpn.map { (partner, id) -> BusinessPartnerWithBpn(partner, id!!) },
+            nopBpn.map { (partner, _) -> partner })
     }
 
-    private fun determineImportedBpn(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
+    private fun partitionHasImportEntry(partners: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerCdq>> {
         val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.externalId!! })
             .associateBy { it.importIdentifier }
 
@@ -282,6 +282,17 @@ class PartnerImportPageService(
         )
     }
 
+    private fun addMissingImportEntries(partners: Collection<BusinessPartnerCdq>) {
+        val (hasBpn, _) = partitionHasBpn(partners)
+        val partnersByImportId = hasBpn.associateBy { it.partner.externalId!! }
+        val existingImportIds = importEntryRepository.findByImportIdentifierIn(partnersByImportId.keys).map { it.importIdentifier }.toSet()
+
+        val missingPartners = partnersByImportId.minus(existingImportIds)
+        val missingEntries = missingPartners.entries.map { ImportEntry(it.key, it.value.bpn) }
+
+        importEntryRepository.saveAll(missingEntries)
+    }
+
     private fun filterValidRelations(
         parents: Collection<BusinessPartnerCdq>,
         children: Collection<BusinessPartnerWithParentId>
@@ -292,7 +303,7 @@ class PartnerImportPageService(
             val parentType = parent.extractLsaType()
             val childType = parentIdToChild[parent.externalId]?.partner?.extractLsaType()
 
-            if (parentType != null && childType != null) {
+            if (childType != null) {
                 val childParentRelation = Pair(childType, parentType)
                 validChildParentRelations.contains(childParentRelation)
             } else {
@@ -303,4 +314,5 @@ class PartnerImportPageService(
 
     private fun BusinessPartnerCdq.extractId(idKey: String): String? =
         identifiers.find { it.type?.technicalKey == idKey }?.value
+
 }
