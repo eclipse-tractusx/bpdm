@@ -40,6 +40,7 @@
         <module>bpdm-pool</module>
         <module>bpdm-gate</module>
         <module>bpdm-common</module>
+        <module>bpdm-pool-client</module>
     </modules>
 
     <properties>
