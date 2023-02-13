@@ -117,6 +117,13 @@ opensearch:
     - master
     - ingest
     - data
+  resources:
+    limits:
+      cpu: 300m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 2Gi
   config:
     opensearch.yml: |
       cluster.name: opensearch-cluster
