@@ -25,10 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.component.cdq.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/cdq")
@@ -64,7 +61,7 @@ class CdqController(
         ]
     )
     @GetMapping("/business-partner/sync")
-    fun getSyncStatus() : SyncResponse {
+    fun getSyncStatus(): SyncResponse {
         return partnerImportService.getImportStatus()
     }
 }

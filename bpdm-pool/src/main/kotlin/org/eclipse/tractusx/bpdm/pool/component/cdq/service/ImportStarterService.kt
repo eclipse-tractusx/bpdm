@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.component.cdq.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportIdEntriesResponse
+import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
+import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.springframework.scheduling.annotation.Scheduled
@@ -33,7 +36,8 @@ import org.springframework.stereotype.Service
 @Service
 class ImportStarterService(
     private val syncRecordService: SyncRecordService,
-    private val importService: PartnerImportService
+    private val importService: PartnerImportService,
+    private val importEntryRepository: ImportEntryRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -58,6 +62,12 @@ class ImportStarterService(
      */
     fun getImportStatus(): SyncResponse {
         return syncRecordService.getOrCreateRecord(SyncType.CDQ_IMPORT).toDto()
+    }
+
+    fun getImportIdEntries(importIdentifiers: Collection<String>): ImportIdEntriesResponse {
+        return ImportIdEntriesResponse(
+            importEntryRepository.findByImportIdentifierIn(importIdentifiers).map { ImportIdEntry(it.importIdentifier, it.bpn) }
+        )
     }
 
     private fun startImport(inSync: Boolean): SyncResponse {
