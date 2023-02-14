@@ -31,7 +31,7 @@ version: 3.0.5-alpha.4
 # Versions are not expected to follow Semantic Versioning.
 # They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "3.0.2-alpha.1"
+appVersion: "3.0.2-alpha.2"
 
 maintainers:
   - name: Nico Koprowski
