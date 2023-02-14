@@ -6,10 +6,10 @@ This Helm Chart deploys the BPDM Gate service to a Kubernetes environment.
 
 * [Kubernetes Cluster](https://kubernetes.io)
 * [Helm](https://helm.sh/docs/)
-* SaaS storage and datasource
+* CDQ Storage and datasource
 * Running BPDM Pool instance
 
-For the default deployment you need to specify a valid SaaS hostname, storage, datasource and API key for the application to connect with.
+For the default deployment you need to specify a valid CDQ storage, datasource and API key for the application to connect with.
 The easiest way to provide this information is by creating your own values files and overwrite the default `applicationConfig` and `applicationSecrets` values.
 
 my_release-values.yaml:
@@ -17,13 +17,12 @@ my_release-values.yaml:
 ```yaml
 applicationConfig:
   bpdm:
-    saas:
-      host: https://saas
+    cdq:
       storage: your_storage_id
       datasource: your_datasource_id
 applicationSecrets:
   bpdm:
-    saas:
+    cdq:
       api-key: your_api_key
 ```
 
