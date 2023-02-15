@@ -1,0 +1,59 @@
+name: Lint and Test Charts
+
+# Run chart linting and tests on each pull request
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/**
+      - charts/**
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - charts/**
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.10.3
+
+      # Setup python as a prerequisite for chart linting
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.7
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.3.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "CHART_CHANGED=true" >> $GITHUB_ENV
+          fi
+
+      # run chart linting
+      - name: Run chart-testing (lint)
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config charts/config/chart-testing-config.yaml
+
+      # Preparing a kind cluster to install and test charts on
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.4.0
+        if: ${{ env.CHART_CHANGED == 'true' }}
+
+      # install the chart to the kind cluster and run helm test
+      # define charts to test with the --charts parameter
+      - name: Run chart-testing (install)
+        run: ct install --charts charts/pool,charts/gate --config charts/config/chart-testing-config.yaml
+        if: ${{ env.CHART_CHANGED == 'true' }}

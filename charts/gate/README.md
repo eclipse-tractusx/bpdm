@@ -87,8 +87,10 @@ ingress:
 
 For the default deployment you already need to overwrite the configuration properties of the application.
 The Helm deployment comes with the ability to configure the BPDM Gate application directly over the values file.
-This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-pool-auth.properties` files.
-Consider that you would need to turn on `auth` and `pool-auth` profile first before overwriting any property in the corresponding properties file could take effect.
+This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties`
+and  `application-pool-auth.properties` files.
+Consider that you would need to turn on `auth` and `pool-auth` profile first before overwriting any property in the corresponding properties file could take
+effect.
 Overwriting configuration properties can be useful for connecting to a remotely hosted BPDM Pool instance:
 
 ```yaml
