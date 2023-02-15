@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: Business Partner Data Management Gate
   description: A gate for a member to share business partner data with CatenaX
-  version: 3.0.2-SNAPSHOT
+  version: 3.0.2
 servers:
   - url: http://localhost:8081
     description: Generated server url
