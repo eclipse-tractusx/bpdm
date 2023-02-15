@@ -2,6 +2,19 @@ apiVersion: v1
 entries:
   bpdm-gate:
   - apiVersion: v2
+    appVersion: 3.0.2-alpha.2
+    created: "2023-02-15T10:19:37.594490249Z"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: 6c986693c7a5c5a0d9b15e293c8de245ec5faa5b12c31c542af90d88f8e2d545
+    maintainers:
+    - name: Nico Koprowski
+    - name: Patrick Zeller
+    name: bpdm-gate
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.5-alpha.4/bpdm-gate-3.0.5-alpha.4.tgz
+    version: 3.0.5-alpha.4
+  - apiVersion: v2
     appVersion: 3.0.2-alpha.1
     created: "2023-02-09T14:57:58.275018292Z"
     description: A Helm chart for deploying the BPDM gate service
@@ -72,6 +85,30 @@ entries:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.1/bpdm-gate-3.0.1.tgz
     version: 3.0.1
   bpdm-pool:
+  - apiVersion: v2
+    appVersion: 3.0.2-alpha.2
+    created: "2023-02-15T10:19:37.833999921Z"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM pool service
+    digest: c8c9b1263ef87781aad03312dbee729427c5134189300c13b791458641104a5d
+    maintainers:
+    - name: Nico Koprowski
+    - name: Patrick Zeller
+    name: bpdm-pool
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.5-alpha.3/bpdm-pool-4.0.5-alpha.3.tgz
+    version: 4.0.5-alpha.3
   - apiVersion: v2
     appVersion: 3.0.2-alpha.1
     created: "2023-02-09T14:57:58.511773124Z"
@@ -240,4 +277,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-02-09T14:57:58.511854432Z"
+generated: "2023-02-15T10:19:37.834187223Z"
