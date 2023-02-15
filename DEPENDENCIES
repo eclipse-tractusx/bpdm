@@ -1,234 +1,172 @@
-ch.qos.logback:logback-classic:jar:1.4.5:compile -- module ch.qos.logback.classic
-ch.qos.logback:logback-core:jar:1.4.5:compile -- module ch.qos.logback.core
-com.carrotsearch:hppc:jar:0.8.1:compile -- module hppc (auto)
-com.fasterxml.jackson.core:jackson-annotations:jar:2.14.1:compile -- module com.fasterxml.jackson.annotation
-com.fasterxml.jackson.core:jackson-core:jar:2.14.1:compile -- module com.fasterxml.jackson.core
-com.fasterxml.jackson.core:jackson-databind:jar:2.14.1:compile -- module com.fasterxml.jackson.databind
-com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:jar:2.14.1:compile -- module com.fasterxml.jackson.dataformat.cbor
-com.fasterxml.jackson.dataformat:jackson-dataformat-smile:jar:2.14.1:compile -- module com.fasterxml.jackson.dataformat.smile
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:jar:2.14.1:compile -- module com.fasterxml.jackson.dataformat.yaml
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.14.1:compile -- module com.fasterxml.jackson.datatype.jdk8
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.14.1:compile -- module com.fasterxml.jackson.datatype.jsr310
-com.fasterxml.jackson.module:jackson-module-kotlin:jar:2.14.1:compile -- module com.fasterxml.jackson.kotlin
-com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.14.1:compile -- module com.fasterxml.jackson.module.paramnames
-com.fasterxml:classmate:jar:1.5.1:compile -- module com.fasterxml.classmate
-com.github.docker-java:docker-java-api:jar:3.2.13:test -- module docker.java.api (auto)
-com.github.docker-java:docker-java-transport-zerodep:jar:3.2.13:test -- module docker.java.transport.zerodep (auto)
-com.github.docker-java:docker-java-transport:jar:3.2.13:test -- module docker.java.transport (auto)
-com.github.spullara.mustache.java:compiler:jar:0.9.10:compile -- module com.github.mustachejava [auto]
-com.github.stephenc.jcip:jcip-annotations:jar:1.0-1:compile -- module jcip.annotations (auto)
-com.github.tomakehurst:wiremock-jre8-standalone:jar:2.35.0:test -- module wiremock.jre8.standalone (auto)
-com.google.code.findbugs:jsr305:jar:3.0.2:compile -- module jsr305 (auto)
-com.jayway.jsonpath:json-path:jar:2.7.0:test -- module json.path (auto)
-com.neovisionaries:nv-i18n:jar:1.29:compile -- module nv.i18n (auto)
-com.nimbusds:content-type:jar:2.2:compile -- module content.type (auto)
-com.nimbusds:lang-tag:jar:1.7:compile -- module lang.tag (auto)
-com.nimbusds:nimbus-jose-jwt:jar:9.24.4:compile -- module com.nimbusds.jose.jwt [auto]
-com.nimbusds:oauth2-oidc-sdk:jar:9.43.1:compile -- module oauth2.oidc.sdk (auto)
-com.ninja-squad:springmockk:jar:3.1.1:test -- module springmockk (auto)
-com.sun.istack:istack-commons-runtime:jar:4.1.1:runtime -- module com.sun.istack.runtime
-com.tdunning:t-digest:jar:3.2:compile -- module t.digest (auto)
-com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test -- module android.json (auto)
-com.zaxxer:HikariCP:jar:5.0.1:compile -- module com.zaxxer.hikari
-commons-codec:commons-codec:jar:1.15:compile -- module org.apache.commons.codec [auto]
-commons-logging:commons-logging:jar:1.2:compile -- module commons.logging (auto)
-io.github.classgraph:classgraph:jar:4.8.149:compile -- module io.github.classgraph
-io.github.microutils:kotlin-logging-jvm:jar:2.1.23:compile -- module kotlin.logging.jvm (auto)
-io.micrometer:micrometer-commons:jar:1.10.3:compile -- module micrometer.commons [auto]
-io.micrometer:micrometer-core:jar:1.10.3:compile -- module micrometer.core [auto]
-io.micrometer:micrometer-observation:jar:1.10.3:compile -- module micrometer.observation [auto]
-io.mockk:mockk-agent-api:jar:1.12.1:test -- module mockk.agent.api (auto)
-io.mockk:mockk-agent-common:jar:1.12.1:test -- module mockk.agent.common (auto)
-io.mockk:mockk-agent-jvm:jar:1.12.1:test -- module mockk.agent.jvm (auto)
-io.mockk:mockk-common:jar:1.12.1:test -- module mockk.common (auto)
-io.mockk:mockk-dsl-jvm:jar:1.12.1:test -- module mockk.dsl.jvm (auto)
-io.mockk:mockk-dsl:jar:1.12.1:test -- module mockk.dsl (auto)
-io.mockk:mockk:jar:1.12.1:test -- module mockk (auto)
-io.netty:netty-buffer:jar:4.1.87.Final:compile -- module io.netty.buffer [auto]
-io.netty:netty-codec-dns:jar:4.1.87.Final:compile -- module io.netty.codec.dns [auto]
-io.netty:netty-codec-http2:jar:4.1.87.Final:compile -- module io.netty.codec.http2 [auto]
-io.netty:netty-codec-http:jar:4.1.87.Final:compile -- module io.netty.codec.http [auto]
-io.netty:netty-codec-socks:jar:4.1.87.Final:compile -- module io.netty.codec.socks [auto]
-io.netty:netty-codec:jar:4.1.87.Final:compile -- module io.netty.codec [auto]
-io.netty:netty-common:jar:4.1.87.Final:compile -- module io.netty.common [auto]
-io.netty:netty-handler-proxy:jar:4.1.87.Final:compile -- module io.netty.handler.proxy [auto]
-io.netty:netty-handler:jar:4.1.87.Final:compile -- module io.netty.handler [auto]
-io.netty:netty-resolver-dns-classes-macos:jar:4.1.87.Final:compile -- module io.netty.resolver.dns.classes.macos [auto]
-io.netty:netty-resolver-dns-native-macos:jar:osx-x86_64:4.1.87.Final:compile -- module io.netty.resolver.dns.macos.osx.x86_64 [auto]
-io.netty:netty-resolver-dns:jar:4.1.87.Final:compile -- module io.netty.resolver.dns [auto]
-io.netty:netty-resolver:jar:4.1.87.Final:compile -- module io.netty.resolver [auto]
-io.netty:netty-transport-classes-epoll:jar:4.1.87.Final:compile -- module io.netty.transport.classes.epoll [auto]
-io.netty:netty-transport-native-epoll:jar:linux-x86_64:4.1.87.Final:compile -- module io.netty.transport.epoll.linux.x86_64 [auto]
-io.netty:netty-transport-native-unix-common:jar:4.1.87.Final:compile -- module io.netty.transport.unix.common [auto]
-io.netty:netty-transport:jar:4.1.87.Final:compile -- module io.netty.transport [auto]
-io.projectreactor.netty:reactor-netty-core:jar:1.1.2:compile -- module reactor.netty.core [auto]
-io.projectreactor.netty:reactor-netty-http:jar:1.1.2:compile -- module reactor.netty.http [auto]
-io.projectreactor:reactor-core:jar:3.5.2:compile -- module reactor.core [auto]
-io.swagger.core.v3:swagger-annotations-jakarta:jar:2.2.7:compile -- module io.swagger.v3.oas.annotations [auto]
-io.swagger.core.v3:swagger-core-jakarta:jar:2.2.7:compile -- module io.swagger.v3.core [auto]
-io.swagger.core.v3:swagger-models-jakarta:jar:2.2.7:compile -- module io.swagger.v3.oas.models [auto]
-jakarta.activation:jakarta.activation-api:jar:2.1.1:compile -- module jakarta.activation
-jakarta.annotation:jakarta.annotation-api:jar:2.1.1:compile -- module jakarta.annotation
-jakarta.inject:jakarta.inject-api:jar:2.0.0:runtime -- module jakarta.inject [auto]
-jakarta.json.bind:jakarta.json.bind-api:jar:3.0.0:runtime -- module jakarta.json.bind
-jakarta.json:jakarta.json-api:jar:2.1.1:compile -- module jakarta.json
-jakarta.persistence:jakarta.persistence-api:jar:3.1.0:compile -- module jakarta.persistence
-jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile -- module jakarta.transaction
-jakarta.validation:jakarta.validation-api:jar:3.0.2:compile -- module jakarta.validation
-jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.0:compile -- module jakarta.xml.bind
-joda-time:joda-time:jar:2.10.12:compile -- module org.joda.time [auto]
-junit:junit:jar:4.13.2:test -- module junit [auto]
-net.bytebuddy:byte-buddy-agent:jar:1.12.22:test -- module net.bytebuddy.agent
-net.bytebuddy:byte-buddy:jar:1.12.22:runtime -- module net.bytebuddy
-net.bytebuddy:byte-buddy:jar:1.12.22:test -- module net.bytebuddy
-net.java.dev.jna:jna:jar:5.5.0:compile -- module com.sun.jna [auto]
-net.minidev:accessors-smart:jar:2.4.8:compile -- module accessors.smart (auto)
-net.minidev:accessors-smart:jar:2.4.8:test -- module accessors.smart (auto)
-net.minidev:json-smart:jar:2.4.8:compile -- module json.smart (auto)
-net.minidev:json-smart:jar:2.4.8:test -- module json.smart (auto)
-net.sf.jopt-simple:jopt-simple:jar:5.0.4:compile -- module jopt.simple (auto)
-org.antlr:antlr4-runtime:jar:4.10.1:runtime -- module org.antlr.antlr4.runtime [auto]
-org.apache.commons:commons-compress:jar:1.21:test -- module org.apache.commons.compress [auto]
-org.apache.commons:commons-lang3:jar:3.12.0:compile -- module org.apache.commons.lang3 [auto]
-org.apache.httpcomponents:httpasyncclient:jar:4.1.5:compile -- module org.apache.httpcomponents.httpasyncclient [auto]
-org.apache.httpcomponents:httpclient:jar:4.5.14:compile -- module org.apache.httpcomponents.httpclient [auto]
-org.apache.httpcomponents:httpcore-nio:jar:4.4.16:compile -- module org.apache.httpcomponents.httpcore.nio [auto]
-org.apache.httpcomponents:httpcore:jar:4.4.16:compile -- module org.apache.httpcomponents.httpcore [auto]
-org.apache.logging.log4j:log4j-api:jar:2.19.0:compile -- module org.apache.logging.log4j
-org.apache.logging.log4j:log4j-core:jar:2.19.0:runtime -- module org.apache.logging.log4j.core [auto]
-org.apache.logging.log4j:log4j-to-slf4j:jar:2.19.0:compile -- module org.apache.logging.slf4j [auto]
-org.apache.lucene:lucene-analysis-common:jar:9.2.0:compile -- module org.apache.lucene.analysis.common
-org.apache.lucene:lucene-backward-codecs:jar:9.2.0:compile -- module org.apache.lucene.backward_codecs
-org.apache.lucene:lucene-core:jar:9.2.0:compile -- module org.apache.lucene.core
-org.apache.lucene:lucene-grouping:jar:9.2.0:compile -- module org.apache.lucene.grouping
-org.apache.lucene:lucene-highlighter:jar:9.2.0:compile -- module org.apache.lucene.highlighter
-org.apache.lucene:lucene-join:jar:9.2.0:compile -- module org.apache.lucene.join
-org.apache.lucene:lucene-memory:jar:9.2.0:compile -- module org.apache.lucene.memory
-org.apache.lucene:lucene-misc:jar:9.2.0:compile -- module org.apache.lucene.misc
-org.apache.lucene:lucene-queries:jar:9.2.0:compile -- module org.apache.lucene.queries
-org.apache.lucene:lucene-queryparser:jar:9.2.0:compile -- module org.apache.lucene.queryparser
-org.apache.lucene:lucene-sandbox:jar:9.2.0:compile -- module org.apache.lucene.sandbox
-org.apache.lucene:lucene-spatial-extras:jar:9.2.0:compile -- module org.apache.lucene.spatial_extras
-org.apache.lucene:lucene-spatial3d:jar:9.2.0:compile -- module org.apache.lucene.spatial3d
-org.apache.lucene:lucene-suggest:jar:9.2.0:compile -- module org.apache.lucene.suggest
-org.apache.tomcat.embed:tomcat-embed-core:jar:10.1.5:compile -- module org.apache.tomcat.embed.core
-org.apache.tomcat.embed:tomcat-embed-el:jar:10.1.5:compile -- module org.apache.tomcat.embed.el
-org.apache.tomcat.embed:tomcat-embed-websocket:jar:10.1.5:compile -- module org.apache.tomcat.embed.websocket
-org.apiguardian:apiguardian-api:jar:1.1.2:test -- module org.apiguardian.api
-org.aspectj:aspectjweaver:jar:1.9.19:compile -- module org.aspectj.weaver [auto]
-org.assertj:assertj-core:jar:3.23.1:test -- module org.assertj.core
-org.checkerframework:checker-qual:jar:3.5.0:runtime -- module org.checkerframework.checker.qual [auto]
-org.eclipse.angus:angus-activation:jar:1.0.0:runtime -- module com.sun.activation.registries
-org.eclipse.parsson:parsson:jar:1.0.0:compile -- module org.eclipse.parsson
-org.eclipse.tractusx:bpdm-common:jar:3.0.2-SNAPSHOT:compile -- module bpdm.common (auto)
-org.eclipse:yasson:jar:3.0.2:runtime -- module org.eclipse.yasson
-org.flywaydb:flyway-core:jar:8.5.12:compile -- module org.flywaydb.core [auto]
-org.glassfish.jaxb:jaxb-core:jar:4.0.1:runtime -- module org.glassfish.jaxb.core
-org.glassfish.jaxb:jaxb-runtime:jar:4.0.1:runtime -- module org.glassfish.jaxb.runtime
-org.glassfish.jaxb:txw2:jar:4.0.1:runtime -- module com.sun.xml.txw2
-org.hamcrest:hamcrest-core:jar:2.2:test -- module org.hamcrest.core.deprecated [auto]
-org.hamcrest:hamcrest:jar:2.2:test -- module org.hamcrest [auto]
-org.hdrhistogram:HdrHistogram:jar:2.1.12:compile -- module HdrHistogram (auto)
-org.hdrhistogram:HdrHistogram:jar:2.1.12:runtime -- module HdrHistogram (auto)
-org.hibernate.common:hibernate-commons-annotations:jar:6.0.2.Final:runtime -- module org.hibernate.commons.annotations
-org.hibernate.orm:hibernate-core:jar:6.1.6.Final:compile -- module org.hibernate.orm.core [auto]
-org.hibernate.validator:hibernate-validator:jar:8.0.0.Final:compile -- module org.hibernate.validator [auto]
-org.jboss.logging:jboss-logging:jar:3.5.0.Final:compile -- module org.jboss.logging
-org.jboss:jandex:jar:2.4.2.Final:runtime -- module org.jboss.jandex [auto]
-org.jetbrains.kotlin:kotlin-reflect:jar:1.7.21:compile -- module kotlin.reflect
-org.jetbrains.kotlin:kotlin-stdlib-common:jar:1.7.21:compile -- module kotlin.stdlib.common (auto)
-org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:1.7.21:compile -- module kotlin.stdlib.jdk7
-org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:1.7.21:compile -- module kotlin.stdlib.jdk8
-org.jetbrains.kotlin:kotlin-stdlib:jar:1.7.21:compile -- module kotlin.stdlib
-org.jetbrains:annotations:jar:13.0:compile -- module annotations (auto)
-org.junit.jupiter:junit-jupiter-api:jar:5.9.2:test -- module org.junit.jupiter.api
-org.junit.jupiter:junit-jupiter-engine:jar:5.9.2:test -- module org.junit.jupiter.engine
-org.junit.jupiter:junit-jupiter-params:jar:5.9.2:test -- module org.junit.jupiter.params
-org.junit.jupiter:junit-jupiter:jar:5.9.2:test -- module org.junit.jupiter
-org.junit.platform:junit-platform-commons:jar:1.9.2:test -- module org.junit.platform.commons
-org.junit.platform:junit-platform-engine:jar:1.9.2:test -- module org.junit.platform.engine
-org.latencyutils:LatencyUtils:jar:2.0.3:runtime -- module LatencyUtils (auto)
-org.mockito:mockito-junit-jupiter:jar:4.8.1:test -- module org.mockito.junit.jupiter [auto]
-org.objenesis:objenesis:jar:3.1:test -- module org.objenesis [auto]
-org.opensearch.client:opensearch-java:jar:2.0.0:compile -- module opensearch.java (auto)
-org.opensearch.client:opensearch-rest-client:jar:2.1.0:compile -- module opensearch.rest.client (auto)
-org.opensearch.client:opensearch-rest-high-level-client:jar:2.1.0:compile -- module opensearch.rest.high.level.client (auto)
-org.opensearch.plugin:aggs-matrix-stats-client:jar:2.1.0:compile -- module aggs.matrix.stats.client (auto)
-org.opensearch.plugin:lang-mustache-client:jar:2.1.0:compile -- module lang.mustache.client (auto)
-org.opensearch.plugin:mapper-extras-client:jar:2.1.0:compile -- module mapper.extras.client (auto)
-org.opensearch.plugin:parent-join-client:jar:2.1.0:compile -- module parent.join.client (auto)
-org.opensearch.plugin:rank-eval-client:jar:2.1.0:compile -- module rank.eval.client (auto)
-org.opensearch:opensearch-cli:jar:2.1.0:compile -- module opensearch.cli (auto)
-org.opensearch:opensearch-core:jar:2.1.0:compile -- module opensearch.core (auto)
-org.opensearch:opensearch-geo:jar:2.1.0:compile -- module opensearch.geo (auto)
-org.opensearch:opensearch-secure-sm:jar:2.1.0:compile -- module opensearch.secure.sm (auto)
-org.opensearch:opensearch-x-content:jar:2.1.0:compile -- module opensearch.x.content (auto)
-org.opensearch:opensearch:jar:2.1.0:compile
-org.opentest4j:opentest4j:jar:1.2.0:test -- module org.opentest4j
-org.ow2.asm:asm:jar:9.1:compile -- module org.objectweb.asm
-org.ow2.asm:asm:jar:9.1:test -- module org.objectweb.asm
-org.postgresql:postgresql:jar:42.5.0:runtime -- module org.postgresql.jdbc [auto]
-org.reactivestreams:reactive-streams:jar:1.0.4:compile -- module org.reactivestreams [auto]
-org.rnorth.duct-tape:duct-tape:jar:1.0.8:test -- module duct.tape (auto)
-org.skyscreamer:jsonassert:jar:1.5.1:test -- module jsonassert (auto)
-org.slf4j:jul-to-slf4j:jar:2.0.6:compile -- module jul.to.slf4j [auto]
-org.slf4j:slf4j-api:jar:2.0.6:compile -- module org.slf4j
-org.springdoc:springdoc-openapi-starter-common:jar:2.0.0:compile -- module org.springdoc.openapi.common [auto]
-org.springdoc:springdoc-openapi-starter-webmvc-api:jar:2.0.0:compile -- module org.springdoc.openapi.webmvc.core [auto]
-org.springdoc:springdoc-openapi-starter-webmvc-ui:jar:2.0.0:compile -- module org.springdoc.openapi.ui [auto]
-org.springframework.boot:spring-boot-actuator-autoconfigure:jar:3.0.2:compile -- module spring.boot.actuator.autoconfigure [auto]
-org.springframework.boot:spring-boot-actuator:jar:3.0.2:compile -- module spring.boot.actuator [auto]
-org.springframework.boot:spring-boot-autoconfigure:jar:3.0.2:compile -- module spring.boot.autoconfigure [auto]
-org.springframework.boot:spring-boot-configuration-processor:jar:3.0.2:compile (optional) -- module spring.boot.configuration.processor [auto]
-org.springframework.boot:spring-boot-starter-actuator:jar:3.0.2:compile -- module spring.boot.starter.actuator [auto]
-org.springframework.boot:spring-boot-starter-aop:jar:3.0.2:compile -- module spring.boot.starter.aop [auto]
-org.springframework.boot:spring-boot-starter-data-jpa:jar:3.0.2:compile -- module spring.boot.starter.data.jpa [auto]
-org.springframework.boot:spring-boot-starter-jdbc:jar:3.0.2:compile -- module spring.boot.starter.jdbc [auto]
-org.springframework.boot:spring-boot-starter-json:jar:3.0.2:compile -- module spring.boot.starter.json [auto]
-org.springframework.boot:spring-boot-starter-logging:jar:3.0.2:compile -- module spring.boot.starter.logging [auto]
-org.springframework.boot:spring-boot-starter-oauth2-client:jar:3.0.2:compile -- module spring.boot.starter.oauth2.client [auto]
-org.springframework.boot:spring-boot-starter-oauth2-resource-server:jar:3.0.2:compile -- module spring.boot.starter.oauth2.resource.server [auto]
-org.springframework.boot:spring-boot-starter-reactor-netty:jar:3.0.2:compile -- module spring.boot.starter.reactor.netty [auto]
-org.springframework.boot:spring-boot-starter-security:jar:3.0.2:compile -- module spring.boot.starter.security [auto]
-org.springframework.boot:spring-boot-starter-test:jar:3.0.2:test -- module spring.boot.starter.test [auto]
-org.springframework.boot:spring-boot-starter-tomcat:jar:3.0.2:compile -- module spring.boot.starter.tomcat [auto]
-org.springframework.boot:spring-boot-starter-validation:jar:3.0.2:compile -- module spring.boot.starter.validation [auto]
-org.springframework.boot:spring-boot-starter-web:jar:3.0.2:compile -- module spring.boot.starter.web [auto]
-org.springframework.boot:spring-boot-starter-webflux:jar:3.0.2:compile -- module spring.boot.starter.webflux [auto]
-org.springframework.boot:spring-boot-starter:jar:3.0.2:compile -- module spring.boot.starter [auto]
-org.springframework.boot:spring-boot-test-autoconfigure:jar:3.0.2:test -- module spring.boot.test.autoconfigure [auto]
-org.springframework.boot:spring-boot-test:jar:3.0.2:test -- module spring.boot.test [auto]
-org.springframework.boot:spring-boot:jar:3.0.2:compile -- module spring.boot [auto]
-org.springframework.data:spring-data-commons:jar:3.0.1:compile -- module spring.data.commons [auto]
-org.springframework.data:spring-data-jpa:jar:3.0.1:compile -- module spring.data.jpa [auto]
-org.springframework.security:spring-security-config:jar:6.0.1:compile -- module spring.security.config [auto]
-org.springframework.security:spring-security-core:jar:6.0.1:compile -- module spring.security.core [auto]
-org.springframework.security:spring-security-crypto:jar:6.0.1:compile -- module spring.security.crypto [auto]
-org.springframework.security:spring-security-oauth2-client:jar:6.0.1:compile -- module spring.security.oauth2.client [auto]
-org.springframework.security:spring-security-oauth2-core:jar:6.0.1:compile -- module spring.security.oauth2.core [auto]
-org.springframework.security:spring-security-oauth2-jose:jar:6.0.1:compile -- module spring.security.oauth2.jose [auto]
-org.springframework.security:spring-security-oauth2-resource-server:jar:6.0.1:compile -- module spring.security.oauth2.resource.server [auto]
-org.springframework.security:spring-security-web:jar:6.0.1:compile -- module spring.security.web [auto]
-org.springframework:spring-aop:jar:6.0.4:compile -- module spring.aop [auto]
-org.springframework:spring-aspects:jar:6.0.4:compile -- module spring.aspects [auto]
-org.springframework:spring-beans:jar:6.0.4:compile -- module spring.beans [auto]
-org.springframework:spring-context:jar:6.0.4:compile -- module spring.context [auto]
-org.springframework:spring-core:jar:6.0.4:compile -- module spring.core [auto]
-org.springframework:spring-expression:jar:6.0.4:compile -- module spring.expression [auto]
-org.springframework:spring-jcl:jar:6.0.4:compile -- module spring.jcl [auto]
-org.springframework:spring-jdbc:jar:6.0.4:compile -- module spring.jdbc [auto]
-org.springframework:spring-orm:jar:6.0.4:compile -- module spring.orm [auto]
-org.springframework:spring-test:jar:6.0.4:test -- module spring.test [auto]
-org.springframework:spring-tx:jar:6.0.4:compile -- module spring.tx [auto]
-org.springframework:spring-web:jar:6.0.4:compile -- module spring.web [auto]
-org.springframework:spring-webflux:jar:6.0.4:compile -- module spring.webflux [auto]
-org.springframework:spring-webmvc:jar:6.0.4:compile -- module spring.webmvc [auto]
-org.testcontainers:database-commons:jar:1.17.2:test -- module database.commons (auto)
-org.testcontainers:jdbc:jar:1.17.2:test -- module jdbc (auto)
-org.testcontainers:junit-jupiter:jar:1.17.2:test -- module junit.jupiter (auto)
-org.testcontainers:postgresql:jar:1.17.2:test -- module postgresql (auto)
-org.testcontainers:testcontainers:jar:1.17.2:test -- module testcontainers (auto)
-org.webjars:swagger-ui:jar:4.15.5:compile -- module swagger.ui (auto)
-org.webjars:webjars-locator-core:jar:0.52:compile -- module webjars.locator.core (auto)
-org.xmlunit:xmlunit-core:jar:2.9.1:test -- module org.xmlunit [auto]
-org.yaml:snakeyaml:jar:1.33:compile -- module org.yaml.snakeyaml [auto]
+maven/mavencentral/ch.qos.logback/logback-classic/1.4.5, EPL-1.0 OR LGPL-2.1-only, approved, #3435
+maven/mavencentral/ch.qos.logback/logback-core/1.4.5, EPL-1.0 OR LGPL-2.1-only, approved, #3373
+maven/mavencentral/com.carrotsearch/hppc/0.8.1, Apache-2.0, approved, CQ22339
+maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.14.1, Apache-2.0, approved, #5303
+maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.14.1, Apache-2.0 AND MIT, approved, #4303
+maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.14.1, Apache-2.0, approved, #4105
+maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.14.1, Apache-2.0, approved, #5922
+maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.14.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.14.1, Apache-2.0, approved, #5933
+maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.14.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.14.1, Apache-2.0, approved, #4699
+maven/mavencentral/com.fasterxml.jackson.module/jackson-module-kotlin/2.14.1, Apache-2.0, approved, #5927
+maven/mavencentral/com.fasterxml.jackson.module/jackson-module-parameter-names/2.14.1, Apache-2.0, approved, #5938
+maven/mavencentral/com.fasterxml/classmate/1.5.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.github.spullara.mustache.java/compiler/0.9.10, Apache-2.0, approved, CQ14417
+maven/mavencentral/com.github.stephenc.jcip/jcip-annotations/1.0-1, Apache-2.0, approved, CQ21949
+maven/mavencentral/com.google.code.findbugs/jsr305/3.0.2, Apache-2.0, approved, #20
+maven/mavencentral/com.neovisionaries/nv-i18n/1.29, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.nimbusds/content-type/2.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.nimbusds/lang-tag/1.7, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.nimbusds/nimbus-jose-jwt/9.24.4, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.nimbusds/oauth2-oidc-sdk/9.43.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.tdunning/t-digest/3.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/com.zaxxer/HikariCP/5.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/commons-codec/commons-codec/1.15, Apache-2.0 AND BSD-3-Clause AND LicenseRef-Public-Domain, approved, CQ22641
+maven/mavencentral/commons-logging/commons-logging/1.2, Apache-2.0, approved, CQ10162
+maven/mavencentral/io.github.classgraph/classgraph/4.8.149, MIT, approved, CQ22530
+maven/mavencentral/io.github.microutils/kotlin-logging-jvm/2.1.23, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.micrometer/micrometer-commons/1.10.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.micrometer/micrometer-core/1.10.3, Apache-2.0 AND (Apache-2.0 AND MIT), approved, #6977
+maven/mavencentral/io.micrometer/micrometer-observation/1.10.3, Apache-2.0, approved, clearlydefined
+maven/mavencentral/io.netty/netty-buffer/4.1.87.Final, Apache-2.0, approved, CQ21842
+maven/mavencentral/io.netty/netty-codec-dns/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec-http/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec-http2/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec-socks/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-codec/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-common/4.1.87.Final, Apache-2.0 AND MIT AND CC0-1.0, approved, CQ21843
+maven/mavencentral/io.netty/netty-handler-proxy/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-handler/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-resolver-dns-classes-macos/4.1.87.Final, Apache-2.0, approved, #6367
+maven/mavencentral/io.netty/netty-resolver-dns-native-macos/4.1.87.Final, , restricted, clearlydefined
+maven/mavencentral/io.netty/netty-resolver-dns/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-resolver/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-transport-classes-epoll/4.1.87.Final, Apache-2.0, approved, #6366
+maven/mavencentral/io.netty/netty-transport-native-epoll/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-transport-native-unix-common/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.netty/netty-transport/4.1.87.Final, Apache-2.0 AND BSD-3-Clause AND MIT, approved, CQ20926
+maven/mavencentral/io.projectreactor.netty/reactor-netty-core/1.1.2, Apache-2.0, approved, #5946
+maven/mavencentral/io.projectreactor.netty/reactor-netty-http/1.1.2, Apache-2.0, approved, #6999
+maven/mavencentral/io.projectreactor/reactor-core/3.5.2, Apache-2.0, approved, #5934
+maven/mavencentral/io.swagger.core.v3/swagger-annotations-jakarta/2.2.7, Apache-2.0, approved, #5947
+maven/mavencentral/io.swagger.core.v3/swagger-core-jakarta/2.2.7, Apache-2.0, approved, #5929
+maven/mavencentral/io.swagger.core.v3/swagger-models-jakarta/2.2.7, Apache-2.0, approved, #5919
+maven/mavencentral/jakarta.activation/jakarta.activation-api/2.1.1, EPL-2.0 OR BSD-3-Clause OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.jaf
+maven/mavencentral/jakarta.annotation/jakarta.annotation-api/2.1.1, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.ca
+maven/mavencentral/jakarta.json/jakarta.json-api/2.1.1, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.jsonp
+maven/mavencentral/jakarta.persistence/jakarta.persistence-api/3.1.0, EPL-2.0 OR BSD-3-Clause, approved, ee4j.jpa
+maven/mavencentral/jakarta.transaction/jakarta.transaction-api/2.0.1, EPL-2.0 OR GPL-2.0-only with Classpath-exception-2.0, approved, ee4j.jta
+maven/mavencentral/jakarta.validation/jakarta.validation-api/3.0.2, Apache-2.0, approved, ee4j.bean-validation
+maven/mavencentral/jakarta.xml.bind/jakarta.xml.bind-api/4.0.0, BSD-3-Clause, approved, ee4j.jaxb
+maven/mavencentral/joda-time/joda-time/2.10.12, Apache-2.0, approved, clearlydefined
+maven/mavencentral/net.java.dev.jna/jna/5.5.0, Apache-2.0 or LGPL-2.1, approved, #1508
+maven/mavencentral/net.minidev/accessors-smart/2.4.8, Apache-2.0, approved, clearlydefined
+maven/mavencentral/net.minidev/json-smart/2.4.8, Apache-2.0, approved, #3288
+maven/mavencentral/net.sf.jopt-simple/jopt-simple/5.0.4, MIT, approved, CQ13174
+maven/mavencentral/org.apache.commons/commons-lang3/3.12.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.apache.httpcomponents/httpasyncclient/4.1.5, Apache-2.0, approved, CQ13506
+maven/mavencentral/org.apache.httpcomponents/httpclient/4.5.14, Apache-2.0 AND LicenseRef-Public-Domain, approved, CQ23527
+maven/mavencentral/org.apache.httpcomponents/httpcore-nio/4.4.16, Apache-2.0, approved, CQ13509
+maven/mavencentral/org.apache.httpcomponents/httpcore/4.4.16, Apache-2.0, approved, CQ23528
+maven/mavencentral/org.apache.logging.log4j/log4j-api/2.19.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.apache.logging.log4j/log4j-jul/2.19.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.apache.logging.log4j/log4j-to-slf4j/2.19.0, Apache-2.0, approved, #5941
+maven/mavencentral/org.apache.lucene/lucene-analysis-common/9.4.2, Apache-2.0 AND BSD-3-Clause, approved, #5636
+maven/mavencentral/org.apache.lucene/lucene-backward-codecs/9.4.2, Apache-2.0, approved, #4394
+maven/mavencentral/org.apache.lucene/lucene-core/9.4.2, Apache-2.0 AND BSD-3-Clause AND NCSA AND ISC AND LicenseRef-scancode-sunpro AND ICU AND LicenseRef-scancode-unicode-mappings AND MIT AND BSD-2-Clause, approved, #5635
+maven/mavencentral/org.apache.lucene/lucene-grouping/9.4.2, Apache-2.0, approved, #7005
+maven/mavencentral/org.apache.lucene/lucene-highlighter/9.4.2, Apache-2.0, approved, #6968
+maven/mavencentral/org.apache.lucene/lucene-join/9.4.2, Apache-2.0, approved, #6985
+maven/mavencentral/org.apache.lucene/lucene-memory/9.4.2, Apache-2.0, approved, #7007
+maven/mavencentral/org.apache.lucene/lucene-misc/9.4.2, Apache-2.0, approved, #6992
+maven/mavencentral/org.apache.lucene/lucene-queries/9.4.2, Apache-2.0, approved, #4386
+maven/mavencentral/org.apache.lucene/lucene-queryparser/9.4.2, Apache-2.0, approved, #4373
+maven/mavencentral/org.apache.lucene/lucene-sandbox/9.4.2, Apache-2.0, approved, #4369
+maven/mavencentral/org.apache.lucene/lucene-spatial-extras/9.4.2, Apache-2.0, approved, #6991
+maven/mavencentral/org.apache.lucene/lucene-spatial3d/9.4.2, Apache-2.0, approved, #6975
+maven/mavencentral/org.apache.lucene/lucene-suggest/9.4.2, Apache-2.0, approved, #6970
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/10.1.5, Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND (CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND W3C AND CC0-1.0, approved, #5949
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/10.1.5, Apache-2.0, approved, #6997
+maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/10.1.5, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.aspectj/aspectjweaver/1.9.19, EPL-1.0, approved, tools.aspectj
+maven/mavencentral/org.eclipse.parsson/parsson/1.0.0, EPL-2.0, approved, ee4j.parsson
+maven/mavencentral/org.eclipse.tractusx/bpdm-common/3.0.2-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.flywaydb/flyway-core/8.5.12, Apache-2.0, approved, #2764
+maven/mavencentral/org.hdrhistogram/HdrHistogram/2.1.12, , approved, CQ13192
+maven/mavencentral/org.hibernate.orm/hibernate-core/6.1.6.Final, LGPL-2.1-or-later AND (Apache-2.0 AND LGPL-2.1-only) AND (CC-PDDC AND LGPL-2.1-only) AND (EPL-2.0 OR BSD-3-Clause), approved, #5939
+maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.0.Final, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jboss.logging/jboss-logging/3.5.0.Final, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains.kotlin/kotlin-reflect/1.7.21, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib-common/1.7.21, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.7.21, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.7.21, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains.kotlin/kotlin-stdlib/1.7.21, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.jetbrains/annotations/13.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.opensearch.client/opensearch-java/2.0.0, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.opensearch.client/opensearch-rest-client/2.5.0, Apache-2.0, approved, #6995
+maven/mavencentral/org.opensearch.client/opensearch-rest-high-level-client/2.5.0, Apache-2.0, approved, #6984
+maven/mavencentral/org.opensearch.plugin/aggs-matrix-stats-client/2.5.0, Apache-2.0, approved, #6988
+maven/mavencentral/org.opensearch.plugin/lang-mustache-client/2.5.0, Apache-2.0, approved, #6978
+maven/mavencentral/org.opensearch.plugin/mapper-extras-client/2.5.0, Apache-2.0, approved, #7000
+maven/mavencentral/org.opensearch.plugin/parent-join-client/2.5.0, Apache-2.0, approved, #6969
+maven/mavencentral/org.opensearch.plugin/rank-eval-client/2.5.0, Apache-2.0, approved, #6993
+maven/mavencentral/org.opensearch/opensearch-cli/2.5.0, Apache-2.0, approved, #7002
+maven/mavencentral/org.opensearch/opensearch-core/2.5.0, Apache-2.0, approved, #6998
+maven/mavencentral/org.opensearch/opensearch-geo/2.5.0, Apache-2.0, approved, #6994
+maven/mavencentral/org.opensearch/opensearch-secure-sm/2.5.0, Apache-2.0, approved, #6990
+maven/mavencentral/org.opensearch/opensearch-x-content/2.5.0, Apache-2.0, approved, #6980
+maven/mavencentral/org.opensearch/opensearch/2.5.0, Apache-2.0, approved, #6996
+maven/mavencentral/org.ow2.asm/asm/9.1, BSD-3-Clause, approved, CQ23029
+maven/mavencentral/org.reactivestreams/reactive-streams/1.0.4, CC0-1.0, approved, CQ16332
+maven/mavencentral/org.slf4j/jul-to-slf4j/2.0.6, MIT, approved, clearlydefined
+maven/mavencentral/org.slf4j/slf4j-api/2.0.6, MIT, approved, #5915
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-common/2.0.0, Apache-2.0, approved, #5920
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-api/2.0.0, Apache-2.0, approved, #5950
+maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.0.0, Apache-2.0, approved, #5923
+maven/mavencentral/org.springframework.boot/spring-boot-actuator-autoconfigure/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot-actuator/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot-autoconfigure/3.0.2, Apache-2.0, approved, #6981
+maven/mavencentral/org.springframework.boot/spring-boot-configuration-processor/3.0.2, Apache-2.0, approved, #6973
+maven/mavencentral/org.springframework.boot/spring-boot-starter-actuator/3.0.2, Apache-2.0, approved, #6983
+maven/mavencentral/org.springframework.boot/spring-boot-starter-aop/3.0.2, Apache-2.0, approved, #6965
+maven/mavencentral/org.springframework.boot/spring-boot-starter-data-jpa/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot-starter-jdbc/3.0.2, Apache-2.0, approved, #6974
+maven/mavencentral/org.springframework.boot/spring-boot-starter-json/3.0.2, Apache-2.0, approved, #7006
+maven/mavencentral/org.springframework.boot/spring-boot-starter-logging/3.0.2, Apache-2.0, approved, #6982
+maven/mavencentral/org.springframework.boot/spring-boot-starter-oauth2-client/3.0.2, Apache-2.0, approved, #5932
+maven/mavencentral/org.springframework.boot/spring-boot-starter-oauth2-resource-server/3.0.2, Apache-2.0, approved, #6967
+maven/mavencentral/org.springframework.boot/spring-boot-starter-reactor-netty/3.0.2, Apache-2.0, approved, #6989
+maven/mavencentral/org.springframework.boot/spring-boot-starter-security/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot-starter-tomcat/3.0.2, Apache-2.0, approved, #6987
+maven/mavencentral/org.springframework.boot/spring-boot-starter-validation/3.0.2, Apache-2.0, approved, #6971
+maven/mavencentral/org.springframework.boot/spring-boot-starter-web/3.0.2, Apache-2.0, approved, #5945
+maven/mavencentral/org.springframework.boot/spring-boot-starter-webflux/3.0.2, Apache-2.0, approved, #6986
+maven/mavencentral/org.springframework.boot/spring-boot-starter/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.boot/spring-boot/3.0.2, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.data/spring-data-commons/3.0.1, Apache-2.0, approved, #5943
+maven/mavencentral/org.springframework.data/spring-data-jpa/3.0.1, Apache-2.0, approved, #5935
+maven/mavencentral/org.springframework.security/spring-security-config/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-core/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-crypto/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-oauth2-client/6.0.1, Apache-2.0, approved, #5931
+maven/mavencentral/org.springframework.security/spring-security-oauth2-core/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-oauth2-jose/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-oauth2-resource-server/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework.security/spring-security-web/6.0.1, Apache-2.0, approved, clearlydefined
+maven/mavencentral/org.springframework/spring-aop/6.0.4, Apache-2.0, approved, #5940
+maven/mavencentral/org.springframework/spring-aspects/6.0.4, Apache-2.0, approved, #5930
+maven/mavencentral/org.springframework/spring-beans/6.0.4, Apache-2.0, approved, #5937
+maven/mavencentral/org.springframework/spring-context/6.0.4, Apache-2.0, approved, #5936
+maven/mavencentral/org.springframework/spring-core/6.0.4, Apache-2.0 AND BSD-3-Clause, approved, #5948
+maven/mavencentral/org.springframework/spring-expression/6.0.4, Apache-2.0, approved, #3284
+maven/mavencentral/org.springframework/spring-jcl/6.0.4, Apache-2.0, approved, #3283
+maven/mavencentral/org.springframework/spring-jdbc/6.0.4, Apache-2.0, approved, #5924
+maven/mavencentral/org.springframework/spring-orm/6.0.4, Apache-2.0, approved, #5925
+maven/mavencentral/org.springframework/spring-tx/6.0.4, Apache-2.0, approved, #5926
+maven/mavencentral/org.springframework/spring-web/6.0.4, Apache-2.0, approved, #5942
+maven/mavencentral/org.springframework/spring-webflux/6.0.4, Apache-2.0, approved, #6964
+maven/mavencentral/org.springframework/spring-webmvc/6.0.4, Apache-2.0, approved, #5944
+maven/mavencentral/org.webjars/swagger-ui/4.15.5, Apache-2.0 AND MIT, approved, #5921
+maven/mavencentral/org.webjars/webjars-locator-core/0.52, MIT, approved, clearlydefined
+maven/mavencentral/org.yaml/snakeyaml/1.33, Apache-2.0, approved, clearlydefined
