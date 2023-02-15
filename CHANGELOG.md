@@ -4,16 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [3.0.2] - tbd
+## [3.0.2] - 2022-02-15
 
 ### Changed
 
-- SaaS Sharing Service Importer now also adds missing import entries (SaaS-ID to BPN) when encountering Business Partners that already have BPNs in the SaaS
+- BPDM Pool: SaaS Sharing Service Importer now also adds missing import entries (SaaS-ID to BPN) when encountering Business Partners that already have BPNs in
+  the SaaS
   storage (possible due to legacy imports done before)
+- BPDM Pool: Business Partner searches have now limited pagination length. Limit is adjustable in configuration.
 
 ### Fixed
 
-- Startup of BPDM Gate without supplying any environment variables or property overwrites
+- BPDM Gate: Now possible to startup without supplying any environment variables or property overwrites
+- BPDM Pool: Now possible to deep paginate over business partners (>10000 entries)
+- Fixed various vulnerabilities by upgrading affected libraries
 
 ## [3.0.1] - 2022-01-24
 
