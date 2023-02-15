@@ -19,20 +19,14 @@
 ################################################################################
 
 apiVersion: v2
-name: bpdm-pool
-description: A Helm chart for deploying the BPDM pool service
-
 type: application
-
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 4.0.5-alpha.3
-
-# This is the version number of the application being deployed.
-# Versions are not expected to follow Semantic Versioning.
-# They should reflect the version the application is using.
-# It is recommended to use it with quotes.
+name: bpdm-pool
 appVersion: "3.0.2-alpha.2"
-
+version: 4.0.5-alpha.4
+description: A Helm chart for deploying the BPDM pool service
+home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+sources:
+  - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: opensearch
     version: 2.4.0
@@ -44,7 +38,6 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
-
 maintainers:
   - name: Nico Koprowski
   - name: Patrick Zeller
