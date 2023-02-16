@@ -106,7 +106,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val parentRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
-            externalId = SaasValues.legalEntity1.externalId!!,
+            externalId = SaasValues.legalEntityRequest1.externalId!!,
             featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
         wireMockServer.stubFor(
@@ -118,7 +118,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = SaasValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntityResponse1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -178,7 +178,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -229,7 +229,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntity1,
+            SaasValues.legalEntityResponse1,
             SaasValues.siteBusinessPartner1
         )
 
@@ -322,7 +322,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntity1,
+            SaasValues.legalEntityResponse1,
             SaasValues.siteBusinessPartner1
         )
 
@@ -447,7 +447,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1
+            SaasValues.legalEntityResponse1
         )
 
         val parentSitesSaas = listOf(

@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 
 object RequestValues {
@@ -211,16 +211,16 @@ object RequestValues {
         legalAddress = address2
     )
 
-    val legalEntityGateInput1 = LegalEntityGateInput(
-        bpn = CommonValues.bpn1,
+    val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
+        legalEntity = legalEntity1,
         externalId = CommonValues.externalId1,
-        legalEntity = legalEntity1
+        bpn = CommonValues.bpn1
     )
 
-    val legalEntityGateInput2 = LegalEntityGateInput(
-        bpn = CommonValues.bpn2,
+    val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
+        legalEntity = legalEntity2,
         externalId = CommonValues.externalId2,
-        legalEntity = legalEntity2
+        bpn = CommonValues.bpn2
     )
 
     val site1 = SiteDto(

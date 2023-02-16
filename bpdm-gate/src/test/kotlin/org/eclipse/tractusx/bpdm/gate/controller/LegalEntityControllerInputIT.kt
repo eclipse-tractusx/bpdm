@@ -27,7 +27,8 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
@@ -38,6 +39,7 @@ import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PAR
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
+import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -75,13 +77,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput2
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2,
         )
 
         val expectedLegalEntities = listOf(
-            SaasValues.legalEntity1,
-            SaasValues.legalEntity2
+            SaasValues.legalEntityRequest1,
+            SaasValues.legalEntityRequest2,
         )
 
         wireMockServer.stubFor(
@@ -121,8 +123,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, missing external id`() {
         val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
-            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntityGateInput1)
-                .apply { remove(LegalEntityGateInput::externalId.name) }
+            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntityGateInputRequest1)
+                .apply { remove(LegalEntityGateInputRequest::externalId.name) }
         )
 
         webTestClient.put().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH)
@@ -140,9 +142,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput1.copy(externalId = "external-1"),
-            RequestValues.legalEntityGateInput1.copy(externalId = "external-2")
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest1.copy(externalId = "external-1"),
+            RequestValues.legalEntityGateInputRequest1.copy(externalId = "external-2")
         )
 
         webTestClient.put().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH)
@@ -160,8 +162,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, duplicate external id`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput1.copy()
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest1.copy()
         )
 
         webTestClient.put().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH)
@@ -179,8 +181,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, SaaS error`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput2
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
         )
 
         wireMockServer.stubFor(
@@ -203,7 +205,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = RequestValues.legalEntityGateInput1
+        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse1
 
         wireMockServer.stubFor(
             post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -213,7 +215,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = SaasValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntityResponse1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -221,11 +223,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(LegalEntityGateInput::class.java)
+            .expectBody(LegalEntityGateInputResponse::class.java)
             .returnResult()
             .responseBody
 
@@ -272,7 +274,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -286,7 +288,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entity without legal address, expect error`() {
 
-        val invalidPartner = SaasValues.legalEntity1.copy(addresses = emptyList())
+        val invalidPartner = SaasValues.legalEntityResponse1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
             post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -304,7 +306,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -319,13 +321,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entities`() {
         val legalEntitiesSaas = listOf(
-            SaasValues.legalEntity1,
-            SaasValues.legalEntity2
+            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntityResponse2,
         )
 
         val expectedLegalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput2
+            ResponseValues.legalEntityGateInputResponse1,
+            ResponseValues.legalEntityGateInputResponse2,
         )
 
         val limit = 2
@@ -363,7 +365,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateInput>>()
+            .returnResult<PageStartAfterResponse<LegalEntityGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -385,14 +387,14 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `filter legal entities without legal address`() {
         val legalEntitiesSaas = listOf(
-            SaasValues.legalEntity1,
-            SaasValues.legalEntity2,
-            SaasValues.legalEntity1.copy(addresses = emptyList())
+            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntityResponse2,
+            SaasValues.legalEntityResponse1.copy(addresses = emptyList())
         )
 
         val expectedLegalEntities = listOf(
-            RequestValues.legalEntityGateInput1,
-            RequestValues.legalEntityGateInput2
+            ResponseValues.legalEntityGateInputResponse1,
+            ResponseValues.legalEntityGateInputResponse2,
         )
 
         val limit = 3
@@ -430,7 +432,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateInput>>()
+            .returnResult<PageStartAfterResponse<LegalEntityGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -484,7 +486,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate a valid legal entity`() {
-        val legalEntity = RequestValues.legalEntityGateInput1
+        val legalEntity = RequestValues.legalEntityGateInputRequest1
 
         val mockDefects = listOf(
             DataDefectSaas(ViolationLevel.INFO, "Info"),
@@ -521,7 +523,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate an invalid legal entity`() {
-        val legalEntity = RequestValues.legalEntityGateInput1
+        val legalEntity = RequestValues.legalEntityGateInputRequest1
 
         val mockErrorMessage = "Validation error"
         val mockDefects = listOf(
