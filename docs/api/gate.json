@@ -3790,8 +3790,8 @@
           "technicalKey": {
             "type": "string",
             "enum": [
-              "SAAS_HIERARCHY",
-              "SAAS_TRANSITION",
+              "CDQ_HIERARCHY",
+              "CDQ_TRANSITION",
               "CX_HIERARCHY",
               "DNB_HIERARCHY",
               "LEI_HIERARCHY"
