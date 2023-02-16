@@ -59,7 +59,7 @@ class BpnControllerIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
     }
 
@@ -84,7 +84,7 @@ class BpnControllerIT @Autowired constructor(
 
     /**
      * Given some business partners imported
-     * When requesting bpn to CDQ id mappings and all the requested CDQ ids exist in the db
+     * When requesting bpn to SaaS id mappings and all the requested SaaS ids exist in the db
      * Then all the requested mappings are returned
      */
     @Test
@@ -106,13 +106,13 @@ class BpnControllerIT @Autowired constructor(
 
     /**
      * Given some business partners imported
-     * When requesting bpn to CDQ id mappings and only some of the requested CDQ ids exist in the db
+     * When requesting bpn to SaaS id mappings and only some of the requested SaaS ids exist in the db
      * Then only the requested mappings that exist in the db are returned
      */
     @Test
     fun `find bpns by identifiers, only some found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(identifierType, listOf(identifierValue1, "someNonexistentCdqId"))
+            IdentifiersSearchRequest(identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
 
         val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -129,7 +129,7 @@ class BpnControllerIT @Autowired constructor(
 
     /**
      * Given some business partners imported
-     * When requesting too many bpn to CDQ id mappings in a single request, so that the requested number exceeds the configured limit
+     * When requesting too many bpn to SaaS id mappings in a single request, so that the requested number exceeds the configured limit
      * Then a "bad request" response is sent
      */
     @Test

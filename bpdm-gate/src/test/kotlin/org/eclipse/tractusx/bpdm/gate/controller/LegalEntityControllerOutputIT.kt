@@ -24,14 +24,14 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.AugmentedBusinessPartnerResponseCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
@@ -55,7 +55,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        private val wireMockServerCdq: WireMockExtension = WireMockExtension.newInstance()
+        private val wireMockServerSaas: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
@@ -67,21 +67,21 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServerCdq.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServerSaas.baseUrl() }
             registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
+     * Given legal entities exists in SaaS and bpdm pool
      * When getting legal entities page via output route
      * Then legal entities page should be returned
      */
     @Test
     fun `get legal entities`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1Response,
-            CdqValues.legalEntity2Response
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntity1Response,
+            SaasValues.legalEntity2Response
         )
 
         val expectedLegalEntities = listOf(
@@ -103,18 +103,18 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         val nextStartAfter = "Aaa222"
         val total = 10
 
-        wireMockServerCdq.stubFor(
-            get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = legalEntitiesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )
@@ -167,15 +167,15 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities exists in cdq and bpdm pool
+     * Given legal entities exists in SaaS and bpdm pool
      * When getting legal entities page via output route filtering by external ids
      * Then legal entities page should be returned
      */
     @Test
     fun `get legal entities, filter by external ids`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1Response,
-            CdqValues.legalEntity2Response
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntity1Response,
+            SaasValues.legalEntity2Response
         )
 
         val expectedLegalEntities = listOf(
@@ -197,19 +197,19 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         val nextStartAfter = "Aaa222"
         val total = 10
 
-        wireMockServerCdq.stubFor(
-            get(urlPathMatching(CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalId1, CommonValues.externalId2).joinToString(",")))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq.map { AugmentedBusinessPartnerResponseCdq(it) }
+                                    values = legalEntitiesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
                                 )
                             )
                         )

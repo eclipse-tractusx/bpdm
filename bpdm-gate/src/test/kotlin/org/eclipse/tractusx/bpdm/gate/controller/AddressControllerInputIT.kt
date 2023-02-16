@@ -24,16 +24,16 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_RELATIONS_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,7 +52,7 @@ import org.springframework.test.web.reactive.server.returnResult
 internal class AddressControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
-    private val cdqConfigProperties: CdqConfigProperties
+    private val saasConfigProperties: SaasConfigProperties
 ) {
     companion object {
         @RegisterExtension
@@ -63,7 +63,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
     }
 
@@ -73,22 +73,22 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given address exists in cdq
+     * Given address exists in SaaS
      * When getting address by external id
      * Then address mapped to the catena data model should be returned
      */
     @Test
     fun `get address by external id`() {
-        val externalIdToQuery = CdqValues.addressBusinessPartnerWithRelations1.externalId!!
+        val externalIdToQuery = SaasValues.addressBusinessPartnerWithRelations1.externalId!!
         val expectedAddress = RequestValues.addressGateInput1
 
         val addressRequest = FetchRequest(
-            dataSource = cdqConfigProperties.datasource,
+            dataSource = saasConfigProperties.datasource,
             externalId = externalIdToQuery,
-            featuresOn = listOf(FetchRequest.CdqFeatures.FETCH_RELATIONS)
+            featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(addressRequest)))
                 .willReturn(
                     aResponse()
@@ -96,7 +96,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = CdqValues.addressBusinessPartnerWithRelations1,
+                                    businessPartner = SaasValues.addressBusinessPartnerWithRelations1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -105,12 +105,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentRequest = FetchRequest(
-            dataSource = cdqConfigProperties.datasource,
-            externalId = CdqValues.legalEntity1.externalId!!,
-            featuresOn = listOf(FetchRequest.CdqFeatures.FETCH_RELATIONS)
+            dataSource = saasConfigProperties.datasource,
+            externalId = SaasValues.legalEntity1.externalId!!,
+            featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(parentRequest)))
                 .willReturn(
                     aResponse()
@@ -118,7 +118,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = CdqValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntity1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -139,14 +139,14 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given address does not exist in cdq
+     * Given address does not exist in SaaS
      * When getting address by external id
      * Then "not found" response is sent
      */
     @Test
     fun `get address by external id, not found`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -168,34 +168,34 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while fetching address by external id
+     * When SaaS api responds with an error status code while fetching address by external id
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get address by external id, cdq error`() {
+    fun `get address by external id, SaaS error`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
     }
 
     /**
-     * Given address business partner without address data in CDQ
+     * Given address business partner without address data in SaaS
      * When query by its external ID
      * Then server error is returned
      */
     @Test
-    fun `get address for which cdq data is invalid, expect error`() {
+    fun `get address for which SaaS data is invalid, expect error`() {
 
-        val invalidPartner = CdqValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList())
+        val invalidPartner = SaasValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -210,27 +210,27 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${CdqValues.addressBusinessPartnerWithRelations1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.addressBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
     }
 
     /**
-     * Given addresses exists in cdq
+     * Given addresses exists in SaaS
      * When getting addresses page
      * Then addresses page mapped to the catena data model should be returned
      */
     @Test
     fun `get addresses`() {
-        val addressesCdq = listOf(
-            CdqValues.addressBusinessPartnerWithRelations1,
-            CdqValues.addressBusinessPartnerWithRelations2
+        val addressesSaas = listOf(
+            SaasValues.addressBusinessPartnerWithRelations1,
+            SaasValues.addressBusinessPartnerWithRelations2
         )
 
-        val parentsCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.siteBusinessPartner1
+        val parentsSaas = listOf(
+            SaasValues.legalEntity1,
+            SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
@@ -245,19 +245,19 @@ internal class AddressControllerInputIT @Autowired constructor(
         val invalidEntries = 0
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = addressesCdq
+                                    values = addressesSaas
                                 )
                             )
                         )
@@ -265,19 +265,19 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", matching(".*"))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
-                                    limit = parentsCdq.size,
+                                PagedResponseSaas(
+                                    limit = parentsSaas.size,
                                     startAfter = null,
                                     nextStartAfter = null,
-                                    total = parentsCdq.size,
-                                    values = parentsCdq
+                                    total = parentsSaas.size,
+                                    values = parentsSaas
                                 )
                             )
                         )
@@ -309,21 +309,21 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given invalid addresses in CDQ
+     * Given invalid addresses in SaaS
      * When getting addresses page
      * Then only valid addresses on page returned
      */
     @Test
     fun `filter invalid addresses`() {
-        val addressesCdq = listOf(
-            CdqValues.addressBusinessPartnerWithRelations1,
-            CdqValues.addressBusinessPartnerWithRelations2,
-            CdqValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList()), // address without address data
+        val addressesSaas = listOf(
+            SaasValues.addressBusinessPartnerWithRelations1,
+            SaasValues.addressBusinessPartnerWithRelations2,
+            SaasValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList()), // address without address data
         )
 
-        val parentsCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.siteBusinessPartner1
+        val parentsSaas = listOf(
+            SaasValues.legalEntity1,
+            SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
@@ -338,19 +338,19 @@ internal class AddressControllerInputIT @Autowired constructor(
         val invalidEntries = 1
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = addressesCdq
+                                    values = addressesSaas
                                 )
                             )
                         )
@@ -358,19 +358,19 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", matching(".*"))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
-                                    limit = parentsCdq.size,
+                                PagedResponseSaas(
+                                    limit = parentsSaas.size,
                                     startAfter = null,
                                     nextStartAfter = null,
-                                    total = parentsCdq.size,
-                                    values = parentsCdq
+                                    total = parentsSaas.size,
+                                    values = parentsSaas
                                 )
                             )
                         )
@@ -402,13 +402,13 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting addresses
+     * When SaaS api responds with an error status code while getting addresses
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get addresses, cdq error`() {
+    fun `get addresses, SaaS error`() {
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -435,9 +435,9 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities and sites in cdq
+     * Given legal entities and sites in SaaS
      * When upserting addresses of legal entities and sites
-     * Then upsert addresses and relations in cdq api should be called with the address data mapped to the cdq data model
+     * Then upsert addresses and relations in SaaS api should be called with the address data mapped to the SaaS data model
      */
     @Test
     fun `upsert addresses`() {
@@ -446,61 +446,61 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInput2
         )
 
-        val parentLegalEntitiesCdq = listOf(
-            CdqValues.legalEntity1
+        val parentLegalEntitiesSaas = listOf(
+            SaasValues.legalEntity1
         )
 
-        val parentSitesCdq = listOf(
-            CdqValues.siteBusinessPartner1
+        val parentSitesSaas = listOf(
+            SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
-            CdqValues.addressBusinessPartner1,
-            CdqValues.addressBusinessPartner2
+            SaasValues.addressBusinessPartner1,
+            SaasValues.addressBusinessPartner2
         )
 
         val expectedRelations = listOf(
-            CdqValues.relationAddress1ToLegalEntity,
-            CdqValues.relationAddress2ToSite
+            SaasValues.relationAddress1ToLegalEntity,
+            SaasValues.relationAddress2ToSite
         )
 
         val expectedDeletedRelations = listOf(
-            DeleteRelationsRequestCdq.RelationToDeleteCdq(
-                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().startNode
+            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().startNode
                 ),
-                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.addressBusinessPartnerWithRelations1.relations.first().endNode
+                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().endNode
                 ),
             ),
-            DeleteRelationsRequestCdq.RelationToDeleteCdq(
-                startNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().startNode
+            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().startNode
                 ),
-                endNode = DeleteRelationsRequestCdq.RelationNodeToDeleteCdq(
-                    dataSourceId = cdqConfigProperties.datasource,
-                    externalId = CdqValues.addressBusinessPartnerWithRelations2.relations.first().endNode
+                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+                    dataSourceId = saasConfigProperties.datasource,
+                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().endNode
                 ),
             ),
         )
 
         // mock "get parent legal entities"
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 1,
-                                    values = parentLegalEntitiesCdq
+                                    values = parentLegalEntitiesSaas
                                 )
                             )
                         )
@@ -508,25 +508,25 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
         // mock "get parent sites"
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 1,
-                                    values = parentSitesCdq
+                                    values = parentSitesSaas
                                 )
                             )
                         )
                 )
         )
         val stubMappingUpsertAddresses = wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -545,21 +545,21 @@ internal class AddressControllerInputIT @Autowired constructor(
         // mock "get addresses with relations"
         // this simulates the case that the address already had some relations
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 2,
                                     values = listOf(
-                                        CdqValues.addressBusinessPartnerWithRelations1,
-                                        CdqValues.addressBusinessPartnerWithRelations2
+                                        SaasValues.addressBusinessPartnerWithRelations1,
+                                        SaasValues.addressBusinessPartnerWithRelations2
                                     )
                                 )
                             )
@@ -567,25 +567,25 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
         val stubMappingDeleteRelations = wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DELETE_RELATIONS_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                DeleteRelationsResponseCdq(2)
+                                DeleteRelationsResponseSaas(2)
                             )
                         )
                 )
         )
         val stubMappingUpsertRelations = wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_RELATIONS_PATH))
+            put(urlPathMatching(SAAS_MOCK_RELATIONS_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                UpsertRelationsResponseCdq(
+                                UpsertRelationsResponseSaas(
                                     failures = emptyList(),
                                     numberOfFailed = 0,
                                     numberOfInserts = 2,
@@ -607,11 +607,11 @@ internal class AddressControllerInputIT @Autowired constructor(
         val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
         assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
 
-        // check that "delete relations" was called in cdq as expected
-        val deleteRelationsRequestCdq = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestCdq>(stubMappingDeleteRelations, objectMapper).single()
-        assertThat(deleteRelationsRequestCdq.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
+        // check that "delete relations" was called in SaaS as expected
+        val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
+        assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
-        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestCdq>(stubMappingUpsertRelations, objectMapper).single()
+        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
         assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
@@ -627,18 +627,18 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         // mock "get parent legal entities"
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 0,
-                                    values = emptyList<BusinessPartnerCdq>()
+                                    values = emptyList<BusinessPartnerSaas>()
                                 )
                             )
                         )
@@ -665,18 +665,18 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         // mock "get parent sites"
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(cdqConfigProperties.datasource))
+                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = 50,
                                     total = 0,
-                                    values = emptyList<BusinessPartnerCdq>()
+                                    values = emptyList<BusinessPartnerSaas>()
                                 )
                             )
                         )
@@ -742,10 +742,10 @@ internal class AddressControllerInputIT @Autowired constructor(
     fun `validate a valid address partner`() {
         val address = RequestValues.addressGateInput2
 
-        val mockParent = CdqValues.siteBusinessPartner1
-        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        val mockParent = SaasValues.siteBusinessPartner1
+        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -754,13 +754,13 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -791,10 +791,10 @@ internal class AddressControllerInputIT @Autowired constructor(
         val address = RequestValues.addressGateInput2
 
 
-        val mockParent = CdqValues.siteBusinessPartner1
-        val mockParentResponse = PagedResponseCdq(1, null, null, 1, listOf(mockParent))
+        val mockParent = SaasValues.siteBusinessPartner1
+        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -805,15 +805,15 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val mockErrorMessage = "Validation error"
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
 
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

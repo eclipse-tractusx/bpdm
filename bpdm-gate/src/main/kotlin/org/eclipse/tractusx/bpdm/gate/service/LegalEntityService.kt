@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -36,30 +36,30 @@ import org.springframework.stereotype.Service
 
 @Service
 class LegalEntityService(
-    private val cdqRequestMappingService: CdqRequestMappingService,
-    private val inputCdqMappingService: InputCdqMappingService,
-    private val cdqClient: CdqClient,
+    private val saasRequestMappingService: SaasRequestMappingService,
+    private val inputSaasMappingService: InputSaasMappingService,
+    private val saasClient: SaasClient,
     private val poolClient: PoolClient
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>) {
-        val legalEntitiesCdq = legalEntities.map { cdqRequestMappingService.toCdqModel(it) }
-        cdqClient.upsertLegalEntities(legalEntitiesCdq)
+        val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
+        saasClient.upsertLegalEntities(legalEntitiesSaas)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {
-        val fetchResponse = cdqClient.getBusinessPartner(externalId)
+        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return inputCdqMappingService.toInputLegalEntity(fetchResponse.businessPartner!!)
+            FetchResponse.Status.OK -> return inputSaasMappingService.toInputLegalEntity(fetchResponse.businessPartner!!)
             FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
         }
     }
 
     fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInput> {
-        val partnerCollection = cdqClient.getLegalEntities(limit, startAfter)
+        val partnerCollection = saasClient.getLegalEntities(limit, startAfter)
 
         val validEntries = toValidLegalEntities(partnerCollection.values)
 
@@ -72,22 +72,22 @@ class LegalEntityService(
     }
 
     /**
-     * Get legal entities by first fetching legal entities from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * Get legal entities by first fetching legal entities from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the legal entities from the bpdm pool.
      */
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateOutput> {
-        val partnerCollection = cdqClient.getAugmentedLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
+        val partnerCollection = saasClient.getAugmentedLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
 
         val bpnToExternalIdMapNullable =
-            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ CdqMappings.findBpn(it.identifiers) }, { it.externalId })
+            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ SaasMappings.findBpn(it.identifiers) }, { it.externalId })
         val numLegalEntitiesWithoutBpn = bpnToExternalIdMapNullable.filter { it.key == null }.size
         val numLegalEntitiesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
         if (numLegalEntitiesWithoutBpn > 0) {
-            logger.warn { "Encountered $numLegalEntitiesWithoutBpn legal entities without BPN in CDQ. Can't retrieve data from pool for these." }
+            logger.warn { "Encountered $numLegalEntitiesWithoutBpn legal entities without BPN in SaaS. Can't retrieve data from pool for these." }
         }
         if (numLegalEntitiesWithoutExternalId > 0) {
-            logger.warn { "Encountered $numLegalEntitiesWithoutExternalId legal entities without external id in CDQ." }
+            logger.warn { "Encountered $numLegalEntitiesWithoutExternalId legal entities without external id in SaaS." }
         }
 
         val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
@@ -109,7 +109,7 @@ class LegalEntityService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = legalEntitiesOutput,
-            invalidEntries = partnerCollection.values.size - legalEntitiesOutput.size // difference of what gate can return to values in cdq
+            invalidEntries = partnerCollection.values.size - legalEntitiesOutput.size // difference of what gate can return to values in SaaS
         )
     }
 
@@ -136,17 +136,17 @@ class LegalEntityService(
         )
     }
 
-    private fun toValidLegalEntities(partners: Collection<BusinessPartnerCdq>): Collection<LegalEntityGateInput> {
+    private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInput> {
         return partners.mapNotNull {
             val logMessageStart =
-                "CDQ business partner for legal entity with ID ${it.id ?: "Unknown"}"
+                "SaaS business partner for legal entity with ID ${it.id ?: "Unknown"}"
 
             try {
                 if (it.addresses.size > 1) {
                     logger.warn { "$logMessageStart has multiple legal addresses." }
                 }
 
-                inputCdqMappingService.toInputLegalEntity(it)
+                inputSaasMappingService.toInputLegalEntity(it)
             } catch (e: BpdmMappingException) {
                 logger.warn { "$logMessageStart will be ignored: ${e.message}" }
                 null

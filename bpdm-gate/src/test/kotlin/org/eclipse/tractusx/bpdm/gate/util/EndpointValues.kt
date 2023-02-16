@@ -21,20 +21,20 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 object EndpointValues {
 
-    const val CDQ_MOCK_DATA_EXCHANGE_API_PATH = "/test-cdq-data-exchange-api/test-cdq-storage"
-    const val CDQ_MOCK_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_DATA_EXCHANGE_API_PATH/businesspartners"
-    const val CDQ_MOCK_RELATIONS_PATH = "$CDQ_MOCK_DATA_EXCHANGE_API_PATH/relations"
-    const val CDQ_MOCK_DELETE_RELATIONS_PATH = "$CDQ_MOCK_RELATIONS_PATH/delete"
-    const val CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_BUSINESS_PARTNER_PATH/fetch"
+    const val SAAS_MOCK_DATA_EXCHANGE_API_PATH = "/test-saas-data-exchange-api/test-saas-storage"
+    const val SAAS_MOCK_BUSINESS_PARTNER_PATH = "$SAAS_MOCK_DATA_EXCHANGE_API_PATH/businesspartners"
+    const val SAAS_MOCK_RELATIONS_PATH = "$SAAS_MOCK_DATA_EXCHANGE_API_PATH/relations"
+    const val SAAS_MOCK_DELETE_RELATIONS_PATH = "$SAAS_MOCK_RELATIONS_PATH/delete"
+    const val SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH = "$SAAS_MOCK_BUSINESS_PARTNER_PATH/fetch"
 
-    const val CDQ_MOCK_DATA_CLINIC_API_PATH = "/test-cdq-data-clinic-api/test-cdq-storage"
-    const val CDQ_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$CDQ_MOCK_DATA_CLINIC_API_PATH/augmentedbusinesspartners"
+    const val SAAS_MOCK_DATA_CLINIC_API_PATH = "/test-saas-data-clinic-api/test-saas-storage"
+    const val SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$SAAS_MOCK_DATA_CLINIC_API_PATH/augmentedbusinesspartners"
 
-    const val CDQ_MOCK_REFERENCE_DATA_API_PATH = "/test-cdq-reference-data-api"
-    const val CDQ_MOCK_REFERENCE_DATA_LOOKUP_PATH = "$CDQ_MOCK_REFERENCE_DATA_API_PATH/businesspartners/lookup"
+    const val SAAS_MOCK_REFERENCE_DATA_API_PATH = "/test-saas-reference-data-api"
+    const val SAAS_MOCK_REFERENCE_DATA_LOOKUP_PATH = "$SAAS_MOCK_REFERENCE_DATA_API_PATH/businesspartners/lookup"
 
-    const val CDQ_MOCK_DATA_VALIDATION_API_PATH = "/test-cdq-data-validation-api"
-    const val CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH = "$CDQ_MOCK_DATA_VALIDATION_API_PATH/businesspartners/validate"
+    const val SAAS_MOCK_DATA_VALIDATION_API_PATH = "/test-saas-data-validation-api"
+    const val SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH = "$SAAS_MOCK_DATA_VALIDATION_API_PATH/businesspartners/validate"
 
     const val GATE_API_PATH = "/api/catena"
     const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"

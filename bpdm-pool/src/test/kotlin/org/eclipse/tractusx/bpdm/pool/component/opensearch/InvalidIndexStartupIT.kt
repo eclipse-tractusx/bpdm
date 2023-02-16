@@ -64,7 +64,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
     }
 
@@ -116,7 +116,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         assertThat(getResponse.found()).isFalse
 
         //import a business partner to DB
-        testHelpers.importAndGetResponse(listOf(CdqValues.legalEntity1), webTestClient, wireMockServer)
+        testHelpers.importAndGetResponse(listOf(SaasValues.legalEntity1), webTestClient, wireMockServer)
 
         //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)

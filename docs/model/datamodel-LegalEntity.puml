@@ -38,7 +38,7 @@ class Identifier_Type {
 
 note as Identifier_Type_Key
 	<b>Example:</b>
-	CX ID - CDQ Identifier
+	CX ID - SaaS Identifier
 	DE BNUM
 	DUNS ID
 	EU_VAT_ID_DE

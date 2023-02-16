@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.ReferenceDataLookupRequestCdq
-import org.eclipse.tractusx.bpdm.gate.config.CdqConfigProperties
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.ReferenceDataLookupRequestSaas
+import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class TypeMatchingService(
-    private val cdqClient: CdqClient,
-    private val cdqLookupMappingService: CdqLookupMappingService,
+    private val saasClient: SaasClient,
+    private val saasLookupMappingService: SaasLookupMappingService,
     private val typeMatchConfigProperties: TypeMatchConfigProperties,
-    private val cdqConfigProperties: CdqConfigProperties
+    private val saasConfigProperties: SaasConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -43,14 +43,14 @@ class TypeMatchingService(
      * Currently can only distinguish between legal entity or nothing
      */
     fun determineCandidateType(partner: BusinessPartnerCandidateDto): TypeMatchResponse {
-        val request = ReferenceDataLookupRequestCdq(
+        val request = ReferenceDataLookupRequestSaas(
             matchingThreshold = typeMatchConfigProperties.legalEntityThreshold,
             pageSize = 1,
             page = 0,
             maxCandidates = 1,
-            businessPartner = cdqLookupMappingService.toCdq(partner)
+            businessPartner = saasLookupMappingService.toSaas(partner)
         )
-        val response = cdqClient.lookUpReferenceData(request)
+        val response = saasClient.lookUpReferenceData(request)
 
         val bestOverall = response.values.maxOfOrNull { it.matchingProfile.matchingScores.overall.value } ?: 0f
 
@@ -66,7 +66,7 @@ class TypeMatchingService(
      * Partitions the input into legal entities and sites for a given collection.
      * Filters out any addresses with a warning since they can't be parents
      */
-    fun partitionIntoParentTypes(parents: Collection<BusinessPartnerCdq>): Pair<Collection<BusinessPartnerCdq>, Collection<BusinessPartnerCdq>> {
+    fun partitionIntoParentTypes(parents: Collection<BusinessPartnerSaas>): Pair<Collection<BusinessPartnerSaas>, Collection<BusinessPartnerSaas>> {
         val typeGroups = parents.groupBy { determineType(it) }
 
         typeGroups.keys
@@ -80,7 +80,7 @@ class TypeMatchingService(
         return Pair(typeGroups[LsaType.LegalEntity] ?: emptyList(), typeGroups[LsaType.Site] ?: emptyList())
     }
 
-    fun determineType(partner: BusinessPartnerCdq): LsaType {
+    fun determineType(partner: BusinessPartnerSaas): LsaType {
         if (partner.types.isEmpty()) {
             logger.warn { "Partner with ID ${partner.id} does not have any type" }
             return LsaType.None
@@ -92,9 +92,9 @@ class TypeMatchingService(
 
         val partnerType = partner.types.first()
         return when (partnerType.technicalKey) {
-            cdqConfigProperties.legalEntityType -> LsaType.LegalEntity
-            cdqConfigProperties.siteType -> LsaType.Site
-            cdqConfigProperties.addressType -> LsaType.Address
+            saasConfigProperties.legalEntityType -> LsaType.LegalEntity
+            saasConfigProperties.siteType -> LsaType.Site
+            saasConfigProperties.addressType -> LsaType.Address
             else -> LsaType.None
         }
     }

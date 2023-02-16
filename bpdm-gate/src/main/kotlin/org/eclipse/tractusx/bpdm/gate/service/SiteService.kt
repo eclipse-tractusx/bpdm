@@ -20,48 +20,48 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.CdqMappings
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.exception.CdqInvalidRecordException
-import org.eclipse.tractusx.bpdm.gate.exception.CdqNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
+import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
 import org.eclipse.tractusx.bpdm.gate.filterNotNullValues
 import org.springframework.stereotype.Service
 
 @Service
 class SiteService(
-    private val cdqRequestMappingService: CdqRequestMappingService,
-    private val inputCdqMappingService: InputCdqMappingService,
-    private val cdqClient: CdqClient,
+    private val saasRequestMappingService: SaasRequestMappingService,
+    private val inputSaasMappingService: InputSaasMappingService,
+    private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
     fun getSites(limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateInput> {
-        val sitesPage = cdqClient.getSites(limit, startAfter)
+        val sitesPage = saasClient.getSites(limit, startAfter)
 
         val validEntries = sitesPage.values.filter { validateSiteBusinessPartner(it) }
 
         return PageStartAfterResponse(
             total = sitesPage.total,
             nextStartAfter = sitesPage.nextStartAfter,
-            content = validEntries.map { inputCdqMappingService.toInputSite(it) },
+            content = validEntries.map { inputSaasMappingService.toInputSite(it) },
             invalidEntries = sitesPage.values.size - validEntries.size
         )
     }
 
     fun getSiteByExternalId(externalId: String): SiteGateInput {
-        val fetchResponse = cdqClient.getBusinessPartner(externalId)
+        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
             FetchResponse.Status.OK -> return toValidSiteInput(fetchResponse.businessPartner!!)
@@ -70,22 +70,22 @@ class SiteService(
     }
 
     /**
-     * Get sites by first fetching sites from "augmented business partners" in CDQ. Augmented business partners from CDQ should contain a BPN,
+     * Get sites by first fetching sites from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the sites from the bpdm pool.
      */
     fun getSitesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateOutput> {
-        val partnerCollection = cdqClient.getAugmentedSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
+        val partnerCollection = saasClient.getAugmentedSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
 
         val bpnToExternalIdMapNullable =
-            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ CdqMappings.findBpn(it.identifiers) }, { it.externalId })
+            partnerCollection.values.mapNotNull { it.augmentedBusinessPartner }.associateBy({ SaasMappings.findBpn(it.identifiers) }, { it.externalId })
         val numSitesWithoutBpn = bpnToExternalIdMapNullable.filter { it.key == null }.size
         val numSitesWithoutExternalId = bpnToExternalIdMapNullable.filter { it.value == null }.size
 
         if (numSitesWithoutBpn > 0) {
-            logger.warn { "Encountered $numSitesWithoutBpn sites without BPN in CDQ. Can't retrieve data from pool for these." }
+            logger.warn { "Encountered $numSitesWithoutBpn sites without BPN in SaaS. Can't retrieve data from pool for these." }
         }
         if (numSitesWithoutExternalId > 0) {
-            logger.warn { "Encountered $numSitesWithoutExternalId sites without external id in CDQ." }
+            logger.warn { "Encountered $numSitesWithoutExternalId sites without external id in SaaS." }
         }
 
         val bpnToExternalIdMap = bpnToExternalIdMapNullable.filterNotNullKeys().filterNotNullValues()
@@ -107,7 +107,7 @@ class SiteService(
             total = partnerCollection.total,
             nextStartAfter = partnerCollection.nextStartAfter,
             content = sitesOutput,
-            invalidEntries = partnerCollection.values.size - sitesOutput.size // difference of what gate can return to values in cdq
+            invalidEntries = partnerCollection.values.size - sitesOutput.size // difference of what gate can return to values in SaaS
         )
     }
 
@@ -145,8 +145,8 @@ class SiteService(
      * - Upserting the new relations
      */
     fun upsertSites(sites: Collection<SiteGateInput>) {
-        val sitesCdq = toCdqModels(sites)
-        cdqClient.upsertSites(sitesCdq)
+        val sitesSaas = toSaasModels(sites)
+        saasClient.upsertSites(sitesSaas)
 
         deleteRelationsOfSites(sites)
 
@@ -154,41 +154,41 @@ class SiteService(
     }
 
     /**
-     * Fetches parent information and converts the given [sites] to their corresponding CDQ models
+     * Fetches parent information and converts the given [sites] to their corresponding SaaS models
      */
-    fun toCdqModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerCdq> {
+    fun toSaasModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
-        return sites.map { toCdqModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
+        return sites.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
     }
 
     private fun upsertRelations(sites: Collection<SiteGateInput>) {
         val relations = sites.map {
-            CdqClient.SiteLegalEntityRelation(
+            SaasClient.SiteLegalEntityRelation(
                 siteExternalId = it.externalId,
                 legalEntityExternalId = it.legalEntityExternalId
             )
         }.toList()
-        cdqClient.upsertSiteRelations(relations)
+        saasClient.upsertSiteRelations(relations)
     }
 
     private fun deleteRelationsOfSites(sites: Collection<SiteGateInput>) {
-        val sitesPage = cdqClient.getSites(externalIds = sites.map { it.externalId })
-        val relationsToDelete = sitesPage.values.flatMap { it.relations }.map { CdqMappings.toRelationToDelete(it) }
+        val sitesPage = saasClient.getSites(externalIds = sites.map { it.externalId })
+        val relationsToDelete = sitesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
         if (relationsToDelete.isNotEmpty()) {
-            cdqClient.deleteRelations(relationsToDelete)
+            saasClient.deleteRelations(relationsToDelete)
         }
     }
 
-    private fun toValidSiteInput(partner: BusinessPartnerCdq): SiteGateInput {
+    private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInput {
         if (!validateSiteBusinessPartner(partner)) {
-            throw CdqInvalidRecordException(partner.id)
+            throw SaasInvalidRecordException(partner.id)
         }
-        return inputCdqMappingService.toInputSite(partner)
+        return inputSaasMappingService.toInputSite(partner)
     }
 
-    private fun validateSiteBusinessPartner(partner: BusinessPartnerCdq): Boolean {
+    private fun validateSiteBusinessPartner(partner: BusinessPartnerSaas): Boolean {
         var valid = true
-        val logMessageStart = "CDQ business partner for site with ${if (partner.id != null) "CDQ ID " + partner.id else "external id " + partner.externalId}"
+        val logMessageStart = "SaaS business partner for site with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
 
         valid = valid && validateAddresses(partner, logMessageStart)
         valid = valid && validateLegalEntityParents(partner, logMessageStart)
@@ -197,7 +197,7 @@ class SiteService(
         return valid
     }
 
-    private fun validateNames(partner: BusinessPartnerCdq, logMessageStart: String): Boolean {
+    private fun validateNames(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
         if (partner.names.size > 1) {
             logger.warn { "$logMessageStart has multiple names." }
         }
@@ -208,7 +208,7 @@ class SiteService(
         return true
     }
 
-    private fun validateAddresses(partner: BusinessPartnerCdq, logMessageStart: String): Boolean {
+    private fun validateAddresses(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
         if (partner.addresses.size > 1) {
             logger.warn { "$logMessageStart has multiple main addresses" }
         }
@@ -219,8 +219,8 @@ class SiteService(
         return true
     }
 
-    private fun validateLegalEntityParents(partner: BusinessPartnerCdq, logMessageStart: String): Boolean {
-        val numLegalEntityParents = inputCdqMappingService.toParentLegalEntityExternalIds(partner.relations).size
+    private fun validateLegalEntityParents(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
+        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner.relations).size
         if (numLegalEntityParents > 1) {
             logger.warn { "$logMessageStart has multiple parent legal entities." }
         }
@@ -231,22 +231,22 @@ class SiteService(
         return true
     }
 
-    private fun getParentLegalEntities(sites: Collection<SiteGateInput>): Map<String, BusinessPartnerCdq> {
+    private fun getParentLegalEntities(sites: Collection<SiteGateInput>): Map<String, BusinessPartnerSaas> {
         val parentLegalEntityExternalIds = sites.map { it.legalEntityExternalId }.distinct().toList()
-        val parentLegalEntitiesPage = cdqClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
+        val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
         if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
-            // should not happen as long as configured upsert limit is lower than cdq's limit
+            // should not happen as long as configured upsert limit is lower than SaaS's limit
             throw IllegalStateException("Could not fetch all parent legal entities in single request.")
         }
         return parentLegalEntitiesPage.values.associateBy { it.externalId!! }
     }
 
-    private fun toCdqModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerCdq?): BusinessPartnerCdq {
+    private fun toSaasModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null) {
-            throw CdqNonexistentParentException(site.legalEntityExternalId)
+            throw SaasNonexistentParentException(site.legalEntityExternalId)
         }
-        val siteCdq = cdqRequestMappingService.toCdqModel(site)
+        val siteSaas = saasRequestMappingService.toSaasModel(site)
         val parentIdentifiersWithoutBpn = parentLegalEntity.identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
-        return siteCdq.copy(identifiers = siteCdq.identifiers.plus(parentIdentifiersWithoutBpn))
+        return siteSaas.copy(identifiers = siteSaas.identifiers.plus(parentIdentifiersWithoutBpn))
     }
 }

@@ -26,16 +26,16 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.cdq.*
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
-import org.eclipse.tractusx.bpdm.gate.util.CdqValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.junit.jupiter.api.Test
@@ -64,13 +64,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.cdq.host") { wireMockServer.baseUrl() }
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
     }
 
     /**
      * When upserting legal entities
-     * Then cdq upsert api should be called with the legal entity data mapped to the cdq data model
+     * Then SaaS upsert api should be called with the legal entity data mapped to the SaaS data model
      */
     @Test
     fun `upsert legal entities`() {
@@ -80,12 +80,12 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2
         )
 
         wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -173,18 +173,18 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while upserting legal entities
+     * When SaaS api responds with an error status code while upserting legal entities
      * Then an internal server error response should be sent
      */
     @Test
-    fun `upsert legal entities, cdq error`() {
+    fun `upsert legal entities, SaaS error`() {
         val legalEntities = listOf(
             RequestValues.legalEntityGateInput1,
             RequestValues.legalEntityGateInput2
         )
 
         wireMockServer.stubFor(
-            put(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -197,7 +197,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity exists in cdq
+     * Given legal entity exists in SaaS
      * When getting legal entity by external id
      * Then legal entity mapped to the catena data model should be returned
      */
@@ -206,14 +206,14 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val expectedLegalEntity = RequestValues.legalEntityGateInput1
 
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = CdqValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntity1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -221,7 +221,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        val legalEntity = webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .isOk
@@ -233,14 +233,14 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity does not exist in cdq
+     * Given legal entity does not exist in SaaS
      * When getting legal entity by external id
      * Then "not found" response is sent
      */
     @Test
     fun `get legal entity by external id, not found`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -262,34 +262,34 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while fetching legal entity by external id
+     * When SaaS api responds with an error status code while fetching legal entity by external id
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get legal entity by external id, cdq error`() {
+    fun `get legal entity by external id, SaaS error`() {
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
     }
 
     /**
-     * Given legal entity without legal address in CDQ
+     * Given legal entity without legal address in SaaS
      * When query by its external ID
      * Then server error is returned
      */
     @Test
     fun `get legal entity without legal address, expect error`() {
 
-        val invalidPartner = CdqValues.legalEntity1.copy(addresses = emptyList())
+        val invalidPartner = SaasValues.legalEntity1.copy(addresses = emptyList())
 
         wireMockServer.stubFor(
-            post(urlPathMatching(CDQ_MOCK_FETCH_BUSINESS_PARTNER_PATH))
+            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -304,7 +304,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${CdqValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -312,15 +312,15 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
 
     /**
-     * Given legal entity exists in cdq
+     * Given legal entity exists in SaaS
      * When getting legal entities page
      * Then legal entities page mapped to the catena data model should be returned
      */
     @Test
     fun `get legal entities`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2
         )
 
         val expectedLegalEntities = listOf(
@@ -335,18 +335,18 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val invalidEntries = 0
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -378,16 +378,16 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entity without legal address in CDQ
+     * Given legal entity without legal address in SaaS
      * When getting legal entities page
      * Then only valid legal entities on page returned
      */
     @Test
     fun `filter legal entities without legal address`() {
-        val legalEntitiesCdq = listOf(
-            CdqValues.legalEntity1,
-            CdqValues.legalEntity2,
-            CdqValues.legalEntity1.copy(addresses = emptyList())
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntity1,
+            SaasValues.legalEntity2,
+            SaasValues.legalEntity1.copy(addresses = emptyList())
         )
 
         val expectedLegalEntities = listOf(
@@ -402,18 +402,18 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val invalidEntries = 1
 
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             objectMapper.writeValueAsString(
-                                PagedResponseCdq(
+                                PagedResponseSaas(
                                     limit = limit,
                                     startAfter = startAfter,
                                     nextStartAfter = nextStartAfter,
                                     total = total,
-                                    values = legalEntitiesCdq
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -445,13 +445,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When cdq api responds with an error status code while getting legal entities
+     * When SaaS api responds with an error status code while getting legal entities
      * Then an internal server error response should be sent
      */
     @Test
-    fun `get legal entities, cdq error`() {
+    fun `get legal entities, SaaS error`() {
         wireMockServer.stubFor(
-            get(urlPathMatching(CDQ_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(badRequest())
         )
 
@@ -487,13 +487,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val legalEntity = RequestValues.legalEntityGateInput1
 
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -525,15 +525,15 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         val mockErrorMessage = "Validation error"
         val mockDefects = listOf(
-            DataDefectCdq(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectCdq(ViolationLevel.INFO, "Info"),
-            DataDefectCdq(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectCdq(ViolationLevel.WARNING, "Warning"),
+            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
+            DataDefectSaas(ViolationLevel.INFO, "Info"),
+            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
+            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
         )
 
-        val mockResponse = ValidationResponseCdq(mockDefects)
+        val mockResponse = ValidationResponseSaas(mockDefects)
         wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.CDQ_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
+            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

@@ -26,10 +26,10 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
-import org.eclipse.tractusx.bpdm.common.dto.cdq.BusinessPartnerCdq
-import org.eclipse.tractusx.bpdm.common.dto.cdq.PagedResponseCdq
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.component.cdq.config.CdqAdapterConfigProperties
+import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
@@ -45,7 +45,7 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
     private val objectMapper: ObjectMapper,
-    private val cdqAdapterConfigProperties: CdqAdapterConfigProperties,
+    private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
@@ -177,11 +177,11 @@ class TestHelpers(
     }
 
     fun importAndGetResponse(
-        partnersToImport: Collection<BusinessPartnerCdq>,
+        partnersToImport: Collection<BusinessPartnerSaas>,
         client: WebTestClient,
         wireMockServer: WireMockExtension
     ): PageResponse<LegalEntityMatchResponse> {
-        val importCollection = PagedResponseCdq(
+        val importCollection = PagedResponseSaas(
             partnersToImport.size,
             null,
             null,
@@ -190,14 +190,14 @@ class TestHelpers(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(cdqAdapterConfigProperties.readBusinessPartnerUrl)).willReturn(
+            WireMock.get(WireMock.urlPathMatching(saasAdapterConfigProperties.readBusinessPartnerUrl)).willReturn(
                 WireMock.aResponse()
                     .withHeader("Content-Type", "application/json")
                     .withBody(objectMapper.writeValueAsString(importCollection))
             )
         )
 
-        startSyncAndAwaitSuccess(client, EndpointValues.CDQ_SYNCH_PATH)
+        startSyncAndAwaitSuccess(client, EndpointValues.SAAS_SYNCH_PATH)
 
         return client.invokeGetEndpoint(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
     }
