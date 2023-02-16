@@ -80,8 +80,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entities`() {
         val legalEntitiesSaas = listOf(
-            SaasValues.legalEntity1Response,
-            SaasValues.legalEntity2Response
+            SaasValues.legalEntityAugmented1,
+            SaasValues.legalEntityAugmented2
         )
 
         val expectedLegalEntities = listOf(
@@ -174,8 +174,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entities, filter by external ids`() {
         val legalEntitiesSaas = listOf(
-            SaasValues.legalEntity1Response,
-            SaasValues.legalEntity2Response
+            SaasValues.legalEntityAugmented1,
+            SaasValues.legalEntityAugmented2
         )
 
         val expectedLegalEntities = listOf(

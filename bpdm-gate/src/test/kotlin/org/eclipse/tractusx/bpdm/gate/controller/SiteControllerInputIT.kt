@@ -146,7 +146,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -365,8 +365,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1,
-            SaasValues.legalEntity2
+            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntityResponse2
         )
 
         val expectedSites = listOf(
@@ -527,7 +527,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInput2
         )
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1
+            SaasValues.legalEntityResponse1
         )
 
         // mock "get parent legal entities"
@@ -567,7 +567,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     fun `validate a valid site`() {
         val site = RequestValues.siteGateInput1
 
-        val mockParent = SaasValues.legalEntity1
+        val mockParent = SaasValues.legalEntityResponse1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
@@ -616,7 +616,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         val site = RequestValues.siteGateInput1
 
 
-        val mockParent = SaasValues.legalEntity1
+        val mockParent = SaasValues.legalEntityResponse1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))

@@ -27,9 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.*
 import java.time.Instant
 
 object ResponseValues {
@@ -469,6 +467,20 @@ object ResponseValues {
         profileClassifications = listOf(classification3, classification4),
         types = listOf(businessPartnerTypeLegalEntity),
         bankAccounts = listOf(bankAccount3, bankAccount4)
+    )
+
+    val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity1,
+        externalId = CommonValues.externalId1,
+        bpn = CommonValues.bpn1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+
+    val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity2,
+        externalId = CommonValues.externalId2,
+        bpn = CommonValues.bpn2,
+        processStartedAt = SaasValues.modificationTime2,
     )
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
