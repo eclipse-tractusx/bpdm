@@ -50,7 +50,7 @@ class SyncRecord(
 
 enum class SyncType{
     OPENSEARCH,
-    SAAS_IMPORT
+    CDQ_IMPORT
 }
 
 enum class SyncStatus{

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.common.model
 
 enum class RelationClass(private val typeName: String) : NamedType {
-    SAAS_HIERARCHY("SaaS Hierarchy"),
-    SAAS_TRANSITION("SaaS Transition"),
+    CDQ_HIERARCHY("SaaS Hierarchy"),
+    CDQ_TRANSITION("SaaS Transition"),
     CX_HIERARCHY("Catena-X"),
     DNB_HIERARCHY("DNB"),
     LEI_HIERARCHY("LEI");
