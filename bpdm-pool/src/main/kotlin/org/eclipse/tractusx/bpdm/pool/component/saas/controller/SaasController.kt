@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/cdq")
+@RequestMapping("/api/saas")
 class SaasController(
     val partnerImportService: ImportStarterService
 ) {

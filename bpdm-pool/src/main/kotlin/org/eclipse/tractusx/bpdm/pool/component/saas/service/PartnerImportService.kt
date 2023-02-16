@@ -65,11 +65,11 @@ class PartnerImportService(
                 val updatedCount = response.legalEntities.updated.size + response.sites.updated.size + response.addresses.updated.size
                 importedCount += createdCount + updatedCount
                 val progress = importedCount / response.totalElements.toFloat()
-                syncRecordService.setProgress(SyncType.CDQ_IMPORT, importedCount, progress)
+                syncRecordService.setProgress(SyncType.SAAS_IMPORT, importedCount, progress)
             } catch (exception: RuntimeException) {
                 logger.error(exception) { "Exception encountered on SaaS import" }
                 syncRecordService.setSynchronizationError(
-                    SyncType.CDQ_IMPORT,
+                    SyncType.SAAS_IMPORT,
                     exception.message ?: "No Message",
                     startAfter
                 )
@@ -80,7 +80,7 @@ class PartnerImportService(
             entityManager.clear()
         } while (startAfter != null)
 
-        syncRecordService.setSynchronizationSuccess(SyncType.CDQ_IMPORT)
+        syncRecordService.setSynchronizationSuccess(SyncType.SAAS_IMPORT)
 
         logger.info { "SaaS import finished successfully" }
     }
