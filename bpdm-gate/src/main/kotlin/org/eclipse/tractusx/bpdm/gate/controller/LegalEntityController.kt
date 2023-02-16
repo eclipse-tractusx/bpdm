@@ -27,7 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -61,7 +62,7 @@ class LegalEntityController(
         ]
     )
     @PutMapping("/input/legal-entities")
-    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInput>): ResponseEntity<Any> {
+    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -80,7 +81,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/input/legal-entities/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInput {
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputResponse {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
@@ -95,7 +96,7 @@ class LegalEntityController(
         ]
     )
     @GetMapping("/input/legal-entities")
-    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInput> {
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }
 
@@ -129,7 +130,7 @@ class LegalEntityController(
     )
     @PostMapping("/input/legal-entities/validation")
     fun validateLegalEntity(
-        @RequestBody legalEntityInput: LegalEntityGateInput
+        @RequestBody legalEntityInput: LegalEntityGateInputRequest
     ): ValidationResponse {
         return validationService.validate(legalEntityInput)
     }
