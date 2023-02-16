@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportIdEntriesResponse
-import org.eclipse.tractusx.bpdm.pool.component.cdq.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntriesResponse
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository

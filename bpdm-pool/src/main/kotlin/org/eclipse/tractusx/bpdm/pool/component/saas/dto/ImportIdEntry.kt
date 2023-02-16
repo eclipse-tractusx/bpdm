@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.sass.dto
+package org.eclipse.tractusx.bpdm.pool.component.saas.dto
 
 data class ImportIdEntry(
     val importId: String,
