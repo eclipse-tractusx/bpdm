@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [4.0.5] - tbd
+## [4.0.5] - 2023-02-16
 
 ### Changed
+
+- support app version 3.0.2
+
+### Fixed
 
 - fixed bug causing missing apiVersion on Ingress resource
 - fixed liveness probe endpoint
