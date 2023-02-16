@@ -27,7 +27,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
@@ -44,12 +45,12 @@ class LegalEntityService(
 
     private val logger = KotlinLogging.logger { }
 
-    fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>) {
+    fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
         val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
         saasClient.upsertLegalEntities(legalEntitiesSaas)
     }
 
-    fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {
+    fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
         val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
@@ -58,7 +59,7 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInput> {
+    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInputResponse> {
         val partnerCollection = saasClient.getLegalEntities(limit, startAfter)
 
         val validEntries = toValidLegalEntities(partnerCollection.values)
@@ -136,7 +137,7 @@ class LegalEntityService(
         )
     }
 
-    private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInput> {
+    private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInputResponse> {
         return partners.mapNotNull {
             val logMessageStart =
                 "SaaS business partner for legal entity with ID ${it.id ?: "Unknown"}"

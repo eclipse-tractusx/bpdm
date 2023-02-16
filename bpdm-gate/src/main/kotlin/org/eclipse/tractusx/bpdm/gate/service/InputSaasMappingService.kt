@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.springframework.stereotype.Service
 
@@ -38,11 +38,12 @@ class InputSaasMappingService(
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
-    fun toInputLegalEntity(businessPartner: BusinessPartnerSaas): LegalEntityGateInput {
-        return LegalEntityGateInput(
-            businessPartner.externalId!!,
-            businessPartner.identifiers.find { it.type?.technicalKey == SaasMappings.BPN_TECHNICAL_KEY }?.value,
-            businessPartner.toLegalEntityDto()
+    fun toInputLegalEntity(businessPartner: BusinessPartnerSaas): LegalEntityGateInputResponse {
+        return LegalEntityGateInputResponse(
+            legalEntity = businessPartner.toLegalEntityDto(),
+            externalId = businessPartner.externalId!!,
+            bpn = businessPartner.identifiers.find { it.type?.technicalKey == SaasMappings.BPN_TECHNICAL_KEY }?.value,
+            processStartedAt = businessPartner.lastModifiedAt,
         )
     }
 

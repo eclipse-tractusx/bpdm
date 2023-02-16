@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.ValidationResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ViolationLevel
 import org.eclipse.tractusx.bpdm.common.service.ValidationMapper
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
@@ -46,7 +46,7 @@ class ValidationService(
     /**
      * Validates a legal entity, listing all errors which will keep it from entering the sharing process
      */
-    fun validate(legalEntityInput: LegalEntityGateInput): ValidationResponse {
+    fun validate(legalEntityInput: LegalEntityGateInputRequest): ValidationResponse {
         val partnerModel = saasRequestMappingService.toSaasModel(legalEntityInput)
         return validate(partnerModel)
     }
