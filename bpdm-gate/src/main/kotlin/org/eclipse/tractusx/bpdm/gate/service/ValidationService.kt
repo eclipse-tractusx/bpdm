@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.ViolationLevel
 import org.eclipse.tractusx.bpdm.common.service.ValidationMapper
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.springframework.stereotype.Service
@@ -54,7 +54,7 @@ class ValidationService(
     /**
      * Validates a lsite, listing all errors which will keep it from entering the sharing process
      */
-    fun validate(siteInput: SiteGateInput): ValidationResponse {
+    fun validate(siteInput: SiteGateInputRequest): ValidationResponse {
         val partnerModel = siteService.toSaasModels(listOf(siteInput)).first()
         return validate(partnerModel)
     }
