@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.ValidationRequestSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ValidationResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ViolationLevel
 import org.eclipse.tractusx.bpdm.common.service.ValidationMapper
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
@@ -62,7 +62,7 @@ class ValidationService(
     /**
      * Validates an address, listing all errors which will keep it from entering the sharing process
      */
-    fun validate(addressInput: AddressGateInput): ValidationResponse {
+    fun validate(addressInput: AddressGateInputRequest): ValidationResponse {
         val partnerModel = addressService.toSaasModels(listOf(addressInput)).first()
         return validate(partnerModel)
     }

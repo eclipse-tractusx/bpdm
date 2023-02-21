@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.springframework.stereotype.Service
@@ -51,7 +51,7 @@ class SaasRequestMappingService(
         )
     }
 
-    fun toSaasModel(address: AddressGateInput): BusinessPartnerSaas {
+    fun toSaasModel(address: AddressGateInputRequest): BusinessPartnerSaas {
         return BusinessPartnerSaas(
             externalId = address.externalId,
             dataSource = saasConfigProperties.datasource,
