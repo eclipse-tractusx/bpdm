@@ -477,7 +477,12 @@ object SaasValues {
         identifiers = listOf(identifierBpnAddress1, identifier1, identifier2), // identifiers copied from legal entity
         addresses = listOf(address1),
         dataSource = testDatasource,
-        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
+        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
+        lastModifiedAt = modificationTime1,
+    )
+
+    val addressBusinessPartnerRequest1 = addressBusinessPartner1.copy(
+        lastModifiedAt = null,
     )
 
     val addressBusinessPartner2 = BusinessPartnerSaas(
@@ -486,7 +491,12 @@ object SaasValues {
         identifiers = listOf(identifierBpnAddress2, identifier1, identifier2), // identifiers copied from site
         addresses = listOf(address2),
         dataSource = testDatasource,
-        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
+        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
+        lastModifiedAt = modificationTime2,
+    )
+
+    val addressBusinessPartnerRequest2 = addressBusinessPartner2.copy(
+        lastModifiedAt = null,
     )
 
     val relationAddress1ToLegalEntity = RelationSaas(

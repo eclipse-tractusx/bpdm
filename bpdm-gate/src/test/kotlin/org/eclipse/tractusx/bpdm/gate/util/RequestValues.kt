@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
@@ -247,17 +247,17 @@ object RequestValues {
         bpn = CommonValues.bpnSite2
     )
 
-    val addressGateInput1 = AddressGateInput(
-        bpn = CommonValues.bpnAddress1,
+    val addressGateInputRequest1 = AddressGateInputRequest(
         address = address1,
         externalId = CommonValues.externalIdAddress1,
-        legalEntityExternalId = CommonValues.externalId1
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnAddress1
     )
-    val addressGateInput2 = AddressGateInput(
-        bpn = CommonValues.bpnAddress2,
+    val addressGateInputRequest2 = AddressGateInputRequest(
         address = address2,
         externalId = CommonValues.externalIdAddress2,
-        siteExternalId = CommonValues.externalIdSite1
+        siteExternalId = CommonValues.externalIdSite1,
+        bpn = CommonValues.bpnAddress2
     )
 
     val candidate1 = BusinessPartnerCandidateDto(
