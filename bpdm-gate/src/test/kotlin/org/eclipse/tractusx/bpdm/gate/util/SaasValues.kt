@@ -381,7 +381,7 @@ object SaasValues {
         geographicCoordinates = geoCoordinate2
     )
 
-    val legalEntityRequest1 = BusinessPartnerSaas(
+    val legalEntityResponse1 = BusinessPartnerSaas(
         externalId = CommonValues.externalId1,
         identifiers = listOf(identifier1, identifier2, identifierBpn1),
         names = listOf(name1, name2),
@@ -392,14 +392,15 @@ object SaasValues {
         bankAccounts = listOf(bankAccount1, bankAccount2),
         addresses = listOf(address1),
         dataSource = testDatasource,
-        lastModifiedAt = null,
-    )
-
-    val legalEntityResponse1 = legalEntityRequest1.copy(
         lastModifiedAt = modificationTime1,
     )
 
-    val legalEntityRequest2 = BusinessPartnerSaas(
+    // identical but without lastModifiedAt
+    val legalEntityRequest1 = legalEntityResponse1.copy(
+        lastModifiedAt = null,
+    )
+
+    val legalEntityResponse2 = BusinessPartnerSaas(
         externalId = CommonValues.externalId2,
         identifiers = listOf(identifier3, identifier4, identifierBpn2),
         names = listOf(name3, name4),
@@ -410,11 +411,12 @@ object SaasValues {
         bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(address2),
         dataSource = testDatasource,
-        lastModifiedAt = null,
+        lastModifiedAt = modificationTime2,
     )
 
-    val legalEntityResponse2 = legalEntityRequest2.copy(
-        lastModifiedAt = modificationTime2,
+    // identical but without lastModifiedAt
+    val legalEntityRequest2 = legalEntityResponse2.copy(
+        lastModifiedAt = null,
     )
 
     val siteBusinessPartner1 = BusinessPartnerSaas(
@@ -423,15 +425,24 @@ object SaasValues {
         names = listOf(nameSite1),
         addresses = listOf(address1),
         dataSource = testDatasource,
-        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
+        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
+        lastModifiedAt = modificationTime1,
     )
+    val siteBusinessPartnerRequest1 = siteBusinessPartner1.copy(
+        lastModifiedAt = null,
+    )
+
     val siteBusinessPartner2 = BusinessPartnerSaas(
         externalId = CommonValues.externalIdSite2,
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
         addresses = listOf(address2),
         dataSource = testDatasource,
-        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
+        types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
+        lastModifiedAt = modificationTime2,
+    )
+    val siteBusinessPartnerRequest2 = siteBusinessPartner2.copy(
+        lastModifiedAt = null,
     )
 
     val relationType = TypeKeyNameSaas(technicalKey = "PARENT")

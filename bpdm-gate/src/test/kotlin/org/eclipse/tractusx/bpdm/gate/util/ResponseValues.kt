@@ -524,6 +524,22 @@ object ResponseValues {
         name = CommonValues.nameSite2
     )
 
+    val siteGateInputResponse1 = SiteGateInputResponse(
+        site = RequestValues.site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnSite1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+
+    val siteGateInputResponse2 = SiteGateInputResponse(
+        site = RequestValues.site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2,
+        bpn = CommonValues.bpnSite2,
+        processStartedAt = SaasValues.modificationTime2,
+    )
+
     val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = address1)
     val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = address2)
 
