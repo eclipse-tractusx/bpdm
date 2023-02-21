@@ -27,15 +27,18 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
-    name = "SiteGateInput", description = " Site with legal entity reference ."
+    name = "SiteGateInputRequest", description = "Site with legal entity reference"
 )
-data class SiteGateInput(
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
+data class SiteGateInputRequest(
     @field:JsonUnwrapped
     val site: SiteDto,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
+
     @Schema(description = "External id of the related legal entity")
     val legalEntityExternalId: String,
+
+    @Schema(description = "Business Partner Number")
+    val bpn: String?,
 )
