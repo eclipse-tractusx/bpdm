@@ -26,7 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchRespons
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -47,7 +48,7 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateInput> {
+    fun getAddresses(limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateInputResponse> {
         val addressesPage = saasClient.getAddresses(limit, startAfter)
         val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
 
@@ -78,7 +79,7 @@ class AddressService(
         )
     }
 
-    fun getAddressByExternalId(externalId: String): AddressGateInput {
+    fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
         val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
@@ -154,7 +155,7 @@ class AddressService(
      * - Retrieving the old relations of the addresses and deleting them
      * - Upserting the new relations
      */
-    fun upsertAddresses(addresses: Collection<AddressGateInput>) {
+    fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
 
@@ -166,20 +167,20 @@ class AddressService(
     /**
      * Fetches parent information and converts the given [addresses] to their corresponding SaaS models
      */
-    fun toSaasModels(addresses: Collection<AddressGateInput>): Collection<BusinessPartnerSaas> {
+    fun toSaasModels(addresses: Collection<AddressGateInputRequest>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = getParentLegalEntities(addresses)
         val parentSitesByExternalId: Map<String, BusinessPartnerSaas> = getParentSites(addresses)
 
         return addresses.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
     }
 
-    private fun upsertRelations(addresses: Collection<AddressGateInput>) {
+    private fun upsertRelations(addresses: Collection<AddressGateInputRequest>) {
         val legalEntityRelations = toLegalEntityRelations(addresses)
         val siteRelations = toSiteRelations(addresses)
         saasClient.upsertAddressRelations(legalEntityRelations, siteRelations)
     }
 
-    private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInput>) {
+    private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInputRequest>) {
         val addressesPage = saasClient.getAddresses(externalIds = addresses.map { it.externalId })
         val relationsToDelete = addressesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
         if (relationsToDelete.isNotEmpty()) {
@@ -187,7 +188,7 @@ class AddressService(
         }
     }
 
-    private fun toSiteRelations(addresses: Collection<AddressGateInput>) = addresses.filter {
+    private fun toSiteRelations(addresses: Collection<AddressGateInputRequest>) = addresses.filter {
         it.siteExternalId != null
     }.map {
         SaasClient.AddressSiteRelation(
@@ -196,7 +197,7 @@ class AddressService(
         )
     }.toList()
 
-    private fun toLegalEntityRelations(addresses: Collection<AddressGateInput>) = addresses.filter {
+    private fun toLegalEntityRelations(addresses: Collection<AddressGateInputRequest>) = addresses.filter {
         it.legalEntityExternalId != null
     }.map {
         SaasClient.AddressLegalEntityRelation(
@@ -205,7 +206,7 @@ class AddressService(
         )
     }.toList()
 
-    private fun getParentSites(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerSaas> {
+    private fun getParentSites(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
         val parentSiteExternalIds = addresses.mapNotNull { it.siteExternalId }.distinct().toList()
         var parentSitesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
         if (parentSiteExternalIds.isNotEmpty()) {
@@ -219,7 +220,7 @@ class AddressService(
         return parentSitesByExternalId
     }
 
-    private fun getParentLegalEntities(addresses: Collection<AddressGateInput>): Map<String, BusinessPartnerSaas> {
+    private fun getParentLegalEntities(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
         val parentLegalEntityExternalIds = addresses.mapNotNull { it.legalEntityExternalId }.distinct().toList()
         var parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
         if (parentLegalEntityExternalIds.isNotEmpty()) {
@@ -233,7 +234,7 @@ class AddressService(
         return parentLegalEntitiesByExternalId
     }
 
-    private fun toSaasModel(address: AddressGateInput, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
+    private fun toSaasModel(address: AddressGateInputRequest, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null && parentSite == null) {
             throw SaasNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
         }
@@ -243,7 +244,7 @@ class AddressService(
         return addressSaas.copy(identifiers = addressSaas.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
-    private fun toValidAddressInput(partner: BusinessPartnerSaas): AddressGateInput {
+    private fun toValidAddressInput(partner: BusinessPartnerSaas): AddressGateInputResponse {
         if (!validateAddressBusinessPartner(partner)) {
             throw SaasInvalidRecordException(partner.id)
         }
