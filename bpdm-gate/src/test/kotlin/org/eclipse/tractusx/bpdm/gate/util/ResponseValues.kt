@@ -564,6 +564,21 @@ object ResponseValues {
     val sitePartnerSearchResponse1 = SitePartnerSearchResponse(site = sitePartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
     val sitePartnerSearchResponse2 = SitePartnerSearchResponse(site = sitePartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
 
+    val addressGateInputResponse1 = AddressGateInputResponse(
+        address = RequestValues.address1,
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnAddress1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+    val addressGateInputResponse2 = AddressGateInputResponse(
+        address = RequestValues.address2,
+        externalId = CommonValues.externalIdAddress2,
+        siteExternalId = CommonValues.externalIdSite1,
+        bpn = CommonValues.bpnAddress2,
+        processStartedAt = SaasValues.modificationTime2,
+    )
+
     val addressGateOutput1 = AddressGateOutput(
         bpn = CommonValues.bpnAddress1,
         address = address1,
