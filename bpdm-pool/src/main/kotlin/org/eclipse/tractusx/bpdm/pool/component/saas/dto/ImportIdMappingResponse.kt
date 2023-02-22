@@ -17,24 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.component.saas.dto
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Index
-import jakarta.persistence.Table
-
-@Entity
-@Table(
-    name = "import_entries",
-    indexes = [
-        Index(columnList = "import_id"),
-        Index(columnList = "bpn")
-    ]
-)
-class ImportEntry(
-    @Column(name = "import_id", nullable = false, unique = true)
-    var importIdentifier: String,
-    @Column(name = "bpn", nullable = false)
-    var bpn: String
-) : BaseEntity()
+data class ImportIdMappingResponse(
+    val entries: Collection<ImportIdEntry>,
+    val notFound: Collection<String>
+) {
+    val size = entries.size
+}

@@ -29,7 +29,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
+import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.Pageable
@@ -44,7 +47,10 @@ class PartnerImportPageService(
     private val mappingService: SaasToRequestMapper,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
     private val importEntryRepository: ImportEntryRepository,
-    private val saasClient: SaasClient
+    private val saasClient: SaasClient,
+    private val legalEntityRepository: LegalEntityRepository,
+    private val siteRepository: SiteRepository,
+    private val addressPartnerRepository: AddressPartnerRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -65,12 +71,10 @@ class PartnerImportPageService(
         addNewMetadata(partnerCollection.values)
 
         val validPartners = partnerCollection.values.filter { isValid(it) }
+        val (noBpn, validBpn) = partitionHasNoBpnAndValidBpn(validPartners)
 
-        addMissingImportEntries(validPartners)
-        val (partnersWithBpn, partnersWithoutBpn) = partitionHasImportEntry(validPartners)
-
-        val (createdLegalEntities, createdSites, createdAddresses) = createPartners(partnersWithoutBpn)
-        val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(partnersWithBpn)
+        val (createdLegalEntities, createdSites, createdAddresses) = createPartners(noBpn)
+        val (updatedLegalEntities, updatedSites, updatedAddresses) = updatePartners(validBpn)
 
         return ImportResponsePage(
             partnerCollection.total,
@@ -163,26 +167,33 @@ class PartnerImportPageService(
         val parents = saasClient.readBusinessPartnersByExternalIds(childrenWithParentId.map { it.parentId }).values
         val validParents = filterValidRelations(parents.filter { isValid(it) }, childrenWithParentId)
 
-        addMissingImportEntries(validParents)
-        val (parentsWithBpn, parentsWithoutBpn) = partitionHasImportEntry(validParents)
-
-        val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
-
-        val parentIdToBpn = newLegalEntities.map { Pair(it.index, it.bpn) }
-            .plus(newSites.map { Pair(it.index, it.bpn) })
-            .plus(parentsWithBpn.map { Pair(it.partner.externalId!!, it.bpn) })
-            .toMap()
-
+        val parentsByImportId = determineParentBPNs(validParents).associateBy { it.partner.externalId!! }
 
         return childrenWithParentId.mapNotNull { childWithParentId ->
-            val parentBpn = parentIdToBpn[childWithParentId.parentId]
-            if (parentBpn != null) {
-                BusinessPartnerWithParentBpn(childWithParentId.partner, parentBpn)
+            val parent = parentsByImportId[childWithParentId.parentId]
+            if (parent != null) {
+                BusinessPartnerWithParentBpn(childWithParentId.partner, parent.bpn)
             } else {
                 logger.warn { "Can not resolve parent with Import-ID ${childWithParentId.parentId} for SaaS record with ID ${childWithParentId.partner.id}" }
                 null
             }
         }
+    }
+
+    private fun determineParentBPNs(parents: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerWithBpn>{
+        val parentByImportId = parents.associateBy { it.externalId!! }
+
+        val (parentsWithoutBpn, parentsWithBpn) = partitionHasNoBpnAndValidBpn(parents)
+
+        //create missing parents in the Pool
+        val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
+
+        val createdParents = newLegalEntities.map { Pair(parentByImportId[it.index], it.bpn) }
+            .plus(newSites.map { Pair(parentByImportId[it.index], it.bpn) })
+            .filter { (parent, _) -> parent != null }
+            .map { BusinessPartnerWithBpn(it.first!!, it.second) }
+
+        return parentsWithBpn + createdParents
     }
 
     private fun determineParentId(children: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerWithParentId> {
@@ -247,7 +258,37 @@ class PartnerImportPageService(
         return type
     }
 
-    private fun partitionHasBpn(partners: Collection<BusinessPartnerSaas>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerSaas>> {
+    /**
+     * Partition business partner collection into records for which no BPN can be retrieved and records which have a BPN that also is found in the Pool
+     * BPN is determined in two priorities:
+     *      1. Try to get BPN from import entry
+     *      2. Try to get BPN from record in identifiers and check whether this BPN actually exists in the Pool (valid BPN)
+     * If we encounter valid BPNs with no import entry we create an import entry for it (as self correction logic)
+     * Optionally, depending on the configuration we either ignore records with invalid BPNs or we treat them as having no BPN
+     */
+    private fun partitionHasNoBpnAndValidBpn(partners: Collection<BusinessPartnerSaas>): Pair<Collection<BusinessPartnerSaas>, Collection<BusinessPartnerWithBpn>>{
+        //search BPN in import entry based on CX-Pool identifier
+        val (withEntry, withoutEntry) = partitionHasImportEntry(partners)
+        //if no entry has been found look for BPN in identifiers of records
+        val (hasBpnIdentifier, hasNoBpnIdentifier) = partitionContainsBpnIdentifier(withoutEntry)
+        //if BPN is identifiers but no import record exists, check whether the BPN is known to the BPDM Pool
+        val (bpnFound, bpnMissing) = partitionBpnFound(hasBpnIdentifier)
+
+        val consequence = if(adapterProperties.treatInvalidBpnAsNew) "Record will be treated as having no BPN." else "Record will be ignored."
+        bpnMissing.forEach {
+            logger.warn { "Business partner with Id ${it.partner.externalId} contains BPN ${it.bpn} but such BPN can't be found in the Pool." + consequence }
+        }
+
+        val hasValidBpn = withEntry + bpnFound
+        val hasNoBpn = if(adapterProperties.treatInvalidBpnAsNew) hasNoBpnIdentifier + bpnMissing.map { it.partner } else hasNoBpnIdentifier
+
+        //Create missing import entries for records which have known BPNs
+        importEntryRepository.saveAll(bpnFound.map { ImportEntry(it.partner.externalId!!, it.bpn) })
+
+        return Pair(hasNoBpn, hasValidBpn)
+    }
+
+    private fun partitionContainsBpnIdentifier(partners: Collection<BusinessPartnerSaas>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerSaas>> {
         val (hasBpn, nopBpn) = partners
             .map { Pair(it, it.extractId(adapterProperties.bpnKey)) }
             .partition { (_, bpn) -> bpn != null }
@@ -270,15 +311,38 @@ class PartnerImportPageService(
         )
     }
 
-    private fun addMissingImportEntries(partners: Collection<BusinessPartnerSaas>) {
-        val (hasBpn, _) = partitionHasBpn(partners)
-        val partnersByImportId = hasBpn.associateBy { it.partner.externalId!! }
-        val existingImportIds = importEntryRepository.findByImportIdentifierIn(partnersByImportId.keys).map { it.importIdentifier }.toSet()
+    private fun partitionBpnFound(partners: Collection<BusinessPartnerWithBpn>): Pair<Collection<BusinessPartnerWithBpn>, Collection<BusinessPartnerWithBpn>> {
 
-        val missingPartners = partnersByImportId.minus(existingImportIds)
-        val missingEntries = missingPartners.entries.map { ImportEntry(it.key, it.value.bpn) }
+        val partnersByBpn = partners.associateBy { it.bpn }
+        val (bpnLs, bpnSs, bpnAs) = partitionLSA(partnersByBpn.keys)
 
-        importEntryRepository.saveAll(missingEntries)
+        val foundBpnLs = legalEntityRepository.findDistinctByBpnIn(bpnLs).map { it.bpn }
+        val foundBpnSs = siteRepository.findDistinctByBpnIn(bpnSs).map { it.bpn }
+        val foundBpnAs = addressPartnerRepository.findDistinctByBpnIn(bpnAs).map { it.bpn }
+
+        val foundBpns = foundBpnLs + foundBpnSs + foundBpnAs
+        val bpnMissing = partnersByBpn - foundBpns.toSet()
+        val bpnExists = partnersByBpn - bpnMissing.keys
+
+        return Pair(bpnExists.values, bpnMissing.values)
+    }
+
+    private fun partitionLSA(bpns: Collection<String>): Triple<Collection<String>, Collection<String>, Collection<String>>{
+        val bpnLs = mutableListOf<String>()
+        val bpnSs = mutableListOf<String>()
+        val bpnAs = mutableListOf<String>()
+
+        bpns.map { it.uppercase()}.forEach {
+            when(it.take(4))
+            {
+                "BPNL" -> bpnLs.add(it)
+                "BPNS" -> bpnSs.add(it)
+                "BPNA" -> bpnAs.add(it)
+                else -> logger.warn { "Encountered non-valid BPN: $it" }
+            }
+        }
+
+        return Triple(bpnLs, bpnSs, bpnAs)
     }
 
     private fun filterValidRelations(
