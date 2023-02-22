@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.Instant
 
-@JsonDeserialize(using = LegalEntityPartnerResponse.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerResponse", description = "Business partner of type legal entity with currentness")
 data class LegalEntityPartnerResponse(
     @Schema(description = "Business Partner Number of this legal entity")
@@ -37,17 +34,4 @@ data class LegalEntityPartnerResponse(
     val properties: LegalEntityResponse,
     @Schema(description = "The timestamp the business partner data was last indicated to be still current")
     val currentness: Instant
-) {
-    class CustomDeserializer(vc: Class<LegalEntityPartnerResponse>?) : StdDeserializer<LegalEntityPartnerResponse>(vc) {
-        constructor() : this(null) // for some reason jackson needs this explicit default constructor
-
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerResponse {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return LegalEntityPartnerResponse(
-                node.get(LegalEntityPartnerResponse::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
-                ctxt.readTreeAsValue(node.get(LegalEntityPartnerResponse::currentness.name), Instant::class.java)
-            )
-        }
-    }
-}
+)

@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.dto
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = SiteGateInputDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
     name = "SiteGateInput", description = " Site with legal entity reference ."
 )
@@ -42,15 +39,3 @@ data class SiteGateInput(
     @Schema(description = "External id of the related legal entity")
     val legalEntityExternalId: String,
 )
-
-class SiteGateInputDeserializer(vc: Class<SiteGateInput>?) : StdDeserializer<SiteGateInput>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteGateInput {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return SiteGateInput(
-            node.get(SiteGateInput::bpn.name)?.textValue(),
-            ctxt.readTreeAsValue(node, SiteDto::class.java),
-            node.get(SiteGateInput::externalId.name).textValue(),
-            node.get(SiteGateInput::legalEntityExternalId.name)?.textValue()!!
-        )
-    }
-}

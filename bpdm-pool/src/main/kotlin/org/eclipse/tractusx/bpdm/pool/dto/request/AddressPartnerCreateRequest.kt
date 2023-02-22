@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = AddressPartnerCreateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "AddressPartnerCreateRequest", description = "Request for creating new business partner record of type address")
 data class AddressPartnerCreateRequest(
     @field:JsonUnwrapped
@@ -37,17 +34,4 @@ data class AddressPartnerCreateRequest(
     val parent: String,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
-) {
-    class CustomDeserializer(vc: Class<AddressPartnerCreateRequest>?) : StdDeserializer<AddressPartnerCreateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerCreateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return AddressPartnerCreateRequest(
-                ctxt.readTreeAsValue(node, AddressDto::class.java),
-                node.get(AddressPartnerCreateRequest::parent.name).textValue(),
-                node.get(AddressPartnerCreateRequest::index.name)?.textValue()
-            )
-        }
-    }
-}
-
-
+)
