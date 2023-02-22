@@ -26,15 +26,22 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientLegalEntityService
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.Instant
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
@@ -55,6 +62,14 @@ class TestHelpers(
 
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
+
+    val webClient: WebClient =
+        WebClient.builder()
+            .baseUrl("http://localhost:8080/api/catena/legal-entities")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build()
+
+    val poolClientLegalEntityService = PoolClientLegalEntityService(webClient);
 
     fun truncateDbTables() {
         em.transaction.begin()
@@ -88,10 +103,7 @@ class TestHelpers(
         client: WebTestClient
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities =
-            client.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
-                EndpointValues.CATENA_LEGAL_ENTITY_PATH,
-                partnerStructures.map { it.legalEntity })
+        val legalEntities = poolClientLegalEntityService.createBusinessPartners(partnerStructures.map { it.legalEntity });
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =

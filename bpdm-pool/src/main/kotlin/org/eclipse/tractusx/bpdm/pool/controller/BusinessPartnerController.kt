@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springdoc.core.annotations.ParameterObject

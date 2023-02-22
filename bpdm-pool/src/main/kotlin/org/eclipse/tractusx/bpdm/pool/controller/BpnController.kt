@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

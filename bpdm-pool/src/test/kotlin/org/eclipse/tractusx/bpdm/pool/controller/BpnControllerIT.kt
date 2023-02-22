@@ -24,8 +24,8 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

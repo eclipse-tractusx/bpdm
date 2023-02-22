@@ -23,9 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerMatchResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

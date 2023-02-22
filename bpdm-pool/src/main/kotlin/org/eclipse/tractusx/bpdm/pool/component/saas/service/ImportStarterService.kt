@@ -20,13 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntriesResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdMappingResponse
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
+import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -64,11 +67,25 @@ class ImportStarterService(
         return syncRecordService.getOrCreateRecord(SyncType.SAAS_IMPORT).toDto()
     }
 
-    fun getImportIdEntries(importIdentifiers: Collection<String>): ImportIdEntriesResponse {
-        return ImportIdEntriesResponse(
-            importEntryRepository.findByImportIdentifierIn(importIdentifiers).map { ImportIdEntry(it.importIdentifier, it.bpn) }
-        )
+    /**
+     * Filter import entries by the given [importIdentifiers]
+     */
+    fun getImportIdEntries(importIdentifiers: Collection<String>): ImportIdMappingResponse {
+        val foundEntries = importEntryRepository.findByImportIdentifierIn(importIdentifiers).map { ImportIdEntry(it.importIdentifier, it.bpn) }
+        val missingEntries = importIdentifiers.minus(foundEntries.map { it.importId }.toSet())
+
+        return ImportIdMappingResponse(foundEntries, missingEntries)
     }
+
+    /**
+     * Paginate over import entries by [paginationRequest]
+     */
+    fun getImportIdEntries(paginationRequest: PaginationRequest): PageResponse<ImportIdEntry> {
+        val entriesPage = importEntryRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        return entriesPage.toDto(entriesPage.content.map { ImportIdEntry(it.importIdentifier, it.bpn) })
+    }
+
+
 
     private fun startImport(inSync: Boolean): SyncResponse {
         val record = syncRecordService.setSynchronizationStart(SyncType.SAAS_IMPORT)

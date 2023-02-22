@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.client.RequestOptions
 import org.opensearch.client.RestHighLevelClient

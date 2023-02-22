@@ -20,20 +20,20 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.BusinessPartnerWithBpn
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.BusinessPartnerWithParentBpn
-import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.springframework.stereotype.Service
 
 @Service

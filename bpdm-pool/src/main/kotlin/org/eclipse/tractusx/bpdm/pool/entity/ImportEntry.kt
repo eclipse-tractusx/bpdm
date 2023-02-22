@@ -33,7 +33,7 @@ import jakarta.persistence.Table
     ]
 )
 class ImportEntry(
-    @Column(name = "import_id", nullable = false)
+    @Column(name = "import_id", nullable = false, unique = true)
     var importIdentifier: String,
     @Column(name = "bpn", nullable = false)
     var bpn: String

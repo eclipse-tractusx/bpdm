@@ -36,6 +36,8 @@ class SaasAdapterConfigProperties(
     val addressType: String = "BP_ADDRESS",
     val parentRelationType: String = "PARENT",
     val bpnKey: String = "CX_BPN",
+    val treatInvalidBpnAsNew: Boolean = false,
+    val requestSizeLimit: Int = 500
 ) {
     private val exchangeApiUrl: String = "data-exchange/rest/v4"
     private val referenceApiUrl: String = "referencedata/rest/v3"

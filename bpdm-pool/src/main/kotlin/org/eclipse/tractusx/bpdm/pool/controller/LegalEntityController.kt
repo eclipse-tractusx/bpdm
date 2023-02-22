@@ -26,11 +26,11 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
