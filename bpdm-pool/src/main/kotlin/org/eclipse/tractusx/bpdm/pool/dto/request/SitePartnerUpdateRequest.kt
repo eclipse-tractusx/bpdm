@@ -20,31 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = SitePartnerUpdateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "SitePartnerUpdateRequest", description = "Request for updating a business partner record of type site")
 data class SitePartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this site")
     val bpn: String,
     @field:JsonUnwrapped
     val site: SiteDto
-) {
-    class CustomDeserializer(vc: Class<SitePartnerUpdateRequest>?) : StdDeserializer<SitePartnerUpdateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SitePartnerUpdateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return SitePartnerUpdateRequest(
-                node.get(LegalEntityPartnerUpdateRequest::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, SiteDto::class.java)
-            )
-        }
-    }
-}
-
-
+)

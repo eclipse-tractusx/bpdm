@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.dto
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = AddressGateInputDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
     name = "AddressGateInput", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
@@ -45,16 +42,3 @@ data class AddressGateInput(
     @Schema(description = "External id of the related site")
     val siteExternalId: String? = null
 )
-
-class AddressGateInputDeserializer(vc: Class<AddressGateInput>?) : StdDeserializer<AddressGateInput>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressGateInput {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressGateInput(
-            node.get(AddressGateInput::bpn.name)?.textValue(),
-            ctxt.readTreeAsValue(node, AddressDto::class.java),
-            node.get(AddressGateInput::externalId.name).textValue(),
-            node.get(AddressGateInput::legalEntityExternalId.name)?.textValue(),
-            node.get(AddressGateInput::siteExternalId.name)?.textValue()
-        )
-    }
-}
