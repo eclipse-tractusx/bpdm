@@ -32,8 +32,8 @@ import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.javaType
 
 /**
- * This is a generic JsonDeserializer that works with Kotlin data classes containing the annotation JsonUnwrapped.
- * The new object is initialized via the primary constructor.
+ * Data classes using the annotation JsonUnwrapped are not supported out-of-the-box by jackson-module-kotlin and need a custom deserializer.
+ * This generic JsonDeserializer supports this use case. A new object is initialized via the primary constructor.
  */
 class DataClassUnwrappedJsonDeserializer : JsonDeserializer<Any?>(), ContextualDeserializer {
     // We need a ContextualDeserializer to find out the destination type.
