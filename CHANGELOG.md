@@ -10,6 +10,10 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 - BPDM Pool: Update dependencies to mitigate vulnerabilities in old versions
 
+### Changed
+
+- Replaced manual JSON deserializer implementations for various DTOs by generic DataClassUnwrappedJsonDeserializer.
+
 ## [3.0.2] - 2022-02-15
 
 ### Changed

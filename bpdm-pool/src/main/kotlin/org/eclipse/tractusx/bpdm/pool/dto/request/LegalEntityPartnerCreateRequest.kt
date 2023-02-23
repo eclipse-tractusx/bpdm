@@ -20,30 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = LegalEntityPartnerCreateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateRequest", description = "Request for creating new business partner record of type legal entity")
 data class LegalEntityPartnerCreateRequest(
     @field:JsonUnwrapped
     val properties: LegalEntityDto,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
-) {
-    class CustomDeserializer(vc: Class<LegalEntityPartnerCreateRequest>?) : StdDeserializer<LegalEntityPartnerCreateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerCreateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return LegalEntityPartnerCreateRequest(
-                ctxt.readTreeAsValue(node, LegalEntityDto::class.java),
-                node.get(LegalEntityPartnerCreateRequest::index.name)?.textValue(),
-            )
-        }
-    }
-}
-
+)

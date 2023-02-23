@@ -20,31 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = LegalEntityPartnerUpdateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityUpdateRequest", description = "Request for updating a business partner record of type legal entity")
 data class LegalEntityPartnerUpdateRequest(
     @Schema(description = "Business Partner Number")
     val bpn: String,
     @field:JsonUnwrapped
     val properties: LegalEntityDto
-) {
-    class CustomDeserializer(vc: Class<LegalEntityPartnerUpdateRequest>?) : StdDeserializer<LegalEntityPartnerUpdateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerUpdateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return LegalEntityPartnerUpdateRequest(
-                node.get(LegalEntityPartnerUpdateRequest::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, LegalEntityDto::class.java)
-            )
-        }
-    }
-}
-
-
+)

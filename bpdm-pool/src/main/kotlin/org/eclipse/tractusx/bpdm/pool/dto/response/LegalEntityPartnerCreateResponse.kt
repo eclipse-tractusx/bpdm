@@ -20,17 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.Instant
 
-@JsonDeserialize(using = LegalEntityPartnerCreateResponse.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateResponse", description = "Created business partner of type legal entity")
 data class LegalEntityPartnerCreateResponse(
     @Schema(description = "Business Partner Number of this legal entity")
@@ -43,19 +40,4 @@ data class LegalEntityPartnerCreateResponse(
     val legalAddress: AddressResponse,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
-) {
-    class CustomDeserializer(vc: Class<LegalEntityPartnerCreateResponse>?) : StdDeserializer<LegalEntityPartnerCreateResponse>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityPartnerCreateResponse {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return LegalEntityPartnerCreateResponse(
-                node.get(LegalEntityPartnerCreateResponse::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, LegalEntityResponse::class.java),
-                ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::currentness.name), Instant::class.java),
-                ctxt.readTreeAsValue(node.get(LegalEntityPartnerCreateResponse::legalAddress.name), AddressResponse::class.java),
-                node.get(LegalEntityPartnerCreateResponse::index.name)?.textValue(),
-            )
-        }
-    }
-}
-
-
+)

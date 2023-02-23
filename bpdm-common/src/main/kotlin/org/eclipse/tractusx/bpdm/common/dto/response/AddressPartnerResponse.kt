@@ -20,31 +20,15 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = AddressPartnerResponse.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "AddressPartnerResponse", description = "Business partner of type address")
 data class AddressPartnerResponse(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
     @field:JsonUnwrapped
     val properties: AddressResponse
-) {
-    class CustomDeserializer(vc: Class<AddressPartnerResponse>?) : StdDeserializer<AddressPartnerResponse>(vc) {
-        constructor() : this(null) // for some reason jackson needs this explicit default constructor
-
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerResponse {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return AddressPartnerResponse(
-                node.get(AddressPartnerResponse::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, AddressResponse::class.java)
-            )
-        }
-    }
-}
-
+)

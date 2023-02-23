@@ -20,31 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = AddressPartnerUpdateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "AddressPartnerUpdateRequest", description = "Request for updating a business partner record of type address")
 data class AddressPartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
     @field:JsonUnwrapped
     val properties: AddressDto
-) {
-    class CustomDeserializer(vc: Class<AddressPartnerUpdateRequest>?) : StdDeserializer<AddressPartnerUpdateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressPartnerUpdateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return AddressPartnerUpdateRequest(
-                node.get(AddressPartnerUpdateRequest::bpn.name).textValue(),
-                ctxt.readTreeAsValue(node, AddressDto::class.java),
-            )
-        }
-    }
-}
-
-
+)

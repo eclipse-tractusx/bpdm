@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.dto.request
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = SitePartnerCreateRequest.CustomDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "SitePartnerCreateRequest", description = "Request for creating new business partner record of type site")
 data class SitePartnerCreateRequest(
     @field:JsonUnwrapped
@@ -37,16 +34,4 @@ data class SitePartnerCreateRequest(
     val legalEntity: String,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
-) {
-    class CustomDeserializer(vc: Class<SitePartnerCreateRequest>?) : StdDeserializer<SitePartnerCreateRequest>(vc) {
-        override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SitePartnerCreateRequest {
-            val node = parser.codec.readTree<JsonNode>(parser)
-            return SitePartnerCreateRequest(
-                ctxt.readTreeAsValue(node, SiteDto::class.java),
-                node.get(SitePartnerCreateRequest::legalEntity.name).textValue(),
-                node.get(SitePartnerCreateRequest::index.name)?.textValue(),
-            )
-        }
-    }
-}
-
+)
