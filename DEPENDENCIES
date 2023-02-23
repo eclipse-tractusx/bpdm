@@ -91,7 +91,7 @@ maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/10.1.5, Apache-2.0, a
 maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/10.1.5, Apache-2.0, approved, clearlydefined
 maven/mavencentral/org.aspectj/aspectjweaver/1.9.19, EPL-1.0, approved, tools.aspectj
 maven/mavencentral/org.eclipse.parsson/parsson/1.0.0, EPL-2.0, approved, ee4j.parsson
-maven/mavencentral/org.eclipse.tractusx/bpdm-common/3.0.2-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common/3.0.3-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
 maven/mavencentral/org.flywaydb/flyway-core/8.5.12, Apache-2.0, approved, #2764
 maven/mavencentral/org.hdrhistogram/HdrHistogram/2.1.12, , approved, CQ13192
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.1.6.Final, LGPL-2.1-or-later AND (Apache-2.0 AND LGPL-2.1-only) AND (CC-PDDC AND LGPL-2.1-only) AND (EPL-2.0 OR BSD-3-Clause), approved, #5939
