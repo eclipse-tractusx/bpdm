@@ -31,11 +31,11 @@
     <parent>
         <groupId>org.eclipse.tractusx</groupId>
         <artifactId>bpdm-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.3-SNAPSHOT</version>
     </parent>
 
     <properties>
-        <postgres.version>42.5.0</postgres.version>
+        <postgres.version>42.5.1</postgres.version>
         <flyway.version>8.5.12</flyway.version>
         <testcontainers.version>1.17.2</testcontainers.version>
         <opensearch.version>2.5.0</opensearch.version>
