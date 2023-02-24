@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.saas.dto
 
-data class ImportIdEntriesResponse(
-    val entries: Collection<ImportIdEntry>
-) {
-    val size = entries.size
-}
+data class ImportIdFilterRequest(
+    val importIdentifiers: Collection<String> = emptyList()
+)

@@ -23,14 +23,23 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdFilterRequest
+import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdMappingResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
+import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/saas")
 class SaasController(
-    val partnerImportService: ImportStarterService
+    private val partnerImportService: ImportStarterService,
+    private val adapterConfigProperties: SaasAdapterConfigProperties
 ) {
     @Operation(
         summary = "Import new business partner records from SaaS",
@@ -63,5 +72,39 @@ class SaasController(
     @GetMapping("/business-partner/sync")
     fun getSyncStatus(): SyncResponse {
         return partnerImportService.getImportStatus()
+    }
+
+    @Operation(
+        summary = "Filter Identifier Mappings by CX-Pool Identifiers",
+        description = "Specify a range of CX-Pool Identifiers to get the corresponding mapping to their Business Partner Numbers"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The found import identifier mappings"),
+            ApiResponse(responseCode = "400", description = "On malformed requests or exceeding the request size of \${bpdm.saas.request-size-limit}"),
+        ]
+    )
+    @PostMapping("/identifier-mappings/filter")
+    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingResponse {
+        if(importIdFilterRequest.importIdentifiers.size > adapterConfigProperties.requestSizeLimit)
+             BpdmRequestSizeException(importIdFilterRequest.importIdentifiers.size, adapterConfigProperties.requestSizeLimit)
+        return partnerImportService.getImportIdEntries(importIdFilterRequest.importIdentifiers)
+    }
+
+    @Operation(
+        summary = "Paginate Identifier Mappings by CX-Pool Identifiers",
+        description = "Paginate through all CX-Pool Identifier and Business Partner Number mappings."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The found import identifier mappings"),
+            ApiResponse(responseCode = "400", description = "On malformed requests or exceeding the request size of \${bpdm.saas.request-size-limit}"),
+        ]
+    )
+    @GetMapping("/identifier-mappings")
+    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageResponse<ImportIdEntry> {
+        if(paginationRequest.size > adapterConfigProperties.requestSizeLimit)
+            BpdmRequestSizeException(paginationRequest.size, adapterConfigProperties.requestSizeLimit)
+        return partnerImportService.getImportIdEntries(paginationRequest)
     }
 }

@@ -17,24 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.exception
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Index
-import jakarta.persistence.Table
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Entity
-@Table(
-    name = "import_entries",
-    indexes = [
-        Index(columnList = "import_id"),
-        Index(columnList = "bpn")
-    ]
-)
-class ImportEntry(
-    @Column(name = "import_id", nullable = false, unique = true)
-    var importIdentifier: String,
-    @Column(name = "bpn", nullable = false)
-    var bpn: String
-) : BaseEntity()
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmRequestSizeException(
+    val actualSize: Int,
+    val maxSize: Int
+            ): RuntimeException("Request size of $actualSize exceeds maximum size of $maxSize") {
+
+}
