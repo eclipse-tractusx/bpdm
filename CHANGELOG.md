@@ -6,6 +6,10 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [3.1.0] - tbd
 
+### Changed
+
+- BPDM Gate: Endpoints returning input versions of legal entity, site and address now provide processStartedAt timestamp.
+
 ## [3.0.3] - 2022-02-23
 
 ### Security
