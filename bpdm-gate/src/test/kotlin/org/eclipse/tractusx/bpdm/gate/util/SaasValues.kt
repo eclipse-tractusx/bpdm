@@ -142,6 +142,18 @@ object SaasValues {
         issuingBody = issuerBpn
     )
 
+    val identifierBpn3 = IdentifierSaas(
+        type = idTypeBpn,
+        value = CommonValues.bpn3,
+        issuingBody = issuerBpn
+    )
+
+    val identifierBpn4 = IdentifierSaas(
+        type = idTypeBpn,
+        value = CommonValues.bpn4,
+        issuingBody = issuerBpn
+    )
+
     val identifierBpnSite1 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite1,
@@ -527,11 +539,47 @@ object SaasValues {
         identifiers = listOf(identifier1Response, identifier2Response, identifierBpn1),
         legalForm = legalForm1Response,
         lastModifiedAt = modificationTime1,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_CONFIDENT_MATCH, "OK")
+        ),
     )
 
     val legalEntityAugmented2 = legalEntityRequest2.copy(
         identifiers = listOf(identifier3Response, identifier4Response, identifierBpn2),
         legalForm = legalForm2Response,
         lastModifiedAt = modificationTime2,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
+    )
+
+    val legalEntityNotInPoolResponse = legalEntityRequest2.copy(
+        externalId = CommonValues.externalId3,
+        identifiers = listOf(identifier3Response, identifier4Response, identifierBpn3),
+        legalForm = legalForm2Response,
+        lastModifiedAt = modificationTime2,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
+    )
+
+    val legalEntitySharingErrorResponse = legalEntityRequest2.copy(
+        externalId = CommonValues.externalId4,
+        identifiers = listOf(),
+        legalForm = legalForm2Response,
+        lastModifiedAt = modificationTime2,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.ERRONEOUS_RECORD, "Error message")
+        ),
+    )
+
+    val legalEntityPendingResponse = legalEntityRequest2.copy(
+        externalId = CommonValues.externalId5,
+        identifiers = listOf(),
+        legalForm = legalForm2Response,
+        lastModifiedAt = LocalDateTime.now().minusMinutes(1),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_BY_REVIEW, "OK")
+        ),
     )
 }

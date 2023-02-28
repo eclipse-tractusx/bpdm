@@ -30,6 +30,9 @@ import java.time.LocalDateTime
 object CommonValues {
     val externalId1 = "external-1"
     val externalId2 = "external-2"
+    val externalId3 = "external-3"
+    val externalId4 = "external-4"
+    val externalId5 = "external-5"
 
     val externalIdSite1 = "site-external-1"
     val externalIdSite2 = "site-external-2"
@@ -39,6 +42,8 @@ object CommonValues {
 
     val bpn1 = "BPNL0000000000XY"
     val bpn2 = "BPNL0000000001XZ"
+    val bpn3 = "BPNL0000000002XY"
+    val bpn4 = "BPNL0000000003X9"
 
     val bpnSite1 = "BPNS0000000001XY"
     val bpnSite2 = "BPNS0000000001XZ"
