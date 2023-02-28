@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.time.Duration
 
 
 @ConfigurationProperties(prefix = "bpdm.saas")
@@ -34,5 +35,6 @@ class SaasConfigProperties(
     val dataExchangeApiUrl: String = "/data-exchange/rest/v4/storages/${storage}",
     val referenceDataApiUrl: String = "referencedata/rest/v3",
     val dataClinicApiUrl: String = "/data-clinic/rest/storages/${storage}",
-    val dataValidationApiUrl: String = "/data-validation/rest/v2"
+    val dataValidationApiUrl: String = "/data-validation/rest/v2",
+    val sharingTimeout: Duration = Duration.ofDays(2),
 )
