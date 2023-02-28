@@ -29,10 +29,10 @@ import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientAddressService
 import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientLegalEntityService
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientSiteService
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
@@ -65,11 +65,13 @@ class TestHelpers(
 
     val webClient: WebClient =
         WebClient.builder()
-            .baseUrl("http://localhost:8080/api/catena/legal-entities")
+            .baseUrl("http://localhost:8080")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build()
 
     val poolClientLegalEntityService = PoolClientLegalEntityService(webClient);
+    val poolClientSiteService = PoolClientSiteService(webClient);
+    val poolClientAddressService = PoolClientAddressService(webClient);
 
     fun truncateDbTables() {
         em.transaction.begin()
@@ -108,7 +110,8 @@ class TestHelpers(
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = client.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, assignedSiteRequests)
+        val sites = poolClientSiteService.createSite(assignedSiteRequests);
+
         val indexedSites = sites.associateBy { it.index }
 
         val assignedSitelessAddresses =
@@ -116,11 +119,8 @@ class TestHelpers(
         val assignedSiteAddresses =
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
-        val addresses =
-            client.invokePostWithArrayResponse<AddressPartnerCreateResponse>(
-                EndpointValues.CATENA_ADDRESSES_PATH,
-                assignedSitelessAddresses + assignedSiteAddresses
-            )
+        val addresses = poolClientAddressService.getAddress(assignedSitelessAddresses + assignedSiteAddresses)
+
         val indexedAddresses = addresses.associateBy { it.index }
 
         return partnerStructures.map { legalEntityStructure ->

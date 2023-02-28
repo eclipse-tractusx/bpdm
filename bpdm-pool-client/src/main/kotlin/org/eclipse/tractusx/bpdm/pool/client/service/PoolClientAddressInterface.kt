@@ -36,9 +36,15 @@ import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.service.annotation.GetExchange
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
+
 
 
 @RequestMapping("/api/catena/addresses")
+@HttpExchange("/api/catena/addresses")
 interface PoolClientAddressInterface {
 
     @Operation(
@@ -55,6 +61,7 @@ interface PoolClientAddressInterface {
         ]
     )
     @GetMapping
+    @GetExchange
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
@@ -72,6 +79,7 @@ interface PoolClientAddressInterface {
         ]
     )
     @GetMapping("/{bpn}")
+    @GetExchange("/{bpn}")
     fun getAddress(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): AddressPartnerSearchResponse
@@ -86,6 +94,7 @@ interface PoolClientAddressInterface {
         ]
     )
     @PostMapping("/search")
+    @PostExchange("/search")
     fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
@@ -105,6 +114,7 @@ interface PoolClientAddressInterface {
         ]
     )
     @PostMapping
+    @PostExchange
     fun createAddresses(
         @RequestBody
         requests: Collection<AddressPartnerCreateRequest>
@@ -122,6 +132,7 @@ interface PoolClientAddressInterface {
         ]
     )
     @PutMapping
+    @PutExchange
     fun updateAddresses(
         @RequestBody
         requests: Collection<AddressPartnerUpdateRequest>

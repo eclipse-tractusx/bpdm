@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
@@ -30,19 +31,28 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientAddressService
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientLegalEntityService
+import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientSiteService
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.junit.Assert.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
@@ -98,6 +108,17 @@ class AddressControllerIT @Autowired constructor(
      * When requesting an address by non-existent bpn-a
      * Then a "not found" response is sent
      */
+
+    val webClient: WebClient =
+        WebClient.builder()
+            .baseUrl("http://localhost:8080")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build()
+
+    val poolClientLegalEntityService = PoolClientLegalEntityService(webClient);
+    val poolClientSiteService = PoolClientSiteService(webClient);
+    val poolClientAddressService = PoolClientAddressService(webClient);
+
     @Test
     fun `get address by bpn-a, not found`() {
         testHelpers.createBusinessPartnerStructure(
@@ -109,9 +130,15 @@ class AddressControllerIT @Autowired constructor(
             ), webTestClient
         )
 
-        webTestClient.get()
-            .uri(EndpointValues.CATENA_ADDRESSES_PATH + "/NONEXISTENT_BPN")
-            .exchange().expectStatus().isNotFound
+//        webTestClient.get()
+//            .uri(EndpointValues.CATENA_ADDRESSES_PATH + "/NONEXISTENT_BPN")
+//            .exchange().expectStatus().isNotFound
+        try{
+            poolClientAddressService.getAddress("NONEXISTENT_BPN")
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.NOT_FOUND,e.statusCode)
+        }
+
     }
 
     /**

@@ -30,11 +30,13 @@ import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerUpdateReq
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.client.exception.PoolRequestException
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
+import java.lang.Thread.sleep
 
 
 class PoolClientAddressService(webClient: WebClient) {
-
 
 
     private val springWebClientConfig = SpringWebClientConfig(webClient)
@@ -47,16 +49,23 @@ class PoolClientAddressService(webClient: WebClient) {
         return client.getAddresses(addressSearchRequest, paginationRequest);
     }
 
-    fun createAddresses(
+    fun getAddress(
         requests: Collection<AddressPartnerCreateRequest>
     ): Collection<AddressPartnerCreateResponse> {
         return client.createAddresses(requests);
     }
 
-    fun createAddresses(
+    fun getAddress(
         bpn: String
     ): AddressPartnerSearchResponse {
-        return client.getAddress(bpn);
+
+        try {
+            println("valid" )
+            sleep(5000)
+            return client.getAddress(bpn)
+        } catch (e: WebClientResponseException) {
+            throw e
+        }
     }
 
     fun updateAddresses(
@@ -72,4 +81,17 @@ class PoolClientAddressService(webClient: WebClient) {
         return client.searchAddresses(addressSearchRequest, pageRequest);
     }
 
+    private fun <T : Any> validateResult(method: T): T {
+
+        try {
+            sleep(5000)
+            return method;
+        } /*catch (e: WebClientResponseException) {
+
+        } */catch (e: Exception) {
+            println("error " + e.message + " " + e.cause)
+            throw PoolRequestException("Error", e)
+        }
+
+    }
 }

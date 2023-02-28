@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCrea
 import org.eclipse.tractusx.bpdm.pool.client.exception.PoolRequestException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.reactive.function.client.WebClient
-import java.lang.Thread.sleep
 
 
 class PoolClientLegalEntityService(webClient: WebClient) {
@@ -35,11 +34,13 @@ class PoolClientLegalEntityService(webClient: WebClient) {
     private val springWebClientConfig = SpringWebClientConfig(webClient)
     private val client = springWebClientConfig.httpServiceProxyFactory.createClient(PoolClientLegalEntityInterface::class.java)
 
-    fun getLegalEntity(bpSearchRequest: LegalEntityPropertiesSearchRequest,
-                       addressSearchRequest: AddressPropertiesSearchRequest,
-                       siteSearchRequest: SitePropertiesSearchRequest,
-                        paginationRequest: PaginationRequest): PageResponse<LegalEntityMatchResponse> {
-        return client.getLegalEntities(bpSearchRequest,addressSearchRequest,siteSearchRequest,paginationRequest)
+    fun getLegalEntity(
+        bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        addressSearchRequest: AddressPropertiesSearchRequest,
+        siteSearchRequest: SitePropertiesSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageResponse<LegalEntityMatchResponse> {
+        return client.getLegalEntities(bpSearchRequest, addressSearchRequest, siteSearchRequest, paginationRequest)
     }
 
     fun getLegalEntity(idValue: String, idType: String?): LegalEntityPartnerResponse {
@@ -67,26 +68,21 @@ class PoolClientLegalEntityService(webClient: WebClient) {
     }
 
     fun createBusinessPartners(businessPartners: Collection<LegalEntityPartnerCreateRequest>): Collection<LegalEntityPartnerCreateResponse> {
-
-        try {
-            println("NotNull")
-            sleep(5000)
-
-            return client.createBusinessPartners(businessPartners)
-        } catch (e: Exception) {
-            println("error message " + e.message + " error cause " + e.cause)
-            throw PoolRequestException("Error", e)
-        }
+        return validateResult(client.createBusinessPartners(businessPartners));
     }
 
     fun updateBusinessPartners(businessPartners: Collection<LegalEntityPartnerUpdateRequest>): Collection<LegalEntityPartnerCreateResponse> {
-        try {
-            return client.updateBusinessPartners(businessPartners)
-        }catch (e: Exception){
-            println("error " + e.message + " " +e.cause)
-            throw PoolRequestException("Error",e )
-        }
+        return validateResult(client.updateBusinessPartners(businessPartners));
+    }
 
+    private fun <T : Any> validateResult(method:T): T  {
+
+        try {
+            return method;
+        } catch (e: Exception) {
+            println("error " + e.message + " " + e.cause)
+            throw PoolRequestException("Error", e)
+        }
     }
 
 

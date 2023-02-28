@@ -34,9 +34,11 @@ import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCrea
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/catena/legal-entities")
+@HttpExchange("/api/catena/legal-entities")
 interface PoolClientLegalEntityInterface  {
 
     @Operation(
