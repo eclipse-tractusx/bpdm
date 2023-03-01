@@ -13,9 +13,11 @@ on:
       - 'v*.*.*-*'
     branches:
       - main
+      - rc/**
   pull_request:
     branches:
       - main
+      - rc/**
 jobs:
   build-docker-pool:
     uses: ./.github/workflows/build-docker.yaml

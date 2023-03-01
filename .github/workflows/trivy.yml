@@ -54,11 +54,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # It's also possible to scan your private registry with Trivy's built-in image scan.
-      # All you have to do is set ENV vars.
-      # Docker Hub needs TRIVY_USERNAME and TRIVY_PASSWORD.
-      # You don't need to set ENV vars when downloading from a public repository.
-      # For public images, no ENV vars must be set.
       - name: Run Trivy vulnerability scanner
         if: always()
         uses: aquasecurity/trivy-action@master
@@ -92,11 +87,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # It's also possible to scan your private registry with Trivy's built-in image scan.
-      # All you have to do is set ENV vars.
-      # Docker Hub needs TRIVY_USERNAME and TRIVY_PASSWORD.
-      # You don't need to set ENV vars when downloading from a public repository.
-      # For public images, no ENV vars must be set.
       - name: Run Trivy vulnerability scanner
         if: always()
         uses: aquasecurity/trivy-action@master
