@@ -43,10 +43,10 @@ object CommonValues {
     val bpn1 = "BPNL0000000000XY"
     val bpn2 = "BPNL0000000001XZ"
     val bpn3 = "BPNL0000000002XY"
-    val bpn4 = "BPNL0000000003X9"
 
     val bpnSite1 = "BPNS0000000001XY"
-    val bpnSite2 = "BPNS0000000001XZ"
+    val bpnSite2 = "BPNS0000000002XY"
+    val bpnSite3 = "BPNS0000000003X9"
 
     val bpnAddress1 = "BPNA0000000001XY"
     val bpnAddress2 = "BPNA0000000001XZ"
