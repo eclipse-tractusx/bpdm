@@ -49,7 +49,8 @@ object CommonValues {
     val bpnSite3 = "BPNS0000000003X9"
 
     val bpnAddress1 = "BPNA0000000001XY"
-    val bpnAddress2 = "BPNA0000000001XZ"
+    val bpnAddress2 = "BPNA0000000002XY"
+    val bpnAddress3 = "BPNA0000000003X9"
 
     val language1 = LanguageCode.de
     val language2 = LanguageCode.en

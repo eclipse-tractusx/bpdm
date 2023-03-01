@@ -178,6 +178,12 @@ object SaasValues {
         issuingBody = issuerBpn
     )
 
+    val identifierBpnAddress3 = IdentifierSaas(
+        type = idTypeBpn,
+        value = CommonValues.bpnAddress3,
+        issuingBody = issuerBpn
+    )
+
     val name1 = NameSaas(
         value = CommonValues.name1,
         shortName = CommonValues.shortName1,
@@ -465,7 +471,7 @@ object SaasValues {
         metadata = null,
     )
 
-    val siteAugmentedNotInPoolResponse = siteBusinessPartner2.copy(
+    val siteNotInPoolResponse = siteBusinessPartner2.copy(
         externalId = CommonValues.externalId3,
         identifiers = listOf(identifier3Response, identifier4Response, identifierBpnSite3),
         metadata = BusinessPartnerMetadataSaas(
@@ -473,7 +479,7 @@ object SaasValues {
         ),
     )
 
-    val siteAugmentedSharingErrorResponse = siteBusinessPartner2.copy(
+    val siteSharingErrorResponse = siteBusinessPartner2.copy(
         externalId = CommonValues.externalId4,
         identifiers = listOf(),
         metadata = BusinessPartnerMetadataSaas(
@@ -481,7 +487,7 @@ object SaasValues {
         ),
     )
 
-    val siteAugmentedPendingResponse = siteBusinessPartner2.copy(
+    val sitePendingResponse = siteBusinessPartner2.copy(
         externalId = CommonValues.externalId5,
         identifiers = listOf(),
         lastModifiedAt = LocalDateTime.now().minusMinutes(1),
@@ -524,10 +530,14 @@ object SaasValues {
         dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
         lastModifiedAt = modificationTime1,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_CONFIDENT_MATCH, "OK")
+        ),
     )
 
     val addressBusinessPartnerRequest1 = addressBusinessPartner1.copy(
         lastModifiedAt = null,
+        metadata = null,
     )
 
     val addressBusinessPartner2 = BusinessPartnerSaas(
@@ -538,10 +548,39 @@ object SaasValues {
         dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
         lastModifiedAt = modificationTime2,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
     )
 
     val addressBusinessPartnerRequest2 = addressBusinessPartner2.copy(
         lastModifiedAt = null,
+        metadata = null,
+    )
+
+    val addressNotInPoolResponse = addressBusinessPartner2.copy(
+        externalId = CommonValues.externalId3,
+        identifiers = listOf(identifierBpnAddress3, identifier1, identifier2), // identifiers copied from site
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
+    )
+
+    val addressSharingErrorResponse = addressBusinessPartner2.copy(
+        externalId = CommonValues.externalId4,
+        identifiers = listOf(),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.ERRONEOUS_RECORD, "Error message")
+        ),
+    )
+
+    val addressPendingResponse = addressBusinessPartner2.copy(
+        externalId = CommonValues.externalId5,
+        identifiers = listOf(),
+        lastModifiedAt = LocalDateTime.now().minusMinutes(1),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_BY_REVIEW, "OK")
+        ),
     )
 
     val relationAddress1ToLegalEntity = RelationSaas(
