@@ -27,7 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -60,7 +61,7 @@ class SiteController(
         ]
     )
     @PutMapping("/input/sites")
-    fun upsertSites(@RequestBody sites: Collection<SiteGateInput>): ResponseEntity<Any> {
+    fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Any> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -79,7 +80,7 @@ class SiteController(
         ]
     )
     @GetMapping("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInput {
+    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputResponse {
         return siteService.getSiteByExternalId(externalId)
     }
 
@@ -94,7 +95,7 @@ class SiteController(
         ]
     )
     @GetMapping("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput> {
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse> {
         return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
     }
 
@@ -128,7 +129,7 @@ class SiteController(
     )
     @PostMapping("/input/sites/validation")
     fun validateSite(
-        @RequestBody siteInput: SiteGateInput
+        @RequestBody siteInput: SiteGateInputRequest
     ): ValidationResponse {
         return validationService.validate(siteInput)
     }

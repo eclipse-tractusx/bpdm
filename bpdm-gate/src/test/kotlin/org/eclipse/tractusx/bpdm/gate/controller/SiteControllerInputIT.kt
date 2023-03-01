@@ -26,19 +26,16 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
-import org.eclipse.tractusx.bpdm.gate.util.SaasValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
+import org.eclipse.tractusx.bpdm.gate.util.*
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_SITES_PATH
-import org.eclipse.tractusx.bpdm.gate.util.RequestValues
-import org.eclipse.tractusx.bpdm.gate.util.deserializeMatchedRequests
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -77,7 +74,7 @@ internal class SiteControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get site by external id`() {
-        val expectedSite = RequestValues.siteGateInput1
+        val expectedSite = ResponseValues.siteGateInputResponse1
 
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -99,9 +96,9 @@ internal class SiteControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(SiteGateInput::class.java)
-            .returnResult()
+            .returnResult<SiteGateInputResponse>()
             .responseBody
+            .blockFirst()
 
         assertThat(site).usingRecursiveComparison().isEqualTo(expectedSite)
     }
@@ -146,7 +143,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -197,8 +194,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val expectedSites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
+            ResponseValues.siteGateInputResponse1,
+            ResponseValues.siteGateInputResponse2
         )
 
         val limit = 2
@@ -236,7 +233,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<SiteGateInput>>()
+            .returnResult<PageStartAfterResponse<SiteGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -266,8 +263,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val expectedSites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
+            ResponseValues.siteGateInputResponse1,
+            ResponseValues.siteGateInputResponse2
         )
 
         val limit = 5
@@ -305,7 +302,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<SiteGateInput>>()
+            .returnResult<PageStartAfterResponse<SiteGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -360,18 +357,18 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `upsert sites`() {
         val sites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
+            RequestValues.siteGateInputRequest1,
+            RequestValues.siteGateInputRequest2
         )
 
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1,
-            SaasValues.legalEntity2
+            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntityResponse2
         )
 
         val expectedSites = listOf(
-            SaasValues.siteBusinessPartner1,
-            SaasValues.siteBusinessPartner2
+            SaasValues.siteBusinessPartnerRequest1,
+            SaasValues.siteBusinessPartnerRequest2
         )
 
         val expectedRelations = listOf(
@@ -523,11 +520,11 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `upsert sites, legal entity parent not found`() {
         val sites = listOf(
-            RequestValues.siteGateInput1,
-            RequestValues.siteGateInput2
+            RequestValues.siteGateInputRequest1,
+            RequestValues.siteGateInputRequest2
         )
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1
+            SaasValues.legalEntityResponse1
         )
 
         // mock "get parent legal entities"
@@ -565,9 +562,9 @@ internal class SiteControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate a valid site`() {
-        val site = RequestValues.siteGateInput1
+        val site = RequestValues.siteGateInputRequest1
 
-        val mockParent = SaasValues.legalEntity1
+        val mockParent = SaasValues.legalEntityResponse1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
@@ -613,10 +610,10 @@ internal class SiteControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate an invalid site`() {
-        val site = RequestValues.siteGateInput1
+        val site = RequestValues.siteGateInputRequest1
 
 
-        val mockParent = SaasValues.legalEntity1
+        val mockParent = SaasValues.legalEntityResponse1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))

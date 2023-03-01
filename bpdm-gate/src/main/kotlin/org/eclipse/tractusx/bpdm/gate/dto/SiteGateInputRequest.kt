@@ -22,16 +22,23 @@ package org.eclipse.tractusx.bpdm.gate.dto
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInput", description = "Legal entity with external id")
-data class LegalEntityGateInput(
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
+@Schema(
+    name = "SiteGateInputRequest", description = "Site with legal entity reference"
+)
+data class SiteGateInputRequest(
+    @field:JsonUnwrapped
+    val site: SiteDto,
+
+    @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
+
+    @Schema(description = "External id of the related legal entity")
+    val legalEntityExternalId: String,
+
     @Schema(description = "Business Partner Number")
     val bpn: String?,
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto
 )

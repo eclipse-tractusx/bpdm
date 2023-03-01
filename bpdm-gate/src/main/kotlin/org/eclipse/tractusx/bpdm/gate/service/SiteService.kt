@@ -20,15 +20,16 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
@@ -47,7 +48,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateInput> {
+    fun getSites(limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateInputResponse> {
         val sitesPage = saasClient.getSites(limit, startAfter)
 
         val validEntries = sitesPage.values.filter { validateSiteBusinessPartner(it) }
@@ -60,7 +61,7 @@ class SiteService(
         )
     }
 
-    fun getSiteByExternalId(externalId: String): SiteGateInput {
+    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         val fetchResponse = saasClient.getBusinessPartner(externalId)
 
         when (fetchResponse.status) {
@@ -144,7 +145,7 @@ class SiteService(
      * - Retrieving the old relations of the sites and deleting them
      * - Upserting the new relations
      */
-    fun upsertSites(sites: Collection<SiteGateInput>) {
+    fun upsertSites(sites: Collection<SiteGateInputRequest>) {
         val sitesSaas = toSaasModels(sites)
         saasClient.upsertSites(sitesSaas)
 
@@ -156,12 +157,12 @@ class SiteService(
     /**
      * Fetches parent information and converts the given [sites] to their corresponding SaaS models
      */
-    fun toSaasModels(sites: Collection<SiteGateInput>): Collection<BusinessPartnerSaas> {
+    fun toSaasModels(sites: Collection<SiteGateInputRequest>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
         return sites.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
     }
 
-    private fun upsertRelations(sites: Collection<SiteGateInput>) {
+    private fun upsertRelations(sites: Collection<SiteGateInputRequest>) {
         val relations = sites.map {
             SaasClient.SiteLegalEntityRelation(
                 siteExternalId = it.externalId,
@@ -171,7 +172,7 @@ class SiteService(
         saasClient.upsertSiteRelations(relations)
     }
 
-    private fun deleteRelationsOfSites(sites: Collection<SiteGateInput>) {
+    private fun deleteRelationsOfSites(sites: Collection<SiteGateInputRequest>) {
         val sitesPage = saasClient.getSites(externalIds = sites.map { it.externalId })
         val relationsToDelete = sitesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
         if (relationsToDelete.isNotEmpty()) {
@@ -179,7 +180,7 @@ class SiteService(
         }
     }
 
-    private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInput {
+    private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInputResponse {
         if (!validateSiteBusinessPartner(partner)) {
             throw SaasInvalidRecordException(partner.id)
         }
@@ -231,7 +232,7 @@ class SiteService(
         return true
     }
 
-    private fun getParentLegalEntities(sites: Collection<SiteGateInput>): Map<String, BusinessPartnerSaas> {
+    private fun getParentLegalEntities(sites: Collection<SiteGateInputRequest>): Map<String, BusinessPartnerSaas> {
         val parentLegalEntityExternalIds = sites.map { it.legalEntityExternalId }.distinct().toList()
         val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
         if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
@@ -241,7 +242,7 @@ class SiteService(
         return parentLegalEntitiesPage.values.associateBy { it.externalId!! }
     }
 
-    private fun toSaasModel(site: SiteGateInput, parentLegalEntity: BusinessPartnerSaas?): BusinessPartnerSaas {
+    private fun toSaasModel(site: SiteGateInputRequest, parentLegalEntity: BusinessPartnerSaas?): BusinessPartnerSaas {
         if (parentLegalEntity == null) {
             throw SaasNonexistentParentException(site.legalEntityExternalId)
         }

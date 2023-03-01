@@ -26,15 +26,15 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -80,7 +80,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get address by external id`() {
         val externalIdToQuery = SaasValues.addressBusinessPartnerWithRelations1.externalId!!
-        val expectedAddress = RequestValues.addressGateInput1
+        val expectedAddress = ResponseValues.addressGateInputResponse1
 
         val addressRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
@@ -106,7 +106,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val parentRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
-            externalId = SaasValues.legalEntity1.externalId!!,
+            externalId = SaasValues.legalEntityRequest1.externalId!!,
             featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
         wireMockServer.stubFor(
@@ -118,7 +118,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = SaasValues.legalEntity1,
+                                    businessPartner = SaasValues.legalEntityResponse1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -131,9 +131,9 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .expectBody(AddressGateInput::class.java)
-            .returnResult()
+            .returnResult<AddressGateInputResponse>()
             .responseBody
+            .blockFirst()
 
         assertThat(address).usingRecursiveComparison().isEqualTo(expectedAddress)
     }
@@ -178,7 +178,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntity1.externalId}")
+        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
             .exchange()
             .expectStatus()
             .is5xxServerError
@@ -229,13 +229,13 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntity1,
+            SaasValues.legalEntityResponse1,
             SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
-            RequestValues.addressGateInput1,
-            RequestValues.addressGateInput2
+            ResponseValues.addressGateInputResponse1,
+            ResponseValues.addressGateInputResponse2,
         )
 
         val limit = 2
@@ -294,7 +294,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<AddressGateInput>>()
+            .returnResult<PageStartAfterResponse<AddressGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -322,13 +322,13 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntity1,
+            SaasValues.legalEntityResponse1,
             SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
-            RequestValues.addressGateInput1,
-            RequestValues.addressGateInput2
+            ResponseValues.addressGateInputResponse1,
+            ResponseValues.addressGateInputResponse2,
         )
 
         val limit = 3
@@ -387,7 +387,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<AddressGateInput>>()
+            .returnResult<PageStartAfterResponse<AddressGateInputResponse>>()
             .responseBody
             .blockFirst()!!
 
@@ -442,12 +442,12 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses`() {
         val addresses = listOf(
-            RequestValues.addressGateInput1,
-            RequestValues.addressGateInput2
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
         )
 
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntity1
+            SaasValues.legalEntityResponse1
         )
 
         val parentSitesSaas = listOf(
@@ -455,8 +455,8 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            SaasValues.addressBusinessPartner1,
-            SaasValues.addressBusinessPartner2
+            SaasValues.addressBusinessPartnerRequest1,
+            SaasValues.addressBusinessPartnerRequest2,
         )
 
         val expectedRelations = listOf(
@@ -622,7 +622,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses, legal entity parent not found`() {
         val addresses = listOf(
-            RequestValues.addressGateInput1
+            RequestValues.addressGateInputRequest1
         )
 
         // mock "get parent legal entities"
@@ -660,7 +660,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses, site parent not found`() {
         val addresses = listOf(
-            RequestValues.addressGateInput2
+            RequestValues.addressGateInputRequest2
         )
 
         // mock "get parent sites"
@@ -698,7 +698,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert address without any parent`() {
         val addresses = listOf(
-            RequestValues.addressGateInput1.copy(
+            RequestValues.addressGateInputRequest1.copy(
                 siteExternalId = null,
                 legalEntityExternalId = null
             )
@@ -719,7 +719,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert address with site and legal entity parents`() {
         val addresses = listOf(
-            RequestValues.addressGateInput1.copy(
+            RequestValues.addressGateInputRequest1.copy(
                 siteExternalId = CommonValues.externalIdSite1,
                 legalEntityExternalId = CommonValues.externalId1
             )
@@ -740,7 +740,7 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate a valid address partner`() {
-        val address = RequestValues.addressGateInput2
+        val address = RequestValues.addressGateInputRequest2
 
         val mockParent = SaasValues.siteBusinessPartner1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
@@ -788,7 +788,7 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate an invalid site`() {
-        val address = RequestValues.addressGateInput2
+        val address = RequestValues.addressGateInputRequest2
 
 
         val mockParent = SaasValues.siteBusinessPartner1

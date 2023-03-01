@@ -27,7 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
@@ -60,7 +61,7 @@ class AddressController(
         ]
     )
     @PutMapping("/input/addresses")
-    fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInput>): ResponseEntity<Any> {
+    fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -84,7 +85,7 @@ class AddressController(
         ]
     )
     @GetMapping("/input/addresses/{externalId}")
-    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInput {
+    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInputResponse {
         return addressService.getAddressByExternalId(externalId)
     }
 
@@ -99,7 +100,7 @@ class AddressController(
         ]
     )
     @GetMapping("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput> {
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInputResponse> {
         return addressService.getAddresses(paginationRequest.limit, paginationRequest.startAfter)
     }
 
@@ -133,7 +134,7 @@ class AddressController(
     )
     @PostMapping("/input/addresses/validation")
     fun validateSite(
-        @RequestBody addressInput: AddressGateInput
+        @RequestBody addressInput: AddressGateInputRequest
     ): ValidationResponse {
         return validationService.validate(addressInput)
     }

@@ -27,9 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.*
 import java.time.Instant
 
 object ResponseValues {
@@ -471,6 +469,20 @@ object ResponseValues {
         bankAccounts = listOf(bankAccount3, bankAccount4)
     )
 
+    val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity1,
+        externalId = CommonValues.externalId1,
+        bpn = CommonValues.bpn1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+
+    val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity2,
+        externalId = CommonValues.externalId2,
+        bpn = CommonValues.bpn2,
+        processStartedAt = SaasValues.modificationTime2,
+    )
+
     val legalEntityGateOutput1 = LegalEntityGateOutput(
         bpn = CommonValues.bpn1,
         legalEntity = legalEntityResponse1,
@@ -512,6 +524,22 @@ object ResponseValues {
         name = CommonValues.nameSite2
     )
 
+    val siteGateInputResponse1 = SiteGateInputResponse(
+        site = RequestValues.site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnSite1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+
+    val siteGateInputResponse2 = SiteGateInputResponse(
+        site = RequestValues.site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2,
+        bpn = CommonValues.bpnSite2,
+        processStartedAt = SaasValues.modificationTime2,
+    )
+
     val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = address1)
     val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = address2)
 
@@ -535,6 +563,21 @@ object ResponseValues {
 
     val sitePartnerSearchResponse1 = SitePartnerSearchResponse(site = sitePartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
     val sitePartnerSearchResponse2 = SitePartnerSearchResponse(site = sitePartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
+
+    val addressGateInputResponse1 = AddressGateInputResponse(
+        address = RequestValues.address1,
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnAddress1,
+        processStartedAt = SaasValues.modificationTime1,
+    )
+    val addressGateInputResponse2 = AddressGateInputResponse(
+        address = RequestValues.address2,
+        externalId = CommonValues.externalIdAddress2,
+        siteExternalId = CommonValues.externalIdSite1,
+        bpn = CommonValues.bpnAddress2,
+        processStartedAt = SaasValues.modificationTime2,
+    )
 
     val addressGateOutput1 = AddressGateOutput(
         bpn = CommonValues.bpnAddress1,
