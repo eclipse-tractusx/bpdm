@@ -148,12 +148,6 @@ object SaasValues {
         issuingBody = issuerBpn
     )
 
-    val identifierBpn4 = IdentifierSaas(
-        type = idTypeBpn,
-        value = CommonValues.bpn4,
-        issuingBody = issuerBpn
-    )
-
     val identifierBpnSite1 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite1,
@@ -163,6 +157,12 @@ object SaasValues {
     val identifierBpnSite2 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite2,
+        issuingBody = issuerBpn
+    )
+
+    val identifierBpnSite3 = IdentifierSaas(
+        type = idTypeBpn,
+        value = CommonValues.bpnSite3,
         issuingBody = issuerBpn
     )
 
@@ -439,9 +439,13 @@ object SaasValues {
         dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
         lastModifiedAt = modificationTime1,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_CONFIDENT_MATCH, "OK")
+        ),
     )
     val siteBusinessPartnerRequest1 = siteBusinessPartner1.copy(
         lastModifiedAt = null,
+        metadata = null,
     )
 
     val siteBusinessPartner2 = BusinessPartnerSaas(
@@ -452,9 +456,38 @@ object SaasValues {
         dataSource = testDatasource,
         types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
         lastModifiedAt = modificationTime2,
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
     )
     val siteBusinessPartnerRequest2 = siteBusinessPartner2.copy(
         lastModifiedAt = null,
+        metadata = null,
+    )
+
+    val siteAugmentedNotInPoolResponse = siteBusinessPartner2.copy(
+        externalId = CommonValues.externalId3,
+        identifiers = listOf(identifier3Response, identifier4Response, identifierBpnSite3),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_NO_MATCH, "OK")
+        ),
+    )
+
+    val siteAugmentedSharingErrorResponse = siteBusinessPartner2.copy(
+        externalId = CommonValues.externalId4,
+        identifiers = listOf(),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.ERRONEOUS_RECORD, "Error message")
+        ),
+    )
+
+    val siteAugmentedPendingResponse = siteBusinessPartner2.copy(
+        externalId = CommonValues.externalId5,
+        identifiers = listOf(),
+        lastModifiedAt = LocalDateTime.now().minusMinutes(1),
+        metadata = BusinessPartnerMetadataSaas(
+            sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_BY_REVIEW, "OK")
+        ),
     )
 
     val relationType = TypeKeyNameSaas(technicalKey = "PARENT")
@@ -553,7 +586,7 @@ object SaasValues {
         ),
     )
 
-    val legalEntityNotInPoolResponse = legalEntityRequest2.copy(
+    val legalEntityAugmentedNotInPoolResponse = legalEntityAugmented2.copy(
         externalId = CommonValues.externalId3,
         identifiers = listOf(identifier3Response, identifier4Response, identifierBpn3),
         legalForm = legalForm2Response,
@@ -563,7 +596,7 @@ object SaasValues {
         ),
     )
 
-    val legalEntitySharingErrorResponse = legalEntityRequest2.copy(
+    val legalEntityAugmentedSharingErrorResponse = legalEntityRequest2.copy(
         externalId = CommonValues.externalId4,
         identifiers = listOf(),
         legalForm = legalForm2Response,
@@ -573,7 +606,7 @@ object SaasValues {
         ),
     )
 
-    val legalEntityPendingResponse = legalEntityRequest2.copy(
+    val legalEntityAugmentedPendingResponse = legalEntityRequest2.copy(
         externalId = CommonValues.externalId5,
         identifiers = listOf(),
         legalForm = legalForm2Response,

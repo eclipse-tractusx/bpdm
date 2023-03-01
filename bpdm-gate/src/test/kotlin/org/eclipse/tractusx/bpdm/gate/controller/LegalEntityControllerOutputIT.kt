@@ -87,17 +87,17 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityGateOutput2
         )
         val expectedErrors = listOf(
-            ErrorInfo(BusinessPartnerOutputError.BpnNotInPool, "BPNL0000000002XY not found in pool", SaasValues.legalEntityNotInPoolResponse.externalId),
-            ErrorInfo(BusinessPartnerOutputError.SharingProcessError, "SaaS sharing process error: Error message", SaasValues.legalEntitySharingErrorResponse.externalId),
+            ErrorInfo(BusinessPartnerOutputError.BpnNotInPool, "BPNL0000000002XY not found in pool", SaasValues.legalEntityAugmentedNotInPoolResponse.externalId),
+            ErrorInfo(BusinessPartnerOutputError.SharingProcessError, "SaaS sharing process error: Error message", SaasValues.legalEntityAugmentedSharingErrorResponse.externalId),
         )
-        val expectedPending = listOf(SaasValues.legalEntityPendingResponse.externalId!!)
+        val expectedPending = listOf(SaasValues.legalEntityAugmentedPendingResponse.externalId!!)
 
         val legalEntitiesSaas = listOf(
             SaasValues.legalEntityAugmented1,
             SaasValues.legalEntityAugmented2,
-            SaasValues.legalEntityNotInPoolResponse,
-            SaasValues.legalEntitySharingErrorResponse,
-            SaasValues.legalEntityPendingResponse,
+            SaasValues.legalEntityAugmentedNotInPoolResponse,
+            SaasValues.legalEntityAugmentedSharingErrorResponse,
+            SaasValues.legalEntityAugmentedPendingResponse,
         )
 
         val legalEntitiesPool = listOf(
