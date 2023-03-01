@@ -20,33 +20,28 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
-import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class LegalEntityService(
     private val saasRequestMappingService: SaasRequestMappingService,
     private val inputSaasMappingService: InputSaasMappingService,
+    private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
-    private val saasConfigProperties: SaasConfigProperties,
     private val poolClient: PoolClient,
 ) {
 
@@ -87,17 +82,17 @@ class LegalEntityService(
         val augmentedPartnerResponse = saasClient.getAugmentedLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
         val augmentedPartnerWrapperCollection = augmentedPartnerResponse.values
 
-        val bpnByExternalIdMap = buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
+        val bpnByExternalIdMap = outputSaasMappingService.buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
 
-        val bpns = bpnByExternalIdMap.values.filterNotNull()
-        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpns).associateBy { it.bpn }
-        val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpns).associateBy { it.legalEntity }
+        val bpnList = bpnByExternalIdMap.values.filterNotNull()
+        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnList).associateBy { it.bpn }
+        val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnList).associateBy { it.legalEntity }
 
-        if (bpns.size > legalEntitiesByBpnMap.size) {
-            logger.warn { "Requested ${bpns.size} legal entities from pool, but only ${legalEntitiesByBpnMap.size} were found." }
+        if (bpnList.size > legalEntitiesByBpnMap.size) {
+            logger.warn { "Requested ${bpnList.size} legal entities from pool, but only ${legalEntitiesByBpnMap.size} were found." }
         }
-        if (bpns.size > legalAddressesByBpnMap.size) {
-            logger.warn { "Requested ${bpns.size} legal addresses from pool, but only ${legalAddressesByBpnMap.size} were found." }
+        if (bpnList.size > legalAddressesByBpnMap.size) {
+            logger.warn { "Requested ${bpnList.size} legal addresses from pool, but only ${legalAddressesByBpnMap.size} were found." }
         }
 
         // We need the sharing status from BusinessPartnerSaas
@@ -115,24 +110,10 @@ class LegalEntityService(
             val sharingStatus = partner?.metadata?.sharingStatus
             val sharingStatusType = sharingStatus?.status
 
-            if (sharingStatusType == null) {
+            if (sharingStatusType == null || sharingStatusType.isError()) {
                 // ERROR: SharingProcessError
                 errors.add(
-                    ErrorInfo(
-                        errorCode = BusinessPartnerOutputError.SharingProcessError,
-                        message = "No SaaS sharing status available",
-                        entityKey = externalId
-                    )
-                )
-            } else if (sharingStatusType.isError()) {
-                // ERROR: SharingProcessError
-                errors.add(
-                    ErrorInfo(
-                        errorCode = BusinessPartnerOutputError.SharingProcessError,
-                        message = "SaaS sharing process error: ${sharingStatus.description}",
-                        entityKey = externalId
-                    )
-                )
+                    outputSaasMappingService.buildErrorInfoSharingProcessError(externalId, sharingStatus))
             } else if (bpn != null) {
                 val legalEntity = legalEntitiesByBpnMap[bpn]
                 val legalAddress = legalAddressesByBpnMap[bpn]
@@ -144,21 +125,12 @@ class LegalEntityService(
                 } else {
                     // ERROR: BpnNotInPool
                     errors.add(
-                        ErrorInfo(
-                            errorCode = BusinessPartnerOutputError.BpnNotInPool,
-                            message = "$bpn not found in pool",
-                            entityKey = externalId
-                        )
-                    )
+                        outputSaasMappingService.buildErrorInfoBpnNotInPool(externalId, bpn))
                 }
-            } else if (isSharingTimeoutReached(partner)) {
+            } else if (outputSaasMappingService.isSharingTimeoutReached(partner)) {
                 // ERROR: SharingTimeout
                 errors.add(
-                    ErrorInfo(
-                        errorCode = BusinessPartnerOutputError.SharingTimeout,
-                        message = "SaaS sharing timeout: Last modified ${partner.lastModifiedAt}",
-                        entityKey = externalId
-                    )
+                    outputSaasMappingService.buildErrorInfoSharingTimeout(externalId, partner.lastModifiedAt)
                 )
             } else {
                 pendingExternalIds.add(externalId)
@@ -175,35 +147,13 @@ class LegalEntityService(
         )
     }
 
-    private fun buildBpnByExternalIdMap(augmentedPartnerWrapperCollection: Collection<AugmentedBusinessPartnerResponseSaas>): Map<String, String?> {
-        val augmentedPartnerCollection = augmentedPartnerWrapperCollection.mapNotNull { it.augmentedBusinessPartner }
-        val missingAugmentedPartnerCount = augmentedPartnerWrapperCollection.size - augmentedPartnerCollection.size
-        if (missingAugmentedPartnerCount > 0) {
-            logger.warn { "Encountered $missingAugmentedPartnerCount entries of AugmentedBusinessPartnerResponseSaas without any usable data." }
-        }
-
-        val bpnByExternalIdMap = augmentedPartnerCollection
-            .associateBy({ it.externalId }, { SaasMappings.findBpn(it.identifiers) })
-            .filterNotNullKeys()
-        val missingExternalIdCount = augmentedPartnerCollection.size - bpnByExternalIdMap.size
-        if (missingExternalIdCount > 0) {
-            logger.warn { "Encountered $missingExternalIdCount legal entities without external id in SaaS." }
-        }
-
-        return bpnByExternalIdMap
-    }
-
-    private fun isSharingTimeoutReached(partner: BusinessPartnerSaas) =
-        partner.lastModifiedAt?.isBefore(LocalDateTime.now().minus(saasConfigProperties.sharingTimeout)) ?: true
-
-    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityPartnerResponse, legalAddress: LegalAddressSearchResponse): LegalEntityGateOutput {
-        return LegalEntityGateOutput(
+    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityPartnerResponse, legalAddress: LegalAddressSearchResponse): LegalEntityGateOutput =
+        LegalEntityGateOutput(
             legalEntity = legalEntity.properties,
             legalAddress = legalAddress.legalAddress,
             bpn = legalEntity.bpn,
             externalId = externalId
         )
-    }
 
     private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInputResponse> {
         return partners.mapNotNull {
