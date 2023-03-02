@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
@@ -183,9 +182,9 @@ class AddressService(
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
 
-        deleteRelationsOfAddresses(addresses)
+        deleteParentRelationsOfAddresses(addresses)
 
-        upsertRelations(addresses)
+        upsertParentRelations(addresses)
     }
 
     /**
@@ -198,37 +197,36 @@ class AddressService(
         return addresses.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
     }
 
-    private fun upsertRelations(addresses: Collection<AddressGateInputRequest>) {
-        val legalEntityRelations = toLegalEntityRelations(addresses)
-        val siteRelations = toSiteRelations(addresses)
+    private fun upsertParentRelations(addresses: Collection<AddressGateInputRequest>) {
+        val legalEntityRelations = toLegalEntityParentRelations(addresses)
+        val siteRelations = toSiteParentRelations(addresses)
         saasClient.upsertAddressRelations(legalEntityRelations, siteRelations)
     }
 
-    private fun deleteRelationsOfAddresses(addresses: Collection<AddressGateInputRequest>) {
+    private fun deleteParentRelationsOfAddresses(addresses: Collection<AddressGateInputRequest>) {
         val addressesPage = saasClient.getAddresses(externalIds = addresses.map { it.externalId })
-        val relationsToDelete = addressesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
-        if (relationsToDelete.isNotEmpty()) {
-            saasClient.deleteRelations(relationsToDelete)
-        }
+        saasClient.deleteParentRelations(addressesPage.values)
     }
 
-    private fun toSiteRelations(addresses: Collection<AddressGateInputRequest>) = addresses.filter {
-        it.siteExternalId != null
-    }.map {
-        SaasClient.AddressSiteRelation(
-            addressExternalId = it.externalId,
-            siteExternalId = it.siteExternalId!!
-        )
-    }.toList()
+    private fun toSiteParentRelations(addresses: Collection<AddressGateInputRequest>) =
+        addresses.filter {
+            it.siteExternalId != null
+        }.map {
+            SaasClient.AddressSiteRelation(
+                addressExternalId = it.externalId,
+                siteExternalId = it.siteExternalId!!
+            )
+        }.toList()
 
-    private fun toLegalEntityRelations(addresses: Collection<AddressGateInputRequest>) = addresses.filter {
-        it.legalEntityExternalId != null
-    }.map {
-        SaasClient.AddressLegalEntityRelation(
-            addressExternalId = it.externalId,
-            legalEntityExternalId = it.legalEntityExternalId!!
-        )
-    }.toList()
+    private fun toLegalEntityParentRelations(addresses: Collection<AddressGateInputRequest>) =
+        addresses.filter {
+            it.legalEntityExternalId != null
+        }.map {
+            SaasClient.AddressLegalEntityRelation(
+                addressExternalId = it.externalId,
+                legalEntityExternalId = it.legalEntityExternalId!!
+            )
+        }.toList()
 
     private fun getParentSites(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
         val parentSiteExternalIds = addresses.mapNotNull { it.siteExternalId }.distinct().toList()

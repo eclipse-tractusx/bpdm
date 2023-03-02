@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.SaasRequestException
 import org.springframework.beans.factory.annotation.Qualifier
@@ -35,7 +36,7 @@ private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
 private const val RELATIONS_PATH = "/relations"
 private const val DELETE_RELATIONS_PATH = "$RELATIONS_PATH/delete"
 
-private const val RELATION_TYPE_KEY = "PARENT"
+const val PARENT_RELATION_TYPE_KEY = "PARENT"
 
 private const val LOOKUP_PATH = "/businesspartners/lookup"
 
@@ -86,6 +87,19 @@ class SaasClient(
             throw SaasRequestException("Read augmented business partners request failed.", e)
         }
         return partnerCollection
+    }
+
+    fun deleteParentRelations(businessPartners: Collection<BusinessPartnerSaas>) {
+        val relationsToDelete = businessPartners
+            .flatMap { businessPartner ->
+                businessPartner.relations
+                    .filter { it.type?.technicalKey == PARENT_RELATION_TYPE_KEY }
+                    .filter { it.endNode == businessPartner.externalId }
+            }
+            .map { SaasMappings.toRelationToDelete(it) }
+        if (relationsToDelete.isNotEmpty()) {
+            deleteRelations(relationsToDelete)
+        }
     }
 
     fun deleteRelations(relations: Collection<DeleteRelationsRequestSaas.RelationToDeleteSaas>) {
@@ -213,7 +227,7 @@ class SaasClient(
                 startNodeDataSource = saasConfigProperties.datasource,
                 endNode = it.siteExternalId,
                 endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
+                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
             )
         }.toList()
         upsertBusinessPartnerRelations(relationsSaas)
@@ -226,7 +240,7 @@ class SaasClient(
                 startNodeDataSource = saasConfigProperties.datasource,
                 endNode = it.addressExternalId,
                 endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
+                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
             )
         }.toList()
         val siteRelationsSaas = siteRelations.map {
@@ -235,7 +249,7 @@ class SaasClient(
                 startNodeDataSource = saasConfigProperties.datasource,
                 endNode = it.addressExternalId,
                 endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = RELATION_TYPE_KEY)
+                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
             )
         }.toList()
         upsertBusinessPartnerRelations(legalEntityRelationsSaas.plus(siteRelationsSaas))

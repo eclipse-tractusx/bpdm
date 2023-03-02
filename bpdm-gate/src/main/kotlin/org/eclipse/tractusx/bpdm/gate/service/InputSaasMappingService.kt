@@ -75,7 +75,7 @@ class InputSaasMappingService(
     fun toParentLegalEntityExternalIds(businessPartner: BusinessPartnerSaas): Collection<String> {
         return businessPartner.relations
             .filter { it.startNodeDataSource == saasConfigProperties.datasource }
-            .filter { it.type?.technicalKey == "PARENT" }
+            .filter { it.type?.technicalKey == PARENT_RELATION_TYPE_KEY }
             .filter { it.endNode == businessPartner.externalId }
             .map { it.startNode }
     }
