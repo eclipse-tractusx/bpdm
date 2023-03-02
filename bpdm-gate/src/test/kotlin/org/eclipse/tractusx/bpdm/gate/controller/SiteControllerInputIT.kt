@@ -380,21 +380,21 @@ internal class SiteControllerInputIT @Autowired constructor(
             DeleteRelationsRequestSaas.RelationToDeleteSaas(
                 startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
                     dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.siteBusinessPartnerWithRelations1.relations.first().startNode
+                    externalId = SaasValues.relationSite1ToLegalEntity.startNode
                 ),
                 endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
                     dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.siteBusinessPartnerWithRelations1.relations.first().endNode
+                    externalId = SaasValues.relationSite1ToLegalEntity.endNode
                 ),
             ),
             DeleteRelationsRequestSaas.RelationToDeleteSaas(
                 startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
                     dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.siteBusinessPartnerWithRelations2.relations.first().startNode
+                    externalId = SaasValues.relationSite2ToLegalEntity.startNode
                 ),
                 endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
                     dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.siteBusinessPartnerWithRelations2.relations.first().endNode
+                    externalId = SaasValues.relationSite2ToLegalEntity.endNode
                 ),
             ),
         )
