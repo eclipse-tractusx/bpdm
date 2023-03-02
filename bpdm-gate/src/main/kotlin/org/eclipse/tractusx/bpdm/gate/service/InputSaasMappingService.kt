@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.RelationSaas
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
@@ -62,21 +61,22 @@ class InputSaasMappingService(
         return SiteGateInputResponse(
             site = businessPartner.toSiteDto(),
             externalId = businessPartner.externalId!!,
-            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner.relations)!!,
+            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner)!!,
             bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
             processStartedAt = businessPartner.lastModifiedAt,
         )
     }
 
-    fun toParentLegalEntityExternalId(relations: Collection<RelationSaas>): String? {
-        return toParentLegalEntityExternalIds(relations).firstOrNull()
+    fun toParentLegalEntityExternalId(businessPartner: BusinessPartnerSaas): String? {
+        return toParentLegalEntityExternalIds(businessPartner).firstOrNull()
     }
 
 
-    fun toParentLegalEntityExternalIds(relations: Collection<RelationSaas>): Collection<String> {
-        return relations.filter { it.startNodeDataSource == saasConfigProperties.datasource }
+    fun toParentLegalEntityExternalIds(businessPartner: BusinessPartnerSaas): Collection<String> {
+        return businessPartner.relations
+            .filter { it.startNodeDataSource == saasConfigProperties.datasource }
             .filter { it.type?.technicalKey == "PARENT" }
+            .filter { it.endNode == businessPartner.externalId }
             .map { it.startNode }
     }
 }
-

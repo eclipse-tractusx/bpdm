@@ -243,7 +243,7 @@ class SiteService(
     }
 
     private fun validateLegalEntityParents(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
-        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner.relations).size
+        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner).size
         if (numLegalEntityParents > 1) {
             logger.warn { "$logMessageStart has multiple parent legal entities." }
         }

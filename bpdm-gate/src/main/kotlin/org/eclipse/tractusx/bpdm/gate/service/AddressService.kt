@@ -55,7 +55,7 @@ class AddressService(
         val addressesPage = saasClient.getAddresses(limit, startAfter)
         val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
 
-        val addressesWithParent = validEntries.map { Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it.relations)!!) }
+        val addressesWithParent = validEntries.map { Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!) }
 
         val parents =
             if (addressesWithParent.isNotEmpty()) saasClient.getBusinessPartners(externalIds = addressesWithParent.map { (_, parentId) -> parentId }).values else emptyList()
@@ -273,7 +273,7 @@ class AddressService(
             throw SaasInvalidRecordException(partner.id)
         }
 
-        val parentId = inputSaasMappingService.toParentLegalEntityExternalId(partner.relations)
+        val parentId = inputSaasMappingService.toParentLegalEntityExternalId(partner)
         val parentType = parentId?.let { saasClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
 
         return when (parentType) {
@@ -294,7 +294,7 @@ class AddressService(
             return false
         }
 
-        val numParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner.relations).size
+        val numParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner).size
         if (numParents > 1) {
             logger.warn { "$logMessageStart has multiple parents." }
         }
