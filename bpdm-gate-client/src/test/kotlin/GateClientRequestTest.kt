@@ -1,0 +1,45 @@
+
+import org.eclipse.tractusx.bpdm.gate.client.service.address.GateClientAddress
+import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.junit.Test
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.web.reactive.function.client.WebClient
+
+/*******************************************************************************
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+
+class GateClientRequestTest (){
+
+    val webClient = WebClient.create("http://localhost:8082/api/catena/input/addresses")
+
+    val gateClientAddress = GateClientAddress(webClient)
+
+
+    @Test
+    fun `Request test`(){
+
+        val paginationRequest = PaginationStartAfterRequest(startAfter = "abc123", limit = 20)
+        val test = gateClientAddress.getAddresses(paginationRequest)
+    }
+
+}

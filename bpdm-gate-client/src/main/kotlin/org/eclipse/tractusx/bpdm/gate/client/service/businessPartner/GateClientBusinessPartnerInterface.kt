@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.controller
+package org.eclipse.tractusx.bpdm.gate.client.service.businessPartner
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -25,18 +25,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
-import org.eclipse.tractusx.bpdm.gate.service.TypeMatchingService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-@RestController
 @RequestMapping("/api/catena/business-partners")
-class BusinessPartnerController(
-    private val typeMatchingService: TypeMatchingService
-) {
+@HttpExchange("/api/catena/business-partners")
+interface GateClientBusinessPartnerInterface {
 
     @Operation(
         summary = "Determine the LSA type of a business partner candidate",
@@ -51,10 +48,7 @@ class BusinessPartnerController(
         ]
     )
     @PostMapping("/type-match")
-    fun determineLsaType(@RequestBody candidate: BusinessPartnerCandidateDto): TypeMatchResponse {
-        if (candidate.names.isEmpty() && candidate.identifiers.isEmpty())
-            throw BpdmInvalidPartnerException("Candidate", "Business partner candidate needs to specify either a name or identifier.")
+    @PostExchange("/type-match")
+    fun determineLsaType(@RequestBody candidate: BusinessPartnerCandidateDto): TypeMatchResponse
 
-        return typeMatchingService.determineCandidateType(candidate)
-    }
 }

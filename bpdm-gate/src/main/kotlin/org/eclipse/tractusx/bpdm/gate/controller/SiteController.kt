@@ -19,12 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import jakarta.validation.Valid
+import org.eclipse.tractusx.bpdm.gate.client.service.site.SiteInterface
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
@@ -36,33 +31,18 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
 import org.eclipse.tractusx.bpdm.gate.service.ValidationService
-import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/catena")
 class SiteController(
     val siteService: SiteService,
     val apiConfigProperties: ApiConfigProperties,
     val validationService: ValidationService
-) {
-    @Operation(
-        summary = "Create or update sites.",
-        description = "Create or update sites. " +
-                "Updates instead of creating a new site if an already existing external id is used. " +
-                "The same external id may not occur more than once in a single request. " +
-                "For a single request, the maximum number of sites in the request is limited to \${bpdm.api.upsert-limit} entries."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Sites were successfully updated or created"),
-            ApiResponse(responseCode = "400", description = "On malformed site request", content = [Content()]),
-        ]
-    )
-    @PutMapping("/input/sites")
-    fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Any> {
+) : SiteInterface {
+
+    override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Any> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -70,68 +50,21 @@ class SiteController(
         return ResponseEntity(HttpStatus.OK)
     }
 
-    @Operation(
-        summary = "Get site by external identifier",
-        description = "Get site by external identifier."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Found site with external identifier"),
-            ApiResponse(responseCode = "404", description = "No site found under specified external identifier", content = [Content()])
-        ]
-    )
-    @GetMapping("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputResponse {
+    override fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         return siteService.getSiteByExternalId(externalId)
     }
 
-    @Operation(
-        summary = "Get page of sites",
-        description = "Get page of sites."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The requested page of sites"),
-            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-        ]
-    )
-    @GetMapping("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse> {
+    override fun getSites(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse> {
         return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
     }
 
-    @Operation(
-        summary = "Get page of sites",
-        description = "Get page of sites. Can optionally be filtered by external ids."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "The requested page of sites"),
-            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-        ]
-    )
-    @PostMapping("/output/sites/search")
-    fun getSitesOutput(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageOutputResponse<SiteGateOutput> {
+    override fun getSitesOutput(paginationRequest: PaginationStartAfterRequest, externalIds: Collection<String>?): PageOutputResponse<SiteGateOutput> {
         return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 
-    @Operation(
-        summary = "Validate a site",
-        description = "Determines errors in a site record which keep it from entering the sharing process"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
-            ApiResponse(responseCode = "400", description = "On malformed site requests", content = [Content()]),
-        ]
-    )
-    @PostMapping("/input/sites/validation")
-    fun validateSite(
-        @RequestBody siteInput: SiteGateInputRequest
-    ): ValidationResponse {
+    override fun validateSite(siteInput: SiteGateInputRequest): ValidationResponse {
         return validationService.validate(siteInput)
     }
+
+
 }

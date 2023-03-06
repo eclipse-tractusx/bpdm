@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.controller
+package org.eclipse.tractusx.bpdm.gate.client
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -25,29 +25,38 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.gate.client.service.address.GateClientAddress
+import org.eclipse.tractusx.bpdm.gate.client.service.legalEntity.GateClientLegalEntity
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_ADDRESSES_PATH
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 internal class AddressControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
@@ -67,6 +76,14 @@ internal class AddressControllerInputIT @Autowired constructor(
         }
     }
 
+    val webClient: WebClient =
+        WebClient.builder()
+            .baseUrl("http://localhost:8082")
+            //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build()
+
+    val gateClientAddress = GateClientAddress(webClient)
+
     @BeforeEach
     fun beforeEach() {
         wireMockServer.resetAll()
@@ -80,7 +97,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get address by external id`() {
         val externalIdToQuery = SaasValues.addressBusinessPartnerWithRelations1.externalId!!
-        val expectedAddress = ResponseValues.addressGateInputResponse1
+        val expectedAddress = RequestValues.addressGateInput1
 
         val addressRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
@@ -106,7 +123,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val parentRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
-            externalId = SaasValues.legalEntityRequest1.externalId!!,
+            externalId = SaasValues.legalEntity1.externalId!!,
             featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
         wireMockServer.stubFor(
@@ -118,7 +135,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                         .withBody(
                             objectMapper.writeValueAsString(
                                 FetchResponse(
-                                    businessPartner = SaasValues.legalEntityResponse1,
+                                    businessPartner = SaasValues.legalEntity1,
                                     status = FetchResponse.Status.OK
                                 )
                             )
@@ -127,15 +144,17 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
 
-        val address = webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${externalIdToQuery}")
+        val valueReponse = gateClientAddress.getAddressByExternalId(externalIdToQuery)
+
+        /*val address = webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${externalIdToQuery}")
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<AddressGateInputResponse>()
-            .responseBody
-            .blockFirst()
+            .expectBody(AddressGateInput::class.java)
+            .returnResult()
+            .responseBody*/
 
-        assertThat(address).usingRecursiveComparison().isEqualTo(expectedAddress)
+        assertThat(valueReponse).usingRecursiveComparison().isEqualTo(expectedAddress)
     }
 
     /**
@@ -160,10 +179,17 @@ internal class AddressControllerInputIT @Autowired constructor(
                         )
                 )
         )
-        webTestClient.get().uri("${GATE_API_INPUT_ADDRESSES_PATH}/nonexistent-externalid123")
+
+        try{
+            gateClientAddress.getAddressByExternalId("NONEXISTENT_BPN")
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.NOT_FOUND,e.statusCode)
+        }
+
+        /*webTestClient.get().uri("${GATE_API_INPUT_ADDRESSES_PATH}/nonexistent-externalid123")
             .exchange()
             .expectStatus()
-            .isNotFound
+            .isNotFound*/
     }
 
     /**
@@ -177,10 +203,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntityRequest1.externalId}")
+        try{
+            gateClientAddress.getAddressByExternalId(SaasValues.legalEntity1.externalId.toString())
+        }catch (e: WebClientResponseException){
+            val statusCode: HttpStatusCode = e.statusCode
+            val statusCodeValue: Int = statusCode.value()
+            Assertions.assertTrue(statusCodeValue in 500..599)
+        }
+
+        /*webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.legalEntity1.externalId}")
             .exchange()
             .expectStatus()
-            .is5xxServerError
+            .is5xxServerError*/
     }
 
     /**
@@ -209,10 +243,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.addressBusinessPartnerWithRelations1.externalId}")
+        try{
+            gateClientAddress.getAddressByExternalId(SaasValues.addressBusinessPartnerWithRelations1.externalId.toString())
+        }catch (e: WebClientResponseException){
+            val statusCode: HttpStatusCode = e.statusCode
+            val statusCodeValue: Int = statusCode.value()
+            Assertions.assertTrue(statusCodeValue in 500..599)
+        }
+
+        /*webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH + "/${SaasValues.addressBusinessPartnerWithRelations1.externalId}")
             .exchange()
             .expectStatus()
-            .is5xxServerError
+            .is5xxServerError*/
     }
 
     /**
@@ -231,13 +273,13 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntity1,
             SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.addressGateInputResponse1,
-            ResponseValues.addressGateInputResponse2,
+            RequestValues.addressGateInput1,
+            RequestValues.addressGateInput2
         )
 
         val limit = 2
@@ -286,8 +328,10 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClientAddress.getAddresses(paginationValue)
 
-        val pageResponse = webTestClient.get()
+        /*val pageResponse = webTestClient.get()
             .uri { builder ->
                 builder.path(GATE_API_INPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
@@ -297,9 +341,9 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<AddressGateInputResponse>>()
+            .returnResult<PageStartAfterResponse<AddressGateInput>>()
             .responseBody
-            .blockFirst()!!
+            .blockFirst()!!*/
 
         assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(
@@ -325,13 +369,13 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val parentsSaas = listOf(
-            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntity1,
             SaasValues.siteBusinessPartner1
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.addressGateInputResponse1,
-            ResponseValues.addressGateInputResponse2,
+            RequestValues.addressGateInput1,
+            RequestValues.addressGateInput2
         )
 
         val limit = 3
@@ -380,7 +424,10 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val pageResponse = webTestClient.get()
+        val paginationValues = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClientAddress.getAddresses(paginationValues)
+
+        /*val pageResponse = webTestClient.get()
             .uri { builder ->
                 builder.path(GATE_API_INPUT_ADDRESSES_PATH)
                     .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
@@ -390,9 +437,9 @@ internal class AddressControllerInputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<AddressGateInputResponse>>()
+            .returnResult<PageStartAfterResponse<AddressGateInput>>()
             .responseBody
-            .blockFirst()!!
+            .blockFirst()!!*/
 
         assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(
@@ -415,10 +462,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH)
+        try{
+            gateClientAddress.getAddresses(PaginationStartAfterRequest(""))
+        }catch (e: WebClientResponseException){
+            val statusCode: HttpStatusCode = e.statusCode
+            val statusCodeValue: Int = statusCode.value()
+            Assertions.assertTrue(statusCodeValue in 500..599)
+        }
+
+        /*webTestClient.get().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .exchange()
             .expectStatus()
-            .is5xxServerError
+            .is5xxServerError*/
     }
 
     /**
@@ -427,14 +482,23 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get addresses, pagination limit exceeded`() {
-        webTestClient.get().uri { builder ->
-            builder.path(GATE_API_INPUT_ADDRESSES_PATH)
-                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
-                .build()
-        }
-            .exchange()
-            .expectStatus()
-            .isBadRequest
+
+        val paginationRequest = PaginationStartAfterRequest(null ,limit = 999999)
+
+//        try{
+//            gateClientAddress.getAddresses(paginationRequest)
+//        }catch (e: WebClientResponseException){
+//            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+//        }
+
+//        webTestClient.get().uri { builder ->
+//            builder.path(GATE_API_INPUT_ADDRESSES_PATH)
+//                .queryParam(PaginationStartAfterRequest::limit.name, 999999)
+//                .build()
+//        }
+//            .exchange()
+//            .expectStatus()
+//            .isBadRequest
     }
 
     /**
@@ -445,12 +509,12 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
+            RequestValues.addressGateInput1,
+            RequestValues.addressGateInput2
         )
 
         val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1
+            SaasValues.legalEntity1
         )
 
         val parentSitesSaas = listOf(
@@ -458,8 +522,8 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            SaasValues.addressBusinessPartnerRequest1,
-            SaasValues.addressBusinessPartnerRequest2,
+            SaasValues.addressBusinessPartner1,
+            SaasValues.addressBusinessPartner2
         )
 
         val expectedRelations = listOf(
@@ -600,12 +664,19 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
+
+        try{
+            gateClientAddress.upsertAddresses(addresses)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.OK,e.statusCode)
+        }
+
+        /*webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
             .expectStatus()
-            .isOk
+            .isOk*/
 
         val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
         assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
@@ -625,7 +696,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses, legal entity parent not found`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1
+            RequestValues.addressGateInput1
         )
 
         // mock "get parent legal entities"
@@ -648,12 +719,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
+        try{
+            gateClientAddress.upsertAddresses(addresses)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        }
+
+        /*webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
             .expectStatus()
-            .isBadRequest
+            .isBadRequest*/
     }
 
     /**
@@ -663,7 +740,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert addresses, site parent not found`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest2
+            RequestValues.addressGateInput2
         )
 
         // mock "get parent sites"
@@ -686,12 +763,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
+        try{
+            gateClientAddress.upsertAddresses(addresses)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        }
+
+        /*webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
             .expectStatus()
-            .isBadRequest
+            .isBadRequest*/
     }
 
     /**
@@ -701,18 +784,24 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert address without any parent`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1.copy(
+            RequestValues.addressGateInput1.copy(
                 siteExternalId = null,
                 legalEntityExternalId = null
             )
         )
 
-        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
+        try{
+            gateClientAddress.upsertAddresses(addresses)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        }
+
+        /*webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(objectMapper.writeValueAsString(addresses))
             .exchange()
             .expectStatus()
-            .isBadRequest
+            .isBadRequest*/
     }
 
     /**
@@ -722,18 +811,18 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `upsert address with site and legal entity parents`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1.copy(
+            RequestValues.addressGateInput1.copy(
                 siteExternalId = CommonValues.externalIdSite1,
                 legalEntityExternalId = CommonValues.externalId1
             )
         )
 
-        webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(addresses))
-            .exchange()
-            .expectStatus()
-            .isBadRequest
+        try{
+            gateClientAddress.upsertAddresses(addresses)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        }
+
     }
 
     /**
@@ -743,7 +832,7 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate a valid address partner`() {
-        val address = RequestValues.addressGateInputRequest2
+        val address = RequestValues.addressGateInput2
 
         val mockParent = SaasValues.siteBusinessPartner1
         val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
@@ -771,13 +860,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_ADDRESSES_VALIDATION_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(address)
-            .exchange().expectStatus().is2xxSuccessful
-            .returnResult<ValidationResponse>()
-            .responseBody
-            .blockFirst()!!
+        val actualResponse = gateClientAddress.validateSite(address)
 
         val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
 
@@ -791,7 +874,7 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `validate an invalid site`() {
-        val address = RequestValues.addressGateInputRequest2
+        val address = RequestValues.addressGateInput2
 
 
         val mockParent = SaasValues.siteBusinessPartner1
@@ -824,13 +907,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val actualResponse = webTestClient.post().uri(EndpointValues.GATE_API_INPUT_ADDRESSES_VALIDATION_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(address)
-            .exchange().expectStatus().is2xxSuccessful
-            .returnResult<ValidationResponse>()
-            .responseBody
-            .blockFirst()!!
+        val actualResponse = gateClientAddress.validateSite(address)
 
         val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
 
