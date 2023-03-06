@@ -26,10 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc

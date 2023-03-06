@@ -17,8 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.saas.dto
+package org.eclipse.tractusx.bpdm.pool.client.dto
 
-data class ImportIdFilterRequest(
-    val importIdentifiers: Collection<String> = emptyList()
-)
+enum class SyncType{
+    OPENSEARCH,
+    SAAS_IMPORT
+}

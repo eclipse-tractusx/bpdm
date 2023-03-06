@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
 import java.time.Instant
 
 @Entity
@@ -48,14 +50,3 @@ class SyncRecord(
     ): BaseEntity()
 
 
-enum class SyncType{
-    OPENSEARCH,
-    SAAS_IMPORT
-}
-
-enum class SyncStatus{
-    NOT_SYNCED,
-    RUNNING,
-    SUCCESS,
-    ERROR
-}

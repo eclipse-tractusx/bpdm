@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientAddressInterface
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
@@ -46,7 +46,7 @@ class AddressController(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse> {
-        return searchService.searchAddresses(addressSearchRequest, paginationRequest)
+        return searchService.searchAddresses(addressSearchRequest,paginationRequest)
     }
 
     override fun getAddress(
@@ -58,9 +58,9 @@ class AddressController(
 
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
-        pageRequest: PaginationRequest
+        paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerSearchResponse> {
-        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
+        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 
 

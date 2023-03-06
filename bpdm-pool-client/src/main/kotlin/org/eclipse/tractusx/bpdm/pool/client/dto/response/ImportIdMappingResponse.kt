@@ -17,18 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.pool.client.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.entity.SyncType
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.pool.client.dto.ImportIdEntry
 
-data class SyncResponse(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
-)
+data class ImportIdMappingResponse(
+    val entries: Collection<ImportIdEntry>,
+    val notFound: Collection<String>
+) {
+    val size = entries.size
+}

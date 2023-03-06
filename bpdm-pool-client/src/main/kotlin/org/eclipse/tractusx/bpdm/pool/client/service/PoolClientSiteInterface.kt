@@ -28,11 +28,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
@@ -93,8 +93,8 @@ interface PoolClientSiteInterface  {
     @PostMapping("/search")
     @PostExchange("/search")
     fun searchSites(
-        @RequestBody siteSearchRequest: SiteBpnSearchRequest,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart siteSearchRequest: SiteBpnSearchRequest,
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerSearchResponse>
 
     @Operation(

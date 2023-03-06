@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.client.service
 
 
-
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -31,15 +30,18 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena/legal-entities")
 @HttpExchange("/api/catena/legal-entities")
-interface PoolClientLegalEntityInterface  {
+interface PoolClientLegalEntityInterface {
 
     @Operation(
         summary = "Get page of legal entity business partners matching the search criteria",
@@ -55,11 +57,12 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @GetMapping
+    @GetExchange
     fun getLegalEntities(
-        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
-        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
+        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse>
 
     @Operation(
@@ -80,12 +83,14 @@ interface PoolClientLegalEntityInterface  {
                 content = [Content()]
             )
         ]
-    )  @GetMapping("/{idValue}")
+    )
+    @GetMapping("/{idValue}")
+    @GetExchange("/{idValue}")
     fun getLegalEntity(
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam
-        idType: String?
+        idType: String? = "BPN"
     ): LegalEntityPartnerResponse
 
     @Operation(
@@ -101,6 +106,7 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @PostMapping("/{bpn}/confirm-up-to-date")
+    @PostExchange("/{bpn}/confirm-up-to-date")
     fun setLegalEntityCurrentness(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     )
@@ -122,6 +128,7 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @PostMapping("/search")
+    @PostExchange("/search")
     fun searchSites(
         @RequestBody bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityPartnerResponse>>
@@ -138,9 +145,10 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @GetMapping("/{bpn}/sites")
+    @GetExchange("/{bpn}/sites")
     fun getSites(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerResponse>
 
     @Operation(
@@ -155,10 +163,12 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @GetMapping("/{bpn}/addresses")
+    @GetExchange("/{bpn}/addresses")
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerResponse>
+
     @Operation(
         summary = "Search Legal Addresses",
         description = "Search legal addresses of legal entities by BPNL"
@@ -170,6 +180,7 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @PostMapping("/legal-addresses/search")
+    @PostExchange("/legal-addresses/search")
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
@@ -195,25 +206,6 @@ interface PoolClientLegalEntityInterface  {
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): Collection<LegalEntityPartnerCreateResponse>
 
-    @Operation(
-        summary = "Create new legal entity business partners",
-        description = "Create new business partners of type legal entity. " +
-                "The given additional identifiers of a record need to be unique, otherwise they are ignored. " +
-                "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
-        ]
-    )
-    @PostMapping("/teste")
-    @PostExchange("/teste")
-    fun createBusinessPartnersString(
-        @RequestBody
-        businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): String
 
     @Operation(
         summary = "Update existing legal entity business partners",
@@ -228,6 +220,7 @@ interface PoolClientLegalEntityInterface  {
         ]
     )
     @PutMapping
+    @PutExchange
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>

@@ -17,18 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto.response
+package org.eclipse.tractusx.bpdm.pool.client.dto.response
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.entity.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
 import java.time.Instant
 
-@Schema(name = "ChangelogEntryResponse", description = "Changelog entry for a business partner")
-data class ChangelogEntryResponse(
-    @Schema(description = "Business Partner Number of the changelog entry")
-    val bpn: String,
-    @Schema(description = "The type of the change")
-    val changelogType: ChangelogType,
-    @Schema(description = "The timestamp of the change")
-    val timestamp: Instant
+data class SyncResponse(
+    val type: SyncType,
+    val status: SyncStatus,
+    val count: Int = 0,
+    val progress: Float = 0f,
+    val errorDetails: String? = null,
+    val startedAt: Instant? = null,
+    val finishedAt: Instant? = null
 )

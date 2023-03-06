@@ -31,8 +31,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/catena/bpn")
+@HttpExchange("/api/catena/bpn")
 interface PoolClientBpnInterface  {
 
     @Operation(
@@ -53,5 +56,6 @@ interface PoolClientBpnInterface  {
         ]
     )
     @PostMapping("/search")
+    @PostExchange("/search")
     fun findBpnsByIdentifiers(@RequestBody identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>>
 }

@@ -17,22 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.client.service
+package org.eclipse.tractusx.bpdm.pool.client.dto.request
 
-import org.eclipse.tractusx.bpdm.pool.client.config.SpringWebClientConfig
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.BpnIdentifierMappingResponse
-import org.springframework.http.ResponseEntity
-import org.springframework.web.reactive.function.client.WebClient
-
-
-class PoolClientBpnService(webClient:WebClient){
-
-    private val springWebClientConfig= SpringWebClientConfig(webClient)
-    private val client = springWebClientConfig.httpServiceProxyFactory.createClient(PoolClientBpnInterface::class.java)
-
-    fun findBpnsByIdentifiers (identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>>{
-        return client.findBpnsByIdentifiers(identifiersSearchRequest);
-    }
-
-}
+data class ImportIdFilterRequest(
+    val importIdentifiers: Collection<String> = emptyList()
+)

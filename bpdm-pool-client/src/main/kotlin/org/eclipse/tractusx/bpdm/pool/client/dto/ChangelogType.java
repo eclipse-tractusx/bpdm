@@ -17,15 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.client.config
+package org.eclipse.tractusx.bpdm.pool.client.dto;
 
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.support.WebClientAdapter
-import org.springframework.web.service.invoker.HttpServiceProxyFactory
-
-class SpringWebClientConfig(webClient: WebClient) {
-
-    val httpServiceProxyFactory = HttpServiceProxyFactory
-        .builder(WebClientAdapter.forClient(webClient))
-        .build()
+public enum ChangelogType {
+    CREATE,
+    UPDATE
 }
+

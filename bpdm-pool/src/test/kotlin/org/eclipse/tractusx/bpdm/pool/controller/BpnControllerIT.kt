@@ -19,25 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.pool.util.RequestValues
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
@@ -47,8 +47,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val objectMapper: ObjectMapper,
-    val webTestClient: WebTestClient,
+    val poolClient: PoolClientServiceConfig
 ) {
     companion object {
         @RegisterExtension
@@ -71,14 +70,13 @@ class BpnControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createTestMetadata()
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3),
-            ),
-            webTestClient
+            )
         )
     }
 
@@ -91,15 +89,7 @@ class BpnControllerIT @Autowired constructor(
     fun `find bpns by identifiers, all found`() {
         val identifiersSearchRequest = IdentifiersSearchRequest(identifierType, listOf(identifierValue1, identifierValue2))
 
-        val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBodyList(BpnIdentifierMappingResponse::class.java)
-            .returnResult()
-            .responseBody
+        val bpnIdentifierMappings = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1, identifierValue2)
     }
@@ -114,15 +104,8 @@ class BpnControllerIT @Autowired constructor(
         val identifiersSearchRequest =
             IdentifiersSearchRequest(identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
 
-        val bpnIdentifierMappings = webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
-            .exchange()
-            .expectStatus()
-            .isOk
-            .expectBodyList(BpnIdentifierMappingResponse::class.java)
-            .returnResult()
-            .responseBody
+
+        val bpnIdentifierMappings = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1)
     }
@@ -136,12 +119,7 @@ class BpnControllerIT @Autowired constructor(
     fun `find bpns by identifiers, bpn request limit exceeded`() {
         val identifiersSearchRequest = IdentifiersSearchRequest(identifierType, listOf(identifierValue1, identifierValue2, identifierValue3))
 
-        webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
-            .exchange()
-            .expectStatus()
-            .isBadRequest
+        testHelpers.`find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest)
     }
 
     /**
@@ -153,11 +131,6 @@ class BpnControllerIT @Autowired constructor(
     fun `find bpns by nonexistent identifier type`() {
         val identifiersSearchRequest = IdentifiersSearchRequest("NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
 
-        webTestClient.post().uri(EndpointValues.CATENA_BPN_SEARCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(identifiersSearchRequest))
-            .exchange()
-            .expectStatus()
-            .isNotFound
+        testHelpers.`find bpns by nonexistent identifier type`(identifiersSearchRequest)
     }
 }

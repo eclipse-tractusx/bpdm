@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
@@ -61,10 +61,10 @@ class BusinessPartnerLegacyController(
     )
     @GetMapping
     fun searchBusinessPartners(
-        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
-        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
+        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerMatchResponse> {
         return searchService.searchBusinessPartners(
             BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),

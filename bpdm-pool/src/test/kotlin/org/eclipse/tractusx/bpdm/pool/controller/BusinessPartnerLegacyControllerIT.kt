@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.BusinessPartnerResponse
@@ -73,8 +74,8 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        testHelpers.createTestMetadata(webTestClient)
-        val givenStructure = testHelpers.createBusinessPartnerStructure(partnerStructures, webTestClient)
+        testHelpers.createTestMetadata()
+        val givenStructure = testHelpers.createBusinessPartnerStructure(partnerStructures)
         givenPartner1 = givenStructure[0].legalEntity
         givenPartner2 = givenStructure[1].legalEntity
         givenPartner3 = givenStructure[2].legalEntity
@@ -95,6 +96,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         val expected = getExpectedPage(listOf(givenPartner1, givenPartner2, givenPartner3))
 
         val respone = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerMatchResponse>>(EndpointValues.CATENA_BUSINESS_PARTNER_LEGACY_PATH)
+
 
         testHelpers.assertRecursively(respone).ignoringFieldsMatchingRegexes(".*uuid", ".*score").isEqualTo(expected)
     }

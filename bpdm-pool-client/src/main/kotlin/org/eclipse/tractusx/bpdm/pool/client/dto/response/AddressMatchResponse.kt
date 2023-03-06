@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.client.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 
+
 @Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
 data class AddressMatchResponse(
     @Schema(description = "Relative quality score of the match. The higher the better")

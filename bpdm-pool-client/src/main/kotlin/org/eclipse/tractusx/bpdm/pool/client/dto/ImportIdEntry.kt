@@ -17,19 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.client.service
+package org.eclipse.tractusx.bpdm.pool.client.dto
 
-
-
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.service.annotation.GetExchange
-
-
-@RequestMapping("/api/dashboard")
-interface CountryRiskClientInterface  {
-
-
-
-    @GetExchange("/getWorldMap")
-    fun getDashBoardWorldMap(): List<Any>
-}
+data class ImportIdEntry(
+    val importId: String,
+    val bpn: String
+)

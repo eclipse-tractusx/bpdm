@@ -17,11 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.saas.dto
+package org.eclipse.tractusx.bpdm.pool.client.dto
 
-data class ImportIdMappingResponse(
-    val entries: Collection<ImportIdEntry>,
-    val notFound: Collection<String>
-) {
-    val size = entries.size
+enum class SyncStatus{
+    NOT_SYNCED,
+    RUNNING,
+    SUCCESS,
+    ERROR
 }
+

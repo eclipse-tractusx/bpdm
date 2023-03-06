@@ -26,22 +26,29 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientAddressService
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientLegalEntityService
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientSiteService
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
+
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
+import org.junit.Assert
+import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.core.env.Environment
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
@@ -53,7 +60,8 @@ class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
     private val objectMapper: ObjectMapper,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
-    private val bpnConfigProperties: BpnConfigProperties
+    private val bpnConfigProperties: BpnConfigProperties,
+    private val poolClient: PoolClientServiceConfig
 ) {
 
     val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
@@ -63,15 +71,6 @@ class TestHelpers(
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
 
-    val webClient: WebClient =
-        WebClient.builder()
-            .baseUrl("http://localhost:8080")
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build()
-
-    val poolClientLegalEntityService = PoolClientLegalEntityService(webClient);
-    val poolClientSiteService = PoolClientSiteService(webClient);
-    val poolClientAddressService = PoolClientAddressService(webClient);
 
     fun truncateDbTables() {
         em.transaction.begin()
@@ -101,16 +100,15 @@ class TestHelpers(
      * Assumption: Legal entities, sites and addresses have unique indexes among them each
      */
     fun createBusinessPartnerStructure(
-        partnerStructures: List<LegalEntityStructureRequest>,
-        client: WebTestClient
+        partnerStructures: List<LegalEntityStructureRequest>
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = poolClientLegalEntityService.createBusinessPartners(partnerStructures.map { it.legalEntity });
+        val legalEntities = poolClient.getPoolClientLegalEntity().createBusinessPartners(partnerStructures.map { it.legalEntity });
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = poolClientSiteService.createSite(assignedSiteRequests);
+        val sites = poolClient.getPoolClientSite().createSite(assignedSiteRequests);
 
         val indexedSites = sites.associateBy { it.index }
 
@@ -119,7 +117,7 @@ class TestHelpers(
         val assignedSiteAddresses =
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
-        val addresses = poolClientAddressService.getAddress(assignedSitelessAddresses + assignedSiteAddresses)
+        val addresses = poolClient.getPoolClientAddress().createAddresses(assignedSitelessAddresses + assignedSiteAddresses)
 
         val indexedAddresses = addresses.associateBy { it.index }
 
@@ -136,26 +134,74 @@ class TestHelpers(
             )
         }
     }
+    fun `get address by bpn-a, not found`(bpn:String ){
+        try {
+            val result = poolClient.getPoolClientAddress().getAddress(bpn)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
+        }
+    }
+
+    fun `find bpns by identifiers, bpn request limit exceeded`( identifiersSearchRequest: IdentifiersSearchRequest){
+        try {
+            val result = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+    }
+
+    fun `find bpns by nonexistent identifier type`( identifiersSearchRequest: IdentifiersSearchRequest){
+        try {
+            val result = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
+        }
+    }
+
+    fun `set business partner currentness using nonexistent bpn`(bpn:String ){
+        try {
+            val result =  poolClient.getPoolClientLegalEntity().setLegalEntityCurrentness(bpn)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
+        }
+    }
+
+    fun `get site by bpn-s, not found`(bpn:String ){
+        try {
+            val result =   poolClient.getPoolClientSite().getSite(bpn)
+            assertThrows<WebClientResponseException> { result }
+        } catch (e: WebClientResponseException) {
+            Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
+        }
+    }
+
 
     /**
      * Creates metadata needed for test data defined in the [RequestValues]
      */
-    fun createTestMetadata(client: WebTestClient) {
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm1)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm2)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH, RequestValues.legalForm3)
+    fun createTestMetadata() {
 
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType1)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType2)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH, RequestValues.identifierType3)
+        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm1)
+        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm2)
+        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm3)
 
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody1)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody2)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH, RequestValues.issuingBody3)
+        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType1)
+        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType2)
+        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType3)
 
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus1)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus2)
-        client.invokePostEndpointWithoutResponse(EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH, RequestValues.identifierStatus3)
+        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody1)
+        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody2)
+        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody3)
+
+        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus1)
+        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus2)
+        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus3)
+
+
     }
 
 
@@ -168,8 +214,9 @@ class TestHelpers(
     }
 
     private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
-        client.invokePostEndpointWithoutResponse(syncPath)
 
+        //poolClient.getPoolClientOpenSearch().export()
+        client.invokePostEndpointWithoutResponse(syncPath)
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
         var syncResponse: SyncResponse
@@ -177,6 +224,7 @@ class TestHelpers(
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
             syncResponse = client.invokeGetEndpoint(syncPath)
+           // syncResponse = poolClient.getPoolClientOpenSearch().getBusinessPartners()
 
             if (syncResponse.status == status)
                 break
@@ -211,7 +259,10 @@ class TestHelpers(
 
         startSyncAndAwaitSuccess(client, EndpointValues.SAAS_SYNCH_PATH)
 
-        return client.invokeGetEndpoint(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
+        return poolClient.getPoolClientLegalEntity().getLegalEntities(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest, AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest, PaginationRequest()
+        )
     }
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {

@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.entity.SyncRecord
-import org.eclipse.tractusx.bpdm.pool.entity.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.entity.SyncType
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncConflictException
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmSyncStateException
 import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository

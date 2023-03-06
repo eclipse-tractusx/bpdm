@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.entity.SyncType
+import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service

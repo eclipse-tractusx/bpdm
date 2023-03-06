@@ -17,9 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.component.saas.dto
+package org.eclipse.tractusx.bpdm.pool.client.dto.response
 
-data class ImportIdEntry(
-    val importId: String,
-    val bpn: String
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.client.dto.ChangelogType
+
+import java.time.Instant
+
+@Schema(name = "ChangelogEntryResponse", description = "Changelog entry for a business partner")
+data class ChangelogEntryResponse(
+    @Schema(description = "Business Partner Number of the changelog entry")
+    val bpn: String,
+    @Schema(description = "The type of the change")
+    val changelogType: ChangelogType,
+    @Schema(description = "The timestamp of the change")
+    val timestamp: Instant
 )

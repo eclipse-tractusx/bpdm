@@ -21,10 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
+import net.bytebuddy.pool.TypePool.Empty
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -48,6 +50,7 @@ import java.time.Instant
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
+    val poolClient: PoolClientServiceConfig
 ) {
     companion object {
         @RegisterExtension
@@ -66,7 +69,7 @@ class LegalEntityControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createTestMetadata()
     }
 
     /**
@@ -80,7 +83,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val expected = ResponseValues.legalEntityUpsert1.copy(bpn = expectedBpn)
 
         val toCreate = RequestValues.legalEntityCreate1
-        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(toCreate))
+        val response = poolClient.getPoolClientLegalEntity().createBusinessPartners(listOf(toCreate))
 
         assertThat(response.size).isEqualTo(1)
         assertThat(response.single())
@@ -101,8 +104,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.legalEntityUpsert1, ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
 
         val toCreate = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
-        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
-
+        val response = poolClient.getPoolClientLegalEntity().createBusinessPartners(toCreate)
         assertThatCreatedLegalEntitiesEqual(response, expected)
     }
 
@@ -114,13 +116,11 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `don't create legal entity with same identifier`() {
         val given = with(RequestValues.legalEntityCreate1) { copy(properties = properties.copy(identifiers = listOf(RequestValues.identifier1))) }
-        webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, listOf(given))
-
+        poolClient.getPoolClientLegalEntity().createBusinessPartners(listOf(given))
         val expected = listOf(ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
 
         val toCreate = listOf(given, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
-        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toCreate)
-
+        val response =poolClient.getPoolClientLegalEntity().createBusinessPartners(toCreate)
         assertThatCreatedLegalEntitiesEqual(response, expected)
     }
 
@@ -132,14 +132,13 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `update existing legal entities`() {
         val given = listOf(RequestValues.legalEntityCreate1)
-        val givenBpn = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
-            .single().bpn
+
+        val givenBpn = poolClient.getPoolClientLegalEntity().createBusinessPartners(given).single().bpn
 
         val expected = listOf(ResponseValues.legalEntityUpsert3.copy(bpn = givenBpn))
 
         val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = givenBpn))
-        val response = webTestClient.invokePutWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
-
+        val response = poolClient.getPoolClientLegalEntity().updateBusinessPartners(toUpdate)
         assertThatModifiedLegalEntitiesEqual(response, expected)
     }
 
@@ -151,11 +150,9 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `ignore invalid legal entity update`() {
         val given = listOf(RequestValues.legalEntityCreate1)
-        webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given)
-
+        poolClient.getPoolClientLegalEntity().createBusinessPartners(given)
         val toUpdate = listOf(RequestValues.legalEntityUpdate3.copy(bpn = "NONEXISTENT"))
-        val response = webTestClient.invokePutWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, toUpdate)
-
+        val response =         poolClient.getPoolClientLegalEntity().updateBusinessPartners(toUpdate)
         assertThat(response).isEmpty()
     }
 
@@ -171,13 +168,12 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map { LegalAddressSearchResponse(it.bpn, it.legalAddress) }
 
         val bpnsToSearch = givenLegalEntities.map { it.bpn }
-        val response = webTestClient.invokePostWithArrayResponse<LegalAddressSearchResponse>(EndpointValues.CATENA_LEGAL_ADDRESS_SEARCH_PATH, bpnsToSearch)
-
+        val response = poolClient.getPoolClientLegalEntity().searchLegalAddresses(bpnsToSearch)
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -197,13 +193,12 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map { LegalAddressSearchResponse(it.bpn, it.legalAddress) }.take(2)
 
         val bpnsToSearch = expected.map { it.legalEntity }.plus("NONEXISTENT")
-        val response = webTestClient.invokePostWithArrayResponse<LegalAddressSearchResponse>(EndpointValues.CATENA_LEGAL_ADDRESS_SEARCH_PATH, bpnsToSearch)
-
+        val response = poolClient.getPoolClientLegalEntity().searchLegalAddresses(bpnsToSearch)
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -223,7 +218,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -234,8 +229,7 @@ class LegalEntityControllerIT @Autowired constructor(
         }.take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpn }
-        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
-
+        val response = poolClient.getPoolClientLegalEntity().searchSites(bpnsToSearch).body
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -254,7 +248,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -265,10 +259,9 @@ class LegalEntityControllerIT @Autowired constructor(
         }.first() // search for first
 
         val identifierToFind = expected.properties.identifiers.first()
-        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>(
-            "${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${identifierToFind.value}",
-            "idType" to identifierToFind.type.technicalKey
-        )
+
+
+       val response = poolClient.getPoolClientLegalEntity().getLegalEntity(identifierToFind.value,identifierToFind.type.technicalKey);
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -288,7 +281,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -300,10 +293,9 @@ class LegalEntityControllerIT @Autowired constructor(
 
         var identifierToFind = expected.properties.identifiers.first()
         identifierToFind = identifierToFind.copy(value = changeCase(identifierToFind.value))
-        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>(
-            "${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${identifierToFind.value}",
-            "idType" to identifierToFind.type.technicalKey
-        )
+
+
+        val response = poolClient.getPoolClientLegalEntity().getLegalEntity(identifierToFind.value,identifierToFind.type.technicalKey);
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -323,7 +315,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -334,7 +326,8 @@ class LegalEntityControllerIT @Autowired constructor(
         }.first() // search for first
 
         val bpnToFind = expected.bpn
-        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>("${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${bpnToFind}")
+
+        val response = poolClient.getPoolClientLegalEntity().getLegalEntity(bpnToFind)
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -354,7 +347,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate1),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -365,8 +358,7 @@ class LegalEntityControllerIT @Autowired constructor(
         }.first() // search for first
 
         val bpnToFind = changeCase(expected.bpn)
-        val response = webTestClient.invokeGetEndpoint<LegalEntityPartnerResponse>("${EndpointValues.CATENA_LEGAL_ENTITY_PATH}/${bpnToFind}")
-
+        val response = poolClient.getPoolClientLegalEntity().getLegalEntity(bpnToFind)
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -386,7 +378,7 @@ class LegalEntityControllerIT @Autowired constructor(
             LegalEntityStructureRequest(RequestValues.legalEntityCreate2),
             LegalEntityStructureRequest(RequestValues.legalEntityCreate3)
         )
-        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures, webTestClient).map { it.legalEntity }
+        val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities.map {
             LegalEntityPartnerResponse(
@@ -397,8 +389,8 @@ class LegalEntityControllerIT @Autowired constructor(
         }.take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpn }.plus("NONEXISTENT") // also search for nonexistent BPN
-        val response = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerResponse>(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpnsToSearch)
 
+        val response = poolClient.getPoolClientLegalEntity().searchSites(bpnsToSearch).body
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
@@ -414,15 +406,17 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `set business partner currentness`() {
         val given = listOf(RequestValues.legalEntityCreate1)
-        val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given).single().bpn
+        //val bpnL = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(EndpointValues.CATENA_LEGAL_ENTITY_PATH, given).single().bpn
+        val bpnL = poolClient.getPoolClientLegalEntity().createBusinessPartners(given).single().bpn
         val initialCurrentness = retrieveCurrentness(bpnL)
         val instantBeforeCurrentnessUpdate = Instant.now()
 
         assertThat(initialCurrentness).isBeforeOrEqualTo(instantBeforeCurrentnessUpdate)
 
-        webTestClient.invokePostEndpointWithoutResponse(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpnL}" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
+        poolClient.getPoolClientLegalEntity().setLegalEntityCurrentness(bpnL)
 
-        val updatedCurrentness = retrieveCurrentness(bpnL)
+
+        val updatedCurrentness = poolClient.getPoolClientLegalEntity().getLegalEntity(bpnL).currentness
         assertThat(updatedCurrentness).isBetween(instantBeforeCurrentnessUpdate, Instant.now())
     }
 
@@ -433,10 +427,9 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `set business partner currentness using nonexistent bpn`() {
-        webTestClient.post().uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/NONEXISTENT_BPN" + EndpointValues.CATENA_CONFIRM_UP_TO_DATE_PATH_POSTFIX)
-            .exchange()
-            .expectStatus()
-            .isNotFound
+
+        testHelpers.`set business partner currentness using nonexistent bpn`("NONEXISTENT_BPN")
+
     }
 
     fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {

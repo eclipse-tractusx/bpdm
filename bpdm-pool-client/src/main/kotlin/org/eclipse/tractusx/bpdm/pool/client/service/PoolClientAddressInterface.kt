@@ -26,14 +26,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -63,8 +64,8 @@ interface PoolClientAddressInterface {
     @GetMapping
     @GetExchange
     fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
-        @ParameterObject paginationRequest: PaginationRequest
+        @RequestPart addressSearchRequest: AddressPartnerSearchRequest,
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse>
 
     @Operation(
@@ -96,8 +97,8 @@ interface PoolClientAddressInterface {
     @PostMapping("/search")
     @PostExchange("/search")
     fun searchAddresses(
-        @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
-        @ParameterObject pageRequest: PaginationRequest
+        @RequestPart addressSearchRequest: AddressPartnerBpnSearchRequest,
+        @RequestPart paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerSearchResponse>
 
     @Operation(
