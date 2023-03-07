@@ -1,0 +1,190 @@
+################################################################################
+# Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
+nameOverride:
+fullnameOverride:
+
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: catenax-ng/tx-bpdm/pool
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+
+podAnnotations: {}
+
+# Spring profiles under which the application should run
+springProfiles:
+- auth
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 3000
+  capabilities:
+    drop:
+    - ALL
+
+service:
+  type: ClusterIP
+  port: 8080
+
+autoscaling:
+  enabled: false
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  hosts:
+  - host: bpdm.dev.cofinity-x.com
+    paths:
+    - path: /
+      pathType: Prefix
+  tls:
+  - secretName: tls-secret
+    hosts:
+    - bpdm.dev.cofinity-x.com
+
+resources:
+  limits:
+    cpu: 800m
+    memory: 2Gi
+  requests:
+    cpu: 300m
+    memory: 2Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: DoesNotExist
+        topologyKey: kubernetes.io/hostname
+
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+readinessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+startupProbe:
+  failureThreshold: 20
+  periodSeconds: 10
+
+applicationConfig:
+  spring:
+    datasource:
+      url: <path:bpdm/data/dev/pool/postgresql#jdbc-url>
+      username: <path:bpdm/data/dev/pool/postgresql#user>
+  bpdm:
+    saas:
+      enabled: false
+    opensearch:
+      host: <path:bpdm/data/dev/pool/opensearch#host>
+      # every hour at minute 30
+      export-scheduler-cron-expr: 0 30 * * * *
+    security:
+      enabled: true
+      auth-server-url: https://centralidp.dev.cofinity-x.com/auth/
+      realm: <path:bpdm/data/dev/pool/keycloak#realm>
+      client-id: <path:bpdm/data/dev/pool/keycloak#client-id>
+  springdoc:
+    swagger-ui:
+      oauth:
+        client-id: <path:bpdm/data/dev/pool/keycloak#swagger-ui-oauth-client-id>
+
+applicationSecrets:
+  spring:
+    datasource:
+      password: <path:bpdm/data/dev/pool/postgresql#password>
+
+
+opensearch:
+  enabled: true
+  masterService: ""
+  fullnameOverride: bpdm-pool-dev-opensearch
+  replicas: 1
+  protocol: http
+  roles:
+  - master
+  - ingest
+  - data
+  resources:
+    limits:
+      cpu: 300m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 2Gi
+  config:
+    opensearch.yml: |
+      cluster.name: opensearch-cluster
+      # Bind to all interfaces because we don't know what
+      # IP address Docker will assign to us.
+      network.host: 0.0.0.0
+      # Disable security
+      plugins.security.disabled: true
+  securityConfig:
+    enabled: false
+  extraInitContainers:
+  # Image that performs the sysctl operation to modify Kernel settings
+  # needed sometimes to avoid boot errors
+  - name: sysctl
+    image: docker.io/bitnami/bitnami-shell:10-debian-10-r199
+    imagePullPolicy: "IfNotPresent"
+    command:
+    - /bin/bash
+    - -ec
+    - |
+      CURRENT=`sysctl -n vm.max_map_count`;
+      DESIRED="262144";
+      if [ "$DESIRED" -gt "$CURRENT" ]; then
+          sysctl -w vm.max_map_count=262144;
+      fi;
+      CURRENT=`sysctl -n fs.file-max`;
+      DESIRED="65536";
+      if [ "$DESIRED" -gt "$CURRENT" ]; then
+          sysctl -w fs.file-max=65536;
+      fi;
+    securityContext:
+      runAsUser: 0
+      privileged: true
+
+postgres:
+  enabled: false

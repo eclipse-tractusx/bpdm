@@ -24,6 +24,7 @@ metadata:
   labels:
      {{- include "bpdm.labels" . | nindent 4 }}
 data:
+  {{- if eq true .Values.postgres.enabled }}
   deployment.yml: |-
     # Place for putting standard deployment configuration which can be overwritten by external.yml
     bpdm:
@@ -31,6 +32,7 @@ data:
         host: {{ include "bpdm.postgresDependency" . }}
       opensearch:
         host: {{ include "bpdm.opensearchDependency" . }}
+  {{- end }}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}
