@@ -17,34 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.saas
+package org.eclipse.tractusx.bpdm.gate.dto.response
 
-data class SharingStatusSaas(
-    val status: SharingStatusType,
-    val description: String? = null
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.exception.ErrorCode
+
+@Schema(title = "ErrorInfo", description = "Holds information about failures")
+data class ErrorInfo<out ERROR : ErrorCode>(
+
+    @Schema(description = "Error code identifying the error")
+    val errorCode: ERROR,
+    @Schema(description = "Error message that explains the error")
+    val message: String,
+    @Schema(description = "Key (externalId) of the entity that failed")
+    val entityKey: String?
 )
-
-enum class SharingStatusType {
-    UNDER_CONSIDERATION,
-    UNDISCLOSED_RECORD,
-    MISSING_INFORMATION_FOR_LINKAGE,
-    ERRONEOUS_INFORMATION_FOR_LINKAGE,
-    ERRONEOUS_RECORD,
-    NATURAL_PERSON,
-    PENDING_LINKAGE_DECISION,
-    SHARED_WITH_NO_MATCH,
-    SHARED_WITH_CONFIDENT_MATCH,
-    SHARED_WITH_NO_MATCH_BY_REVIEW,
-    SHARED_BY_REVIEW,
-    PROCESS_ISSUE,
-}
-
-fun SharingStatusType.isError(): Boolean =
-    when (this) {
-        SharingStatusType.UNDISCLOSED_RECORD -> true
-        SharingStatusType.MISSING_INFORMATION_FOR_LINKAGE -> true
-        SharingStatusType.ERRONEOUS_INFORMATION_FOR_LINKAGE -> true
-        SharingStatusType.ERRONEOUS_RECORD -> true
-        SharingStatusType.NATURAL_PERSON -> true
-        else -> false
-    }

@@ -152,13 +152,13 @@ class SaasClient(
         return fetchResponse
     }
 
-    fun getLegalEntities(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
+    fun getLegalEntities(limit: Int? = null, startAfter: String? = null, externalIds: Collection<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, saasConfigProperties.legalEntityType, listOf("USE_NEXT_START_AFTER"))
 
-    fun getSites(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
+    fun getSites(limit: Int? = null, startAfter: String? = null, externalIds: Collection<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, saasConfigProperties.siteType, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
 
-    fun getAddresses(limit: Int? = null, startAfter: String? = null, externalIds: List<String>? = null) =
+    fun getAddresses(limit: Int? = null, startAfter: String? = null, externalIds: Collection<String>? = null) =
         getBusinessPartners(limit, startAfter, externalIds, saasConfigProperties.addressType, listOf("USE_NEXT_START_AFTER", "FETCH_RELATIONS"))
 
     fun lookUpReferenceData(lookupRequest: ReferenceDataLookupRequestSaas): ReferenceDataLookupResponseSaas {

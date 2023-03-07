@@ -28,14 +28,17 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerRespons
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.util.SaasValues
+import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -79,14 +82,22 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `get legal entities`() {
-        val legalEntitiesSaas = listOf(
-            SaasValues.legalEntityAugmented1,
-            SaasValues.legalEntityAugmented2
-        )
-
         val expectedLegalEntities = listOf(
             ResponseValues.legalEntityGateOutput1,
             ResponseValues.legalEntityGateOutput2
+        )
+        val expectedErrors = listOf(
+            ErrorInfo(BusinessPartnerOutputError.BpnNotInPool, "BPNL0000000002XY not found in pool", SaasValues.legalEntityAugmentedNotInPoolResponse.externalId),
+            ErrorInfo(BusinessPartnerOutputError.SharingProcessError, "SaaS sharing process error: Error message", SaasValues.legalEntityAugmentedSharingErrorResponse.externalId),
+        )
+        val expectedPending = listOf(SaasValues.legalEntityAugmentedPendingResponse.externalId!!)
+
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntityAugmented1,
+            SaasValues.legalEntityAugmented2,
+            SaasValues.legalEntityAugmentedNotInPoolResponse,
+            SaasValues.legalEntityAugmentedSharingErrorResponse,
+            SaasValues.legalEntityAugmentedPendingResponse,
         )
 
         val legalEntitiesPool = listOf(
@@ -115,6 +126,25 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = legalEntitiesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -152,16 +182,18 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateOutput>>()
+            .returnResult<PageOutputResponse<LegalEntityGateOutput>>()
             .responseBody
             .blockFirst()!!
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
+            PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedLegalEntities,
-                invalidEntries = 0
+                invalidEntries = expectedPending.size + expectedErrors.size,
+                pending = expectedPending,
+                errors = expectedErrors,
             )
         )
     }
@@ -173,14 +205,14 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `get legal entities, filter by external ids`() {
-        val legalEntitiesSaas = listOf(
-            SaasValues.legalEntityAugmented1,
-            SaasValues.legalEntityAugmented2
-        )
-
         val expectedLegalEntities = listOf(
             ResponseValues.legalEntityGateOutput1,
             ResponseValues.legalEntityGateOutput2
+        )
+
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntityAugmented1,
+            SaasValues.legalEntityAugmented2
         )
 
         val legalEntitiesPool = listOf(
@@ -210,6 +242,25 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = legalEntitiesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = legalEntitiesSaas
                                 )
                             )
                         )
@@ -249,16 +300,18 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<LegalEntityGateOutput>>()
+            .returnResult<PageOutputResponse<LegalEntityGateOutput>>()
             .responseBody
             .blockFirst()!!
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
+            PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedLegalEntities,
-                invalidEntries = 0
+                invalidEntries = 0,
+                pending = listOf(),
+                errors = listOf(),
             )
         )
     }

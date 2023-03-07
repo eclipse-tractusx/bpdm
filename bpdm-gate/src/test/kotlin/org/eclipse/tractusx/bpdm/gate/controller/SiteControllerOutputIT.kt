@@ -24,19 +24,22 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.util.SaasValues
+import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_SITES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_SEARCH_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -80,14 +83,22 @@ internal class SiteControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `get sites`() {
-        val sitesSaas = listOf(
-            SaasValues.siteBusinessPartner1,
-            SaasValues.siteBusinessPartner2
-        )
-
         val expectedSites = listOf(
             ResponseValues.siteGateOutput1,
             ResponseValues.siteGateOutput2
+        )
+        val expectedErrors = listOf(
+            ErrorInfo(BusinessPartnerOutputError.BpnNotInPool, "BPNS0000000003X9 not found in pool", SaasValues.siteNotInPoolResponse.externalId),
+            ErrorInfo(BusinessPartnerOutputError.SharingProcessError, "SaaS sharing process error: Error message", SaasValues.siteSharingErrorResponse.externalId),
+        )
+        val expectedPending = listOf(SaasValues.sitePendingResponse.externalId!!)
+
+        val sitesSaas = listOf(
+            SaasValues.siteBusinessPartner1,
+            SaasValues.siteBusinessPartner2,
+            SaasValues.siteNotInPoolResponse,
+            SaasValues.siteSharingErrorResponse,
+            SaasValues.sitePendingResponse,
         )
 
         val sitesPool = listOf(
@@ -116,6 +127,25 @@ internal class SiteControllerOutputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = sitesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = sitesSaas
                                 )
                             )
                         )
@@ -162,16 +192,18 @@ internal class SiteControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<SiteGateOutput>>()
+            .returnResult<PageOutputResponse<SiteGateOutput>>()
             .responseBody
             .blockFirst()!!
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
+            PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedSites,
-                invalidEntries = 0
+                invalidEntries = expectedPending.size + expectedErrors.size,
+                pending = expectedPending,
+                errors = expectedErrors,
             )
         )
     }
@@ -183,14 +215,14 @@ internal class SiteControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `get sites, filter by external ids`() {
-        val sitesSaas = listOf(
-            SaasValues.siteBusinessPartner1,
-            SaasValues.siteBusinessPartner2
-        )
-
         val expectedSites = listOf(
             ResponseValues.siteGateOutput1,
             ResponseValues.siteGateOutput2
+        )
+
+        val sitesSaas = listOf(
+            SaasValues.siteBusinessPartner1,
+            SaasValues.siteBusinessPartner2
         )
 
         val sitesPool = listOf(
@@ -220,6 +252,25 @@ internal class SiteControllerOutputIT @Autowired constructor(
                                     nextStartAfter = nextStartAfter,
                                     total = total,
                                     values = sitesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServerSaas.stubFor(
+            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = sitesSaas
                                 )
                             )
                         )
@@ -267,16 +318,18 @@ internal class SiteControllerOutputIT @Autowired constructor(
             .exchange()
             .expectStatus()
             .isOk
-            .returnResult<PageStartAfterResponse<SiteGateOutput>>()
+            .returnResult<PageOutputResponse<SiteGateOutput>>()
             .responseBody
             .blockFirst()!!
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
+            PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
                 content = expectedSites,
-                invalidEntries = 0
+                invalidEntries = 0,
+                pending = listOf(),
+                errors = listOf(),
             )
         )
     }

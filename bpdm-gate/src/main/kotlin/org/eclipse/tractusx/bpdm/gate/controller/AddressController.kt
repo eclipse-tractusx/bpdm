@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -118,7 +119,7 @@ class AddressController(
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageStartAfterResponse<AddressGateOutput> {
+    ): PageOutputResponse<AddressGateOutput> {
         return addressService.getAddressesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 

@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -114,7 +115,7 @@ class LegalEntityController(
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageStartAfterResponse<LegalEntityGateOutput> {
+    ): PageOutputResponse<LegalEntityGateOutput> {
         return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 

@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
@@ -113,7 +114,7 @@ class SiteController(
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageStartAfterResponse<SiteGateOutput> {
+    ): PageOutputResponse<SiteGateOutput> {
         return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 
