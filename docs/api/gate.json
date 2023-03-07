@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Gate",
     "description": "A gate for a member to share business partner data with CatenaX",
-    "version": "3.0.3"
+    "version": "3.1.0-SNAPSHOT"
   },
   "servers": [
     {
@@ -49,7 +49,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseSiteGateInput"
+                  "$ref": "#/components/schemas/PageStartAfterResponseSiteGateInputResponse"
                 }
               }
             }
@@ -72,7 +72,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/SiteGateInput"
+                  "$ref": "#/components/schemas/SiteGateInputRequest"
                 }
               }
             }
@@ -133,7 +133,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseLegalEntityGateInput"
+                  "$ref": "#/components/schemas/PageStartAfterResponseLegalEntityGateInputResponse"
                 }
               }
             }
@@ -156,7 +156,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/LegalEntityGateInput"
+                  "$ref": "#/components/schemas/LegalEntityGateInputRequest"
                 }
               }
             }
@@ -217,7 +217,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseAddressGateInput"
+                  "$ref": "#/components/schemas/PageStartAfterResponseAddressGateInputResponse"
                 }
               }
             }
@@ -240,7 +240,7 @@
               "schema": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/AddressGateInput"
+                  "$ref": "#/components/schemas/AddressGateInputRequest"
                 }
               }
             }
@@ -253,7 +253,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Unit"
                 }
               }
             }
@@ -313,7 +313,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseSiteGateOutput"
+                  "$ref": "#/components/schemas/PageOutputResponseSiteGateOutput"
                 }
               }
             }
@@ -373,7 +373,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseLegalEntityGateOutput"
+                  "$ref": "#/components/schemas/PageOutputResponseLegalEntityGateOutput"
                 }
               }
             }
@@ -433,7 +433,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/PageStartAfterResponseAddressGateOutput"
+                  "$ref": "#/components/schemas/PageOutputResponseAddressGateOutput"
                 }
               }
             }
@@ -456,7 +456,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SiteGateInput"
+                "$ref": "#/components/schemas/SiteGateInputRequest"
               }
             }
           },
@@ -491,7 +491,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LegalEntityGateInput"
+                "$ref": "#/components/schemas/LegalEntityGateInputRequest"
               }
             }
           },
@@ -526,7 +526,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddressGateInput"
+                "$ref": "#/components/schemas/AddressGateInputRequest"
               }
             }
           },
@@ -609,7 +609,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/SiteGateInput"
+                  "$ref": "#/components/schemas/SiteGateInputResponse"
                 }
               }
             }
@@ -645,7 +645,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/LegalEntityGateInput"
+                  "$ref": "#/components/schemas/LegalEntityGateInputResponse"
                 }
               }
             }
@@ -681,7 +681,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/AddressGateInput"
+                  "$ref": "#/components/schemas/AddressGateInputResponse"
                 }
               }
             }
@@ -1047,12 +1047,9 @@
         },
         "description": "Localized address record for a business partner"
       },
-      "AddressGateInput": {
+      "AddressGateInputRequest": {
         "type": "object",
         "properties": {
-          "bpn": {
-            "type": "string"
-          },
           "version": {
             "$ref": "#/components/schemas/AddressVersion"
           },
@@ -1407,6 +1404,377 @@
           },
           "siteExternalId": {
             "type": "string"
+          },
+          "bpn": {
+            "type": "string"
+          }
+        },
+        "description": "Address with legal entity or site references. Only one of either legal entity or site external id can be set for an address."
+      },
+      "AddressGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "$ref": "#/components/schemas/AddressVersion"
+          },
+          "careOf": {
+            "type": "string"
+          },
+          "contexts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": "string",
+            "enum": [
+              "UNDEFINED",
+              "AC",
+              "AD",
+              "AE",
+              "AF",
+              "AG",
+              "AI",
+              "AL",
+              "AM",
+              "AN",
+              "AO",
+              "AQ",
+              "AR",
+              "AS",
+              "AT",
+              "AU",
+              "AW",
+              "AX",
+              "AZ",
+              "BA",
+              "BB",
+              "BD",
+              "BE",
+              "BF",
+              "BG",
+              "BH",
+              "BI",
+              "BJ",
+              "BL",
+              "BM",
+              "BN",
+              "BO",
+              "BQ",
+              "BR",
+              "BS",
+              "BT",
+              "BU",
+              "BV",
+              "BW",
+              "BY",
+              "BZ",
+              "CA",
+              "CC",
+              "CD",
+              "CF",
+              "CG",
+              "CH",
+              "CI",
+              "CK",
+              "CL",
+              "CM",
+              "CN",
+              "CO",
+              "CP",
+              "CR",
+              "CS",
+              "CU",
+              "CV",
+              "CW",
+              "CX",
+              "CY",
+              "CZ",
+              "DE",
+              "DG",
+              "DJ",
+              "DK",
+              "DM",
+              "DO",
+              "DZ",
+              "EA",
+              "EC",
+              "EE",
+              "EG",
+              "EH",
+              "ER",
+              "ES",
+              "ET",
+              "EU",
+              "EZ",
+              "FI",
+              "FJ",
+              "FK",
+              "FM",
+              "FO",
+              "FR",
+              "FX",
+              "GA",
+              "GB",
+              "GD",
+              "GE",
+              "GF",
+              "GG",
+              "GH",
+              "GI",
+              "GL",
+              "GM",
+              "GN",
+              "GP",
+              "GQ",
+              "GR",
+              "GS",
+              "GT",
+              "GU",
+              "GW",
+              "GY",
+              "HK",
+              "HM",
+              "HN",
+              "HR",
+              "HT",
+              "HU",
+              "IC",
+              "ID",
+              "IE",
+              "IL",
+              "IM",
+              "IN",
+              "IO",
+              "IQ",
+              "IR",
+              "IS",
+              "IT",
+              "JE",
+              "JM",
+              "JO",
+              "JP",
+              "KE",
+              "KG",
+              "KH",
+              "KI",
+              "KM",
+              "KN",
+              "KP",
+              "KR",
+              "KW",
+              "KY",
+              "KZ",
+              "LA",
+              "LB",
+              "LC",
+              "LI",
+              "LK",
+              "LR",
+              "LS",
+              "LT",
+              "LU",
+              "LV",
+              "LY",
+              "MA",
+              "MC",
+              "MD",
+              "ME",
+              "MF",
+              "MG",
+              "MH",
+              "MK",
+              "ML",
+              "MM",
+              "MN",
+              "MO",
+              "MP",
+              "MQ",
+              "MR",
+              "MS",
+              "MT",
+              "MU",
+              "MV",
+              "MW",
+              "MX",
+              "MY",
+              "MZ",
+              "NA",
+              "NC",
+              "NE",
+              "NF",
+              "NG",
+              "NI",
+              "NL",
+              "NO",
+              "NP",
+              "NR",
+              "NT",
+              "NU",
+              "NZ",
+              "OM",
+              "PA",
+              "PE",
+              "PF",
+              "PG",
+              "PH",
+              "PK",
+              "PL",
+              "PM",
+              "PN",
+              "PR",
+              "PS",
+              "PT",
+              "PW",
+              "PY",
+              "QA",
+              "RE",
+              "RO",
+              "RS",
+              "RU",
+              "RW",
+              "SA",
+              "SB",
+              "SC",
+              "SD",
+              "SE",
+              "SF",
+              "SG",
+              "SH",
+              "SI",
+              "SJ",
+              "SK",
+              "SL",
+              "SM",
+              "SN",
+              "SO",
+              "SR",
+              "SS",
+              "ST",
+              "SU",
+              "SV",
+              "SX",
+              "SY",
+              "SZ",
+              "TA",
+              "TC",
+              "TD",
+              "TF",
+              "TG",
+              "TH",
+              "TJ",
+              "TK",
+              "TL",
+              "TM",
+              "TN",
+              "TO",
+              "TP",
+              "TR",
+              "TT",
+              "TV",
+              "TW",
+              "TZ",
+              "UA",
+              "UG",
+              "UK",
+              "UM",
+              "US",
+              "UY",
+              "UZ",
+              "VA",
+              "VC",
+              "VE",
+              "VG",
+              "VI",
+              "VN",
+              "VU",
+              "WF",
+              "WS",
+              "XI",
+              "XU",
+              "XK",
+              "YE",
+              "YT",
+              "YU",
+              "ZA",
+              "ZM",
+              "ZR",
+              "ZW"
+            ]
+          },
+          "administrativeAreas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdministrativeArea"
+            }
+          },
+          "postCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Postcode"
+            }
+          },
+          "localities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Locality"
+            }
+          },
+          "thoroughfares": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Thoroughfare"
+            }
+          },
+          "premises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Premise"
+            }
+          },
+          "postalDeliveryPoints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostalDeliveryPoint"
+            }
+          },
+          "geographicCoordinates": {
+            "$ref": "#/components/schemas/GeoCoordinates"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BRANCH_OFFICE",
+                "CARE_OF",
+                "HEADQUARTER",
+                "LEGAL_ALTERNATIVE",
+                "PO_BOX",
+                "REGISTERED",
+                "REGISTERED_AGENT_MAIL",
+                "REGISTERED_AGENT_PHYSICAL",
+                "VAT_REGISTERED",
+                "UNSPECIFIC"
+              ]
+            }
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "legalEntityExternalId": {
+            "type": "string"
+          },
+          "siteExternalId": {
+            "type": "string"
+          },
+          "bpn": {
+            "type": "string"
+          },
+          "processStartedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "description": "Address with legal entity or site references. Only one of either legal entity or site external id can be set for an address."
@@ -2192,6 +2560,28 @@
         },
         "description": "Classification record of a business partner"
       },
+      "ErrorInfoBusinessPartnerOutputError": {
+        "title": "ErrorInfo",
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "string",
+            "description": "BusinessPartnerOutputError",
+            "enum": [
+              "SharingProcessError",
+              "SharingTimeout",
+              "BpnNotInPool"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "entityKey": {
+            "type": "string"
+          }
+        },
+        "description": "Holds information about failures"
+      },
       "GeoCoordinates": {
         "type": "object",
         "properties": {
@@ -2246,15 +2636,9 @@
         },
         "description": "Identifier record of a business partner"
       },
-      "LegalEntityGateInput": {
+      "LegalEntityGateInputRequest": {
         "type": "object",
         "properties": {
-          "externalId": {
-            "type": "string"
-          },
-          "bpn": {
-            "type": "string"
-          },
           "identifiers": {
             "type": "array",
             "items": {
@@ -2300,6 +2684,74 @@
           },
           "legalAddress": {
             "$ref": "#/components/schemas/Address"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "bpn": {
+            "type": "string"
+          }
+        },
+        "description": "Legal entity with external id"
+      },
+      "LegalEntityGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "identifiers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Identifier"
+            }
+          },
+          "names": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Name"
+            }
+          },
+          "legalForm": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BusinessStatus"
+          },
+          "profileClassifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Classification"
+            }
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BRAND",
+                "LEGAL_ENTITY",
+                "ORGANIZATIONAL_UNIT",
+                "SITE",
+                "UNKNOWN"
+              ]
+            }
+          },
+          "bankAccounts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankAccount"
+            }
+          },
+          "legalAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "bpn": {
+            "type": "string"
+          },
+          "processStartedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "description": "Legal entity with external id"
@@ -2681,30 +3133,7 @@
         },
         "description": "General type with name and URL link for further information"
       },
-      "PageStartAfterResponseAddressGateInput": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "nextStartAfter": {
-            "type": "string"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AddressGateInput"
-            }
-          },
-          "invalidEntries": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageStartAfterResponseAddressGateOutput": {
+      "PageOutputResponseAddressGateOutput": {
         "type": "object",
         "properties": {
           "total": {
@@ -2723,34 +3152,23 @@
           "invalidEntries": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageStartAfterResponseLegalEntityGateInput": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
           },
-          "nextStartAfter": {
-            "type": "string"
-          },
-          "content": {
+          "pending": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LegalEntityGateInput"
+              "type": "string"
             }
           },
-          "invalidEntries": {
-            "type": "integer",
-            "format": "int32"
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorInfoBusinessPartnerOutputError"
+            }
           }
         },
         "description": "Paginated collection of results"
       },
-      "PageStartAfterResponseLegalEntityGateOutput": {
+      "PageOutputResponseLegalEntityGateOutput": {
         "type": "object",
         "properties": {
           "total": {
@@ -2769,34 +3187,23 @@
           "invalidEntries": {
             "type": "integer",
             "format": "int32"
-          }
-        },
-        "description": "Paginated collection of results"
-      },
-      "PageStartAfterResponseSiteGateInput": {
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int32"
           },
-          "nextStartAfter": {
-            "type": "string"
-          },
-          "content": {
+          "pending": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SiteGateInput"
+              "type": "string"
             }
           },
-          "invalidEntries": {
-            "type": "integer",
-            "format": "int32"
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorInfoBusinessPartnerOutputError"
+            }
           }
         },
         "description": "Paginated collection of results"
       },
-      "PageStartAfterResponseSiteGateOutput": {
+      "PageOutputResponseSiteGateOutput": {
         "type": "object",
         "properties": {
           "total": {
@@ -2810,6 +3217,87 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SiteGateOutput"
+            }
+          },
+          "invalidEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pending": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ErrorInfoBusinessPartnerOutputError"
+            }
+          }
+        },
+        "description": "Paginated collection of results"
+      },
+      "PageStartAfterResponseAddressGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nextStartAfter": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressGateInputResponse"
+            }
+          },
+          "invalidEntries": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Paginated collection of results"
+      },
+      "PageStartAfterResponseLegalEntityGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nextStartAfter": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LegalEntityGateInputResponse"
+            }
+          },
+          "invalidEntries": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Paginated collection of results"
+      },
+      "PageStartAfterResponseSiteGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nextStartAfter": {
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SiteGateInputResponse"
             }
           },
           "invalidEntries": {
@@ -2971,12 +3459,9 @@
         },
         "description": "Directed relation between two business partners"
       },
-      "SiteGateInput": {
+      "SiteGateInputRequest": {
         "type": "object",
         "properties": {
-          "bpn": {
-            "type": "string"
-          },
           "name": {
             "type": "string"
           },
@@ -2988,9 +3473,37 @@
           },
           "legalEntityExternalId": {
             "type": "string"
+          },
+          "bpn": {
+            "type": "string"
           }
         },
-        "description": " Site with legal entity reference ."
+        "description": "Site with legal entity reference"
+      },
+      "SiteGateInputResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "mainAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "legalEntityExternalId": {
+            "type": "string"
+          },
+          "bpn": {
+            "type": "string"
+          },
+          "processStartedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "description": "Site with legal entity reference"
       },
       "SiteGateOutput": {
         "type": "object",
@@ -4102,6 +4615,9 @@
             ]
           }
         }
+      },
+      "Unit": {
+        "type": "object"
       },
       "ValidationResponse": {
         "type": "object",
