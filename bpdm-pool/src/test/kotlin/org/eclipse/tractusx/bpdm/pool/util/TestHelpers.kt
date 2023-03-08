@@ -26,28 +26,21 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
-
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
-
-import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
-import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
-
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
 import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.junit.Assert
 import org.junit.jupiter.api.assertThrows
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
-import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
@@ -61,7 +54,7 @@ class TestHelpers(
     private val objectMapper: ObjectMapper,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val poolClient: PoolClientServiceConfig
+    private val poolClient: PoolClient
 ) {
 
     val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)
@@ -70,6 +63,7 @@ class TestHelpers(
 
 
     val em: EntityManager = entityManagerFactory.createEntityManager()
+
 
 
     fun truncateDbTables() {
@@ -103,13 +97,12 @@ class TestHelpers(
         partnerStructures: List<LegalEntityStructureRequest>
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = poolClient.getPoolClientLegalEntity().createBusinessPartners(partnerStructures.map { it.legalEntity });
+        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity });
         val indexedLegalEntities = legalEntities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = poolClient.getPoolClientSite().createSite(assignedSiteRequests);
-
+        val sites = poolClient.sites().createSite(assignedSiteRequests);
         val indexedSites = sites.associateBy { it.index }
 
         val assignedSitelessAddresses =
@@ -117,7 +110,7 @@ class TestHelpers(
         val assignedSiteAddresses =
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
-        val addresses = poolClient.getPoolClientAddress().createAddresses(assignedSitelessAddresses + assignedSiteAddresses)
+        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses)
 
         val indexedAddresses = addresses.associateBy { it.index }
 
@@ -136,7 +129,7 @@ class TestHelpers(
     }
     fun `get address by bpn-a, not found`(bpn:String ){
         try {
-            val result = poolClient.getPoolClientAddress().getAddress(bpn)
+            val result = poolClient.addresses().getAddress(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -145,7 +138,8 @@ class TestHelpers(
 
     fun `find bpns by identifiers, bpn request limit exceeded`( identifiersSearchRequest: IdentifiersSearchRequest){
         try {
-            val result = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest)
+            val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
+           
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
@@ -154,7 +148,7 @@ class TestHelpers(
 
     fun `find bpns by nonexistent identifier type`( identifiersSearchRequest: IdentifiersSearchRequest){
         try {
-            val result = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest)
+            val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -163,7 +157,7 @@ class TestHelpers(
 
     fun `set business partner currentness using nonexistent bpn`(bpn:String ){
         try {
-            val result =  poolClient.getPoolClientLegalEntity().setLegalEntityCurrentness(bpn)
+            val result =  poolClient.legalEntities().setLegalEntityCurrentness(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -172,7 +166,7 @@ class TestHelpers(
 
     fun `get site by bpn-s, not found`(bpn:String ){
         try {
-            val result =   poolClient.getPoolClientSite().getSite(bpn)
+            val result =   poolClient.sites().getSite(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -185,21 +179,22 @@ class TestHelpers(
      */
     fun createTestMetadata() {
 
-        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm1)
-        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm2)
-        poolClient.getPoolClientMetadata().createLegalForm(RequestValues.legalForm3)
+        poolClient.metadata().createLegalForm(RequestValues.legalForm1)
+        poolClient.metadata()
+        poolClient.metadata().createLegalForm(RequestValues.legalForm2)
+        poolClient.metadata().createLegalForm(RequestValues.legalForm3)
 
-        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType1)
-        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType2)
-        poolClient.getPoolClientMetadata().createIdentifierType( RequestValues.identifierType3)
+        poolClient.metadata().createIdentifierType( RequestValues.identifierType1)
+        poolClient.metadata().createIdentifierType( RequestValues.identifierType2)
+        poolClient.metadata().createIdentifierType( RequestValues.identifierType3)
 
-        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody1)
-        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody2)
-        poolClient.getPoolClientMetadata().createIssuingBody(RequestValues.issuingBody3)
+        poolClient.metadata().createIssuingBody(RequestValues.issuingBody1)
+        poolClient.metadata().createIssuingBody(RequestValues.issuingBody2)
+        poolClient.metadata().createIssuingBody(RequestValues.issuingBody3)
 
-        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus1)
-        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus2)
-        poolClient.getPoolClientMetadata().createIdentifierStatus(RequestValues.identifierStatus3)
+        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus1)
+        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus2)
+        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus3)
 
 
     }
@@ -215,7 +210,7 @@ class TestHelpers(
 
     private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
 
-        //poolClient.getPoolClientOpenSearch().export()
+        //poolClient.opensearch().export()
         client.invokePostEndpointWithoutResponse(syncPath)
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
@@ -224,7 +219,7 @@ class TestHelpers(
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
             syncResponse = client.invokeGetEndpoint(syncPath)
-           // syncResponse = poolClient.getPoolClientOpenSearch().getBusinessPartners()
+           // syncResponse = poolClient.opensearch().getBusinessPartners()
 
             if (syncResponse.status == status)
                 break
@@ -259,7 +254,7 @@ class TestHelpers(
 
         startSyncAndAwaitSuccess(client, EndpointValues.SAAS_SYNCH_PATH)
 
-        return poolClient.getPoolClientLegalEntity().getLegalEntities(
+        return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest, AddressPropertiesSearchRequest.EmptySearchRequest,
             SitePropertiesSearchRequest.EmptySearchRequest, PaginationRequest()
         )

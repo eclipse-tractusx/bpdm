@@ -17,30 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.client.dto.request
+package org.eclipse.tractusx.bpdm.pool.client.client
 
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.PositiveOrZero
+import org.eclipse.tractusx.bpdm.pool.client.service.*
 
+interface PoolClient {
 
-@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
-data class PaginationRequest (
-    @field:Parameter(
-        description = "Number of page to get results from", schema =
-        Schema(defaultValue = "0"))
-    @field:PositiveOrZero
-    val page: Int=0,
-    @field:Parameter(description = "Size of each page", schema =
-    Schema(defaultValue = "10"))
-    @field:Min(0)
-    @field:Max(100)
-    val size: Int=10
-)
-{
-    constructor(jsonString: String) : this() {
-        println(jsonString)
-    }
+    fun addresses(): PoolClientAddressInterface
+
+    fun bpns(): PoolClientBpnInterface
+
+    fun businessPartners(): PoolClientBusinessPartnerInterface
+
+    fun legalEntities(): PoolClientLegalEntityInterface
+
+    fun metadata(): PoolClientMetadataInterface
+
+    fun sites(): PoolClientSiteInterface
+
+    fun suggestions(): PoolClientSuggestionInterface
+
+    fun opensearch(): PoolClientOpenSearchInterface
+
+    fun saas(): PoolClientSaasInterface
 }

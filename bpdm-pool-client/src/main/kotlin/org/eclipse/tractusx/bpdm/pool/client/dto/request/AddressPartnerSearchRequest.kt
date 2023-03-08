@@ -19,15 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.client.dto.request
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.io.IOException
 
 
 @Schema(name = "AddressPartnerSearchRequest", description = "Contains keywords used for searching in address properties")
@@ -51,13 +45,5 @@ data class AddressPartnerSearchRequest constructor(
         val EmptySearchRequest = AddressPartnerSearchRequest()
     }
 
-//    constructor(jsonString: String) : this() {
-//        try {
-//            val obj = jacksonObjectMapper().readValue<AddressPartnerSearchRequest>(jsonString)
-//        } catch (e: IOException) {
-//            // Handle the exception as appropriate for your use case
-//            e.printStackTrace()
-//        }
-//    }
 
 }

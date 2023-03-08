@@ -23,7 +23,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
@@ -47,7 +47,7 @@ import org.springframework.test.context.DynamicPropertySource
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientServiceConfig
+    val poolClient: PoolClient
 ) {
     companion object {
         @RegisterExtension
@@ -89,7 +89,7 @@ class BpnControllerIT @Autowired constructor(
     fun `find bpns by identifiers, all found`() {
         val identifiersSearchRequest = IdentifiersSearchRequest(identifierType, listOf(identifierValue1, identifierValue2))
 
-        val bpnIdentifierMappings = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest).body
+        val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1, identifierValue2)
     }
@@ -105,7 +105,7 @@ class BpnControllerIT @Autowired constructor(
             IdentifiersSearchRequest(identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
 
 
-        val bpnIdentifierMappings = poolClient.getPoolClientBpn().findBpnsByIdentifiers(identifiersSearchRequest).body
+        val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1)
     }

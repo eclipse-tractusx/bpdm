@@ -19,35 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.config
 
-import jakarta.annotation.PostConstruct
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
+import org.eclipse.tractusx.bpdm.pool.client.client.SimplePoolClient
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.env.Environment
-import org.springframework.stereotype.Component
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClient
 
 
 @Configuration
 class PoolClientConfig {
-
-
     @Bean
-    fun poolClient(): PoolClientServiceConfig? {
-        return PoolClientServiceConfig(WebClient.create())
+    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolClient {
+        return SimplePoolClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
     }
-
-    @Autowired
-    lateinit var webServerAppCtxt: ServletWebServerApplicationContext
-
-    @PostConstruct
-    fun poolClientConstruct() {
-        PoolClientServiceConfig(WebClient.create())
-    }
-
-
 }

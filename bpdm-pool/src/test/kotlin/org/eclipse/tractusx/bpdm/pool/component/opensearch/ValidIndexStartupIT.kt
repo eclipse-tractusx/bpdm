@@ -24,8 +24,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -49,7 +52,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ValidIndexStartupIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val testHelpers: TestHelpers
+    val testHelpers: TestHelpers,
+    val poolClient: PoolClient
 ) {
 
     companion object {
@@ -75,7 +79,8 @@ class ValidIndexStartupIT @Autowired constructor(
     fun setupIndexForNextTest() {
         testHelpers.truncateDbTables()
         //Clear and set up a fresh valid OpenSearch context
-        webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
+        // webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
+        poolClient.opensearch().clear()
 
         //Import values to DB
         val partnersToImport = listOf(SaasValues.legalEntity1, SaasValues.legalEntity2, SaasValues.legalEntity3)
@@ -83,7 +88,12 @@ class ValidIndexStartupIT @Autowired constructor(
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
+        val searchResult = poolClient.legalEntities().getLegalEntities(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest,
+            PaginationRequest()
+        )
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)
     }
@@ -96,8 +106,13 @@ class ValidIndexStartupIT @Autowired constructor(
     @Test
     @Order(1)
     fun acceptValidIndexOnStartup() {
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
 
+        val searchResult = poolClient.legalEntities().getLegalEntities(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest,
+            PaginationRequest()
+        )
         Assertions.assertThat(searchResult.content).isNotEmpty
         Assertions.assertThat(searchResult.contentSize).isEqualTo(3)
     }

@@ -19,19 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import io.mockk.InternalPlatformDsl.toArray
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
-
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
-
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,7 +49,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientServiceConfig
+    val poolClient: PoolClient
 ) {
 
     private val partnerStructure1 = LegalEntityStructureRequest(
@@ -76,7 +73,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
         //webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
-        poolClient.getPoolClientOpenSearch().clear()
+        poolClient.opensearch().clear()
         testHelpers.createTestMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
@@ -167,7 +164,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val page = page?.toInt() ?: 0
         val size = size?.toInt() ?: 10
 
-        return poolClient.getPoolClientLegalEntity().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+        return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest,PaginationRequest(page,size))
 
 

@@ -22,13 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -37,14 +34,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClientServiceConfig
+    val poolClient: PoolClient
 ) {
     @BeforeEach
     fun beforeEach() {
@@ -106,7 +102,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL = createdStructures[0].legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = poolClient.getPoolClientSite().searchSites(siteSearchRequest, PaginationRequest())
+        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
         val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
 
@@ -141,7 +137,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
-        val searchResult = poolClient.getPoolClientSite().searchSites(siteSearchRequest, PaginationRequest())
+        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)
         val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL1)
         val expectedSiteWithReference3 = SitePartnerSearchResponse(ResponseValues.site3, bpnL2)
@@ -159,7 +155,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `create new sites`() {
 
-        val givenLegalEntities = poolClient.getPoolClientLegalEntity().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -172,7 +168,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate3.copy(legalEntity = bpnL2)
         )
 
-        val response = poolClient.getPoolClientSite().createSite(toCreate)
+        val response = poolClient.sites().createSite(toCreate)
         assertThatCreatedSitesEqual(response, expected)
     }
 
@@ -185,7 +181,7 @@ class SiteControllerIT @Autowired constructor(
     fun `don't create sites with non-existing parent`() {
 
 
-        val givenLegalEntities = poolClient.getPoolClientLegalEntity().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -198,7 +194,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
-        val response = poolClient.getPoolClientSite().createSite(toCreate)
+        val response = poolClient.sites().createSite(toCreate)
         assertThatCreatedSitesEqual(response, expected)
     }
 
@@ -238,7 +234,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate3.copy(bpn = bpnS2)
         )
 
-        val response = poolClient.getPoolClientSite().updateSite(toUpdate);
+        val response = poolClient.sites().updateSite(toUpdate);
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -271,7 +267,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
-        val response = poolClient.getPoolClientSite().updateSite(toUpdate)
+        val response = poolClient.sites().updateSite(toUpdate)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -299,7 +295,7 @@ class SiteControllerIT @Autowired constructor(
 
         val toSearch = expected.map { it.site }
 
-        val response = poolClient.getPoolClientSite().searchMainAddresses(toSearch)
+        val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -327,7 +323,7 @@ class SiteControllerIT @Autowired constructor(
 
         val toSearch = expected.map { it.site }.plus("NON-EXISTENT")
 
-        val response = poolClient.getPoolClientSite().searchMainAddresses(toSearch)
+        val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -337,9 +333,9 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(actuals).ignoringFields(SitePartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
-    private fun requestSite(bpnSite: String) = poolClient.getPoolClientSite().getSite(bpnSite)
+    private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
 
 
-    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.getPoolClientLegalEntity().getSites(bpn,PaginationRequest());
+    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn,PaginationRequest());
 
 }

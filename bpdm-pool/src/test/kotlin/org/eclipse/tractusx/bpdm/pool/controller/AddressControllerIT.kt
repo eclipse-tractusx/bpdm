@@ -26,11 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchReque
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.config.PoolClientServiceConfig
-
+import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.config.PoolClientConfig
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,15 +41,14 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.client.WebClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class, PoolClientConfig::class])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
-    val poolClient: PoolClientServiceConfig
+    val poolClient: PoolClient
 ) {
     companion object {
         @RegisterExtension
@@ -65,6 +62,8 @@ class AddressControllerIT @Autowired constructor(
             registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
         }
     }
+
+
 
     @BeforeEach
     fun beforeEach() {
@@ -94,7 +93,7 @@ class AddressControllerIT @Autowired constructor(
         importedPartner.bpn
             .let { bpn -> requestAddressesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnAddress -> requestAddress(bpnAddress) }
-            .let { addressResponse ->
+            ?.let { addressResponse ->
                 assertThat(addressResponse.bpnLegalEntity).isEqualTo(importedPartner.bpn)
             }
     }
@@ -146,7 +145,7 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
         val searchResult =
-            poolClient.getPoolClientAddress().searchAddresses(searchRequest, PaginationRequest())
+            poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
 
 
 
@@ -192,7 +191,7 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerBpnSearchRequest(listOf(bpnL1, bpnL2), emptyList())
 
-        val searchResult = poolClient.getPoolClientAddress().searchAddresses(searchRequest,PaginationRequest())
+        val searchResult = poolClient.addresses().searchAddresses(searchRequest,PaginationRequest())
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
         val expectedAddress1 = ResponseValues.addressPartner1
@@ -245,7 +244,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnS2 = createdStructures[1].siteStructures[0].site.bpn
 
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = poolClient.getPoolClientAddress().searchAddresses(searchRequest,PaginationRequest())
+        val searchResult = poolClient.addresses().searchAddresses(searchRequest,PaginationRequest())
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
         val expectedAddressWithReferences1 = AddressPartnerSearchResponse(ResponseValues.addressPartner1, null, bpnS1)
@@ -267,6 +266,7 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `create new addresses`() {
+
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
@@ -291,7 +291,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate3.copy(parent = bpnS)
         )
 
-        val response = poolClient.getPoolClientAddress().createAddresses(toCreate)
+        val response = poolClient.addresses().createAddresses(toCreate)
 
 
         response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
@@ -306,7 +306,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `don't create addresses with non-existent parent`() {
 
-        val bpnL = poolClient.getPoolClientLegalEntity().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).single().bpn
+        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).single().bpn
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,
@@ -318,7 +318,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
         )
 
-        val response = poolClient.getPoolClientAddress().createAddresses(toCreate)
+        val response = poolClient.addresses().createAddresses(toCreate)
         response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
         testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
@@ -364,7 +364,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate3.copy(bpn = bpnA1)
         )
 
-        val response = poolClient.getPoolClientAddress().updateAddresses(toUpdate)
+        val response = poolClient.addresses().updateAddresses(toUpdate)
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
@@ -403,17 +403,17 @@ class AddressControllerIT @Autowired constructor(
         )
 
 
-        val response = poolClient.getPoolClientAddress().updateAddresses(toUpdate);
+        val response = poolClient.addresses().updateAddresses(toUpdate);
 
 
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
 
-    private fun requestAddress(bpnAddress: String) = poolClient.getPoolClientAddress().getAddress(bpnAddress)
+    private fun requestAddress(bpnAddress: String) = poolClient.addresses().getAddress(bpnAddress).body
 
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
-        poolClient.getPoolClientLegalEntity().getAddresses(bpn,PaginationRequest())
+        poolClient.legalEntities().getAddresses(bpn,PaginationRequest())
 
 }
