@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [4.1.0] - tbd
+## [4.1.0] - 2023-03-08
 
 ### Changed
 
-- increase to app version 3.1.0.alpha.1
+- increase to app version 3.1.0
 
 ## [4.0.6] - 2023-02-24
 
