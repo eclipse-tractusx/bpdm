@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [3.1.0] - tbd
+## [3.1.0] - 2023-03-08
 
 ### Changed
 
@@ -16,7 +16,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - BPDM Gate: For a business partner with a child relation, this relation could be returned as parent relation erroneously. 
 - BPDM Gate: When a business partner with a child relation was updated, this relation was erroneously deleted, rendering the previous child invalid.
 
-## [3.0.3] - 2022-02-23
+## [3.0.3] - 2023-02-23
 
 ### Security
 
@@ -26,7 +26,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 - Replaced manual JSON deserializer implementations for various DTOs by generic DataClassUnwrappedJsonDeserializer.
 
-## [3.0.2] - 2022-02-15
+## [3.0.2] - 2023-02-15
 
 ### Changed
 
@@ -40,7 +40,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - BPDM Pool: Now possible to deep paginate over business partners (>10000 entries)
 - Fixed various vulnerabilities by upgrading affected libraries
 
-## [3.0.1] - 2022-01-24
+## [3.0.1] - 2023-01-24
 
 ### Security
 

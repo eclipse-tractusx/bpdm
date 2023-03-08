@@ -20,14 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.controller
 
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientOpenSearchInterface
-import org.springframework.web.bind.annotation.*
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OpenSearchController(
