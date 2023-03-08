@@ -514,14 +514,6 @@ object SaasValues {
         type = relationType
     )
 
-    val siteBusinessPartnerWithRelations1 = siteBusinessPartner1.copy(
-        relations = listOf(relationSite1ToLegalEntity)
-    )
-
-    val siteBusinessPartnerWithRelations2 = siteBusinessPartner2.copy(
-        relations = listOf(relationSite2ToLegalEntity)
-    )
-
     val addressBusinessPartner1 = BusinessPartnerSaas(
         externalId = CommonValues.externalIdAddress1,
         names = legalEntityRequest1.names,
@@ -653,5 +645,13 @@ object SaasValues {
         metadata = BusinessPartnerMetadataSaas(
             sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_BY_REVIEW, "OK")
         ),
+    )
+
+    val siteBusinessPartnerWithRelations1 = siteBusinessPartner1.copy(
+        relations = listOf(relationAddress2ToSite, relationSite1ToLegalEntity)      // relations to both child and parent
+    )
+
+    val siteBusinessPartnerWithRelations2 = siteBusinessPartner2.copy(
+        relations = listOf(relationSite2ToLegalEntity)
     )
 }

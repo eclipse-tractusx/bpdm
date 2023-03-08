@@ -171,9 +171,9 @@ class SiteService(
         val sitesSaas = toSaasModels(sites)
         saasClient.upsertSites(sitesSaas)
 
-        deleteRelationsOfSites(sites)
+        deleteParentRelationsOfSites(sites)
 
-        upsertRelations(sites)
+        upsertParentRelations(sites)
     }
 
     /**
@@ -184,7 +184,7 @@ class SiteService(
         return sites.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
     }
 
-    private fun upsertRelations(sites: Collection<SiteGateInputRequest>) {
+    private fun upsertParentRelations(sites: Collection<SiteGateInputRequest>) {
         val relations = sites.map {
             SaasClient.SiteLegalEntityRelation(
                 siteExternalId = it.externalId,
@@ -194,12 +194,9 @@ class SiteService(
         saasClient.upsertSiteRelations(relations)
     }
 
-    private fun deleteRelationsOfSites(sites: Collection<SiteGateInputRequest>) {
+    private fun deleteParentRelationsOfSites(sites: Collection<SiteGateInputRequest>) {
         val sitesPage = saasClient.getSites(externalIds = sites.map { it.externalId })
-        val relationsToDelete = sitesPage.values.flatMap { it.relations }.map { SaasMappings.toRelationToDelete(it) }
-        if (relationsToDelete.isNotEmpty()) {
-            saasClient.deleteRelations(relationsToDelete)
-        }
+        saasClient.deleteParentRelations(sitesPage.values)
     }
 
     private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInputResponse {
@@ -243,7 +240,7 @@ class SiteService(
     }
 
     private fun validateLegalEntityParents(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
-        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner.relations).size
+        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner).size
         if (numLegalEntityParents > 1) {
             logger.warn { "$logMessageStart has multiple parent legal entities." }
         }

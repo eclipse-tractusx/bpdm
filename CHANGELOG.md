@@ -11,6 +11,11 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - BPDM Gate: Endpoints returning input versions of legal entity, site and address now provide processStartedAt timestamp.
 - BPDM Gate: Endpoints for output versions of legal entity, site and address now return error infos and pending entries
 
+### Fixed
+
+- BPDM Gate: For a business partner with a child relation, this relation could be returned as parent relation erroneously. 
+- BPDM Gate: When a business partner with a child relation was updated, this relation was erroneously deleted, rendering the previous child invalid.
+
 ## [3.0.3] - 2022-02-23
 
 ### Security
