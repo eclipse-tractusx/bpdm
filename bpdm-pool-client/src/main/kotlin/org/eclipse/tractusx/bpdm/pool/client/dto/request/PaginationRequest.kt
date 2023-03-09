@@ -25,7 +25,6 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.PositiveOrZero
 
-
 @Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
 data class PaginationRequest (
     @field:Parameter(
@@ -39,8 +38,3 @@ data class PaginationRequest (
     @field:Max(100)
     val size: Int=10
 )
-{
-    constructor(jsonString: String) : this() {
-        println(jsonString)
-    }
-}

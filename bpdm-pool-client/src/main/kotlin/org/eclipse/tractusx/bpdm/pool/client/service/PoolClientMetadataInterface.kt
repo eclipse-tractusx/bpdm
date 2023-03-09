@@ -79,7 +79,7 @@ interface PoolClientMetadataInterface {
     )
     @GetMapping("/identifier-types")
     @GetExchange("/identifier-types")
-    fun getIdentifierTypes(@RequestPart paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
+    fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
 
     @Operation(
         summary = "Get valid identifier types for a country",
@@ -119,7 +119,7 @@ interface PoolClientMetadataInterface {
     ])
     @GetMapping("/identifier-status")
     @GetExchange("/identifier-status")
-    fun getIdentifierStati(@RequestPart paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
+    fun getIdentifierStati(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
     @Operation(
         summary = "Create new issuing body",
         description = "Create a new issuing body which can be referenced by business partner records. " +
@@ -147,7 +147,7 @@ interface PoolClientMetadataInterface {
     )
     @GetMapping("/issuing-bodies")
     @GetExchange("/issuing-bodies")
-    fun getIssuingBodies(@RequestPart paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
+    fun getIssuingBodies(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
 
     @Operation(
         summary = "Create new legal form",
@@ -176,5 +176,5 @@ interface PoolClientMetadataInterface {
     )
     @GetMapping("/legal-forms")
     @GetExchange("/legal-forms")
-    fun getLegalForms(@RequestPart paginationRequest: PaginationRequest): PageResponse<LegalFormResponse>
+    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageResponse<LegalFormResponse>
 }

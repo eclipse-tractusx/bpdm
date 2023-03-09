@@ -70,8 +70,6 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         testHelpers.createTestMetadata()
     }
-    @Autowired
-    lateinit var webServerAppCtxt: ServletWebServerApplicationContext
 
     /**
      * Given partners in db
@@ -410,7 +408,7 @@ class AddressControllerIT @Autowired constructor(
     }
 
 
-    private fun requestAddress(bpnAddress: String) = poolClient.addresses().getAddress(bpnAddress).body
+    private fun requestAddress(bpnAddress: String) = poolClient.addresses().getAddress(bpnAddress)
 
 
     private fun requestAddressesOfLegalEntity(bpn: String) =

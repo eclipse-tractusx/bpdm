@@ -61,10 +61,10 @@ class BusinessPartnerLegacyController(
     )
     @GetMapping
     fun searchBusinessPartners(
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart paginationRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerMatchResponse> {
         return searchService.searchBusinessPartners(
             BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),

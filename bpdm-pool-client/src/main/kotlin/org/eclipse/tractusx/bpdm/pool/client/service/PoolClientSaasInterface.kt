@@ -103,5 +103,5 @@ interface PoolClientSaasInterface  {
     )
     @GetMapping("/identifier-mappings")
     @GetExchange("/identifier-mappings")
-    fun getImportEntries(@RequestPart paginationRequest: PaginationRequest): PageResponse<ImportIdEntry>
+    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageResponse<ImportIdEntry>
 }

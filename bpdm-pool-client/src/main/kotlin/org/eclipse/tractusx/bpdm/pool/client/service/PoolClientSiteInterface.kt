@@ -93,8 +93,8 @@ interface PoolClientSiteInterface  {
     @PostMapping("/search")
     @PostExchange("/search")
     fun searchSites(
-        @RequestPart siteSearchRequest: SiteBpnSearchRequest,
-        @RequestPart paginationRequest: PaginationRequest
+        @RequestBody siteSearchRequest: SiteBpnSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerSearchResponse>
 
     @Operation(

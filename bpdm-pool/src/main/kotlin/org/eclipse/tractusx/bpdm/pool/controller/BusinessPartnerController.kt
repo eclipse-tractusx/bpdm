@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientBusinessPartnerInterface
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.RestController
 
 @RestController

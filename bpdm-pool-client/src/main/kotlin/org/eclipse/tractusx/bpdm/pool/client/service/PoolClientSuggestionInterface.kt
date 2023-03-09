@@ -22,16 +22,15 @@ package org.eclipse.tractusx.bpdm.pool.client.service
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.client.dto.response.SuggestionResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 
@@ -50,10 +49,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("legal-entities/names")
     fun getNameSuggestion(
         @Parameter(description = "Show names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -67,10 +66,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("legal-entities/legal-forms")
     fun getLegalFormSuggestion(
         @Parameter(description = "Show legal form names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -84,10 +83,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("sites/names")
     fun getSiteSuggestion(
         @Parameter(description = "Show site names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -101,10 +100,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("legal-entities/statuses")
     fun getStatusSuggestion(
         @Parameter(description = "Show business status denotations best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -118,10 +117,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("legal-entities/classifications")
     fun getClassificationSuggestion(
         @Parameter(description = "Show business partner classifications best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
     @Operation(
         summary = "Find best matches for given text in administrative areas",
@@ -134,10 +133,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/administrative-areas")
     fun getAdminAreaSuggestion(
         @Parameter(description = "Show administrative area names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -151,10 +150,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/postcodes")
     fun getPostcodeSuggestion(
         @Parameter(description = "Show postcodes best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -168,10 +167,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/localities")
     fun getLocalitySuggestion(
         @Parameter(description = "Show locality names this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -185,10 +184,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/thoroughfares")
     fun getThoroughfareSuggestion(
         @Parameter(description = "Show thoroughfare names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -202,10 +201,10 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/premises")
     fun getPremiseSuggestion(
         @Parameter(description = "Show premise names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 
     @Operation(
@@ -219,9 +218,9 @@ interface PoolClientSuggestionInterface {
     @GetExchange("/addresses/postal-delivery-points")
     fun getPostalDeliverPointSuggestion(
         @Parameter(description = "Show postal delivery point names best matching this text") text: String?,
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart pageRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
 }

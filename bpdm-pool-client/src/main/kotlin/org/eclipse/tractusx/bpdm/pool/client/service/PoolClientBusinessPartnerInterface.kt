@@ -53,6 +53,6 @@ interface PoolClientBusinessPartnerInterface  {
     @GetExchange("/{bpn}/changelog")
     fun getChangelogEntries(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
-        @RequestPart paginationRequest: PaginationRequest
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse>
 }

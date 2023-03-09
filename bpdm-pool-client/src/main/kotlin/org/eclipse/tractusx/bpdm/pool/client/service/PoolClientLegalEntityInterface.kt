@@ -59,10 +59,10 @@ interface PoolClientLegalEntityInterface {
     @GetMapping
     @GetExchange
     fun getLegalEntities(
-        @RequestPart bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @RequestPart addressSearchRequest: AddressPropertiesSearchRequest,
-        @RequestPart siteSearchRequest: SitePropertiesSearchRequest,
-        @RequestPart paginationRequest: PaginationRequest
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
+        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse>
 
     @Operation(
@@ -89,8 +89,7 @@ interface PoolClientLegalEntityInterface {
     fun getLegalEntity(
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
-        @RequestParam
-        idType: String? = "BPN"
+        @RequestParam idType: String? = "BPN"
     ): LegalEntityPartnerResponse
 
     @Operation(
@@ -148,7 +147,7 @@ interface PoolClientLegalEntityInterface {
     @GetExchange("/{bpn}/sites")
     fun getSites(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
-        @RequestPart paginationRequest: PaginationRequest
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SitePartnerResponse>
 
     @Operation(
@@ -166,7 +165,7 @@ interface PoolClientLegalEntityInterface {
     @GetExchange("/{bpn}/addresses")
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
-        @RequestPart paginationRequest: PaginationRequest
+        @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerResponse>
 
     @Operation(

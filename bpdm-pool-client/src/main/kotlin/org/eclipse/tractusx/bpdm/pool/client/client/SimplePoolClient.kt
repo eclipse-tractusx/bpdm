@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.client.client
 
+import org.eclipse.tractusx.bpdm.pool.client.config.ParameterObjectArgumentResolver
 import org.eclipse.tractusx.bpdm.pool.client.service.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
@@ -32,7 +33,9 @@ class SimplePoolClient(
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
         HttpServiceProxyFactory
             .builder(WebClientAdapter.forClient(webClientProvider()))
+            .customArgumentResolver(ParameterObjectArgumentResolver())
             .build()
+
     }
 
 
