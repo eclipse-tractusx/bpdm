@@ -23,7 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
-
+// TODO rename to LogisticAddressSearchRequest / adjust
 @Schema(name = "AddressPartnerSearchRequest", description = "Contains keywords used for searching in address properties")
 data class AddressPartnerSearchRequest constructor(
     @field:Parameter(description = "Filter business partners by administrative area name")

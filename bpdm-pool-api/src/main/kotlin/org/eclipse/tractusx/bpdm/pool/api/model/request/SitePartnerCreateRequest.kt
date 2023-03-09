@@ -30,8 +30,10 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class SitePartnerCreateRequest(
     @field:JsonUnwrapped
     val site: SiteDto,
+
     @Schema(description = "Business Partner Number of the legal entity this site belongs to")
-    val legalEntity: String,
+    val bpnParent: String,
+
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
 )

@@ -20,6 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class PostCodeSaas(
-    val value: String? = null,
-    val type: TypeKeyNameUrlSaas? = null
-)
+    override val value: String? = null,
+    override val type: TypeKeyNameUrlSaas? = null
+) : TypeValueSaas

@@ -19,12 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Site", description = "Site record")
 data class SiteDto(
     @Schema(description = "Site name")
     val name: String,
+
+    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    val states: Collection<SiteStateDto>,
+
     @Schema(description = "Main address where this site resides")
-    val mainAddress: AddressDto
+    val mainAddress: LogisticAddressDto
 )

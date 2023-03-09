@@ -19,84 +19,67 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
 
-    val name1 = NameDto(value = CommonValues.name1, type = CommonValues.nameType1, shortName = null)
-    val name2 = NameDto(value = CommonValues.name2, type = CommonValues.nameType1, shortName = null)
-    val name3 = NameDto(value = CommonValues.name3, type = CommonValues.nameType1, shortName = null)
-    val name4 = NameDto(value = CommonValues.name4, type = CommonValues.nameType1, shortName = null)
-    val name5 = NameDto(value = CommonValues.name5, type = CommonValues.nameType1, shortName = null)
+    val name1 = NameDto(value = CommonValues.name1, shortName = null)
+    val name2 = NameDto(value = CommonValues.name2, shortName = null)
+    val name3 = NameDto(value = CommonValues.name3, shortName = null)
+    val name4 = NameDto(value = CommonValues.name4, shortName = null)
+    val name5 = NameDto(value = CommonValues.name5, shortName = null)
 
-    val identifierType1 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
-    val identifierType2 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2, CommonValues.identifierTypeUrl2)
-    val identifierType3 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3, CommonValues.identifierTypeUrl3)
+    val identifierType1 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val identifierStatus1 = TypeKeyNameDto(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
-    val identifierStatus2 = TypeKeyNameDto(CommonValues.identifierStatusKey2, CommonValues.identifierStatusName2)
-    val identifierStatus3 = TypeKeyNameDto(CommonValues.identifierStatusKey3, CommonValues.identifierStatusName3)
+    val identifierTypeDto1 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey1, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
+    val identifierTypeDto2 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
+    val identifierTypeDto3 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey3, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
 
-    val issuingBody1 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
-    val issuingBody2 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey2, CommonValues.issuingBodyName2, CommonValues.issuingBodyUrl2)
-    val issuingBody3 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey3, CommonValues.issuingBodyName3, CommonValues.issuingBodyUrl3)
-
-    val identifier1 = IdentifierDto(
-        CommonValues.identifierValue1,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
+    val identifier1 = LegalEntityIdentifierDto(
+        value = CommonValues.identifierValue1,
+        type = CommonValues.identifierTypeTechnicalKey1,
+        issuingBody = CommonValues.issuingBody1,
     )
 
-    val identifier2 = IdentifierDto(
-        CommonValues.identifierValue2,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
+    val identifier2 = LegalEntityIdentifierDto(
+        value = CommonValues.identifierValue2,
+        type = CommonValues.identifierTypeTechnicalKey2,
+        issuingBody = CommonValues.issuingBody2,
     )
 
-    val identifier3 = IdentifierDto(
-        CommonValues.identifierValue3,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
+    val identifier3 = LegalEntityIdentifierDto(
+        value = CommonValues.identifierValue3,
+        type = CommonValues.identifierTypeTechnicalKey3,
+        issuingBody = CommonValues.issuingBody3,
     )
-
-    val legalFormCategory1 = TypeNameUrlDto(CommonValues.legalFormCategoryName1, CommonValues.legalFormCategoryUrl1)
-    val legalFormCategory2 = TypeNameUrlDto(CommonValues.legalFormCategoryName2, CommonValues.legalFormCategoryUrl2)
-    val legalFormCategory3 = TypeNameUrlDto(CommonValues.legalFormCategoryName3, CommonValues.legalFormCategoryUrl3)
 
     val legalForm1 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
-        CommonValues.legalFormAbbreviation1,
-        LanguageCode.en
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
+        abbreviation = CommonValues.legalFormAbbreviation1,
     )
     val legalForm2 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
-        CommonValues.legalFormAbbreviation2,
-        LanguageCode.de
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
+        abbreviation = CommonValues.legalFormAbbreviation2,
     )
     val legalForm3 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
-        CommonValues.legalFormAbbreviation3,
-        LanguageCode.zh
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
+        abbreviation = CommonValues.legalFormAbbreviation3,
     )
 
-    val status1 = BusinessStatusDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
-    val status2 = BusinessStatusDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
-    val status3 = BusinessStatusDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
+    val leStatus1 = LegalEntityStateDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
+    val leStatus2 = LegalEntityStateDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
+    val leStatus3 = LegalEntityStateDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
 
+    val siteStatus1 = SiteStateDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
+    val siteStatus2 = SiteStateDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
+    val siteStatus3 = SiteStateDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
 
     val classification1 = ClassificationDto(CommonValues.classification1, null, CommonValues.classificationType)
     val classification2 = ClassificationDto(CommonValues.classification2, null, CommonValues.classificationType)
@@ -104,154 +87,155 @@ object RequestValues {
     val classification4 = ClassificationDto(CommonValues.classification4, null, CommonValues.classificationType)
     val classification5 = ClassificationDto(CommonValues.classification5, null, CommonValues.classificationType)
 
-    val adminArea1 = AdministrativeAreaDto(value = CommonValues.adminArea1, type = CommonValues.adminAreaType1)
-    val adminArea2 = AdministrativeAreaDto(value = CommonValues.adminArea2, type = CommonValues.adminAreaType1)
-    val adminArea3 = AdministrativeAreaDto(value = CommonValues.adminArea3, type = CommonValues.adminAreaType1)
-    val adminArea4 = AdministrativeAreaDto(value = CommonValues.adminArea4, type = CommonValues.adminAreaType1)
-    val adminArea5 = AdministrativeAreaDto(value = CommonValues.adminArea5, type = CommonValues.adminAreaType1)
-
-    val postCode1 = PostCodeDto(CommonValues.postCode1, CommonValues.postCodeType1)
-    val postCode2 = PostCodeDto(CommonValues.postCode2, CommonValues.postCodeType1)
-    val postCode3 = PostCodeDto(CommonValues.postCode3, CommonValues.postCodeType1)
-    val postCode4 = PostCodeDto(CommonValues.postCode4, CommonValues.postCodeType1)
-    val postCode5 = PostCodeDto(CommonValues.postCode5, CommonValues.postCodeType1)
-
-    val locality1 = LocalityDto(CommonValues.locality1, null, CommonValues.localityType1)
-    val locality2 = LocalityDto(CommonValues.locality2, null, CommonValues.localityType1)
-    val locality3 = LocalityDto(CommonValues.locality3, null, CommonValues.localityType1)
-    val locality4 = LocalityDto(CommonValues.locality4, null, CommonValues.localityType1)
-    val locality5 = LocalityDto(CommonValues.locality5, null, CommonValues.localityType1)
-
-    val thoroughfare1 = ThoroughfareDto(value = CommonValues.thoroughfare1, type = CommonValues.thoroughfareType1)
-    val thoroughfare2 = ThoroughfareDto(value = CommonValues.thoroughfare2, type = CommonValues.thoroughfareType1)
-    val thoroughfare3 = ThoroughfareDto(value = CommonValues.thoroughfare3, type = CommonValues.thoroughfareType1)
-    val thoroughfare4 = ThoroughfareDto(value = CommonValues.thoroughfare4, type = CommonValues.thoroughfareType1)
-    val thoroughfare5 = ThoroughfareDto(value = CommonValues.thoroughfare5, type = CommonValues.thoroughfareType1)
-
-    val premise1 = PremiseDto(value = CommonValues.premise1, type = CommonValues.premiseType1)
-    val premise2 = PremiseDto(value = CommonValues.premise2, type = CommonValues.premiseType1)
-    val premise3 = PremiseDto(value = CommonValues.premise3, type = CommonValues.premiseType1)
-    val premise4 = PremiseDto(value = CommonValues.premise4, type = CommonValues.premiseType1)
-    val premise5 = PremiseDto(value = CommonValues.premise5, type = CommonValues.premiseType1)
-
-    val postalDeliveryPoint1 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint1, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint2 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint2, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint3 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint3, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint4 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint4, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint5 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint5, type = CommonValues.postalDeliveryPointType1)
 
     val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
 
-    val address1 = AddressDto(
-        version = version1,
-        country = CommonValues.country1,
-        administrativeAreas = listOf(adminArea1, adminArea2),
-        postCodes = listOf(postCode1, postCode2),
-        localities = listOf(locality1, locality2),
-        thoroughfares = listOf(thoroughfare1, thoroughfare2),
-        premises = listOf(premise1, premise2),
-        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+    val postalAddress1 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = null,
+            country = CommonValues.country1,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+            administrativeAreaLevel2 = CommonValues.county1,
+            postCode = CommonValues.postCode1,
+            city = CommonValues.city1,
+            districtLevel1 = CommonValues.districtLevel1_1,
+            districtLevel2 = CommonValues.districtLevel2_1,
+            street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        )
     )
 
-    val address2 = AddressDto(
-        version = version1,
-        country = CommonValues.country2,
-        administrativeAreas = listOf(adminArea3, adminArea4),
-        postCodes = listOf(postCode3, postCode4),
-        localities = listOf(locality3, locality4),
-        thoroughfares = listOf(thoroughfare3, thoroughfare4),
-        premises = listOf(premise3, premise4),
-        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+    val postalAddress2 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = null,
+            country = CommonValues.country2,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+            administrativeAreaLevel2 = CommonValues.county2,
+            postCode = CommonValues.postCode2,
+            city = CommonValues.city2,
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
+            street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        )
     )
 
-    val address3 = AddressDto(
-        version = version1,
-        country = CommonValues.country3,
-        administrativeAreas = listOf(adminArea5),
-        postCodes = listOf(postCode5),
-        localities = listOf(locality5),
-        thoroughfares = listOf(thoroughfare5),
-        premises = listOf(premise5),
-        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+    val postalAddress3 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone3,
+        building = CommonValues.building3,
+        floor = CommonValues.floor3,
+        door = CommonValues.door3,
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = null,
+            country = CommonValues.country3,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
+            administrativeAreaLevel2 = CommonValues.county3,
+            postCode = CommonValues.postCode3,
+            city = CommonValues.city3,
+            districtLevel1 = CommonValues.districtLevel1_3,
+            districtLevel2 = CommonValues.districtLevel2_3,
+            street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
+        )
+    )
+
+    val logisticAddress1 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress1
+    )
+
+    val logisticAddress2 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress2,
+    )
+
+    val logisticAddress3 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress3,
     )
 
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
-        properties = LegalEntityDto(
-            names = listOf(name1, name2),
+        legalEntity = LegalEntityDto(
+            legalName = name1,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
-            status = status1,
-            profileClassifications = listOf(classification1, classification2),
-            legalAddress = address1
+            states = listOf(leStatus1),
+            classifications = listOf(classification1, classification2),
+            legalAddress = logisticAddress1
         ),
         index = CommonValues.index1
     )
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
-        properties = LegalEntityDto(
-            names = listOf(name3, name4),
+        legalEntity = LegalEntityDto(
+            legalName = name3,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
-            status = status2,
-            profileClassifications = listOf(classification3, classification4),
-            legalAddress = address2
+            states = listOf(leStatus2),
+            classifications = listOf(classification3, classification4),
+            legalAddress = logisticAddress2
         ),
         index = CommonValues.index2
     )
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
-        properties = LegalEntityDto(
-            names = listOf(name5),
+        legalEntity = LegalEntityDto(
+            legalName = name5,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
-            status = status3,
-            profileClassifications = listOf(classification5),
-            legalAddress = address3
+            states = listOf(leStatus3),
+            classifications = listOf(classification5),
+            legalAddress = logisticAddress3
         ),
         index = CommonValues.index3
     )
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpn = CommonValues.bpnL1,
-        properties = legalEntityCreate1.properties
+        legalEntity = legalEntityCreate1.legalEntity
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
         bpn = CommonValues.bpnL2,
-        properties = legalEntityCreate2.properties
+        legalEntity = legalEntityCreate2.legalEntity
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
         bpn = CommonValues.bpnL3,
-        properties = legalEntityCreate3.properties
+        legalEntity = legalEntityCreate3.legalEntity
     )
 
     val siteCreate1 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName1,
-            mainAddress = address1
+            states = listOf(siteStatus1),
+            mainAddress = logisticAddress1
         ),
         index = CommonValues.index1,
-        legalEntity = legalEntityUpdate1.bpn
+        bpnParent = legalEntityUpdate1.bpn
     )
 
     val siteCreate2 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName2,
-            mainAddress = address2
+            states = listOf(siteStatus2),
+            mainAddress = logisticAddress2
         ),
         index = CommonValues.index2,
-        legalEntity = legalEntityUpdate2.bpn
+        bpnParent = legalEntityUpdate2.bpn
     )
 
     val siteCreate3 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName3,
-            mainAddress = address3
+            states = listOf(siteStatus3),
+            mainAddress = logisticAddress3
         ),
         index = CommonValues.index3,
-        legalEntity = legalEntityUpdate3.bpn
+        bpnParent = legalEntityUpdate3.bpn
     )
 
     val siteUpdate1 = SitePartnerUpdateRequest(
@@ -270,36 +254,36 @@ object RequestValues {
     )
 
     val addressPartnerCreate1 = AddressPartnerCreateRequest(
-        properties = address1,
-        parent = legalEntityUpdate1.bpn,
+        address = logisticAddress1,
+        bpnParent = legalEntityUpdate1.bpn,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressPartnerCreateRequest(
-        properties = address2,
-        parent = legalEntityUpdate2.bpn,
+        address = logisticAddress2,
+        bpnParent = legalEntityUpdate2.bpn,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressPartnerCreateRequest(
-        properties = address3,
-        parent = legalEntityUpdate3.bpn,
+        address = logisticAddress3,
+        bpnParent = legalEntityUpdate3.bpn,
         index = CommonValues.index3
     )
 
     val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA1,
-        properties = address1
+        address = logisticAddress1
     )
 
     val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA2,
-        properties = address2
+        address = logisticAddress2
     )
 
     val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA3,
-        properties = address3
+        address = logisticAddress3
     )
 
     val partnerStructure1 = LegalEntityStructureRequest(

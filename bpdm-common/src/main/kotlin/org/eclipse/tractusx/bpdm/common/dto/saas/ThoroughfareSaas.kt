@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class ThoroughfareSaas(
-    var type: TypeKeyNameUrlSaas? = null,
+    override var type: TypeKeyNameUrlSaas? = null,
     val shortName: String? = null,
     val number: String? = null,
-    val value: String? = null,
+    override val value: String? = null,
     val name: String? = null,
     val direction: String? = null,
     var language: LanguageSaas? = null
-)
+) : TypeValueSaas

@@ -20,10 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class LegalFormSaas(
-    val name: String? = null,
-    val url: String? = null,
     val technicalKey: String? = null,
+    val name: String? = null,
     val mainAbbreviation: String? = null,
-    val language: LanguageSaas? = null,
-    val categories: Collection<TypeNameUrlSaas> = emptyList()
 )

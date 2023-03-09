@@ -20,8 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
@@ -86,8 +85,8 @@ class SiteService(
         val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.site.bpn }
-        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.site }
+        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.bpn }
+        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.bpnSite }
 
         if (bpnSet.size > sitesByBpnMap.size) {
             logger.warn { "Requested ${bpnSet.size} sites from pool, but only ${sitesByBpnMap.size} were found." }
@@ -120,15 +119,11 @@ class SiteService(
         )
     }
 
-    fun toSiteOutput(externalId: String, site: SitePartnerSearchResponse, mainAddress: MainAddressSearchResponse) =
+    fun toSiteOutput(externalId: String, site: SiteResponse, mainAddress: LogisticAddressResponse) =
         SiteGateOutput(
-            site = SiteResponse(
-                name = site.site.name
-            ),
-            mainAddress = mainAddress.mainAddress,
-            externalId = externalId,
-            bpn = site.site.bpn,
-            legalEntityBpn = site.bpnLegalEntity
+            site = site,
+            mainAddress = mainAddress,
+            externalId = externalId
         )
 
     /**

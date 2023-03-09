@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class LegalEntityPartnerUpdateRequest(
     @Schema(description = "Business Partner Number")
     val bpn: String,
+
     @field:JsonUnwrapped
-    val properties: LegalEntityDto
+    val legalEntity: LegalEntityDto
 )

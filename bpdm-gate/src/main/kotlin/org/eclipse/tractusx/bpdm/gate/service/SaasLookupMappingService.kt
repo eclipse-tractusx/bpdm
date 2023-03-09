@@ -19,8 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.GenericIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.springframework.stereotype.Service
@@ -39,17 +40,21 @@ class SaasLookupMappingService {
         }
     }
 
-    private fun toSaas(identifier: IdentifierDto): IdentifierLookupSaas =
+    private fun toSaas(identifier: LegalEntityIdentifierDto): IdentifierLookupSaas =
         IdentifierLookupSaas(identifier.value, TechnicalKeyLookupSaas(identifier.type))
 
-    private fun toSaas(address: AddressDto): AddressLookupSaas =
+    private fun toSaas(identifier: GenericIdentifierDto): IdentifierLookupSaas =
+        IdentifierLookupSaas(identifier.value, TechnicalKeyLookupSaas(identifier.type))
+
+    private fun toSaas(address: LogisticAddressDto): AddressLookupSaas =
         with(address) {
             AddressLookupSaas(
-                administrativeAreas = administrativeAreas.map { ValueLookupSaas(it.value) },
-                country = NameLookupSaas(country.alpha2),
-                localities = localities.map { ValueLookupSaas(it.value) },
-                postCodes = postCodes.map { ValueLookupSaas(it.value) },
-                thoroughfares = thoroughfares.map { ThoroughfareLookupSaas(it.number, it.value) }
+                // TODO Mapping
+                administrativeAreas = listOf(),
+                country = null,
+                localities = listOf(),
+                postCodes = listOf(),
+                thoroughfares = listOf()
             )
         }
 

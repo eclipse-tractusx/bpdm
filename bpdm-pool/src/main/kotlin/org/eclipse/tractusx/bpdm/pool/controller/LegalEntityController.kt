@@ -61,7 +61,7 @@ class LegalEntityController(
         )
     }
 
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityPartnerResponse {
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -72,10 +72,9 @@ class LegalEntityController(
         businessPartnerBuildService.setBusinessPartnerCurrentness(bpn.uppercase())
     }
 
-
     override fun searchSites(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityPartnerResponse>> {
+    ): ResponseEntity<Collection<LegalEntityResponse>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -85,7 +84,7 @@ class LegalEntityController(
     override fun getSites(
         bpn: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<SitePartnerResponse> {
+    ): PageResponse<SiteResponse> {
         return siteService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
@@ -93,14 +92,14 @@ class LegalEntityController(
     override fun getAddresses(
         bpn: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<AddressPartnerResponse> {
+    ): PageResponse<LogisticAddressResponse> {
         return addressService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
 
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressSearchResponse> {
+    ): Collection<LogisticAddressResponse> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

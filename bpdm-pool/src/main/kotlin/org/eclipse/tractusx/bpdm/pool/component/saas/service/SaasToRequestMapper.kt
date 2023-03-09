@@ -20,15 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.convertSaasAdressesToDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -75,7 +73,7 @@ class SaasToRequestMapper {
     fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             site = partnerWithParent.partner.toSiteDto(),
-            legalEntity = partnerWithParent.parentBpn,
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -108,8 +106,8 @@ class SaasToRequestMapper {
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            properties = toDto(partnerWithParent.partner.addresses.first()),
-            parent = partnerWithParent.parentBpn,
+            address = convertSaasAdressesToDto(partnerWithParent.partner.addresses, null),
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -126,7 +124,7 @@ class SaasToRequestMapper {
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
             partnerWithBpn.bpn,
-            properties = toDto(partnerWithBpn.partner.addresses.first())
+            address = convertSaasAdressesToDto(partnerWithBpn.partner.addresses, null)
         )
     }
 
@@ -140,27 +138,20 @@ class SaasToRequestMapper {
     }
 
 
-    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameUrlDto<String> {
-        return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name ?: "", idType.url)
-    }
-
-    fun toRequest(idStatus: TypeKeyNameSaas): TypeKeyNameDto<String> {
-        return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name ?: "")
+    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameDto<String> {
+        return TypeKeyNameDto(idType.technicalKey!!, idType.name ?: "")
     }
 
     fun toRequest(legalForm: LegalFormSaas, partner: BusinessPartnerSaas): LegalFormRequest {
         return LegalFormRequest(
-            legalForm.technicalKey!!,
-            legalForm.name,
-            legalForm.url,
-            legalForm.mainAbbreviation,
-            SaasMappings.toLanguageCode(legalForm.language),
-            partner.categories.map { toCategoryRequest(it) }
+            technicalKey = legalForm.technicalKey!!,
+            name = legalForm.name!!,
+            abbreviation = legalForm.mainAbbreviation
         )
     }
 
-    fun toCategoryRequest(category: TypeKeyNameUrlSaas): TypeNameUrlDto {
-        return TypeNameUrlDto(category.name!!, category.url)
+    fun toIdentifierTypeDto(it: TypeKeyNameUrlSaas, lsaType: IdentifierLsaType): IdentifierTypeDto {
+        return IdentifierTypeDto(it.technicalKey!!, lsaType, it.name ?: it.technicalKey!!, listOf())
     }
 
 }

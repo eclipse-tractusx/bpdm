@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class AdministrativeAreaSaas(
-    val value: String? = null,
+    override val value: String? = null,
     val shortName: String? = null,
-    val type: TypeKeyNameUrlSaas? = null,
+    override val type: TypeKeyNameUrlSaas? = null,
     val language: LanguageSaas? = null
-)
+) : TypeValueSaas

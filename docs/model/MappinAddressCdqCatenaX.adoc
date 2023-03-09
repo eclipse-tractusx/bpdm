@@ -1,0 +1,161 @@
+
+|===
+|CatenaX Class | CatenaX Attribute|CDQ Class |CDQ Attribute|CDQ Link
+
+|PostalAddress PhysicalPostalAddress
+|
+|Address ('Address Type '='Legal Address')
+|
+|https://meta.cdq.com/Address[Address]
+
+|PostalAddress AlternativePostalAddress
+|
+|Address ('Address Type '='Alternative Legal Address')
+|
+|https://meta.cdq.com/Address[Address]
+
+|PostalAddress GeographicCoordinates
+|Latitude
+|Address 'Geographic Coordinates'
+|Geographic Latitude
+|https://meta.cdq.com/Address/geographic_coordinates[Geographic Coordinates]
+
+|PostalAddress GeographicCoordinates
+|Longitude
+|Address 'Geographic Coordinates'
+|Geographic Longitude
+|https://meta.cdq.com/Address/geographic_coordinates[Geographic Coordinates]
+
+|PostalAddress GeographicCoordinates
+|Altitude
+|
+|
+|
+
+|PostalAddress Country
+|Name
+|
+|
+|
+
+|PostalAddress Country
+|Country Code
+|Address Country
+|Country Short Name (Two-character abbreviation for countries defined by the ISO standard 3166)
+|https://meta.cdq.com/Address/country[Country]
+
+|PostalAddress
+|AdministrativeAreaLevel1
+|Address 'Administrative Area' ('Administrative Area Type'='Region')
+|'Administrative Area Value'
+|https://meta.cdq.com/Address/administrative_area[Administrative Area]
+
+|PostalAddress
+|AdministrativeAreaLevel2
+|Address 'Administrative Area' ('Administrative Area Type'='County')
+|'Administrative Area Value'
+|https://meta.cdq.com/Address/administrative_area[Administrative Area]
+
+|PostalAddress
+|AdministrativeAreaLevel3
+|
+|
+|
+
+|PostalAddress
+|AdministrativeAreaLevel4
+|
+|
+|
+
+|PostalAddress
+|PostCode
+|Address 'Post Code' ('Post Code Type'='Regular')
+|'Post Code Value'
+|https://meta.cdq.com/Address/post_code[Post Code]
+
+|PostalAddress
+|City
+|Address Locality ('Locality Type'='City')
+|'Locality Value'
+|https://meta.cdq.com/Address/locality[Locality]
+
+|PostalAddress
+|DistrictLevel1
+|Address Locality ('Locality Type'='District')
+|'Locality Value'
+|https://meta.cdq.com/Address/locality[Locality]
+
+|PostalAddress
+|DistrictLevel2
+|Address Locality ('Locality Type'='Quarter')
+|'Locality Value'
+|https://meta.cdq.com/Address/locality[Locality]
+
+|PostalAddress Street
+|Name
+|Address Thoroughfare ('Thoroughfare Type'='Street')
+|Thoroughfare Name
+|https://meta.cdq.com/Address/thoroughfare[Thoroughfare]
+
+|PostalAddress Street
+|HouseNumber
+|Address Thoroughfare ('Thoroughfare Type'='Street')
+|Thoroughfare Number
+|https://meta.cdq.com/Address/thoroughfare[Thoroughfare]
+
+|PostalAddress Street
+|Milestone
+|Address Thoroughfare ('Thoroughfare Type'='Street')
+|Thoroughfare Short Name
+|https://meta.cdq.com/Address/thoroughfare[Thoroughfare]
+
+|PostalAddress Street
+|Direction
+|Address Thoroughfare ('Thoroughfare Type'='Street')
+|Thoroughfare Direction
+|https://meta.cdq.com/Address/thoroughfare[Thoroughfare]
+
+|PhysicalPostalAddress
+|CompanyPostCode
+|Address 'Post Code' ('Post Code Type'='Large Mail User')
+|'Post Code Value'
+|https://meta.cdq.com/Address/post_code[Post Code]
+
+|PhysicalPostalAddress
+|IndustrialZone
+|Address Thoroughfare ('Thoroughfare Type'='Industrial Zone')
+|Thoroughfare Name
+|https://meta.cdq.com/Address/thoroughfare[Thoroughfare]
+
+|PhysicalPostalAddress
+|Building
+|Address Premise ('Premise Type'='Building')
+|Premise Value
+|https://meta.cdq.com/Address/premise[Premise]
+
+|PhysicalPostalAddress
+|Floor
+|Address Premise ('Premise Type'='Level')
+|Premise Value
+|https://meta.cdq.com/Address/premise[Premise]
+
+|PhysicalPostalAddress
+|Door
+|Address Premise ('Premise Type'='Room')
+|Premise Value
+|https://meta.cdq.com/Address/premise[Premise]
+
+|AlternativePostalAddress DeliveryServiceType (TechnicalKey ='PrivateBag')
+|DerliveryServiceNumber
+|Address 'Postal Delivery Point' ('Postal Delivery Point Type'='Mailbox')
+|'Postal Delivery Point Value'
+|https://meta.cdq.com/Address/postal_delivery_point[Postal Delivery Point]
+
+|AlternativePostalAddress DeliveryServiceType (TechnicalKey ='POBox')
+|DerliveryServiceNumber
+|Address 'Postal Delivery Point' ('Postal Delivery Point Type'='Post Office Box')
+|'Postal Delivery Point Value'
+|https://meta.cdq.com/Address/postal_delivery_point[Postal Delivery Point]
+
+|===

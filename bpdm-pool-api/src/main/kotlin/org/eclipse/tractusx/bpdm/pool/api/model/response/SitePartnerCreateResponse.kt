@@ -19,17 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
 data class SitePartnerCreateResponse(
-    @Schema(description = "Business Partner Number, main identifier value for sites")
-    val bpn: String,
-    @Schema(description = "Site name")
-    val name: String,
+    @field:JsonUnwrapped
+    val site: SiteResponse,
+
     @Schema(description = "Main address of this site")
-    val mainAddress: AddressResponse,
+    val mainAddress: LogisticAddressResponse,
+
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
 )

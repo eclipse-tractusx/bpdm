@@ -20,8 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -64,9 +63,9 @@ class AddressControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenAddress1: AddressPartnerSearchResponse
-    private lateinit var givenAddress2: AddressPartnerSearchResponse
-    private lateinit var givenAddress3: AddressPartnerSearchResponse
+    private lateinit var givenAddress1: LogisticAddressResponse
+    private lateinit var givenAddress2: LogisticAddressResponse
+    private lateinit var givenAddress3: LogisticAddressResponse
 
 
     @BeforeEach
@@ -77,24 +76,9 @@ class AddressControllerSearchIT @Autowired constructor(
         testHelpers.createTestMetadata()
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
-        givenAddress1 = with(givenStructure[0].addresses[0]) {
-            AddressPartnerSearchResponse(
-                address = AddressPartnerResponse(bpn, properties),
-                bpnLegalEntity = givenStructure[0].legalEntity.bpn
-            )
-        }
-        givenAddress2 = with(givenStructure[0].addresses[1]) {
-            AddressPartnerSearchResponse(
-                address = AddressPartnerResponse(bpn, properties),
-                bpnLegalEntity = givenStructure[0].legalEntity.bpn
-            )
-        }
-        givenAddress3 = with(givenStructure[1].siteStructures[0].addresses[0]) {
-            AddressPartnerSearchResponse(
-                address = AddressPartnerResponse(bpn, properties),
-                bpnSite = givenStructure[1].siteStructures[0].site.bpn
-            )
-        }
+        givenAddress1 = givenStructure[0].addresses[0].address
+        givenAddress2 = givenStructure[0].addresses[1].address
+        givenAddress3 = givenStructure[1].siteStructures[0].addresses[0].address
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
@@ -112,7 +96,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.administrativeArea = (RequestValues.addressPartnerCreate1.properties.administrativeAreas as List).first().value
+        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel1
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -133,7 +117,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.properties.postCodes.first().value
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -154,7 +138,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.locality = RequestValues.addressPartnerCreate1.properties.localities.first().value
+        addressSearchRequest.locality = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.city
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -173,7 +157,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(null,null,null,RequestValues.addressPartnerCreate1.properties.thoroughfares.first().value,
+        val addressSearchRequest = AddressPartnerSearchRequest(null,null,null,RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.street!!.name,
         null,null,null)
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -194,7 +178,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.premise = RequestValues.addressPartnerCreate1.properties.premises.first().value
+        addressSearchRequest.premise = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.building
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -214,7 +198,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.properties.postalDeliveryPoints.first().value
+        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -233,7 +217,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(countryCode = RequestValues.addressPartnerCreate1.properties.country)
+        val addressSearchRequest = AddressPartnerSearchRequest(countryCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.country)
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -256,8 +240,8 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.properties.postalDeliveryPoints.first().value
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.properties.postCodes.first().value
+        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -277,7 +261,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.properties.postCodes.first().value
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
         addressSearchRequest.administrativeArea = "someNonexistentValue"
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -317,7 +301,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate2.properties.postCodes.first().value
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate2.address.physicalPostalAddress.baseAddress.postCode
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)

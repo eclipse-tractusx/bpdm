@@ -20,12 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 
 @Schema(name = "LegalEntityMatchResponse", description = "Match with score for a business partner record of type legal entity")
 data class LegalEntityMatchResponse(
     @Schema(description = "Relative quality score of the match. The higher the better")
     val score: Float,
+
     @Schema(description = "Matched legal entity business partner record")
-    val legalEntity: LegalEntityPartnerResponse
+    val legalEntity: LegalEntityResponse
 )

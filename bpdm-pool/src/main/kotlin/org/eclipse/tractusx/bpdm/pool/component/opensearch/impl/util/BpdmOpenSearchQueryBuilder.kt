@@ -86,7 +86,7 @@ class BpdmOpenSearchQueryBuilder {
      */
     fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
-            Pair(LegalEntityDoc::names.name, bpSearch.name),
+            Pair(LegalEntityDoc::legalName.name, bpSearch.legalName),
             Pair(LegalEntityDoc::legalForm.name, bpSearch.legalForm),
             Pair(LegalEntityDoc::classifications.name, bpSearch.classification),
             Pair(LegalEntityDoc::status.name, bpSearch.status)
@@ -168,7 +168,7 @@ class BpdmOpenSearchQueryBuilder {
      */
     fun toLowerCaseSearchRequest(searchRequest: LegalEntityPropertiesSearchRequest): LegalEntityPropertiesSearchRequest {
         return LegalEntityPropertiesSearchRequest(
-            searchRequest.name?.lowercase(),
+            searchRequest.legalName?.lowercase(),
             searchRequest.legalForm?.lowercase(),
             searchRequest.status?.lowercase(),
             searchRequest.classification?.lowercase()

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -106,7 +106,7 @@ class AddressService(
 
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.address.bpn }
+        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpn }
 
         if (bpnSet.size > addressesByBpnMap.size) {
             logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
@@ -134,13 +134,10 @@ class AddressService(
         )
     }
 
-    fun toAddressOutput(externalId: String, address: AddressPartnerSearchResponse): AddressGateOutput {
+    fun toAddressOutput(externalId: String, address: LogisticAddressResponse): AddressGateOutput {
         return AddressGateOutput(
-            bpn = address.address.bpn,
-            address = address.address.properties,
-            externalId = externalId,
-            legalEntityBpn = address.bpnLegalEntity,
-            siteBpn = address.bpnSite
+            address = address,
+            externalId = externalId
         )
     }
 

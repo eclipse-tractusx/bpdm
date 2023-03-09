@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
@@ -97,7 +97,7 @@ class LegalEntityService(
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
         val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.bpn }
-        val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnSet).associateBy { it.legalEntity }
+        val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnSet).associateBy { it.bpnLegalEntity }
 
         if (bpnSet.size > legalEntitiesByBpnMap.size) {
             logger.warn { "Requested ${bpnSet.size} legal entities from pool, but only ${legalEntitiesByBpnMap.size} were found." }
@@ -130,11 +130,10 @@ class LegalEntityService(
         )
     }
 
-    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityPartnerResponse, legalAddress: LegalAddressSearchResponse): LegalEntityGateOutput =
+    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityResponse, legalAddress: LogisticAddressResponse): LegalEntityGateOutput =
         LegalEntityGateOutput(
-            legalEntity = legalEntity.properties,
-            legalAddress = legalAddress.legalAddress,
-            bpn = legalEntity.bpn,
+            legalEntity = legalEntity,
+            legalAddress = legalAddress,
             externalId = externalId
         )
 

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc
 
 enum class SuggestionType(val docName: String) {
-    NAME(LegalEntityDoc::names.name),
+    NAME(LegalEntityDoc::legalName.name),
     LEGAL_FORM(LegalEntityDoc::legalForm.name),
     STATUS(LegalEntityDoc::status.name),
     CLASSIFICATION(LegalEntityDoc::classifications.name),

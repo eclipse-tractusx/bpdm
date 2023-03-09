@@ -62,36 +62,34 @@ object SaasValues {
     val siteName2 = NameSaas(CommonValues.siteName2)
     val siteName3 = NameSaas(CommonValues.siteName3)
 
-    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
+    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
+    val issuingBody1 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody1)
+    val issuingBody2 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody2)
+    val issuingBody3 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody3)
 
-    val identifierStatus1 = TypeKeyNameSaas(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
+    val identifierStatus1 = TypeKeyNameSaas("identifierstatuskey", "identifierstatusname")
 
     val identifier1 = IdentifierSaas(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
-    val identifier2 = IdentifierSaas(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
-    val identifier3 = IdentifierSaas(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
+    val identifier2 = IdentifierSaas(identifierType2, CommonValues.identifierValue2, issuingBody2, identifierStatus1)
+    val identifier3 = IdentifierSaas(identifierType3, CommonValues.identifierValue3, issuingBody3, identifierStatus1)
 
     val legalForm1 = LegalFormSaas(
-        CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormAbbreviation1,
-        language1
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
+        mainAbbreviation = CommonValues.legalFormAbbreviation1,
     )
     val legalForm2 = LegalFormSaas(
-        CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormAbbreviation2,
-        language2
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
+        mainAbbreviation = CommonValues.legalFormAbbreviation2,
     )
     val legalForm3 = LegalFormSaas(
-        CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormAbbreviation3,
-        language3
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
+        mainAbbreviation = CommonValues.legalFormAbbreviation3,
     )
 
     val statusType1 = TypeKeyNameUrlSaas(CommonValues.statusType1.name)
@@ -260,6 +258,7 @@ object SaasValues {
         externalId = partnerId4,
         dataSource = datasource1,
         names = listOf(siteName1),
+        status = status1,
         addresses = listOf(address1),
         types = listOf(siteType),
         relations = listOf(
@@ -280,6 +279,7 @@ object SaasValues {
         externalId = partnerId5,
         dataSource = datasource1,
         names = listOf(siteName2),
+        status = status2,
         addresses = listOf(address2),
         types = listOf(siteType),
         relations = listOf(
@@ -300,6 +300,7 @@ object SaasValues {
         externalId = partnerId6,
         dataSource = datasource1,
         names = listOf(siteName3),
+        status = status3,
         addresses = listOf(address3),
         types = listOf(siteType),
         relations = listOf(

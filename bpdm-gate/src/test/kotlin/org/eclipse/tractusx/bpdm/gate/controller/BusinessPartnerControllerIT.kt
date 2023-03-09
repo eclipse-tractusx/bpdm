@@ -98,7 +98,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //make sure candidate is valid by providing identifier and name
         val givenCandidate = with(RequestValues.candidate1) {
             copy(
-                identifiers = listOf(RequestValues.identifier1),
+                identifiers = listOf(RequestValues.genericIdentifier),
                 names = listOf(RequestValues.name1)
             )
         }
@@ -123,7 +123,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //make sure candidate is valid by providing identifier and name
         val givenCandidate = with(RequestValues.candidate1) {
             copy(
-                identifiers = listOf(RequestValues.identifier1),
+                identifiers = listOf(RequestValues.genericIdentifier),
                 names = listOf(RequestValues.name1)
             )
         }
@@ -148,7 +148,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //create candidate without name
         val givenCandidate = with(RequestValues.candidate1) {
             copy(
-                identifiers = listOf(RequestValues.identifier1),
+                identifiers = listOf(RequestValues.genericIdentifier),
                 names = emptyList()
             )
         }

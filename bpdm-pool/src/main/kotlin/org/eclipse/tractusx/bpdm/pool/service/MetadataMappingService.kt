@@ -19,17 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
-import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierStatusRepository
+import org.eclipse.tractusx.bpdm.pool.entity.Region
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IssuingBodyRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -38,42 +39,46 @@ import org.springframework.stereotype.Service
 @Service
 class MetadataMappingService(
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val identifierStatusRepository: IdentifierStatusRepository,
-    private val issuingBodyRepository: IssuingBodyRepository,
-    private val legalFormRepository: LegalFormRepository
+    private val legalFormRepository: LegalFormRepository,
+    private val regionRepository: RegionRepository
 ) {
 
     /**
      * Fetch metadata entities referenced in [partners] and map them by their referenced keys
      */
-    fun mapRequests(partners: Collection<LegalEntityDto>): MetadataMappingDto {
-        return MetadataMappingDto(
-            mapIdentifierTypes(partners),
-            mapIdentifierStatuses(partners),
-            mapIssuingBodies(partners),
-            mapLegalForms(partners)
+    fun mapRequests(partners: Collection<LegalEntityDto>): LegalEntityMetadataMappingDto {
+        return LegalEntityMetadataMappingDto(
+            idTypes = mapLegalEntityIdentifierTypes(partners),
+            legalForms = mapLegalForms(partners)
+        )
+    }
+
+    /**
+     * Fetch metadata entities referenced in [partners] and map them by their referenced keys
+     */
+    fun mapRequests(partners: Collection<LogisticAddressDto>): AddressMetadataMappingDto {
+        return AddressMetadataMappingDto(
+            idTypes = mapAddressIdentifierTypes(partners),
+            // TODO enable regionCodes later
+//            regions = mapAddressRegions(partners)
+            regions = mapOf()
         )
     }
 
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
-        return mapIdentifierTypes(partners.flatMap { it.identifiers.map { id -> id.type } }.toSet())
+    fun mapLegalEntityIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
+        val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
+        return mapIdentifierTypes(IdentifierLsaType.LEGAL_ENTITY, technicalKeys)
     }
 
     /**
-     * Fetch [IdentifierStatus] referenced in [partners] and map them by their referenced keys
+     * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierStatuses(partners: Collection<LegalEntityDto>): Map<String, IdentifierStatus>{
-        return mapIdentifierStatuses(partners.flatMap { it.identifiers.mapNotNull { id -> id.status } }.toSet())
-    }
-
-    /**
-     * Fetch [IssuingBody] referenced in [partners] and map them by their referenced keys
-     */
-    fun mapIssuingBodies(partners: Collection<LegalEntityDto>): Map<String, IssuingBody>{
-        return mapIssuingBodies(partners.flatMap { it.identifiers.mapNotNull{  id -> id.issuingBody } }.toSet())
+    fun mapAddressIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
+        val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
+        return mapIdentifierTypes(IdentifierLsaType.ADDRESS, technicalKeys)
     }
 
     /**
@@ -83,21 +88,21 @@ class MetadataMappingService(
         return mapLegalForms(partners.mapNotNull { it.legalForm }.toSet())
     }
 
+    fun mapAddressRegions(partners: Collection<LogisticAddressDto>): Map<String, Region> {
+        val regionCodes = partners.mapNotNull { it.physicalPostalAddress.baseAddress.administrativeAreaLevel1 }
+            .plus(partners.mapNotNull { it.alternativePostalAddress?.baseAddress?.administrativeAreaLevel1 })
+            .toSet()
 
-    private fun mapIdentifierTypes(keys: Set<String>): Map<String, IdentifierType>{
-        val typeMap = identifierTypeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
-        assertKeysFound(keys, typeMap)
-        return typeMap
+        return regionRepository.findByRegionCodeIn(regionCodes)
+            .associateBy { it.regionCode }
+            .also {
+                assertKeysFound(regionCodes, it)
+            }
     }
 
-    private fun mapIdentifierStatuses(keys: Set<String>): Map<String, IdentifierStatus>{
-        val typeMap = identifierStatusRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
-        assertKeysFound(keys, typeMap)
-        return typeMap
-    }
 
-    private fun mapIssuingBodies(keys: Set<String>): Map<String, IssuingBody>{
-        val typeMap = issuingBodyRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
+    private fun mapIdentifierTypes(lsaType: IdentifierLsaType, keys: Set<String>): Map<String, IdentifierType>{
+        val typeMap = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(lsaType, keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }
@@ -110,7 +115,7 @@ class MetadataMappingService(
 
     private inline fun <reified T> assertKeysFound(keys: Set<String>, typeMap: Map<String, T>){
         val keysNotfound = keys.minus(typeMap.keys)
-        if(keysNotfound.isNotEmpty()) throw BpdmMultipleNotfound(T::class.simpleName!!, keysNotfound )
+        if(keysNotfound.isNotEmpty()) throw BpdmMultipleNotFoundException(T::class.simpleName!!, keysNotfound )
     }
 
 }

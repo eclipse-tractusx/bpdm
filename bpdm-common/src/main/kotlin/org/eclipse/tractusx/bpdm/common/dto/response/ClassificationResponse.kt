@@ -20,11 +20,17 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(name = "ClassificationResponse", description = "Classification record of a business partner")
 data class ClassificationResponse(
+    @Schema(description = "Name of the classification")
     val value: String? = null,
+
+    @Schema(description = "Identifying code of the classification, if applicable")
     val code: String? = null,
-    val type: TypeNameUrlDto? = null
+
+    @Schema(description = "Type of specified classification")
+    val type: TypeKeyNameDto<ClassificationType>
 )

@@ -27,7 +27,7 @@ const val MAPPINGS_FILE_PATH_LEGAL_ENTITIES = "opensearch/index-mappings-legal-e
 data class LegalEntityDoc(
     @JsonIgnore // ignore since this is the id and does not need to be in the document source
     val bpn: String,
-    val names: Collection<TextDoc>,
+    val legalName: TextDoc,
     val legalForm: TextDoc?,
     val status: TextDoc?,
     val addresses: Collection<AddressDoc>,

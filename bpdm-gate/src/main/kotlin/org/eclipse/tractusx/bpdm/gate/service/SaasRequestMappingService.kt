@@ -36,27 +36,28 @@ class SaasRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val saasConfigProperties: SaasConfigProperties
 ) {
-    fun toSaasModel(legalEntity: LegalEntityGateInputRequest): BusinessPartnerSaas {
-        return toSaasModel(legalEntity.legalEntity, legalEntity.externalId, legalEntity.bpn)
+    fun toSaasModel(request: LegalEntityGateInputRequest): BusinessPartnerSaas {
+        return toSaasModel(request.legalEntity, request.externalId, request.bpn)
     }
 
-    fun toSaasModel(site: SiteGateInputRequest): BusinessPartnerSaas {
+    fun toSaasModel(request: SiteGateInputRequest): BusinessPartnerSaas {
         return BusinessPartnerSaas(
-            externalId = site.externalId,
+            externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
-            names = listOf(NameSaas(value = site.site.name)),
-            addresses = listOf(toSaasModel(site.site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierSaas(site.bpn!!)) else emptyList(),
+            names = listOf(NameSaas(value = request.site.name)),
+            status = request.site.states.map { it.toSaasModel() }.firstOrNull(),
+            addresses = toSaasModel(request.site.mainAddress),
+            identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
     }
 
-    fun toSaasModel(address: AddressGateInputRequest): BusinessPartnerSaas {
+    fun toSaasModel(request: AddressGateInputRequest): BusinessPartnerSaas {
         return BusinessPartnerSaas(
-            externalId = address.externalId,
+            externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
-            addresses = listOf(toSaasModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierSaas(address.bpn!!)) else emptyList(),
+            addresses = toSaasModel(request.address),
+            identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
     }
@@ -66,22 +67,12 @@ class SaasRequestMappingService(
             externalId = externalId,
             dataSource = saasConfigProperties.datasource,
             identifiers = toIdentifiersSaas(legalEntity.identifiers, bpn),
-            names = legalEntity.names.map { it.toSaasModel() },
+            names = listOf(legalEntity.legalName.toSaasModel()),
             legalForm = toLegalFormSaas(legalEntity.legalForm),
-            status = legalEntity.status?.toSaasModel(),
-            profile = toPartnerProfileSaas(legalEntity.profileClassifications),
+            status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
+            profile = toPartnerProfileSaas(legalEntity.classifications),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-            bankAccounts = legalEntity.bankAccounts.map { it.toSaasModel() },
-            addresses = listOf(toSaasModel(legalEntity.legalAddress))
-        )
-    }
-
-    private fun BankAccountDto.toSaasModel(): BankAccountSaas {
-        return BankAccountSaas(
-            internationalBankAccountIdentifier = internationalBankAccountIdentifier,
-            internationalBankIdentifier = internationalBankIdentifier,
-            nationalBankAccountIdentifier = nationalBankAccountIdentifier,
-            nationalBankIdentifier = nationalBankIdentifier
+            addresses = toSaasModel(legalEntity.legalAddress)
         )
     }
 
@@ -96,16 +87,25 @@ class SaasRequestMappingService(
         return ClassificationSaas(
             value = value,
             code = code,
-            type = if (type != null) TypeKeyNameUrlSaas(type!!.name) else null
+            type = TypeKeyNameUrlSaas(type.name)
         )
     }
 
-    private fun BusinessStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
+    private fun LegalEntityStateDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
             validFrom = validFrom,
-            validUntil = validUntil
+            validUntil = validTo
+        )
+    }
+
+    private fun SiteStateDto.toSaasModel(): BusinessPartnerStatusSaas {
+        return BusinessPartnerStatusSaas(
+            type = TypeKeyNameUrlSaas(type.name),
+            officialDenotation = description,
+            validFrom = validFrom,
+            validUntil = validTo
         )
     }
 
@@ -114,38 +114,77 @@ class SaasRequestMappingService(
     private fun NameDto.toSaasModel(): NameSaas {
         return NameSaas(
             value = value,
-            shortName = shortName,
-            type = TypeKeyNameUrlSaas(type.name),
-            language = toLanguageSaas(this.language)
+            shortName = shortName
         )
     }
 
-    private fun IdentifierDto.toSaasModel(): IdentifierSaas {
+    private fun LegalEntityIdentifierDto.toSaasModel(): IdentifierSaas {
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
             value = value,
-            issuingBody = TypeKeyNameUrlSaas(issuingBody),
-            status = TypeKeyNameSaas(status)
+            issuingBody = TypeKeyNameUrlSaas(name = issuingBody)
         )
     }
 
-    private fun toSaasModel(address: AddressDto): AddressSaas {
-        return with(address) {
+    // TODO still unused!
+    private fun AddressIdentifierDto.toSaasModel(): IdentifierSaas {
+        return IdentifierSaas(
+            type = TypeKeyNameUrlSaas(type),
+            value = value
+        )
+    }
+
+    private fun toSaasModel(address: LogisticAddressDto): Collection<AddressSaas> {
+
+        val mapPhysicalAddress = SaasDtoToSaasAddressMapping(address.physicalPostalAddress.baseAddress);
+
+        val addresses: MutableList<AddressSaas> = mutableListOf()
+        addresses.add(
             AddressSaas(
-                version = toSaasModel(version),
-                careOf = toCareOfSaas(careOf),
-                contexts = contexts.map { toContextSaas(it) },
-                country = toCountrySaas(country),
-                administrativeAreas = administrativeAreas.map { toSaasModel(it, version.language) },
-                postCodes = postCodes.map { toSaasModel(it) },
-                localities = localities.map { toSaasModel(it, version.language) },
-                thoroughfares = thoroughfares.map { toSaasModel(it, version.language) },
-                postalDeliveryPoints = postalDeliveryPoints.map { toSaasModel(it, version.language) },
-                premises = premises.map { toSaasModel(it, version.language) },
-                geographicCoordinates = toSaasModel(geographicCoordinates),
-                types = types.map { toKeyNameUrlTypeSaas(it) }
-            )
+                 id = "0",
+             externalId = null,
+             saasId = null,
+             version = null,
+             identifyingName = null,
+             careOf = null,
+             contexts = emptyList(),
+             country = mapPhysicalAddress.country(),
+             administrativeAreas = mapPhysicalAddress.administrativeAreas(),
+             postCodes = mapPhysicalAddress.postcodes(),
+             localities = mapPhysicalAddress.localities(),
+             thoroughfares = mapPhysicalAddress.thoroughfares(address.physicalPostalAddress),
+             premises = mapPhysicalAddress.premesis(address.physicalPostalAddress),
+             postalDeliveryPoints = listOf(PostalDeliveryPointSaas()),
+             geographicCoordinates = mapPhysicalAddress.geoCoordinates(),
+             types = listOf(TypeKeyNameUrlSaas()),
+             metadataSaas = AddressMetadataSaas()
+            ))
+
+        if (address.alternativePostalAddress != null) {
+            val mapAlternativeAddress = SaasDtoToSaasAddressMapping(address.alternativePostalAddress!!.baseAddress);
+            addresses.add(
+                AddressSaas(
+                    id = "0",
+                    externalId = null,
+                    saasId = null,
+                    version = null,
+                    identifyingName = null,
+                    careOf = null,
+                    contexts = emptyList(),
+                    country = mapAlternativeAddress.country(),
+                    administrativeAreas = mapAlternativeAddress.administrativeAreas(),
+                    postCodes = mapAlternativeAddress.postcodes(),
+                    localities = mapAlternativeAddress.localities(),
+                    thoroughfares = mapAlternativeAddress.thoroughfares(physicalAddress = null),
+                    premises = mapAlternativeAddress.premesis(physicalAddress = null),
+                    postalDeliveryPoints = mapAlternativeAddress.postalDeliveryPoints(address.alternativePostalAddress),
+                    geographicCoordinates = mapAlternativeAddress.geoCoordinates(),
+                    types = emptyList(),
+                    metadataSaas = AddressMetadataSaas()
+                ))
         }
+
+        return addresses;
     }
 
     private fun toSaasModel(version: AddressVersionDto): AddressVersionSaas? {
@@ -162,44 +201,11 @@ class SaasRequestMappingService(
     private fun toContextSaas(context: String): WrappedValueSaas =
         WrappedValueSaas(context)
 
-    private fun toSaasModel(adminArea: AdministrativeAreaDto, languageCode: LanguageCode): AdministrativeAreaSaas =
-        AdministrativeAreaSaas(adminArea.value, adminArea.shortName, toKeyNameUrlTypeSaas(adminArea.type), toLanguageSaas(languageCode))
-
-
-    private fun toSaasModel(postcode: PostCodeDto): PostCodeSaas =
-        PostCodeSaas(postcode.value, toKeyNameUrlTypeSaas(postcode.type))
-
-    private fun toSaasModel(locality: LocalityDto, languageCode: LanguageCode): LocalitySaas =
-        LocalitySaas(toKeyNameUrlTypeSaas(locality.type), locality.shortName, locality.value, toLanguageSaas(languageCode))
-
-    private fun toSaasModel(thoroughfare: ThoroughfareDto, languageCode: LanguageCode): ThoroughfareSaas =
-        ThoroughfareSaas(
-            toKeyNameUrlTypeSaas(thoroughfare.type),
-            thoroughfare.shortName,
-            thoroughfare.number,
-            thoroughfare.value,
-            thoroughfare.name,
-            thoroughfare.direction,
-            toLanguageSaas(languageCode)
-        )
-
-    private fun toSaasModel(deliveryPoint: PostalDeliveryPointDto, languageCode: LanguageCode): PostalDeliveryPointSaas =
-        PostalDeliveryPointSaas(
-            toKeyNameUrlTypeSaas(deliveryPoint.type),
-            deliveryPoint.shortName,
-            deliveryPoint.number,
-            deliveryPoint.value,
-            toLanguageSaas(languageCode)
-        )
-
-    private fun toSaasModel(premise: PremiseDto, languageCode: LanguageCode): PremiseSaas =
-        PremiseSaas(toKeyNameUrlTypeSaas(premise.type), premise.shortName, premise.number, premise.value, toLanguageSaas(languageCode))
-
 
     private fun toSaasModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =
         geoCoordinate?.let { GeoCoordinatesSaas(it.longitude, it.latitude) }
 
-    private fun toIdentifiersSaas(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
+    private fun toIdentifiersSaas(identifiers: Collection<LegalEntityIdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
         var identifiersSaas = identifiers.map { it.toSaasModel() }
         if (bpn != null) {
             identifiersSaas = identifiersSaas.plus(createBpnIdentifierSaas(bpn))
@@ -211,7 +217,7 @@ class SaasRequestMappingService(
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(bpnConfigProperties.id, bpnConfigProperties.name),
             value = bpn,
-            issuingBody = TypeKeyNameUrlSaas(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName)
+            issuingBody = TypeKeyNameUrlSaas(name = bpnConfigProperties.agencyName)
         )
     }
 

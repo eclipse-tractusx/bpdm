@@ -22,8 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
@@ -36,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
@@ -60,11 +60,11 @@ class SiteControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
 
         val importedPartner = createdStructures.single().legalEntity
-        importedPartner.bpn
+        importedPartner.legalEntity.bpn
             .let { bpn -> requestSitesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnSite -> requestSite(bpnSite) }
             .let { siteResponse ->
-                assertThat(siteResponse.bpnLegalEntity).isEqualTo(importedPartner.bpn)
+                assertThat(siteResponse.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
             }
     }
 
@@ -99,16 +99,18 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
-        val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
-        val bpnL = createdStructures[0].legalEntity.bpn
+        val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpn
+        val bpnS2 = createdStructures[0].siteStructures[1].site.site.bpn
+        val bpnL = createdStructures[0].legalEntity.legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
-        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
-        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
+
+        val expectedSiteWithReference1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL)
+        val expectedSiteWithReference2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL)
 
         testHelpers.assertRecursively(searchResult.content)
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
 
@@ -135,16 +137,18 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL1 = createdStructures[0].legalEntity.bpn
-        val bpnL2 = createdStructures[1].legalEntity.bpn
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
-        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)
-        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL1)
-        val expectedSiteWithReference3 = SitePartnerSearchResponse(ResponseValues.site3, bpnL2)
+
+        val expectedSiteWithReference1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL1)
+        val expectedSiteWithReference2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL1)
+        val expectedSiteWithReference3 = ResponseValues.site3.copy(bpnLegalEntity = bpnL2)
 
         testHelpers.assertRecursively(searchResult.content)
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }
 
@@ -159,15 +163,15 @@ class SiteControllerIT @Autowired constructor(
 
         val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
-        val bpnL1 = givenLegalEntities.first().bpn
-        val bpnL2 = givenLegalEntities.last().bpn
+        val bpnL1 = givenLegalEntities.first().legalEntity.bpn
+        val bpnL2 = givenLegalEntities.last().legalEntity.bpn
 
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2, ResponseValues.siteUpsert3)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(legalEntity = bpnL1),
-            RequestValues.siteCreate2.copy(legalEntity = bpnL2),
-            RequestValues.siteCreate3.copy(legalEntity = bpnL2)
+            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnParent = bpnL2)
         )
 
         val response = poolClient.sites().createSite(toCreate)
@@ -187,16 +191,16 @@ class SiteControllerIT @Autowired constructor(
 
         val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
-        val bpnL1 = givenLegalEntities.first().bpn
-        val bpnL2 = givenLegalEntities.last().bpn
+        val bpnL1 = givenLegalEntities.first().legalEntity.bpn
+        val bpnL2 = givenLegalEntities.last().legalEntity.bpn
 
 
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(legalEntity = bpnL1),
-            RequestValues.siteCreate2.copy(legalEntity = bpnL2),
-            RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
+            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnParent = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
 
@@ -227,14 +231,14 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
-        val bpnS2 = givenStructure[1].siteStructures[0].site.bpn
-        val bpnS3 = givenStructure[1].siteStructures[1].site.bpn
+        val bpnS1 = givenStructure[0].siteStructures[0].site.site.bpn
+        val bpnS2 = givenStructure[1].siteStructures[0].site.site.bpn
+        val bpnS3 = givenStructure[1].siteStructures[1].site.site.bpn
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.copy(bpn = bpnS3, index = null),
-            ResponseValues.siteUpsert2.copy(bpn = bpnS1, index = null),
-            ResponseValues.siteUpsert3.copy(bpn = bpnS2, index = null)
+            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn=bpnS1), index = null) },
+            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn=bpnS1), index = null) },
+            ResponseValues.siteUpsert3.run { copy(site = site.copy(bpn=bpnS2), index = null) },
         )
 
         val toUpdate = listOf(
@@ -265,12 +269,12 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
-        val bpnS2 = givenStructure[0].siteStructures[1].site.bpn
+        val bpnS1 = givenStructure[0].siteStructures[0].site.site.bpn
+        val bpnS2 = givenStructure[0].siteStructures[1].site.site.bpn
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.copy(bpn = bpnS2, index = null),
-            ResponseValues.siteUpsert2.copy(bpn = bpnS1, index = null)
+            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn=bpnS2), index = null) },
+            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn=bpnS1), index = null) },
         )
 
         val toUpdate = listOf(
@@ -307,9 +311,9 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
+        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
 
-        val toSearch = expected.map { it.site }
+        val toSearch = expected.map { it.bpnSite!! }
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
@@ -335,18 +339,18 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
+        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
 
-        val toSearch = expected.map { it.site }.plus("NON-EXISTENT")
+        val toSearch = expected.map { it.bpnSite!! }.plus("NON-EXISTENT")
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateResponse>, expected: Collection<SitePartnerCreateResponse>) {
-        actuals.forEach { assertThat(it.bpn).matches(testHelpers.bpnSPattern) }
+        actuals.forEach { assertThat(it.site.bpn).matches(testHelpers.bpnSPattern) }
 
-        testHelpers.assertRecursively(actuals).ignoringFields(SitePartnerCreateResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(actuals).ignoringFields(SiteResponse::bpn.name).isEqualTo(expected)
     }
 
     private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)

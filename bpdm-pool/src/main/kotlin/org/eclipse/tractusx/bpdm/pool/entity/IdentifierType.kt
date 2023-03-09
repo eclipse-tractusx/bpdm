@@ -19,18 +19,30 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
-@Table(name = "identifier_types")
+@Table(
+    name = "identifier_types",
+    uniqueConstraints = [UniqueConstraint(
+        name = "uc_identifier_types_technical_key_lsa_type",
+        columnNames = ["technical_key", "lsa_type"]
+    )]
+)
 class IdentifierType(
+    @Column(name = "technical_key", nullable = false)
+    val technicalKey: String,
+
+    @Column(name = "lsa_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val lsaType: IdentifierLsaType,
+
     @Column(name = "name", nullable = false)
     val name: String,
-    @Column(name = "url")
-    val url: String?,
-    @Column(name = "technical_key", nullable = false)
-    val technicalKey: String
-) : BaseEntity()
+
+    ) : BaseEntity() {
+    @OneToMany(mappedBy = "identifierType", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val details: MutableSet<IdentifierTypeDetail> = mutableSetOf()
+}

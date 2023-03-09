@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 data class LocalitySaas(
-    val type: TypeKeyNameUrlSaas? = null,
+    override val type: TypeKeyNameUrlSaas? = null,
     val shortName: String? = null,
-    val value: String? = null,
+    override val value: String? = null,
     val language: LanguageSaas? = null
-)
+) : TypeValueSaas

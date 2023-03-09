@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.service
 
 import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
@@ -40,9 +39,5 @@ fun LanguageCode.toDto(): TypeKeyNameDto<LanguageCode> {
 }
 
 fun CountryCode.toDto(): TypeKeyNameDto<CountryCode> {
-    return TypeKeyNameDto(this, getName())
-}
-
-fun CurrencyCode.toDto(): TypeKeyNameDto<CurrencyCode> {
     return TypeKeyNameDto(this, getName())
 }

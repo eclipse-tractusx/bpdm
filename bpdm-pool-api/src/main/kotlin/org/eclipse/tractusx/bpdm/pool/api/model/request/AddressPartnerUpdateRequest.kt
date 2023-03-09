@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class AddressPartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
+
     @field:JsonUnwrapped
-    val properties: AddressDto
+    val address: LogisticAddressDto
 )

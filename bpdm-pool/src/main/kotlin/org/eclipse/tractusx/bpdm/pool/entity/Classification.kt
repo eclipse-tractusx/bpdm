@@ -33,13 +33,16 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 class Classification (
     @Column(name = "`value`")
     val value: String?,
+
     @Column(name = "code")
     val code: String?,
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    val type: ClassificationType?,
+    val type: ClassificationType,
+
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity
-) : BaseEntity()
 
+) : BaseEntity()

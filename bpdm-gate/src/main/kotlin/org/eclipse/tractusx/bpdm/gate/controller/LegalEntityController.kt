@@ -42,7 +42,7 @@ class LegalEntityController(
     val validationService: ValidationService
 ) : GateLegalEntityApi {
 
-    override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Any> {
+    override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -68,6 +68,5 @@ class LegalEntityController(
     override fun validateLegalEntity(legalEntityInput: LegalEntityGateInputRequest): ValidationResponse {
         return validationService.validate(legalEntityInput)
     }
-
 
 }

@@ -20,7 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
@@ -29,9 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateRespon
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
@@ -50,7 +51,7 @@ class PartnerImportPageService(
     private val saasClient: SaasClient,
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
-    private val addressPartnerRepository: AddressPartnerRepository
+    private val logisticAddressRepository: LogisticAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -86,30 +87,26 @@ class PartnerImportPageService(
     }
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerSaas>){
-        partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.status?.technicalKey == null) null else id.status } }
-            .associateBy { it.technicalKey }
-            .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
-            .values
-            .map { mappingService.toRequest(it) }
-            .forEach { metadataService.createIdentifierStatus(it) }
+        val (legalEntitiesSaas, _, addressesSaas) = partitionIntoLSA(partners) { it.extractLsaType() }
 
+        addNewMetadataIdentifierTypes(legalEntitiesSaas, IdentifierLsaType.LEGAL_ENTITY)
+        addNewMetadataIdentifierTypes(addressesSaas, IdentifierLsaType.ADDRESS)
+
+        addNewMetadataLegalForms(legalEntitiesSaas)
+    }
+
+    private fun addNewMetadataIdentifierTypes(partners: Collection<BusinessPartnerSaas>, lsaType: IdentifierLsaType) {
         partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
+            .flatMap { it.identifiers }
+            .mapNotNull { if (it.type?.technicalKey == null) null else it.type }
             .associateBy { it.technicalKey }
-            .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
+            .minus(metadataService.getIdentifierTypes(Pageable.unpaged(), lsaType).content.map { it.technicalKey }.toSet())
             .values
-            .map { mappingService.toRequest(it) }
+            .map { mappingService.toIdentifierTypeDto(it, lsaType) }
             .forEach { metadataService.createIdentifierType(it) }
+    }
 
-        partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.issuingBody?.technicalKey == null) null else id.issuingBody } }
-            .associateBy { it.technicalKey }
-            .minus(metadataService.getIssuingBodies(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
-            .values
-            .map { mappingService.toRequest(it) }
-            .forEach { metadataService.createIssuingBody(it) }
-
+    private fun addNewMetadataLegalForms(partners: Collection<BusinessPartnerSaas>) {
         partners
             .filter { it.legalForm?.technicalKey != null }
             .map { it.legalForm!! to it }
@@ -135,9 +132,9 @@ class PartnerImportPageService(
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses).entities else emptyList()
 
-        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
-        val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
-        val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
+        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.legalEntity.bpn) else null }
+        val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.site.bpn) else null }
+        val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.address.bpn) else null }
 
         importEntryRepository.saveAll(legalEntityImportEntries + siteImportEntries + addressImportEntries)
 
@@ -145,7 +142,7 @@ class PartnerImportPageService(
     }
 
     private fun updatePartners(partners: Collection<BusinessPartnerWithBpn>):
-            Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerResponse>> {
+            Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<LogisticAddressResponse>> {
         val (legalEntitiesSaas, sitesSaas, addressesSaas) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
         val legalEntities = legalEntitiesSaas.mapNotNull { mappingService.toLegalEntityUpdateRequestOrNull(it) }
@@ -188,8 +185,8 @@ class PartnerImportPageService(
         //create missing parents in the Pool
         val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
 
-        val createdParents = newLegalEntities.map { Pair(parentByImportId[it.index], it.bpn) }
-            .plus(newSites.map { Pair(parentByImportId[it.index], it.bpn) })
+        val createdParents = newLegalEntities.map { Pair(parentByImportId[it.index], it.legalEntity.bpn) }
+            .plus(newSites.map { Pair(parentByImportId[it.index], it.site.bpn) })
             .filter { (parent, _) -> parent != null }
             .map { BusinessPartnerWithBpn(it.first!!, it.second) }
 
@@ -316,9 +313,10 @@ class PartnerImportPageService(
         val partnersByBpn = partners.associateBy { it.bpn }
         val (bpnLs, bpnSs, bpnAs) = partitionLSA(partnersByBpn.keys)
 
+        // TODO use BPN projection as optimization
         val foundBpnLs = legalEntityRepository.findDistinctByBpnIn(bpnLs).map { it.bpn }
         val foundBpnSs = siteRepository.findDistinctByBpnIn(bpnSs).map { it.bpn }
-        val foundBpnAs = addressPartnerRepository.findDistinctByBpnIn(bpnAs).map { it.bpn }
+        val foundBpnAs = logisticAddressRepository.findDistinctByBpnIn(bpnAs).map { it.bpn }
 
         val foundBpns = foundBpnLs + foundBpnSs + foundBpnAs
         val bpnMissing = partnersByBpn - foundBpns.toSet()
