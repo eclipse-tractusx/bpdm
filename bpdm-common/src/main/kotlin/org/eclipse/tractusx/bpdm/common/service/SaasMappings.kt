@@ -118,10 +118,10 @@ object SaasMappings {
 
     fun toDto(status: BusinessPartnerStatusSaas): BusinessStatusDto {
         return BusinessStatusDto(
-            status.officialDenotation,
-            status.validFrom,
-            status.validUntil,
-            toTypeOrDefault(status.type)
+            officialDenotation = status.officialDenotation,
+            validFrom = status.validFrom,
+            validUntil = status.validUntil,
+            type = toTypeOrDefault(status.type)
         )
     }
 

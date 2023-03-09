@@ -156,7 +156,7 @@ object CommonValues {
     val businessStatusValidUntil2 = LocalDateTime.of(2022, 1, 1, 0, 0)
 
     val businessStatusType1 = BusinessStatusType.ACTIVE
-    val businessStatusType2 = BusinessStatusType.INSOLVENCY
+    val businessStatusType2 = BusinessStatusType.INACTIVE
 
     val classificationType = ClassificationType.NACE
 

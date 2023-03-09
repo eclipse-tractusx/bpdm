@@ -28,7 +28,7 @@ data class LegalFormRequest(
     @Schema(description = "Unique key to be used for reference")
     val technicalKey: String,
     @Schema(description = "Full name of the legal form")
-    val name: String?,
+    val name: String,
     @Schema(description = "Link for further information on the legal form")
     val url: String?,
     @Schema(description = "Abbreviation of the legal form name")

@@ -65,7 +65,7 @@ interface PoolMetadataApi {
     )
     @PostMapping("/identifier-types")
     @PostExchange("/identifier-types")
-    fun createIdentifierType(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String>
+    fun createIdentifierType(@RequestBody type: TypeKeyNameDto<String>): TypeKeyNameDto<String>
 
     @Operation(
         summary = "Get page of identifier types",
@@ -79,7 +79,7 @@ interface PoolMetadataApi {
     )
     @GetMapping("/identifier-types")
     @GetExchange("/identifier-types")
-    fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
+    fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
 
     @Operation(
         summary = "Get valid identifier types for a country",
@@ -135,7 +135,7 @@ interface PoolMetadataApi {
     )
     @PostMapping("/issuing-bodies")
     @PostExchange("/issuing-bodies")
-    fun createIssuingBody(@RequestBody type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String>
+    fun createIssuingBody(@RequestBody type: TypeKeyNameDto<String>): TypeKeyNameDto<String>
 
     @Operation(summary = "Get page of issuing bodies",
         description = "Lists all currently known issuing bodies in a paginated result")
@@ -147,7 +147,7 @@ interface PoolMetadataApi {
     )
     @GetMapping("/issuing-bodies")
     @GetExchange("/issuing-bodies")
-    fun getIssuingBodies(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>>
+    fun getIssuingBodies(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
 
     @Operation(
         summary = "Create new legal form",

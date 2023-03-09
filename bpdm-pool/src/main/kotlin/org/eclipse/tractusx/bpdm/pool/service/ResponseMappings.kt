@@ -63,15 +63,12 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
 
 fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
-        identifiers.map { it.toDto() },
-        names.map { it.toDto() },
-        legalForm?.toDto(),
-        stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
-        classification.map { it.toDto() },
-        types.map { it.toDto() },
-        bankAccounts.map { it.toDto() },
-        roles.map { it.toDto() },
-        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
+        identifiers = identifiers.map { it.toDto() },
+        legalName = names.map { it.toDto() }.first(),       // TODO
+        legalForm = legalForm?.toDto(),
+        status = stati.map { it.toDto() },
+        classifications = classification.map { it.toDto() },
+        relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() }
     )
 }
 
@@ -87,27 +84,27 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
 }
 
 fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto(), status?.toDto())
+    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto())
 }
 
-fun IdentifierType.toDto(): TypeKeyNameUrlDto<String> {
-    return TypeKeyNameUrlDto(technicalKey, name, url)
+fun IdentifierType.toDto(): TypeKeyNameDto<String> {
+    return TypeKeyNameDto(technicalKey, name)
 }
 
 fun IdentifierStatus.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
-fun IssuingBody.toDto(): TypeKeyNameUrlDto<String> {
-    return TypeKeyNameUrlDto(technicalKey, name, url)
+fun IssuingBody.toDto(): TypeKeyNameDto<String> {
+    return TypeKeyNameDto(technicalKey, name)
 }
 
 fun Name.toDto(): NameResponse {
-    return NameResponse(value, shortName, type.toDto(), language.toDto())
+    return NameResponse(value, shortName)
 }
 
 fun LegalForm.toDto(): LegalFormResponse {
-    return LegalFormResponse(technicalKey, name, url, mainAbbreviation, language.toDto(), categories.map { it.toDto() })
+    return LegalFormResponse(technicalKey, name, mainAbbreviation)
 }
 
 fun LegalFormCategory.toDto(): TypeNameUrlDto {
@@ -248,12 +245,18 @@ fun Classification.toDto(): ClassificationResponse {
     return ClassificationResponse(value, code, type?.toDto())
 }
 
-fun ClassificationType.toDto(): TypeNameUrlDto {
-    return TypeNameUrlDto(name, url)
+fun ClassificationType.toDto(): TypeKeyNameDto<ClassificationType> {
+    return TypeKeyNameDto(this, name)       // TODO name -> typeName
 }
 
 fun Relation.toDto(): RelationResponse {
-    return RelationResponse(relationClass.toDto(), type.toDto(), startNode.bpn, endNode.bpn, startedAt, endedAt)
+    return RelationResponse(
+        type = type.toDto(),
+        startBpn = startNode.bpn,
+        endBpn = endNode.bpn,
+        validFrom = startedAt,
+        validTo = endedAt
+    )
 }
 
 fun BankAccount.toDto(): BankAccountResponse {

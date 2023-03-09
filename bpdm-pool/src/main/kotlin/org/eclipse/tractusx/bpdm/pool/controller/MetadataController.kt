@@ -37,11 +37,11 @@ class MetadataController(
     val metadataService: MetadataService
 ) : PoolMetadataApi {
 
-    override fun createIdentifierType(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+    override fun createIdentifierType(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         return metadataService.createIdentifierType(type)
     }
 
-    override fun getIdentifierTypes(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
+    override fun getIdentifierTypes(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
@@ -58,11 +58,11 @@ class MetadataController(
         return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
-    override fun createIssuingBody(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+    override fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         return metadataService.createIssuingBody(type)
     }
 
-    override fun getIssuingBodies(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameUrlDto<String>> {
+    override fun getIssuingBodies(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
         return metadataService.getIssuingBodies(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 

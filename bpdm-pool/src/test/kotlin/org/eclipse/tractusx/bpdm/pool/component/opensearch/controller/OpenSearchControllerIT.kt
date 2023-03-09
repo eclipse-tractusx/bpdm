@@ -204,7 +204,7 @@ class OpenSearchControllerIT @Autowired constructor(
             val pageResult = searchBusinessPartnerByName(name)
 
             assertThat(pageResult.content).isNotEmpty
-            assertThat(pageResult.content.first()).matches { it.legalEntity.properties.names.any { n -> n.value == name } }
+            assertThat(pageResult.content.first()).matches { it.legalEntity.properties.legalName.value == name }
         }
     }
 

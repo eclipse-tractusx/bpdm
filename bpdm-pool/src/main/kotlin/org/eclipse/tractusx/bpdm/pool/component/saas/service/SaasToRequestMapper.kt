@@ -140,8 +140,8 @@ class SaasToRequestMapper {
     }
 
 
-    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameUrlDto<String> {
-        return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name ?: "", idType.url)
+    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameDto<String> {
+        return TypeKeyNameDto(idType.technicalKey!!, idType.name ?: "")
     }
 
     fun toRequest(idStatus: TypeKeyNameSaas): TypeKeyNameDto<String> {
@@ -150,12 +150,12 @@ class SaasToRequestMapper {
 
     fun toRequest(legalForm: LegalFormSaas, partner: BusinessPartnerSaas): LegalFormRequest {
         return LegalFormRequest(
-            legalForm.technicalKey!!,
-            legalForm.name,
-            legalForm.url,
-            legalForm.mainAbbreviation,
-            SaasMappings.toLanguageCode(legalForm.language),
-            partner.categories.map { toCategoryRequest(it) }
+            technicalKey = legalForm.technicalKey!!,
+            name = legalForm.name!!,
+            url = legalForm.url,
+            mainAbbreviation = legalForm.mainAbbreviation,
+            language = SaasMappings.toLanguageCode(legalForm.language),
+            category = partner.categories.map { toCategoryRequest(it) }
         )
     }
 

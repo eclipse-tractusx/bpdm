@@ -62,9 +62,9 @@ object SaasValues {
     val siteName2 = NameSaas(CommonValues.siteName2)
     val siteName3 = NameSaas(CommonValues.siteName3)
 
-    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
+    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, "TODO remove")
 
-    val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
+    val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, "TODO remove")
 
     val identifierStatus1 = TypeKeyNameSaas(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
 
@@ -73,25 +73,25 @@ object SaasValues {
     val identifier3 = IdentifierSaas(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
 
     val legalForm1 = LegalFormSaas(
-        CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormAbbreviation1,
-        language1
+        name = CommonValues.legalFormName1,
+        url = "TODO remove",
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        mainAbbreviation = CommonValues.legalFormAbbreviation1,
+        language = language1
     )
     val legalForm2 = LegalFormSaas(
-        CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormAbbreviation2,
-        language2
+        name = CommonValues.legalFormName2,
+        url = "TODO remove",
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        mainAbbreviation = CommonValues.legalFormAbbreviation2,
+        language = language2
     )
     val legalForm3 = LegalFormSaas(
-        CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormAbbreviation3,
-        language3
+        name = CommonValues.legalFormName3,
+        url = "TODO remove",
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        mainAbbreviation = CommonValues.legalFormAbbreviation3,
+        language = language3
     )
 
     val statusType1 = TypeKeyNameUrlSaas(CommonValues.statusType1.name)

@@ -59,10 +59,10 @@ class AddressController(
 
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
-        pageRequest: PaginationRequest
+        paginationRequest: PaginationRequest
     ): PageResponse<AddressPartnerSearchResponse> {
 
-        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
+        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 
 
