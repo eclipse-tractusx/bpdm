@@ -17,25 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.controller
+package org.eclipse.tractusx.bpdm.gate.client.config
 
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientAddressInterface
 import org.eclipse.tractusx.bpdm.gate.client.service.GateClientBusinessPartnerInterface
-import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
-import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
-import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
-import org.eclipse.tractusx.bpdm.gate.service.TypeMatchingService
-import org.springframework.web.bind.annotation.RestController
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientSiteInterface
 
-@RestController
-class GateClientBusinessPartnerController(
-    private val typeMatchingService: TypeMatchingService
-) : GateClientBusinessPartnerInterface {
+interface GateClient {
 
-    override fun determineLsaType(candidate: BusinessPartnerCandidateDto): TypeMatchResponse {
-        if (candidate.names.isEmpty() && candidate.identifiers.isEmpty())
-            throw BpdmInvalidPartnerException("Candidate", "Business partner candidate needs to specify either a name or identifier.")
+    fun addresses(): GateClientAddressInterface
 
-        return typeMatchingService.determineCandidateType(candidate)
-    }
+    fun businessPartners(): GateClientBusinessPartnerInterface
+
+    fun legalEntities(): GateClientLegalEntityInterface
+
+    fun sites(): GateClientSiteInterface
 
 }

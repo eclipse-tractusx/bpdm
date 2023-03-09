@@ -27,7 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.client.config.GateClient
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
@@ -35,6 +35,7 @@ import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_OUTPUT_SITES_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
@@ -44,18 +45,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("test")
 internal class SiteControllerOutputIT @Autowired constructor(
-    private val webTestClient: WebTestClient,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    val gateClient: GateClient
 ) {
     companion object {
         @RegisterExtension
@@ -182,21 +180,10 @@ internal class SiteControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val pageResponse = webTestClient.post()
-            .uri { builder ->
-                builder.path(GATE_API_OUTPUT_SITES_PATH)
-                    .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
-                    .queryParam(PaginationStartAfterRequest::limit.name, limit)
-                    .build()
-            }
-            .exchange()
-            .expectStatus()
-            .isOk
-            .returnResult<PageOutputResponse<SiteGateOutput>>()
-            .responseBody
-            .blockFirst()!!
+        val paginationValue = PaginationStartAfterRequest(startAfter,limit)
+        val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, emptyList())
 
-        assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponseValue).isEqualTo(
             PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,
@@ -306,23 +293,10 @@ internal class SiteControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val pageResponse = webTestClient.post()
-            .uri { builder ->
-                builder.path(GATE_API_OUTPUT_SITES_PATH)
-                    .queryParam(PaginationStartAfterRequest::startAfter.name, startAfter)
-                    .queryParam(PaginationStartAfterRequest::limit.name, limit)
-                    .build()
-            }
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2)))
-            .exchange()
-            .expectStatus()
-            .isOk
-            .returnResult<PageOutputResponse<SiteGateOutput>>()
-            .responseBody
-            .blockFirst()!!
+        val paginationValue = PaginationStartAfterRequest(startAfter,limit)
+        val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))
 
-        assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponseValue).isEqualTo(
             PageOutputResponse(
                 total = total,
                 nextStartAfter = nextStartAfter,

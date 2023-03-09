@@ -17,15 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.config
+package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.gate.client.config.GateClient
+import org.eclipse.tractusx.bpdm.gate.client.config.GateClientServiceConfig
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.support.WebClientAdapter
-import org.springframework.web.service.invoker.HttpServiceProxyFactory
 
-class SpringWebClientConfig(webClient: WebClient) {
+@Configuration
+class GateClientConfig {
 
-    val httpServiceProxyFactory = HttpServiceProxyFactory
-        .builder(WebClientAdapter.forClient(webClient))
-        .build()
+    @Bean
+    fun gateClient(webServerAppCtxt: ServletWebServerApplicationContext): GateClient {
+        return GateClientServiceConfig { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
+    }
+
 }
+

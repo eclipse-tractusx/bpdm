@@ -57,7 +57,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.legalEntity.GateClientLegalEntityInterface
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput

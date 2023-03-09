@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.service.address
+package org.eclipse.tractusx.bpdm.gate.client.service
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -89,8 +89,7 @@ interface GateClientAddressInterface {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@RequestPart paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput>
-    //@ParameterObject @Valid @RequestPart
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput>
 
     @Operation(
         summary = "Get page of addresses",
@@ -105,10 +104,9 @@ interface GateClientAddressInterface {
     @PostMapping("/output/addresses/search")
     @PostExchange("/output/addresses/search")
     fun getAddressesOutput(
-        @RequestPart paginationRequest: PaginationStartAfterRequest,
-        @RequestPart(required = false) externalIds: Collection<String>?
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @RequestBody (required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<AddressGateOutput>
-    //@ParameterObject @Valid @RequestPart
 
     @Operation(
         summary = "Validate an address partner",

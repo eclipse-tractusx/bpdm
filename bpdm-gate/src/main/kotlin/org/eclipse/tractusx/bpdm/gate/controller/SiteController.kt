@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.site.SiteInterface
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientSiteInterface
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
@@ -40,7 +40,7 @@ class SiteController(
     val siteService: SiteService,
     val apiConfigProperties: ApiConfigProperties,
     val validationService: ValidationService
-) : SiteInterface {
+) : GateClientSiteInterface {
 
     override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Any> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {

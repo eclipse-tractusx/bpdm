@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.address.GateClientAddressInterface
+import org.eclipse.tractusx.bpdm.gate.client.service.GateClientAddressInterface
 
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates

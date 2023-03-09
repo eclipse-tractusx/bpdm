@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.service.legalEntity
+package org.eclipse.tractusx.bpdm.gate.client.service
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -87,8 +87,7 @@ interface GateClientLegalEntityInterface {
     )
     @GetMapping("/input/legal-entities")
     @GetExchange("/input/legal-entities")
-    fun getLegalEntities(@RequestPart  paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse>
-    //@ParameterObject @Valid
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse>
 
     @Operation(
         summary = "Get page of legal entities",
@@ -103,10 +102,9 @@ interface GateClientLegalEntityInterface {
     @PostMapping("/output/legal-entities/search")
     @PostExchange("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
-        @RequestPart paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<LegalEntityGateOutput>
-    //@ParameterObject @Valid
 
     @Operation(
         summary = "Validate a legal entity",

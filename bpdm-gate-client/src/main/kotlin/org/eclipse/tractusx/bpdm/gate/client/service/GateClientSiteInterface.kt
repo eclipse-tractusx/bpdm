@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.service.site
+package org.eclipse.tractusx.bpdm.gate.client.service
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -41,7 +40,7 @@ import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena")
 @HttpExchange("/api/catena")
-interface SiteInterface {
+interface GateClientSiteInterface {
 
     @Operation(
         summary = "Create or update sites.",
@@ -87,7 +86,6 @@ interface SiteInterface {
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
     fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput>
-    //@ParameterObject @Valid
 
     @Operation(
         summary = "Get page of sites",
@@ -102,10 +100,9 @@ interface SiteInterface {
     @PostMapping("/output/sites/search")
     @PostExchange("/output/sites/search")
     fun getSitesOutput(
-        @RequestPart paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageStartAfterResponse<SiteGateOutput>
-    //@ParameterObject @Valid @RequestPart
 
     @Operation(
         summary = "Validate a site",
