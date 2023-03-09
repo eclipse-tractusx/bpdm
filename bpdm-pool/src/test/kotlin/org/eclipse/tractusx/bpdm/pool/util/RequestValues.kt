@@ -24,27 +24,24 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
 
-    val name1 = NameDto(value = CommonValues.name1, type = CommonValues.nameType1, shortName = null)
-    val name2 = NameDto(value = CommonValues.name2, type = CommonValues.nameType1, shortName = null)
-    val name3 = NameDto(value = CommonValues.name3, type = CommonValues.nameType1, shortName = null)
-    val name4 = NameDto(value = CommonValues.name4, type = CommonValues.nameType1, shortName = null)
-    val name5 = NameDto(value = CommonValues.name5, type = CommonValues.nameType1, shortName = null)
+    val name1 = NameDto(value = CommonValues.name1, type = NameType.OTHER, shortName = null)
+    val name2 = NameDto(value = CommonValues.name2, type = NameType.OTHER, shortName = null)
+    val name3 = NameDto(value = CommonValues.name3, type = NameType.OTHER, shortName = null)
+    val name4 = NameDto(value = CommonValues.name4, type = NameType.OTHER, shortName = null)
+    val name5 = NameDto(value = CommonValues.name5, type = NameType.OTHER, shortName = null)
 
-    val identifierType1 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
-    val identifierType2 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2, CommonValues.identifierTypeUrl2)
-    val identifierType3 = TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3, CommonValues.identifierTypeUrl3)
+    val identifierType1 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val identifierStatus1 = TypeKeyNameDto(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
-    val identifierStatus2 = TypeKeyNameDto(CommonValues.identifierStatusKey2, CommonValues.identifierStatusName2)
-    val identifierStatus3 = TypeKeyNameDto(CommonValues.identifierStatusKey3, CommonValues.identifierStatusName3)
-
-    val issuingBody1 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
-    val issuingBody2 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey2, CommonValues.issuingBodyName2, CommonValues.issuingBodyUrl2)
-    val issuingBody3 = TypeKeyNameUrlDto(CommonValues.issuingBodyKey3, CommonValues.issuingBodyName3, CommonValues.issuingBodyUrl3)
+    val issuingBody1 = TypeKeyNameDto(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1)
+    val issuingBody2 = TypeKeyNameDto(CommonValues.issuingBodyKey2, CommonValues.issuingBodyName2)
+    val issuingBody3 = TypeKeyNameDto(CommonValues.issuingBodyKey3, CommonValues.issuingBodyName3)
 
     val identifier1 = IdentifierDto(
         CommonValues.identifierValue1,
@@ -74,21 +71,21 @@ object RequestValues {
     val legalForm1 = LegalFormRequest(
         CommonValues.legalFormTechnicalKey1,
         CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
+        "TODO remove",
         CommonValues.legalFormAbbreviation1,
         LanguageCode.en
     )
     val legalForm2 = LegalFormRequest(
         CommonValues.legalFormTechnicalKey2,
         CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
+        "TODO remove",
         CommonValues.legalFormAbbreviation2,
         LanguageCode.de
     )
     val legalForm3 = LegalFormRequest(
         CommonValues.legalFormTechnicalKey3,
         CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
+        "TODO remove",
         CommonValues.legalFormAbbreviation3,
         LanguageCode.zh
     )

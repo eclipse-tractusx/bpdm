@@ -183,23 +183,16 @@ class TestHelpers(
     fun createTestMetadata() {
 
         poolClient.metadata().createLegalForm(RequestValues.legalForm1)
-        poolClient.metadata()
         poolClient.metadata().createLegalForm(RequestValues.legalForm2)
         poolClient.metadata().createLegalForm(RequestValues.legalForm3)
 
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType1)
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType2)
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType3)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierType1)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierType2)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierType3)
 
         poolClient.metadata().createIssuingBody(RequestValues.issuingBody1)
         poolClient.metadata().createIssuingBody(RequestValues.issuingBody2)
         poolClient.metadata().createIssuingBody(RequestValues.issuingBody3)
-
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus1)
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus2)
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus3)
-
-
     }
 
 

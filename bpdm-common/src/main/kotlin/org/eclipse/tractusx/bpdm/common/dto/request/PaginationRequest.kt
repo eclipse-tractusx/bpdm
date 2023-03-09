@@ -32,6 +32,7 @@ data class PaginationRequest (
         Schema(defaultValue = "0"))
     @field:PositiveOrZero
     val page: Int=0,
+
     @field:Parameter(description = "Size of each page", schema =
     Schema(defaultValue = "10"))
     @field:Min(0)

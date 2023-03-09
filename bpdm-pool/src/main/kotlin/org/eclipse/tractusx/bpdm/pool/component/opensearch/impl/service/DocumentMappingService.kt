@@ -42,7 +42,7 @@ class DocumentMappingService {
         return LegalEntityDoc(
             partner.bpn,
             partner.names.map { TextDoc(it.value) },
-            if (partner.legalForm?.name != null) TextDoc(partner.legalForm!!.name!!) else null,
+            if (partner.legalForm?.name != null) TextDoc(partner.legalForm!!.name) else null,
             if (partnerStatus?.officialDenotation != null) TextDoc(partnerStatus.officialDenotation) else null,
             listOf(toDocument(partner.legalAddress)),
             partner.classification.filter { it.value != null }.map { TextDoc(it.value!!) },

@@ -25,24 +25,25 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
+// TODO probably rename to LegalEntityDetailedDto
+// TODO can we add bpn?
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<IdentifierResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"))
-    val names: Collection<NameResponse> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "Legal name the partner goes by"))
+    val legalName: NameResponse,
+
     @Schema(description = "Legal form of the business partner")
     val legalForm: LegalFormResponse? = null,
+
     @Schema(description = "Current business status")
-    val status: BusinessStatusResponse? = null,
+    val status: Collection<BusinessStatusResponse> = emptyList(),
+
     @ArraySchema(arraySchema = Schema(description = "Profile classifications"))
-    val profileClassifications: Collection<ClassificationResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The partner types"))
-    val types: Collection<TypeKeyNameUrlDto<BusinessPartnerType>> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner"))
-    val bankAccounts: Collection<BankAccountResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Roles the partner takes in the Catena network"))
-    val roles: Collection<TypeKeyNameDto<String>> = emptyList(),
+    val classifications: Collection<ClassificationResponse> = emptyList(),
+
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
 )

@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
@@ -33,8 +34,6 @@ import java.time.ZoneOffset
  * Numbered values should match with @see SaasValues numbered values for easier testing
  */
 object ResponseValues {
-
-    val nameType1 = TypeKeyNameUrlDto(CommonValues.nameType1, CommonValues.nameType1.getTypeName(), CommonValues.nameType1.getUrl())
 
     val language0 = TypeKeyNameDto(CommonValues.language0, CommonValues.language0.getName())
     val language1 = TypeKeyNameDto(CommonValues.language1, CommonValues.language1.getName())
@@ -48,49 +47,43 @@ object ResponseValues {
     val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
 
     val identifier1 =
-        IdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
+        IdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, RequestValues.issuingBody1)
     val identifier2 =
-        IdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
+        IdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType1, RequestValues.issuingBody1)
     val identifier3 =
-        IdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType1, RequestValues.issuingBody1, RequestValues.identifierStatus1)
+        IdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType1, RequestValues.issuingBody1)
 
-    val name1 = NameResponse(value = CommonValues.name1, type = nameType1, language = language0)
-    val name2 = NameResponse(value = CommonValues.name2, type = nameType1, language = language0)
-    val name3 = NameResponse(value = CommonValues.name3, type = nameType1, language = language0)
-    val name4 = NameResponse(value = CommonValues.name4, type = nameType1, language = language0)
-    val name5 = NameResponse(value = CommonValues.name5, type = nameType1, language = language0)
+    val name1 = NameResponse(value = CommonValues.name1)
+    val name2 = NameResponse(value = CommonValues.name2)
+    val name3 = NameResponse(value = CommonValues.name3)
+    val name4 = NameResponse(value = CommonValues.name4)
+    val name5 = NameResponse(value = CommonValues.name5)
 
     val legalForm1 = LegalFormResponse(
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
-        CommonValues.legalFormAbbreviation1,
-        language1
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
+        abbreviation = CommonValues.legalFormAbbreviation1,
     )
     val legalForm2 = LegalFormResponse(
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
-        CommonValues.legalFormAbbreviation2,
-        language2
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
+        abbreviation = CommonValues.legalFormAbbreviation2,
     )
     val legalForm3 = LegalFormResponse(
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
-        CommonValues.legalFormAbbreviation3,
-        language3
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
+        abbreviation = CommonValues.legalFormAbbreviation3,
     )
 
-    val statusType1 = TypeKeyNameUrlDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName(), CommonValues.statusType1.getUrl())
-    val statusType2 = TypeKeyNameUrlDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName(), CommonValues.statusType2.getUrl())
-    val statusType3 = TypeKeyNameUrlDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName(), CommonValues.statusType3.getUrl())
+    val statusType1 = TypeKeyNameDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName())
+    val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
+    val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
 
     val status1 = BusinessStatusResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
     val status2 = BusinessStatusResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
     val status3 = BusinessStatusResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
 
-    val classificationType = TypeNameUrlDto(CommonValues.classificationType.name, "")
+    val classificationType = TypeKeyNameDto<ClassificationType>(CommonValues.classificationType, CommonValues.classificationType.name)
 
     val classification1 = ClassificationResponse(CommonValues.classification1, null, classificationType)
     val classification2 = ClassificationResponse(CommonValues.classification2, null, classificationType)
@@ -264,11 +257,11 @@ object ResponseValues {
     val legalEntity1 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL1,
         properties = LegalEntityResponse(
-            names = listOf(name1, name2),
+            legalName = name1,
             identifiers = listOf(identifier1),
             legalForm = legalForm1,
-            status = status1,
-            profileClassifications = listOf(classification1, classification2)
+            status = listOf(status1),
+            classifications = listOf(classification1, classification2)
         ),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
@@ -276,11 +269,11 @@ object ResponseValues {
     val legalEntity2 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL2,
         properties = LegalEntityResponse(
-            names = listOf(name3, name4),
+            legalName = name3,
             identifiers = listOf(identifier2),
             legalForm = legalForm2,
-            status = status2,
-            profileClassifications = listOf(classification3, classification4)
+            status = listOf(status2),
+            classifications = listOf(classification3, classification4)
         ),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
     )
@@ -288,11 +281,11 @@ object ResponseValues {
     val legalEntity3 = LegalEntityPartnerResponse(
         bpn = CommonValues.bpnL3,
         properties = LegalEntityResponse(
-            names = listOf(name5),
+            legalName = name5,
             identifiers = listOf(identifier3),
             legalForm = legalForm3,
-            status = status3,
-            profileClassifications = listOf(classification5)
+            status = listOf(status3),
+            classifications = listOf(classification5)
         ),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
     )

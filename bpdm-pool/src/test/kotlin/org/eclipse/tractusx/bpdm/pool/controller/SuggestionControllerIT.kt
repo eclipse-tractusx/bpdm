@@ -69,7 +69,7 @@ class SuggestionControllerIT @Autowired constructor(
             .build()
 
         private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.properties
-        private val expectedLegalEntityName = expectedLegalEntity.names.first().value
+        private val expectedLegalEntityName = expectedLegalEntity.legalName.value
         private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
@@ -94,15 +94,15 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(
                     expectedLegalEntity.legalForm!!.name,
                     EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH,
-                    expectedLegalEntity.names.first().value
+                    expectedLegalEntity.legalName.value
                 ),
                 Arguments.of(
-                    expectedLegalEntity.status!!.officialDenotation,
+                    expectedLegalEntity.status.first().officialDenotation,
                     EndpointValues.CATENA_SUGGESTION_LE_STATUS_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalEntity.profileClassifications.first().value,
+                    expectedLegalEntity.classifications.first().value,
                     EndpointValues.CATENA_SUGGESTION_LE_CLASSIFICATION_PATH,
                     expectedLegalEntityName
                 ),
@@ -146,7 +146,7 @@ class SuggestionControllerIT @Autowired constructor(
         @JvmStatic
         fun argumentsSuggestPropertyValuesNonLatin(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(nonlatinLegalEntity.names.first().value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
+                Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
                 Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
                 Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),

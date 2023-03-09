@@ -49,15 +49,15 @@ class MetadataService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createIdentifierType(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+    fun createIdentifierType(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         if (identifierTypeRepository.findByTechnicalKey(type.technicalKey) != null)
             throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, type.technicalKey)
 
         logger.info { "Create new Identifier-Type with key ${type.technicalKey} and name ${type.name}" }
-        return identifierTypeRepository.save(IdentifierType(type.name, type.url, type.technicalKey)).toDto()
+        return identifierTypeRepository.save(IdentifierType(type.name, "", type.technicalKey)).toDto()
     }
 
-    fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameUrlDto<String>> {
+    fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
         val page = identifierTypeRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }
@@ -82,15 +82,15 @@ class MetadataService(
     }
 
     @Transactional
-    fun createIssuingBody(type: TypeKeyNameUrlDto<String>): TypeKeyNameUrlDto<String> {
+    fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         if (issuingBodyRepository.findByTechnicalKey(type.technicalKey) != null)
             throw BpdmAlreadyExists(IssuingBody::class.simpleName!!, type.technicalKey)
 
         logger.info { "Create new Issuing-Body with key ${type.technicalKey} and name ${type.name}" }
-        return issuingBodyRepository.save(IssuingBody(type.name, type.url, type.technicalKey)).toDto()
+        return issuingBodyRepository.save(IssuingBody(type.name, "", type.technicalKey)).toDto()
     }
 
-    fun getIssuingBodies(pageRequest: Pageable): PageResponse<TypeKeyNameUrlDto<String>> {
+    fun getIssuingBodies(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
         val page = issuingBodyRepository.findAll(pageRequest)
         return page.toDto( page.content.map { it.toDto() } )
     }
@@ -102,7 +102,14 @@ class MetadataService(
 
         logger.info { "Create new Legal-Form with key ${request.technicalKey}, name ${request.name} and ${request.category.size} categories" }
         val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toMutableSet()
-        val legalForm = LegalForm(request.name, request.url, request.language, request.mainAbbreviation, categories, request.technicalKey)
+        val legalForm = LegalForm(
+            name = request.name,
+            url = request.url,
+            language = request.language,
+            mainAbbreviation = request.mainAbbreviation,
+            categories = categories,
+            technicalKey = request.technicalKey
+        )
 
         return legalFormRepository.save(legalForm).toDto()
     }

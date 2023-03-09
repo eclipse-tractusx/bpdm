@@ -67,17 +67,16 @@ class MetadataControllerIT @Autowired constructor(
     companion object {
 
         private val identifierTypes = listOf(RequestValues.identifierType1, RequestValues.identifierType2, RequestValues.identifierType3)
-        private val identifierStatuses = listOf(RequestValues.identifierStatus1, RequestValues.identifierStatus2, RequestValues.identifierStatus3)
         private val issuingBodies = listOf(RequestValues.issuingBody1, RequestValues.issuingBody2, RequestValues.issuingBody3)
         private val legalFormRequests = listOf(
             RequestValues.legalForm1,
-            RequestValues.legalForm2.copy(category = listOf(RequestValues.legalFormCategory1)),
-            RequestValues.legalForm3.copy(category = listOf(RequestValues.legalFormCategory2, RequestValues.legalFormCategory3))
+            RequestValues.legalForm2,
+            RequestValues.legalForm3
         )
         private val legalFormExpected = listOf(
             ResponseValues.legalForm1,
-            ResponseValues.legalForm2.copy(categories = listOf(RequestValues.legalFormCategory1)),
-            ResponseValues.legalForm3.copy(categories = listOf(RequestValues.legalFormCategory2, RequestValues.legalFormCategory3))
+            ResponseValues.legalForm2,
+            ResponseValues.legalForm3
         )
 
         private fun postIdentifierType(client: WebTestClient, type: TypeKeyNameUrlDto<String>) =
@@ -148,11 +147,6 @@ class MetadataControllerIT @Autowired constructor(
                     ::postIdentifierType
                 ),
                 Arguments.of(
-                    RequestValues.identifierStatus1,
-                    RequestValues.identifierStatus1,
-                    ::postIdentifierStatus
-                ),
-                Arguments.of(
                     RequestValues.issuingBody1,
                     RequestValues.issuingBody1,
                     ::postIssuingBody
@@ -172,12 +166,6 @@ class MetadataControllerIT @Autowired constructor(
                     RequestValues.identifierType1,
                     ::postIdentifierTypeWithoutExpectation,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    RequestValues.identifierStatus1,
-                    RequestValues.identifierStatus1,
-                    ::postIdentifierStatusWithoutExpectation,
-                    ::getIdentifierStatus
                 ),
                 Arguments.of(
                     RequestValues.issuingBody1,
@@ -201,12 +189,6 @@ class MetadataControllerIT @Autowired constructor(
                     identifierTypes,
                     ::postIdentifierType,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    identifierStatuses,
-                    identifierStatuses,
-                    ::postIdentifierStatus,
-                    ::getIdentifierStatus
                 ),
                 Arguments.of(
                     issuingBodies,
@@ -366,8 +348,8 @@ class MetadataControllerIT @Autowired constructor(
         val givenCountryIdentifierTypes = listOf(countryIdentifierType1, countryIdentifierType2, countryIdentifierType3)
 
         val expected = listOf(
-            CountryIdentifierTypeResponse(TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, null), true),
-            CountryIdentifierTypeResponse(TypeKeyNameUrlDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3, null), false)
+            CountryIdentifierTypeResponse(TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1), true),
+            CountryIdentifierTypeResponse(TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3), false)
         )
 
         identifierTypeRepository.saveAll(givenIdentifierTypes)

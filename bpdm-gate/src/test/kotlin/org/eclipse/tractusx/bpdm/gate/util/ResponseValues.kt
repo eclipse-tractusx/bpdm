@@ -43,157 +43,98 @@ object ResponseValues {
 
     val identifier1 = IdentifierResponse(
         value = CommonValues.identifierValue1,
-        type = TypeKeyNameUrlDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
             name = CommonValues.identifierTypeName1,
-            url = CommonValues.identifierTypeUrl1
         ),
-        issuingBody = TypeKeyNameUrlDto(
+        issuingBody = TypeKeyNameDto(
             technicalKey = CommonValues.identifierIssuingBodyTechnicalKey1,
             name = CommonValues.identifierIssuingBodyName1,
-            url = CommonValues.identifierIssuingBodyUrl1
-        ),
-        status = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierStatusTechnicalKey1,
-            name = CommonValues.identifierStatusName1
         )
     )
     val identifier2 = IdentifierResponse(
         value = CommonValues.identifierValue2,
-        type = TypeKeyNameUrlDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
             name = CommonValues.identifierTypeName2,
-            url = CommonValues.identifierTypeUrl2
         ),
-        issuingBody = TypeKeyNameUrlDto(
+        issuingBody = TypeKeyNameDto(
             technicalKey = CommonValues.identifierIssuingBodyTechnicalKey2,
             name = CommonValues.identifierIssuingBodyName2,
-            url = CommonValues.identifierIssuingBodyUrl2
-        ),
-        status = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierStatusTechnicalKey2,
-            name = CommonValues.identifierStatusName2
         )
     )
     val identifier3 = IdentifierResponse(
         value = CommonValues.identifierValue3,
-        type = TypeKeyNameUrlDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
             name = CommonValues.identifierTypeName3,
-            url = CommonValues.identifierTypeUrl3
         ),
-        issuingBody = TypeKeyNameUrlDto(
+        issuingBody = TypeKeyNameDto(
             technicalKey = CommonValues.identifierIssuingBodyTechnicalKey3,
             name = CommonValues.identifierIssuingBodyName3,
-            url = CommonValues.identifierIssuingBodyUrl3
-        ),
-        status = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierStatusTechnicalKey3,
-            name = CommonValues.identifierStatusName3
         )
     )
     val identifier4 = IdentifierResponse(
         value = CommonValues.identifierValue4,
-        type = TypeKeyNameUrlDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey4,
             name = CommonValues.identifierTypeName4,
-            url = CommonValues.identifierTypeUrl4
         ),
-        issuingBody = TypeKeyNameUrlDto(
+        issuingBody = TypeKeyNameDto(
             technicalKey = CommonValues.identifierIssuingBodyTechnicalKey4,
             name = CommonValues.identifierIssuingBodyName4,
-            url = CommonValues.identifierIssuingBodyUrl4
-        ),
-        status = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierStatusTechnicalKey4,
-            name = CommonValues.identifierStatusName4
         )
     )
 
     val name1 = NameResponse(
         value = CommonValues.name1,
         shortName = CommonValues.shortName1,
-        type = TypeKeyNameUrlDto(
-            technicalKey = CommonValues.nameType1,
-            name = CommonValues.nameType1.getTypeName(),
-            url = CommonValues.nameType1.getUrl()
-        ),
-        language = language1
     )
 
     val name2 = NameResponse(
         value = CommonValues.name2,
         shortName = CommonValues.shortName2,
-        type = TypeKeyNameUrlDto(
-            technicalKey = CommonValues.nameType1,
-            name = CommonValues.nameType1.getTypeName(),
-            url = CommonValues.nameType1.getUrl()
-        ),
-        language = language1
     )
 
     val name3 = NameResponse(
         value = CommonValues.name3,
         shortName = CommonValues.shortName3,
-        type = TypeKeyNameUrlDto(
-            technicalKey = CommonValues.nameType1,
-            name = CommonValues.nameType1.getTypeName(),
-            url = CommonValues.nameType1.getUrl()
-        ),
-        language = language1
     )
 
     val name4 = NameResponse(
         value = CommonValues.name4,
         shortName = CommonValues.shortName4,
-        type = TypeKeyNameUrlDto(
-            technicalKey = CommonValues.nameType1,
-            name = CommonValues.nameType1.getTypeName(),
-            url = CommonValues.nameType1.getUrl()
-        ),
-        language = language1
     )
-
-    val legalFormCategory1 = TypeNameUrlDto(CommonValues.legalFormCategoryName1, CommonValues.legalFormCategoryUrl1)
-    val legalFormCategory2 = TypeNameUrlDto(CommonValues.legalFormCategoryName2, CommonValues.legalFormCategoryUrl2)
 
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
-        url = CommonValues.legalFormUrl1,
-        mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1,
-        categories = listOf(legalFormCategory1)
+        abbreviation = CommonValues.legalFormAbbreviation1,
     )
 
     val legalForm2 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey2,
         name = CommonValues.legalFormName2,
-        url = CommonValues.legalFormUrl2,
-        mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2,
-        categories = listOf(legalFormCategory2)
+        abbreviation = CommonValues.legalFormAbbreviation2,
     )
 
     val businessStatus1 = BusinessStatusResponse(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
-        validUntil = CommonValues.businessStatusValidUntil1,
-        type = TypeKeyNameUrlDto(
+        validTo = CommonValues.businessStatusValidUntil1,
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.businessStatusType1,
             name = CommonValues.businessStatusType1.getTypeName(),
-            url = CommonValues.businessStatusType1.getUrl()
         )
     )
 
     val businessStatus2 = BusinessStatusResponse(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
-        validUntil = CommonValues.businessStatusValidUntil2,
-        type = TypeKeyNameUrlDto(
+        validTo = CommonValues.businessStatusValidUntil2,
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.businessStatusType2,
             name = CommonValues.businessStatusType2.getTypeName(),
-            url = CommonValues.businessStatusType2.getUrl()
         )
     )
 
@@ -451,22 +392,18 @@ object ResponseValues {
 
     val legalEntityResponse1 = LegalEntityResponse(
         identifiers = listOf(identifier1, identifier2),
-        names = listOf(name1, name2),
+        legalName = name1,
         legalForm = legalForm1,
-        status = businessStatus1,
-        profileClassifications = listOf(classification1, classification2),
-        types = listOf(businessPartnerTypeLegalEntity),
-        bankAccounts = listOf(bankAccount1, bankAccount2)
+        status = listOf(businessStatus1),
+        classifications = listOf(classification1, classification2),
     )
 
     val legalEntityResponse2 = LegalEntityResponse(
         identifiers = listOf(identifier3, identifier4),
-        names = listOf(name3, name4),
+        legalName = name3,
         legalForm = legalForm2,
-        status = businessStatus2,
-        profileClassifications = listOf(classification3, classification4),
-        types = listOf(businessPartnerTypeLegalEntity),
-        bankAccounts = listOf(bankAccount3, bankAccount4)
+        status = listOf(businessStatus2),
+        classifications = listOf(classification3, classification4),
     )
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(

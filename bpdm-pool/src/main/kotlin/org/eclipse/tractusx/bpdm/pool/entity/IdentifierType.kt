@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 class IdentifierType(
     @Column(name = "name", nullable = false)
     val name: String,
+    // TODO remove
     @Column(name = "url")
     val url: String?,
     @Column(name = "technical_key", nullable = false)

@@ -30,8 +30,10 @@ import java.time.Instant
 data class LegalEntityPartnerResponse(
     @Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,
+
     @field:JsonUnwrapped
     val properties: LegalEntityResponse,
+
     @Schema(description = "The timestamp the business partner data was last indicated to be still current")
     val currentness: Instant
 )

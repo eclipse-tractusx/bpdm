@@ -27,13 +27,17 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 @Table(name = "legal_forms")
 class LegalForm(
     @Column(name = "name")
-    val name: String?,
+    val name: String,      // TODO now mandatory
+
     @Column(name = "url")
     val url: String?,
+
     @Column(name = "language", nullable = false)
     val language: LanguageCode,
+
     @Column(name = "abbreviation")
-    val mainAbbreviation: String?,
+    val mainAbbreviation: String?,  // TODO rename to abbreviation
+
     @ManyToMany(cascade = [CascadeType.ALL])
     @JoinTable(
         name = "legal_forms_legal_categories",
@@ -42,6 +46,7 @@ class LegalForm(
         indexes = [Index(columnList = "form_id"), Index(columnList = "category_id")]
     )
     val categories: MutableSet<LegalFormCategory>,
+
     @Column(name = "technical_key", nullable = false)
     val technicalKey: String
 ) : BaseEntity()

@@ -60,8 +60,6 @@ object CommonValues {
     val country2 = CountryCode.FR
     val country3 = CountryCode.PL
 
-    val nameType1 = NameType.OTHER
-
     val name1 = "Business Partner Name"
     val name2 = "Company ABC AG"
     val name3 = "Another Organisation Corp"
@@ -83,10 +81,6 @@ object CommonValues {
     val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
     val legalFormName3 = "股份有限公司"
 
-    val legalFormUrl1 = "http://catenax-host/legal-form1"
-    val legalFormUrl2 = "http://catenax-host/legal-form2"
-    val legalFormUrl3 = "http://catenax-host/legal-form3"
-
     val legalFormAbbreviation1 = "LLC"
     val legalFormAbbreviation2 = "GmbH"
     val legalFormAbbreviation3 = "股份有限"
@@ -107,10 +101,6 @@ object CommonValues {
     val identifierTypeName2 = "VAT USA"
     val identifierTypeName3 = "VAT France"
 
-    val identifierTypeUrl1 = "http://catenax-host/id-type1"
-    val identifierTypeUrl2 = "http://catenax-host/id-type2"
-    val identifierTypeUrl3 = "http://catenax-host/id-type3"
-
     val identifierStatusKey1 = "ACTIVE"
     val identifierStatusKey2 = "EXPIRED"
     val identifierStatusKey3 = "UNKNOWN"
@@ -127,17 +117,13 @@ object CommonValues {
     val issuingBodyName2 = "Body Y"
     val issuingBodyName3 = "Official Z"
 
-    val issuingBodyUrl1 = "http://catenax-host/issuing-body1"
-    val issuingBodyUrl2 = "http://catenax-host/issuing-body2"
-    val issuingBodyUrl3 = "http://catenax-host/issuing-body3"
-
     val identifierValue1 = "ID-XYZ"
     val identifierValue2 = "Another ID Value"
     val identifierValue3 = "An ID Value"
 
     val statusType1 = BusinessStatusType.ACTIVE
-    val statusType2 = BusinessStatusType.DISSOLVED
-    val statusType3 = BusinessStatusType.INSOLVENCY
+    val statusType2 = BusinessStatusType.INACTIVE
+    val statusType3 = BusinessStatusType.ACTIVE         // TODO unknown?
 
     val statusDenotation1 = "Active"
     val statusDenotation2 = "Dissolved"

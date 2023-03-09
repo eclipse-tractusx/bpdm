@@ -27,10 +27,13 @@ import org.eclipse.tractusx.bpdm.common.model.NameType
 data class NameDto(
     @Schema(description = "Full name")
     val value: String,
+
     @Schema(description = "Abbreviated name or shorthand")
     val shortName: String?,
+
     @Schema(description = "Type of specified name", defaultValue = "OTHER")
     val type: NameType = NameType.OTHER,
+
     @Schema(description = "Language in which the name is specified", defaultValue = "undefined")
     val language: LanguageCode = LanguageCode.undefined
 )
