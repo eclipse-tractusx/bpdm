@@ -17,19 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.model
 
-import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 
-/**
- * For every combination of possible errors a separate enum class is defined extending this marker interface.
- * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
- */
-interface ErrorCode
-
-@Schema(description = "BusinessPartnerOutputError")
-enum class BusinessPartnerOutputError : ErrorCode {
-    SharingProcessError,
-    SharingTimeout,
-    BpnNotInPool
-}
+data class SharingStatusEvaluationResult(
+    val validExternalIds: Collection<String>,
+    val pendingExternalIds: Collection<String>,
+    val errors: Collection<ErrorInfo<BusinessPartnerOutputError>>
+)

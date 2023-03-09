@@ -23,20 +23,97 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.SharingStatusSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
+import org.eclipse.tractusx.bpdm.gate.model.BusinessPartnerSaaSWithBpn
+import org.eclipse.tractusx.bpdm.gate.model.BusinessPartnerSaaSWithExternalId
+import org.eclipse.tractusx.bpdm.gate.model.SharingStatusEvaluationResult
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
 class OutputSaasMappingService(
     private val saasConfigProperties: SaasConfigProperties,
+    private val saasClient: SaasClient
 ) {
 
     private val logger = KotlinLogging.logger { }
+
+    fun mapWithLocalBpn(partners: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerSaaSWithBpn> {
+        val partnersWithExternalId = mapWithExternalId(partners)
+        val externalIds = partnersWithExternalId.map { it.externalId }
+
+        val augmentedPartnerResponse = saasClient.getAugmentedLegalEntities(externalIds = externalIds)
+        val augmentedPartnerWrapperCollection = augmentedPartnerResponse.values
+        val bpnByExternalIdMap = buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
+
+        val partnersWithLocalBpn = partnersWithExternalId
+            .filter { partner -> bpnByExternalIdMap[partner.externalId] != null }
+            .map { partner -> BusinessPartnerSaaSWithBpn(partner.partner, bpnByExternalIdMap[partner.externalId]!!, partner.externalId) }
+
+        return partnersWithLocalBpn
+    }
+
+    fun evaluateSharingStatus(
+        partners: Collection<BusinessPartnerSaas>,
+        partnersWithLocalBpn: Collection<BusinessPartnerSaaSWithBpn>,
+        partnersWithPoolBpn: Collection<BusinessPartnerSaaSWithBpn>
+    ): SharingStatusEvaluationResult {
+
+        val partnersWithExternalId = mapWithExternalId(partners)
+
+        val localBpnByExternalId = partnersWithLocalBpn.associateBy { it.externalId }
+        val poolBpnByExternalId = partnersWithPoolBpn.associateBy { it.externalId }
+
+        /// We sort all the entries in one of 3 buckets: valid content, errors or still pending
+        val validExternalIds = mutableListOf<String>()
+        val errors = mutableListOf<ErrorInfo<BusinessPartnerOutputError>>()
+        val pendingExternalIds = mutableListOf<String>()
+
+        partnersWithExternalId.forEach { partnerWithIds ->
+            val partner = partnerWithIds.partner
+            val sharingStatus = partner.metadata?.sharingStatus
+            val sharingStatusType = sharingStatus?.status
+            val externalId = partnerWithIds.externalId
+            val localBpn = localBpnByExternalId[externalId]?.bpn
+            val poolBpn = poolBpnByExternalId[externalId]?.bpn
+
+            if (sharingStatusType == null || sharingStatusType.isError()) {
+                // ERROR: SharingProcessError
+                errors.add(buildErrorInfoSharingProcessError(externalId, sharingStatus))
+            } else if (localBpn != null) {
+                if (poolBpn != null) {
+                    // OKAY: entry found in pool
+                    validExternalIds.add(externalId)
+                } else {
+                    // ERROR: BpnNotInPool
+                    errors.add(buildErrorInfoBpnNotInPool(externalId, localBpn))
+                }
+            } else if (isSharingTimeoutReached(partner)) {
+                // ERROR: SharingTimeout
+                errors.add(buildErrorInfoSharingTimeout(externalId, partner.lastModifiedAt))
+            } else {
+                pendingExternalIds.add(externalId)
+            }
+        }
+
+        return SharingStatusEvaluationResult(validExternalIds, pendingExternalIds, errors)
+    }
+
+
+    private fun mapWithExternalId(partners: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerSaaSWithExternalId> {
+        val (partnersWithExternalId, partnersWithoutExternalId) = partners.partition { it.externalId != null }
+        //Should only happen when paginating without filtering for externalIds
+        if (partnersWithoutExternalId.isNotEmpty()) {
+            logger.warn { "Encountered ${partnersWithoutExternalId.size} records without an externalId." }
+        }
+
+        return partnersWithExternalId.map { BusinessPartnerSaaSWithExternalId(it, it.externalId!!) }
+    }
 
     fun buildBpnByExternalIdMap(augmentedPartnerWrapperCollection: Collection<AugmentedBusinessPartnerResponseSaas>): Map<String, String?> {
         val augmentedPartnerCollection = augmentedPartnerWrapperCollection.mapNotNull { it.augmentedBusinessPartner }
