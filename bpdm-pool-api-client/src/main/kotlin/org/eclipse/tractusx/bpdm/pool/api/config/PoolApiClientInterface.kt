@@ -17,21 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.config
 
+import org.eclipse.tractusx.bpdm.pool.api.service.*
 
+interface PoolApiClientInterface {
 
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
+    fun addresses(): PoolClientAddressInterface
 
+    fun bpns(): PoolClientBpnInterface
 
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
+    fun businessPartners(): PoolClientBusinessPartnerInterface
+
+    fun legalEntities(): PoolClientLegalEntityInterface
+
+    fun metadata(): PoolClientMetadataInterface
+
+    fun sites(): PoolClientSiteInterface
+
+    fun suggestions(): PoolClientSuggestionInterface
+
+    fun opensearch(): PoolClientOpenSearchInterface
+
+    fun saas(): PoolClientSaasInterface
 }

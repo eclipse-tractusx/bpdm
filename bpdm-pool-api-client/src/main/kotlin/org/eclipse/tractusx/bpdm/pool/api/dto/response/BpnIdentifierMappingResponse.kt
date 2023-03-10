@@ -17,21 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
 
-
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
-}
+@Schema(name = "BpnIdentifierMappingResponse", description = "Mapping of Business Partner Number to identifier value")
+data class BpnIdentifierMappingResponse(
+    @Schema(description = "Value of the identifier")
+    val idValue: String,
+    @Schema(description = "Business Partner Number")
+    val bpn: String
+)

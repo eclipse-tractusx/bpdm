@@ -17,21 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
-}
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "AddressPartnerCreateResponse", description = "Created business partners of type address")
+data class AddressPartnerCreateResponse(
+    @Schema(description = "Business Partner Number of this address")
+    val bpn: String,
+    @field:JsonUnwrapped
+    val properties: AddressResponse,
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    val index: String?
+)

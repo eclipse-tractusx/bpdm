@@ -17,21 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 
+@Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
+data class SitePartnerCreateResponse(
+    @Schema(description = "Business Partner Number, main identifier value for sites")
+    val bpn: String,
+    @Schema(description = "Site name")
+    val name: String,
+    @Schema(description = "Main address of this site")
+    val mainAddress: AddressResponse,
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    val index: String?
+) {
 
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
 }

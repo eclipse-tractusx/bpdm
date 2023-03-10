@@ -17,21 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.request
 
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.PositiveOrZero
 
-
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
-}
+@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
+data class PaginationRequest (
+    @field:Parameter(
+        description = "Number of page to get results from", schema =
+        Schema(defaultValue = "0"))
+    @field:PositiveOrZero
+    val page: Int=0,
+    @field:Parameter(description = "Size of each page", schema =
+    Schema(defaultValue = "10"))
+    @field:Min(0)
+    @field:Max(100)
+    val size: Int=10
+)

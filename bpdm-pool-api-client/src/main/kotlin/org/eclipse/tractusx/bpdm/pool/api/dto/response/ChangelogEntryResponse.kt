@@ -17,21 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
+import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
-
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
-}
+@Schema(name = "ChangelogEntryResponse", description = "Changelog entry for a business partner")
+data class ChangelogEntryResponse(
+    @Schema(description = "Business Partner Number of the changelog entry")
+    val bpn: String,
+    @Schema(description = "The type of the change")
+    val changelogType: org.eclipse.tractusx.bpdm.pool.api.dto.ChangelogType,
+    @Schema(description = "The timestamp of the change")
+    val timestamp: Instant
+)

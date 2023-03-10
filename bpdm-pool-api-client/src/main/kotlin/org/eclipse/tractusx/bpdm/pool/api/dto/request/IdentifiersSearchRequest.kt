@@ -17,21 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.config
+package org.eclipse.tractusx.bpdm.pool.api.dto.request
 
+import io.swagger.v3.oas.annotations.media.Schema
 
-
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.function.client.WebClient
-
-
-@Configuration
-class PoolClientConfig {
-    @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
-    }
-}
+@Schema(name = "IdentifiersSearchRequest", description = "Contains identifiers to search legal entities by")
+data class IdentifiersSearchRequest(
+    @Schema(description = "Technical key of the type to which the identifiers belongs to")
+    val idType: String,
+    @Schema(description = "Values of the identifiers")
+    val idValues: List<String>
+)
