@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
 
 object RequestValues {
 

@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClient
+    val poolClient: PoolApiClient
 ) {
     @BeforeEach
     fun beforeEach() {

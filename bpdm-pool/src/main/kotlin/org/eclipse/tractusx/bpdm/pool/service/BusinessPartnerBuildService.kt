@@ -23,11 +23,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.client.dto.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*

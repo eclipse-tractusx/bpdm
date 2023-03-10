@@ -3,7 +3,7 @@
   "info": {
     "title": "Business Partner Data Management Gate",
     "description": "A gate for a member to share business partner data with CatenaX",
-    "version": "3.1.0"
+    "version": "3.1.1"
   },
   "servers": [
     {

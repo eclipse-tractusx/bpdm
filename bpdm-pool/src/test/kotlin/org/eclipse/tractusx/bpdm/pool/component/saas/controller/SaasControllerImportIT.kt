@@ -33,8 +33,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
@@ -61,7 +61,7 @@ class SaasControllerImportIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val importEntryRepository: ImportEntryRepository,
-    private val poolClient: PoolClient
+    private val poolClient: PoolApiClient
 ) {
     companion object {
         @RegisterExtension

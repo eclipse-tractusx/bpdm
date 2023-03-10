@@ -25,8 +25,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
-import org.springframework.web.bind.annotation.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.DeleteExchange
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange

@@ -203,7 +203,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             1, 1, 0, 1,
             listOf(
                 BusinessPartnerLookupMatchSaas(
-                    "0", "0",
+                    "0",
                     MatchingProfileSaas(
                         MatchingScoresSaas(MatchingScoreSaas(0.5f), MatchingScoreSaas(0.5f), MatchingScoreSaas(overallScore))
                     )

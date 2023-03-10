@@ -23,9 +23,7 @@ import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.entity.Address
 import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository

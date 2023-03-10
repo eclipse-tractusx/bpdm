@@ -19,20 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientBpnInterface
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientBpnInterface
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController

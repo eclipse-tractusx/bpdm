@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.controller
 
 
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientOpenSearchInterface
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientOpenSearchInterface
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.springframework.web.bind.annotation.RestController
 

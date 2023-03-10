@@ -23,8 +23,8 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.RequestValues
@@ -47,7 +47,7 @@ import org.springframework.test.context.DynamicPropertySource
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolClient
+    val poolClient: PoolApiClient
 ) {
     companion object {
         @RegisterExtension

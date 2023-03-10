@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.client.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.api.dto.ImportIdEntry
 
 data class ImportIdMappingResponse(
     val entries: Collection<ImportIdEntry>,

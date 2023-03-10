@@ -27,9 +27,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

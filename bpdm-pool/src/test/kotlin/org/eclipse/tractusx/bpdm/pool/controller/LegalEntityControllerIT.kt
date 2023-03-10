@@ -25,8 +25,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ import java.time.Instant
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
-    val poolClient: PoolClient
+    val poolClient: PoolApiClient
 ) {
     companion object {
         @RegisterExtension

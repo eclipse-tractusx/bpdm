@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.ImportIdEntry
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.ImportIdMappingResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.api.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto

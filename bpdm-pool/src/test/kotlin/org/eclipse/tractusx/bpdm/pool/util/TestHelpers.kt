@@ -29,11 +29,11 @@ import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.junit.Assert
@@ -54,7 +54,7 @@ class TestHelpers(
     private val objectMapper: ObjectMapper,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val poolClient: PoolClient
+    private val poolClient: PoolApiClient
 ) {
 
     val bpnLPattern = createBpnPattern(bpnConfigProperties.legalEntityChar)

@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientLegalEntityInterface
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientLegalEntityInterface
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService

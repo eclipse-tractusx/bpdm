@@ -23,11 +23,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SuggestionResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

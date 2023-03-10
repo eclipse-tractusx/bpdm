@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.client.dto.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.client.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.dto.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.api.dto.SyncType
 import java.time.Instant
 
 data class SyncResponse(

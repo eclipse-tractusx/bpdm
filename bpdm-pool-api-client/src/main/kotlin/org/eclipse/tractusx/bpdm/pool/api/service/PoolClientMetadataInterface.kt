@@ -29,9 +29,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.CountryIdentifierTypeResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.CountryIdentifierTypeResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange

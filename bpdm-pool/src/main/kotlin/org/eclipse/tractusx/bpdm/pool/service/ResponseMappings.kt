@@ -26,9 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.ChangelogEntryResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 

@@ -23,9 +23,9 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry

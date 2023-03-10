@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.BusinessPartnerWithBpn
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.BusinessPartnerWithParentBpn
 import org.springframework.stereotype.Service

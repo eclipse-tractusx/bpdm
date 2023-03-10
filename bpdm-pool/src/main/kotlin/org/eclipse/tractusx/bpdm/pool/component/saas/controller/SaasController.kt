@@ -19,22 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.saas.controller
 
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.ImportIdFilterRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientSaasInterface
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
-import org.eclipse.tractusx.bpdm.pool.client.dto.ImportIdEntry
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.ImportIdMappingResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientSaasInterface
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
-import org.springdoc.core.annotations.ParameterObject
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SaasController(

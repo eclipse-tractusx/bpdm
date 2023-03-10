@@ -26,16 +26,15 @@ import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchReque
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -48,7 +47,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
-    val poolClient: PoolClient
+    val poolClient: PoolApiClient
 ) {
     companion object {
         @RegisterExtension

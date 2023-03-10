@@ -23,12 +23,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
-    val poolClient: PoolClient
+    val poolClient: PoolApiClient
 ) {
 
     private val partnerStructure1 = LegalEntityStructureRequest(
@@ -143,7 +143,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
             )
         )
 
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name)
+        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name,0,10)
 
         assertPageEquals(pageResponse, expected)
     }
@@ -155,17 +155,15 @@ class LegalEntityControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner by site name, no result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name").content
+        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name",0,10).content
         assertThat(foundPartners).isEmpty()
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int? = null, size: Int? = null): PageResponse<LegalEntityMatchResponse> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int , size: Int ): PageResponse<LegalEntityMatchResponse> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
-        val page = page?.toInt() ?: 0
-        val size = size?.toInt() ?: 10
 
         return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest,PaginationRequest(page,size))
+            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest,PaginationRequest(page, size))
 
 
     }

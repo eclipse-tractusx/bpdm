@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.SuggestionResponse
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientSuggestionInterface
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SuggestionResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientSuggestionInterface
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.springframework.web.bind.annotation.RestController

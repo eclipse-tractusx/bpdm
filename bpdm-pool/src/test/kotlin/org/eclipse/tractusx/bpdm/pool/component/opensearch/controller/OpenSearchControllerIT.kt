@@ -27,12 +27,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.client.client.PoolClient
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
@@ -64,7 +64,7 @@ class OpenSearchControllerIT @Autowired constructor(
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers,
-    private val poolClient: PoolClient
+    private val poolClient: PoolApiClient
 ) {
 
     companion object {

@@ -19,19 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.client.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.client.service.PoolClientAddressInterface
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientAddressInterface
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
