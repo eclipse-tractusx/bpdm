@@ -6,6 +6,10 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## [3.1.1] - tbd
 
+### Fixed
+
+- BPDM Gate: internal server error when invoking the POST business-partners/type-match endpoint
+
 ## [3.1.0] - 2023-03-08
 
 ### Changed
