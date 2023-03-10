@@ -17,25 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto
+package org.eclipse.tractusx.bpdm.gate.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.client.exception.ErrorCode
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "SiteGateInput", description = " Site with legal entity reference ."
-)
-data class SiteGateInput(
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
-    @field:JsonUnwrapped
-    val site: SiteDto,
-    @Schema(description = "ID the record has in the external system where the record originates from")
-    val externalId: String,
-    @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String,
+@Schema(title = "ErrorInfo", description = "Holds information about failures")
+data class ErrorInfo<out ERROR : ErrorCode>(
+
+    @Schema(description = "Error code identifying the error")
+    val errorCode: ERROR,
+    @Schema(description = "Error message that explains the error")
+    val message: String,
+    @Schema(description = "Key (externalId) of the entity that failed")
+    val entityKey: String?
 )

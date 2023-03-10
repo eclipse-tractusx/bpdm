@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.service.TypeMatchingService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class GateClientBusinessPartnerController(
+class BusinessPartnerController(
     private val typeMatchingService: TypeMatchingService
 ) : GateClientBusinessPartnerInterface {
 

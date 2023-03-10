@@ -25,9 +25,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -58,7 +60,7 @@ interface GateClientAddressInterface {
     )
     @PutMapping("/input/addresses")
     @PutExchange("/input/addresses")
-    fun upsertAddresses (@RequestBody addresses: Collection<AddressGateInput>): ResponseEntity<Any>
+    fun upsertAddresses (@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit>
 
 
     @Operation(
@@ -74,7 +76,7 @@ interface GateClientAddressInterface {
 
     @GetMapping("/input/addresses/{externalId}")
     @GetExchange("/input/addresses/{externalId}")
-    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInput
+    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInputResponse
 
 
     @Operation(
@@ -89,7 +91,7 @@ interface GateClientAddressInterface {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInput>
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInputResponse>
 
     @Operation(
         summary = "Get page of addresses",
@@ -106,7 +108,7 @@ interface GateClientAddressInterface {
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody (required = false) externalIds: Collection<String>?
-    ): PageStartAfterResponse<AddressGateOutput>
+    ): PageOutputResponse<AddressGateOutput>
 
     @Operation(
         summary = "Validate an address partner",
@@ -121,7 +123,7 @@ interface GateClientAddressInterface {
     @PostMapping("/input/addresses/validation")
     @PostExchange("/input/addresses/validation")
     fun validateSite(
-        @RequestBody addressInput: AddressGateInput
+        @RequestBody addressInput: AddressGateInputRequest
     ): ValidationResponse
 
 }

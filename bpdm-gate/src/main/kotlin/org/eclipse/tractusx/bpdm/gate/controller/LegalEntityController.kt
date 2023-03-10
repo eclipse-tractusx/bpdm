@@ -60,9 +60,11 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -72,14 +74,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/catena")
-class GateClientLegalEntityController(
+class LegalEntityController(
     val legalEntityService: LegalEntityService,
     val apiConfigProperties: ApiConfigProperties,
     val validationService: ValidationService
 ) : GateClientLegalEntityInterface {
 
-    override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInput>): ResponseEntity<Any> {
+    override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -87,22 +88,22 @@ class GateClientLegalEntityController(
         return ResponseEntity(HttpStatus.OK)
     }
 
-    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInput {
+    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
-    override fun getLegalEntities(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInput> {
+    override fun getLegalEntities(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }
 
     override fun getLegalEntitiesOutput(
         paginationRequest: PaginationStartAfterRequest,
         externalIds: Collection<String>?
-    ): PageStartAfterResponse<LegalEntityGateOutput> {
+    ): PageOutputResponse<LegalEntityGateOutput> {
         return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 
-    override fun validateLegalEntity(legalEntityInput: LegalEntityGateInput): ValidationResponse {
+    override fun validateLegalEntity(legalEntityInput: LegalEntityGateInputRequest): ValidationResponse {
         return validationService.validate(legalEntityInput)
     }
 

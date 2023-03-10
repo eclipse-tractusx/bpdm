@@ -73,7 +73,7 @@ interface GateClientLegalEntityInterface {
     )
     @GetMapping("/input/legal-entities/{externalId}")
     @GetExchange("/input/legal-entities/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInput
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputResponse
 
     @Operation(
         summary = "Get page of legal entities",

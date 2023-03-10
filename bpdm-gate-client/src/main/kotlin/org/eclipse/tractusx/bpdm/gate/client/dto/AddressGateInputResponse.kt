@@ -50,4 +50,3 @@ data class AddressGateInputResponse(
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
 )
-

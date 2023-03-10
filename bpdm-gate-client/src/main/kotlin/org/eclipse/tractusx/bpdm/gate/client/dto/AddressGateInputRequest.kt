@@ -27,18 +27,22 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
-    name = "AddressGateInput", description = "Address with legal entity or site references. " +
+    name = "AddressGateInputRequest", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
 )
-data class AddressGateInput(
-    @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
+data class AddressGateInputRequest(
     @field:JsonUnwrapped
     val address: AddressDto,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
+
     @Schema(description = "External id of the related legal entity")
     val legalEntityExternalId: String? = null,
+
     @Schema(description = "External id of the related site")
-    val siteExternalId: String? = null
+    val siteExternalId: String? = null,
+
+    @Schema(description = "Business Partner Number")
+    val bpn: String? = null
 )

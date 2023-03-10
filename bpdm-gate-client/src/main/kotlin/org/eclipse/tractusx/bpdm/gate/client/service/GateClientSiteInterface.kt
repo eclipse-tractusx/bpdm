@@ -25,9 +25,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInput
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -57,7 +59,7 @@ interface GateClientSiteInterface {
     )
     @PutMapping("/input/sites")
     @PutExchange("/input/sites")
-    fun upsertSites(@RequestBody sites: Collection<SiteGateInput>): ResponseEntity<Any>
+    fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Any>
 
     @Operation(
         summary = "Get site by external identifier",
@@ -71,7 +73,7 @@ interface GateClientSiteInterface {
     )
     @GetMapping("/input/sites/{externalId}")
     @GetExchange("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInput
+    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputResponse
 
     @Operation(
         summary = "Get page of sites",
@@ -85,7 +87,7 @@ interface GateClientSiteInterface {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInput>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",
@@ -102,7 +104,7 @@ interface GateClientSiteInterface {
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageStartAfterResponse<SiteGateOutput>
+    ): PageOutputResponse<SiteGateOutput>
 
     @Operation(
         summary = "Validate a site",
@@ -117,7 +119,7 @@ interface GateClientSiteInterface {
     @PostMapping("/input/sites/validation")
     @PostExchange("/input/sites/validation")
     fun validateSite(
-        @RequestBody siteInput: SiteGateInput
+        @RequestBody siteInput: SiteGateInputRequest
     ): ValidationResponse
 
 }
