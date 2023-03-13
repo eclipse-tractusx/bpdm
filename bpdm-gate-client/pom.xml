@@ -23,8 +23,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <artifactId>bpdm-gate-client</artifactId>
-    <name>Business Partner Data Management Gate Client</name>
-    <description>Service that doest request for Client Gate</description>
+    <name>Business Partner Data Management Gate Api Client</name>
+    <description>Service that does request for Client Gate</description>
     <packaging>jar</packaging>
 
     <parent>
@@ -83,7 +83,6 @@
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
 
         <plugins>
             <plugin>

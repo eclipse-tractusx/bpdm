@@ -28,14 +28,13 @@ import kotlin.reflect.full.memberProperties
 
 class ParameterObjectArgumentResolver : HttpServiceArgumentResolver {
 
-    val conversionService = DefaultFormattingConversionService()
+    private val conversionService = DefaultFormattingConversionService()
     override fun resolve(argument: Any?, parameter: MethodParameter, requestValues: HttpRequestValues.Builder): Boolean {
         val annot = parameter.getParameterAnnotation(ParameterObject::class.java)
         if (annot != null && argument != null) {
             for (memberProperty in argument.javaClass.kotlin.memberProperties) {
                 val propName = memberProperty.name
-                val propValue = memberProperty.get(argument)
-                val propValueString = when (propValue) {
+                val propValueString = when (val propValue = memberProperty.get(argument)) {
                     is String -> propValue
                     else -> conversionService.convert(propValue, String::class.java)
                 }

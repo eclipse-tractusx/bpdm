@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.client.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 
 @Schema(description = "Paginated collection of results")
 data class PageOutputResponse<T>(

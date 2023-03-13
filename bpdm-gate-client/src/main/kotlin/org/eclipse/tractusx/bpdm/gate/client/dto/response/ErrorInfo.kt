@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.client.exception.ErrorCode
+import org.eclipse.tractusx.bpdm.gate.exception.ErrorCode
 
 @Schema(title = "ErrorInfo", description = "Holds information about failures")
 data class ErrorInfo<out ERROR : ErrorCode>(

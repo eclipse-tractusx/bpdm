@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.exception
+package org.eclipse.tractusx.bpdm.gate.exception
 
 import io.swagger.v3.oas.annotations.media.Schema
 
