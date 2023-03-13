@@ -20,16 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.dto
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.LocalDateTime
 
-@JsonDeserialize(using = SiteGateInputResponseDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
     name = "SiteGateInputResponse", description = "Site with legal entity reference"
 )
@@ -49,19 +46,3 @@ data class SiteGateInputResponse(
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
 )
-
-private class SiteGateInputResponseDeserializer(vc: Class<SiteGateInputResponse>?) : StdDeserializer<SiteGateInputResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): SiteGateInputResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return SiteGateInputResponse(
-            site = ctxt.readTreeAsValue(node, SiteDto::class.java),
-            externalId = node.get(SiteGateInputResponse::externalId.name).textValue(),
-            legalEntityExternalId = node.get(SiteGateInputResponse::legalEntityExternalId.name)?.textValue()!!,
-            bpn = node.get(SiteGateInputResponse::bpn.name)?.textValue(),
-            processStartedAt = node.get(SiteGateInputResponse::processStartedAt.name).let {
-                if (it.isNull) null
-                else ctxt.readTreeAsValue(it, LocalDateTime::class.java)
-            }
-        )
-    }
-}
