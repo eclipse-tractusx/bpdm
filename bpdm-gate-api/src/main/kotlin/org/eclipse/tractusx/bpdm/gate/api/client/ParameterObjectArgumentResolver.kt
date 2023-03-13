@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.config
+package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.core.MethodParameter

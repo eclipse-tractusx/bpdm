@@ -57,7 +57,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
+import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
@@ -78,7 +78,7 @@ class LegalEntityController(
     val legalEntityService: LegalEntityService,
     val apiConfigProperties: ApiConfigProperties,
     val validationService: ValidationService
-) : GateClientLegalEntityInterface {
+) : GateLegalEntityApi {
 
     override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Any> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {

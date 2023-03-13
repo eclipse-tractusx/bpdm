@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.gate.client.config.GateClient
-import org.eclipse.tractusx.bpdm.gate.client.config.GateClientServiceConfig
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClientImpl
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,7 +31,7 @@ class GateClientConfig {
 
     @Bean
     fun gateClient(webServerAppCtxt: ServletWebServerApplicationContext): GateClient {
-        return GateClientServiceConfig { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
+        return GateClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
     }
 
 }

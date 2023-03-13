@@ -40,7 +40,7 @@
         <module>bpdm-pool</module>
         <module>bpdm-gate</module>
         <module>bpdm-common</module>
-        <module>bpdm-gate-client</module>
+        <module>bpdm-gate-api</module>
     </modules>
 
     <properties>
@@ -85,7 +85,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>bpdm-gate-client</artifactId>
+                <artifactId>bpdm-gate-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

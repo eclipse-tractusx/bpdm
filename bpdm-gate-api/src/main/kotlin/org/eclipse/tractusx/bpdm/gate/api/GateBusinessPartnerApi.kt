@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.service
+package org.eclipse.tractusx.bpdm.gate.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -33,7 +33,7 @@ import org.springframework.web.service.annotation.PostExchange
 
 @RequestMapping("/api/catena/business-partners")
 @HttpExchange("/api/catena/business-partners")
-interface GateClientBusinessPartnerInterface {
+interface GateBusinessPartnerApi {
 
     @Operation(
         summary = "Determine the LSA type of a business partner candidate",

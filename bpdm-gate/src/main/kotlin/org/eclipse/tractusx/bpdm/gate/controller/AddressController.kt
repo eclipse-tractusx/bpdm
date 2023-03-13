@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientAddressInterface
+import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -41,7 +41,7 @@ class AddressController(
     private val addressService: AddressService,
     private val apiConfigProperties: ApiConfigProperties,
     private val validationService: ValidationService
-) : GateClientAddressInterface {
+) : GateAddressApi {
 
     override fun upsertAddresses(addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {

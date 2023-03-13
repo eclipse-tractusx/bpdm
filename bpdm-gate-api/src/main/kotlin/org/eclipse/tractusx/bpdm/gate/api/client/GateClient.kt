@@ -17,21 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.config
+package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientAddressInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientBusinessPartnerInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientSiteInterface
+import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
+import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
+import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 
 interface GateClient {
 
-    fun addresses(): GateClientAddressInterface
+    fun addresses(): GateAddressApi
 
-    fun businessPartners(): GateClientBusinessPartnerInterface
+    fun businessPartners(): GateBusinessPartnerApi
 
-    fun legalEntities(): GateClientLegalEntityInterface
+    fun legalEntities(): GateLegalEntityApi
 
-    fun sites(): GateClientSiteInterface
+    fun sites(): GateSiteApi
 
 }

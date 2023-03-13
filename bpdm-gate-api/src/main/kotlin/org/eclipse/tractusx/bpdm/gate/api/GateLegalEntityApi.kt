@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.service
+package org.eclipse.tractusx.bpdm.gate.api
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -42,7 +42,7 @@ import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena")
 @HttpExchange("/api/catena")
-interface GateClientLegalEntityInterface {
+interface GateLegalEntityApi {
 
     @Operation(
         summary = "Create or update legal entities.",

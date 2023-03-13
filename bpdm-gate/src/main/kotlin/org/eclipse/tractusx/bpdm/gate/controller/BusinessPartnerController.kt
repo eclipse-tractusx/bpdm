@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientBusinessPartnerInterface
+import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class BusinessPartnerController(
     private val typeMatchingService: TypeMatchingService
-) : GateClientBusinessPartnerInterface {
+) : GateBusinessPartnerApi {
 
     override fun determineLsaType(candidate: BusinessPartnerCandidateDto): TypeMatchResponse {
         if (candidate.names.isEmpty() && candidate.identifiers.isEmpty())

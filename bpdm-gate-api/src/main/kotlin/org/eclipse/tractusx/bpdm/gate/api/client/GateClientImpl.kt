@@ -17,17 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.client.config
+package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientAddressInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientBusinessPartnerInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientLegalEntityInterface
-import org.eclipse.tractusx.bpdm.gate.client.service.GateClientSiteInterface
+import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
+import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
+import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 
-class GateClientServiceConfig(
+class GateClientImpl(
     private val webClientProvider: () -> WebClient
 ) : GateClient {
 
@@ -38,10 +38,10 @@ class GateClientServiceConfig(
             .build()
     }
 
-    private val gateClientAddress by lazy { httpServiceProxyFactory.createClient(GateClientAddressInterface::class.java) }
-    private val gateClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(GateClientBusinessPartnerInterface::class.java) }
-    private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateClientLegalEntityInterface::class.java) }
-    private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateClientSiteInterface::class.java) }
+    private val gateClientAddress by lazy { httpServiceProxyFactory.createClient(GateAddressApi::class.java) }
+    private val gateClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(GateBusinessPartnerApi::class.java) }
+    private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateLegalEntityApi::class.java) }
+    private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateSiteApi::class.java) }
 
     override fun addresses() = gateClientAddress
 
