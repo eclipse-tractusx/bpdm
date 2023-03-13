@@ -20,16 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.dto
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.LocalDateTime
 
-@JsonDeserialize(using = LegalEntityGateInputResponseDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityGateInputResponse", description = "Legal entity with external id")
 data class LegalEntityGateInputResponse(
     @field:JsonUnwrapped
@@ -44,18 +41,3 @@ data class LegalEntityGateInputResponse(
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
 )
-
-private class LegalEntityGateInputResponseDeserializer(vc: Class<LegalEntityGateInputResponse>?) : StdDeserializer<LegalEntityGateInputResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): LegalEntityGateInputResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return LegalEntityGateInputResponse(
-            legalEntity = ctxt.readTreeAsValue(node, LegalEntityDto::class.java),
-            externalId = node.get(LegalEntityGateInputResponse::externalId.name).textValue(),
-            bpn = node.get(LegalEntityGateInputResponse::bpn.name)?.textValue(),
-            processStartedAt = node.get(LegalEntityGateInputResponse::processStartedAt.name).let {
-                if (it.isNull) null
-                else ctxt.readTreeAsValue(it, LocalDateTime::class.java)
-            }
-        )
-    }
-}

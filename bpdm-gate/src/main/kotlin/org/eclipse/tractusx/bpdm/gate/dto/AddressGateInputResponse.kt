@@ -20,16 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.dto
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.LocalDateTime
 
-@JsonDeserialize(using = AddressGateInputResponseDeserializer::class)
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
     name = "AddressGateInputResponse", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
@@ -53,20 +50,3 @@ data class AddressGateInputResponse(
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
 )
-
-private class AddressGateInputResponseDeserializer(vc: Class<AddressGateInputResponse>?) : StdDeserializer<AddressGateInputResponse>(vc) {
-    override fun deserialize(parser: JsonParser, ctxt: DeserializationContext): AddressGateInputResponse {
-        val node = parser.codec.readTree<JsonNode>(parser)
-        return AddressGateInputResponse(
-            address = ctxt.readTreeAsValue(node, AddressDto::class.java),
-            externalId = node.get(AddressGateInputResponse::externalId.name).textValue(),
-            legalEntityExternalId = node.get(AddressGateInputResponse::legalEntityExternalId.name)?.textValue(),
-            siteExternalId = node.get(AddressGateInputResponse::siteExternalId.name)?.textValue(),
-            bpn = node.get(AddressGateInputResponse::bpn.name)?.textValue(),
-            processStartedAt = node.get(AddressGateInputResponse::processStartedAt.name).let {
-                if (it.isNull) null
-                else ctxt.readTreeAsValue(it, LocalDateTime::class.java)
-            }
-        )
-    }
-}
