@@ -24,12 +24,15 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
-import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
+import org.eclipse.tractusx.bpdm.pool.entity.LegalFormCategory
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.repository.CountryIdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,9 +43,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class MetadataService(
     val identifierTypeRepository: IdentifierTypeRepository,
-    val issuingBodyRepository: IssuingBodyRepository,
     val legalFormRepository: LegalFormRepository,
-    val identifierStatusRepository: IdentifierStatusRepository,
     val countryIdentifierTypeRepository: CountryIdentifierTypeRepository
 ) {
 
@@ -65,39 +66,6 @@ class MetadataService(
     fun getValidIdentifierTypesForCountry(countryCode: CountryCode): Collection<CountryIdentifierTypeResponse> {
         val countryIdentifierTypes = countryIdentifierTypeRepository.findByCountryCodeInOrCountryCodeIsNull(setOf(countryCode))
         return countryIdentifierTypes.map { CountryIdentifierTypeResponse(it.identifierType.toDto(), it.mandatory) }
-    }
-
-    // TODO remove
-    @Transactional
-    fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        if (identifierStatusRepository.findByTechnicalKey(status.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierStatus::class.simpleName!!, status.technicalKey)
-
-        logger.info { "Create new Identifier-Status with key ${status.technicalKey} and name ${status.name}" }
-        return identifierStatusRepository.save(IdentifierStatus(status.name, status.technicalKey)).toDto()
-    }
-
-    fun getIdentifierStati(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
-        val page = identifierStatusRepository.findAll(pageRequest)
-        return page.toDto( page.content.map { it.toDto() } )
-    }
-
-    // TODO remove
-    @Transactional
-    fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        if (issuingBodyRepository.findByTechnicalKey(type.technicalKey) != null)
-            throw BpdmAlreadyExists(IssuingBody::class.simpleName!!, type.technicalKey)
-
-        logger.info { "Create new Issuing-Body with key ${type.technicalKey} and name ${type.name}" }
-//        return issuingBodyRepository.save(IssuingBody(type.name, "", type.technicalKey)).toDto()
-        return TypeKeyNameDto(type.technicalKey, type.name)
-    }
-
-    // TODO remove
-    fun getIssuingBodies(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
-        val page = issuingBodyRepository.findAll(pageRequest)
-//        return page.toDto( page.content.map { it.toDto() } )
-        return page.toDto( listOf() )
     }
 
     @Transactional
