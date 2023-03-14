@@ -48,27 +48,6 @@ class MetadataController(
         return metadataService.getValidIdentifierTypesForCountry(country)
     }
 
-    // TODO remove
-    @Deprecated("IdentifierStatus removed")
-    override fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        return metadataService.createIdentifierStatus(status)
-    }
-
-    // TODO remove
-    override fun getIdentifierStati(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
-        return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
-    }
-
-    // TODO remove
-    override fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        return metadataService.createIssuingBody(type)
-    }
-
-    // TODO remove
-    override fun getIssuingBodies(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
-        return metadataService.getIssuingBodies(PageRequest.of(paginationRequest.page, paginationRequest.size))
-    }
-
     override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {
         return metadataService.createLegalForm(type)
     }

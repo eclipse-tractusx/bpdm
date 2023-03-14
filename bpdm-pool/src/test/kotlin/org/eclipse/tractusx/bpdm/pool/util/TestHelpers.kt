@@ -189,10 +189,6 @@ class TestHelpers(
         poolClient.metadata().createIdentifierType(RequestValues.identifierType1)
         poolClient.metadata().createIdentifierType(RequestValues.identifierType2)
         poolClient.metadata().createIdentifierType(RequestValues.identifierType3)
-
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody1)
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody2)
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody3)
     }
 
 
