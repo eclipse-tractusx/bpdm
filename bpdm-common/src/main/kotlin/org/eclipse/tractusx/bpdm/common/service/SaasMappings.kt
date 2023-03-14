@@ -93,6 +93,7 @@ object SaasMappings {
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
         return SiteDto(
             name = names.first().value,
+            status = if (status != null) listOf(toDto(status)) else listOf(),
             mainAddress = toDto(addresses.first())
         )
     }

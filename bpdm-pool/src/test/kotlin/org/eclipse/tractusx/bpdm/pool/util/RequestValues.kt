@@ -22,8 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
@@ -219,6 +217,7 @@ object RequestValues {
     val siteCreate1 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName1,
+            status = listOf(status1),
             mainAddress = address1
         ),
         index = CommonValues.index1,
@@ -228,6 +227,7 @@ object RequestValues {
     val siteCreate2 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName2,
+            status = listOf(status2),
             mainAddress = address2
         ),
         index = CommonValues.index2,
@@ -237,6 +237,7 @@ object RequestValues {
     val siteCreate3 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName3,
+            status = listOf(status3),
             mainAddress = address3
         ),
         index = CommonValues.index3,

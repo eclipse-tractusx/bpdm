@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 
+// TODO What's the distinction between SitePartnerSearchResponse, SitePartnerResponse and SiteResponse??
 @Schema(name = "SitePartnerSearchResponse", description = "Business partner of type site with parent BPN")
 data class SitePartnerSearchResponse(
     @Schema(description = "Site properties")
