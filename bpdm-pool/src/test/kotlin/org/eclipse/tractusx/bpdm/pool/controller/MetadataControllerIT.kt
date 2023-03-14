@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
@@ -67,7 +66,6 @@ class MetadataControllerIT @Autowired constructor(
     companion object {
 
         private val identifierTypes = listOf(RequestValues.identifierType1, RequestValues.identifierType2, RequestValues.identifierType3)
-        private val issuingBodies = listOf(RequestValues.issuingBody1, RequestValues.issuingBody2, RequestValues.issuingBody3)
         private val legalFormRequests = listOf(
             RequestValues.legalForm1,
             RequestValues.legalForm2,
@@ -79,32 +77,14 @@ class MetadataControllerIT @Autowired constructor(
             ResponseValues.legalForm3
         )
 
-        private fun postIdentifierType(client: WebTestClient, type: TypeKeyNameUrlDto<String>) =
+        private fun postIdentifierType(client: WebTestClient, type: TypeKeyNameDto<String>) =
             postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
         private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int) =
-            getMetadata<PageResponse<TypeKeyNameUrlDto<String>>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
+            getMetadata<PageResponse<TypeKeyNameDto<String>>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: TypeKeyNameUrlDto<String>) =
+        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: TypeKeyNameDto<String>) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
-
-        private fun postIdentifierStatus(client: WebTestClient, type: TypeKeyNameDto<String>) =
-            postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH)
-
-        private fun getIdentifierStatus(client: WebTestClient, page: Int, size: Int) =
-            getMetadata<PageResponse<TypeKeyNameDto<String>>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH)
-
-        private fun postIdentifierStatusWithoutExpectation(client: WebTestClient, type: TypeKeyNameDto<String>) =
-            postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_STATUS_PATH)
-
-        private fun postIssuingBody(client: WebTestClient, type: TypeKeyNameUrlDto<String>) =
-            postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH)
-
-        private fun getIssuingBodies(client: WebTestClient, page: Int, size: Int) =
-            getMetadata<PageResponse<TypeKeyNameUrlDto<String>>>(client, page, size, EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH)
-
-        private fun postIssuingBodyWithoutExpectation(client: WebTestClient, type: TypeKeyNameUrlDto<String>) =
-            postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_ISSUING_BODY_PATH)
 
         private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
             postMetadata<LegalFormRequest, LegalFormResponse>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
@@ -147,11 +127,6 @@ class MetadataControllerIT @Autowired constructor(
                     ::postIdentifierType
                 ),
                 Arguments.of(
-                    RequestValues.issuingBody1,
-                    RequestValues.issuingBody1,
-                    ::postIssuingBody
-                ),
-                Arguments.of(
                     RequestValues.legalForm1,
                     ResponseValues.legalForm1,
                     ::postLegalForm
@@ -166,12 +141,6 @@ class MetadataControllerIT @Autowired constructor(
                     RequestValues.identifierType1,
                     ::postIdentifierTypeWithoutExpectation,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    RequestValues.issuingBody1,
-                    RequestValues.issuingBody1,
-                    ::postIssuingBodyWithoutExpectation,
-                    ::getIssuingBodies
                 ),
                 Arguments.of(
                     RequestValues.legalForm1,
@@ -189,12 +158,6 @@ class MetadataControllerIT @Autowired constructor(
                     identifierTypes,
                     ::postIdentifierType,
                     ::getIdentifierTypes
-                ),
-                Arguments.of(
-                    issuingBodies,
-                    issuingBodies,
-                    ::postIssuingBody,
-                    ::getIssuingBodies
                 ),
                 Arguments.of(
                     legalFormRequests,

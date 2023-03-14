@@ -87,28 +87,12 @@ class PartnerImportPageService(
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerSaas>){
         partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.status?.technicalKey == null) null else id.status } }
-            .associateBy { it.technicalKey }
-            .minus(metadataService.getIdentifierStati(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
-            .values
-            .map { mappingService.toRequest(it) }
-            .forEach { metadataService.createIdentifierStatus(it) }
-
-        partners
             .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
             .associateBy { it.technicalKey }
             .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
             .values
             .map { mappingService.toRequest(it) }
             .forEach { metadataService.createIdentifierType(it) }
-
-        partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.issuingBody?.technicalKey == null) null else id.issuingBody } }
-            .associateBy { it.technicalKey }
-            .minus(metadataService.getIssuingBodies(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
-            .values
-            .map { mappingService.toRequest(it) }
-            .forEach { metadataService.createIssuingBody(it) }
 
         partners
             .filter { it.legalForm?.technicalKey != null }

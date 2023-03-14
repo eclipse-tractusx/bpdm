@@ -28,7 +28,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
@@ -94,60 +93,6 @@ interface PoolMetadataApi {
     @GetMapping("/identifier-types/for-country")
     @GetExchange("/identifier-types/for-country")
     fun getValidIdentifierTypesForCountry(@Parameter @RequestParam country: CountryCode): Collection<CountryIdentifierTypeResponse>
-
-    @Operation(
-        summary = "Create new identifier status",
-        description = "Create a new identifier status which can be referenced by business partner records. " +
-                "A status further distinguishes an identifier by adding current status information such as active or revoked." +
-                "The actual name of the identifier status is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "New identifier status successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "409", description = "Identifier status with specified technical key already exists", content = [Content()])
-        ])
-    @PostMapping("/identifier-status")
-    @PostExchange("/identifier-status")
-    fun createIdentifierStatus(@RequestBody status: TypeKeyNameDto<String>): TypeKeyNameDto<String>
-
-    @Operation(summary = "Get page of identifier statuses",
-        description = "Lists all currently known identifier statuses in a paginated result")
-    @ApiResponses(value = [
-        ApiResponse(responseCode = "200", description = "Page of existing identifier statuses, may be empty"),
-        ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-    ])
-    @GetMapping("/identifier-status")
-    @GetExchange("/identifier-status")
-    fun getIdentifierStati(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
-    @Operation(
-        summary = "Create new issuing body",
-        description = "Create a new issuing body which can be referenced by business partner records. " +
-                "An issuing body should be an entity which the Catena organisation trusts to issue identifiers." +
-                "The actual name of the issuing body is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "New issuing body successfully created"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "409", description = "Issuing body with specified technical key already exists", content = [Content()])
-        ]
-    )
-    @PostMapping("/issuing-bodies")
-    @PostExchange("/issuing-bodies")
-    fun createIssuingBody(@RequestBody type: TypeKeyNameDto<String>): TypeKeyNameDto<String>
-
-    @Operation(summary = "Get page of issuing bodies",
-        description = "Lists all currently known issuing bodies in a paginated result")
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Page of existing issuing bodies, may be empty"),
-            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
-        ]
-    )
-    @GetMapping("/issuing-bodies")
-    @GetExchange("/issuing-bodies")
-    fun getIssuingBodies(@ParameterObject paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>>
 
     @Operation(
         summary = "Create new legal form",

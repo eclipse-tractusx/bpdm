@@ -67,6 +67,7 @@ class MetadataService(
         return countryIdentifierTypes.map { CountryIdentifierTypeResponse(it.identifierType.toDto(), it.mandatory) }
     }
 
+    // TODO remove
     @Transactional
     fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         if (identifierStatusRepository.findByTechnicalKey(status.technicalKey) != null)

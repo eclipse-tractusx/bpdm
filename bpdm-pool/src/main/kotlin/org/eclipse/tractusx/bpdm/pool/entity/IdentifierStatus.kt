@@ -24,6 +24,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Table
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
+// TODO remove
 @Entity
 @Table(name = "identifier_status")
 class IdentifierStatus(

@@ -23,11 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierStatusRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IssuingBodyRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.stereotype.Service
 
@@ -37,8 +34,6 @@ import org.springframework.stereotype.Service
 @Service
 class MetadataMappingService(
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val identifierStatusRepository: IdentifierStatusRepository,
-    private val issuingBodyRepository: IssuingBodyRepository,
     private val legalFormRepository: LegalFormRepository
 ) {
 
@@ -48,7 +43,6 @@ class MetadataMappingService(
     fun mapRequests(partners: Collection<LegalEntityDto>): MetadataMappingDto {
         return MetadataMappingDto(
             idTypes = mapIdentifierTypes(partners),
-            issuingBodies = mapIssuingBodies(partners),
             legalForms = mapLegalForms(partners)
         )
     }
@@ -61,13 +55,6 @@ class MetadataMappingService(
     }
 
     /**
-     * Fetch [IssuingBody] referenced in [partners] and map them by their referenced keys
-     */
-    fun mapIssuingBodies(partners: Collection<LegalEntityDto>): Map<String, IssuingBody>{
-        return mapIssuingBodies(partners.flatMap { it.identifiers.mapNotNull{  id -> id.issuingBody } }.toSet())
-    }
-
-    /**
      * Fetch [LegalForm] referenced in [partners] and map them by their referenced keys
      */
     fun mapLegalForms(partners: Collection<LegalEntityDto>): Map<String, LegalForm>{
@@ -77,12 +64,6 @@ class MetadataMappingService(
 
     private fun mapIdentifierTypes(keys: Set<String>): Map<String, IdentifierType>{
         val typeMap = identifierTypeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
-        assertKeysFound(keys, typeMap)
-        return typeMap
-    }
-
-    private fun mapIssuingBodies(keys: Set<String>): Map<String, IssuingBody>{
-        val typeMap = issuingBodyRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }

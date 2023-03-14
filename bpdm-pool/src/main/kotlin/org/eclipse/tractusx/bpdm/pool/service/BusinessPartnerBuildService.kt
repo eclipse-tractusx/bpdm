@@ -429,8 +429,9 @@ class BusinessPartnerBuildService(
         return Identifier(
             value = dto.value,
             type = metadataMap.idTypes[dto.type]!!,
-            status = null,
-            issuingBody = if (dto.issuingBody != null) metadataMap.issuingBodies[dto.issuingBody]!! else null,
+            status = null,      // TODO
+//            issuingBody = dto.issuingBody,
+            issuingBody = null,     // TODO
             legalEntity = partner
         )
     }
