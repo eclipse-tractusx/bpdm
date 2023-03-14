@@ -22,12 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,19 +34,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val webTestClient: WebTestClient
+    val poolClient: PoolApiClient
 ) {
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createTestMetadata()
     }
 
     /**
@@ -57,7 +55,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s`() {
-        val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1), webTestClient)
+        val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
 
         val importedPartner = createdStructures.single().legalEntity
         importedPartner.bpn
@@ -75,11 +73,8 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s, not found`() {
-        testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1), webTestClient)
-
-        webTestClient.get()
-            .uri(EndpointValues.CATENA_SITES_PATH + "/NONEXISTENT_BPN")
-            .exchange().expectStatus().isNotFound
+        testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
+        testHelpers.`get site by bpn-s, not found`("NONEXISTENT_BPN")
     }
 
     /**
@@ -99,8 +94,7 @@ class SiteControllerIT @Autowired constructor(
                         SiteStructureRequest(site = RequestValues.siteCreate3)
                     )
                 )
-            ),
-            webTestClient
+            )
         )
 
         val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
@@ -108,8 +102,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL = createdStructures[0].legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
-
+        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
         val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
 
@@ -137,16 +130,14 @@ class SiteControllerIT @Autowired constructor(
                     legalEntity = RequestValues.legalEntityCreate2,
                     siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate3))
                 )
-            ),
-            webTestClient
+            )
         )
 
         val bpnL1 = createdStructures[0].legalEntity.bpn
         val bpnL2 = createdStructures[1].legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
-        val searchResult = webTestClient.invokePostEndpoint<PageResponse<SitePartnerSearchResponse>>(EndpointValues.CATENA_SITE_SEARCH_PATH, siteSearchRequest)
-
+        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
         val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)
         val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL1)
         val expectedSiteWithReference3 = SitePartnerSearchResponse(ResponseValues.site3, bpnL2)
@@ -163,10 +154,8 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create new sites`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
-            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
-            listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        )
+
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -178,8 +167,8 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = bpnL2)
         )
-        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
 
+        val response = poolClient.sites().createSite(toCreate)
         assertThatCreatedSitesEqual(response, expected)
     }
 
@@ -190,10 +179,9 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create sites with non-existing parent`() {
-        val givenLegalEntities = webTestClient.invokePostWithArrayResponse<LegalEntityPartnerCreateResponse>(
-            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
-            listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        )
+
+
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -206,8 +194,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(legalEntity = bpnL2),
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
-        val response = webTestClient.invokePostWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toCreate)
-
+        val response = poolClient.sites().createSite(toCreate)
         assertThatCreatedSitesEqual(response, expected)
     }
 
@@ -228,8 +215,7 @@ class SiteControllerIT @Autowired constructor(
                     legalEntity = RequestValues.legalEntityCreate2,
                     siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
                 )
-            ),
-            webTestClient
+            )
         )
 
         val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
@@ -247,8 +233,8 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = bpnS2)
         )
-        val response = webTestClient.invokePutWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
 
+        val response = poolClient.sites().updateSite(toUpdate);
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -265,8 +251,7 @@ class SiteControllerIT @Autowired constructor(
                     legalEntity = RequestValues.legalEntityCreate1,
                     siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1), SiteStructureRequest(RequestValues.siteCreate2))
                 )
-            ),
-            webTestClient
+            )
         )
 
         val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
@@ -282,8 +267,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpn = bpnS1),
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
-        val response = webTestClient.invokePutWithArrayResponse<SitePartnerCreateResponse>(EndpointValues.CATENA_SITES_PATH, toUpdate)
-
+        val response = poolClient.sites().updateSite(toUpdate)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -304,15 +288,14 @@ class SiteControllerIT @Autowired constructor(
                     legalEntity = RequestValues.legalEntityCreate2,
                     siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
                 )
-            ),
-            webTestClient
+            )
         )
 
         val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
 
         val toSearch = expected.map { it.site }
-        val response = webTestClient.invokePostWithArrayResponse<MainAddressSearchResponse>(EndpointValues.CATENA_SITE_MAIN_ADDRESS_SEARCH_PATH, toSearch)
 
+        val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -333,15 +316,14 @@ class SiteControllerIT @Autowired constructor(
                     legalEntity = RequestValues.legalEntityCreate2,
                     siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
                 )
-            ),
-            webTestClient
+            )
         )
 
         val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
 
         val toSearch = expected.map { it.site }.plus("NON-EXISTENT")
-        val response = webTestClient.invokePostWithArrayResponse<MainAddressSearchResponse>(EndpointValues.CATENA_SITE_MAIN_ADDRESS_SEARCH_PATH, toSearch)
 
+        val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -351,9 +333,9 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(actuals).ignoringFields(SitePartnerCreateResponse::bpn.name).isEqualTo(expected)
     }
 
-    private fun requestSite(bpnSite: String) =
-        webTestClient.invokeGetEndpoint<SitePartnerSearchResponse>(EndpointValues.CATENA_SITES_PATH + "/${bpnSite}")
+    private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
 
-    private fun requestSitesOfLegalEntity(bpn: String) =
-        webTestClient.invokeGetEndpoint<PageResponse<SitePartnerResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}" + EndpointValues.CATENA_SITES_PATH_POSTFIX)
+
+    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn,PaginationRequest());
+
 }

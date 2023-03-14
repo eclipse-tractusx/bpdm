@@ -24,10 +24,10 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.dto.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
-import org.eclipse.tractusx.bpdm.pool.dto.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
-import org.eclipse.tractusx.bpdm.pool.entity.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -66,7 +66,7 @@ class PartnerChangelogIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createTestMetadata()
     }
 
     /**
@@ -80,8 +80,7 @@ class PartnerChangelogIT @Autowired constructor(
             listOf(
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2)
-            ),
-            webTestClient
+            )
         )
         val bpnL1 = createdStructures[0].legalEntity.bpn
         val bpnL2 = createdStructures[1].legalEntity.bpn

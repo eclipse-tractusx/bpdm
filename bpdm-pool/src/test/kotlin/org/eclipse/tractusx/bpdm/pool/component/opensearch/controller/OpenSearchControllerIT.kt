@@ -24,14 +24,18 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,7 +47,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
 
 
 /**
@@ -60,7 +63,8 @@ class OpenSearchControllerIT @Autowired constructor(
     private val openSearchSyncService: OpenSearchSyncStarterService,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val objectMapper: ObjectMapper,
-    private val testHelpers: TestHelpers
+    private val testHelpers: TestHelpers,
+    private val poolClient: PoolApiClient
 ) {
 
     companion object {
@@ -156,9 +160,7 @@ class OpenSearchControllerIT @Autowired constructor(
         assertSearchableByNames(names)
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.OPENSEARCH_SYNC_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
+        poolClient.opensearch().clear()
 
         //check that the partners can really not be searched anymore
         names.forEach { assertThat(searchBusinessPartnerByName(it)).matches { it.contentSize == 0 } }
@@ -177,9 +179,8 @@ class OpenSearchControllerIT @Autowired constructor(
 
 
         //clear the index
-        webTestClient.delete().uri(EndpointValues.OPENSEARCH_SYNC_PATH)
-            .exchange()
-            .expectStatus().is2xxSuccessful
+        poolClient.opensearch().clear()
+
 
         //export partners again
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
@@ -190,16 +191,12 @@ class OpenSearchControllerIT @Autowired constructor(
     }
 
     private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
-        return webTestClient.get().uri { builder ->
-            builder.path(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
-                .queryParam(LegalEntityPropertiesSearchRequest::name.name, name)
-                .build()
-        }
-            .exchange()
-            .expectStatus().is2xxSuccessful
-            .returnResult<PageResponse<LegalEntityMatchResponse>>()
-            .responseBody
-            .blockFirst()!!
+
+        return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest(name,null,null,null)
+        , AddressPropertiesSearchRequest.EmptySearchRequest
+        , SitePropertiesSearchRequest.EmptySearchRequest
+        , PaginationRequest()
+        )
     }
 
     private fun assertSearchableByNames(names: Collection<String>) {

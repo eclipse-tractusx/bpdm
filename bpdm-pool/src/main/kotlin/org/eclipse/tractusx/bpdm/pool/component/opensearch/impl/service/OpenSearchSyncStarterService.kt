@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_ADDRESSES
@@ -59,7 +60,7 @@ class OpenSearchSyncStarterService(
      * Checks for changed records since the last export and exports those changes to OpenSearch
      */
     @Scheduled(cron = "\${bpdm.opensearch.export-scheduler-cron-expr:-}", zone = "UTC")
-    fun export(): SyncResponse {
+    fun export(): org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse {
         return startExport(true)
     }
 

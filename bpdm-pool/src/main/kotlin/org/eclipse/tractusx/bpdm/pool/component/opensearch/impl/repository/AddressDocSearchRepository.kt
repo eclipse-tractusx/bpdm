@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
 import org.opensearch.action.search.SearchRequest
 import org.opensearch.client.RequestOptions
 import org.opensearch.client.RestHighLevelClient

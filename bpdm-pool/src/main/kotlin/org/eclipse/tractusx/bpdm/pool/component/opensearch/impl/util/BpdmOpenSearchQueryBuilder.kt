@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util
 
 import org.apache.lucene.search.join.ScoreMode
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
-import org.eclipse.tractusx.bpdm.pool.dto.request.*
 import org.opensearch.common.unit.Fuzziness
 import org.opensearch.index.query.BoolQueryBuilder
 import org.opensearch.index.query.InnerHitBuilder

@@ -24,9 +24,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -57,6 +59,7 @@ class SuggestionControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val openSearchSyncService: OpenSearchSyncStarterService,
     val testHelpers: TestHelpers,
+    val poolClient: PoolApiClient
 ) {
 
     companion object {
@@ -190,8 +193,8 @@ class SuggestionControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
-        testHelpers.createTestMetadata(webTestClient)
-        testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2, partnerStructure3), webTestClient)
+        testHelpers.createTestMetadata()
+        testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2, partnerStructure3))
         openSearchSyncService.export()
     }
 
@@ -210,6 +213,8 @@ class SuggestionControllerIT @Autowired constructor(
             .returnResult<PageResponse<SuggestionResponse>>()
             .responseBody
             .blockFirst()!!
+
+
 
         assertThat(page.content).anyMatch { it.suggestion == expectedSuggestionValue }
     }

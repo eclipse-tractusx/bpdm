@@ -23,9 +23,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,7 +48,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
-    val testHelpers: TestHelpers
+    val testHelpers: TestHelpers,
+    val poolClient: PoolApiClient
 ) {
 
     private val partnerStructure1 = LegalEntityStructureRequest(
@@ -68,10 +72,10 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
-
-        testHelpers.createTestMetadata(webTestClient)
-        val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2), webTestClient)
+        //webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
+        poolClient.opensearch().clear()
+        testHelpers.createTestMetadata()
+        val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
         givenPartner2 = with(givenStructure[1].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
 
@@ -139,7 +143,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
             )
         )
 
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name)
+        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name,0,10)
 
         assertPageEquals(pageResponse, expected)
     }
@@ -151,19 +155,17 @@ class LegalEntityControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner by site name, no result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name").content
+        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name",0,10).content
         assertThat(foundPartners).isEmpty()
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int? = null, size: Int? = null): PageResponse<LegalEntityMatchResponse> {
-        return webTestClient.invokeGetEndpoint(
-            EndpointValues.CATENA_LEGAL_ENTITY_PATH,
-            *(listOfNotNull(
-                SitePropertiesSearchRequest::siteName.name to siteName,
-                if (page != null) PaginationRequest::page.name to page.toString() else null,
-                if (size != null) PaginationRequest::size.name to size.toString() else null
-            ).toTypedArray())
-        )
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int , size: Int ): PageResponse<LegalEntityMatchResponse> {
+        val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
+
+        return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest,PaginationRequest(page, size))
+
+
     }
 
     private fun assertPageEquals(actual: PageResponse<LegalEntityMatchResponse>, expected: PageResponse<LegalEntityMatchResponse>) {
