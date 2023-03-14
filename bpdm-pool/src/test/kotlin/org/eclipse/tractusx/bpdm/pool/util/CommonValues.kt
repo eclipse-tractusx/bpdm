@@ -108,6 +108,10 @@ object CommonValues {
     val issuingBody2 = "Body Y"
     val issuingBody3 = "Official Z"
 
+    val issuingBody1 = "Agency X"
+    val issuingBody2 = "Body Y"
+    val issuingBody3 = "Official Z"
+
     val identifierValue1 = "ID-XYZ"
     val identifierValue2 = "Another ID Value"
     val identifierValue3 = "An ID Value"
