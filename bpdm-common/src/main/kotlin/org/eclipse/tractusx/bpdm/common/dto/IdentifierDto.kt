@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class IdentifierDto(
     @Schema(description = "Value of the identifier")
     val value: String,
+
     @Schema(description = "Technical key of the type to which this identifier belongs to")
     val type: String,
+
     @Schema(description = "Technical key of the body which issued this identifier")
-    val issuingBody: String?,
-    @Schema(description = "Technical key of the status this identifier has")
-    val status: String?
+    val issuingBody: String?
 )

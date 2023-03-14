@@ -82,11 +82,10 @@ object SaasMappings {
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
-            names = names.map { toDto(it) },
+            legalName = names.map { toDto(it) }.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", id ?: "Unknown"),
             legalForm = toOptionalReference(legalForm),
-            status = if (status != null) toDto(status) else null,
-            profileClassifications = toDto(profile),
-            bankAccounts = bankAccounts.map { toDto(it) },
+            status = if (status != null) listOf(toDto(status)) else listOf(),
+            classifications = toDto(profile),
             legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )
     }
@@ -100,19 +99,16 @@ object SaasMappings {
 
     fun toDto(identifier: IdentifierSaas): IdentifierDto {
         return IdentifierDto(
-            identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, IdentifierDto::class, IdentifierSaas::value),
-            toReference(identifier.type),
-            toOptionalReference(identifier.issuingBody),
-            toOptionalReference(identifier.status)
+            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, IdentifierDto::class, IdentifierSaas::value),
+            type = toReference(identifier.type),
+            issuingBody = toOptionalReference(identifier.issuingBody)
         )
     }
 
     fun toDto(name: NameSaas): NameDto {
         return NameDto(
             name.value,
-            name.shortName,
-            toTypeOrDefault(name.type),
-            toLanguageCode(name.language)
+            name.shortName
         )
     }
 

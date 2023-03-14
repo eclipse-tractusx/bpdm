@@ -22,18 +22,17 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
 
-    val name1 = NameDto(value = CommonValues.name1, type = NameType.OTHER, shortName = null)
-    val name2 = NameDto(value = CommonValues.name2, type = NameType.OTHER, shortName = null)
-    val name3 = NameDto(value = CommonValues.name3, type = NameType.OTHER, shortName = null)
-    val name4 = NameDto(value = CommonValues.name4, type = NameType.OTHER, shortName = null)
-    val name5 = NameDto(value = CommonValues.name5, type = NameType.OTHER, shortName = null)
+    val name1 = NameDto(value = CommonValues.name1, shortName = null)
+    val name2 = NameDto(value = CommonValues.name2, shortName = null)
+    val name3 = NameDto(value = CommonValues.name3, shortName = null)
+    val name4 = NameDto(value = CommonValues.name4, shortName = null)
+    val name5 = NameDto(value = CommonValues.name5, shortName = null)
 
     val identifierType1 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
     val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
@@ -47,26 +46,19 @@ object RequestValues {
         CommonValues.identifierValue1,
         CommonValues.identifierTypeTechnicalKey1,
         CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
     )
 
     val identifier2 = IdentifierDto(
         CommonValues.identifierValue2,
         CommonValues.identifierTypeTechnicalKey1,
         CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
     )
 
     val identifier3 = IdentifierDto(
         CommonValues.identifierValue3,
         CommonValues.identifierTypeTechnicalKey1,
         CommonValues.issuingBodyKey1,
-        CommonValues.identifierStatusKey1
     )
-
-    val legalFormCategory1 = TypeNameUrlDto(CommonValues.legalFormCategoryName1, CommonValues.legalFormCategoryUrl1)
-    val legalFormCategory2 = TypeNameUrlDto(CommonValues.legalFormCategoryName2, CommonValues.legalFormCategoryUrl2)
-    val legalFormCategory3 = TypeNameUrlDto(CommonValues.legalFormCategoryName3, CommonValues.legalFormCategoryUrl3)
 
     val legalForm1 = LegalFormRequest(
         CommonValues.legalFormTechnicalKey1,
@@ -175,11 +167,11 @@ object RequestValues {
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         properties = LegalEntityDto(
-            names = listOf(name1, name2),
+            legalName = name1,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
-            status = status1,
-            profileClassifications = listOf(classification1, classification2),
+            status = listOf(status1),
+            classifications = listOf(classification1, classification2),
             legalAddress = address1
         ),
         index = CommonValues.index1
@@ -187,11 +179,11 @@ object RequestValues {
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
         properties = LegalEntityDto(
-            names = listOf(name3, name4),
+            legalName = name3,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
-            status = status2,
-            profileClassifications = listOf(classification3, classification4),
+            status = listOf(status2),
+            classifications = listOf(classification3, classification4),
             legalAddress = address2
         ),
         index = CommonValues.index2
@@ -199,11 +191,11 @@ object RequestValues {
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
         properties = LegalEntityDto(
-            names = listOf(name5),
+            legalName = name5,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
-            status = status3,
-            profileClassifications = listOf(classification5),
+            status = listOf(status3),
+            classifications = listOf(classification5),
             legalAddress = address3
         ),
         index = CommonValues.index3

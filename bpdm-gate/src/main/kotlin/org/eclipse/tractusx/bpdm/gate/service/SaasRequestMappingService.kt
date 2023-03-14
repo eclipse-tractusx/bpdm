@@ -66,12 +66,11 @@ class SaasRequestMappingService(
             externalId = externalId,
             dataSource = saasConfigProperties.datasource,
             identifiers = toIdentifiersSaas(legalEntity.identifiers, bpn),
-            names = legalEntity.names.map { it.toSaasModel() },
+            names = listOf(legalEntity.legalName.toSaasModel()),
             legalForm = toLegalFormSaas(legalEntity.legalForm),
-            status = legalEntity.status?.toSaasModel(),
-            profile = toPartnerProfileSaas(legalEntity.profileClassifications),
+            status = legalEntity.status.map { it.toSaasModel() }.firstOrNull(),
+            profile = toPartnerProfileSaas(legalEntity.classifications),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-            bankAccounts = legalEntity.bankAccounts.map { it.toSaasModel() },
             addresses = listOf(toSaasModel(legalEntity.legalAddress))
         )
     }
@@ -114,9 +113,7 @@ class SaasRequestMappingService(
     private fun NameDto.toSaasModel(): NameSaas {
         return NameSaas(
             value = value,
-            shortName = shortName,
-            type = TypeKeyNameUrlSaas(type.name),
-            language = toLanguageSaas(this.language)
+            shortName = shortName
         )
     }
 
@@ -124,8 +121,7 @@ class SaasRequestMappingService(
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
             value = value,
-            issuingBody = TypeKeyNameUrlSaas(issuingBody),
-            status = TypeKeyNameSaas(status)
+            issuingBody = TypeKeyNameUrlSaas(issuingBody)
         )
     }
 

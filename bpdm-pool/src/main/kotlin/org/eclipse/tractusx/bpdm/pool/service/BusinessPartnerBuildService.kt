@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -262,7 +265,14 @@ class BusinessPartnerBuildService(
         val legalForm = if (dto.legalForm != null) metadataMap.legalForms[dto.legalForm]!! else null
 
         val legalAddress = createAddress(dto.legalAddress)
-        val partner = LegalEntity(bpnL, legalForm, dto.types.toMutableSet(), mutableSetOf(), Instant.now().truncatedTo(ChronoUnit.MICROS), legalAddress)
+        val partner = LegalEntity(
+            bpn = bpnL,
+            legalForm = legalForm,
+            types = mutableSetOf(),
+            roles = mutableSetOf(),
+            currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
+            legalAddress = legalAddress
+        )
 
         return updateLegalEntity(partner, dto, metadataMap)
     }
@@ -273,7 +283,12 @@ class BusinessPartnerBuildService(
         partner: LegalEntity
     ): Site {
         val mainAddress = createAddress(dto.mainAddress)
-        val site = Site(bpnS, dto.name, partner, mainAddress)
+        val site = Site(
+            bpn = bpnS,
+            name = dto.name,
+            legalEntity = partner,
+            mainAddress = mainAddress
+        )
 
         return site
     }
@@ -294,11 +309,10 @@ class BusinessPartnerBuildService(
         partner.bankAccounts.clear()
 
         partner.legalForm = if (request.legalForm != null) metadataMap.legalForms[request.legalForm]!! else null
-        partner.stati.addAll(if (request.status != null) setOf(toEntity(request.status!!, partner)) else setOf())
-        partner.names.addAll(request.names.map { toEntity(it, partner) }.toSet())
+        partner.stati.addAll(request.status.map { toEntity(it, partner) })
+        partner.names.addAll(request.legalName.let { listOf(toEntity(it, partner)) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
-        partner.classification.addAll(request.profileClassifications.map { toEntity(it, partner) }.toSet())
-        partner.bankAccounts.addAll(request.bankAccounts.map { toEntity(it, partner) }.toSet())
+        partner.classification.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
 
         updateAddress(partner.legalAddress, request.legalAddress)
 
@@ -317,12 +331,12 @@ class BusinessPartnerBuildService(
         dto: AddressDto
     ): Address {
         val address = Address(
-            dto.careOf,
-            dto.contexts.toMutableSet(),
-            dto.country,
-            dto.types.toMutableSet(),
-            toEntity(dto.version),
-            dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
+            careOf = dto.careOf,
+            contexts = dto.contexts.toMutableSet(),
+            country = dto.country,
+            types = dto.types.toMutableSet(),
+            version = toEntity(dto.version),
+            geoCoordinates = dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
         )
 
         return updateAddress(address, dto)
@@ -389,11 +403,23 @@ class BusinessPartnerBuildService(
     }
 
     private fun toEntity(dto: NameDto, partner: LegalEntity): Name {
-        return Name(dto.value, dto.shortName, dto.type, dto.language, partner)
+        // TODO
+        return Name(
+            value = dto.value,
+            shortName = dto.shortName,
+            type = NameType.OTHER,
+            language = LanguageCode.undefined,
+            legalEntity = partner
+        )
     }
 
     private fun toEntity(dto: ClassificationDto, partner: LegalEntity): Classification {
-        return Classification(dto.value, dto.code, dto.type, partner)
+        return Classification(
+            value = dto.value,
+            code = dto.code,
+            type = dto.type,
+            legalEntity = partner
+        )
     }
 
     private fun toEntity(
@@ -401,15 +427,13 @@ class BusinessPartnerBuildService(
         metadataMap: MetadataMappingDto,
         partner: LegalEntity
     ): Identifier {
-        return toEntity(dto,
-            metadataMap.idTypes[dto.type]!!,
-            if(dto.status != null) metadataMap.idStatuses[dto.status]!! else null,
-            if(dto.issuingBody != null) metadataMap.issuingBodies[dto.issuingBody]!! else null,
-            partner)
-    }
-
-    private fun toEntity(dto: IdentifierDto, type: IdentifierType, status: IdentifierStatus?, issuingBody: IssuingBody?, partner: LegalEntity): Identifier {
-        return Identifier(dto.value, type, status, issuingBody, partner)
+        return Identifier(
+            value = dto.value,
+            type = metadataMap.idTypes[dto.type]!!,
+            status = null,
+            issuingBody = if (dto.issuingBody != null) metadataMap.issuingBodies[dto.issuingBody]!! else null,
+            legalEntity = partner
+        )
     }
 
     private fun toEntity(dto: AddressVersionDto): AddressVersion {

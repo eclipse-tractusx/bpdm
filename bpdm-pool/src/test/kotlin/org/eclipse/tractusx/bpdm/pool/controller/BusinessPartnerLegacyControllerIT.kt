@@ -56,11 +56,9 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         LegalEntityStructureRequest(legalEntity = with(RequestValues.legalEntityCreate1) {
             copy(
                 properties = properties.copy(
-                    names = listOf(
-                        NameDto(
-                            uniqueName,
-                            null
-                        )
+                    legalName = NameDto(
+                        uniqueName,
+                        null
                     )
                 )
             )
