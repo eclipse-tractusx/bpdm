@@ -90,6 +90,11 @@ object CommonValues {
     val identifierIssuingBodyName3 = "Official Z"
     val identifierIssuingBodyName4 = "Gov A"
 
+    val identifierIssuingBody1 = "Agency X"
+    val identifierIssuingBody2 = "Body Y"
+    val identifierIssuingBody3 = "Official Z"
+    val identifierIssuingBody4 = "Gov A"
+
     val identifierIssuingBodyUrl1 = "http://catenax-host/issuing-body1"
     val identifierIssuingBodyUrl2 = "http://catenax-host/issuing-body2"
     val identifierIssuingBodyUrl3 = "http://catenax-host/issuing-body3"

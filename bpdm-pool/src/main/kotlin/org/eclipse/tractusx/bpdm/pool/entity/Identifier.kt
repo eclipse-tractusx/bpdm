@@ -43,7 +43,7 @@ class Identifier(
     var status: IdentifierStatus?,
     @ManyToOne
     @JoinColumn(name = "issuing_body_id")
-    var issuingBody: IssuingBody?,
+    var issuingBody: IssuingBody?,      // TODO Type String
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity

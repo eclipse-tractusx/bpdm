@@ -31,5 +31,5 @@ data class IdentifierResponse(
     val type: TypeKeyNameDto<String>,
 
     @Schema(description = "Body which issued the identifier")
-    val issuingBody: TypeKeyNameDto<String>? = null
+    val issuingBody: String? = null
 )

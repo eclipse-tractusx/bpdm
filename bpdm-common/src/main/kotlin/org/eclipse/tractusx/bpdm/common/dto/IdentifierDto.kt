@@ -29,6 +29,6 @@ data class IdentifierDto(
     @Schema(description = "Technical key of the type to which this identifier belongs to")
     val type: String,
 
-    @Schema(description = "Technical key of the body which issued this identifier")
+    @Schema(description = "Body which issued the identifier")
     val issuingBody: String?
 )

@@ -35,5 +35,5 @@ data class BusinessStatusDto(
     val validUntil: LocalDateTime?,
 
     @Schema(description = "The type of this specified status")
-    val type: BusinessStatusType
+    val type: BusinessStatusType?
 )

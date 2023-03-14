@@ -24,7 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import java.time.LocalDateTime
 
-// TODO split into StatusWithOfficialDenotationResponse/StatusWithDescriptionResponse
+// TODO Either split into StatusWithOfficialDenotationResponse/StatusWithDescriptionResponse
+// TODO or split into LegalEntityStatusResponse, SiteStatusResponse, AddressStatusResponse (like business model, better extensibility)
 @Schema(name = "BusinessStatusResponse", description = "Status of a business partner")
 data class BusinessStatusResponse(
     @Schema(description = "Exact, official denotation of the status")
