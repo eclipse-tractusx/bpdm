@@ -219,11 +219,13 @@ object RequestValues {
 
     val site1 = SiteDto(
         name = CommonValues.nameSite1,
+        status = listOf(businessStatus1),
         mainAddress = address1
     )
 
     val site2 = SiteDto(
         name = CommonValues.nameSite2,
+        status = listOf(businessStatus2),
         mainAddress = address2
     )
 

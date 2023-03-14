@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*

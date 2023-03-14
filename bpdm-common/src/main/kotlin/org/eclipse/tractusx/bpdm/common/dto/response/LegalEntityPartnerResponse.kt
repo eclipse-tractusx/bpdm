@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.Instant
 
+// TODO Do we want createdAt, updatedAt?
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerResponse", description = "Business partner of type legal entity with currentness")
 data class LegalEntityPartnerResponse(

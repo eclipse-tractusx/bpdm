@@ -19,12 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "SitePartnerResponse", description = "Business partner of type site")
 data class SitePartnerResponse(
     @Schema(description = "Business Partner Number, main identifier value for sites")
     val bpn: String,
+
     @Schema(description = "Site name")
-    val name: String
+    val name: String,
+
+    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    val status: Collection<BusinessStatusResponse> = emptyList(),
 )

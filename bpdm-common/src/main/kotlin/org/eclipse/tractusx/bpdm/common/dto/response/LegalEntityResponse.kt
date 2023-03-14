@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
 // TODO probably rename to LegalEntityDetailedDto
-// TODO can we add bpn?
+// TODO can we move BPN from LegalEntityPartnerResponse to here?
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
