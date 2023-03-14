@@ -101,14 +101,6 @@ object CommonValues {
     val identifierTypeName2 = "VAT USA"
     val identifierTypeName3 = "VAT France"
 
-    val identifierStatusKey1 = "ACTIVE"
-    val identifierStatusKey2 = "EXPIRED"
-    val identifierStatusKey3 = "UNKNOWN"
-
-    val identifierStatusName1 = "Active"
-    val identifierStatusName2 = "Expired"
-    val identifierStatusName3 = "Unknown Status"
-
     val issuingBodyKey1 = "AGENCYX"
     val issuingBodyKey2 = "BODYY"
     val issuingBodyKey3 = "OFFICIALZ"

@@ -33,34 +33,30 @@ object RequestValues {
             CommonValues.identifierValue1,
             CommonValues.identifierTypeTechnicalKey1,
             CommonValues.identifierIssuingBodyTechnicalKey1,
-            CommonValues.identifierStatusTechnicalKey1
         )
     val identifier2 =
         IdentifierDto(
             CommonValues.identifierValue2,
             CommonValues.identifierTypeTechnicalKey2,
             CommonValues.identifierIssuingBodyTechnicalKey2,
-            CommonValues.identifierStatusTechnicalKey2
         )
     val identifier3 =
         IdentifierDto(
             CommonValues.identifierValue3,
             CommonValues.identifierTypeTechnicalKey3,
             CommonValues.identifierIssuingBodyTechnicalKey3,
-            CommonValues.identifierStatusTechnicalKey3
         )
     val identifier4 =
         IdentifierDto(
             CommonValues.identifierValue4,
             CommonValues.identifierTypeTechnicalKey4,
             CommonValues.identifierIssuingBodyTechnicalKey4,
-            CommonValues.identifierStatusTechnicalKey4
         )
 
-    val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1, type = CommonValues.nameType1, language = CommonValues.language1)
-    val name2 = NameDto(value = CommonValues.name2, shortName = CommonValues.shortName2, type = CommonValues.nameType1, language = CommonValues.language1)
-    val name3 = NameDto(value = CommonValues.name3, shortName = CommonValues.shortName3, type = CommonValues.nameType1, language = CommonValues.language1)
-    val name4 = NameDto(value = CommonValues.name4, shortName = CommonValues.shortName4, type = CommonValues.nameType1, language = CommonValues.language1)
+    val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
+    val name2 = NameDto(value = CommonValues.name2, shortName = CommonValues.shortName2)
+    val name3 = NameDto(value = CommonValues.name3, shortName = CommonValues.shortName3)
+    val name4 = NameDto(value = CommonValues.name4, shortName = CommonValues.shortName4)
 
     val businessStatus1 = BusinessStatusDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
@@ -193,21 +189,19 @@ object RequestValues {
 
     val legalEntity1 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
-        names = listOf(name1, name2),
+        legalName = name1,
         legalForm = CommonValues.legalFormTechnicalKey1,
-        status = businessStatus1,
-        profileClassifications = listOf(classification1, classification2),
-        bankAccounts = listOf(bankAccount1, bankAccount2),
+        status = listOf(businessStatus1),
+        classifications = listOf(classification1, classification2),
         legalAddress = address1
     )
 
     val legalEntity2 = LegalEntityDto(
         identifiers = listOf(identifier3, identifier4),
-        names = listOf(name3, name4),
+        legalName = name3,
         legalForm = CommonValues.legalFormTechnicalKey2,
-        status = businessStatus2,
-        profileClassifications = listOf(classification3, classification4),
-        bankAccounts = listOf(bankAccount3, bankAccount4),
+        status = listOf(businessStatus2),
+        classifications = listOf(classification3, classification4),
         legalAddress = address2
     )
 

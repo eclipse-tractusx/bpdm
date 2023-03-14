@@ -66,7 +66,7 @@ object SaasValues {
 
     val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, "TODO remove")
 
-    val identifierStatus1 = TypeKeyNameSaas(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
+    val identifierStatus1 = TypeKeyNameSaas("identifierstatuskey", "identifierstatusname")
 
     val identifier1 = IdentifierSaas(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
     val identifier2 = IdentifierSaas(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)

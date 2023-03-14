@@ -49,11 +49,12 @@ class MetadataController(
         return metadataService.getValidIdentifierTypesForCountry(country)
     }
 
-
+    @Deprecated("IdentifierStatus removed")
     override fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         return metadataService.createIdentifierStatus(status)
     }
 
+    @Deprecated("IdentifierStatus removed")
     override fun getIdentifierStati(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
         return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }

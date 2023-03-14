@@ -27,5 +27,5 @@ data class NameResponse (
     val value: String,
 
     @Schema(description = "Abbreviated name or shorthand")
-    val shortName: String? = null,
+    val shortName: String? = null
 )

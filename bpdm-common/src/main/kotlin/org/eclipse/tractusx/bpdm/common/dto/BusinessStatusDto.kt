@@ -27,10 +27,13 @@ import java.time.LocalDateTime
 data class BusinessStatusDto(
     @Schema(description = "Exact, official denotation of the status")
     val officialDenotation: String?,
+
     @Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
+
     @Schema(description = "Until the status was valid, if applicable")
     val validUntil: LocalDateTime?,
+
     @Schema(description = "The type of this specified status")
     val type: BusinessStatusType
 )

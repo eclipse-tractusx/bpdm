@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierStatus
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IssuingBody
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
@@ -48,10 +47,9 @@ class MetadataMappingService(
      */
     fun mapRequests(partners: Collection<LegalEntityDto>): MetadataMappingDto {
         return MetadataMappingDto(
-            mapIdentifierTypes(partners),
-            mapIdentifierStatuses(partners),
-            mapIssuingBodies(partners),
-            mapLegalForms(partners)
+            idTypes = mapIdentifierTypes(partners),
+            issuingBodies = mapIssuingBodies(partners),
+            legalForms = mapLegalForms(partners)
         )
     }
 
@@ -60,13 +58,6 @@ class MetadataMappingService(
      */
     fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
         return mapIdentifierTypes(partners.flatMap { it.identifiers.map { id -> id.type } }.toSet())
-    }
-
-    /**
-     * Fetch [IdentifierStatus] referenced in [partners] and map them by their referenced keys
-     */
-    fun mapIdentifierStatuses(partners: Collection<LegalEntityDto>): Map<String, IdentifierStatus>{
-        return mapIdentifierStatuses(partners.flatMap { it.identifiers.mapNotNull { id -> id.status } }.toSet())
     }
 
     /**
@@ -86,12 +77,6 @@ class MetadataMappingService(
 
     private fun mapIdentifierTypes(keys: Set<String>): Map<String, IdentifierType>{
         val typeMap = identifierTypeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
-        assertKeysFound(keys, typeMap)
-        return typeMap
-    }
-
-    private fun mapIdentifierStatuses(keys: Set<String>): Map<String, IdentifierStatus>{
-        val typeMap = identifierStatusRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }
