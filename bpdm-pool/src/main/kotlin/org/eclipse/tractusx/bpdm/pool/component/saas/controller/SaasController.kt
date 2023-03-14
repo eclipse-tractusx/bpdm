@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.ImportIdEntry
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.ImportIdMappingResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientSaasInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolSaasApi
+import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController
 class SaasController(
     private val partnerImportService: ImportStarterService,
     private val adapterConfigProperties: SaasAdapterConfigProperties
-) : PoolClientSaasInterface {
+) : PoolSaasApi {
 
     override fun importBusinessPartners(): SyncResponse {
         return partnerImportService.importAsync()

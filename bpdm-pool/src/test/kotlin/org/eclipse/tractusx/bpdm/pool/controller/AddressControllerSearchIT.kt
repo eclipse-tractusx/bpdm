@@ -23,10 +23,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +46,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class AddressControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
-    val poolClient: PoolApiClient
+    val poolClient: PoolClientImpl
 ) {
 
     val partnerStructure1 = LegalEntityStructureRequest(

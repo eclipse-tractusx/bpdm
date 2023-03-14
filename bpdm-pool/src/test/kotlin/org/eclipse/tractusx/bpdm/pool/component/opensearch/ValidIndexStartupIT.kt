@@ -24,11 +24,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -53,7 +53,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class ValidIndexStartupIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
-    val poolClient: PoolApiClient
+    val poolClient: PoolClientImpl
 ) {
 
     companion object {

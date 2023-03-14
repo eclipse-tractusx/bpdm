@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import jakarta.persistence.EntityManager
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService

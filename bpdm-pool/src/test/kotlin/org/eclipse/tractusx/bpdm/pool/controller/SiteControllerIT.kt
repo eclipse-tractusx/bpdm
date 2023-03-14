@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class SiteControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val poolClient: PoolApiClient
+    val poolClient: PoolClientImpl
 ) {
     @BeforeEach
     fun beforeEach() {
@@ -234,7 +234,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate3.copy(bpn = bpnS2)
         )
 
-        val response = poolClient.sites().updateSite(toUpdate);
+        val response = poolClient.sites().updateSite(toUpdate)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -336,6 +336,6 @@ class SiteControllerIT @Autowired constructor(
     private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
 
 
-    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn,PaginationRequest());
+    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn,PaginationRequest())
 
 }

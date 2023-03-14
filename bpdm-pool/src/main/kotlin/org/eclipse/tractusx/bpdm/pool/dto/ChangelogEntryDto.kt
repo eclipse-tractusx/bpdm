@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
-import org.eclipse.tractusx.bpdm.pool.api.dto.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 
 data class ChangelogEntryDto(

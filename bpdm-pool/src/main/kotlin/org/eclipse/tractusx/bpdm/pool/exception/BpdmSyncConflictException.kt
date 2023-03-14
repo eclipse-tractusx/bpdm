@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.exception
 
-import org.eclipse.tractusx.bpdm.pool.api.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 

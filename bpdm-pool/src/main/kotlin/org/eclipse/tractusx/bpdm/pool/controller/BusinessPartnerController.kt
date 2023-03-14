@@ -20,16 +20,16 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.ChangelogEntryResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientBusinessPartnerInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class BusinessPartnerController(
     private val partnerChangelogService: PartnerChangelogService
-) : PoolClientBusinessPartnerInterface {
+) : PoolBusinessPartnerApi {
     override fun getChangelogEntries(
         bpn: String,
         paginationRequest: PaginationRequest

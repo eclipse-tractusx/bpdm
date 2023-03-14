@@ -19,12 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 
 data class LegalEntityStructureRequest(
     val legalEntity: LegalEntityPartnerCreateRequest,

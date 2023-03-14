@@ -23,12 +23,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,7 +49,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
-    val poolClient: PoolApiClient
+    val poolClient: PoolClientImpl
 ) {
 
     private val partnerStructure1 = LegalEntityStructureRequest(

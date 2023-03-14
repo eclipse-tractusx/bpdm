@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.pool.api.dto.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
 @Entity
 @Table(name = "partner_changelog_entries")

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 
 
 
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration
 class PoolClientConfig {
     @Bean
-    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolApiClient {
-        return PoolApiClient { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
+    fun poolClient(webServerAppCtxt: ServletWebServerApplicationContext): PoolClientImpl {
+        return PoolClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
     }
 }

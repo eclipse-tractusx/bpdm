@@ -20,15 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.controller
 
 
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientOpenSearchInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolOpenSearchApi
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class OpenSearchController(
     val openSearchSyncService: OpenSearchSyncStarterService
-) : PoolClientOpenSearchInterface {
+) : PoolOpenSearchApi {
 
 
     override fun export(): SyncResponse {

@@ -24,11 +24,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
@@ -57,7 +57,7 @@ class InvalidIndexStartupIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val testHelpers: TestHelpers,
     private val openSearchClient: OpenSearchClient,
-    private val poolClient: PoolApiClient
+    private val poolClient: PoolClientImpl
 ) {
 
     companion object {

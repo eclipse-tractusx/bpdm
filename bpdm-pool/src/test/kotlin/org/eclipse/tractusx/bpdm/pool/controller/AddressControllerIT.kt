@@ -26,9 +26,11 @@ import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchReque
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.config.PoolClientConfig
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -90,7 +92,7 @@ class AddressControllerIT @Autowired constructor(
         importedPartner.bpn
             .let { bpn -> requestAddressesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnAddress -> requestAddress(bpnAddress) }
-            ?.let { addressResponse ->
+            .let { addressResponse ->
                 assertThat(addressResponse.bpnLegalEntity).isEqualTo(importedPartner.bpn)
             }
     }
@@ -400,7 +402,7 @@ class AddressControllerIT @Autowired constructor(
         )
 
 
-        val response = poolClient.addresses().updateAddresses(toUpdate);
+        val response = poolClient.addresses().updateAddresses(toUpdate)
 
 
         testHelpers.assertRecursively(response).isEqualTo(expected)

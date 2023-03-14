@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.pool.api.dto.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.dto.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import java.time.Instant
 
 @Entity

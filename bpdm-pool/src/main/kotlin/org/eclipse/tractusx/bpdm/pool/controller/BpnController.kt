@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientBpnInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.springframework.http.HttpStatus
@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 class BpnController(
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val bpnConfigProperties: BpnConfigProperties
-) : PoolClientBpnInterface{
+) : PoolBpnApi {
 
     override fun findBpnsByIdentifiers(identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>> {
         if (identifiersSearchRequest.idValues.size > bpnConfigProperties.searchRequestLimit) {

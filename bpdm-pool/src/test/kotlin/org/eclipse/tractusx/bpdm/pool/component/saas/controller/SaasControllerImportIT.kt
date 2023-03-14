@@ -33,8 +33,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
-import org.eclipse.tractusx.bpdm.pool.api.config.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
@@ -61,7 +61,7 @@ class SaasControllerImportIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val importEntryRepository: ImportEntryRepository,
-    private val poolClient: PoolApiClient
+    private val poolClient: PoolClientImpl
 ) {
     companion object {
         @RegisterExtension
@@ -582,8 +582,8 @@ class SaasControllerImportIT @Autowired constructor(
         return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
     }
 
-    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> =
-        webTestClient.invokePostWithArrayResponse(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpns)
+    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> = poolClient.legalEntities().searchSites(bpns).body!!
+
 
     private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),PaginationRequest())
 

@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.dto
 
 
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 
 data class ImportResponsePage(
     val totalElements: Int,

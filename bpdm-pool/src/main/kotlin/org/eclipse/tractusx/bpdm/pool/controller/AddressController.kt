@@ -23,13 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchReque
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientAddressInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
@@ -40,7 +40,7 @@ class AddressController(
     private val addressService: AddressService,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
     private val searchService: SearchService
-) : PoolClientAddressInterface {
+) : PoolAddressApi {
 
 
     override fun getAddresses(

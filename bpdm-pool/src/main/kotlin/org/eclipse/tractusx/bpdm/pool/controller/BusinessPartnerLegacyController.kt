@@ -26,9 +26,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.BusinessPartnerResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService

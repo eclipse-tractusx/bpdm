@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.api.dto.request.*
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.service.PoolClientLegalEntityInterface
+import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
@@ -42,7 +42,7 @@ class LegalEntityController(
     val bpnConfigProperties: BpnConfigProperties,
     val siteService: SiteService,
     val addressService: AddressService
-) : PoolClientLegalEntityInterface {
+) : PoolLegalEntityApi {
 
 
     override fun getLegalEntities(
