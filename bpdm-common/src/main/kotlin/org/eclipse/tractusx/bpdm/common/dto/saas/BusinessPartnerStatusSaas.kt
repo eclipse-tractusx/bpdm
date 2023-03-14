@@ -26,5 +26,4 @@ data class BusinessPartnerStatusSaas(
     val officialDenotation: String? = null,
     val validFrom: LocalDateTime? = null,
     val validUntil: LocalDateTime? = null,
-
-    )
+)

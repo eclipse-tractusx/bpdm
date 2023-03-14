@@ -19,16 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class BusinessStatusType(private val statusName: String) : NamedType, HasDefaultValue<BusinessStatusType> {
+enum class BusinessStatusType(private val statusName: String) : NamedType {
     ACTIVE("Active"),
     INACTIVE("Inactive");
 
     override fun getTypeName(): String {
         return statusName
-    }
-
-    // TODO do we want a default?
-    override fun getDefault(): BusinessStatusType {
-        return ACTIVE
     }
 }

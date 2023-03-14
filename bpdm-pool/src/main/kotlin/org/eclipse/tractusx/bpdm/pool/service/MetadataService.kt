@@ -81,18 +81,22 @@ class MetadataService(
         return page.toDto( page.content.map { it.toDto() } )
     }
 
+    // TODO remove
     @Transactional
     fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         if (issuingBodyRepository.findByTechnicalKey(type.technicalKey) != null)
             throw BpdmAlreadyExists(IssuingBody::class.simpleName!!, type.technicalKey)
 
         logger.info { "Create new Issuing-Body with key ${type.technicalKey} and name ${type.name}" }
-        return issuingBodyRepository.save(IssuingBody(type.name, "", type.technicalKey)).toDto()
+//        return issuingBodyRepository.save(IssuingBody(type.name, "", type.technicalKey)).toDto()
+        return TypeKeyNameDto(type.technicalKey, type.name)
     }
 
+    // TODO remove
     fun getIssuingBodies(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
         val page = issuingBodyRepository.findAll(pageRequest)
-        return page.toDto( page.content.map { it.toDto() } )
+//        return page.toDto( page.content.map { it.toDto() } )
+        return page.toDto( listOf() )
     }
 
     @Transactional

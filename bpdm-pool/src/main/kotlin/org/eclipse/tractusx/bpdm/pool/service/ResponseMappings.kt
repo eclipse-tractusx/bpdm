@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -84,7 +83,7 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
 }
 
 fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto())
+    return IdentifierResponse(value, type.toDto(), issuingBody?.name)
 }
 
 fun IdentifierType.toDto(): TypeKeyNameDto<String> {
@@ -92,10 +91,6 @@ fun IdentifierType.toDto(): TypeKeyNameDto<String> {
 }
 
 fun IdentifierStatus.toDto(): TypeKeyNameDto<String> {
-    return TypeKeyNameDto(technicalKey, name)
-}
-
-fun IssuingBody.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
@@ -112,7 +107,7 @@ fun LegalFormCategory.toDto(): TypeNameUrlDto {
 }
 
 fun BusinessStatus.toDto(): BusinessStatusResponse {
-    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type.toDto())
+    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type?.toDto())
 }
 
 fun Role.toDto(): TypeKeyNameDto<String> {

@@ -38,8 +38,8 @@ class BusinessStatus (
     val validFrom: LocalDateTime?,
     @Column(name = "valid_to")
     val validUntil: LocalDateTime?,
-    @Column(name = "type", nullable = false)
-    val type: BusinessStatusType,
+    @Column(name = "type")        // TODO migrate
+    val type: BusinessStatusType?,
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity

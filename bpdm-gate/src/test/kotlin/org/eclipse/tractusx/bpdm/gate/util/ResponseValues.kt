@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -47,10 +46,7 @@ object ResponseValues {
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
             name = CommonValues.identifierTypeName1,
         ),
-        issuingBody = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierIssuingBodyTechnicalKey1,
-            name = CommonValues.identifierIssuingBodyName1,
-        )
+        issuingBody = CommonValues.identifierIssuingBody1
     )
     val identifier2 = IdentifierResponse(
         value = CommonValues.identifierValue2,
@@ -58,10 +54,8 @@ object ResponseValues {
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
             name = CommonValues.identifierTypeName2,
         ),
-        issuingBody = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierIssuingBodyTechnicalKey2,
-            name = CommonValues.identifierIssuingBodyName2,
-        )
+        issuingBody = CommonValues.identifierIssuingBody2
+
     )
     val identifier3 = IdentifierResponse(
         value = CommonValues.identifierValue3,
@@ -69,10 +63,8 @@ object ResponseValues {
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
             name = CommonValues.identifierTypeName3,
         ),
-        issuingBody = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierIssuingBodyTechnicalKey3,
-            name = CommonValues.identifierIssuingBodyName3,
-        )
+        issuingBody = CommonValues.identifierIssuingBody3
+
     )
     val identifier4 = IdentifierResponse(
         value = CommonValues.identifierValue4,
@@ -80,10 +72,8 @@ object ResponseValues {
             technicalKey = CommonValues.identifierTypeTechnicalKey4,
             name = CommonValues.identifierTypeName4,
         ),
-        issuingBody = TypeKeyNameDto(
-            technicalKey = CommonValues.identifierIssuingBodyTechnicalKey4,
-            name = CommonValues.identifierIssuingBodyName4,
-        )
+        issuingBody = CommonValues.identifierIssuingBody4
+
     )
 
     val name1 = NameResponse(

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
@@ -49,20 +48,23 @@ class MetadataController(
         return metadataService.getValidIdentifierTypesForCountry(country)
     }
 
+    // TODO remove
     @Deprecated("IdentifierStatus removed")
     override fun createIdentifierStatus(status: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         return metadataService.createIdentifierStatus(status)
     }
 
-    @Deprecated("IdentifierStatus removed")
+    // TODO remove
     override fun getIdentifierStati(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
         return metadataService.getIdentifierStati(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
+    // TODO remove
     override fun createIssuingBody(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
         return metadataService.createIssuingBody(type)
     }
 
+    // TODO remove
     override fun getIssuingBodies(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
         return metadataService.getIssuingBodies(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }

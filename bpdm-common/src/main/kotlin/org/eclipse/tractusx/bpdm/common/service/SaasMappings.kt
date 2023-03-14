@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
@@ -55,6 +56,10 @@ object SaasMappings {
 
     private inline fun <reified T> toType(type: TypeKeyNameUrlSaas): T where T : Enum<T> {
         return enumValueOf(type.technicalKey!!)
+    }
+
+    private inline fun <reified T> toTypeOrNull(type: TypeKeyNameUrlSaas?): T? where T : Enum<T> {
+        return type?.technicalKey?.let { enumValueOf<T>(it) }
     }
 
     inline fun <reified T> toTypeOrDefault(type: TypeKeyNameUrlSaas?): T where T : Enum<T>, T : HasDefaultValue<T> {
@@ -118,7 +123,7 @@ object SaasMappings {
             officialDenotation = status.officialDenotation,
             validFrom = status.validFrom,
             validUntil = status.validUntil,
-            type = toTypeOrDefault(status.type)
+            type = toTypeOrNull<BusinessStatusType>(status.type)
         )
     }
 

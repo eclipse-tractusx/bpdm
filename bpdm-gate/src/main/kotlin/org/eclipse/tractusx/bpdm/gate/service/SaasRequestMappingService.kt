@@ -101,7 +101,7 @@ class SaasRequestMappingService(
 
     private fun BusinessStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
-            type = TypeKeyNameUrlSaas(type.name),
+            type = type?.let { TypeKeyNameUrlSaas(it.name) },
             officialDenotation = officialDenotation,
             validFrom = validFrom,
             validUntil = validUntil
