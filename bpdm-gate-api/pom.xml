@@ -26,6 +26,7 @@
     <name>Business Partner Data Management Gate Api Client</name>
     <description>Service that does request for Client Gate</description>
     <packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <artifactId>bpdm-parent</artifactId>
@@ -33,20 +34,14 @@
         <version>3.1.1-SNAPSHOT</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.7.0</kotlin.version>
-        <kotlin.code.style>official</kotlin.code.style>
-        <junit.version>4.13.1</junit.version>
     </properties>
 
     <dependencies>
     <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>${kotlin.version}</version>
     </dependency>
 
         <dependency>
@@ -66,16 +61,6 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
