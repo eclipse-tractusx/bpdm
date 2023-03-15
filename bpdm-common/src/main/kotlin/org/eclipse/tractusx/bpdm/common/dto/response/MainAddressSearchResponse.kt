@@ -25,6 +25,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class MainAddressSearchResponse(
     @Schema(description = "BPNS of the site this main address belongs to")
     val site: String,
-    @Schema(description = "Adress properties")
-    val mainAddress: AddressResponse
+    @Schema(description = "Address properties")
+    val mainAddress: LogisticAddressResponse
 )

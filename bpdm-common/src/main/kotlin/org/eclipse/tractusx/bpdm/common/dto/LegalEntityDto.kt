@@ -41,5 +41,5 @@ data class LegalEntityDto(
 
     // TODO change to LogisticAddressDto
     @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: AddressDto
+    val legalAddress: LogisticAddressDto
 )

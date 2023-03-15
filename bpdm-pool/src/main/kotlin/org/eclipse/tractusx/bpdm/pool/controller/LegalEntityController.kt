@@ -92,7 +92,7 @@ class LegalEntityController(
     override fun getAddresses(
         bpn: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<AddressPartnerResponse> {
+    ): PageResponse<LogisticAddressResponse> {
         return addressService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 

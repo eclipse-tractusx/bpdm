@@ -19,20 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.neovisionaries.i18n.LanguageCode
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.LocalityType
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@Schema(name = "LocalityResponse", description = "Locality record of an address such as city, block or district")
-data class LocalityResponse (
-    @Schema(description = "Full name of the locality")
-    val value: String,
-    @Schema(description = "Abbreviation or shorthand of the locality's name")
-    val shortName: String? = null,
-    @Schema(description = "Type of locality")
-    val type: TypeKeyNameUrlDto<LocalityType>,
-    @Schema(description = "Language the locality is specified in")
-    val language: TypeKeyNameDto<LanguageCode>
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "LogisticAddressResponse", description = "Logistic address ")
+data class LogisticAddressResponse(
+    @Schema(description = "Business Partner Number of this address")
+    val bpn: String,
+
+    @field:JsonUnwrapped
+    val postalAddress: PostalAddressResponse,
+
+    @ArraySchema(arraySchema = Schema(description = "Address status"))
+    val status: Collection<LegalEntityStateResponse> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
+    val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
+
 )

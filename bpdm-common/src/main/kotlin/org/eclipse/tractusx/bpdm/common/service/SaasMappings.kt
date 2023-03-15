@@ -23,9 +23,11 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object SaasMappings {
@@ -166,20 +168,23 @@ object SaasMappings {
         }
     }
 
-    fun toDto(address: AddressSaas): AddressDto {
-        return AddressDto(
-            toDto(address.version),
-            address.careOf?.value,
-            address.contexts.mapNotNull { it.value },
-            toCountryCode(address.country),
-            address.administrativeAreas.map { toDto(it) },
-            address.postCodes.map { toDto(it) },
-            address.localities.map { toDto(it) },
-            address.thoroughfares.map { toDto(it) },
-            address.premises.map { toDto(it) },
-            address.postalDeliveryPoints.map { toDto(it) },
-            if (address.geographicCoordinates != null) toDto(address.geographicCoordinates) else null,
-            address.types.map { toTypeOrDefault(it) }
+    fun toDto(address: AddressSaas): LogisticAddressDto {
+        // TODO Map sass to DTO
+        return LogisticAddressDto(
+            postalAddress = PostalAddressDto(city = "", country = CountryCode.AD),
+            isSiteMainAddress = false
+//            toDto(address.version),
+//            address.careOf?.value,
+//            address.contexts.mapNotNull { it.value },
+//            toCountryCode(address.country),
+//            address.administrativeAreas.map { toDto(it) },
+//            address.postCodes.map { toDto(it) },
+//            address.localities.map { toDto(it) },
+//            address.thoroughfares.map { toDto(it) },
+//            address.premises.map { toDto(it) },
+//            address.postalDeliveryPoints.map { toDto(it) },
+//            if (address.geographicCoordinates != null) toDto(address.geographicCoordinates) else null,
+//            address.types.map { toTypeOrDefault(it) }
         )
     }
 
@@ -187,58 +192,7 @@ object SaasMappings {
         return AddressVersionDto(toTypeOrDefault(version?.characterSet), toLanguageCode(version?.language))
     }
 
-    fun toDto(area: AdministrativeAreaSaas): AdministrativeAreaDto {
-        return AdministrativeAreaDto(
-            area.value ?: throw BpdmNullMappingException(area::class, AdministrativeAreaDto::class, area::value),
-            area.shortName,
-            null,
-            toTypeOrDefault(area.type)
-        )
-    }
 
-    fun toDto(postcode: PostCodeSaas): PostCodeDto {
-        return PostCodeDto(
-            postcode.value ?: throw BpdmNullMappingException(postcode::class, PostCodeDto::class, postcode::value),
-            toTypeOrDefault(postcode.type)
-        )
-    }
-
-    fun toDto(locality: LocalitySaas): LocalityDto {
-        return LocalityDto(
-            locality.value ?: throw BpdmNullMappingException(locality::class, LocalityDto::class, locality::value),
-            locality.shortName,
-            toTypeOrDefault(locality.type)
-        )
-    }
-
-    fun toDto(thoroughfare: ThoroughfareSaas): ThoroughfareDto {
-        return ThoroughfareDto(
-            thoroughfare.value ?: throw BpdmNullMappingException(thoroughfare::class, ThoroughfareDto::class, thoroughfare::value),
-            thoroughfare.name,
-            thoroughfare.shortName,
-            thoroughfare.number,
-            thoroughfare.direction,
-            toTypeOrDefault(thoroughfare.type)
-        )
-    }
-
-    fun toDto(premise: PremiseSaas): PremiseDto {
-        return PremiseDto(
-            premise.value ?: throw BpdmNullMappingException(premise::class, PremiseDto::class, premise::value),
-            premise.shortName,
-            premise.number,
-            toTypeOrDefault(premise.type)
-        )
-    }
-
-    fun toDto(deliveryPoint: PostalDeliveryPointSaas): PostalDeliveryPointDto {
-        return PostalDeliveryPointDto(
-            deliveryPoint.value ?: throw BpdmNullMappingException(deliveryPoint::class, PostalDeliveryPointDto::class, deliveryPoint::value),
-            deliveryPoint.shortName,
-            deliveryPoint.number,
-            toTypeOrDefault(deliveryPoint.type)
-        )
-    }
 
     fun toDto(geoCoords: GeoCoordinatesSaas): GeoCoordinateDto? {
         return if (geoCoords.latitude != null && geoCoords.longitude != null) GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null) else null

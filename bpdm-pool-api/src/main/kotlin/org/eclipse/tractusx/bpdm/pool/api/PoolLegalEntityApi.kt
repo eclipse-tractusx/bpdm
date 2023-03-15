@@ -165,7 +165,7 @@ interface PoolLegalEntityApi {
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressPartnerResponse>
+    ): PageResponse<LogisticAddressResponse>
 
     @Operation(
         summary = "Search Legal Addresses",

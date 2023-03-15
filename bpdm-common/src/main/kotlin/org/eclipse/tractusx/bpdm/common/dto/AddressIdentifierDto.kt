@@ -17,17 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto
 
-import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 
-@Schema(name = "AddressVersionResponse", description = "Localization record of an address")
-data class AddressVersionResponse(
-    @Schema(description = "Character set in which the address is written")
-    val characterSet: TypeKeyNameDto<CharacterSet>,
-    @Schema(description = "Language in which the address is written")
-    val language: TypeKeyNameDto<LanguageCode>
+@Schema(name = "AddressIdentifier", description = "Identifier record for a logistic address")
+data class AddressIdentifierDto(
+    @Schema(description = "Value of the identifier")
+    val value: String,
+
+    @Schema(description = "Technical key of the type to which this identifier belongs to")
+    val type: String,
 )

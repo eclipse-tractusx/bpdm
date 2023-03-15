@@ -19,17 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 
-@Schema(name = "AdministrativeArea", description = "Areas such as country regions or counties")
-data class AdministrativeAreaDto(
-    @Schema(description = "Full name of the area")
-    val value: String,
-    @Schema(description = "Abbreviation or shorthand of the area")
-    val shortName: String? = null,
-    @Schema(description = "FIPS code if applicable")
-    val fipsCode: String? = null,
-    @Schema(description = "Type of specified area")
-    val type: AdministrativeAreaType = AdministrativeAreaType.OTHER
+@Schema(name = "LogisticAddressDto", description = "Address record for a business partner")
+data class LogisticAddressDto(
+
+    @Schema(description = "Name of the logistic address of the business partner. This is notaccording to official\n" +
+            "registers but according to the name the uploading sharing member chooses.")
+    val addressName: String? = null,
+
+    @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
+    val status: Collection<AddressStatusDto> = emptyList(),
+
+    @Schema(description = "This indicates if the given BPNA is the main address to a site")
+    val isSiteMainAddress: Boolean?,
+
+    @ArraySchema(arraySchema = Schema(description = "List of identifiers"))
+    val addressIdentifier: Collection<AddressIdentifierDto> = emptyList(),
+
+    @Schema(description = "Postal address")
+    val postalAddress: PostalAddressDto
+
 )

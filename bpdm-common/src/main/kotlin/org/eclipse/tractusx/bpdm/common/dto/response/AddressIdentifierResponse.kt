@@ -19,22 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
-@Schema(name = "PostalDeliveryPointResponse", description = "Postal delivery point record of an address")
-data class PostalDeliveryPointResponse(
-    @Schema(description = "Full denotation of the delivery point")
+@Schema(name = "IdentifierResponse", description = "Identifier record of a business partner")
+data class AddressIdentifierResponse(
+    @Schema(description = "Value of the identifier")
     val value: String,
-    @Schema(description = "Abbreviation or shorthand of the locality's name")
-    val shortName: String? = null,
-    @Schema(description = "Number/code of the delivery point")
-    val number: String? = null,
-    @Schema(description = "Type of the specified delivery point")
-    val type: TypeKeyNameUrlDto<PostalDeliveryPointType>,
-    @Schema(description = "Language the delivery point is specified in")
-    val language: TypeKeyNameDto<LanguageCode>
+
+    @Schema(description = "Type of the identifier")
+    val type: TypeKeyNameDto<String>,
+
 )

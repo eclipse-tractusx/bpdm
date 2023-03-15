@@ -40,7 +40,7 @@ class AddressService(
     private val siteRepository: SiteRepository,
     private val addressRepository: AddressRepository
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<AddressPartnerResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<LogisticAddressResponse> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }

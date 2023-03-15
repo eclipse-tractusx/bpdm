@@ -1,0 +1,34 @@
+== AddressBpnResponse - nur in Test
+== AddressIdentifierResponse - not used
+
+== AddressPartnerResponse
+    * AddressPartnerSearchResponse
+    * ImportResponsePage
+    * PartnerImportPageService.import
+    * LegalEntityController.getAddresses
+    * BusinessPartnerResponse
+    * EntitiesWithErrors
+    * AddressService
+
+== AddressPartnerSearchResponse
+    * AddressController.searchAddresses
+    * AddressMatchResponse
+
+== AddressMatchResponse
+    * AddressController.getAddresses
+
+== AddressVersionResponse - not used anymore
+
+== LegalAddressSearchResponse
+    * LegalEntityController.searchLegalAddresses
+
+== MainAddressSearchResponse
+  * SiteController.searchMainAddresses
+
+== PostalAddressResponse
+ * AddressBpnResponse
+ * AddressPartnerResponse
+ * LegalAddressSearchResponse
+ * MainAddressSearchResponse
+
+== AddressPartnerCreateResponse

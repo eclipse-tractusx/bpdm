@@ -31,5 +31,5 @@ data class SiteDto(
     val states: Collection<SiteStateDto>,
 
     @Schema(description = "Main address where this site resides")
-    val mainAddress: AddressDto
+    val mainAddress: LogisticAddressDto
 )

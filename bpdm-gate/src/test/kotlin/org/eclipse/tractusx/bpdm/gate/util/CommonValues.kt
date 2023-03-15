@@ -176,44 +176,60 @@ object CommonValues {
     val context1 = "Context1"
     val context2 = "Context2"
 
-    val adminArea1 = "Baden-Württemberg"
-    val adminArea2 = "Stuttgart"
+    val adminAreaLevel1Name_1 = "Baden-Württemberg"
+    val adminAreaLevel1RegionCode_1 = "BW"
+    val adminAreaLevel1Name_2 = "Georgia"
+    val adminAreaLevel1RegionCode_2 = "GA"
 
-    val adminAreaType1 = AdministrativeAreaType.COUNTY
-    val adminAreaType2 = AdministrativeAreaType.REGION
+    val county1 = "Stuttgart"
+    val county2 = " Fulton County"
 
-    val postCode1 = "70546"
+    val city1 = "Stuttgart"
+    val city2 = "Atlanta"
+
+
+    val districtLevel1_1 = "Vaihingen"
+    val districtLevel1_2 = "TODO"
+    val districtLevel1_3= "TODO"
+
+    val districtLevel2_1 = "Vaihingen-Level2"
+    val districtLevel2_2 = "TODO"
+    val districtLevel2_3 = "TODO"
+
+    val street1 = "Mercedesstraße 120"
+    val street2 = "TODO"
+    val street3 = "TODO"
+
+    val houseNumber1 = ""
+    val houseNumber2 = ""
+    val houseNumber3 = ""
+
+    val industrialZone1 = "Werk 1"
+    val industrialZone2 = "Industrial Zone Two"
+    val industrialZone3 = "Industrial Zone Three"
+
+    val building1 = "Bauteil A"
+    val building2 = "Building Two"
+    val building3 = "Building Two"
+
+    val floor1 = "Etage 1"
+    val floor2 = "Floor Two"
+    val floor3 = "Floor Two"
+
+    val door1 = "Door One"
+    val door2 = "Door Two"
+    val door3 = "Door Two"
+
+    val postCode1 = "70546 "
     val postCode2 = "70547"
 
     val postCodeType1 = PostCodeType.REGULAR
     val postCodeType2 = PostCodeType.POST_BOX
 
-    val locality1 = "Stuttgart"
-    val locality2 = "Vaihingen"
-
-    val localityType1 = LocalityType.CITY
-    val localityType2 = LocalityType.DISTRICT
-
-    val thoroughfare1 = "Mercedesstraße 120"
-    val thoroughfare2 = "Werk 1"
-
-    val thoroughfareType1 = ThoroughfareType.STREET
-    val thoroughfareType2 = ThoroughfareType.INDUSTRIAL_ZONE
-
-    val premise1 = "Bauteil A"
-    val premise2 = "Etage 1"
-
-    val premiseType1 = PremiseType.BUILDING
-    val premiseType2 = PremiseType.WAREHOUSE
-
-    val postalDeliveryPoint1 = "Postal Delivery point"
-    val postalDeliveryPoint2 = "Mailbox Premise Street"
-
-    val postalDeliveryPointType1 = PostalDeliveryPointType.MAILBOX
-    val postalDeliveryPointType2 = PostalDeliveryPointType.POST_OFFICE_BOX
-
     val geoCoordinates1 = Triple(0f, 0f, 0f)
     val geoCoordinates2 = Triple(1f, 1f, 0f)
 
+    val postalDeliveryPoint1 = "Postal Delivery point"
+    val postalDeliveryPoint2 = "Mailbox Premise Street"
 
 }

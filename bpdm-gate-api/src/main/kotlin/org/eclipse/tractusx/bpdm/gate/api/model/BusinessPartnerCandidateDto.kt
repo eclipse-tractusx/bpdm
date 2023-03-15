@@ -21,8 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
 
 data class BusinessPartnerCandidateDto(
@@ -36,5 +37,5 @@ data class BusinessPartnerCandidateDto(
     val legalForm: String? = null,
 
     @Schema(description = "Address of this partner")
-    val address: AddressDto
+    val address: LogisticAddressDto
 )
