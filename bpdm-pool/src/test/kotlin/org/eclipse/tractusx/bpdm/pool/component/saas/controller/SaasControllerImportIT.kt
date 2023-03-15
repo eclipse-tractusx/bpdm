@@ -165,9 +165,9 @@ class SaasControllerImportIT @Autowired constructor(
 
         //Assert actual created sites with expected
         val expectedSites = listOf(
-            SitePartnerSearchResponse(ResponseValues.site1, bpnL1),
-            SitePartnerSearchResponse(ResponseValues.site2, bpnL2),
-            SitePartnerSearchResponse(ResponseValues.site3, createdParentBpn)
+            ResponseValues.site1,
+            ResponseValues.site2,
+            ResponseValues.site3.copy(bpnLegalEntity = createdParentBpn)
         )
 
         val actualSites = getSites(bpnSs).content
@@ -509,9 +509,9 @@ class SaasControllerImportIT @Autowired constructor(
 
         //assert actual is expected
         val expectedPartners = listOf(
-            SitePartnerSearchResponse(ResponseValues.site1.copy(bpn = bpnS2), bpnL2),
-            SitePartnerSearchResponse(ResponseValues.site2.copy(bpn = bpnS3), bpnL3),
-            SitePartnerSearchResponse(ResponseValues.site3.copy(bpn = bpnS1), bpnL1)
+            ResponseValues.site1.copy(bpn = bpnS2, bpnLegalEntity = bpnL2),
+            ResponseValues.site2.copy(bpn = bpnS3, bpnLegalEntity = bpnL3),
+            ResponseValues.site3.copy(bpn = bpnS1, bpnLegalEntity = bpnL1),
         )
         val actual = getSites(bpns).content
         testHelpers.assertRecursively(actual).isEqualTo(expectedPartners)
@@ -579,11 +579,11 @@ class SaasControllerImportIT @Autowired constructor(
         return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
     }
 
-    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityResponse> = poolClient.legalEntities().searchSites(bpns).body!!
+    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityResponse> =
+        poolClient.legalEntities().searchSites(bpns).body!!
 
-    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),
-        PaginationRequest()
-    )
+    private fun getSites(bpns: Collection<String>): PageResponse<SiteResponse> =
+        poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns), PaginationRequest())
 
     private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
 

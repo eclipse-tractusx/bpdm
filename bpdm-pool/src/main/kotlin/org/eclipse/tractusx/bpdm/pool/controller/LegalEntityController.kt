@@ -84,7 +84,7 @@ class LegalEntityController(
     override fun getSites(
         bpn: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<SitePartnerResponse> {
+    ): PageResponse<SiteResponse> {
         return siteService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 

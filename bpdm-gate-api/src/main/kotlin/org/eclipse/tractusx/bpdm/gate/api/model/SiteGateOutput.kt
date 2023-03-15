@@ -31,12 +31,10 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class SiteGateOutput(
     @field:JsonUnwrapped
     val site: SiteResponse,
+
     @Schema(description = "Main address where this site resides")
     val mainAddress: AddressResponse,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
-    val externalId: String,
-    @Schema(description = "Business Partner Number, main identifier value for sites")
-    val bpn: String?,
-    @Schema(description = "Bpn of the related legal entity")
-    val legalEntityBpn: String,
+    val externalId: String
 )

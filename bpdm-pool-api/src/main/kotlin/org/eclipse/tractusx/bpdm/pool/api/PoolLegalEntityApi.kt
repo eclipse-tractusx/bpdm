@@ -147,7 +147,7 @@ interface PoolLegalEntityApi {
     fun getSites(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SitePartnerResponse>
+    ): PageResponse<SiteResponse>
 
     @Operation(
         summary = "Get address partners of a legal entity",

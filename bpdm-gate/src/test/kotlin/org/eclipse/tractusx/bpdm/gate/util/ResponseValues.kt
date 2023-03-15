@@ -440,10 +440,16 @@ object ResponseValues {
     )
 
     val siteResponse1 = SiteResponse(
-        name = CommonValues.nameSite1
+        bpn = CommonValues.bpnSite1,
+        name = CommonValues.nameSite1,
+        status = listOf(),
+        bpnLegalEntity = CommonValues.bpn1
     )
     val siteResponse2 = SiteResponse(
-        name = CommonValues.nameSite2
+        bpn = CommonValues.bpnSite2,
+        name = CommonValues.nameSite2,
+        status = listOf(),
+        bpnLegalEntity = CommonValues.bpn2
     )
 
     val siteGateInputResponse1 = SiteGateInputResponse(
@@ -469,22 +475,12 @@ object ResponseValues {
         site = siteResponse1,
         mainAddress = address1,
         externalId = CommonValues.externalIdSite1,
-        bpn = CommonValues.bpnSite1,
-        legalEntityBpn = CommonValues.bpn1
     )
     val siteGateOutput2 = SiteGateOutput(
         site = siteResponse2,
         mainAddress = address2,
         externalId = CommonValues.externalIdSite2,
-        bpn = CommonValues.bpnSite2,
-        legalEntityBpn = CommonValues.bpn2
     )
-
-    val sitePartnerResponse1 = SitePartnerResponse(bpn = CommonValues.bpnSite1, name = CommonValues.nameSite1)
-    val sitePartnerResponse2 = SitePartnerResponse(bpn = CommonValues.bpnSite2, name = CommonValues.nameSite2)
-
-    val sitePartnerSearchResponse1 = SitePartnerSearchResponse(site = sitePartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
-    val sitePartnerSearchResponse2 = SitePartnerSearchResponse(site = sitePartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
 
     val addressGateInputResponse1 = AddressGateInputResponse(
         address = RequestValues.address1,
