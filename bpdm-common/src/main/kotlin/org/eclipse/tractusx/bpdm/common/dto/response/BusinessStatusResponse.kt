@@ -38,5 +38,5 @@ data class BusinessStatusResponse(
     val validTo: LocalDateTime?,
 
     @Schema(description = "The type of this status")
-    val type: TypeKeyNameDto<BusinessStatusType>?
+    val type: TypeKeyNameDto<BusinessStatusType>
 )

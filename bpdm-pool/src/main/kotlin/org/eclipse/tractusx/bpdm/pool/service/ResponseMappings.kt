@@ -99,7 +99,7 @@ fun LegalFormCategory.toDto(): TypeNameUrlDto {
 }
 
 fun BusinessStatus.toDto(): BusinessStatusResponse {
-    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type?.toDto())
+    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type.toDto())
 }
 
 fun Role.toDto(): TypeKeyNameDto<String> {
