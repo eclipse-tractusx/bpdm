@@ -22,8 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
@@ -105,8 +104,9 @@ class SiteControllerIT @Autowired constructor(
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
-        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL)
-        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL)
+
+        val expectedSiteWithReference1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL)
+        val expectedSiteWithReference2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL)
 
         testHelpers.assertRecursively(searchResult.content)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
@@ -140,9 +140,10 @@ class SiteControllerIT @Autowired constructor(
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
-        val expectedSiteWithReference1 = SitePartnerSearchResponse(ResponseValues.site1, bpnL1)
-        val expectedSiteWithReference2 = SitePartnerSearchResponse(ResponseValues.site2, bpnL1)
-        val expectedSiteWithReference3 = SitePartnerSearchResponse(ResponseValues.site3, bpnL2)
+
+        val expectedSiteWithReference1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL1)
+        val expectedSiteWithReference2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL1)
+        val expectedSiteWithReference3 = ResponseValues.site3.copy(bpnLegalEntity = bpnL2)
 
         testHelpers.assertRecursively(searchResult.content)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))

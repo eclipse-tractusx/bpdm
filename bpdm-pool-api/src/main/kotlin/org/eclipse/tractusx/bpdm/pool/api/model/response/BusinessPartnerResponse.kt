@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -37,5 +37,5 @@ data class BusinessPartnerResponse(
 
     val addresses: Collection<AddressPartnerResponse>,
 
-    val sites: Collection<SitePartnerResponse>,
+    val sites: Collection<SiteResponse>,
 )

@@ -24,9 +24,15 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "SiteResponse", description = "Site of a legal entity")
 data class SiteResponse(
+    @Schema(description = "Business Partner Number, main identifier value for sites")
+    val bpn: String,
+
     @Schema(description = "Site name")
     val name: String,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
     val status: Collection<BusinessStatusResponse> = emptyList(),
+
+    @Schema(description = "Business Partner Number of the related legal entity")
+    val bpnLegalEntity: String,
 )

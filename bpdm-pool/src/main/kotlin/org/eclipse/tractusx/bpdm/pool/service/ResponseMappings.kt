@@ -181,19 +181,15 @@ fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
     )
 }
 
-fun Site.toDto(): SitePartnerResponse {
-    return SitePartnerResponse(
+fun Site.toDto(): SiteResponse {
+    return SiteResponse(
         bpn,
-        name
+        name,
+        status = listOf(),
+        bpnLegalEntity = legalEntity.bpn
     )
 }
 
-fun Site.toWithReferenceDto(): SitePartnerSearchResponse {
-    return SitePartnerSearchResponse(
-        toDto(),
-        legalEntity.bpn
-    )
-}
 
 fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
     return AdministrativeAreaResponse(value, shortName, fipsCode, type.toDto(), language.toDto())

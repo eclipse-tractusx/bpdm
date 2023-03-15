@@ -69,7 +69,7 @@ class PoolClient(
         return legalAddresses
     }
 
-    fun searchSites(bpnSs: Collection<String>): Collection<SitePartnerSearchResponse> {
+    fun searchSites(bpnSs: Collection<String>): Collection<SiteResponse> {
         if (bpnSs.isEmpty()) return emptyList()
 
         val sites = try {
@@ -78,7 +78,7 @@ class PoolClient(
                 .uri("/sites/search")
                 .bodyValue(objectMapper.writeValueAsString(SiteBpnSearchRequest(sites = bpnSs)))
                 .retrieve()
-                .bodyToMono<PageResponse<SitePartnerSearchResponse>>()
+                .bodyToMono<PageResponse<SiteResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search sites failed.", e)

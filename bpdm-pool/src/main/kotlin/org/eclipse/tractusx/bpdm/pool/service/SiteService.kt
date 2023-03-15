@@ -22,8 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
@@ -37,7 +36,7 @@ class SiteService(
     private val legalEntityRepository: LegalEntityRepository,
     private val addressService: AddressService
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SitePartnerResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SiteResponse> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -47,18 +46,18 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePartnerSearchResponse> {
+    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageResponse<SiteResponse> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage =
             siteRepository.findByLegalEntityInOrBpnIn(partners, siteSearchRequest.sites, PageRequest.of(paginationRequest.page, paginationRequest.size))
         fetchSiteDependencies(sitePage.toSet())
-        return sitePage.toDto(sitePage.content.map { it.toWithReferenceDto() })
+        return sitePage.toDto(sitePage.content.map { it.toDto() })
     }
 
-    fun findByBpn(bpn: String): SitePartnerSearchResponse {
+    fun findByBpn(bpn: String): SiteResponse {
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
-        return site.toWithReferenceDto()
+        return site.toDto()
     }
 
     private fun fetchSiteDependencies(sites: Set<Site>) {
