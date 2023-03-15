@@ -77,7 +77,9 @@ class SiteService(
         val partnerResponse = saasClient.getSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
         val partners = partnerResponse.values
 
-        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partners)
+        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
+        val augmentedPartnerResponse = saasClient.getAugmentedSites(externalIds = partnersWithExternalId.map { it.externalId })
+        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
         val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.site.bpn }

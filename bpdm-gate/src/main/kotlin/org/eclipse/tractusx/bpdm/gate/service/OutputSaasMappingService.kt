@@ -37,19 +37,16 @@ import java.time.LocalDateTime
 
 @Service
 class OutputSaasMappingService(
-    private val saasConfigProperties: SaasConfigProperties,
-    private val saasClient: SaasClient
+    private val saasConfigProperties: SaasConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
 
-    fun mapWithLocalBpn(partners: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerSaaSWithBpn> {
-        val partnersWithExternalId = mapWithExternalId(partners)
-        val externalIds = partnersWithExternalId.map { it.externalId }
-
-        val augmentedPartnerResponse = saasClient.getAugmentedLegalEntities(externalIds = externalIds)
-        val augmentedPartnerWrapperCollection = augmentedPartnerResponse.values
-        val bpnByExternalIdMap = buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
+    fun mapWithLocalBpn(
+        partnersWithExternalId: Collection<BusinessPartnerSaaSWithExternalId>,
+        augmentedPartners: Collection<AugmentedBusinessPartnerResponseSaas>
+    ): Collection<BusinessPartnerSaaSWithBpn> {
+        val bpnByExternalIdMap = buildBpnByExternalIdMap(augmentedPartners)
 
         val partnersWithLocalBpn = partnersWithExternalId
             .filter { partner -> bpnByExternalIdMap[partner.externalId] != null }
@@ -74,11 +71,11 @@ class OutputSaasMappingService(
         val errors = mutableListOf<ErrorInfo<BusinessPartnerOutputError>>()
         val pendingExternalIds = mutableListOf<String>()
 
-        partnersWithExternalId.forEach { partnerWithIds ->
-            val partner = partnerWithIds.partner
+        partnersWithExternalId.forEach { partnerWithId ->
+            val partner = partnerWithId.partner
             val sharingStatus = partner.metadata?.sharingStatus
             val sharingStatusType = sharingStatus?.status
-            val externalId = partnerWithIds.externalId
+            val externalId = partnerWithId.externalId
             val localBpn = localBpnByExternalId[externalId]?.bpn
             val poolBpn = poolBpnByExternalId[externalId]?.bpn
 
@@ -105,7 +102,7 @@ class OutputSaasMappingService(
     }
 
 
-    private fun mapWithExternalId(partners: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerSaaSWithExternalId> {
+    fun mapWithExternalId(partners: Collection<BusinessPartnerSaas>): Collection<BusinessPartnerSaaSWithExternalId> {
         val (partnersWithExternalId, partnersWithoutExternalId) = partners.partition { it.externalId != null }
         //Should only happen when paginating without filtering for externalIds
         if (partnersWithoutExternalId.isNotEmpty()) {

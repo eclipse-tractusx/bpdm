@@ -79,7 +79,9 @@ class LegalEntityService(
         val partnerResponse = saasClient.getLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
         val partners = partnerResponse.values
 
-        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partners)
+        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
+        val augmentedPartnerResponse = saasClient.getAugmentedLegalEntities(externalIds = partnersWithExternalId.map { it.externalId })
+        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
