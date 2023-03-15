@@ -217,24 +217,30 @@ object ResponseValues {
     )
 
     val site1 = SiteResponse(
-        CommonValues.bpnS1,
-        CommonValues.siteName1,
-        listOf(),
-        CommonValues.bpnL1
+        bpn = CommonValues.bpnS1,
+        name = CommonValues.siteName1,
+        status = listOf(),
+        bpnLegalEntity = CommonValues.bpnL1,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val site2 = SiteResponse(
-        CommonValues.bpnS2,
-        CommonValues.siteName2,
-        listOf(),
-        CommonValues.bpnL2
+        bpn = CommonValues.bpnS2,
+        name = CommonValues.siteName2,
+        status = listOf(),
+        bpnLegalEntity = CommonValues.bpnL2,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val site3 = SiteResponse(
-        CommonValues.bpnS3,
-        CommonValues.siteName3,
-        listOf(),
-        CommonValues.bpnL3
+        bpn = CommonValues.bpnS3,
+        name = CommonValues.siteName3,
+        status = listOf(),
+        bpnLegalEntity = CommonValues.bpnL3,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val siteUpsert1 = SitePartnerCreateResponse(
