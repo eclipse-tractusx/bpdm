@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
-import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 import org.eclipse.tractusx.bpdm.common.model.NameType.REGISTERED
@@ -57,10 +56,6 @@ object SaasMappings {
 
     private inline fun <reified T> toType(type: TypeKeyNameUrlSaas): T where T : Enum<T> {
         return enumValueOf(type.technicalKey!!)
-    }
-
-    private inline fun <reified T> toTypeOrNull(type: TypeKeyNameUrlSaas?): T? where T : Enum<T> {
-        return type?.technicalKey?.let { enumValueOf<T>(it) }
     }
 
     inline fun <reified T> toTypeOrDefault(type: TypeKeyNameUrlSaas?): T where T : Enum<T>, T : HasDefaultValue<T> {
@@ -95,7 +90,7 @@ object SaasMappings {
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             legalName = legalName,
             legalForm = toOptionalReference(legalForm),
-            status = if (status != null) listOf(toDto(status)) else listOf(),
+            status = toDtos(status),
             classifications = toDto(profile),
             legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )
@@ -104,7 +99,7 @@ object SaasMappings {
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
         return SiteDto(
             name = names.first().value,
-            status = if (status != null) listOf(toDto(status)) else listOf(),
+            status = toDtos(status),
             mainAddress = toDto(addresses.first())
         )
     }
@@ -124,14 +119,18 @@ object SaasMappings {
         )
     }
 
-    fun toDto(status: BusinessPartnerStatusSaas): BusinessStatusDto {
-        return BusinessStatusDto(
-            officialDenotation = status.officialDenotation,
-            validFrom = status.validFrom,
-            validUntil = status.validUntil,
-            type = toTypeOrNull<BusinessStatusType>(status.type)
-        )
-    }
+    fun toDtos(status: BusinessPartnerStatusSaas?): Collection<BusinessStatusDto> =
+        status?.type?.let {
+            listOf(
+                BusinessStatusDto(
+                    officialDenotation = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validUntil = status.validUntil,
+                    type = toType(status.type)
+                )
+            )
+        }
+            ?: listOf()
 
     fun toDto(profile: PartnerProfileSaas?): Collection<ClassificationDto> {
         return profile?.classifications?.map { toDto(it) } ?: emptyList()
