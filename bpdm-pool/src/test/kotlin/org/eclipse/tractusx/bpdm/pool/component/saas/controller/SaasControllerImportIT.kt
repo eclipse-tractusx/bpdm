@@ -28,10 +28,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -566,8 +563,8 @@ class SaasControllerImportIT @Autowired constructor(
     }
 
     private fun assertLegalEntityResponseEquals(
-        actualPartners: Collection<LegalEntityPartnerResponse>,
-        expectedPartners: Collection<LegalEntityPartnerResponse>
+        actualPartners: Collection<LegalEntityResponse>,
+        expectedPartners: Collection<LegalEntityResponse>
     ) {
         assertThat(actualPartners)
             .usingRecursiveComparison()
@@ -582,17 +579,13 @@ class SaasControllerImportIT @Autowired constructor(
         return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
     }
 
-    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> = poolClient.legalEntities().searchSites(bpns).body!!
-
+    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityResponse> = poolClient.legalEntities().searchSites(bpns).body!!
 
     private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),
         PaginationRequest()
     )
 
-
     private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
-
-
 
     private fun importPartners(
         partnersToImport: List<BusinessPartnerSaas>,

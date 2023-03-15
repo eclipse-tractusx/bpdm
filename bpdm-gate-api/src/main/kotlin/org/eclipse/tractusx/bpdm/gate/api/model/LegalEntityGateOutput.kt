@@ -32,10 +32,10 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class LegalEntityGateOutput(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
+
     @Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: AddressResponse,
-    @Schema(description = "Business Partner Number, main identifier value for business partners")
-    val bpn: String?,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String
 )

@@ -21,11 +21,14 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
 // TODO probably rename to LegalEntityDetailedDto
-// TODO can we move BPN from LegalEntityPartnerResponse to here?
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
+    @Schema(description = "Business Partner Number of this legal entity")
+    val bpn: String,
+
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<IdentifierResponse> = emptyList(),
 
@@ -43,4 +46,13 @@ data class LegalEntityResponse(
 
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
+
+    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    val currentness: Instant,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

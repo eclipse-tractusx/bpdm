@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
@@ -130,11 +130,10 @@ class LegalEntityService(
         )
     }
 
-    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityPartnerResponse, legalAddress: LegalAddressSearchResponse): LegalEntityGateOutput =
+    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityResponse, legalAddress: LegalAddressSearchResponse): LegalEntityGateOutput =
         LegalEntityGateOutput(
-            legalEntity = legalEntity.properties,
+            legalEntity = legalEntity,
             legalAddress = legalAddress.legalAddress,
-            bpn = legalEntity.bpn,
             externalId = externalId
         )
 

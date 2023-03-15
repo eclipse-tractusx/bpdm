@@ -60,11 +60,11 @@ class SiteControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
 
         val importedPartner = createdStructures.single().legalEntity
-        importedPartner.bpn
+        importedPartner.legalEntity.bpn
             .let { bpn -> requestSitesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnSite -> requestSite(bpnSite) }
             .let { siteResponse ->
-                assertThat(siteResponse.bpnLegalEntity).isEqualTo(importedPartner.bpn)
+                assertThat(siteResponse.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
             }
     }
 
@@ -101,7 +101,7 @@ class SiteControllerIT @Autowired constructor(
 
         val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
         val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
-        val bpnL = createdStructures[0].legalEntity.bpn
+        val bpnL = createdStructures[0].legalEntity.legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
@@ -135,8 +135,8 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL1 = createdStructures[0].legalEntity.bpn
-        val bpnL2 = createdStructures[1].legalEntity.bpn
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
@@ -159,8 +159,8 @@ class SiteControllerIT @Autowired constructor(
 
         val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
-        val bpnL1 = givenLegalEntities.first().bpn
-        val bpnL2 = givenLegalEntities.last().bpn
+        val bpnL1 = givenLegalEntities.first().legalEntity.bpn
+        val bpnL2 = givenLegalEntities.last().legalEntity.bpn
 
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2, ResponseValues.siteUpsert3)
 
@@ -187,8 +187,8 @@ class SiteControllerIT @Autowired constructor(
 
         val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
-        val bpnL1 = givenLegalEntities.first().bpn
-        val bpnL2 = givenLegalEntities.last().bpn
+        val bpnL1 = givenLegalEntities.first().legalEntity.bpn
+        val bpnL2 = givenLegalEntities.last().legalEntity.bpn
 
 
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2)

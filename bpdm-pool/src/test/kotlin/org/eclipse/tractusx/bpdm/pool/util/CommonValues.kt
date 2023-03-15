@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.model.*
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
@@ -29,6 +30,8 @@ import java.util.*
  * Contains simple test values used to create more complex test values such as DTOs
  */
 object CommonValues {
+
+    val now = Instant.now()
 
     //The BPNs should match the first generated BPNs from the Issuer in order
     val bpnL1 = "BPNL000000000001"

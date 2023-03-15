@@ -68,12 +68,12 @@ class SuggestionControllerIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.properties
+        private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.legalEntity
         private val expectedLegalEntityName = expectedLegalEntity.legalName.value
         private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
-        private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.properties
+        private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.legalEntity
         private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
         private val nonlatinSite = ResponseValues.siteUpsert3
 

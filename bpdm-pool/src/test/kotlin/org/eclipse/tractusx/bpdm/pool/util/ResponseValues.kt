@@ -253,62 +253,56 @@ object ResponseValues {
     )
 
 
-    val legalEntity1 = LegalEntityPartnerResponse(
+    val legalEntity1 = LegalEntityResponse(
         bpn = CommonValues.bpnL1,
-        properties = LegalEntityResponse(
-            legalName = name1,
-            identifiers = listOf(identifier1),
-            legalForm = legalForm1,
-            status = listOf(status1),
-            classifications = listOf(classification1, classification2)
-        ),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
+        legalName = name1,
+        identifiers = listOf(identifier1),
+        legalForm = legalForm1,
+        status = listOf(status1),
+        classifications = listOf(classification1, classification2),
+        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
-    val legalEntity2 = LegalEntityPartnerResponse(
+    val legalEntity2 = LegalEntityResponse(
         bpn = CommonValues.bpnL2,
-        properties = LegalEntityResponse(
-            legalName = name3,
-            identifiers = listOf(identifier2),
-            legalForm = legalForm2,
-            status = listOf(status2),
-            classifications = listOf(classification3, classification4)
-        ),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
+        legalName = name3,
+        identifiers = listOf(identifier2),
+        legalForm = legalForm2,
+        status = listOf(status2),
+        classifications = listOf(classification3, classification4),
+        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
-    val legalEntity3 = LegalEntityPartnerResponse(
+    val legalEntity3 = LegalEntityResponse(
         bpn = CommonValues.bpnL3,
-        properties = LegalEntityResponse(
-            legalName = name5,
-            identifiers = listOf(identifier3),
-            legalForm = legalForm3,
-            status = listOf(status3),
-            classifications = listOf(classification5)
-        ),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC)
+        legalName = name5,
+        identifiers = listOf(identifier3),
+        legalForm = legalForm3,
+        status = listOf(status3),
+        classifications = listOf(classification5),
+        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
-        bpn = legalEntity1.bpn,
-        properties = legalEntity1.properties,
-        currentness = legalEntity1.currentness,
+        legalEntity = legalEntity1,
         legalAddress = address1,
         index = CommonValues.index1
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
-        bpn = legalEntity2.bpn,
-        properties = legalEntity2.properties,
-        currentness = legalEntity2.currentness,
+        legalEntity = legalEntity2,
         legalAddress = address2,
         index = CommonValues.index2
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
-        bpn = legalEntity3.bpn,
-        properties = legalEntity3.properties,
-        currentness = legalEntity3.currentness,
+        legalEntity = legalEntity3,
         legalAddress = address3,
         index = CommonValues.index3
     )

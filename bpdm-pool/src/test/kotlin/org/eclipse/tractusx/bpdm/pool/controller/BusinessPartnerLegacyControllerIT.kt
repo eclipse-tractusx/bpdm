@@ -127,7 +127,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     fun `find by BPN`() {
         val expected = convertCreateResponse(givenPartner1)
 
-        val bpn = givenPartner1.bpn
+        val bpn = givenPartner1.legalEntity.bpn
         val respone = webTestClient.invokeGetEndpoint<BusinessPartnerResponse>("${EndpointValues.CATENA_BUSINESS_PARTNER_LEGACY_PATH}/${bpn}")
 
         testHelpers.assertRecursively(respone).ignoringFieldsMatchingRegexes(".*uuid").isEqualTo(expected)
@@ -142,7 +142,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     fun `find by other identifier`() {
         val expected = convertCreateResponse(givenPartner1)
 
-        val additionalIdentifier = givenPartner1.properties.identifiers.first()
+        val additionalIdentifier = givenPartner1.legalEntity.identifiers.first()
         val idValue = additionalIdentifier.value
         val idType = additionalIdentifier.type.technicalKey
         val respone =
@@ -159,11 +159,9 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     private fun convertCreateResponse(toConvert: LegalEntityPartnerCreateResponse): BusinessPartnerResponse {
         return BusinessPartnerResponse(
             "",
-            toConvert.bpn,
-            toConvert.properties,
+            toConvert.legalEntity,
             listOf(AddressPartnerResponse("", toConvert.legalAddress)),
-            emptyList(),
-            toConvert.currentness
+            emptyList()
         )
     }
 }
