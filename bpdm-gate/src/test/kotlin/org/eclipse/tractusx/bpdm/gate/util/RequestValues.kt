@@ -133,7 +133,7 @@ object RequestValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val address1 = AddressDto(
+    val address1 = LogisticAddressDto(
         addressVersion1,
         CommonValues.careOf1,
         listOf(CommonValues.context1),
@@ -148,7 +148,7 @@ object RequestValues {
         listOf(AddressType.HEADQUARTER)
     )
 
-    val address2 = AddressDto(
+    val address2 = LogisticAddressDto(
         addressVersion2,
         CommonValues.careOf2,
         listOf(CommonValues.context2),

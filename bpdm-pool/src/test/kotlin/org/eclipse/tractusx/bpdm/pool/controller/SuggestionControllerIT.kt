@@ -61,7 +61,7 @@ class SuggestionControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
-
+    // TODO handle new data model
     companion object {
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
@@ -112,32 +112,32 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.administrativeAreas.first().value,
+                    expectedLegalAddress.administrativeAreaLevel1,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postCodes.first().value,
+                    expectedLegalAddress.postCode,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.localities.first().value,
+                    expectedLegalAddress.city,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.thoroughfares.first().value,
+                    expectedLegalAddress.street,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.premises.first().value,
+                    expectedLegalAddress.physicalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalDeliveryPoints.first().value,
+                    expectedLegalAddress.alternativeAddress!!.derliveryServiceNumber,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
                     expectedLegalEntityName
                 )
@@ -149,12 +149,12 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
                 Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
-                Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
-                Arguments.of(nonlatinLegalAddress.postCodes.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
-                Arguments.of(nonlatinLegalAddress.localities.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
-                Arguments.of(nonlatinLegalAddress.thoroughfares.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.premises.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalDeliveryPoints.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinLegalAddress.administrativeAreaLevel1, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.street, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.alternativeAddress!!.derliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 

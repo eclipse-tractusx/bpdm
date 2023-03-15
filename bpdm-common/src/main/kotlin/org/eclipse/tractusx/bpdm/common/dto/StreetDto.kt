@@ -20,16 +20,18 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
-@Schema(name = "PostalDeliveryPoint", description = "Postal delivery point record for an address")
-data class PostalDeliveryPointDto(
-    @Schema(description = "Full name of the delivery point")
-    val value: String,
-    @Schema(description = "Abbreviation or shorthand, if applicable")
-    val shortName: String? = null,
-    @Schema(description = "Number/code of the delivery point, if applicable")
-    val number: String? = null,
-    @Schema(description = "Type of the specified delivery point", defaultValue = "OTHER")
-    val type: PostalDeliveryPointType = PostalDeliveryPointType.OTHER
+@Schema(name = "Name", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
+data class StreetDto(
+    @Schema(description = "Describes the official Name of the Street.")
+    val name: String? = null,
+
+    @Schema(description = "Describes the House Number")
+    val houseNumber: String? = null,
+
+    @Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
+    val milestone: String? = null,
+
+    @Schema(description = "Describes the direction")
+    val direction: String?  = null
 )

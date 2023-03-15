@@ -19,9 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -331,22 +333,23 @@ class BusinessPartnerBuildService(
     }
 
     private fun createAddress(
-        dto: AddressDto
+        dto: LogisticAddressDto
     ): Address {
         val address = Address(
-            careOf = dto.careOf,
-            contexts = dto.contexts.toMutableSet(),
-            country = dto.country,
-            types = dto.types.toMutableSet(),
-            version = toEntity(dto.version),
-            geoCoordinates = dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
+            // TODO map dto
+            careOf = "dto.careOf",
+            contexts = mutableSetOf(),
+            country = dto.postalAddress.country,
+            types =  mutableSetOf(),
+            version = AddressVersion(CharacterSet.CHINESE,LanguageCode.aa),
+            geoCoordinates = dto.postalAddress.geographicCoordinates?.let { toEntity(dto.postalAddress.geographicCoordinates!!) }
         )
 
         return updateAddress(address, dto)
     }
 
     private fun createPartnerAddress(
-        dto: AddressDto,
+        dto: LogisticAddressDto,
         bpn: String,
         partner: LegalEntity?,
         site: Site?
@@ -363,10 +366,11 @@ class BusinessPartnerBuildService(
         return addressPartner
     }
 
-    private fun updateAddress(address: Address, dto: AddressDto): Address{
-        address.careOf = dto.careOf
-        address.country = dto.country
-        address.geoCoordinates =  dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
+    private fun updateAddress(address: Address, dto: LogisticAddressDto): Address{
+        //TODO update addresses
+//        address.careOf = dto.careOf
+//        address.country = dto.country
+//        address.geoCoordinates =  dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
 
         address.administrativeAreas.clear()
         address.postCodes.clear()
@@ -377,14 +381,14 @@ class BusinessPartnerBuildService(
         address.contexts.clear()
         address.types.clear()
 
-        address.administrativeAreas.addAll(dto.administrativeAreas.map { toEntity(it, address) }.toSet())
-        address.postCodes.addAll(dto.postCodes.map { toEntity(it, address) }.toSet())
-        address.thoroughfares.addAll(dto.thoroughfares.map { toEntity(it, address) }.toSet())
-        address.localities.addAll(dto.localities.map { toEntity(it, address) }.toSet())
-        address.premises.addAll(dto.premises.map { toEntity(it, address) }.toSet())
-        address.postalDeliveryPoints.addAll(dto.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
-        address.contexts.addAll(dto.contexts)
-        address.types.addAll(dto.types)
+//        address.administrativeAreas.addAll(dto.administrativeAreas.map { toEntity(it, address) }.toSet())
+//        address.postCodes.addAll(dto.postCodes.map { toEntity(it, address) }.toSet())
+//        address.thoroughfares.addAll(dto.thoroughfares.map { toEntity(it, address) }.toSet())
+//        address.localities.addAll(dto.localities.map { toEntity(it, address) }.toSet())
+//        address.premises.addAll(dto.premises.map { toEntity(it, address) }.toSet())
+//        address.postalDeliveryPoints.addAll(dto.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
+//        address.contexts.addAll(dto.contexts)
+//        address.types.addAll(dto.types)
 
         return address
     }
@@ -444,30 +448,6 @@ class BusinessPartnerBuildService(
 
     private fun toEntity(dto: GeoCoordinateDto): GeographicCoordinate {
         return GeographicCoordinate(dto.latitude, dto.longitude, dto.altitude)
-    }
-
-    private fun toEntity(dto: ThoroughfareDto, address: Address): Thoroughfare {
-        return Thoroughfare(dto.value, dto.name, dto.shortName, dto.number, dto.direction, dto.type, address.version.language, address)
-    }
-
-    private fun toEntity(dto: LocalityDto, address: Address): Locality {
-        return Locality(dto.value, dto.shortName, dto.type, address.version.language, address)
-    }
-
-    private fun toEntity(dto: PremiseDto, address: Address): Premise {
-        return Premise(dto.value, dto.shortName, dto.number, dto.type, address.version.language, address)
-    }
-
-    private fun toEntity(dto: PostalDeliveryPointDto, address: Address): PostalDeliveryPoint {
-        return PostalDeliveryPoint(dto.value, dto.shortName, dto.number, dto.type, address.version.language, address)
-    }
-
-    private fun toEntity(dto: AdministrativeAreaDto, address: Address): AdministrativeArea {
-        return AdministrativeArea(dto.value, dto.shortName, dto.fipsCode, dto.type, address.version.language, address.country, address)
-    }
-
-    private fun toEntity(dto: PostCodeDto, address: Address): PostCode {
-        return PostCode(dto.value, dto.type, address.country, address)
     }
 
     private fun filterLegalEntityDuplicatesByIdentifier(

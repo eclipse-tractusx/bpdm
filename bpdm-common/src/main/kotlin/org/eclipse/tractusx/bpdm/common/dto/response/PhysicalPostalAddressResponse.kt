@@ -17,15 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.PostCodeType
+import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
 
-@Schema(name = "Postcode", description = "Postcode record for an address")
-data class PostCodeDto(
-    @Schema(description = "Full postcode denotation")
-    val value: String,
-    @Schema(description = "Type of specified postcode", defaultValue = "OTHER")
-    val type: PostCodeType = PostCodeType.OTHER
+@Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
+data class PhysicalPostalAddressResponse (
+
+    @Schema(description = "The practice of designating an area for industrial development.")
+    val industrialZone: String? = null,
+
+    @Schema(description = "Describes a specific building within the address.")
+    val building: String? = null,
+
+    @Schema(description = "Describes the floor/level the delivery shall take place")
+    val floor: String? = null,
+
+    @Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
+    val door: String? = null,
+
 )
+

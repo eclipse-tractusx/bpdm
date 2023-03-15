@@ -19,6 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
+import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
@@ -38,8 +41,6 @@ object ResponseValues {
     val language1 = TypeKeyNameDto(CommonValues.language1, CommonValues.language1.getName())
     val language2 = TypeKeyNameDto(CommonValues.language2, CommonValues.language2.getName())
     val language3 = TypeKeyNameDto(CommonValues.language3, CommonValues.language3.getName())
-
-    val characterSet1 = TypeKeyNameDto(CommonValues.characterSet1, CommonValues.characterSet1.getTypeName())
 
     val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
     val country2 = TypeKeyNameDto(CommonValues.country2, CommonValues.country2.getName())
@@ -94,129 +95,74 @@ object ResponseValues {
     val classification4 = ClassificationResponse(CommonValues.classification4, null, classificationType)
     val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
-    val adminAreaType1 = TypeKeyNameUrlDto(CommonValues.adminAreaType1, CommonValues.adminAreaType1.getTypeName(), CommonValues.adminAreaType1.getUrl())
-
-    val adminArea1 = AdministrativeAreaResponse(value = CommonValues.adminArea1, type = adminAreaType1, language = language0)
-    val adminArea2 = AdministrativeAreaResponse(value = CommonValues.adminArea2, type = adminAreaType1, language = language0)
-    val adminArea3 = AdministrativeAreaResponse(value = CommonValues.adminArea3, type = adminAreaType1, language = language0)
-    val adminArea4 = AdministrativeAreaResponse(value = CommonValues.adminArea4, type = adminAreaType1, language = language0)
-    val adminArea5 = AdministrativeAreaResponse(value = CommonValues.adminArea5, type = adminAreaType1, language = language0)
-
-    val postCodeType1 = TypeKeyNameUrlDto(CommonValues.postCodeType1, CommonValues.postCodeType1.getTypeName(), CommonValues.postCodeType1.getUrl())
-
-    val postCode1 = PostCodeResponse(CommonValues.postCode1, postCodeType1)
-    val postCode2 = PostCodeResponse(CommonValues.postCode2, postCodeType1)
-    val postCode3 = PostCodeResponse(CommonValues.postCode3, postCodeType1)
-    val postCode4 = PostCodeResponse(CommonValues.postCode4, postCodeType1)
-    val postCode5 = PostCodeResponse(CommonValues.postCode5, postCodeType1)
-
-    val localityType1 = TypeKeyNameUrlDto(CommonValues.localityType1, CommonValues.localityType1.getTypeName(), CommonValues.localityType1.getUrl())
-
-    val locality1 = LocalityResponse(CommonValues.locality1, null, localityType1, language0)
-    val locality2 = LocalityResponse(CommonValues.locality2, null, localityType1, language0)
-    val locality3 = LocalityResponse(CommonValues.locality3, null, localityType1, language0)
-    val locality4 = LocalityResponse(CommonValues.locality4, null, localityType1, language0)
-    val locality5 = LocalityResponse(CommonValues.locality5, null, localityType1, language0)
-
-    val thoroughfareType1 =
-        TypeKeyNameUrlDto(CommonValues.thoroughfareType1, CommonValues.thoroughfareType1.getTypeName(), CommonValues.thoroughfareType1.getUrl())
-
-    val thoroughfare1 = ThoroughfareResponse(value = CommonValues.thoroughfare1, type = thoroughfareType1, language = language0)
-    val thoroughfare2 = ThoroughfareResponse(value = CommonValues.thoroughfare2, type = thoroughfareType1, language = language0)
-    val thoroughfare3 = ThoroughfareResponse(value = CommonValues.thoroughfare3, type = thoroughfareType1, language = language0)
-    val thoroughfare4 = ThoroughfareResponse(value = CommonValues.thoroughfare4, type = thoroughfareType1, language = language0)
-    val thoroughfare5 = ThoroughfareResponse(value = CommonValues.thoroughfare5, type = thoroughfareType1, language = language0)
-
-    val premiseType1 = TypeKeyNameUrlDto(CommonValues.premiseType1, CommonValues.premiseType1.getTypeName(), CommonValues.premiseType1.getUrl())
-
-    val premise1 = PremiseResponse(value = CommonValues.premise1, type = premiseType1, language = language0)
-    val premise2 = PremiseResponse(value = CommonValues.premise2, type = premiseType1, language = language0)
-    val premise3 = PremiseResponse(value = CommonValues.premise3, type = premiseType1, language = language0)
-    val premise4 = PremiseResponse(value = CommonValues.premise4, type = premiseType1, language = language0)
-    val premise5 = PremiseResponse(value = CommonValues.premise5, type = premiseType1, language = language0)
-
-    val postalDeliveryPointType1 = TypeKeyNameUrlDto(
-        CommonValues.postalDeliveryPointType1,
-        CommonValues.postalDeliveryPointType1.getTypeName(),
-        CommonValues.postalDeliveryPointType1.getUrl()
-    )
-
-    val postalDeliveryPoint1 =
-        PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint1, type = postalDeliveryPointType1, language = language0)
-    val postalDeliveryPoint2 =
-        PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint2, type = postalDeliveryPointType1, language = language0)
-    val postalDeliveryPoint3 =
-        PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint3, type = postalDeliveryPointType1, language = language0)
-    val postalDeliveryPoint4 =
-        PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint4, type = postalDeliveryPointType1, language = language0)
-    val postalDeliveryPoint5 =
-        PostalDeliveryPointResponse(value = CommonValues.postalDeliveryPoint5, type = postalDeliveryPointType1, language = language0)
-
-    val version1 = AddressVersionResponse(characterSet1, language0)
-
-    val address1 = AddressResponse(
-        version = version1,
+    val address1 = PostalAddressResponse(
+        geographicCoordinates = null,
         country = country1,
-        administrativeAreas = listOf(adminArea1, adminArea2),
-        postCodes = listOf(postCode1, postCode2),
-        localities = listOf(locality1, locality2),
-        thoroughfares = listOf(thoroughfare1, thoroughfare2),
-        premises = listOf(premise1, premise2),
-        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+        administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_1,CommonValues.adminAreaLevel1Name_1),
+        administrativeAreaLevel2 = CommonValues.county1,
+        postCode = CommonValues.postCode1,
+        city = CommonValues.city1,
+        districtLevel1 = CommonValues.districtLevel1_1,
+        districtLevel2 = CommonValues.districtLevel2_1,
+        street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
     )
-
-    val address2 = AddressResponse(
-        version = version1,
+    val address2 = PostalAddressResponse(
+        geographicCoordinates = null,
         country = country2,
-        administrativeAreas = listOf(adminArea3, adminArea4),
-        postCodes = listOf(postCode3, postCode4),
-        localities = listOf(locality3, locality4),
-        thoroughfares = listOf(thoroughfare3, thoroughfare4),
-        premises = listOf(premise3, premise4),
-        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+        administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_2,CommonValues.adminAreaLevel1Name_2),
+        administrativeAreaLevel2 = CommonValues.county2,
+        postCode = CommonValues.postCode2,
+        city = CommonValues.city2,
+        districtLevel1 = CommonValues.districtLevel1_2,
+        districtLevel2 = CommonValues.districtLevel2_2,
+        street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
     )
 
-    val address3 = AddressResponse(
-        version = version1,
+    val address3 = PostalAddressResponse(
+        geographicCoordinates = null,
         country = country3,
-        administrativeAreas = listOf(adminArea5),
-        postCodes = listOf(postCode5),
-        localities = listOf(locality5),
-        thoroughfares = listOf(thoroughfare5),
-        premises = listOf(premise5),
-        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+        administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_3,CommonValues.adminAreaLevel1Name_3),
+        administrativeAreaLevel2 = CommonValues.county3,
+        postCode = CommonValues.postCode3,
+        city = CommonValues.city3,
+        districtLevel1 = CommonValues.districtLevel1_3,
+        districtLevel2 = CommonValues.districtLevel2_3,
+        street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
+        physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
     )
 
-    val addressPartner1 = AddressPartnerResponse(
+    val addressPartner1 = LogisticAddressResponse(
         bpn = CommonValues.bpnA1,
-        properties = address1
+        postalAddress = address1
     )
 
-    val addressPartner2 = AddressPartnerResponse(
+    val addressPartner2 = LogisticAddressResponse(
         bpn = CommonValues.bpnA2,
-        properties = address2
+        postalAddress = address2
     )
 
-    val addressPartner3 = AddressPartnerResponse(
+    val addressPartner3 = LogisticAddressResponse(
         bpn = CommonValues.bpnA3,
-        properties = address3
+        postalAddress = address3
     )
 
     val addressPartnerCreate1 = AddressPartnerCreateResponse(
         bpn = addressPartner1.bpn,
-        properties = addressPartner1.properties,
+        properties = addressPartner1.postalAddress,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressPartnerCreateResponse(
         bpn = addressPartner2.bpn,
-        properties = addressPartner2.properties,
+        properties = addressPartner2.postalAddress,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressPartnerCreateResponse(
         bpn = addressPartner3.bpn,
-        properties = addressPartner3.properties,
+        properties = addressPartner3.postalAddress,
         index = CommonValues.index3
     )
 
@@ -250,21 +196,21 @@ object ResponseValues {
     val siteUpsert1 = SitePartnerCreateResponse(
         site1.bpn,
         site1.name,
-        address1,
+        addressPartner1,
         CommonValues.index1
     )
 
     val siteUpsert2 = SitePartnerCreateResponse(
         site2.bpn,
         site2.name,
-        address2,
+        addressPartner2,
         CommonValues.index2
     )
 
     val siteUpsert3 = SitePartnerCreateResponse(
         site3.bpn,
         site3.name,
-        address3,
+        addressPartner3,
         CommonValues.index3
     )
 

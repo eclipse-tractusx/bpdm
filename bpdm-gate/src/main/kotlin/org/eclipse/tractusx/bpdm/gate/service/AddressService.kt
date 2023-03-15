@@ -136,7 +136,7 @@ class AddressService(
     fun toAddressOutput(externalId: String, address: AddressPartnerSearchResponse): AddressGateOutput {
         return AddressGateOutput(
             bpn = address.address.bpn,
-            address = address.address.properties,
+            address = address.address.postalAddress,
             externalId = externalId,
             legalEntityBpn = address.bpnLegalEntity,
             siteBpn = address.bpnSite

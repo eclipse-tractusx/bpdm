@@ -19,9 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -42,8 +46,9 @@ fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchRes
 
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
+        // TODO Mapping
         legalEntity = toDto(),
-        legalAddress = legalAddress.toDto(),
+        legalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
         index = entryId
     )
 }
@@ -65,9 +70,10 @@ fun LegalEntity.toDto(): LegalEntityResponse {
 
 fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
     return BusinessPartnerResponse(
+        //TODO Mapping
         uuid = "",
         legalEntity = toDto(),
-        addresses = listOf(AddressPartnerResponse("", legalAddress.toDto())),
+        addresses = listOf(LogisticAddressResponse("", PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),)),
         sites = emptyList(),
     )
 }
@@ -96,40 +102,36 @@ fun SiteState.toSiteStatusDto(): SiteStateResponse {
     return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
-fun AddressPartner.toDto(): AddressPartnerResponse {
-    return AddressPartnerResponse(
+fun AddressPartner.toDto(): LogisticAddressResponse {
+    return LogisticAddressResponse(
+        //TODO mapping
         bpn,
-        address.toDto()
+        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
     )
 }
 
-fun Address.toDto(): AddressResponse {
-    return AddressResponse(
-        version.toDto(),
-        careOf,
-        contexts,
-        country.toDto(),
-        administrativeAreas.map { it.toDto() },
-        postCodes.map { it.toDto() },
-        localities.map { it.toDto() },
-        thoroughfares.map { it.toDto() },
-        premises.map { it.toDto() },
-        postalDeliveryPoints.map { it.toDto() },
-        geoCoordinates?.toDto(),
-        types.map { it.toDto() })
+fun Address.toDto(): LogisticAddressResponse {
+    return LogisticAddressResponse(
+
+        // TODO mapping
+        bpn = "TODO",
+        postalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
+        )
 }
 
 fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
     return LegalAddressSearchResponse(
+        // TODO mapping
         bpnL,
-        this.toDto()
+        legalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
     )
 }
 
 fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
     return MainAddressSearchResponse(
-        bpnS,
-        this.toDto()
+        //TODO
+        site = bpnS,
+        mainAddress = LogisticAddressResponse(bpn = "TODO", PostalAddressResponse(city="TODO", country = this.country.toDto()))
     )
 }
 
@@ -137,17 +139,19 @@ fun AddressPartner.toMatchDto(score: Float): AddressMatchResponse {
     return AddressMatchResponse(score, this.toDtoWithReference())
 }
 
-fun AddressPartner.toPoolDto(): AddressPartnerResponse {
-    return AddressPartnerResponse(
+fun AddressPartner.toPoolDto(): LogisticAddressResponse {
+    return LogisticAddressResponse(
+        //TODO mapping
         bpn,
-        address.toDto()
+        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
     )
 }
 
 fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateResponse {
     return AddressPartnerCreateResponse(
+        //TODO mapping
         bpn,
-        address.toDto(),
+        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
         index
     )
 }
@@ -188,26 +192,6 @@ fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
 
 fun PostCode.toDto(): PostCodeResponse {
     return PostCodeResponse(value, type.toDto())
-}
-
-fun Locality.toDto(): LocalityResponse {
-    return LocalityResponse(value, shortName, localityType.toDto(), language.toDto())
-}
-
-fun Thoroughfare.toDto(): ThoroughfareResponse {
-    return ThoroughfareResponse(value, name, shortName, number, direction, type.toDto(), language.toDto())
-}
-
-fun Premise.toDto(): PremiseResponse {
-    return PremiseResponse(value, shortName, number, type.toDto(), language.toDto())
-}
-
-fun PostalDeliveryPoint.toDto(): PostalDeliveryPointResponse {
-    return PostalDeliveryPointResponse(value, shortName, number, type.toDto(), language.toDto())
-}
-
-fun AddressVersion.toDto(): AddressVersionResponse {
-    return AddressVersionResponse(characterSet.toDto(), language.toDto())
 }
 
 fun GeographicCoordinate.toDto(): GeoCoordinateDto {

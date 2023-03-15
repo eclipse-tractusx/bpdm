@@ -22,7 +22,9 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PostalAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
@@ -33,7 +35,7 @@ data class SiteGateOutput(
     val site: SiteResponse,
 
     @Schema(description = "Main address where this site resides")
-    val mainAddress: AddressResponse,
+    val mainAddress: LogisticAddressResponse,
 
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String

@@ -20,14 +20,20 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.LocalityType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(name = "Locality", description = "Locality record for an address such as city, block or district")
-data class LocalityDto(
-    @Schema(description = "Full name of the locality")
-    val value: String,
-    @Schema(description = "Abbreviation or shorthand of the locality's name, if applicable")
-    val shortName: String? = null,
-    @Schema(description = "Type of specified locality", defaultValue = "OTHER")
-    val type: LocalityType = LocalityType.OTHER
+@Schema(name = "AddressState", description = "Status record for a address")
+data class AddressStatusDto(
+    @Schema(description = "Description of the status")
+    val description: String?,
+
+    @Schema(description = "Since when the status is/was valid")
+    val validFrom: LocalDateTime?,
+
+    @Schema(description = "Until the status was valid, if applicable")
+    val validUntil: LocalDateTime?,
+
+    @Schema(description = "The type of this specified status")
+    val type: BusinessStateType
 )

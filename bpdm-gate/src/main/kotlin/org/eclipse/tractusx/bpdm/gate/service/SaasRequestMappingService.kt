@@ -126,21 +126,10 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toSaasModel(address: AddressDto): AddressSaas {
+    private fun toSaasModel(address: LogisticAddressDto): AddressSaas {
         return with(address) {
             AddressSaas(
-                version = toSaasModel(version),
-                careOf = toCareOfSaas(careOf),
-                contexts = contexts.map { toContextSaas(it) },
-                country = toCountrySaas(country),
-                administrativeAreas = administrativeAreas.map { toSaasModel(it, version.language) },
-                postCodes = postCodes.map { toSaasModel(it) },
-                localities = localities.map { toSaasModel(it, version.language) },
-                thoroughfares = thoroughfares.map { toSaasModel(it, version.language) },
-                postalDeliveryPoints = postalDeliveryPoints.map { toSaasModel(it, version.language) },
-                premises = premises.map { toSaasModel(it, version.language) },
-                geographicCoordinates = toSaasModel(geographicCoordinates),
-                types = types.map { toKeyNameUrlTypeSaas(it) }
+                // TODO Mapping
             )
         }
     }
@@ -158,39 +147,6 @@ class SaasRequestMappingService(
 
     private fun toContextSaas(context: String): WrappedValueSaas =
         WrappedValueSaas(context)
-
-    private fun toSaasModel(adminArea: AdministrativeAreaDto, languageCode: LanguageCode): AdministrativeAreaSaas =
-        AdministrativeAreaSaas(adminArea.value, adminArea.shortName, toKeyNameUrlTypeSaas(adminArea.type), toLanguageSaas(languageCode))
-
-
-    private fun toSaasModel(postcode: PostCodeDto): PostCodeSaas =
-        PostCodeSaas(postcode.value, toKeyNameUrlTypeSaas(postcode.type))
-
-    private fun toSaasModel(locality: LocalityDto, languageCode: LanguageCode): LocalitySaas =
-        LocalitySaas(toKeyNameUrlTypeSaas(locality.type), locality.shortName, locality.value, toLanguageSaas(languageCode))
-
-    private fun toSaasModel(thoroughfare: ThoroughfareDto, languageCode: LanguageCode): ThoroughfareSaas =
-        ThoroughfareSaas(
-            toKeyNameUrlTypeSaas(thoroughfare.type),
-            thoroughfare.shortName,
-            thoroughfare.number,
-            thoroughfare.value,
-            thoroughfare.name,
-            thoroughfare.direction,
-            toLanguageSaas(languageCode)
-        )
-
-    private fun toSaasModel(deliveryPoint: PostalDeliveryPointDto, languageCode: LanguageCode): PostalDeliveryPointSaas =
-        PostalDeliveryPointSaas(
-            toKeyNameUrlTypeSaas(deliveryPoint.type),
-            deliveryPoint.shortName,
-            deliveryPoint.number,
-            deliveryPoint.value,
-            toLanguageSaas(languageCode)
-        )
-
-    private fun toSaasModel(premise: PremiseDto, languageCode: LanguageCode): PremiseSaas =
-        PremiseSaas(toKeyNameUrlTypeSaas(premise.type), premise.shortName, premise.number, premise.value, toLanguageSaas(languageCode))
 
 
     private fun toSaasModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =

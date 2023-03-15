@@ -108,10 +108,6 @@ object CommonValues {
     val issuingBody2 = "Body Y"
     val issuingBody3 = "Official Z"
 
-    val issuingBody1 = "Agency X"
-    val issuingBody2 = "Body Y"
-    val issuingBody3 = "Official Z"
-
     val identifierValue1 = "ID-XYZ"
     val identifierValue2 = "Another ID Value"
     val identifierValue3 = "An ID Value"
@@ -136,23 +132,64 @@ object CommonValues {
     val classification4 = "Financial and insurance activities"
     val classification5 = "Accounting, bookkeeping and auditing activities; tax consultancy"
 
-    val adminAreaType1 = AdministrativeAreaType.OTHER
+    val adminAreaLevel1Name_1 = "Baden-Württemberg"
+    val adminAreaLevel1RegionCode_1 = "BW"
+    val adminAreaLevel1Name_2 = "Georgia"
+    val adminAreaLevel1RegionCode_2 = "GA"
+    val adminAreaLevel1Name_3 = "Georgia"
+    val adminAreaLevel1RegionCode_3 = "GA"
 
-    val adminArea1 = "Baden-Württemberg"
-    val adminArea2 = "Stuttgart"
-    val adminArea3 = "Georgia"
-    val adminArea4 = "South Carolina"
-    val adminArea5 = "河北省"
+    val county1 = "Böblingen"
+    val county2 = " Fulton County"
+    val county3 = " Fulton County"
 
-    val postCodeType1 = PostCodeType.OTHER
+    val city1 = "Böblingen"
+    val city2 = "Atlanta"
+    val city3 = "Atlanta"
 
-    val postCode1 = "70546"
+    val districtLevel1_1 = "Sindelfingen-Ost"
+    val districtLevel1_2 = ""
+    val districtLevel1_3= ""
+
+    val districtLevel2_1 = "Sindelfingen-Ost-Level2"
+    val districtLevel2_2 = ""
+    val districtLevel2_3 = ""
+
+    val street1 = "Bela-Barenyi-Straße"
+    val street2 = ""
+    val street3 = ""
+
+    val houseNumber1 = ""
+    val houseNumber2 = ""
+    val houseNumber3 = ""
+
+    val industrialZone1 = "Industrial Zone One"
+    val industrialZone2 = "Industrial Zone Two"
+    val industrialZone3 = "Industrial Zone Three"
+
+    val building1 = "Building One"
+    val building2 = "Building Two"
+    val building3 = "Building Two"
+
+    val floor1 = "Floor One"
+    val floor2 = "Floor Two"
+    val floor3 = "Floor Two"
+
+    val door1 = "Door One"
+    val door2 = "Door Two"
+    val door3 = "Door Two"
+
+    val postCode1 = "71059 "
     val postCode2 = "70547"
     val postCode3 = "30346"
     val postCode4 = "07677-7731"
     val postCode5 = "511464"
 
-    val localityType1 = LocalityType.OTHER
+    val adminArea1 = "Stuttgart"
+    val adminArea2 = "Stuttgart"
+    val adminArea3 = "Georgia"
+    val adminArea4 = "South Carolina"
+    val adminArea5 = "河北省"
 
     val locality1 = "Stuttgart"
     val locality2 = "Vaihingen"
@@ -160,15 +197,11 @@ object CommonValues {
     val locality4 = "Woodcliff Lake"
     val locality5 = "北京市"
 
-    val thoroughfareType1 = ThoroughfareType.OTHER
-
     val thoroughfare1 = "Mercedesstraße 120"
     val thoroughfare2 = "Werk 1"
     val thoroughfare3 = "300 Chestnut Ridge Road"
     val thoroughfare4 = "Factory 1"
     val thoroughfare5 = "工人体育场东路"
-
-    val premiseType1 = PremiseType.OTHER
 
     val premise1 = "Bauteil A"
     val premise2 = "Etage 1"
@@ -176,8 +209,6 @@ object CommonValues {
     val premise4 = "First Floor"
     val premise5 = "主楼"
     val premise6 = "Komplex X"
-
-    val postalDeliveryPointType1 = PostalDeliveryPointType.OTHER
 
     val postalDeliveryPoint1 = "Postal Delivery point"
     val postalDeliveryPoint2 = "Mailbox Premise Street"

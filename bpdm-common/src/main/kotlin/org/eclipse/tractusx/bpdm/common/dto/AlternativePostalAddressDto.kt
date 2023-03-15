@@ -17,18 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressPartnerResponse", description = "Business partner of type address")
-data class AddressPartnerResponse(
-    @Schema(description = "Business Partner Number of this address")
-    val bpn: String,
-    @field:JsonUnwrapped
-    val properties: AddressResponse
+@Schema(name = "AlternativePostalAddress", description = "Alternative Postal Address Part")
+data class AlternativePostalAddressDto(
+
+    @Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
+    val derliveryServiceNumber: String = "",
+
+    @Schema(description = "The type of this specified delivery")
+    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX
+
 )

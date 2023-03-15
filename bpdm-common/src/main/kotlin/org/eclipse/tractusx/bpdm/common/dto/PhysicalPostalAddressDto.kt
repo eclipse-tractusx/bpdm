@@ -17,24 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto
 
-import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.PremiseType
 
-@Schema(name = "PremiseResponse", description = "Premise record of an address such as building, room or floor")
-data class PremiseResponse (
-    @Schema(description = "Full denotation of the premise")
-    val value: String,
-    @Schema(description = "Abbreviation or shorthand")
-    val shortName: String? = null,
-    @Schema(description = "Premise number")
-    val number: String? = null,
-    @Schema(description = "Type of premise")
-    val type: TypeKeyNameUrlDto<PremiseType>,
-    @Schema(description = "Language the premise is specified in")
-    val language: TypeKeyNameDto<LanguageCode>
+@Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
+data class PhysicalPostalAddressDto (
+
+    @Schema(description = "The practice of designating an area for industrial development.")
+    val industrialZone: String? = null,
+
+    @Schema(description = "Describes a specific building within the address.")
+    val building: String? = null,
+
+    @Schema(description = "Describes the floor/level the delivery shall take place")
+    val floor: String? = null,
+
+    @Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
+    val door: String? = null,
 )
+

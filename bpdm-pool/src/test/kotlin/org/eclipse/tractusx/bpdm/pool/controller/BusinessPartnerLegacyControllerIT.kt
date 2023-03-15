@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -160,7 +160,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         return BusinessPartnerResponse(
             "",
             toConvert.legalEntity,
-            listOf(AddressPartnerResponse("", toConvert.legalAddress)),
+            listOf(LogisticAddressResponse("", toConvert.legalAddress)),
             emptyList()
         )
     }

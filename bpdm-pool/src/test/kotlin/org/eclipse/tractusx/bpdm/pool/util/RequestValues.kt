@@ -83,75 +83,57 @@ object RequestValues {
     val classification4 = ClassificationDto(CommonValues.classification4, null, CommonValues.classificationType)
     val classification5 = ClassificationDto(CommonValues.classification5, null, CommonValues.classificationType)
 
-    val adminArea1 = AdministrativeAreaDto(value = CommonValues.adminArea1, type = CommonValues.adminAreaType1)
-    val adminArea2 = AdministrativeAreaDto(value = CommonValues.adminArea2, type = CommonValues.adminAreaType1)
-    val adminArea3 = AdministrativeAreaDto(value = CommonValues.adminArea3, type = CommonValues.adminAreaType1)
-    val adminArea4 = AdministrativeAreaDto(value = CommonValues.adminArea4, type = CommonValues.adminAreaType1)
-    val adminArea5 = AdministrativeAreaDto(value = CommonValues.adminArea5, type = CommonValues.adminAreaType1)
-
-    val postCode1 = PostCodeDto(CommonValues.postCode1, CommonValues.postCodeType1)
-    val postCode2 = PostCodeDto(CommonValues.postCode2, CommonValues.postCodeType1)
-    val postCode3 = PostCodeDto(CommonValues.postCode3, CommonValues.postCodeType1)
-    val postCode4 = PostCodeDto(CommonValues.postCode4, CommonValues.postCodeType1)
-    val postCode5 = PostCodeDto(CommonValues.postCode5, CommonValues.postCodeType1)
-
-    val locality1 = LocalityDto(CommonValues.locality1, null, CommonValues.localityType1)
-    val locality2 = LocalityDto(CommonValues.locality2, null, CommonValues.localityType1)
-    val locality3 = LocalityDto(CommonValues.locality3, null, CommonValues.localityType1)
-    val locality4 = LocalityDto(CommonValues.locality4, null, CommonValues.localityType1)
-    val locality5 = LocalityDto(CommonValues.locality5, null, CommonValues.localityType1)
-
-    val thoroughfare1 = ThoroughfareDto(value = CommonValues.thoroughfare1, type = CommonValues.thoroughfareType1)
-    val thoroughfare2 = ThoroughfareDto(value = CommonValues.thoroughfare2, type = CommonValues.thoroughfareType1)
-    val thoroughfare3 = ThoroughfareDto(value = CommonValues.thoroughfare3, type = CommonValues.thoroughfareType1)
-    val thoroughfare4 = ThoroughfareDto(value = CommonValues.thoroughfare4, type = CommonValues.thoroughfareType1)
-    val thoroughfare5 = ThoroughfareDto(value = CommonValues.thoroughfare5, type = CommonValues.thoroughfareType1)
-
-    val premise1 = PremiseDto(value = CommonValues.premise1, type = CommonValues.premiseType1)
-    val premise2 = PremiseDto(value = CommonValues.premise2, type = CommonValues.premiseType1)
-    val premise3 = PremiseDto(value = CommonValues.premise3, type = CommonValues.premiseType1)
-    val premise4 = PremiseDto(value = CommonValues.premise4, type = CommonValues.premiseType1)
-    val premise5 = PremiseDto(value = CommonValues.premise5, type = CommonValues.premiseType1)
-
-    val postalDeliveryPoint1 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint1, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint2 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint2, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint3 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint3, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint4 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint4, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint5 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint5, type = CommonValues.postalDeliveryPointType1)
 
     val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
 
-    val address1 = AddressDto(
-        version = version1,
+    val postalAddress1 = PostalAddressDto(
+        geographicCoordinates = null,
         country = CommonValues.country1,
-        administrativeAreas = listOf(adminArea1, adminArea2),
-        postCodes = listOf(postCode1, postCode2),
-        localities = listOf(locality1, locality2),
-        thoroughfares = listOf(thoroughfare1, thoroughfare2),
-        premises = listOf(premise1, premise2),
-        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+        administrativeAreaLevel2 = CommonValues.county1,
+        postCode = CommonValues.postCode1,
+        city = CommonValues.city1,
+        districtLevel1 = CommonValues.districtLevel1_1,
+        districtLevel2 = CommonValues.districtLevel2_1,
+        street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
     )
 
-    val address2 = AddressDto(
-        version = version1,
+    val postalAddress2 = PostalAddressDto(
+        geographicCoordinates = null,
         country = CommonValues.country2,
-        administrativeAreas = listOf(adminArea3, adminArea4),
-        postCodes = listOf(postCode3, postCode4),
-        localities = listOf(locality3, locality4),
-        thoroughfares = listOf(thoroughfare3, thoroughfare4),
-        premises = listOf(premise3, premise4),
-        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+        administrativeAreaLevel2 = CommonValues.county2,
+        postCode = CommonValues.postCode2,
+        city = CommonValues.city2,
+        street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
     )
 
-    val address3 = AddressDto(
-        version = version1,
+    val postalAddress3 = PostalAddressDto(
+        geographicCoordinates = null,
         country = CommonValues.country3,
-        administrativeAreas = listOf(adminArea5),
-        postCodes = listOf(postCode5),
-        localities = listOf(locality5),
-        thoroughfares = listOf(thoroughfare5),
-        premises = listOf(premise5),
-        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
+        administrativeAreaLevel2 = CommonValues.county3,
+        postCode = CommonValues.postCode3,
+        city = CommonValues.city3,
+        street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
+        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone3, building = CommonValues.building3, floor = CommonValues.floor3, door = CommonValues.door3),
+    )
+
+    val logisticAddress1 = LogisticAddressDto(
+        postalAddress = postalAddress1,
+        isSiteMainAddress = true
+    )
+
+    val logisticAddress2 = LogisticAddressDto(
+        postalAddress = postalAddress2,
+        isSiteMainAddress = true
+    )
+
+    val logisticAddress3 = LogisticAddressDto(
+        postalAddress = postalAddress3,
+        isSiteMainAddress = true
     )
 
 
@@ -162,7 +144,7 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
-            legalAddress = address1
+            legalAddress = logisticAddress1
         ),
         index = CommonValues.index1
     )
@@ -174,7 +156,7 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
-            legalAddress = address2
+            legalAddress = logisticAddress2
         ),
         index = CommonValues.index2
     )
@@ -186,7 +168,7 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),
-            legalAddress = address3
+            legalAddress = logisticAddress3
         ),
         index = CommonValues.index3
     )
@@ -210,7 +192,7 @@ object RequestValues {
         site = SiteDto(
             name = CommonValues.siteName1,
             states = listOf(siteStatus1),
-            mainAddress = address1
+            mainAddress = logisticAddress1
         ),
         index = CommonValues.index1,
         legalEntity = legalEntityUpdate1.bpn
@@ -220,7 +202,7 @@ object RequestValues {
         site = SiteDto(
             name = CommonValues.siteName2,
             states = listOf(siteStatus2),
-            mainAddress = address2
+            mainAddress = logisticAddress2
         ),
         index = CommonValues.index2,
         legalEntity = legalEntityUpdate2.bpn
@@ -230,7 +212,7 @@ object RequestValues {
         site = SiteDto(
             name = CommonValues.siteName3,
             states = listOf(siteStatus3),
-            mainAddress = address3
+            mainAddress = logisticAddress3
         ),
         index = CommonValues.index3,
         legalEntity = legalEntityUpdate3.bpn
@@ -252,36 +234,36 @@ object RequestValues {
     )
 
     val addressPartnerCreate1 = AddressPartnerCreateRequest(
-        properties = address1,
+        properties = logisticAddress1,
         parent = legalEntityUpdate1.bpn,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressPartnerCreateRequest(
-        properties = address2,
+        properties = logisticAddress2,
         parent = legalEntityUpdate2.bpn,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressPartnerCreateRequest(
-        properties = address3,
+        properties = logisticAddress3,
         parent = legalEntityUpdate3.bpn,
         index = CommonValues.index3
     )
 
     val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA1,
-        properties = address1
+        properties = logisticAddress1
     )
 
     val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA2,
-        properties = address2
+        properties = logisticAddress2
     )
 
     val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
         bpn = CommonValues.bpnA3,
-        properties = address3
+        properties = logisticAddress3
     )
 
     val partnerStructure1 = LegalEntityStructureRequest(

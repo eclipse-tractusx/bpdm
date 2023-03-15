@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.dto
 
 
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
@@ -30,5 +30,5 @@ data class ImportResponsePage(
     val nextStartAfter: String?,
     val legalEntities: UpsertCollection<LegalEntityPartnerCreateResponse, LegalEntityPartnerCreateResponse>,
     val sites: UpsertCollection<SitePartnerCreateResponse, SitePartnerCreateResponse>,
-    val addresses: UpsertCollection<AddressPartnerCreateResponse, AddressPartnerResponse>
+    val addresses: UpsertCollection<AddressPartnerCreateResponse, LogisticAddressResponse>
 )

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
@@ -129,7 +129,7 @@ class PartnerImportPageService(
     }
 
     private fun updatePartners(partners: Collection<BusinessPartnerWithBpn>):
-            Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<AddressPartnerResponse>> {
+            Triple<Collection<LegalEntityPartnerCreateResponse>, Collection<SitePartnerCreateResponse>, Collection<LogisticAddressResponse>> {
         val (legalEntitiesSaas, sitesSaas, addressesSaas) = partitionIntoLSA(partners) { it.partner.extractLsaType() }
 
         val legalEntities = legalEntitiesSaas.mapNotNull { mappingService.toLegalEntityUpdateRequestOrNull(it) }

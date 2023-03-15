@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 
 @Schema(name = "EntitiesWithErrorsResponse", description = "Holds information about successfully and failed entities after the creating/updating of several objects")
 
@@ -42,4 +42,4 @@ typealias LegalEntityPartnerUpdateResponseWrapper = EntitiesWithErrors<LegalEnti
 typealias SitePartnerCreateResponseWrapper = EntitiesWithErrors<SitePartnerCreateResponse, SiteCreateError>
 typealias SitePartnerUpdateResponseWrapper = EntitiesWithErrors<SitePartnerCreateResponse, SiteUpdateError>
 typealias AddressPartnerCreateResponseWrapper = EntitiesWithErrors<AddressPartnerCreateResponse, AddressCreateError>
-typealias AddressPartnerUpdateResponseWrapper = EntitiesWithErrors<AddressPartnerResponse, AddressUpdateError>
+typealias AddressPartnerUpdateResponseWrapper = EntitiesWithErrors<LogisticAddressResponse, AddressUpdateError>
