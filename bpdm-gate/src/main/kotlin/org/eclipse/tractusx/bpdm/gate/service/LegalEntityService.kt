@@ -95,7 +95,8 @@ class LegalEntityService(
             logger.warn { "Requested ${bpnSet.size} legal addresses from pool, but only ${legalAddressesByBpnMap.size} were found." }
         }
 
-        val partnersWithPoolBpn = partnersWithLocalBpn.filter { legalEntitiesByBpnMap[it.bpn] != null }
+        //Filter only legal entities which can be found with their legal address  in the Pool under the given local BPN
+        val partnersWithPoolBpn = partnersWithLocalBpn.filter { legalEntitiesByBpnMap[it.bpn] != null && legalAddressesByBpnMap[it.bpn] != null }
         val bpnByExternalIdMap = partnersWithPoolBpn.associate { Pair(it.externalId, it.bpn) }
 
         //Evaluate the sharing status of the legal entities

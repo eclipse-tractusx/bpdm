@@ -92,7 +92,8 @@ class SiteService(
             logger.warn { "Requested ${bpnSet.size} main addresses of sites from pool, but only ${mainAddressesByBpnMap.size} were found." }
         }
 
-        val partnersWithPoolBpn = partnersWithLocalBpn.filter { sitesByBpnMap[it.bpn] != null }
+        //Filter only sites which can be found with their main address  in the Pool under the given local BPN
+        val partnersWithPoolBpn = partnersWithLocalBpn.filter { sitesByBpnMap[it.bpn] != null && mainAddressesByBpnMap[it.bpn] != null }
         val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
 
         //Evaluate the sharing status of the legal entities
