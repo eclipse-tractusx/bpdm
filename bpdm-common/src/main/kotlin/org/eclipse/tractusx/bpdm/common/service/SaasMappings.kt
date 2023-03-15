@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
+import org.eclipse.tractusx.bpdm.common.model.NameType.REGISTERED
 
 object SaasMappings {
 
@@ -85,9 +86,14 @@ object SaasMappings {
     }
 
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
+        val legalName = names
+            .filter { it.type?.technicalKey == REGISTERED.name }
+            .map { toDto(it) }
+            .firstOrNull()
+            ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", id ?: "Unknown")
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
-            legalName = names.map { toDto(it) }.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", id ?: "Unknown"),
+            legalName = legalName,
             legalForm = toOptionalReference(legalForm),
             status = if (status != null) listOf(toDto(status)) else listOf(),
             classifications = toDto(profile),
