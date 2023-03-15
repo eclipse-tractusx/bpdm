@@ -21,8 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.model
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 
-data class BusinessPartnerSaaSWithBpn(
+data class BusinessPartnerSaasWithExternalId(
     val partner: BusinessPartnerSaas,
-    val bpn: String,
     val externalId: String
 )
