@@ -23,17 +23,14 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.springframework.stereotype.Service
@@ -95,68 +92,40 @@ class AddressService(
      * which is then used to fetch the data for the addresses from the bpdm pool.
      */
     fun getAddressesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageOutputResponse<AddressGateOutput> {
-        val augmentedPartnerResponse = saasClient.getAugmentedAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
-        val augmentedPartnerWrapperCollection = augmentedPartnerResponse.values
+        val partnerResponse = saasClient.getAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
+        val partners = partnerResponse.values
 
-        val bpnByExternalIdMap = outputSaasMappingService.buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
+        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
+        val augmentedPartnerResponse = saasClient.getAugmentedAddresses(externalIds = partnersWithExternalId.map { it.externalId })
+        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
-        val bpnList = bpnByExternalIdMap.values.filterNotNull()
-        val addressesByBpnMap = poolClient.searchAddresses(bpnList).associateBy { it.address.bpn }
+        //Search entries in the pool with BPNs found in the local mirror
+        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
+        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.address.bpn }
 
-        if (bpnList.size > addressesByBpnMap.size) {
-            logger.warn { "Requested ${bpnList.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
+        if (bpnSet.size > addressesByBpnMap.size) {
+            logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
         }
 
-        // We need the sharing status from BusinessPartnerSaas
-        val partnerResponse = saasClient.getAddresses(externalIds = bpnByExternalIdMap.keys)
-        val partnerByExternalIdMap = partnerResponse.values.associateBy { it.externalId }
+        val partnersWithPoolBpn = partnersWithLocalBpn.filter { addressesByBpnMap[it.bpn] != null }
+        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
 
-        // We sort all the entries in one of 3 buckets: valid content, errors or still pending
-        val validContent = mutableListOf<AddressGateOutput>()
-        val errors = mutableListOf<ErrorInfo<BusinessPartnerOutputError>>()
-        val pendingExternalIds = mutableListOf<String>()
+        //Evaluate the sharing status of the legal entities
+        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
 
-        for ((externalId, bpn) in bpnByExternalIdMap) {
-            // Business partner sharing
-            val partner = partnerByExternalIdMap[externalId]
-            val sharingStatus = partner?.metadata?.sharingStatus
-            val sharingStatusType = sharingStatus?.status
-
-            if (sharingStatusType == null || sharingStatusType.isError()) {
-                // ERROR: SharingProcessError
-                errors.add(
-                    outputSaasMappingService.buildErrorInfoSharingProcessError(externalId, sharingStatus)
-                )
-            } else if (bpn != null) {
-                val address = addressesByBpnMap[bpn]
-                if (address != null) {
-                    // OKAY: entry found in pool
-                    validContent.add(
-                        toAddressOutput(externalId, address)
-                    )
-                } else {
-                    // ERROR: BpnNotInPool
-                    errors.add(
-                        outputSaasMappingService.buildErrorInfoBpnNotInPool(externalId, bpn)
-                    )
-                }
-            } else if (outputSaasMappingService.isSharingTimeoutReached(partner)) {
-                // ERROR: SharingTimeout
-                errors.add(
-                    outputSaasMappingService.buildErrorInfoSharingTimeout(externalId, partner.lastModifiedAt)
-                )
-            } else {
-                pendingExternalIds.add(externalId)
-            }
+        val validAddresses = sharingStatus.validExternalIds.map { externalId ->
+            val bpn = bpnByExternalIdMap[externalId]!!
+            val address = addressesByBpnMap[bpn]!!
+            toAddressOutput(externalId, address)
         }
 
         return PageOutputResponse(
-            total = augmentedPartnerResponse.total,
-            nextStartAfter = augmentedPartnerResponse.nextStartAfter,
-            content = validContent,
-            invalidEntries = augmentedPartnerWrapperCollection.size - validContent.size, // difference between all entries from SaaS and valid content
-            pending = pendingExternalIds,
-            errors = errors,
+            total = partnerResponse.total,
+            nextStartAfter = partnerResponse.nextStartAfter,
+            content = validAddresses,
+            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
+            pending = sharingStatus.pendingExternalIds,
+            errors = sharingStatus.errors,
         )
     }
 

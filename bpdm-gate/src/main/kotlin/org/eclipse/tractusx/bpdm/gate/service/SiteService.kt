@@ -25,17 +25,13 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.springframework.stereotype.Service
@@ -78,73 +74,45 @@ class SiteService(
      * which is then used to fetch the data for the sites from the bpdm pool.
      */
     fun getSitesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageOutputResponse<SiteGateOutput> {
-        val augmentedPartnerResponse = saasClient.getAugmentedSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
-        val augmentedPartnerWrapperCollection = augmentedPartnerResponse.values
+        val partnerResponse = saasClient.getSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
+        val partners = partnerResponse.values
 
-        val bpnByExternalIdMap = outputSaasMappingService.buildBpnByExternalIdMap(augmentedPartnerWrapperCollection)
+        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
+        val augmentedPartnerResponse = saasClient.getAugmentedSites(externalIds = partnersWithExternalId.map { it.externalId })
+        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
-        val bpnList = bpnByExternalIdMap.values.filterNotNull()
-        val sitesByBpnMap = poolClient.searchSites(bpnList).associateBy { it.site.bpn }
-        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnList).associateBy { it.site }
+        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
+        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.site.bpn }
+        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.site }
 
-        if (bpnList.size > sitesByBpnMap.size) {
-            logger.warn { "Requested ${bpnList.size} sites from pool, but only ${sitesByBpnMap.size} were found." }
+        if (bpnSet.size > sitesByBpnMap.size) {
+            logger.warn { "Requested ${bpnSet.size} sites from pool, but only ${sitesByBpnMap.size} were found." }
         }
-        if (bpnList.size > mainAddressesByBpnMap.size) {
-            logger.warn { "Requested ${bpnList.size} main addresses of sites from pool, but only ${mainAddressesByBpnMap.size} were found." }
+        if (bpnSet.size > mainAddressesByBpnMap.size) {
+            logger.warn { "Requested ${bpnSet.size} main addresses of sites from pool, but only ${mainAddressesByBpnMap.size} were found." }
         }
 
-        // We need the sharing status from BusinessPartnerSaas
-        val partnerResponse = saasClient.getSites(externalIds = bpnByExternalIdMap.keys)
-        val partnerByExternalIdMap = partnerResponse.values.associateBy { it.externalId }
+        //Filter only sites which can be found with their main address  in the Pool under the given local BPN
+        val partnersWithPoolBpn = partnersWithLocalBpn.filter { sitesByBpnMap[it.bpn] != null && mainAddressesByBpnMap[it.bpn] != null }
+        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
 
-        // We sort all the entries in one of 3 buckets: valid content, errors or still pending
-        val validContent = mutableListOf<SiteGateOutput>()
-        val errors = mutableListOf<ErrorInfo<BusinessPartnerOutputError>>()
-        val pendingExternalIds = mutableListOf<String>()
+        //Evaluate the sharing status of the legal entities
+        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
 
-        for ((externalId, bpn) in bpnByExternalIdMap) {
-            // Business partner sharing
-            val partner = partnerByExternalIdMap[externalId]
-            val sharingStatus = partner?.metadata?.sharingStatus
-            val sharingStatusType = sharingStatus?.status
-
-            if (sharingStatusType == null || sharingStatusType.isError()) {
-                // ERROR: SharingProcessError
-                errors.add(
-                    outputSaasMappingService.buildErrorInfoSharingProcessError(externalId, sharingStatus)
-                )
-            } else if (bpn != null) {
-                val site = sitesByBpnMap[bpn]
-                val mainAddress = mainAddressesByBpnMap[bpn]
-                if (site != null && mainAddress != null) {
-                    // OKAY: entry found in pool
-                    validContent.add(
-                        toSiteOutput(externalId, site, mainAddress)
-                    )
-                } else {
-                    // ERROR: BpnNotInPool
-                    errors.add(
-                        outputSaasMappingService.buildErrorInfoBpnNotInPool(externalId, bpn)
-                    )
-                }
-            } else if (outputSaasMappingService.isSharingTimeoutReached(partner)) {
-                // ERROR: SharingTimeout
-                errors.add(
-                    outputSaasMappingService.buildErrorInfoSharingTimeout(externalId, partner.lastModifiedAt)
-                )
-            } else {
-                pendingExternalIds.add(externalId)
-            }
+        val validSites = sharingStatus.validExternalIds.map { externalId ->
+            val bpn = bpnByExternalIdMap[externalId]!!
+            val site = sitesByBpnMap[bpn]!!
+            val mainAddress = mainAddressesByBpnMap[bpn]!!
+            toSiteOutput(externalId, site, mainAddress)
         }
 
         return PageOutputResponse(
-            total = augmentedPartnerResponse.total,
-            nextStartAfter = augmentedPartnerResponse.nextStartAfter,
-            content = validContent,
-            invalidEntries = augmentedPartnerWrapperCollection.size - validContent.size, // difference between all entries from SaaS and valid content
-            pending = pendingExternalIds,
-            errors = errors,
+            total = partnerResponse.total,
+            nextStartAfter = partnerResponse.nextStartAfter,
+            content = validSites,
+            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
+            pending = sharingStatus.pendingExternalIds,
+            errors = sharingStatus.errors,
         )
     }
 
