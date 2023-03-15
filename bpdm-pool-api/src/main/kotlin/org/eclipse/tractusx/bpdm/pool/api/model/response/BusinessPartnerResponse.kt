@@ -26,18 +26,16 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.Instant
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "BusinessPartnerResponse", description = "Business Partner of type legal entity in deprecated response format", deprecated = true)
 data class BusinessPartnerResponse(
     val uuid: String,
-    @Schema(description = "Business Partner Number, main identifier value for business partners")
-    val bpn: String,
+
     @field:JsonUnwrapped
-    val properties: LegalEntityResponse,
+    val legalEntity: LegalEntityResponse,
+
     val addresses: Collection<AddressPartnerResponse>,
+
     val sites: Collection<SitePartnerResponse>,
-    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
-    val currentness: Instant
 )

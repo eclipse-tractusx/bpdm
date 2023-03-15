@@ -24,12 +24,16 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import java.time.Instant
 import java.time.LocalDateTime
 
 /**
  * Contains simple test values used to create more complex test values such as DTOs
  */
 object CommonValues {
+
+    val now = Instant.now()
+
     val externalId1 = "external-1"
     val externalId2 = "external-2"
     val externalId3 = "external-3"

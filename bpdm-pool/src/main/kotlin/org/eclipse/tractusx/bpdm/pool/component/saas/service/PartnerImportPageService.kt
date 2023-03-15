@@ -119,7 +119,7 @@ class PartnerImportPageService(
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites).entities else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses).entities else emptyList()
 
-        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
+        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.legalEntity.bpn) else null }
         val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
         val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
 
@@ -172,7 +172,7 @@ class PartnerImportPageService(
         //create missing parents in the Pool
         val (newLegalEntities, newSites, _) = createPartners(parentsWithoutBpn)
 
-        val createdParents = newLegalEntities.map { Pair(parentByImportId[it.index], it.bpn) }
+        val createdParents = newLegalEntities.map { Pair(parentByImportId[it.index], it.legalEntity.bpn) }
             .plus(newSites.map { Pair(parentByImportId[it.index], it.bpn) })
             .filter { (parent, _) -> parent != null }
             .map { BusinessPartnerWithBpn(it.first!!, it.second) }

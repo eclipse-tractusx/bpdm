@@ -88,8 +88,8 @@ class PartnerChangelogIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3)
             )
         )
-        val bpnL1 = createdStructures[0].legalEntity.bpn
-        val bpnL2 = createdStructures[1].legalEntity.bpn
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
 
         // prepare modified partner to import
         val modifiedPartnersToImport = listOf(

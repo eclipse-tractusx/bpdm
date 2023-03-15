@@ -89,11 +89,11 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val importedPartner = createdStructures.single().legalEntity
-        importedPartner.bpn
+        importedPartner.legalEntity.bpn
             .let { bpn -> requestAddressesOfLegalEntity(bpn).content.single().bpn }
             .let { bpnAddress -> requestAddress(bpnAddress) }
             .let { addressResponse ->
-                assertThat(addressResponse.bpnLegalEntity).isEqualTo(importedPartner.bpn)
+                assertThat(addressResponse.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
             }
     }
 
@@ -136,7 +136,7 @@ class AddressControllerIT @Autowired constructor(
 
         val bpnA1 = createdStructures[0].addresses[0].bpn
         val bpnA2 = createdStructures[0].addresses[1].bpn
-        val bpnL = createdStructures[0].legalEntity.bpn
+        val bpnL = createdStructures[0].legalEntity.legalEntity.bpn
 
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
         val searchResult =
@@ -179,8 +179,8 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL1 = createdStructures[0].legalEntity.bpn
-        val bpnL2 = createdStructures[1].legalEntity.bpn
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
 
         val searchRequest = AddressPartnerBpnSearchRequest(listOf(bpnL1, bpnL2), emptyList())
 
@@ -269,7 +269,7 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL = givenStructure[0].legalEntity.bpn
+        val bpnL = givenStructure[0].legalEntity.legalEntity.bpn
         val bpnS = givenStructure[0].siteStructures[0].site.bpn
 
         val expected = listOf(
@@ -300,8 +300,8 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create addresses with non-existent parent`() {
-
-        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).entities.single().bpn
+        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1))
+            .entities.single().legalEntity.bpn
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,

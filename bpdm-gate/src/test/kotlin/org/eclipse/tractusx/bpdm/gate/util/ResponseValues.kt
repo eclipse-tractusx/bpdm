@@ -381,19 +381,27 @@ object ResponseValues {
     )
 
     val legalEntityResponse1 = LegalEntityResponse(
+        bpn = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         legalName = name1,
         legalForm = legalForm1,
         status = listOf(businessStatus1),
         classifications = listOf(classification1, classification2),
+        currentness = CommonValues.now,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val legalEntityResponse2 = LegalEntityResponse(
+        bpn = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         legalName = name3,
         legalForm = legalForm2,
         status = listOf(businessStatus2),
         classifications = listOf(classification3, classification4),
+        currentness = CommonValues.now,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
@@ -411,28 +419,15 @@ object ResponseValues {
     )
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
-        bpn = CommonValues.bpn1,
         legalEntity = legalEntityResponse1,
-        externalId = CommonValues.externalId1,
-        legalAddress = address1
+        legalAddress = address1,
+        externalId = CommonValues.externalId1
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
-        bpn = CommonValues.bpn2,
         legalEntity = legalEntityResponse2,
-        externalId = CommonValues.externalId2,
-        legalAddress = address2
-    )
-
-    val legalEntityPartnerResponse1 = LegalEntityPartnerResponse(
-        bpn = CommonValues.bpn1,
-        properties = legalEntityResponse1,
-        currentness = Instant.ofEpochMilli(0)
-    )
-    val legalEntityPartnerResponse2 = LegalEntityPartnerResponse(
-        bpn = CommonValues.bpn2,
-        properties = legalEntityResponse2,
-        currentness = Instant.ofEpochMilli(0)
+        legalAddress = address2,
+        externalId = CommonValues.externalId2
     )
 
     val legalAddressSearchResponse1 = LegalAddressSearchResponse(

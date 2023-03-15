@@ -80,13 +80,13 @@ class AddressControllerSearchIT @Autowired constructor(
         givenAddress1 = with(givenStructure[0].addresses[0]) {
             AddressPartnerSearchResponse(
                 address = AddressPartnerResponse(bpn, properties),
-                bpnLegalEntity = givenStructure[0].legalEntity.bpn
+                bpnLegalEntity = givenStructure[0].legalEntity.legalEntity.bpn
             )
         }
         givenAddress2 = with(givenStructure[0].addresses[1]) {
             AddressPartnerSearchResponse(
                 address = AddressPartnerResponse(bpn, properties),
-                bpnLegalEntity = givenStructure[0].legalEntity.bpn
+                bpnLegalEntity = givenStructure[0].legalEntity.legalEntity.bpn
             )
         }
         givenAddress3 = with(givenStructure[1].siteStructures[0].addresses[0]) {
