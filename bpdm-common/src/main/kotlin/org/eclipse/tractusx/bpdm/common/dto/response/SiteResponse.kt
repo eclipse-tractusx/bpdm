@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
 @Schema(name = "SiteResponse", description = "Site of a legal entity")
 data class SiteResponse(
@@ -35,4 +36,10 @@ data class SiteResponse(
 
     @Schema(description = "Business Partner Number of the related legal entity")
     val bpnLegalEntity: String,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

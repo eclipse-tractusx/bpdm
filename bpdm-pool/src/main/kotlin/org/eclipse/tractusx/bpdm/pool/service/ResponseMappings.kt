@@ -186,7 +186,9 @@ fun Site.toDto(): SiteResponse {
         bpn,
         name,
         status = listOf(),
-        bpnLegalEntity = legalEntity.bpn
+        bpnLegalEntity = legalEntity.bpn,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 

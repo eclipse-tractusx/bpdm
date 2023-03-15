@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
@@ -109,6 +110,7 @@ class SiteControllerIT @Autowired constructor(
         val expectedSiteWithReference2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL)
 
         testHelpers.assertRecursively(searchResult.content)
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
 
@@ -146,6 +148,7 @@ class SiteControllerIT @Autowired constructor(
         val expectedSiteWithReference3 = ResponseValues.site3.copy(bpnLegalEntity = bpnL2)
 
         testHelpers.assertRecursively(searchResult.content)
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }
 

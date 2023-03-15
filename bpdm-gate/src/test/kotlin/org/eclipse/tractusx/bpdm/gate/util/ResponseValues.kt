@@ -443,13 +443,17 @@ object ResponseValues {
         bpn = CommonValues.bpnSite1,
         name = CommonValues.nameSite1,
         status = listOf(),
-        bpnLegalEntity = CommonValues.bpn1
+        bpnLegalEntity = CommonValues.bpn1,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
     val siteResponse2 = SiteResponse(
         bpn = CommonValues.bpnSite2,
         name = CommonValues.nameSite2,
         status = listOf(),
-        bpnLegalEntity = CommonValues.bpn2
+        bpnLegalEntity = CommonValues.bpn2,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
     )
 
     val siteGateInputResponse1 = SiteGateInputResponse(
