@@ -21,17 +21,15 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdMappingResponse
-import org.eclipse.tractusx.bpdm.pool.component.saas.dto.ImportIdEntry
-import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.entity.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 

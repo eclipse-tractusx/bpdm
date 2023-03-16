@@ -36,6 +36,7 @@
         <version>3.0.2</version>
     </parent>
     <modules>
+        <module>bpdm-pool-api</module>
         <module>bpdm-pool</module>
         <module>bpdm-gate</module>
         <module>bpdm-common</module>
@@ -74,6 +75,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-pool-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

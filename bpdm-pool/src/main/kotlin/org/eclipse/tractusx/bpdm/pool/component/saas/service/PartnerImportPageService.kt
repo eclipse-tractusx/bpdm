@@ -23,11 +23,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.*
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
 import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
@@ -135,9 +135,9 @@ class PartnerImportPageService(
         val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites) else emptyList()
         val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses) else emptyList()
 
-        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
-        val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
-        val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index, it.bpn) else null }
+        val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
+        val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
+        val addressImportEntries = createdAddresses.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
 
         importEntryRepository.saveAll(legalEntityImportEntries + siteImportEntries + addressImportEntries)
 

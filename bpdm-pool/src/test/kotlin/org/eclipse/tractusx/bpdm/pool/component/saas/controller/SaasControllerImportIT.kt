@@ -25,14 +25,16 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
@@ -58,7 +60,8 @@ class SaasControllerImportIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers,
     private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
-    private val importEntryRepository: ImportEntryRepository
+    private val importEntryRepository: ImportEntryRepository,
+    private val poolClient: PoolClientImpl
 ) {
     companion object {
         @RegisterExtension
@@ -104,7 +107,7 @@ class SaasControllerImportIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        testHelpers.createTestMetadata(webTestClient)
+        testHelpers.createTestMetadata()
         wireMockServer.resetAll()
     }
 
@@ -579,20 +582,14 @@ class SaasControllerImportIT @Autowired constructor(
         return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
     }
 
-    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> =
-        webTestClient.invokePostWithArrayResponse(EndpointValues.CATENA_LEGAL_ENTITIES_SEARCH_PATH, bpns)
+    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> = poolClient.legalEntities().searchSites(bpns).body!!
 
-    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> =
-        webTestClient.invokePostEndpoint(
-            EndpointValues.CATENA_SITE_SEARCH_PATH,
-            SiteBpnSearchRequest(sites = bpns)
-        )
 
-    private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> =
-        webTestClient.invokePostEndpoint(
-            EndpointValues.CATENA_ADDRESSES_SEARCH_PATH,
-            AddressPartnerBpnSearchRequest(addresses = bpns)
-        )
+    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),PaginationRequest())
+
+
+    private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
+
 
 
     private fun importPartners(

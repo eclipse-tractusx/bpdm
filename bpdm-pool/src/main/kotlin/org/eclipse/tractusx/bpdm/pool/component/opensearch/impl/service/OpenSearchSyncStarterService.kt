@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_ADDRESSES
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_LEGAL_ENTITIES
-import org.eclipse.tractusx.bpdm.pool.dto.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.entity.SyncType
 import org.eclipse.tractusx.bpdm.pool.service.SyncRecordService
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.opensearch.client.RequestOptions

@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.springframework.data.jpa.repository.Query
@@ -37,7 +37,7 @@ interface IdentifierRepository : CrudRepository<Identifier, Long> {
     @Query("SELECT DISTINCT i FROM Identifier i LEFT JOIN FETCH i.issuingBody WHERE i IN :identifiers")
     fun joinIssuingBody(identifiers: Set<Identifier>): Set<Identifier>
 
-    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.dto.response.BpnIdentifierMappingResponse(i.value,i.legalEntity.bpn) FROM Identifier i WHERE i.type = :identifierType AND i.value in :values")
+    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.legalEntity.bpn) FROM Identifier i WHERE i.type = :identifierType AND i.value in :values")
     fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingResponse>
 
 

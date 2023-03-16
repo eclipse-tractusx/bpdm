@@ -23,6 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
@@ -30,13 +37,6 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.Addre
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
-import org.eclipse.tractusx.bpdm.pool.dto.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.pool.dto.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.BusinessPartnerMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.dto.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchUserException

@@ -22,10 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
-import org.eclipse.tractusx.bpdm.pool.dto.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
@@ -52,7 +56,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class InvalidIndexStartupIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val testHelpers: TestHelpers,
-    private val openSearchClient: OpenSearchClient
+    private val openSearchClient: OpenSearchClient,
+    private val poolClient: PoolClientImpl
 ) {
 
     companion object {
@@ -121,7 +126,12 @@ class InvalidIndexStartupIT @Autowired constructor(
         //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        val searchResult = webTestClient.invokeGetEndpoint<PageResponse<LegalEntityMatchResponse>>(EndpointValues.CATENA_LEGAL_ENTITY_PATH)
+        val searchResult = poolClient.legalEntities().getLegalEntities(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest
+            , AddressPropertiesSearchRequest.EmptySearchRequest
+            , SitePropertiesSearchRequest.EmptySearchRequest
+            , PaginationRequest())
+
         assertThat(searchResult.content).isNotEmpty
         assertThat(searchResult.contentSize).isEqualTo(1)
     }

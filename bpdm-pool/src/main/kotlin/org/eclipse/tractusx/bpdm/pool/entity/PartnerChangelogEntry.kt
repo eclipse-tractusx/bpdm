@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
 @Entity
 @Table(name = "partner_changelog_entries")
@@ -34,10 +35,7 @@ class PartnerChangelogEntry(
     val changelogSubject: ChangelogSubject
 ) : BaseEntity()
 
-enum class ChangelogType() {
-    CREATE,
-    UPDATE
-}
+
 
 enum class ChangelogSubject {
     LEGAL_ENTITY,
