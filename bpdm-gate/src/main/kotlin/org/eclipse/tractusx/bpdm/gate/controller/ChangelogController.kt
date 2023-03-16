@@ -25,14 +25,12 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
-
+@RestController
 @RequestMapping("/api/catena/business-partners/changelog")
 class ChangelogController (
     private val  changelogService: ChangelogService
@@ -49,12 +47,19 @@ class ChangelogController (
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
-    @GetMapping
+    @PostMapping("/search")
     fun getChangelogEntries(
-        @RequestBody externalIds: Collection<String>?,
         @Parameter(description = "From Time") @RequestParam fromTime: Instant?,
-        @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?
+        @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?,
+        @RequestBody externalIds: Collection<String>? = emptyList()
+    ): List<ChangelogEntity> {
+        return changelogService.getChangeLog(externalIds!!,lsaType, fromTime)
+    }
+
+    @PostMapping
+    fun createChangelogEntries(
+        @Parameter(description = "externalId") @RequestParam externalId: String
     ) {
-        return changelogService.getChangeLog(externalIds,fromTime,lsaType)
+        return changelogService.createChangelog(externalId)
     }
 }

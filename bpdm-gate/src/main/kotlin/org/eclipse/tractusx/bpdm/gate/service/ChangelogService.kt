@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.dto.ChangelogDto
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,15 +32,19 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createChangelog(changelogDto: ChangelogDto) {
-
+    fun createChangelog(externalId: String) {
+        val changelogEntity = ChangelogEntity(externalId,LsaType.Address)
+        changelogRepository.save(changelogEntity)
     }
 
 
-    fun getChangeLog(externalIds: Collection<String>?, fromTime: Instant?, lsaType: LsaType?) {
-        if(fromTime == null && lsaType == null && externalIds!!.isEmpty() ){
-            changelogRepository.findAllByExternalIdIn(externalIds!!)
-        }
+    fun getChangeLog(externalIds: Collection<String>, lsaType: LsaType?, fromTime: Instant?): List<ChangelogEntity> {
+        return changelogRepository.findAllByExternalIdInAndBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+            externalIds = externalIds,
+            businessPartnerType = lsaType.toString(),
+            createdAt = fromTime
+        )
     }
+
 
 }

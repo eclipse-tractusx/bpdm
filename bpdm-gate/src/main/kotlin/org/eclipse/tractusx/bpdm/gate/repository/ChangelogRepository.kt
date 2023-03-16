@@ -21,10 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import java.time.Instant
+
 
 interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
 
-    fun findAllByExternalIdIn(externalIds: Collection<String>): List<ChangelogEntity>
-
-
+    fun findAllByExternalIdInAndBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+        externalIds: Collection<String>,
+        businessPartnerType: String?,
+        createdAt: Instant?
+    ): List<ChangelogEntity>
 }

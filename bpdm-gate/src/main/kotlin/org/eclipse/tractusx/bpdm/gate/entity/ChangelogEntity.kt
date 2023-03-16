@@ -27,11 +27,11 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 @Table(name = "changelog_entries")
 class ChangelogEntity (
 
-    @Column(name = "externalId", nullable = false, updatable = false)
+    @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,
     @Enumerated(EnumType.STRING)
-    @Column(name = "lsa_type", nullable = false, updatable = false)
-    val lsaType: LsaType
+    @Column(name = "business_partner_type", nullable = false, updatable = false)
+    val businessPartnerType: LsaType
 
 ) : BaseEntity()
 
