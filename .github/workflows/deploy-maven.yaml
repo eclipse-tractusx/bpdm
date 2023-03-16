@@ -5,6 +5,7 @@ on:
     paths:
       - pom.xml
       - bpdm-common/**
+      - bpdm-gate-api/**
     branches:
       - main
       - rc/**
