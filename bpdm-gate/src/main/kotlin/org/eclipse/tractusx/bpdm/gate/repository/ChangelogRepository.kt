@@ -17,30 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.service
+package org.eclipse.tractusx.bpdm.gate.repository
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.dto.ChangelogDto
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.springframework.data.jpa.repository.JpaRepository
 
-@Service
-class ChangelogService (private val changelogRepository: ChangelogRepository) {
-    private val logger = KotlinLogging.logger { }
+interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
 
-    @Transactional
-    fun createChangelog(changelogDto: ChangelogDto) {
+    fun findAllByExternalIdIn(externalIds: Collection<String>): List<ChangelogEntity>
 
-    }
-
-
-    fun getChangeLog(externalIds: Collection<String>?, fromTime: Instant?, lsaType: LsaType?) {
-        if(fromTime == null && lsaType == null && externalIds!!.isEmpty() ){
-            changelogRepository.findAllByExternalIdIn(externalIds!!)
-        }
-    }
 
 }
