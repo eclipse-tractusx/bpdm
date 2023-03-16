@@ -51,10 +51,10 @@ class ChangelogController (
     )
     @GetMapping
     fun getChangelogEntries(
-        @RequestBody externalIds: Collection<String>,
-        @Parameter(description = "From Time") @RequestParam fromTime: Instant,
-        @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType
+        @RequestBody externalIds: Collection<String>?,
+        @Parameter(description = "From Time") @RequestParam fromTime: Instant?,
+        @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?
     ) {
-        return changelogService.getChangeLog()
+        return changelogService.getChangeLog(externalIds,fromTime,lsaType)
     }
 }
