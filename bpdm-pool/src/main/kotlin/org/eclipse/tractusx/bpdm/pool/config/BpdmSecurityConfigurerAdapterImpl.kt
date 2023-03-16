@@ -50,6 +50,7 @@ class BpdmSecurityConfigurerAdapterImpl(
             .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS, HttpMethod.GET.name())).authenticated()
             .requestMatchers(AntPathRequestMatcher("/api/catena/**/search", HttpMethod.POST.name())).authenticated()
             .requestMatchers(AntPathRequestMatcher("/api/catena/**/filter", HttpMethod.POST.name())).authenticated()
+            .requestMatchers(AntPathRequestMatcher("/error")).permitAll()
             .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS)).hasRole("add_company_data")
             .and().oauth2ResourceServer()
             .jwt()
