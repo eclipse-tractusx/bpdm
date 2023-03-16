@@ -78,11 +78,11 @@ object ResponseValues {
     val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
     val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
 
-    val status1 = BusinessStatusResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
-    val status2 = BusinessStatusResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
-    val status3 = BusinessStatusResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
+    val leStatus1 = LegalEntityStatusResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
+    val leStatus2 = LegalEntityStatusResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
+    val leStatus3 = LegalEntityStatusResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
 
-    val classificationType = TypeKeyNameDto<ClassificationType>(CommonValues.classificationType, CommonValues.classificationType.name)
+    val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
 
     val classification1 = ClassificationResponse(CommonValues.classification1, null, classificationType)
     val classification2 = ClassificationResponse(CommonValues.classification2, null, classificationType)
@@ -270,7 +270,7 @@ object ResponseValues {
         legalName = name1,
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
-        status = listOf(status1),
+        status = listOf(leStatus1),
         classifications = listOf(classification1, classification2),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,
@@ -282,7 +282,7 @@ object ResponseValues {
         legalName = name3,
         identifiers = listOf(identifier2),
         legalForm = legalForm2,
-        status = listOf(status2),
+        status = listOf(leStatus2),
         classifications = listOf(classification3, classification4),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,
@@ -294,7 +294,7 @@ object ResponseValues {
         legalName = name5,
         identifiers = listOf(identifier3),
         legalForm = legalForm3,
-        status = listOf(status3),
+        status = listOf(leStatus3),
         classifications = listOf(classification5),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,

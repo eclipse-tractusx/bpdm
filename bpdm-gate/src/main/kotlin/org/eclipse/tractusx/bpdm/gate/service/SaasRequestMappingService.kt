@@ -36,27 +36,28 @@ class SaasRequestMappingService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val saasConfigProperties: SaasConfigProperties
 ) {
-    fun toSaasModel(legalEntity: LegalEntityGateInputRequest): BusinessPartnerSaas {
-        return toSaasModel(legalEntity.legalEntity, legalEntity.externalId, legalEntity.bpn)
+    fun toSaasModel(request: LegalEntityGateInputRequest): BusinessPartnerSaas {
+        return toSaasModel(request.legalEntity, request.externalId, request.bpn)
     }
 
-    fun toSaasModel(site: SiteGateInputRequest): BusinessPartnerSaas {
+    fun toSaasModel(request: SiteGateInputRequest): BusinessPartnerSaas {
         return BusinessPartnerSaas(
-            externalId = site.externalId,
+            externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
-            names = listOf(NameSaas(value = site.site.name)),
-            addresses = listOf(toSaasModel(site.site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierSaas(site.bpn!!)) else emptyList(),
+            names = listOf(NameSaas(value = request.site.name)),
+            status = request.site.status.map { it.toSaasModel() }.firstOrNull(),
+            addresses = listOf(toSaasModel(request.site.mainAddress)),
+            identifiers = if (request.bpn != null) listOf(createBpnIdentifierSaas(request.bpn!!)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
     }
 
-    fun toSaasModel(address: AddressGateInputRequest): BusinessPartnerSaas {
+    fun toSaasModel(request: AddressGateInputRequest): BusinessPartnerSaas {
         return BusinessPartnerSaas(
-            externalId = address.externalId,
+            externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
-            addresses = listOf(toSaasModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierSaas(address.bpn!!)) else emptyList(),
+            addresses = listOf(toSaasModel(request.address)),
+            identifiers = if (request.bpn != null) listOf(createBpnIdentifierSaas(request.bpn!!)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
     }
@@ -99,10 +100,19 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun BusinessStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
+    private fun LegalEntityStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
+            validFrom = validFrom,
+            validUntil = validUntil
+        )
+    }
+
+    private fun SiteStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
+        return BusinessPartnerStatusSaas(
+            type = TypeKeyNameUrlSaas(type.name),
+            officialDenotation = description,
             validFrom = validFrom,
             validUntil = validUntil
         )

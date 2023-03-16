@@ -21,21 +21,20 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.NameDto
 
 data class BusinessPartnerCandidateDto(
     @ArraySchema(arraySchema = Schema(description = "Identifiers of this partner candidate", required = false))
     val identifiers: Collection<IdentifierDto> = emptyList(),
+
     @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
     val names: Collection<NameDto>,
+
     @Schema(description = "Technical key of the legal form")
     val legalForm: String? = null,
-    @Schema(description = "Current business status")
-    val status: BusinessStatusDto? = null,
-    @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
-    val profileClassifications: Collection<ClassificationDto> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
-    val bankAccounts: Collection<BankAccountDto> = emptyList(),
+
     @Schema(description = "Address of this partner")
     val address: AddressDto
 )

@@ -80,10 +80,13 @@ object RequestValues {
         LanguageCode.zh
     )
 
-    val status1 = BusinessStatusDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
-    val status2 = BusinessStatusDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
-    val status3 = BusinessStatusDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
+    val leStatus1 = LegalEntityStatusDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
+    val leStatus2 = LegalEntityStatusDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
+    val leStatus3 = LegalEntityStatusDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
 
+    val siteStatus1 = SiteStatusDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)
+    val siteStatus2 = SiteStatusDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
+    val siteStatus3 = SiteStatusDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
 
     val classification1 = ClassificationDto(CommonValues.classification1, null, CommonValues.classificationType)
     val classification2 = ClassificationDto(CommonValues.classification2, null, CommonValues.classificationType)
@@ -168,7 +171,7 @@ object RequestValues {
             legalName = name1,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
-            status = listOf(status1),
+            status = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             legalAddress = address1
         ),
@@ -180,7 +183,7 @@ object RequestValues {
             legalName = name3,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
-            status = listOf(status2),
+            status = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             legalAddress = address2
         ),
@@ -192,7 +195,7 @@ object RequestValues {
             legalName = name5,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
-            status = listOf(status3),
+            status = listOf(leStatus3),
             classifications = listOf(classification5),
             legalAddress = address3
         ),
@@ -217,7 +220,7 @@ object RequestValues {
     val siteCreate1 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName1,
-            status = listOf(status1),
+            status = listOf(siteStatus1),
             mainAddress = address1
         ),
         index = CommonValues.index1,
@@ -227,7 +230,7 @@ object RequestValues {
     val siteCreate2 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName2,
-            status = listOf(status2),
+            status = listOf(siteStatus2),
             mainAddress = address2
         ),
         index = CommonValues.index2,
@@ -237,7 +240,7 @@ object RequestValues {
     val siteCreate3 = SitePartnerCreateRequest(
         site = SiteDto(
             name = CommonValues.siteName3,
-            status = listOf(status3),
+            status = listOf(siteStatus3),
             mainAddress = address3
         ),
         index = CommonValues.index3,

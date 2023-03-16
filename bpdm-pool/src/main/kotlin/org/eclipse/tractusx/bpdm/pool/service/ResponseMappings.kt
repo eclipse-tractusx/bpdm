@@ -56,7 +56,7 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         identifiers = identifiers.map { it.toDto() },
         legalName = names.map { it.toDto() }.first(),       // TODO
         legalForm = legalForm?.toDto(),
-        status = stati.map { it.toDto() },
+        status = stati.map { it.toLegalEntityStatusDto() },
         classifications = classification.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
@@ -98,8 +98,12 @@ fun LegalFormCategory.toDto(): TypeNameUrlDto {
     return TypeNameUrlDto(name, url)
 }
 
-fun BusinessStatus.toDto(): BusinessStatusResponse {
-    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type.toDto())
+fun BusinessStatus.toLegalEntityStatusDto(): LegalEntityStatusResponse {
+    return LegalEntityStatusResponse(description, validFrom, validUntil, type.toDto())
+}
+
+fun BusinessStatus.toSiteStatusDto(): SiteStatusResponse {
+    return SiteStatusResponse(description, validFrom, validUntil, type.toDto())
 }
 
 fun Role.toDto(): TypeKeyNameDto<String> {

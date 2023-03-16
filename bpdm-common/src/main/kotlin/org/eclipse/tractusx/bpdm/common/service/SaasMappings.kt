@@ -90,7 +90,7 @@ object SaasMappings {
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             legalName = legalName,
             legalForm = toOptionalReference(legalForm),
-            status = toDtos(status),
+            status = toLegalEntityStatusDtos(status),
             classifications = toDto(profile),
             legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )
@@ -99,7 +99,7 @@ object SaasMappings {
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
         return SiteDto(
             name = names.first().value,
-            status = toDtos(status),
+            status = toSiteStatusDtos(status),
             mainAddress = toDto(addresses.first())
         )
     }
@@ -119,11 +119,24 @@ object SaasMappings {
         )
     }
 
-    fun toDtos(status: BusinessPartnerStatusSaas?): Collection<BusinessStatusDto> =
+    fun toLegalEntityStatusDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStatusDto> =
         status?.type?.let {
             listOf(
-                BusinessStatusDto(
+                LegalEntityStatusDto(
                     officialDenotation = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validUntil = status.validUntil,
+                    type = toType(status.type)
+                )
+            )
+        }
+            ?: listOf()
+
+    fun toSiteStatusDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStatusDto> =
+        status?.type?.let {
+            listOf(
+                SiteStatusDto(
+                    description = status.officialDenotation,
                     validFrom = status.validFrom,
                     validUntil = status.validUntil,
                     type = toType(status.type)
