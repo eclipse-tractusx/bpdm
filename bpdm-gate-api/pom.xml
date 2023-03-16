@@ -56,7 +56,6 @@
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
-
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -64,5 +63,12 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub CatenaX-NG Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/catenax-ng/bpdm-gate-api</url>
+        </repository>
+    </distributionManagement>
 
 </project>

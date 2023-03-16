@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
+import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
