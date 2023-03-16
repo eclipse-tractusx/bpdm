@@ -17,19 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
+import java.time.LocalDateTime
 
-@Schema(name = "Site", description = "Site record")
-data class SiteDto(
-    @Schema(description = "Site name")
-    val name: String,
+@Schema(name = "LegalEntityStatusResponse", description = "Status record of a legal entity")
+data class LegalEntityStatusResponse(
+    @Schema(description = "Exact, official denotation of the status")
+    val officialDenotation: String?,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val status: Collection<SiteStatusDto>,
+    @Schema(description = "Since when the status is/was valid")
+    val validFrom: LocalDateTime?,
 
-    @Schema(description = "Main address where this site resides")
-    val mainAddress: AddressDto
+    @Schema(description = "Until the status was valid, if applicable")
+    val validTo: LocalDateTime?,
+
+    @Schema(description = "The type of this status")
+    val type: TypeKeyNameDto<BusinessStatusType>
 )

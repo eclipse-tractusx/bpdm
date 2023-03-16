@@ -108,7 +108,7 @@ object ResponseValues {
         abbreviation = CommonValues.legalFormAbbreviation2,
     )
 
-    val businessStatus1 = BusinessStatusResponse(
+    val leBusinessStatus1 = LegalEntityStatusResponse(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
@@ -118,7 +118,7 @@ object ResponseValues {
         )
     )
 
-    val businessStatus2 = BusinessStatusResponse(
+    val leBusinessStatus2 = LegalEntityStatusResponse(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
@@ -385,7 +385,7 @@ object ResponseValues {
         identifiers = listOf(identifier1, identifier2),
         legalName = name1,
         legalForm = legalForm1,
-        status = listOf(businessStatus1),
+        status = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
         currentness = CommonValues.now,
         createdAt = CommonValues.now,
@@ -397,7 +397,7 @@ object ResponseValues {
         identifiers = listOf(identifier3, identifier4),
         legalName = name3,
         legalForm = legalForm2,
-        status = listOf(businessStatus2),
+        status = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),
         currentness = CommonValues.now,
         createdAt = CommonValues.now,

@@ -385,8 +385,24 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun toEntity(dto: BusinessStatusDto, partner: LegalEntity): BusinessStatus {
-        return BusinessStatus(dto.officialDenotation, dto.validFrom, dto.validUntil, dto.type, partner)
+    private fun toEntity(dto: LegalEntityStatusDto, partner: LegalEntity): BusinessStatus {
+        return BusinessStatus(
+            description = dto.officialDenotation,
+            validFrom = dto.validFrom,
+            validUntil = dto.validUntil,
+            type = dto.type,
+            legalEntity = partner
+        )
+    }
+
+    private fun toEntity(dto: SiteStatusDto, partner: LegalEntity): BusinessStatus {
+        return BusinessStatus(
+            description = dto.description,
+            validFrom = dto.validFrom,
+            validUntil = dto.validUntil,
+            type = dto.type,
+            legalEntity = partner
+        )
     }
 
     private fun toEntity(dto: BankAccountDto, partner: LegalEntity): BankAccount {

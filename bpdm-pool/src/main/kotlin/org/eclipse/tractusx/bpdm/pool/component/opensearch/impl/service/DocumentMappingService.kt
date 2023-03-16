@@ -43,7 +43,7 @@ class DocumentMappingService {
             partner.bpn,
             partner.names.map { TextDoc(it.value) },
             if (partner.legalForm?.name != null) TextDoc(partner.legalForm!!.name) else null,
-            if (partnerStatus?.officialDenotation != null) TextDoc(partnerStatus.officialDenotation) else null,
+            if (partnerStatus?.description != null) TextDoc(partnerStatus.description) else null,
             listOf(toDocument(partner.legalAddress)),
             partner.classification.filter { it.value != null }.map { TextDoc(it.value!!) },
             partner.sites.map { TextDoc(it.name) }

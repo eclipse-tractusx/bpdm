@@ -32,8 +32,9 @@ import java.time.LocalDateTime
     ]
 )
 class BusinessStatus (
+    // TODO rename description
     @Column(name = "denotation")
-    val officialDenotation: String?,
+    val description: String?,
     @Column(name = "valid_from")
     val validFrom: LocalDateTime?,
     @Column(name = "valid_to")
