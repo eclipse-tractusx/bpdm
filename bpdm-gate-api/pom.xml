@@ -67,7 +67,7 @@
         <repository>
             <id>github</id>
             <name>GitHub CatenaX-NG Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/catenax-ng/bpdm-gate-api</url>
+            <url>https://maven.pkg.github.com/catenax-ng/tx-bpdm</url>
         </repository>
     </distributionManagement>
 
