@@ -23,6 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -38,11 +40,13 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
     }
 
 
-    fun getChangeLog(externalIds: Collection<String>, lsaType: LsaType?, fromTime: Instant?): List<ChangelogEntity> {
+    fun getChangeLog(externalIds: Collection<String>, lsaType: LsaType?, fromTime: Instant?, page: Int, pageSize: Int ): Page<ChangelogEntity> {
+
         return changelogRepository.findAllByExternalIdInAndBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
             externalIds = externalIds,
             businessPartnerType = lsaType.toString(),
-            createdAt = fromTime
+            createdAt = fromTime,
+            pageable = PageRequest.of(page, pageSize)
         )
     }
 

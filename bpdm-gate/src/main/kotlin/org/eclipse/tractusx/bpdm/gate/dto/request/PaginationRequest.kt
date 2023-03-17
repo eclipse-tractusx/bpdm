@@ -17,24 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.gate.dto.request
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.PositiveOrZero
 
-
-@Entity
-@Table(name = "changelog_entries")
-class ChangelogEntity (
-
-    @Column(name = "external_id", nullable = false, updatable = false)
-    val externalId: String,
-    @Enumerated(EnumType.STRING)
-    @Column(name = "business_partner_type", nullable = false, updatable = false)
-    val businessPartnerType: LsaType
-
-) : BaseEntity()
-
-
-
+@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
+data class PaginationRequest (
+    @field:Parameter(
+        description = "Number of page to get results from", schema =
+        Schema(defaultValue = "0"))
+    @field:PositiveOrZero
+    val page: Int=0,
+    @field:Parameter(description = "Size of each page", schema =
+    Schema(defaultValue = "10"))
+    @field:Min(0)
+    @field:Max(100)
+    val size: Int=10
+)

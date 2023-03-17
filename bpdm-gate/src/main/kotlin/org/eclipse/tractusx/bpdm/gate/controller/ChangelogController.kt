@@ -24,9 +24,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import jakarta.validation.Valid
+import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.data.domain.Page
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
@@ -49,11 +53,12 @@ class ChangelogController (
     )
     @PostMapping("/search")
     fun getChangelogEntries(
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "From Time") @RequestParam fromTime: Instant?,
         @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?,
         @RequestBody externalIds: Collection<String>? = emptyList()
-    ): List<ChangelogEntity> {
-        return changelogService.getChangeLog(externalIds!!,lsaType, fromTime)
+    ): Page<ChangelogEntity> {
+        return changelogService.getChangeLog(externalIds!!,lsaType, fromTime, paginationRequest.page, paginationRequest.size)
     }
 
     @PostMapping
