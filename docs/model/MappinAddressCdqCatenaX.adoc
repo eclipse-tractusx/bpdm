@@ -2,7 +2,7 @@
 |===
 |CatenaX Class | CatenaX Attribute|CDQ Class |CDQ Attribute|CDQ Link
 
-|PostalAddress PysiclaPostalAddress
+|PostalAddress PhysicalPostalAddress
 |
 |Address ('Address Type '='Legal Address')
 |
