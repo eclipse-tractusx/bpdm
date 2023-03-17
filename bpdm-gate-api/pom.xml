@@ -23,8 +23,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <artifactId>bpdm-gate-api</artifactId>
-    <name>Business Partner Data Management Gate Api Client</name>
-    <description>Service that does request for Client Gate</description>
+    <name>Business Partner Data Management Gate Api</name>
+    <description>API definition and client logic for the BPDM Gate</description>
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
