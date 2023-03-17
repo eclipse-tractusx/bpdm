@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [3.2.0] - tbd
+## [3.2.0] - 2023-03-17
+
+### Added
+
+- BPDM Pool API: client library for accessing BPDM Pool API application
+- BPDM Gate API: client library for accessing a BPDM Gate API application
 
 ### Fixed
 
 - BPDM Gate: internal server error when invoking the POST business-partners/type-match endpoint
 - BPDM Gate: output endpoints could miss returning any information for Business Partners in some cases
+- BPDM: security issue CVE-2022-1471
+- BPDM: applications returning 403 status code on internal errors
 
 ## [3.1.0] - 2023-03-08
 
