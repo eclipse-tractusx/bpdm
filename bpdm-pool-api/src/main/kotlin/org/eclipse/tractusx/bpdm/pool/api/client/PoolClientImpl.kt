@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.client
 
+import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
 import org.eclipse.tractusx.bpdm.pool.api.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter

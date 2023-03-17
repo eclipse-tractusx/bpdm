@@ -24,14 +24,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.LocalDateTime
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
-    name = "AddressGateInputResponse", description = "Address with legal entity or site references. " +
+    name = "AddressGateInputRequest", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
 )
-data class AddressGateInputResponse(
+data class AddressGateInputRequest(
     @field:JsonUnwrapped
     val address: AddressDto,
 
@@ -45,9 +44,5 @@ data class AddressGateInputResponse(
     val siteExternalId: String? = null,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
-
-    @Schema(description = "Time the sharing process was started according to SaaS")
-    val processStartedAt: LocalDateTime? = null,
+    val bpn: String? = null
 )
-

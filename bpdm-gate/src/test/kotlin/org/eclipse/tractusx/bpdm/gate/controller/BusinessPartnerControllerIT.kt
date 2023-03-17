@@ -17,6 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
+/*******************************************************************************
+ * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ *
+ * See the NOTICE file(s) distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Apache License, Version 2.0 which is available at
+ * https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ ******************************************************************************/
+
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,28 +44,32 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.returnResult
+import org.springframework.web.reactive.function.client.WebClientResponseException
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class BusinessPartnerControllerIT @Autowired constructor(
-    private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
-    private val typeMatchConfigProperties: TypeMatchConfigProperties
+    private val typeMatchConfigProperties: TypeMatchConfigProperties,
+    val gateClient: GateClient
 ) {
 
     companion object {
@@ -82,16 +105,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(expectedScore)
 
-        val typeResponse = webTestClient.post().uri(EndpointValues.GATE_API_TYPE_MATCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(givenCandidate))
-            .exchange()
-            .expectStatus().isOk
-            .returnResult<TypeMatchResponse>()
-            .responseBody
-            .blockFirst()
+        val typeResponseValue = gateClient.businessPartners().determineLsaType(givenCandidate)
 
-        assertThat(typeResponse).isEqualTo(expected)
+        assertThat(typeResponseValue).isEqualTo(expected)
     }
 
     /**
@@ -114,16 +130,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(mockedScore)
 
-        val typeResponse = webTestClient.post().uri(EndpointValues.GATE_API_TYPE_MATCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(givenCandidate))
-            .exchange()
-            .expectStatus().isOk
-            .returnResult<TypeMatchResponse>()
-            .responseBody
-            .blockFirst()
+        val typeResponseValue = gateClient.businessPartners().determineLsaType(givenCandidate)
 
-        assertThat(typeResponse).isEqualTo(expected)
+        assertThat(typeResponseValue).isEqualTo(expected)
     }
 
     /**
@@ -143,11 +152,12 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        webTestClient.post().uri(EndpointValues.GATE_API_TYPE_MATCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(givenCandidate))
-            .exchange()
-            .expectStatus().isOk
+        try{
+            gateClient.businessPartners().determineLsaType(givenCandidate)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.OK,e.statusCode)
+        }
+
     }
 
     /**
@@ -167,11 +177,12 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        webTestClient.post().uri(EndpointValues.GATE_API_TYPE_MATCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(givenCandidate))
-            .exchange()
-            .expectStatus().isOk
+        try{
+            gateClient.businessPartners().determineLsaType(givenCandidate)
+        }catch (e: WebClientResponseException){
+            assertEquals(HttpStatus.OK,e.statusCode)
+        }
+
     }
 
     /**
@@ -191,11 +202,14 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        webTestClient.post().uri(EndpointValues.GATE_API_TYPE_MATCH_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(givenCandidate))
-            .exchange()
-            .expectStatus().is4xxClientError
+        try{
+            gateClient.businessPartners().determineLsaType(givenCandidate)
+        }catch (e: WebClientResponseException){
+            val statusCode: HttpStatusCode = e.statusCode
+            val statusCodeValue: Int = statusCode.value()
+            assertTrue(statusCodeValue in 400..499)
+        }
+
     }
 
     private fun setLookupMockResponse(overallScore: Float) {

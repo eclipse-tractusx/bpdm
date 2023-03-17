@@ -22,32 +22,21 @@ package org.eclipse.tractusx.bpdm.gate.dto
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressDto
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.LocalDateTime
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "AddressGateInputResponse", description = "Address with legal entity or site references. " +
-            "Only one of either legal entity or site external id can be set for an address."
-)
-data class AddressGateInputResponse(
+@Schema(name = "SiteGateOutput", description = "Site with legal entity reference.")
+data class SiteGateOutput(
     @field:JsonUnwrapped
-    val address: AddressDto,
-
+    val site: SiteResponse,
+    @Schema(description = "Main address where this site resides")
+    val mainAddress: AddressResponse,
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
-
-    @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String? = null,
-
-    @Schema(description = "External id of the related site")
-    val siteExternalId: String? = null,
-
-    @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
-
-    @Schema(description = "Time the sharing process was started according to SaaS")
-    val processStartedAt: LocalDateTime? = null,
+    @Schema(description = "Business Partner Number, main identifier value for sites")
+    val bpn: String?,
+    @Schema(description = "Bpn of the related legal entity")
+    val legalEntityBpn: String,
 )
-

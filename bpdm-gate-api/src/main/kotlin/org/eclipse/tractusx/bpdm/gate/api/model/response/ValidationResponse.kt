@@ -17,29 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto
+package org.eclipse.tractusx.bpdm.gate.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.LocalDateTime
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputResponse", description = "Legal entity with external id")
-data class LegalEntityGateInputResponse(
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
-
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
-    val externalId: String,
-
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
-
-    @Schema(description = "Time the sharing process was started according to SaaS")
-    val processStartedAt: LocalDateTime? = null,
+@Schema(description = "Contains overall result of a sharing process validation request")
+data class ValidationResponse(
+    @Schema(description = "Overall status of the result of the validation")
+    val status: ValidationStatus,
+    @Schema(description = "All found validation errors of this record")
+    val errors: Collection<String>
 )
 
-
+enum class ValidationStatus {
+    OK,
+    ERROR
+}

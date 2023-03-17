@@ -39,18 +39,6 @@ object EndpointValues {
     const val GATE_API_PATH = "/api/catena"
     const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"
     const val GATE_API_INPUT_LEGAL_ENTITIES_PATH = "${GATE_API_INPUT_PATH}/legal-entities"
-    const val GATE_API_INPUT_SITES_PATH = "${GATE_API_INPUT_PATH}/sites"
-    const val GATE_API_INPUT_ADDRESSES_PATH = "${GATE_API_INPUT_PATH}/addresses"
-    const val GATE_API_INPUT_LEGAL_ENTITIES_VALIDATION_PATH = "$GATE_API_INPUT_LEGAL_ENTITIES_PATH/validation"
-    const val GATE_API_INPUT_SITES_VALIDATION_PATH = "$GATE_API_INPUT_SITES_PATH/validation"
-    const val GATE_API_INPUT_ADDRESSES_VALIDATION_PATH = "$GATE_API_INPUT_ADDRESSES_PATH/validation"
-
-    const val GATE_API_OUTPUT_PATH = "${GATE_API_PATH}/output"
-    const val GATE_API_OUTPUT_LEGAL_ENTITIES_PATH = "${GATE_API_OUTPUT_PATH}/legal-entities/search"
-    const val GATE_API_OUTPUT_SITES_PATH = "${GATE_API_OUTPUT_PATH}/sites/search"
-    const val GATE_API_OUTPUT_ADDRESSES_PATH = "${GATE_API_OUTPUT_PATH}/addresses/search"
-
-    const val GATE_API_TYPE_MATCH_PATH = "${GATE_API_PATH}/business-partners/type-match"
 
     const val POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH = "/legal-entities/search"
     const val POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH = "/legal-entities/legal-addresses/search"
