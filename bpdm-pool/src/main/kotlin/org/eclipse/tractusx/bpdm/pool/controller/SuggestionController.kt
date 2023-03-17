@@ -19,9 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolSuggestionApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType

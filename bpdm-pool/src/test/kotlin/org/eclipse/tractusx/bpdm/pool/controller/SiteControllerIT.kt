@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
@@ -352,6 +353,6 @@ class SiteControllerIT @Autowired constructor(
     private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
 
 
-    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn,PaginationRequest())
+    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn, PaginationRequest())
 
 }

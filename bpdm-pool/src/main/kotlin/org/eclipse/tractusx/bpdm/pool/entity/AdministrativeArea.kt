@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(

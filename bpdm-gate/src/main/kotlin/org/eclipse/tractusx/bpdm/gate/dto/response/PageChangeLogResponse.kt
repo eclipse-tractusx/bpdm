@@ -17,24 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto.request
+package org.eclipse.tractusx.bpdm.gate.dto.response
 
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.PositiveOrZero
+import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
 
-@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
-data class PaginationRequest (
-    @field:Parameter(
-        description = "Number of page to get results from", schema =
-        Schema(defaultValue = "0"))
-    @field:PositiveOrZero
-    val page: Int=0,
-    @field:Parameter(description = "Size of each page", schema =
-    Schema(defaultValue = "10"))
-    @field:Min(0)
-    @field:Max(100)
-    val size: Int=10
+@Schema(description = "Paginated collection of results")
+data class PageChangeLogResponse<T>(
+    @Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+    @Schema(description = "Total number pages")
+    val totalPages: Int,
+    @Schema(description = "Current page number")
+    val page: Int,
+    @Schema(description = "Number of results in the page")
+    val contentSize: Int,
+    @Schema(description = "Collection of results in the page")
+    val content: Collection<T>,
+    @Schema(description = "Number of entries in the page that have been omitted due to being invalid (error or still pending)")
+    val invalidEntries: Int,
+    @Schema(description = "Infos about the entries with errors")
+    val errors: Collection<ErrorInfo<ChangeLogOutputError>>,
 )
+

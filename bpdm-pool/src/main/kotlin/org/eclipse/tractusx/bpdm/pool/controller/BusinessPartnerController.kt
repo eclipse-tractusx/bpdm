@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException

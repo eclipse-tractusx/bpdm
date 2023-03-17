@@ -19,15 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
-
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 
 /**

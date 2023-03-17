@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest

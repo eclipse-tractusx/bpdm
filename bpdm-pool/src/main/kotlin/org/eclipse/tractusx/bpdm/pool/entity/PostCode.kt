@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.PostCodeType
 
 @Entity

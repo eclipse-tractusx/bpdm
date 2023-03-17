@@ -24,13 +24,13 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService

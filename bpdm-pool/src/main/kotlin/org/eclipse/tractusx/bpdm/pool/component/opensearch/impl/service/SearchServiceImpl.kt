@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse

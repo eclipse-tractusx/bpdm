@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*

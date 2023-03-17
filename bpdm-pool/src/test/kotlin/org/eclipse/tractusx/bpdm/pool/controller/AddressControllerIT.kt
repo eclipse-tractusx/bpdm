@@ -23,6 +23,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -184,7 +185,7 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerBpnSearchRequest(listOf(bpnL1, bpnL2), emptyList())
 
-        val searchResult = poolClient.addresses().searchAddresses(searchRequest,PaginationRequest())
+        val searchResult = poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
         val expectedAddress1 = ResponseValues.addressPartner1
@@ -237,7 +238,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnS2 = createdStructures[1].siteStructures[0].site.bpn
 
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = poolClient.addresses().searchAddresses(searchRequest,PaginationRequest())
+        val searchResult = poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
         val expectedAddressWithReferences1 = AddressPartnerSearchResponse(ResponseValues.addressPartner1, null, bpnS1)
@@ -424,6 +425,6 @@ class AddressControllerIT @Autowired constructor(
 
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
-        poolClient.legalEntities().getAddresses(bpn,PaginationRequest())
+        poolClient.legalEntities().getAddresses(bpn, PaginationRequest())
 
 }

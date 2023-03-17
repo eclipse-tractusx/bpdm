@@ -32,6 +32,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange

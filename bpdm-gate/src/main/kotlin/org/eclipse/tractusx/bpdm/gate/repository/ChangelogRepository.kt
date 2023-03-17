@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -28,10 +29,16 @@ import java.time.Instant
 
 interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
 
-    fun findAllByExternalIdInAndBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+    fun findAllByExternalIdInAndCreatedAtGreaterThanEqual(
         externalIds: Collection<String>,
-        businessPartnerType: String?,
         createdAt: Instant?,
         pageable: Pageable
     ): Page<ChangelogEntity>
+
+    fun findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+        businessPartnerType: LsaType?,
+        createdAt: Instant?,
+        pageable: Pageable
+    ): Page<ChangelogEntity>
+
 }

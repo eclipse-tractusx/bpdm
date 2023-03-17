@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(name = "legal_form_categories")

@@ -20,10 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,16 +42,47 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
         changelogRepository.save(changelogEntity)
     }
 
+    fun getChangeLogByExternalId(externalIds: Collection<String>, fromTime: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
 
-    fun getChangeLog(externalIds: Collection<String>, lsaType: LsaType?, fromTime: Instant?, page: Int, pageSize: Int ): Page<ChangelogEntity> {
 
-        return changelogRepository.findAllByExternalIdInAndBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+        val pageResponse = changelogRepository.findAllByExternalIdInAndCreatedAtGreaterThanEqual(
             externalIds = externalIds,
-            businessPartnerType = lsaType.toString(),
             createdAt = fromTime,
             pageable = PageRequest.of(page, pageSize)
         )
+
+        val errorInfoList = externalIds.filterNot { id ->
+            pageResponse.content.any { it.externalId == id }
+        }.map {
+            ErrorInfo(
+                ChangeLogOutputError.ExternalIdNotFound,
+                "$it not found",
+                "externalId not found"
+            )
+        }
+
+        return PageChangeLogResponse(page = page, totalElements = pageResponse.totalElements,
+            totalPages = pageResponse.totalPages,
+            contentSize = pageResponse.content.size,
+            content = pageResponse.content,
+            invalidEntries = errorInfoList.size,
+            errors = errorInfoList
+        )
     }
 
+    fun getChangeLogByLsaType(lsaType: LsaType?, fromTime: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogEntity> {
 
+
+        val pageResponse = changelogRepository.findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
+            businessPartnerType = lsaType,
+            createdAt = fromTime,
+            pageable = PageRequest.of(page, pageSize)
+        )
+
+        return PageResponse(page = page, totalElements = pageResponse.totalElements,
+            totalPages = pageResponse.totalPages,
+            contentSize = pageResponse.content.size,
+            content = pageResponse.content,
+        )
+    }
 }

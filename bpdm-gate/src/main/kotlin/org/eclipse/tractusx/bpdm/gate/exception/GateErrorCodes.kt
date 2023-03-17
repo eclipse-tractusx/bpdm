@@ -33,3 +33,8 @@ enum class BusinessPartnerOutputError : ErrorCode {
     SharingTimeout,
     BpnNotInPool
 }
+
+@Schema(description = "ChangeLogOutputError")
+enum class ChangeLogOutputError : ErrorCode {
+    ExternalIdNotFound,
+}

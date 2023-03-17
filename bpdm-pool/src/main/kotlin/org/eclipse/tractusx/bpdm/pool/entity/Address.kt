@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
