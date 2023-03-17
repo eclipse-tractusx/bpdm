@@ -2,6 +2,21 @@ apiVersion: v1
 entries:
   bpdm-gate:
   - apiVersion: v2
+    appVersion: 3.2.0
+    created: "2023-03-17T16:05:37.124026473Z"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: a9a7ccd6e0a24c51536dfc34209f7997db7ed9b22b08b4bda1f45446bd773110
+    home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm-gate
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.3.0/bpdm-gate-3.3.0.tgz
+    version: 3.3.0
+  - apiVersion: v2
     appVersion: 3.1.0
     created: "2023-03-16T09:12:19.112253562Z"
     description: A Helm chart for deploying the BPDM gate service
@@ -180,6 +195,32 @@ entries:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.0.1/bpdm-gate-3.0.1.tgz
     version: 3.0.1
   bpdm-pool:
+  - apiVersion: v2
+    appVersion: 3.2.0
+    created: "2023-03-17T16:05:37.33239563Z"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM pool service
+    digest: 840934e2cc9582b0e1d56278fa985c509afe3e4390a205de360cdf0eaa8ad232
+    home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm-pool
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.3.0/bpdm-pool-4.3.0.tgz
+    version: 4.3.0
   - apiVersion: v2
     appVersion: 3.1.0
     created: "2023-03-16T09:12:19.265711888Z"
@@ -533,4 +574,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-03-16T09:12:19.265939491Z"
+generated: "2023-03-17T16:05:37.332812432Z"
