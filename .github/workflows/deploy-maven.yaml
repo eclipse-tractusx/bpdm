@@ -1,12 +1,6 @@
 name: Maven Deploy
 on:
   push:
-    # only execute when source specific files change
-    paths:
-      - pom.xml
-      - bpdm-common/**
-      - bpdm-gate-api/**
-      - bpdm-pool-api/**
     branches:
       - main
       - rc/**
