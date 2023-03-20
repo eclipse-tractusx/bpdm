@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -52,8 +51,8 @@ interface PoolBusinessPartnerApi  {
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
-    @GetMapping("/{bpn}/changelog")
-    @GetExchange("/{bpn}/changelog")
+    @GetMapping("/changelog")
+    @GetExchange("/changelog")
     fun getChangelogEntries(
         @Parameter(description = "BPN values") bpn: Array<String>?,
         @Parameter(description = "Modified after") modifiedAfter: Instant?,
