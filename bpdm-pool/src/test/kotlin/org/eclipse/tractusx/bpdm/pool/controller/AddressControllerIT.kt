@@ -27,10 +27,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.config.PoolClientConfig
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -102,10 +102,6 @@ class AddressControllerIT @Autowired constructor(
      * When requesting an address by non-existent bpn-a
      * Then a "not found" response is sent
      */
-
-
-
-
     @Test
     fun `get address by bpn-a, not found`() {
         testHelpers.createBusinessPartnerStructure(
@@ -145,8 +141,6 @@ class AddressControllerIT @Autowired constructor(
         val searchRequest = AddressPartnerBpnSearchRequest(emptyList(), emptyList(), listOf(bpnA1, bpnA2))
         val searchResult =
             poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
-
-
 
         searchResult.content.sortedByDescending { it.bpnLegalEntity } // need revert
 
@@ -293,8 +287,9 @@ class AddressControllerIT @Autowired constructor(
         val response = poolClient.addresses().createAddresses(toCreate)
 
 
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -305,21 +300,30 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `don't create addresses with non-existent parent`() {
 
-        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).single().bpn
+        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1)).entities.single().bpn
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,
         )
 
+        val invalidSiteBpn = "BPNSXXXXXXXXXX"
+        val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
+        val completelyInvalidBpn = "XYZ"
         val toCreate = listOf(
             RequestValues.addressPartnerCreate1.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate2.copy(parent = "BPNSXXXXXXXXXX"),
-            RequestValues.addressPartnerCreate3.copy(parent = "BPNLXXXXXXXXXX")
+            RequestValues.addressPartnerCreate1.copy(parent = invalidSiteBpn),
+            RequestValues.addressPartnerCreate2.copy(parent = invalidLegalEntityBpn),
+            RequestValues.addressPartnerCreate3.copy(parent = completelyInvalidBpn),
         )
 
         val response = poolClient.addresses().createAddresses(toCreate)
-        response.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
-        testHelpers.assertRecursively(response).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+        response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+
+        assertThat(response.errorCount).isEqualTo(3)
+        testHelpers.assertErrorResponse(response.errors.elementAt(0), AddressCreateError.BpnNotValid, CommonValues.index3)   // BPN validity check always first
+        testHelpers.assertErrorResponse(response.errors.elementAt(1), AddressCreateError.SiteNotFound, CommonValues.index1)
+        testHelpers.assertErrorResponse(response.errors.elementAt(2), AddressCreateError.LegalEntityNotFound, CommonValues.index2)
     }
 
     /**
@@ -365,7 +369,8 @@ class AddressControllerIT @Autowired constructor(
 
         val response = poolClient.addresses().updateAddresses(toUpdate)
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -395,17 +400,23 @@ class AddressControllerIT @Autowired constructor(
             ResponseValues.addressPartner2.copy(bpn = bpnA1)
         )
 
+        val firstInvalidBpn = "BPNLXXXXXXXX"
+        val secondInvalidBpn = "BPNAXXXXXXXX"
         val toUpdate = listOf(
             RequestValues.addressPartnerUpdate2.copy(bpn = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpn = "BPNLXXXXXXXX"),
-            RequestValues.addressPartnerUpdate3.copy(bpn = "BPNAXXXXXXXX")
+            RequestValues.addressPartnerUpdate2.copy(bpn = firstInvalidBpn),
+            RequestValues.addressPartnerUpdate3.copy(bpn = secondInvalidBpn)
         )
 
 
         val response = poolClient.addresses().updateAddresses(toUpdate)
 
 
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+
+        assertThat(response.errorCount).isEqualTo(2)
+        testHelpers.assertErrorResponse(response.errors.first(), AddressUpdateError.AddressNotFound, firstInvalidBpn)
+        testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
 
 

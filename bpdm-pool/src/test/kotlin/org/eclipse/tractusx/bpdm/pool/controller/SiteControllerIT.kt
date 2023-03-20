@@ -26,7 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -155,7 +157,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `create new sites`() {
 
-        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -169,7 +171,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val response = poolClient.sites().createSite(toCreate)
-        assertThatCreatedSitesEqual(response, expected)
+
+        assertThatCreatedSitesEqual(response.entities, expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -181,7 +185,7 @@ class SiteControllerIT @Autowired constructor(
     fun `don't create sites with non-existing parent`() {
 
 
-        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2))
+        val givenLegalEntities = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().bpn
         val bpnL2 = givenLegalEntities.last().bpn
@@ -195,7 +199,12 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
-        assertThatCreatedSitesEqual(response, expected)
+
+        // 2 entities okay
+        assertThatCreatedSitesEqual(response.entities, expected)
+        // 1 error
+        assertThat(response.errorCount).isEqualTo(1)
+        testHelpers.assertErrorResponse(response.errors.first(), SiteCreateError.LegalEntityNotFound, CommonValues.index3)
     }
 
     /**
@@ -235,7 +244,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val response = poolClient.sites().updateSite(toUpdate)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThat(response.errorCount).isEqualTo(0)
     }
 
     /**
@@ -268,7 +279,12 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
         )
         val response = poolClient.sites().updateSite(toUpdate)
-        testHelpers.assertRecursively(response).isEqualTo(expected)
+
+        // 2 entities okay
+        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        // 1 error
+        assertThat(response.errorCount).isEqualTo(1)
+        testHelpers.assertErrorResponse(response.errors.first(), SiteUpdateError.SiteNotFound, "NONEXISTENT")
     }
 
     /**

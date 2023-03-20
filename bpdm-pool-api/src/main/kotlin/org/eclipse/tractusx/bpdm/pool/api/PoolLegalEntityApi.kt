@@ -28,8 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -192,9 +191,8 @@ interface PoolLegalEntityApi {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "200", description = "New legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
     )
     @PostMapping
@@ -202,7 +200,7 @@ interface PoolLegalEntityApi {
     fun createBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse>
+    ): LegalEntityPartnerCreateResponseWrapper
 
 
     @Operation(
@@ -212,9 +210,8 @@ interface PoolLegalEntityApi {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "200", description = "Update legal entities request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "Metadata referenced by technical key not found", content = [Content()])
         ]
     )
     @PutMapping
@@ -222,6 +219,6 @@ interface PoolLegalEntityApi {
     fun updateBusinessPartners(
         @RequestBody
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse>
+    ): LegalEntityPartnerUpdateResponseWrapper
 
 }

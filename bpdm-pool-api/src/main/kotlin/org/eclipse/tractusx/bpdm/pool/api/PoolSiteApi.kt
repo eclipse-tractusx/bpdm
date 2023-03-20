@@ -33,7 +33,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -105,7 +106,7 @@ interface PoolSiteApi  {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "New business partner record successfully created"),
+            ApiResponse(responseCode = "200", description = "New sites request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
@@ -114,7 +115,7 @@ interface PoolSiteApi  {
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
-    ) : Collection<SitePartnerCreateResponse>
+    ) : SitePartnerCreateResponseWrapper
 
     @Operation(
         summary = "Update existing site business partners",
@@ -123,7 +124,7 @@ interface PoolSiteApi  {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The successfully updated records"),
+            ApiResponse(responseCode = "200", description = "Update sites request was processed successfully, possible errors are returned"),
             ApiResponse(responseCode = "400", description = "On malformed requests", content = [Content()])
         ]
     )
@@ -132,5 +133,5 @@ interface PoolSiteApi  {
     fun updateSite(
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
-    ): Collection<SitePartnerCreateResponse>
+    ): SitePartnerUpdateResponseWrapper
 }

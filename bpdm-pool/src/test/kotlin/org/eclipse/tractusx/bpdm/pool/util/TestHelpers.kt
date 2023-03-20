@@ -32,6 +32,8 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
@@ -97,20 +99,20 @@ class TestHelpers(
         partnerStructures: List<LegalEntityStructureRequest>
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity });
-        val indexedLegalEntities = legalEntities.associateBy { it.index }
+        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity })
+        val indexedLegalEntities = legalEntities.entities.associateBy { it.index }
 
         val assignedSiteRequests =
             partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
-        val sites = poolClient.sites().createSite(assignedSiteRequests);
-        val indexedSites = sites.associateBy { it.index }
+        val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)
+        val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
             partnerStructures.flatMap { it.addresses.map { address -> address.copy(parent = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
         val assignedSiteAddresses =
             partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
 
-        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses)
+        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
 
         val indexedAddresses = addresses.associateBy { it.index }
 
@@ -139,7 +141,7 @@ class TestHelpers(
     fun `find bpns by identifiers, bpn request limit exceeded`( identifiersSearchRequest: IdentifiersSearchRequest){
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
-           
+
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
@@ -210,7 +212,6 @@ class TestHelpers(
 
     private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
 
-        //poolClient.opensearch().export()
         client.invokePostEndpointWithoutResponse(syncPath)
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
@@ -219,7 +220,6 @@ class TestHelpers(
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
             syncResponse = client.invokeGetEndpoint(syncPath)
-           // syncResponse = poolClient.opensearch().getBusinessPartners()
 
             if (syncResponse.status == status)
                 break
@@ -265,6 +265,11 @@ class TestHelpers(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+    }
+
+    fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
+        Assertions.assertThat(errorResponse.entityKey).isEqualTo(keyToCheck)
+        Assertions.assertThat(errorResponse.errorCode).isEqualTo(codeToCheck)
     }
 
     private fun createBpnPattern(typeId: Char): String {

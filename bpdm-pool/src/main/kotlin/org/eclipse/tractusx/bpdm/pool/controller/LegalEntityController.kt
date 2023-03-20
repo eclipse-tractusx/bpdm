@@ -23,7 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
@@ -105,16 +106,13 @@ class LegalEntityController(
 
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    ): LegalEntityPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
-
-    override fun updateBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
-    ): Collection<LegalEntityPartnerCreateResponse> {
+    override fun updateBusinessPartners(businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+    ): LegalEntityPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
-
 
 }

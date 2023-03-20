@@ -131,9 +131,9 @@ class PartnerImportPageService(
         val sites = sitesWithParent.mapNotNull { mappingService.toSiteCreateRequestOrNull(it) }
         val addresses = addressesWithParent.mapNotNull { mappingService.toAddressCreateRequestOrNull(it) }
 
-        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities) else emptyList()
-        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites) else emptyList()
-        val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses) else emptyList()
+        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.createLegalEntities(legalEntities).entities else emptyList()
+        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.createSites(sites).entities else emptyList()
+        val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.createAddresses(addresses).entities else emptyList()
 
         val legalEntityImportEntries = createdLegalEntities.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
         val siteImportEntries = createdSites.mapNotNull { if (it.index != null) ImportEntry(it.index!!, it.bpn) else null }
@@ -152,9 +152,9 @@ class PartnerImportPageService(
         val sites = sitesSaas.mapNotNull { mappingService.toSiteUpdateRequestOrNull(it) }
         val addresses = addressesSaas.mapNotNull { mappingService.toAddressUpdateRequestOrNull(it) }
 
-        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities) else emptyList()
-        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites) else emptyList()
-        val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.updateAddresses(addresses) else emptyList()
+        val createdLegalEntities = if (legalEntities.isNotEmpty()) businessPartnerBuildService.updateLegalEntities(legalEntities).entities else emptyList()
+        val createdSites = if (sites.isNotEmpty()) businessPartnerBuildService.updateSites(sites).entities else emptyList()
+        val createdAddresses = if (addresses.isNotEmpty()) businessPartnerBuildService.updateAddresses(addresses).entities else emptyList()
 
         return Triple(createdLegalEntities, createdSites, createdAddresses)
     }

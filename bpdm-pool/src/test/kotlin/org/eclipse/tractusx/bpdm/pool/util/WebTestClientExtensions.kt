@@ -51,21 +51,10 @@ inline fun <reified T : Any> WebTestClient.invokePostWithArrayResponse(path: Str
         .responseBody!!
 }
 
-fun WebTestClient.invokePostEndpointWithoutResponse(path: String) {
+fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any? = null) {
+    val bodyInserter = body?.let { BodyInserters.fromValue(it) } ?: BodyInserters.empty()
     post().uri(path)
-        .exchange()
-        .expectStatus().is2xxSuccessful
-        .expectBody()
-        .returnResult()
-    /*
-    Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
-    */
-}
-
-
-fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
-    post().uri(path)
-        .body(BodyInserters.fromValue(body))
+        .body(bodyInserter)
         .exchange()
         .expectStatus().is2xxSuccessful
         .expectBody()
@@ -73,6 +62,20 @@ fun WebTestClient.invokePostEndpointWithoutResponse(path: String, body: Any) {
     /*
     Mitigates Timeout issue when WebTestClient gets executed too many times without result returned
      */
+}
+
+/**
+ * Helper method for invoking a put endpoint on [path] with a request [body] and an expected response body
+ * Only works for response bodies that are serialized as Json Objects
+ */
+inline fun <reified T : Any> WebTestClient.invokePutEndpoint(path: String, body: Any): T {
+    return put().uri(path)
+        .body(BodyInserters.fromValue(body))
+        .exchange()
+        .expectStatus().is2xxSuccessful
+        .returnResult<T>()
+        .responseBody
+        .blockFirst()!!
 }
 
 inline fun <reified T : Any> WebTestClient.invokePutWithArrayResponse(path: String, body: Any): Collection<T> {
