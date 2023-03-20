@@ -29,12 +29,26 @@ import java.time.Instant
 
 interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
 
+    //Query for ExternalID only
+    fun findAllByExternalIdIn(
+        externalIds: Collection<String>,
+        pageable: Pageable
+    ): Page<ChangelogEntity>
+
+    //Query for ExternalID and fromTime Parameter
     fun findAllByExternalIdInAndCreatedAtGreaterThanEqual(
         externalIds: Collection<String>,
         createdAt: Instant?,
         pageable: Pageable
     ): Page<ChangelogEntity>
 
+    //Query for BusinessPartnerType only
+    fun findAllByBusinessPartnerType(
+        businessPartnerType: LsaType?,
+        pageable: Pageable
+    ): Page<ChangelogEntity>
+
+    //Query for BusinessPartnerType and fromTime Parameter
     fun findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
         businessPartnerType: LsaType?,
         createdAt: Instant?,
