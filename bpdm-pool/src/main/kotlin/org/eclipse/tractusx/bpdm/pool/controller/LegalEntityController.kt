@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchRespons
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
@@ -40,6 +41,7 @@ class LegalEntityController(
     val businessPartnerBuildService: BusinessPartnerBuildService,
     val searchService: SearchService,
     val bpnConfigProperties: BpnConfigProperties,
+    val controllerConfigProperties: ControllerConfigProperties,
     val siteService: SiteService,
     val addressService: AddressService
 ) : PoolLegalEntityApi {
@@ -72,7 +74,7 @@ class LegalEntityController(
     override fun searchSites(
         bpnLs: Collection<String>
     ): ResponseEntity<Collection<LegalEntityPartnerResponse>> {
-        if (bpnLs.size > bpnConfigProperties.searchRequestLimit) {
+        if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         return ResponseEntity(businessPartnerFetchService.fetchDtosByBpns(bpnLs), HttpStatus.OK)
