@@ -267,6 +267,7 @@ class TestHelpers(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
     }
 
     fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {
