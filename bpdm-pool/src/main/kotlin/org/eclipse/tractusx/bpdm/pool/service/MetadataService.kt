@@ -55,7 +55,7 @@ class MetadataService(
             throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, type.technicalKey)
 
         logger.info { "Create new Identifier-Type with key ${type.technicalKey} and name ${type.name}" }
-        return identifierTypeRepository.save(IdentifierType(type.name, "", type.technicalKey)).toDto()
+        return identifierTypeRepository.save(IdentifierType(type.name, type.technicalKey)).toDto()
     }
 
     fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {

@@ -75,14 +75,10 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
 }
 
 fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody?.name)
+    return IdentifierResponse(value, type.toDto(), issuingBody)
 }
 
 fun IdentifierType.toDto(): TypeKeyNameDto<String> {
-    return TypeKeyNameDto(technicalKey, name)
-}
-
-fun IdentifierStatus.toDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 

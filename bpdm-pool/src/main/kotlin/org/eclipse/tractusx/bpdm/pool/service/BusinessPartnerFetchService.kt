@@ -129,8 +129,6 @@ class BusinessPartnerFetchService(
 
     fun fetchIdentifierDependencies(identifiers: Set<Identifier>): Set<Identifier> {
         identifierRepository.joinType(identifiers)
-        identifierRepository.joinStatus(identifiers)
-        identifierRepository.joinIssuingBody(identifiers)
 
         return identifiers
     }
