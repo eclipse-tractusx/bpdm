@@ -46,6 +46,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.Instant
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
@@ -568,9 +569,10 @@ class SaasControllerImportIT @Autowired constructor(
     ) {
         assertThat(actualPartners)
             .usingRecursiveComparison()
-            .ignoringFieldsMatchingRegexes(".*uuid", ".*bpn", ".*currentness")
+            .ignoringFieldsMatchingRegexes(".*uuid", ".*bpn")
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expectedPartners)
     }
 

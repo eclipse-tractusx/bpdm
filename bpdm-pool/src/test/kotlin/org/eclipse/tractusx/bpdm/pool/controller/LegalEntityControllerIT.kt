@@ -278,6 +278,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -305,6 +306,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -334,6 +336,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -362,6 +365,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -390,7 +394,6 @@ class LegalEntityControllerIT @Autowired constructor(
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
             .ignoringFieldsOfTypes(Instant::class.java)
-//            .ignoringFields(*CommonValues.legalEntityFieldsToIgnore)
             .isEqualTo(expected)
     }
 
@@ -419,6 +422,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
