@@ -73,5 +73,4 @@ class SiteController(
         return validationService.validate(siteInput)
     }
 
-
 }
