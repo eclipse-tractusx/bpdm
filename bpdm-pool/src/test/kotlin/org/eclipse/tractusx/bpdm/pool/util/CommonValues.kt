@@ -104,14 +104,6 @@ object CommonValues {
     val identifierTypeName2 = "VAT USA"
     val identifierTypeName3 = "VAT France"
 
-    val issuingBodyKey1 = "AGENCYX"
-    val issuingBodyKey2 = "BODYY"
-    val issuingBodyKey3 = "OFFICIALZ"
-
-    val issuingBodyName1 = "Agency X"
-    val issuingBodyName2 = "Body Y"
-    val issuingBodyName3 = "Official Z"
-
     val issuingBody1 = "Agency X"
     val issuingBody2 = "Body Y"
     val issuingBody3 = "Official Z"

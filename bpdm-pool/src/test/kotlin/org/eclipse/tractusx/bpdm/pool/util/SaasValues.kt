@@ -62,15 +62,19 @@ object SaasValues {
     val siteName2 = NameSaas(CommonValues.siteName2)
     val siteName3 = NameSaas(CommonValues.siteName3)
 
-    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, "TODO remove")
+    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, "TODO remove")
+    val issuingBody1 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody1)
+    val issuingBody2 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody2)
+    val issuingBody3 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody3)
 
     val identifierStatus1 = TypeKeyNameSaas("identifierstatuskey", "identifierstatusname")
 
     val identifier1 = IdentifierSaas(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
-    val identifier2 = IdentifierSaas(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
-    val identifier3 = IdentifierSaas(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
+    val identifier2 = IdentifierSaas(identifierType2, CommonValues.identifierValue2, issuingBody2, identifierStatus1)
+    val identifier3 = IdentifierSaas(identifierType3, CommonValues.identifierValue3, issuingBody3, identifierStatus1)
 
     val legalForm1 = LegalFormSaas(
         name = CommonValues.legalFormName1,
