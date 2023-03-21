@@ -28,29 +28,22 @@ import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 
 @Service
-class ChangelogService (private val changelogRepository: ChangelogRepository) {
+class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    @Transactional
-    fun createChangelog(externalId: String) {
-        val changelogEntity = ChangelogEntity(externalId,LsaType.Address)
-        changelogRepository.save(changelogEntity)
-    }
+
 
     fun getChangeLogByExternalId(externalIds: Collection<String>, fromTime: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
 
         val pageResponse = changelogRepository.run {
             val pageable = PageRequest.of(page, pageSize)
             if (fromTime == null) {
-                findAllByExternalIdIn(externalIds = externalIds, pageable = pageable)
+                changelogRepository.findAllByExternalIdIn(externalIds, pageable)
             } else {
-                findAllByExternalIdInAndCreatedAtGreaterThanEqual(
-                    externalIds = externalIds,
-                    createdAt = fromTime,
-                    pageable = pageable
+                changelogRepository.findAllByExternalIdInAndCreatedAtGreaterThanEqual(
+                    externalIds, fromTime, pageable
                 )
             }
         }
@@ -65,7 +58,8 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
             )
         }
 
-        return PageChangeLogResponse(page = page, totalElements = pageResponse.totalElements,
+        return PageChangeLogResponse(
+            page = page, totalElements = pageResponse.totalElements,
             totalPages = pageResponse.totalPages,
             contentSize = pageResponse.content.size,
             content = pageResponse.content,
@@ -78,8 +72,12 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
 
         val pageResponse = changelogRepository.run {
             val pageable = PageRequest.of(page, pageSize)
-            if (fromTime == null) {
+            if (fromTime == null && lsaType == null) {
+                findAll(pageable)
+            } else if (fromTime == null ) {
                 findAllByBusinessPartnerType(businessPartnerType = lsaType, pageable = pageable)
+            } else if ( lsaType == null) {
+                findAllByCreatedAtGreaterThanEqual(createdAt = fromTime, pageable = pageable)
             } else {
                 findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
                     businessPartnerType = lsaType,
@@ -89,7 +87,8 @@ class ChangelogService (private val changelogRepository: ChangelogRepository) {
             }
         }
 
-        return PageResponse(page = page, totalElements = pageResponse.totalElements,
+        return PageResponse(
+            page = page, totalElements = pageResponse.totalElements,
             totalPages = pageResponse.totalPages,
             contentSize = pageResponse.content.size,
             content = pageResponse.content,

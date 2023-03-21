@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi

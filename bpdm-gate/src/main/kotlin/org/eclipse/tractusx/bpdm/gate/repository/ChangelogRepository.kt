@@ -48,6 +48,12 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
         pageable: Pageable
     ): Page<ChangelogEntity>
 
+    //Query for fromTime Parameter only
+    fun findAllByCreatedAtGreaterThanEqual(
+        createdAt: Instant?,
+        pageable: Pageable
+    ): Page<ChangelogEntity>
+
     //Query for BusinessPartnerType and fromTime Parameter
     fun findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
         businessPartnerType: LsaType?,

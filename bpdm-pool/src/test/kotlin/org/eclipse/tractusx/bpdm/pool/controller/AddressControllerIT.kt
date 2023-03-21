@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError

@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotEmpty
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
@@ -32,11 +33,13 @@ import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
 @RestController
 @RequestMapping("/api/catena/business-partners/changelog")
+@Validated
 class ChangelogController (
     private val  changelogService: ChangelogService
     ) {
@@ -55,12 +58,11 @@ class ChangelogController (
     @PostMapping("/search")
     fun getChangelogEntriesExternalId(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam fromTime: Instant? ,
-        @RequestBody externalIds: Collection<String>? = emptyList()
+        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
+        @RequestBody(required = true)  @NotEmpty(message = "Input externalIds list cannot be empty.") externalIds: Collection<String>
     ): PageChangeLogResponse<ChangelogEntity> {
-        return changelogService.getChangeLogByExternalId(externalIds!!,fromTime,paginationRequest.page,paginationRequest.size)
+        return changelogService.getChangeLogByExternalId(externalIds,fromTime,paginationRequest.page,paginationRequest.size)
     }
-
     @Operation(
         summary = "Get business partner changelog entries by timestamp or LSA type",
         description = "Get business partner changelog entries by from timestamp or LSA type"
@@ -81,10 +83,5 @@ class ChangelogController (
         return changelogService.getChangeLogByLsaType(lsaType,fromTime,paginationRequest.page,paginationRequest.size)
     }
 
-    @PostMapping
-    fun createChangelogEntries(
-        @Parameter(description = "externalId") @RequestParam externalId: String
-    ) {
-        return changelogService.createChangelog(externalId)
-    }
+
 }

@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
