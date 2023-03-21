@@ -131,7 +131,7 @@ class SaasRequestMappingService(
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
             value = value,
-            issuingBody = TypeKeyNameUrlSaas(issuingBody)
+            issuingBody = TypeKeyNameUrlSaas(name = issuingBody)
         )
     }
 

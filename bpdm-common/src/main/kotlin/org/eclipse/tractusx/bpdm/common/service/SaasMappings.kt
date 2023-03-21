@@ -112,7 +112,7 @@ object SaasMappings {
         return IdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, IdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type),
-            issuingBody = toOptionalReference(identifier.issuingBody)
+            issuingBody = identifier.issuingBody?.name
         )
     }
 
