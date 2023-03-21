@@ -328,7 +328,7 @@ class SuggestionControllerIT @Autowired constructor(
         val page = webTestClient.get()
             .uri { builder ->
                 builder.path(endpointPath)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()
@@ -352,7 +352,7 @@ class SuggestionControllerIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()
@@ -378,7 +378,7 @@ class SuggestionControllerIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()

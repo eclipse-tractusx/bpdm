@@ -40,13 +40,13 @@ class DocumentMappingService {
     fun toDocument(partner: LegalEntity): LegalEntityDoc {
         val partnerStatus = partner.stati.maxWithOrNull(compareBy { it.validFrom })
         return LegalEntityDoc(
-            partner.bpn,
-            partner.names.map { TextDoc(it.value) },
-            if (partner.legalForm?.name != null) TextDoc(partner.legalForm!!.name) else null,
-            if (partnerStatus?.description != null) TextDoc(partnerStatus.description) else null,
-            listOf(toDocument(partner.legalAddress)),
-            partner.classification.filter { it.value != null }.map { TextDoc(it.value!!) },
-            partner.sites.map { TextDoc(it.name) }
+            bpn = partner.bpn,
+            legalName = TextDoc(partner.legalName.value),
+            legalForm = partner.legalForm?.name?.let { TextDoc(it) },
+            status = partnerStatus?.description?.let { TextDoc(it) },
+            addresses = listOf(toDocument(partner.legalAddress)),
+            classifications = partner.classification.mapNotNull { classif -> classif.value?.let { TextDoc(it) } },
+            sites = partner.sites.map { TextDoc(it.name) }
         )
     }
 

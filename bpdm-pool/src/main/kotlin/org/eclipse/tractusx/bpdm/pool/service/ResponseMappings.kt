@@ -54,7 +54,7 @@ fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
         bpn = bpn,
         identifiers = identifiers.map { it.toDto() },
-        legalName = names.map { it.toDto() }.first(),       // TODO
+        legalName = legalName.toDto(),
         legalForm = legalForm?.toDto(),
         status = stati.map { it.toLegalEntityStatusDto() },
         classifications = classification.map { it.toDto() },

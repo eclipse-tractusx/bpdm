@@ -19,31 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.LanguageCode
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.NameType
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 
-@Entity
-@Table(
-    name = "names",
-    indexes = [
-        Index(columnList = "legal_entity_id")
-    ]
-)
+@Embeddable
 class Name(
-    @Column(name = "`value`", nullable = false)
+    @Column(name = "name_value", nullable = false)
     val value: String,
-    @Column(name = "shortName")
-    val shortName: String?,
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val type: NameType,
-    @Column(name = "language", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val language: LanguageCode,
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity
-) : BaseEntity()
 
+    @Column(name = "name_shortname")
+    val shortName: String?
+)
