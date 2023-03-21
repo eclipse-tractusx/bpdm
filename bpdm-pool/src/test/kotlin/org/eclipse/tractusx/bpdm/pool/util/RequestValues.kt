@@ -36,26 +36,22 @@ object RequestValues {
     val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
     val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val issuingBody1 = TypeKeyNameDto(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1)
-    val issuingBody2 = TypeKeyNameDto(CommonValues.issuingBodyKey2, CommonValues.issuingBodyName2)
-    val issuingBody3 = TypeKeyNameDto(CommonValues.issuingBodyKey3, CommonValues.issuingBodyName3)
-
     val identifier1 = IdentifierDto(
         CommonValues.identifierValue1,
         CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
+        CommonValues.issuingBody1,
     )
 
     val identifier2 = IdentifierDto(
         CommonValues.identifierValue2,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
+        CommonValues.identifierTypeTechnicalKey2,
+        CommonValues.issuingBody2,
     )
 
     val identifier3 = IdentifierDto(
         CommonValues.identifierValue3,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBodyKey1,
+        CommonValues.identifierTypeTechnicalKey3,
+        CommonValues.issuingBody3,
     )
 
     val legalForm1 = LegalFormRequest(

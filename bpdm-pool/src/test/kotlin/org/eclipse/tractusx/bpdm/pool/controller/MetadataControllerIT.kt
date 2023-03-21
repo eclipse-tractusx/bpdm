@@ -300,9 +300,9 @@ class MetadataControllerIT @Autowired constructor(
      */
     @Test
     fun getValidIdentifiersForCountry() {
-        val identifierType1 = IdentifierType(name = CommonValues.identifierTypeName1, technicalKey = CommonValues.identifierTypeTechnicalKey1, url = null)
-        val identifierType2 = IdentifierType(name = CommonValues.identifierTypeName2, technicalKey = CommonValues.identifierTypeTechnicalKey2, url = null)
-        val identifierType3 = IdentifierType(name = CommonValues.identifierTypeName3, technicalKey = CommonValues.identifierTypeTechnicalKey3, url = null)
+        val identifierType1 = IdentifierType(name = CommonValues.identifierTypeName1, technicalKey = CommonValues.identifierTypeTechnicalKey1)
+        val identifierType2 = IdentifierType(name = CommonValues.identifierTypeName2, technicalKey = CommonValues.identifierTypeTechnicalKey2)
+        val identifierType3 = IdentifierType(name = CommonValues.identifierTypeName3, technicalKey = CommonValues.identifierTypeTechnicalKey3)
         val givenIdentifierTypes = listOf(identifierType1, identifierType2, identifierType3)
 
         val countryIdentifierType1 = CountryIdentifierType(null, identifierType1, true)
