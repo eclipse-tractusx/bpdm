@@ -47,7 +47,7 @@ class SaasRequestMappingService(
             names = listOf(NameSaas(value = request.site.name)),
             status = request.site.status.map { it.toSaasModel() }.firstOrNull(),
             addresses = listOf(toSaasModel(request.site.mainAddress)),
-            identifiers = if (request.bpn != null) listOf(createBpnIdentifierSaas(request.bpn!!)) else emptyList(),
+            identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
     }
@@ -57,7 +57,7 @@ class SaasRequestMappingService(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
             addresses = listOf(toSaasModel(request.address)),
-            identifiers = if (request.bpn != null) listOf(createBpnIdentifierSaas(request.bpn!!)) else emptyList(),
+            identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
     }

@@ -69,5 +69,4 @@ class LegalEntityController(
         return validationService.validate(legalEntityInput)
     }
 
-
 }
