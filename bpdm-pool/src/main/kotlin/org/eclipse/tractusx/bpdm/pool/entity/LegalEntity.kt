@@ -33,6 +33,9 @@ class LegalEntity(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
 
+    @Embedded
+    var legalName: Name,
+
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
@@ -62,9 +65,6 @@ class LegalEntity(
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val identifiers: MutableSet<Identifier> = mutableSetOf()
-
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val names: MutableSet<Name> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val stati: MutableSet<BusinessStatus> = mutableSetOf()

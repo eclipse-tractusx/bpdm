@@ -19,11 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -257,15 +255,17 @@ class BusinessPartnerBuildService(
     }
 
     private fun createLegalEntity(
-        dto: LegalEntityDto,
+        request: LegalEntityDto,
         bpnL: String,
         metadataMap: MetadataMappingDto
     ): LegalEntity {
-        val legalForm = if (dto.legalForm != null) metadataMap.legalForms[dto.legalForm]!! else null
+        val legalName = toEntity(request.legalName)
+        val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
+        val legalAddress = createAddress(request.legalAddress)
 
-        val legalAddress = createAddress(dto.legalAddress)
         val partner = LegalEntity(
             bpn = bpnL,
+            legalName = legalName,
             legalForm = legalForm,
             types = mutableSetOf(),
             roles = mutableSetOf(),
@@ -273,7 +273,7 @@ class BusinessPartnerBuildService(
             legalAddress = legalAddress
         )
 
-        return updateLegalEntity(partner, dto, metadataMap)
+        return updateLegalEntity(partner, request, metadataMap)
     }
 
     private fun createSite(
@@ -301,15 +301,15 @@ class BusinessPartnerBuildService(
 
         partner.currentness = createCurrentnessTimestamp()
 
-        partner.names.clear()
+        partner.legalName = toEntity(request.legalName)
+        partner.legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
+
         partner.identifiers.clear()
         partner.stati.clear()
         partner.classification.clear()
         partner.bankAccounts.clear()
 
-        partner.legalForm = if (request.legalForm != null) metadataMap.legalForms[request.legalForm]!! else null
         partner.stati.addAll(request.status.map { toEntity(it, partner) })
-        partner.names.addAll(request.legalName.let { listOf(toEntity(it, partner)) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
         partner.classification.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
 
@@ -417,14 +417,10 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: NameDto, partner: LegalEntity): Name {
-        // TODO
+    private fun toEntity(dto: NameDto): Name {
         return Name(
             value = dto.value,
-            shortName = dto.shortName,
-            type = NameType.OTHER,
-            language = LanguageCode.undefined,
-            legalEntity = partner
+            shortName = dto.shortName
         )
     }
 

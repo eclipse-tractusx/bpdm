@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
-import org.eclipse.tractusx.bpdm.common.model.NameType.REGISTERED
 
 object SaasMappings {
 
@@ -81,10 +80,7 @@ object SaasMappings {
     }
 
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
-        val legalName = names
-            .filter { it.type?.technicalKey == REGISTERED.name }
-            .map { toDto(it) }
-            .firstOrNull()
+        val legalName = toNameDto(names)
             ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", id ?: "Unknown")
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
@@ -97,12 +93,20 @@ object SaasMappings {
     }
 
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
+        val name = toNameDto(names)
+            ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", id ?: "Unknown")
         return SiteDto(
-            name = names.first().value,
+            name = name.value,
             status = toSiteStatusDtos(status),
             mainAddress = toDto(addresses.first())
         )
     }
+
+    private fun toNameDto(names: Collection<NameSaas>): NameDto? =
+        names
+//            .filter { it.type?.technicalKey == REGISTERED.name }      // type doesn't matter - just take first one
+            .map { toDto(it) }
+            .firstOrNull()
 
     fun toDto(identifier: IdentifierSaas): IdentifierDto {
         return IdentifierDto(
