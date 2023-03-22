@@ -19,34 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.entity
 
-import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(name = "legal_forms")
 class LegalForm(
-    @Column(name = "name")
-    val name: String,      // TODO now mandatory
+    @Column(name = "technical_key", nullable = false)
+    val technicalKey: String,
 
-    @Column(name = "url")
-    val url: String?,
-
-    @Column(name = "language", nullable = false)
-    val language: LanguageCode,
+    @Column(name = "name", nullable = false)
+    val name: String,
 
     @Column(name = "abbreviation")
-    val mainAbbreviation: String?,  // TODO rename to abbreviation
+    val abbreviation: String?
 
-    @ManyToMany(cascade = [CascadeType.ALL])
-    @JoinTable(
-        name = "legal_forms_legal_categories",
-        joinColumns = [JoinColumn(name = "form_id")],
-        inverseJoinColumns = [JoinColumn(name = "category_id")],
-        indexes = [Index(columnList = "form_id"), Index(columnList = "category_id")]
-    )
-    val categories: MutableSet<LegalFormCategory>,
-
-    @Column(name = "technical_key", nullable = false)
-    val technicalKey: String
 ) : BaseEntity()

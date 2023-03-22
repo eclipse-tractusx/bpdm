@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
-import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -41,7 +40,6 @@ class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val identifierRepository: IdentifierRepository,
-    private val legalFormRepository: LegalFormRepository,
     private val addressService: AddressService
 ) {
 
@@ -115,9 +113,6 @@ class BusinessPartnerFetchService(
 
         val identifiers = partners.flatMap { it.identifiers }.toSet()
         fetchIdentifierDependencies(identifiers)
-
-        val legalForms = partners.mapNotNull { it.legalForm }.toSet()
-        legalFormRepository.joinCategories(legalForms)
 
         return partners
     }

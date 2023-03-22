@@ -21,12 +21,9 @@ package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
@@ -143,23 +140,12 @@ class SaasToRequestMapper {
         return TypeKeyNameDto(idType.technicalKey!!, idType.name ?: "")
     }
 
-    fun toRequest(idStatus: TypeKeyNameSaas): TypeKeyNameDto<String> {
-        return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name ?: "")
-    }
-
     fun toRequest(legalForm: LegalFormSaas, partner: BusinessPartnerSaas): LegalFormRequest {
         return LegalFormRequest(
             technicalKey = legalForm.technicalKey!!,
             name = legalForm.name!!,
-            url = legalForm.url,
-            mainAbbreviation = legalForm.mainAbbreviation,
-            language = SaasMappings.toLanguageCode(legalForm.language),
-            category = partner.categories.map { toCategoryRequest(it) }
+            abbreviation = legalForm.mainAbbreviation
         )
-    }
-
-    fun toCategoryRequest(category: TypeKeyNameUrlSaas): TypeNameUrlDto {
-        return TypeNameUrlDto(category.name!!, category.url)
     }
 
 }

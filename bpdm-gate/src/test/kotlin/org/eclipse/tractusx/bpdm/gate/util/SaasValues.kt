@@ -215,34 +215,18 @@ object SaasValues {
     val nameSite1 = NameSaas(value = CommonValues.nameSite1)
     val nameSite2 = NameSaas(value = CommonValues.nameSite2)
 
-    val legalFormCategory1 = TypeNameUrlSaas(
-        name = CommonValues.legalFormCategoryName1,
-        url = CommonValues.legalFormCategoryUrl1
-    )
-
-    val legalFormCategory2 = TypeNameUrlSaas(
-        name = CommonValues.legalFormCategoryName2,
-        url = CommonValues.legalFormCategoryUrl2
-    )
-
     val legalForm1 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey1)
 
     val legalForm1Response = legalForm1.copy(
         name = CommonValues.legalFormName1,
-        url = CommonValues.legalFormUrl1,
         mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1,
-        categories = listOf(legalFormCategory1)
     )
 
     val legalForm2 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey2)
 
     val legalForm2Response = legalForm2.copy(
         name = CommonValues.legalFormName2,
-        url = CommonValues.legalFormUrl2,
         mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2,
-        categories = listOf(legalFormCategory2)
     )
 
     val businessStatus1 = BusinessPartnerStatusSaas(

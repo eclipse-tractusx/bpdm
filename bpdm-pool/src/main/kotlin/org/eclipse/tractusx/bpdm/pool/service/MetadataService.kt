@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
-import org.eclipse.tractusx.bpdm.pool.entity.LegalFormCategory
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.CountryIdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
@@ -73,15 +72,12 @@ class MetadataService(
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
             throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.technicalKey)
 
-        logger.info { "Create new Legal-Form with key ${request.technicalKey}, name ${request.name} and ${request.category.size} categories" }
-        val categories = request.category.map { LegalFormCategory(it.name, it.url) }.toMutableSet()
+        logger.info { "Create new Legal-Form with key ${request.technicalKey} and name ${request.name}" }
+
         val legalForm = LegalForm(
+            technicalKey = request.technicalKey,
             name = request.name,
-            url = request.url,
-            language = request.language,
-            mainAbbreviation = request.mainAbbreviation,
-            categories = categories,
-            technicalKey = request.technicalKey
+            abbreviation = request.abbreviation
         )
 
         return legalFormRepository.save(legalForm).toDto()
