@@ -258,6 +258,7 @@ object SaasValues {
         externalId = partnerId4,
         dataSource = datasource1,
         names = listOf(siteName1),
+        status = status1,
         addresses = listOf(address1),
         types = listOf(siteType),
         relations = listOf(
@@ -278,6 +279,7 @@ object SaasValues {
         externalId = partnerId5,
         dataSource = datasource1,
         names = listOf(siteName2),
+        status = status2,
         addresses = listOf(address2),
         types = listOf(siteType),
         relations = listOf(
@@ -298,6 +300,7 @@ object SaasValues {
         externalId = partnerId6,
         dataSource = datasource1,
         names = listOf(siteName3),
+        status = status3,
         addresses = listOf(address3),
         types = listOf(siteType),
         relations = listOf(

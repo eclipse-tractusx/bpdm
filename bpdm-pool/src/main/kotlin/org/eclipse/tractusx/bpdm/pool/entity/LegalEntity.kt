@@ -51,7 +51,7 @@ class LegalEntity(
     val identifiers: MutableSet<Identifier> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val states: MutableSet<BusinessState> = mutableSetOf()
+    val states: MutableSet<LegalEntityState> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<AddressPartner> = mutableSetOf()

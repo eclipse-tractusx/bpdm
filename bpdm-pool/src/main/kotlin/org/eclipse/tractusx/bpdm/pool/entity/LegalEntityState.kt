@@ -17,11 +17,36 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import org.eclipse.tractusx.bpdm.pool.entity.BusinessState
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-interface BusinessStatusRepository : PagingAndSortingRepository<BusinessState, Long>, CrudRepository<BusinessState, Long> {
-}
+@Entity
+@Table(
+    name = "legal_entity_states",
+    indexes = [
+        Index(columnList = "legal_entity_id")
+    ]
+)
+class LegalEntityState (
+    @Column(name = "official_denotation")
+    val officialDenotation: String?,
+
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
+
+    @Column(name = "valid_to")
+    val validTo: LocalDateTime?,
+
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val type: BusinessStateType,
+
+    @ManyToOne
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
+
+) : BaseEntity()

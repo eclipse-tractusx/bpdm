@@ -17,33 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.pool.repository
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityState
+import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 
-@Entity
-@Table(name = "sites")
-class Site(
-    @Column(name = "bpn", nullable = false, unique = true)
-    var bpn: String,
-
-    @Column(name = "name", nullable = false)
-    var name: String,
-
-    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val states: MutableSet<SiteState> = mutableSetOf(),
-
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity,
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "main_address_id", nullable = false)
-    var mainAddress: Address
-
-) : BaseEntity() {
-
-    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<AddressPartner> = mutableSetOf()
+interface LegalEntityStateRepository : PagingAndSortingRepository<LegalEntityState, Long>, CrudRepository<LegalEntityState, Long> {
 }

@@ -275,17 +275,20 @@ class BusinessPartnerBuildService(
     }
 
     private fun createSite(
-        dto: SiteDto,
+        request: SiteDto,
         bpnS: String,
         partner: LegalEntity
     ): Site {
-        val mainAddress = createAddress(dto.mainAddress)
+        val mainAddress = createAddress(request.mainAddress)
+
         val site = Site(
             bpn = bpnS,
-            name = dto.name,
+            name = request.name,
             legalEntity = partner,
             mainAddress = mainAddress
         )
+
+        site.states.addAll(request.states.map { toEntity(it, site) })
 
         return site
     }
@@ -317,6 +320,10 @@ class BusinessPartnerBuildService(
 
     private fun updateSite(site: Site, request: SiteDto): Site {
         site.name = request.name
+
+        site.states.clear()
+
+        site.states.addAll(request.states.map { toEntity(it, site) })
 
         updateAddress(site.mainAddress, request.mainAddress)
 
@@ -382,23 +389,23 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun toEntity(dto: LegalEntityStateDto, partner: LegalEntity): BusinessState {
-        return BusinessState(
-            description = dto.officialDenotation,
+    private fun toEntity(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+        return LegalEntityState(
+            officialDenotation = dto.officialDenotation,
             validFrom = dto.validFrom,
             validTo = dto.validTo,
             type = dto.type,
-            legalEntity = partner
+            legalEntity = legalEntity
         )
     }
 
-    private fun toEntity(dto: SiteStateDto, partner: LegalEntity): BusinessState {
-        return BusinessState(
+    private fun toEntity(dto: SiteStateDto, site: Site): SiteState {
+        return SiteState(
             description = dto.description,
             validFrom = dto.validFrom,
             validTo = dto.validTo,
             type = dto.type,
-            legalEntity = partner
+            site = site
         )
     }
 
