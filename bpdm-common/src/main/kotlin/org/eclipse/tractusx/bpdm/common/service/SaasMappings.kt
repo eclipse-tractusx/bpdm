@@ -26,7 +26,6 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object SaasMappings {
@@ -154,11 +153,17 @@ object SaasMappings {
             ?: listOf()
 
     fun toDto(profile: PartnerProfileSaas?): Collection<ClassificationDto> {
-        return profile?.classifications?.map { toDto(it) } ?: emptyList()
+        return profile?.classifications?.mapNotNull { toDto(it) } ?: emptyList()
     }
 
-    fun toDto(classification: ClassificationSaas): ClassificationDto {
-        return ClassificationDto(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
+    fun toDto(classification: ClassificationSaas): ClassificationDto? {
+        return classification.type?.let {
+            ClassificationDto(
+                value = classification.value,
+                code = classification.code,
+                type = toType(it)
+            )
+        }
     }
 
     fun toDto(address: AddressSaas): AddressDto {

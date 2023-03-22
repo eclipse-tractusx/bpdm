@@ -87,7 +87,7 @@ class SaasRequestMappingService(
         return ClassificationSaas(
             value = value,
             code = code,
-            type = if (type != null) TypeKeyNameUrlSaas(type!!.name) else null
+            type = TypeKeyNameUrlSaas(type.name)
         )
     }
 

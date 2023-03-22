@@ -304,11 +304,11 @@ class BusinessPartnerBuildService(
 
         partner.identifiers.clear()
         partner.stati.clear()
-        partner.classification.clear()
+        partner.classifications.clear()
 
         partner.stati.addAll(request.status.map { toEntity(it, partner) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
-        partner.classification.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
+        partner.classifications.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
 
         updateAddress(partner.legalAddress, request.legalAddress)
 

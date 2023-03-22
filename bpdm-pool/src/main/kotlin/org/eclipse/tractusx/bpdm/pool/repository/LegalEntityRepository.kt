@@ -49,7 +49,7 @@ interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>,
     @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.stati WHERE p IN :partners")
     fun joinStatuses(partners: Set<LegalEntity>): Set<LegalEntity>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.classification WHERE p IN :partners")
+    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.classifications WHERE p IN :partners")
     fun joinClassifications(partners: Set<LegalEntity>): Set<LegalEntity>
 
     @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.startNodeRelations LEFT JOIN FETCH p.endNodeRelations WHERE p IN :partners")

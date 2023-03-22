@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -56,7 +55,7 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         legalName = legalName.toDto(),
         legalForm = legalForm?.toDto(),
         status = stati.map { it.toLegalEntityStatusDto() },
-        classifications = classification.map { it.toDto() },
+        classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         createdAt = createdAt,
@@ -187,7 +186,6 @@ fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
     return AdministrativeAreaResponse(value, shortName, fipsCode, type.toDto(), language.toDto())
 }
 
-
 fun PostCode.toDto(): PostCodeResponse {
     return PostCodeResponse(value, type.toDto())
 }
@@ -217,11 +215,7 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
 }
 
 fun Classification.toDto(): ClassificationResponse {
-    return ClassificationResponse(value, code, type?.toDto())
-}
-
-fun ClassificationType.toDto(): TypeKeyNameDto<ClassificationType> {
-    return TypeKeyNameDto(this, name)       // TODO name -> typeName
+    return ClassificationResponse(value, code, type.toDto())
 }
 
 fun Relation.toDto(): RelationResponse {

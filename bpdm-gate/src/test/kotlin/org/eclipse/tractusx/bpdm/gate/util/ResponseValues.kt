@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 
 object ResponseValues {
@@ -127,22 +128,26 @@ object ResponseValues {
 
     val classification1 = ClassificationResponse(
         value = CommonValues.classificationValue1,
-        code = CommonValues.classificationCode1
+        code = CommonValues.classificationCode1,
+        type = CommonValues.classificationType.toDto()
     )
 
     val classification2 = ClassificationResponse(
         value = CommonValues.classificationValue2,
-        code = CommonValues.classificationCode2
+        code = CommonValues.classificationCode2,
+        type = CommonValues.classificationType.toDto()
     )
 
     val classification3 = ClassificationResponse(
         value = CommonValues.classificationValue3,
-        code = CommonValues.classificationCode3
+        code = CommonValues.classificationCode3,
+        type = CommonValues.classificationType.toDto()
     )
 
     val classification4 = ClassificationResponse(
         value = CommonValues.classificationValue4,
-        code = CommonValues.classificationCode4
+        code = CommonValues.classificationCode4,
+        type = CommonValues.classificationType.toDto()
     )
 
     val characterSet1 = TypeKeyNameDto(
