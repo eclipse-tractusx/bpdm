@@ -132,7 +132,7 @@ object SaasMappings {
                 LegalEntityStatusDto(
                     officialDenotation = status.officialDenotation,
                     validFrom = status.validFrom,
-                    validUntil = status.validUntil,
+                    validTo = status.validUntil,
                     type = toType(status.type)
                 )
             )
@@ -145,7 +145,7 @@ object SaasMappings {
                 SiteStatusDto(
                     description = status.officialDenotation,
                     validFrom = status.validFrom,
-                    validUntil = status.validUntil,
+                    validTo = status.validUntil,
                     type = toType(status.type)
                 )
             )

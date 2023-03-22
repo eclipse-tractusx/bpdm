@@ -35,13 +35,18 @@ class BusinessStatus (
     // TODO rename description
     @Column(name = "denotation")
     val description: String?,
+
     @Column(name = "valid_from")
     val validFrom: LocalDateTime?,
+
     @Column(name = "valid_to")
-    val validUntil: LocalDateTime?,
+    val validTo: LocalDateTime?,
+
     @Column(name = "type", nullable = false)
     val type: BusinessStatusType,
+
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity
+
 ) : BaseEntity()

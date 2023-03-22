@@ -386,7 +386,7 @@ class BusinessPartnerBuildService(
         return BusinessStatus(
             description = dto.officialDenotation,
             validFrom = dto.validFrom,
-            validUntil = dto.validUntil,
+            validTo = dto.validTo,
             type = dto.type,
             legalEntity = partner
         )
@@ -396,7 +396,7 @@ class BusinessPartnerBuildService(
         return BusinessStatus(
             description = dto.description,
             validFrom = dto.validFrom,
-            validUntil = dto.validUntil,
+            validTo = dto.validTo,
             type = dto.type,
             legalEntity = partner
         )
