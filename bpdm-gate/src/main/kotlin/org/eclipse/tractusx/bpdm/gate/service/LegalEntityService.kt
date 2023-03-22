@@ -29,8 +29,11 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -40,11 +43,17 @@ class LegalEntityService(
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
+    private val changelogRepository: ChangelogRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
+
+        legalEntities.forEach { legalEntity ->
+            changelogRepository.save(ChangelogEntity(legalEntity.externalId, LsaType.LegalEntity))
+        }
+
         val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
         saasClient.upsertLegalEntities(legalEntitiesSaas)
     }

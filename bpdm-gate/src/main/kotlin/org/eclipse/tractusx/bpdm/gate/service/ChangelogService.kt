@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.data.domain.PageRequest
@@ -32,8 +32,6 @@ import java.time.Instant
 
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
-
-
 
     fun getChangeLogByExternalId(externalIds: Collection<String>, fromTime: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
 

@@ -30,7 +30,7 @@ data class PaginationStartAfterRequest(
         description = "Value used to indicate which page to retrieve. When this value is not provided, the first page is returned." +
                 "The nextStartAfter value from the response can then be used to request subsequent pages."
     )
-    val startAfter: String? = "0",
+    val startAfter: String?,
     @field:Parameter(
         description = "Size of each page", schema =
         Schema(defaultValue = "10")

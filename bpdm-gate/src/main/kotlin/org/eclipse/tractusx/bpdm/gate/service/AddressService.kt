@@ -31,8 +31,10 @@ import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,7 +45,8 @@ class AddressService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val typeMatchingService: TypeMatchingService
+    private val typeMatchingService: TypeMatchingService,
+    private val changelogRepository: ChangelogRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -148,6 +151,11 @@ class AddressService(
      * - Upserting the new relations
      */
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
+
+        addresses.forEach { address ->
+            changelogRepository.save(ChangelogEntity(address.externalId, LsaType.Address))
+        }
+
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
 

@@ -17,24 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.entity
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 
-import io.swagger.v3.oas.annotations.media.Schema
 
-/**
- * For every combination of possible errors a separate enum class is defined extending this marker interface.
- * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
- */
-interface ErrorCode
+@Entity
+@Table(name = "changelog_entries")
+class ChangelogEntity (
 
-@Schema(description = "BusinessPartnerOutputError")
-enum class BusinessPartnerOutputError : ErrorCode {
-    SharingProcessError,
-    SharingTimeout,
-    BpnNotInPool,
-}
+    @Column(name = "external_id", nullable = false, updatable = false)
+    val externalId: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "business_partner_type", nullable = false, updatable = false)
+    val businessPartnerType: LsaType
 
-@Schema(description = "ChangeLogOutputError")
-enum class ChangeLogOutputError : ErrorCode {
-    ExternalIdNotFound,
-}
+) : BaseEntity()
+
+
+
