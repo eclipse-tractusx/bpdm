@@ -110,12 +110,12 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
 
         val expected = getExpectedPage(listOf(givenPartner1))
 
-        val respone = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerMatchResponse>>(
+        val response = webTestClient.invokeGetEndpoint<PageResponse<BusinessPartnerMatchResponse>>(
             EndpointValues.CATENA_BUSINESS_PARTNER_LEGACY_PATH,
-            Pair("name", uniqueName)
+            Pair("legalName", uniqueName)
         )
 
-        testHelpers.assertRecursively(respone).ignoringFieldsMatchingRegexes(".*uuid", ".*score").isEqualTo(expected)
+        testHelpers.assertRecursively(response).ignoringFieldsMatchingRegexes(".*uuid", ".*score").isEqualTo(expected)
     }
 
     /**
