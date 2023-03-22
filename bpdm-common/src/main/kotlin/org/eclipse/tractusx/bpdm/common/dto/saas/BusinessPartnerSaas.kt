@@ -40,5 +40,4 @@ data class BusinessPartnerSaas(
     val relations: Collection<RelationSaas> = emptyList(),
     val types: Collection<TypeKeyNameUrlSaas> = emptyList(),
     val addresses: Collection<AddressSaas> = emptyList(),
-    val bankAccounts: Collection<BankAccountSaas> = emptyList(),
 )

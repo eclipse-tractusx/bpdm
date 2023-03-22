@@ -76,15 +76,6 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun BankAccountDto.toSaasModel(): BankAccountSaas {
-        return BankAccountSaas(
-            internationalBankAccountIdentifier = internationalBankAccountIdentifier,
-            internationalBankIdentifier = internationalBankIdentifier,
-            nationalBankAccountIdentifier = nationalBankAccountIdentifier,
-            nationalBankIdentifier = nationalBankIdentifier
-        )
-    }
-
     private fun toPartnerProfileSaas(profileClassifications: Collection<ClassificationDto>): PartnerProfileSaas? {
         if (profileClassifications.isEmpty()) {
             return null

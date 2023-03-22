@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
@@ -108,42 +107,6 @@ object RequestValues {
         value = CommonValues.classificationValue4,
         code = CommonValues.classificationCode4,
         type = CommonValues.classificationType
-    )
-
-    val bankAccount1 = BankAccountDto(
-        trustScores = emptyList(),
-        currency = CurrencyCode.UNDEFINED,
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier1,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier1,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount2 = BankAccountDto(
-        trustScores = emptyList(),
-        currency = CurrencyCode.UNDEFINED,
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier2,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier2,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount3 = BankAccountDto(
-        trustScores = emptyList(),
-        currency = CurrencyCode.UNDEFINED,
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier3,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier3,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount4 = BankAccountDto(
-        trustScores = emptyList(),
-        currency = CurrencyCode.UNDEFINED,
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier4,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier4,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
     val addressVersion1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language1)

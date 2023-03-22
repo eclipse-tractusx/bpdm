@@ -179,21 +179,6 @@ object CommonValues {
     val classificationCode3 = "code3"
     val classificationCode4 = "code4"
 
-    val internationalBankIdentifier0 = "11111111"
-    val nationalBankIdentifier0 = "22222222"
-
-    val internationalBankAccountIdentifier1 = "DE0000000000000000001"
-    val nationalBankAccountIdentifier1 = "000000001"
-
-    val internationalBankAccountIdentifier2 = "DE0000000000000000002"
-    val nationalBankAccountIdentifier2 = "000000002"
-
-    val internationalBankAccountIdentifier3 = "DE0000000000000000001"
-    val nationalBankAccountIdentifier3 = "000000001"
-
-    val internationalBankAccountIdentifier4 = "DE0000000000000000002"
-    val nationalBankAccountIdentifier4 = "000000002"
-
     val careOf1 = "Caring Entity Co"
     val careOf2 = "Another Caring Entity"
 

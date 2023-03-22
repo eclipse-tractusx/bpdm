@@ -102,11 +102,6 @@ fun BusinessStatus.toSiteStatusDto(): SiteStatusResponse {
     return SiteStatusResponse(description, validFrom, validUntil, type.toDto())
 }
 
-fun Role.toDto(): TypeKeyNameDto<String> {
-    return TypeKeyNameDto(technicalKey, name)
-}
-
-
 fun AddressPartner.toDto(): AddressPartnerResponse {
     return AddressPartnerResponse(
         bpn,
@@ -241,13 +236,6 @@ fun Relation.toDto(): RelationResponse {
         endBpn = endNode.bpn,
         validFrom = startedAt,
         validTo = endedAt
-    )
-}
-
-fun BankAccount.toDto(): BankAccountResponse {
-    return BankAccountResponse(
-        trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
-        nationalBankAccountIdentifier, nationalBankIdentifier
     )
 }
 
