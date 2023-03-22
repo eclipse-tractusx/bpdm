@@ -30,5 +30,5 @@ data class ChangelogResponse(
     @Schema(description = "The type of the change")
     val businessPartnerType: LsaType,
     @Schema(description = "The timestamp of the operation")
-    val createdAt: Instant
+    val modifiedAt: Instant
 )

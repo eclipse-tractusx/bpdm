@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.gate.dto.*
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import java.time.Instant
 
 object ResponseValues {

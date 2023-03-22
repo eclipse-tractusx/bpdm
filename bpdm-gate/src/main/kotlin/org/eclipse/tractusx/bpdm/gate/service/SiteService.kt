@@ -26,13 +26,13 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
@@ -141,12 +141,13 @@ class SiteService(
      */
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
+        val sitesSaas = toSaasModels(sites)
+        saasClient.upsertSites(sitesSaas)
+
+        // create changelog entry if all goes well from saasClient
         sites.forEach { site ->
             changelogRepository.save(ChangelogEntity(site.externalId, LsaType.Site))
         }
-
-        val sitesSaas = toSaasModels(sites)
-        saasClient.upsertSites(sitesSaas)
 
         deleteParentRelationsOfSites(sites)
 

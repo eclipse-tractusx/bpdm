@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.springframework.stereotype.Service
 
 @Service

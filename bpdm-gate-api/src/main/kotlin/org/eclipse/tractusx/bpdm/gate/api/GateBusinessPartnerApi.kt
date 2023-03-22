@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

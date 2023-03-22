@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
-import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
@@ -48,23 +48,23 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             it.toGateDto()
         }
 
-        val errorInfoList = externalIds.filterNot { id ->
+        val errorInfoSet = externalIds.filterNot { id ->
             pageDto.content.any { it.externalId == id }
         }.map {
             ErrorInfo(
                 ChangeLogOutputError.ExternalIdNotFound,
                 "$it not found",
-                "externalId not found"
+                it
             )
-        }
+        }.toSet()
 
         return PageChangeLogResponse(
             page = page, totalElements = pageDto.totalElements,
             totalPages = pageDto.totalPages,
             contentSize = pageDto.content.size,
             content = pageDto.content,
-            invalidEntries = errorInfoList.size,
-            errors = errorInfoList
+            invalidEntries = errorInfoSet.size,
+            errors = errorInfoSet
         )
     }
 

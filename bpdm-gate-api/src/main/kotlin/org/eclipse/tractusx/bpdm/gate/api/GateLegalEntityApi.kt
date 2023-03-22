@@ -25,9 +25,9 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse

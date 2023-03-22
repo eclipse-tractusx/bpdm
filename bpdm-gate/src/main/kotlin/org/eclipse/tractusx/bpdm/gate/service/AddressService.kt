@@ -24,14 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchRespons
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
@@ -153,12 +153,13 @@ class AddressService(
      */
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
 
+        val addressesSaas = toSaasModels(addresses)
+        saasClient.upsertAddresses(addressesSaas)
+
+        // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
             changelogRepository.save(ChangelogEntity(address.externalId, LsaType.Address))
         }
-
-        val addressesSaas = toSaasModels(addresses)
-        saasClient.upsertAddresses(addressesSaas)
 
         deleteParentRelationsOfAddresses(addresses)
 

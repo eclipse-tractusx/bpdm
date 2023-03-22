@@ -289,6 +289,7 @@ class AddressControllerIT @Autowired constructor(
 
         response.entities.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
         testHelpers.assertRecursively(response.entities).ignoringFields(AddressPartnerCreateResponse::bpn.name).isEqualTo(expected)
+
         assertThat(response.errorCount).isEqualTo(0)
     }
 

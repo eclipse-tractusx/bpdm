@@ -45,10 +45,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
+import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
+import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -59,6 +60,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -66,6 +68,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val typeMatchConfigProperties: TypeMatchConfigProperties,

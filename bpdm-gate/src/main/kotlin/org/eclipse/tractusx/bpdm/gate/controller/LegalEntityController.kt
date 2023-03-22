@@ -20,15 +20,15 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
-import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.containsDuplicates
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
 import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springframework.http.HttpStatus

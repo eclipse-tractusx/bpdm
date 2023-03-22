@@ -51,7 +51,6 @@ interface GateChangelogApi {
         value = [
             ApiResponse(responseCode = "200", description = "The changelog entries for the specified parameters"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
     @PostMapping("/search")
@@ -70,15 +69,14 @@ interface GateChangelogApi {
         value = [
             ApiResponse(responseCode = "200", description = "The changelog entries for the specified parameters"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
     @PostMapping("/filter")
     @PostExchange("/filter")
     fun getChangelogEntriesLsaType(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam fromTime: Instant?,
-        @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?
+        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
+        @Parameter(description = "LSA Type") @RequestParam(required = false) lsaType: LsaType?
     ): PageResponse<ChangelogResponse>
 
 }
