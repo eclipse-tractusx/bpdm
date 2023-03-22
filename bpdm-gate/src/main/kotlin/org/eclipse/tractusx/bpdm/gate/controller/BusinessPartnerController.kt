@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
-import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.eclipse.tractusx.bpdm.gate.service.TypeMatchingService
 import org.springframework.web.bind.annotation.RestController

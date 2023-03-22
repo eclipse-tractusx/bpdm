@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
@@ -27,7 +27,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
 
-interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> , JpaSpecificationExecutor<ChangelogEntity> {
+interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecificationExecutor<ChangelogEntity> {
 
     object Specs {
 
@@ -59,11 +59,10 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> , JpaSpecif
         fun byLsaType(lsaType: LsaType?) =
             Specification<ChangelogEntity> { root, _, builder ->
                 lsaType?.let {
-                    builder.equal(root.get<LsaType>(ChangelogEntity::businessPartnerType.name),lsaType)
+                    builder.equal(root.get<LsaType>(ChangelogEntity::businessPartnerType.name), lsaType)
                 }
             }
     }
-
 
 
 }

@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
-import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
@@ -37,15 +37,19 @@ import java.time.Instant
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogByExternalId(externalIds: Collection<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
+    fun getChangeLogByExternalId(externalIds: Collection<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
 
-        val spec = Specification.allOf(byExternalIdsIn(externalIds = externalIds),byCreatedAtGreaterThan(createdAt = createdAt))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds = externalIds), byCreatedAtGreaterThan(createdAt = createdAt))
         val pageable = PageRequest.of(page, pageSize)
-        val pageResponse = changelogRepository.findAll(spec,pageable)
+        val pageResponse = changelogRepository.findAll(spec, pageable)
 
+
+        val pageDto = pageResponse.map {
+            it.toGateDto()
+        }
 
         val errorInfoList = externalIds.filterNot { id ->
-            pageResponse.content.any { it.externalId == id }
+            pageDto.content.any { it.externalId == id }
         }.map {
             ErrorInfo(
                 ChangeLogOutputError.ExternalIdNotFound,
@@ -55,26 +59,31 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         }
 
         return PageChangeLogResponse(
-            page = page, totalElements = pageResponse.totalElements,
-            totalPages = pageResponse.totalPages,
-            contentSize = pageResponse.content.size,
-            content = pageResponse.content,
+            page = page, totalElements = pageDto.totalElements,
+            totalPages = pageDto.totalPages,
+            contentSize = pageDto.content.size,
+            content = pageDto.content,
             invalidEntries = errorInfoList.size,
             errors = errorInfoList
         )
     }
 
-    fun getChangeLogByLsaType(lsaType: LsaType?, createdAt: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogEntity> {
+    fun getChangeLogByLsaType(lsaType: LsaType?, createdAt: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogResponse> {
 
         val spec = Specification.allOf(byCreatedAtGreaterThan(createdAt = createdAt), byLsaType(lsaType))
         val pageable = PageRequest.of(page, pageSize)
-        val pageResponse = changelogRepository.findAll(spec,pageable)
+        val pageResponse = changelogRepository.findAll(spec, pageable)
+
+        val pageDto = pageResponse.map {
+            it.toGateDto()
+        }
 
         return PageResponse(
-            page = page, totalElements = pageResponse.totalElements,
-            totalPages = pageResponse.totalPages,
-            contentSize = pageResponse.content.size,
-            content = pageResponse.content,
+            page = page,
+            totalElements = pageDto.totalElements,
+            totalPages = pageDto.totalPages,
+            contentSize = pageDto.content.size,
+            content = pageDto.content,
         )
     }
 }

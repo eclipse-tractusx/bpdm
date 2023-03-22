@@ -28,9 +28,10 @@ import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
@@ -252,8 +253,8 @@ class AddressService(
         val parentType = parentId?.let { saasClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
 
         return when (parentType) {
-            LsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
-            LsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
+            OptionalLsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
+            OptionalLsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
             else -> throw SaasInvalidRecordException(parentId)
         }
     }

@@ -30,10 +30,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
@@ -110,10 +110,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.OK,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.OK, e.statusCode)
         }
 
         val body = wireMockServer.allServeEvents.single().request.bodyAsString
@@ -152,10 +152,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest1.copy(externalId = "external-2")
         )
 
-        try{
+        try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        } catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
     }
 
@@ -170,10 +170,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest1.copy()
         )
 
-        try{
+        try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        } catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }
@@ -194,9 +194,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -256,9 +256,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.legalEntities().getLegalEntityByExternalId("nonexistent-externalid123")
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
 
@@ -275,9 +275,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -310,9 +310,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -442,10 +442,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             val paginationValue = PaginationStartAfterRequest("")
             gateClient.legalEntities().getLegalEntities(paginationValue)
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -464,10 +464,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entities, pagination limit exceeded`() {
 
-        try{
+        try {
             val paginationValue = PaginationStartAfterRequest("", 999999)
             gateClient.legalEntities().getLegalEntities(paginationValue)
-        } catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
@@ -497,7 +497,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-         val actualResponse = gateClient.legalEntities().validateLegalEntity(legalEntity)
+        val actualResponse = gateClient.legalEntities().validateLegalEntity(legalEntity)
 
         val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
 

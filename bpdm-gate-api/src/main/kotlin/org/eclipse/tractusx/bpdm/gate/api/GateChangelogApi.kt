@@ -29,9 +29,9 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotEmpty
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.HttpExchange
@@ -60,7 +60,7 @@ interface GateChangelogApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
         @RequestBody(required = true)  @NotEmpty(message = "Input externalIds list cannot be empty.") externalIds: Collection<String>
-    ): PageChangeLogResponse<ChangelogEntity>
+    ): PageChangeLogResponse<ChangelogResponse>
 
     @Operation(
         summary = "Get business partner changelog entries by timestamp or LSA type",
@@ -79,6 +79,6 @@ interface GateChangelogApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam fromTime: Instant?,
         @Parameter(description = "LSA Type") @RequestParam lsaType: LsaType?
-    ): PageResponse<ChangelogEntity>
+    ): PageResponse<ChangelogResponse>
 
 }

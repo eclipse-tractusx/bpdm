@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.exception
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.exception.ErrorCode
 
 /**
  * For every combination of possible errors a separate enum class is defined extending this marker interface.

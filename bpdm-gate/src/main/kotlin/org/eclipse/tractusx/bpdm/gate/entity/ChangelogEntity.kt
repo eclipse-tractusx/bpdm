@@ -21,12 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 
 
 @Entity
 @Table(name = "changelog_entries")
-class ChangelogEntity (
+class ChangelogEntity(
 
     @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,

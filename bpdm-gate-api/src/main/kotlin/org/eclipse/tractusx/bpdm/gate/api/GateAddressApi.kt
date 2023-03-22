@@ -28,10 +28,10 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

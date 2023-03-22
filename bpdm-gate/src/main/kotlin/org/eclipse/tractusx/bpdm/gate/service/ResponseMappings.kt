@@ -17,12 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto
+package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.springframework.data.domain.Page
 
 
-data class ChangelogDto(
-    val externalId: String,
-    val lsaType: LsaType
-)
+fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
+    return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
+}
+
+fun ChangelogEntity.toGateDto(): ChangelogResponse {
+    return ChangelogResponse(
+        externalId,
+        businessPartnerType,
+        createdAt
+    )
+}
+
+

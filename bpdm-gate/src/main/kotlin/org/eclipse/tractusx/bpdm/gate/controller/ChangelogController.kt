@@ -22,28 +22,30 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RestController
 import java.time.Instant
 
 @RestController
 @Validated
-class ChangelogController (
-    private val  changelogService: ChangelogService
-    ) : GateChangelogApi {
+class ChangelogController(
+    private val changelogService: ChangelogService
+) : GateChangelogApi {
 
-    override fun getChangelogEntriesExternalId(paginationRequest: PaginationRequest, fromTime: Instant?, externalIds: Collection<String>
-    ): PageChangeLogResponse<ChangelogEntity> {
-        return changelogService.getChangeLogByExternalId(externalIds,fromTime,paginationRequest.page,paginationRequest.size)
+    override fun getChangelogEntriesExternalId(
+        paginationRequest: PaginationRequest, fromTime: Instant?, externalIds: Collection<String>
+    ): PageChangeLogResponse<ChangelogResponse> {
+        return changelogService.getChangeLogByExternalId(externalIds, fromTime, paginationRequest.page, paginationRequest.size)
     }
 
-    override fun getChangelogEntriesLsaType(paginationRequest: PaginationRequest, fromTime: Instant?, lsaType: LsaType?
-    ): PageResponse<ChangelogEntity> {
-        return changelogService.getChangeLogByLsaType(lsaType,fromTime,paginationRequest.page,paginationRequest.size)
+    override fun getChangelogEntriesLsaType(
+        paginationRequest: PaginationRequest, fromTime: Instant?, lsaType: LsaType?
+    ): PageResponse<ChangelogResponse> {
+        return changelogService.getChangeLogByLsaType(lsaType, fromTime, paginationRequest.page, paginationRequest.size)
     }
 
 

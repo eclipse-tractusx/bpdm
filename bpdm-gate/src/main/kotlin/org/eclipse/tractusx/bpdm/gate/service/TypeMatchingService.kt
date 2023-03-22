@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.ReferenceDataLookupRequestSaas
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
 import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
 import org.springframework.stereotype.Service
 
 @Service
@@ -55,10 +55,10 @@ class TypeMatchingService(
         val bestOverall = response.values.maxOfOrNull { it.matchingProfile.matchingScores.overall.value } ?: 0f
 
         return if (bestOverall >= typeMatchConfigProperties.legalEntityThreshold)
-            TypeMatchResponse(bestOverall, LsaType.LegalEntity)
+            TypeMatchResponse(bestOverall, OptionalLsaType.LegalEntity)
         else
 
-            TypeMatchResponse(1f - bestOverall, LsaType.None)
+            TypeMatchResponse(1f - bestOverall, OptionalLsaType.None)
 
     }
 
@@ -70,20 +70,20 @@ class TypeMatchingService(
         val typeGroups = parents.groupBy { determineType(it) }
 
         typeGroups.keys
-            .filterNot { it == LsaType.LegalEntity || it == LsaType.Site }
+            .filterNot { it == OptionalLsaType.LegalEntity || it == OptionalLsaType.Site }
             .forEach { invalidGroup ->
                 typeGroups[invalidGroup]!!.forEach {
                     logger.warn { "Business Partner with ID ${it.id} is parent with invalid type $invalidGroup" }
                 }
             }
 
-        return Pair(typeGroups[LsaType.LegalEntity] ?: emptyList(), typeGroups[LsaType.Site] ?: emptyList())
+        return Pair(typeGroups[OptionalLsaType.LegalEntity] ?: emptyList(), typeGroups[OptionalLsaType.Site] ?: emptyList())
     }
 
-    fun determineType(partner: BusinessPartnerSaas): LsaType {
+    fun determineType(partner: BusinessPartnerSaas): OptionalLsaType {
         if (partner.types.isEmpty()) {
             logger.warn { "Partner with ID ${partner.id} does not have any type" }
-            return LsaType.None
+            return OptionalLsaType.None
         }
 
         if (partner.types.size > 1) {
@@ -92,10 +92,10 @@ class TypeMatchingService(
 
         val partnerType = partner.types.first()
         return when (partnerType.technicalKey) {
-            saasConfigProperties.legalEntityType -> LsaType.LegalEntity
-            saasConfigProperties.siteType -> LsaType.Site
-            saasConfigProperties.addressType -> LsaType.Address
-            else -> LsaType.None
+            saasConfigProperties.legalEntityType -> OptionalLsaType.LegalEntity
+            saasConfigProperties.siteType -> OptionalLsaType.Site
+            saasConfigProperties.addressType -> OptionalLsaType.Address
+            else -> OptionalLsaType.None
         }
     }
 }

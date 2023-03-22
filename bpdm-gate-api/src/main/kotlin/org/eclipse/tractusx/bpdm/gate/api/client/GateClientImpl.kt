@@ -20,10 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.client
 
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
-import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
-import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
-import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
-import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
+import org.eclipse.tractusx.bpdm.gate.api.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
@@ -43,6 +40,7 @@ class GateClientImpl(
     private val gateClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(GateBusinessPartnerApi::class.java) }
     private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateLegalEntityApi::class.java) }
     private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateSiteApi::class.java) }
+    private val gateClientChangelog by lazy { httpServiceProxyFactory.createClient(GateChangelogApi::class.java) }
 
     override fun addresses() = gateClientAddress
 
@@ -51,6 +49,8 @@ class GateClientImpl(
     override fun legalEntities() = gateClientLegalEntity
 
     override fun sites() = gateClientSite
+
+    override fun changelog() = gateClientChangelog
 
 
 }

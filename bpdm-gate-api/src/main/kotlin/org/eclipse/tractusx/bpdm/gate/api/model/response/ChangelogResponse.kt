@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
@@ -17,18 +18,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto.response
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
-@Schema(description = "Paginated collection of results")
-data class PageStartAfterResponse<T>(
-    @Schema(description = "Total number of all results in all pages")
-    val total: Int,
-    @Schema(description = "Value to be used as startAfter in request for next page. Value is only sent if more data exists for a next page.")
-    val nextStartAfter: String?,
-    @Schema(description = "Collection of results in the page")
-    val content: Collection<T>,
-    @Schema(description = "Number of entries in the page that have been omitted due to being invalid")
-    val invalidEntries: Int
+@Schema(name = "ChangelogResponse", description = "Changelog entry for a business partner")
+data class ChangelogResponse(
+    @Schema(description = "External ID of the changelog entry")
+    val externalId: String,
+    @Schema(description = "The type of the change")
+    val businessPartnerType: LsaType,
+    @Schema(description = "The timestamp of the operation")
+    val createdAt: Instant
 )

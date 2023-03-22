@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.model
 
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
 
 data class SharingStatusEvaluationResult(
     val validExternalIds: Collection<String>,
