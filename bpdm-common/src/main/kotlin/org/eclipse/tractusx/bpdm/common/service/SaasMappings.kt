@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.common.service
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
@@ -30,6 +31,8 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object SaasMappings {
+
+    private val logger = KotlinLogging.logger { }
 
     const val BPN_TECHNICAL_KEY = "CX_BPN"
 
@@ -80,8 +83,8 @@ object SaasMappings {
     }
 
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
-        val legalName = toNameDto(names)
-            ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", id ?: "Unknown")
+        val legalName = toNameDto()
+            ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             legalName = legalName,
@@ -93,8 +96,8 @@ object SaasMappings {
     }
 
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
-        val name = toNameDto(names)
-            ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", id ?: "Unknown")
+        val name = toNameDto()
+            ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", externalId ?: "Unknown")
         return SiteDto(
             name = name.value,
             status = toSiteStatusDtos(status),
@@ -102,11 +105,13 @@ object SaasMappings {
         )
     }
 
-    private fun toNameDto(names: Collection<NameSaas>): NameDto? =
-        names
-//            .filter { it.type?.technicalKey == REGISTERED.name }      // type doesn't matter - just take first one
-            .map { toDto(it) }
+    private fun BusinessPartnerSaas.toNameDto(): NameDto? {
+        if (names.size > 1) {
+            logger.warn { "Business Partner with ID $externalId has more than one name" }
+        }
+        return names.map { toDto(it) }
             .firstOrNull()
+    }
 
     fun toDto(identifier: IdentifierSaas): IdentifierDto {
         return IdentifierDto(

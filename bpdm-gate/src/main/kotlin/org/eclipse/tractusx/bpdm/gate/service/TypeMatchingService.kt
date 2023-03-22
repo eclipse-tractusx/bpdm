@@ -73,7 +73,7 @@ class TypeMatchingService(
             .filterNot { it == OptionalLsaType.LegalEntity || it == OptionalLsaType.Site }
             .forEach { invalidGroup ->
                 typeGroups[invalidGroup]!!.forEach {
-                    logger.warn { "Business Partner with ID ${it.id} is parent with invalid type $invalidGroup" }
+                    logger.warn { "Business Partner with ID ${it.externalId} is parent with invalid type $invalidGroup" }
                 }
             }
 
