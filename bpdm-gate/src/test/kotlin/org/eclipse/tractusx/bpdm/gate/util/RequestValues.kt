@@ -60,28 +60,28 @@ object RequestValues {
     val leBusinessStatus1 = LegalEntityStatusDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
-        validUntil = CommonValues.businessStatusValidUntil1,
+        validTo = CommonValues.businessStatusValidUntil1,
         type = CommonValues.businessStatusType1
     )
 
     val leBusinessStatus2 = LegalEntityStatusDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
-        validUntil = CommonValues.businessStatusValidUntil2,
+        validTo = CommonValues.businessStatusValidUntil2,
         type = CommonValues.businessStatusType2
     )
 
     val siteBusinessStatus1 = SiteStatusDto(
         description = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
-        validUntil = CommonValues.businessStatusValidUntil1,
+        validTo = CommonValues.businessStatusValidUntil1,
         type = CommonValues.businessStatusType1
     )
 
     val siteBusinessStatus2 = SiteStatusDto(
         description = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
-        validUntil = CommonValues.businessStatusValidUntil2,
+        validTo = CommonValues.businessStatusValidUntil2,
         type = CommonValues.businessStatusType2
     )
 

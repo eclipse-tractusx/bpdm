@@ -89,11 +89,11 @@ fun LegalForm.toDto(): LegalFormResponse {
 }
 
 fun BusinessStatus.toLegalEntityStatusDto(): LegalEntityStatusResponse {
-    return LegalEntityStatusResponse(description, validFrom, validUntil, type.toDto())
+    return LegalEntityStatusResponse(description, validFrom, validTo, type.toDto())
 }
 
 fun BusinessStatus.toSiteStatusDto(): SiteStatusResponse {
-    return SiteStatusResponse(description, validFrom, validUntil, type.toDto())
+    return SiteStatusResponse(description, validFrom, validTo, type.toDto())
 }
 
 fun AddressPartner.toDto(): AddressPartnerResponse {

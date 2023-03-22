@@ -96,7 +96,7 @@ class SaasRequestMappingService(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
             validFrom = validFrom,
-            validUntil = validUntil
+            validUntil = validTo
         )
     }
 
@@ -105,7 +105,7 @@ class SaasRequestMappingService(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = description,
             validFrom = validFrom,
-            validUntil = validUntil
+            validUntil = validTo
         )
     }
 
