@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-// TODO make it a NamedType?
-enum class ClassificationType {
-    NACE,
-    NAF,
-    NAICS,
-    SIC
+enum class ClassificationType(private val typeName: String) : NamedType {
+    NACE("NACE"),
+    NAF("NAF"),
+    NAICS("NAICS"),
+    SIC("SIC");
+
+    override fun getTypeName(): String = typeName
 }

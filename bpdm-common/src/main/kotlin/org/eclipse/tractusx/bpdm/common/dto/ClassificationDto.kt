@@ -31,5 +31,5 @@ data class ClassificationDto(
     val code: String?,
 
     @Schema(description = "Type of specified classification")
-    val type: ClassificationType?
+    val type: ClassificationType
 )
