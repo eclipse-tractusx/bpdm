@@ -223,8 +223,8 @@ fun Relation.toDto(): RelationResponse {
         type = type.toDto(),
         startBpn = startNode.bpn,
         endBpn = endNode.bpn,
-        validFrom = startedAt,
-        validTo = endedAt
+        validFrom = validFrom,
+        validTo = validTo
     )
 }
 
