@@ -20,20 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
 @Entity
 @Table(
-    name = "business_stati",
+    name = "site_states",
     indexes = [
-        Index(columnList = "legal_entity_id")
+        Index(columnList = "site_id")
     ]
 )
-class BusinessState (
-    // TODO rename description
-    @Column(name = "denotation")
+class SiteState (
+    @Column(name = "description")
     val description: String?,
 
     @Column(name = "valid_from")
@@ -43,10 +41,11 @@ class BusinessState (
     val validTo: LocalDateTime?,
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     val type: BusinessStateType,
 
     @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity
+    @JoinColumn(name = "site_id", nullable = false)
+    var site: Site
 
 ) : BaseEntity()

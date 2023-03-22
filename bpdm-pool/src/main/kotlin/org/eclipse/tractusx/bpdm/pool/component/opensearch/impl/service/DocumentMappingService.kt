@@ -43,7 +43,7 @@ class DocumentMappingService {
             bpn = partner.bpn,
             legalName = TextDoc(partner.legalName.value),
             legalForm = partner.legalForm?.name?.let { TextDoc(it) },
-            status = partnerStatus?.description?.let { TextDoc(it) },
+            status = partnerStatus?.officialDenotation?.let { TextDoc(it) },
             addresses = listOf(toDocument(partner.legalAddress)),
             classifications = partner.classifications.mapNotNull { classif -> classif.value?.let { TextDoc(it) } },
             sites = partner.sites.map { TextDoc(it.name) }

@@ -88,11 +88,11 @@ fun LegalForm.toDto(): LegalFormResponse {
     return LegalFormResponse(technicalKey, name, abbreviation)
 }
 
-fun BusinessState.toLegalEntityStatusDto(): LegalEntityStateResponse {
-    return LegalEntityStateResponse(description, validFrom, validTo, type.toDto())
+fun LegalEntityState.toLegalEntityStatusDto(): LegalEntityStateResponse {
+    return LegalEntityStateResponse(officialDenotation, validFrom, validTo, type.toDto())
 }
 
-fun BusinessState.toSiteStatusDto(): SiteStateResponse {
+fun SiteState.toSiteStatusDto(): SiteStateResponse {
     return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
@@ -174,7 +174,7 @@ fun Site.toDto(): SiteResponse {
     return SiteResponse(
         bpn,
         name,
-        states = listOf(),
+        states = states.map { it.toSiteStatusDto() },
         bpnLegalEntity = legalEntity.bpn,
         createdAt = createdAt,
         updatedAt = updatedAt

@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
+import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
@@ -80,6 +81,10 @@ object ResponseValues {
     val leStatus1 = LegalEntityStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
     val leStatus2 = LegalEntityStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
     val leStatus3 = LegalEntityStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
+
+    val siteStatus1 = SiteStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1.toDto())
+    val siteStatus2 = SiteStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2.toDto())
+    val siteStatus3 = SiteStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3.toDto())
 
     val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
 
@@ -218,7 +223,7 @@ object ResponseValues {
     val site1 = SiteResponse(
         bpn = CommonValues.bpnS1,
         name = CommonValues.siteName1,
-        states = listOf(),
+        states = listOf(siteStatus1),
         bpnLegalEntity = CommonValues.bpnL1,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
@@ -227,7 +232,7 @@ object ResponseValues {
     val site2 = SiteResponse(
         bpn = CommonValues.bpnS2,
         name = CommonValues.siteName2,
-        states = listOf(),
+        states = listOf(siteStatus2),
         bpnLegalEntity = CommonValues.bpnL2,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
@@ -236,7 +241,7 @@ object ResponseValues {
     val site3 = SiteResponse(
         bpn = CommonValues.bpnS3,
         name = CommonValues.siteName3,
-        states = listOf(),
+        states = listOf(siteStatus3),
         bpnLegalEntity = CommonValues.bpnL3,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
