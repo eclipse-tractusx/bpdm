@@ -19,15 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import java.time.Instant
 
 object ResponseValues {
     val language1 = TypeKeyNameDto(
@@ -146,48 +143,6 @@ object ResponseValues {
     val classification4 = ClassificationResponse(
         value = CommonValues.classificationValue4,
         code = CommonValues.classificationCode4
-    )
-
-    val businessPartnerTypeLegalEntity = TypeKeyNameUrlDto(
-        technicalKey = BusinessPartnerType.LEGAL_ENTITY,
-        name = BusinessPartnerType.LEGAL_ENTITY.getTypeName(),
-        url = BusinessPartnerType.LEGAL_ENTITY.getUrl()
-    )
-
-    val bankAccount1 = BankAccountResponse(
-        trustScores = emptyList(),
-        currency = TypeKeyNameDto(technicalKey = CurrencyCode.UNDEFINED, name = CurrencyCode.UNDEFINED.name),
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier1,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier1,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount2 = BankAccountResponse(
-        trustScores = emptyList(),
-        currency = TypeKeyNameDto(technicalKey = CurrencyCode.UNDEFINED, name = CurrencyCode.UNDEFINED.name),
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier2,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier2,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount3 = BankAccountResponse(
-        trustScores = emptyList(),
-        currency = TypeKeyNameDto(technicalKey = CurrencyCode.UNDEFINED, name = CurrencyCode.UNDEFINED.name),
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier3,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier3,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount4 = BankAccountResponse(
-        trustScores = emptyList(),
-        currency = TypeKeyNameDto(technicalKey = CurrencyCode.UNDEFINED, name = CurrencyCode.UNDEFINED.name),
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier4,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier4,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
     )
 
     val characterSet1 = TypeKeyNameDto(

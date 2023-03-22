@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.service
 
 import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
@@ -160,17 +159,6 @@ object SaasMappings {
 
     fun toDto(classification: ClassificationSaas): ClassificationDto {
         return ClassificationDto(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
-    }
-
-    fun toDto(account: BankAccountSaas): BankAccountDto {
-        return BankAccountDto(
-            emptyList(),
-            CurrencyCode.UNDEFINED,
-            account.internationalBankAccountIdentifier,
-            account.internationalBankIdentifier,
-            account.nationalBankAccountIdentifier,
-            account.nationalBankIdentifier
-        )
     }
 
     fun toDto(address: AddressSaas): AddressDto {

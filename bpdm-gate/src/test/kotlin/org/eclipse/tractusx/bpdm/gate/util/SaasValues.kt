@@ -291,34 +291,6 @@ object SaasValues {
         classifications = listOf(classification3, classification4)
     )
 
-    val bankAccount1 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier1,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier1,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount2 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier2,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier2,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount3 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier3,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier3,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
-    val bankAccount4 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier4,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier4,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
-
     val version1 = AddressVersionSaas(language1, characterSet1)
     val version2 = AddressVersionSaas(language2, characterSet2)
 
@@ -407,7 +379,6 @@ object SaasValues {
         status = businessStatus1,
         profile = profile1,
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount1, bankAccount2),
         addresses = listOf(address1),
         dataSource = testDatasource,
         lastModifiedAt = modificationTime1,
@@ -426,7 +397,6 @@ object SaasValues {
         status = businessStatus2,
         profile = profile2,
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(address2),
         dataSource = testDatasource,
         lastModifiedAt = modificationTime2,

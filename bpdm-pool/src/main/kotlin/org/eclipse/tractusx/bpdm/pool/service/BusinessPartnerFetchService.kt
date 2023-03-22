@@ -26,7 +26,10 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Identifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -39,7 +42,6 @@ class BusinessPartnerFetchService(
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val identifierRepository: IdentifierRepository,
     private val legalFormRepository: LegalFormRepository,
-    private val bankAccountRepository: BankAccountRepository,
     private val addressService: AddressService
 ) {
 
@@ -106,10 +108,7 @@ class BusinessPartnerFetchService(
         legalEntityRepository.joinIdentifiers(partners)
         legalEntityRepository.joinStatuses(partners)
         legalEntityRepository.joinClassifications(partners)
-        legalEntityRepository.joinBankAccounts(partners)
         legalEntityRepository.joinRelations(partners)
-        legalEntityRepository.joinTypes(partners)
-        legalEntityRepository.joinRoles(partners)
         legalEntityRepository.joinLegalForm(partners)
 
         // don't fetch sites/addresses since those are not needed when mapping to BusinessPartnerResponse
@@ -119,9 +118,6 @@ class BusinessPartnerFetchService(
 
         val legalForms = partners.mapNotNull { it.legalForm }.toSet()
         legalFormRepository.joinCategories(legalForms)
-
-        val bankAccounts = partners.flatMap { it.bankAccounts }.toSet()
-        bankAccountRepository.joinTrustScores(bankAccounts)
 
         return partners
     }

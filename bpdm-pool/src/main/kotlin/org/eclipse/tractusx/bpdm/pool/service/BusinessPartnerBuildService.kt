@@ -267,8 +267,6 @@ class BusinessPartnerBuildService(
             bpn = bpnL,
             legalName = legalName,
             legalForm = legalForm,
-            types = mutableSetOf(),
-            roles = mutableSetOf(),
             currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
             legalAddress = legalAddress
         )
@@ -307,7 +305,6 @@ class BusinessPartnerBuildService(
         partner.identifiers.clear()
         partner.stati.clear()
         partner.classification.clear()
-        partner.bankAccounts.clear()
 
         partner.stati.addAll(request.status.map { toEntity(it, partner) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
@@ -402,18 +399,6 @@ class BusinessPartnerBuildService(
             validUntil = dto.validUntil,
             type = dto.type,
             legalEntity = partner
-        )
-    }
-
-    private fun toEntity(dto: BankAccountDto, partner: LegalEntity): BankAccount {
-        return BankAccount(
-            dto.trustScores.toMutableSet(),
-            dto.currency,
-            dto.internationalBankAccountIdentifier,
-            dto.internationalBankIdentifier,
-            dto.nationalBankAccountIdentifier,
-            dto.nationalBankIdentifier,
-            partner
         )
     }
 

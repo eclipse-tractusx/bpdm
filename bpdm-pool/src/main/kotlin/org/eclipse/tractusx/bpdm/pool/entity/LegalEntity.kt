@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import java.time.Instant
 
 @Entity
@@ -39,21 +38,6 @@ class LegalEntity(
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
-
-    @ElementCollection(targetClass = BusinessPartnerType::class)
-    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var types: MutableSet<BusinessPartnerType>,
-
-    @ManyToMany(cascade = [CascadeType.ALL])
-    @JoinTable(
-        name = "legal_entity_roles",
-        joinColumns = [JoinColumn(name = "legal_entity_id")],
-        inverseJoinColumns = [JoinColumn(name = "role_id")],
-        indexes = [Index(columnList = "legal_entity_id")]
-    )
-    val roles: MutableSet<Role>,
 
     @Column(name = "currentness", nullable = false)
     var currentness: Instant,
@@ -78,13 +62,9 @@ class LegalEntity(
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val classification: MutableSet<Classification> = mutableSetOf()
 
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
-
     @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val startNodeRelations: MutableSet<Relation> = mutableSetOf()
 
     @OneToMany(mappedBy = "endNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val endNodeRelations: MutableSet<Relation> = mutableSetOf()
 }
-
