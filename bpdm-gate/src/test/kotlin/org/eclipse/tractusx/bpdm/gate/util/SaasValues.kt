@@ -230,14 +230,14 @@ object SaasValues {
     )
 
     val businessStatus1 = BusinessPartnerStatusSaas(
-        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStatusType1.name),
+        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStateType1.name),
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validUntil = CommonValues.businessStatusValidUntil1
     )
 
     val businessStatus2 = BusinessPartnerStatusSaas(
-        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStatusType2.name),
+        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStateType2.name),
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validUntil = CommonValues.businessStatusValidUntil2

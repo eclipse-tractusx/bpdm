@@ -32,7 +32,7 @@ data class SiteResponse(
     val name: String,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val status: Collection<SiteStatusResponse> = emptyList(),
+    val states: Collection<SiteStateResponse> = emptyList(),
 
     @Schema(description = "Business Partner Number of the related legal entity")
     val bpnLegalEntity: String,

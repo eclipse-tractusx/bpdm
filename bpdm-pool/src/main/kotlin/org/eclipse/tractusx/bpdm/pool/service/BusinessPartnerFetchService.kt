@@ -104,7 +104,7 @@ class BusinessPartnerFetchService(
     fun fetchLegalEntityDependencies(partners: Set<LegalEntity>): Set<LegalEntity> {
 
         legalEntityRepository.joinIdentifiers(partners)
-        legalEntityRepository.joinStatuses(partners)
+        legalEntityRepository.joinStates(partners)
         legalEntityRepository.joinClassifications(partners)
         legalEntityRepository.joinRelations(partners)
         legalEntityRepository.joinLegalForm(partners)

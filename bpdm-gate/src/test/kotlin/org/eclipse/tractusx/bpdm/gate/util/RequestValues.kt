@@ -57,32 +57,32 @@ object RequestValues {
     val name3 = NameDto(value = CommonValues.name3, shortName = CommonValues.shortName3)
     val name4 = NameDto(value = CommonValues.name4, shortName = CommonValues.shortName4)
 
-    val leBusinessStatus1 = LegalEntityStatusDto(
+    val leBusinessStatus1 = LegalEntityStateDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
-        type = CommonValues.businessStatusType1
+        type = CommonValues.businessStateType1
     )
 
-    val leBusinessStatus2 = LegalEntityStatusDto(
+    val leBusinessStatus2 = LegalEntityStateDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
-        type = CommonValues.businessStatusType2
+        type = CommonValues.businessStateType2
     )
 
-    val siteBusinessStatus1 = SiteStatusDto(
+    val siteBusinessStatus1 = SiteStateDto(
         description = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
-        type = CommonValues.businessStatusType1
+        type = CommonValues.businessStateType1
     )
 
-    val siteBusinessStatus2 = SiteStatusDto(
+    val siteBusinessStatus2 = SiteStateDto(
         description = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
-        type = CommonValues.businessStatusType2
+        type = CommonValues.businessStateType2
     )
 
     val classification1 = ClassificationDto(
@@ -168,7 +168,7 @@ object RequestValues {
         identifiers = listOf(identifier1, identifier2),
         legalName = name1,
         legalForm = CommonValues.legalFormTechnicalKey1,
-        status = listOf(leBusinessStatus1),
+        states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
         legalAddress = address1
     )
@@ -177,7 +177,7 @@ object RequestValues {
         identifiers = listOf(identifier3, identifier4),
         legalName = name3,
         legalForm = CommonValues.legalFormTechnicalKey2,
-        status = listOf(leBusinessStatus2),
+        states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),
         legalAddress = address2
     )
@@ -196,13 +196,13 @@ object RequestValues {
 
     val site1 = SiteDto(
         name = CommonValues.nameSite1,
-        status = listOf(siteBusinessStatus1),
+        states = listOf(siteBusinessStatus1),
         mainAddress = address1
     )
 
     val site2 = SiteDto(
         name = CommonValues.nameSite2,
-        status = listOf(siteBusinessStatus2),
+        states = listOf(siteBusinessStatus2),
         mainAddress = address2
     )
 

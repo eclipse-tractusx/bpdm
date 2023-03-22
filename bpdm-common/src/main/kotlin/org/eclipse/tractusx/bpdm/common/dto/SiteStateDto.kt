@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(name = "LegalEntityStatus", description = "Status record of a legal entity")
-data class LegalEntityStatusDto(
-    @Schema(description = "Exact, official denotation of the status")
-    val officialDenotation: String?,
+@Schema(name = "SiteState", description = "Status record of a site")
+data class SiteStateDto(
+    @Schema(description = "Description of the status")
+    val description: String?,
 
     @Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
@@ -35,5 +35,5 @@ data class LegalEntityStatusDto(
     val validTo: LocalDateTime?,
 
     @Schema(description = "The type of this specified status")
-    val type: BusinessStatusType
+    val type: BusinessStateType
 )

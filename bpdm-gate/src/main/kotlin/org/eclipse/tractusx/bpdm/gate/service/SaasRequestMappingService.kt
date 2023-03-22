@@ -45,7 +45,7 @@ class SaasRequestMappingService(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
             names = listOf(NameSaas(value = request.site.name)),
-            status = request.site.status.map { it.toSaasModel() }.firstOrNull(),
+            status = request.site.states.map { it.toSaasModel() }.firstOrNull(),
             addresses = listOf(toSaasModel(request.site.mainAddress)),
             identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
@@ -69,7 +69,7 @@ class SaasRequestMappingService(
             identifiers = toIdentifiersSaas(legalEntity.identifiers, bpn),
             names = listOf(legalEntity.legalName.toSaasModel()),
             legalForm = toLegalFormSaas(legalEntity.legalForm),
-            status = legalEntity.status.map { it.toSaasModel() }.firstOrNull(),
+            status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
             profile = toPartnerProfileSaas(legalEntity.classifications),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
             addresses = listOf(toSaasModel(legalEntity.legalAddress))
@@ -91,7 +91,7 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun LegalEntityStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
+    private fun LegalEntityStateDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
@@ -100,7 +100,7 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun SiteStatusDto.toSaasModel(): BusinessPartnerStatusSaas {
+    private fun SiteStateDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
             type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = description,

@@ -39,7 +39,7 @@ data class LegalEntityResponse(
     val legalForm: LegalFormResponse? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val status: Collection<LegalEntityStatusResponse> = emptyList(),
+    val states: Collection<LegalEntityStateResponse> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "Classifications"))
     val classifications: Collection<ClassificationResponse> = emptyList(),

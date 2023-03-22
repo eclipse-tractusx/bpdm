@@ -87,7 +87,7 @@ object SaasMappings {
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
             legalName = legalName,
             legalForm = toOptionalReference(legalForm),
-            status = toLegalEntityStatusDtos(status),
+            states = toLegalEntityStatusDtos(status),
             classifications = toDto(profile),
             legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
         )
@@ -98,7 +98,7 @@ object SaasMappings {
             ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", externalId ?: "Unknown")
         return SiteDto(
             name = name.value,
-            status = toSiteStatusDtos(status),
+            states = toSiteStatusDtos(status),
             mainAddress = toDto(addresses.first())
         )
     }
@@ -126,10 +126,10 @@ object SaasMappings {
         )
     }
 
-    fun toLegalEntityStatusDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStatusDto> =
+    fun toLegalEntityStatusDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStateDto> =
         status?.type?.let {
             listOf(
-                LegalEntityStatusDto(
+                LegalEntityStateDto(
                     officialDenotation = status.officialDenotation,
                     validFrom = status.validFrom,
                     validTo = status.validUntil,
@@ -139,10 +139,10 @@ object SaasMappings {
         }
             ?: listOf()
 
-    fun toSiteStatusDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStatusDto> =
+    fun toSiteStatusDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStateDto> =
         status?.type?.let {
             listOf(
-                SiteStatusDto(
+                SiteStateDto(
                     description = status.officialDenotation,
                     validFrom = status.validFrom,
                     validTo = status.validUntil,

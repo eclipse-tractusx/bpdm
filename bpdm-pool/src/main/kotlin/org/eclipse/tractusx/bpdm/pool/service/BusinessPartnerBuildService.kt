@@ -303,10 +303,10 @@ class BusinessPartnerBuildService(
         partner.legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
 
         partner.identifiers.clear()
-        partner.stati.clear()
+        partner.states.clear()
         partner.classifications.clear()
 
-        partner.stati.addAll(request.status.map { toEntity(it, partner) })
+        partner.states.addAll(request.states.map { toEntity(it, partner) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
         partner.classifications.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
 
@@ -382,8 +382,8 @@ class BusinessPartnerBuildService(
         return address
     }
 
-    private fun toEntity(dto: LegalEntityStatusDto, partner: LegalEntity): BusinessStatus {
-        return BusinessStatus(
+    private fun toEntity(dto: LegalEntityStateDto, partner: LegalEntity): BusinessState {
+        return BusinessState(
             description = dto.officialDenotation,
             validFrom = dto.validFrom,
             validTo = dto.validTo,
@@ -392,8 +392,8 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: SiteStatusDto, partner: LegalEntity): BusinessStatus {
-        return BusinessStatus(
+    private fun toEntity(dto: SiteStateDto, partner: LegalEntity): BusinessState {
+        return BusinessState(
             description = dto.description,
             validFrom = dto.validFrom,
             validTo = dto.validTo,

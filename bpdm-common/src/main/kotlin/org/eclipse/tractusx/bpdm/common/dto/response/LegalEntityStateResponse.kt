@@ -17,36 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Entity
-@Table(
-    name = "business_stati",
-    indexes = [
-        Index(columnList = "legal_entity_id")
-    ]
-)
-class BusinessStatus (
-    // TODO rename description
-    @Column(name = "denotation")
-    val description: String?,
+@Schema(name = "LegalEntityStateResponse", description = "Status record of a legal entity")
+data class LegalEntityStateResponse(
+    @Schema(description = "Exact, official denotation of the status")
+    val officialDenotation: String?,
 
-    @Column(name = "valid_from")
+    @Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
 
-    @Column(name = "valid_to")
+    @Schema(description = "Until the status was valid, if applicable")
     val validTo: LocalDateTime?,
 
-    @Column(name = "type", nullable = false)
-    val type: BusinessStatusType,
-
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity
-
-) : BaseEntity()
+    @Schema(description = "The type of this status")
+    val type: TypeKeyNameDto<BusinessStateType>
+)
