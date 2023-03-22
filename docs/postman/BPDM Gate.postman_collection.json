@@ -1,0 +1,565 @@
+{
+  "info": {
+    "_postman_id": "90341b2a-db32-4d38-b6b6-864fd85a21c8",
+    "name": "BPDM Gate Copy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "1816771"
+  },
+  "item": [
+    {
+      "name": "Input",
+      "item": [
+        {
+          "name": "Legal Entity",
+          "item": [
+            {
+              "name": "Legal Entities",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/legal-entities?limit=10",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "legal-entities"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Legal Entity",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/legal-entities/external-id",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "legal-entities",
+                    "external-id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Legal Entities",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"identifiers\": [\n      {\n        \"value\": \"string\",\n        \"type\": \"string\",\n        \"issuingBody\": \"string\",\n        \"status\": \"string\"\n      }\n    ],\n    \"names\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"type\": \"ACRONYM\",\n        \"language\": \"undefined\"\n      }\n    ],\n    \"legalForm\": \"string\",\n    \"status\": {\n      \"officialDenotation\": \"string\",\n      \"validFrom\": \"2023-03-21T13:47:05.538Z\",\n      \"validUntil\": \"2023-03-21T13:47:05.538Z\",\n      \"type\": \"ACTIVE\"\n    },\n    \"profileClassifications\": [\n      {\n        \"value\": \"string\",\n        \"code\": \"string\",\n        \"type\": \"NACE\"\n      }\n    ],\n    \"types\": [\n      \"BRAND\"\n    ],\n    \"bankAccounts\": [\n      {\n        \"trustScores\": [\n          0\n        ],\n        \"currency\": \"UNDEFINED\",\n        \"internationalBankAccountIdentifier\": \"string\",\n        \"internationalBankIdentifier\": \"string\",\n        \"nationalBankAccountIdentifier\": \"string\",\n        \"nationalBankIdentifier\": \"string\"\n      }\n    ],\n    \"legalAddress\": {\n      \"version\": {\n        \"characterSet\": \"ARABIC\",\n        \"language\": \"undefined\"\n      },\n      \"careOf\": \"string\",\n      \"contexts\": [\n        \"string\"\n      ],\n      \"country\": \"UNDEFINED\",\n      \"administrativeAreas\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"fipsCode\": \"string\",\n          \"type\": \"COUNTY\"\n        }\n      ],\n      \"postCodes\": [\n        {\n          \"value\": \"string\",\n          \"type\": \"CEDEX\"\n        }\n      ],\n      \"localities\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"type\": \"BLOCK\"\n        }\n      ],\n      \"thoroughfares\": [\n        {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"direction\": \"string\",\n          \"type\": \"INDUSTRIAL_ZONE\"\n        }\n      ],\n      \"premises\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"BUILDING\"\n        }\n      ],\n      \"postalDeliveryPoints\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"INTERURBAN_DELIVERY_POINT\"\n        }\n      ],\n      \"geographicCoordinates\": {\n        \"longitude\": 0,\n        \"latitude\": 0,\n        \"altitude\": 0\n      },\n      \"types\": [\n        \"BRANCH_OFFICE\"\n      ]\n    },\n    \"externalId\": \"string\",\n    \"bpn\": \"string\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/legal-entities",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "legal-entities"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Legal Entity Validation",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identifiers\": [\n    {\n      \"value\": \"string\",\n      \"type\": \"string\",\n      \"issuingBody\": \"string\",\n      \"status\": \"string\"\n    }\n  ],\n  \"names\": [\n    {\n      \"value\": \"string\",\n      \"shortName\": \"string\",\n      \"type\": \"ACRONYM\",\n      \"language\": \"undefined\"\n    }\n  ],\n  \"legalForm\": \"string\",\n  \"status\": {\n    \"officialDenotation\": \"string\",\n    \"validFrom\": \"2023-03-21T13:48:49.321Z\",\n    \"validUntil\": \"2023-03-21T13:48:49.321Z\",\n    \"type\": \"ACTIVE\"\n  },\n  \"profileClassifications\": [\n    {\n      \"value\": \"string\",\n      \"code\": \"string\",\n      \"type\": \"NACE\"\n    }\n  ],\n  \"types\": [\n    \"BRAND\"\n  ],\n  \"bankAccounts\": [\n    {\n      \"trustScores\": [\n        0\n      ],\n      \"currency\": \"UNDEFINED\",\n      \"internationalBankAccountIdentifier\": \"string\",\n      \"internationalBankIdentifier\": \"string\",\n      \"nationalBankAccountIdentifier\": \"string\",\n      \"nationalBankIdentifier\": \"string\"\n    }\n  ],\n  \"legalAddress\": {\n    \"version\": {\n      \"characterSet\": \"ARABIC\",\n      \"language\": \"undefined\"\n    },\n    \"careOf\": \"string\",\n    \"contexts\": [\n      \"string\"\n    ],\n    \"country\": \"UNDEFINED\",\n    \"administrativeAreas\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"fipsCode\": \"string\",\n        \"type\": \"COUNTY\"\n      }\n    ],\n    \"postCodes\": [\n      {\n        \"value\": \"string\",\n        \"type\": \"CEDEX\"\n      }\n    ],\n    \"localities\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"type\": \"BLOCK\"\n      }\n    ],\n    \"thoroughfares\": [\n      {\n        \"value\": \"string\",\n        \"name\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"direction\": \"string\",\n        \"type\": \"INDUSTRIAL_ZONE\"\n      }\n    ],\n    \"premises\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"BUILDING\"\n      }\n    ],\n    \"postalDeliveryPoints\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"INTERURBAN_DELIVERY_POINT\"\n      }\n    ],\n    \"geographicCoordinates\": {\n      \"longitude\": 0,\n      \"latitude\": 0,\n      \"altitude\": 0\n    },\n    \"types\": [\n      \"BRANCH_OFFICE\"\n    ]\n  },\n  \"externalId\": \"string\",\n  \"bpn\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/legal-entities/validation",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "legal-entities",
+                    "validation"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Site",
+          "item": [
+            {
+              "name": "Sites",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/sites?limit=10",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "sites"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Site",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/sites/external-id",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "sites",
+                    "external-id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Sites",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"name\": \"string\",\n    \"mainAddress\": {\n      \"version\": {\n        \"characterSet\": \"ARABIC\",\n        \"language\": \"undefined\"\n      },\n      \"careOf\": \"string\",\n      \"contexts\": [\n        \"string\"\n      ],\n      \"country\": \"UNDEFINED\",\n      \"administrativeAreas\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"fipsCode\": \"string\",\n          \"type\": \"COUNTY\"\n        }\n      ],\n      \"postCodes\": [\n        {\n          \"value\": \"string\",\n          \"type\": \"CEDEX\"\n        }\n      ],\n      \"localities\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"type\": \"BLOCK\"\n        }\n      ],\n      \"thoroughfares\": [\n        {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"direction\": \"string\",\n          \"type\": \"INDUSTRIAL_ZONE\"\n        }\n      ],\n      \"premises\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"BUILDING\"\n        }\n      ],\n      \"postalDeliveryPoints\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"INTERURBAN_DELIVERY_POINT\"\n        }\n      ],\n      \"geographicCoordinates\": {\n        \"longitude\": 0,\n        \"latitude\": 0,\n        \"altitude\": 0\n      },\n      \"types\": [\n        \"BRANCH_OFFICE\"\n      ]\n    },\n    \"externalId\": \"string\",\n    \"legalEntityExternalId\": \"string\",\n    \"bpn\": \"string\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/sites",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "sites"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Site Validation",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"string\",\n  \"mainAddress\": {\n    \"version\": {\n      \"characterSet\": \"ARABIC\",\n      \"language\": \"undefined\"\n    },\n    \"careOf\": \"string\",\n    \"contexts\": [\n      \"string\"\n    ],\n    \"country\": \"UNDEFINED\",\n    \"administrativeAreas\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"fipsCode\": \"string\",\n        \"type\": \"COUNTY\"\n      }\n    ],\n    \"postCodes\": [\n      {\n        \"value\": \"string\",\n        \"type\": \"CEDEX\"\n      }\n    ],\n    \"localities\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"type\": \"BLOCK\"\n      }\n    ],\n    \"thoroughfares\": [\n      {\n        \"value\": \"string\",\n        \"name\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"direction\": \"string\",\n        \"type\": \"INDUSTRIAL_ZONE\"\n      }\n    ],\n    \"premises\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"BUILDING\"\n      }\n    ],\n    \"postalDeliveryPoints\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"INTERURBAN_DELIVERY_POINT\"\n      }\n    ],\n    \"geographicCoordinates\": {\n      \"longitude\": 0,\n      \"latitude\": 0,\n      \"altitude\": 0\n    },\n    \"types\": [\n      \"BRANCH_OFFICE\"\n    ]\n  },\n  \"externalId\": \"string\",\n  \"legalEntityExternalId\": \"string\",\n  \"bpn\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/sites/validation",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "sites",
+                    "validation"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Address",
+          "item": [
+            {
+              "name": "Addresses",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/addresses?limit=10",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "addresses"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Address",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/addresses/external-id",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "addresses",
+                    "external-id"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Addresses",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"version\": {\n      \"characterSet\": \"ARABIC\",\n      \"language\": \"undefined\"\n    },\n    \"careOf\": \"string\",\n    \"contexts\": [\n      \"string\"\n    ],\n    \"country\": \"UNDEFINED\",\n    \"administrativeAreas\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"fipsCode\": \"string\",\n        \"type\": \"COUNTY\"\n      }\n    ],\n    \"postCodes\": [\n      {\n        \"value\": \"string\",\n        \"type\": \"CEDEX\"\n      }\n    ],\n    \"localities\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"type\": \"BLOCK\"\n      }\n    ],\n    \"thoroughfares\": [\n      {\n        \"value\": \"string\",\n        \"name\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"direction\": \"string\",\n        \"type\": \"INDUSTRIAL_ZONE\"\n      }\n    ],\n    \"premises\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"BUILDING\"\n      }\n    ],\n    \"postalDeliveryPoints\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"number\": \"string\",\n        \"type\": \"INTERURBAN_DELIVERY_POINT\"\n      }\n    ],\n    \"geographicCoordinates\": {\n      \"longitude\": 0,\n      \"latitude\": 0,\n      \"altitude\": 0\n    },\n    \"types\": [\n      \"BRANCH_OFFICE\"\n    ],\n    \"externalId\": \"string\",\n    \"legalEntityExternalId\": \"string\",\n    \"siteExternalId\": \"string\",\n    \"bpn\": \"string\"\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/addresses",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "addresses"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Address Validation",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"version\": {\n    \"characterSet\": \"ARABIC\",\n    \"language\": \"undefined\"\n  },\n  \"careOf\": \"string\",\n  \"contexts\": [\n    \"string\"\n  ],\n  \"country\": \"UNDEFINED\",\n  \"administrativeAreas\": [\n    {\n      \"value\": \"string\",\n      \"shortName\": \"string\",\n      \"fipsCode\": \"string\",\n      \"type\": \"COUNTY\"\n    }\n  ],\n  \"postCodes\": [\n    {\n      \"value\": \"string\",\n      \"type\": \"CEDEX\"\n    }\n  ],\n  \"localities\": [\n    {\n      \"value\": \"string\",\n      \"shortName\": \"string\",\n      \"type\": \"BLOCK\"\n    }\n  ],\n  \"thoroughfares\": [\n    {\n      \"value\": \"string\",\n      \"name\": \"string\",\n      \"shortName\": \"string\",\n      \"number\": \"string\",\n      \"direction\": \"string\",\n      \"type\": \"INDUSTRIAL_ZONE\"\n    }\n  ],\n  \"premises\": [\n    {\n      \"value\": \"string\",\n      \"shortName\": \"string\",\n      \"number\": \"string\",\n      \"type\": \"BUILDING\"\n    }\n  ],\n  \"postalDeliveryPoints\": [\n    {\n      \"value\": \"string\",\n      \"shortName\": \"string\",\n      \"number\": \"string\",\n      \"type\": \"INTERURBAN_DELIVERY_POINT\"\n    }\n  ],\n  \"geographicCoordinates\": {\n    \"longitude\": 0,\n    \"latitude\": 0,\n    \"altitude\": 0\n  },\n  \"types\": [\n    \"BRANCH_OFFICE\"\n  ],\n  \"externalId\": \"string\",\n  \"legalEntityExternalId\": \"string\",\n  \"siteExternalId\": \"string\",\n  \"bpn\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/addresses/validation",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "addresses",
+                    "validation"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Output",
+      "item": [
+        {
+          "name": "Legal Entity Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  \"external-id\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Gate-Host}}/api/catena/output/legal-entities/search?limit=10",
+              "host": [
+                "{{Gate-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "output",
+                "legal-entities",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Site Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  \"external-id\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Gate-Host}}/api/catena/output/sites/search?limit=10",
+              "host": [
+                "{{Gate-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "output",
+                "sites",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Address Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  \"external-id\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Gate-Host}}/api/catena/output/addresses/search?limit=10",
+              "host": [
+                "{{Gate-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "output",
+                "addresses",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Determine Type",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"identifiers\": [\n        {\n            \"value\": \"DE216038746\",\n            \"type\": \"EU_VAT_ID_DE\",\n            \"issuingBody\": null,\n            \"status\": null\n        }\n    ],\n    \"names\": [\n        {\n            \"value\": \"eXXcellent solutions gmbh\",\n            \"shortName\": null,\n            \"type\": \"REGISTERED\",\n            \"language\": \"de\"\n        }\n    ],\n    \"legalForm\": null,\n    \"address\": {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"de\"\n        },\n        \"careOf\": null,\n        \"contexts\": [],\n        \"country\": \"DE\",\n        \"administrativeAreas\": [],\n        \"postCodes\": [\n            {\n                \"value\": \"89075\",\n                \"type\": \"REGULAR\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Ulm\",\n                \"shortName\": null,\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Beim Alten Fritz 2\",\n                \"name\": null,\n                \"shortName\": null,\n                \"number\": null,\n                \"direction\": null,\n                \"type\": \"STREET\"\n            }\n        ],\n        \"premises\": [],\n        \"postalDeliveryPoints\": [],\n        \"geographicCoordinates\": null,\n        \"types\": [\n            \"UNSPECIFIC\"\n        ]\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{Gate-Host}}/api/catena/business-partners/type-match",
+          "host": [
+            "{{Gate-Host}}"
+          ],
+          "path": [
+            "api",
+            "catena",
+            "business-partners",
+            "type-match"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "clientSecret",
+        "value": "{{Gate-Client-Secret}}",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{Gate-Client-ID}}",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+        "type": "string"
+      },
+      {
+        "key": "tokenName",
+        "value": "BPDM Gate Token {{Environment}}",
+        "type": "string"
+      },
+      {
+        "key": "challengeAlgorithm",
+        "value": "S256",
+        "type": "string"
+      },
+      {
+        "key": "redirect_uri",
+        "value": "https://catenax-dev003-app-onboarding.azurewebsites.net",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com/iamcentralidp/auth/realms/CX-Central/protocol/openid-connect/auth",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "client_authentication",
+        "value": "body",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
