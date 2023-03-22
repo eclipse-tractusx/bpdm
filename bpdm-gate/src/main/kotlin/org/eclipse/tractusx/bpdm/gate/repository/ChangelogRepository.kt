@@ -21,44 +21,49 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import java.time.Instant
 
 
-interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> {
+interface ChangelogRepository : JpaRepository<ChangelogEntity, Long> , JpaSpecificationExecutor<ChangelogEntity> {
 
-    //Query for ExternalID only
-    fun findAllByExternalIdIn(
-        externalIds: Collection<String>,
-        pageable: Pageable
-    ): Page<ChangelogEntity>
+    object Specs {
 
-    //Query for ExternalID and fromTime Parameter
-    fun findAllByExternalIdInAndCreatedAtGreaterThanEqual(
-        externalIds: Collection<String>,
-        createdAt: Instant?,
-        pageable: Pageable
-    ): Page<ChangelogEntity>
+        /**
+         * Restrict to entries with any one of the given ExternalIds; ignore if null
+         */
+        fun byExternalIdsIn(externalIds: Collection<String>) =
+            Specification<ChangelogEntity> { root, _, _ ->
 
-    //Query for BusinessPartnerType only
-    fun findAllByBusinessPartnerType(
-        businessPartnerType: LsaType?,
-        pageable: Pageable
-    ): Page<ChangelogEntity>
+                externalIds.let {
+                    root.get<String>(ChangelogEntity::externalId.name).`in`(externalIds.map { externalId -> externalId })
+                }
 
-    //Query for fromTime Parameter only
-    fun findAllByCreatedAtGreaterThanEqual(
-        createdAt: Instant?,
-        pageable: Pageable
-    ): Page<ChangelogEntity>
+            }
 
-    //Query for BusinessPartnerType and fromTime Parameter
-    fun findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
-        businessPartnerType: LsaType?,
-        createdAt: Instant?,
-        pageable: Pageable
-    ): Page<ChangelogEntity>
+        /**
+         * Restrict to entries created at or after the given instant; ignore if null
+         */
+        fun byCreatedAtGreaterThan(createdAt: Instant?) =
+            Specification<ChangelogEntity> { root, _, builder ->
+                createdAt?.let {
+                    builder.greaterThanOrEqualTo(root.get(ChangelogEntity::createdAt.name), createdAt)
+                }
+            }
+
+        /**
+         * Restrict to entries for the LsaType; ignore if null
+         */
+        fun byLsaType(lsaType: LsaType?) =
+            Specification<ChangelogEntity> { root, _, builder ->
+                lsaType?.let {
+                    builder.equal(root.get<LsaType>(ChangelogEntity::businessPartnerType.name),lsaType)
+                }
+            }
+    }
+
+
 
 }

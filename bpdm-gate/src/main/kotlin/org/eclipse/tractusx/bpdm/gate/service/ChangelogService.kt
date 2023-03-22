@@ -20,31 +20,29 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.dto.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.eclipse.tractusx.bpdm.gate.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaType
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogByExternalId(externalIds: Collection<String>, fromTime: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
+    fun getChangeLogByExternalId(externalIds: Collection<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogEntity> {
 
-        val pageResponse = changelogRepository.run {
-            val pageable = PageRequest.of(page, pageSize)
-            if (fromTime == null) {
-                changelogRepository.findAllByExternalIdIn(externalIds, pageable)
-            } else {
-                changelogRepository.findAllByExternalIdInAndCreatedAtGreaterThanEqual(
-                    externalIds, fromTime, pageable
-                )
-            }
-        }
+        val spec = Specification.allOf(byExternalIdsIn(externalIds = externalIds),byCreatedAtGreaterThan(createdAt = createdAt))
+        val pageable = PageRequest.of(page, pageSize)
+        val pageResponse = changelogRepository.findAll(spec,pageable)
+
 
         val errorInfoList = externalIds.filterNot { id ->
             pageResponse.content.any { it.externalId == id }
@@ -66,24 +64,11 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         )
     }
 
-    fun getChangeLogByLsaType(lsaType: LsaType?, fromTime: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogEntity> {
+    fun getChangeLogByLsaType(lsaType: LsaType?, createdAt: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogEntity> {
 
-        val pageResponse = changelogRepository.run {
-            val pageable = PageRequest.of(page, pageSize)
-            if (fromTime == null && lsaType == null) {
-                findAll(pageable)
-            } else if (fromTime == null ) {
-                findAllByBusinessPartnerType(businessPartnerType = lsaType, pageable = pageable)
-            } else if ( lsaType == null) {
-                findAllByCreatedAtGreaterThanEqual(createdAt = fromTime, pageable = pageable)
-            } else {
-                findAllByBusinessPartnerTypeAndCreatedAtGreaterThanEqual(
-                    businessPartnerType = lsaType,
-                    createdAt = fromTime,
-                    pageable = pageable
-                )
-            }
-        }
+        val spec = Specification.allOf(byCreatedAtGreaterThan(createdAt = createdAt), byLsaType(lsaType))
+        val pageable = PageRequest.of(page, pageSize)
+        val pageResponse = changelogRepository.findAll(spec,pageable)
 
         return PageResponse(
             page = page, totalElements = pageResponse.totalElements,
