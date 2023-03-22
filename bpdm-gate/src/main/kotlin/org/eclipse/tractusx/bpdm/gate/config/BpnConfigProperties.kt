@@ -25,7 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.bpn")
 data class BpnConfigProperties(
     val agencyName: String = "Catena-X",
-    val agencyKey: String = "CATENAX",
     var name: String = "Business Partner Number",
     val id: String = "CX_BPN"
 )

@@ -217,7 +217,7 @@ class SaasRequestMappingService(
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(bpnConfigProperties.id, bpnConfigProperties.name),
             value = bpn,
-            issuingBody = TypeKeyNameUrlSaas(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName)
+            issuingBody = TypeKeyNameUrlSaas(name = bpnConfigProperties.agencyName)
         )
     }
 
