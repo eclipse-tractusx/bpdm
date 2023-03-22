@@ -99,7 +99,7 @@ class SaasControllerImportIT @Autowired constructor(
     private val importReadyAddress3 = SaasValues.addressPartner3.copy(externalId = addressImportId3)
 
     private val idTypeBpn = TypeKeyNameUrlSaas(saasAdapterConfigProperties.bpnKey, bpnConfigProperties.name, "")
-    private val issuerBpn = TypeKeyNameUrlSaas(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName, "")
+    private val issuerBpn = TypeKeyNameUrlSaas(name = bpnConfigProperties.agencyName)
     private val statusBpn = TypeKeyNameSaas("UNKNOWN", "Unknown")
 
     @BeforeEach
