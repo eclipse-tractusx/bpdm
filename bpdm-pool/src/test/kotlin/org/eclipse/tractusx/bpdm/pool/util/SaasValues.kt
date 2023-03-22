@@ -77,25 +77,19 @@ object SaasValues {
     val identifier3 = IdentifierSaas(identifierType3, CommonValues.identifierValue3, issuingBody3, identifierStatus1)
 
     val legalForm1 = LegalFormSaas(
-        name = CommonValues.legalFormName1,
-        url = "TODO remove",
         technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
         mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1
     )
     val legalForm2 = LegalFormSaas(
-        name = CommonValues.legalFormName2,
-        url = "TODO remove",
         technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
         mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2
     )
     val legalForm3 = LegalFormSaas(
-        name = CommonValues.legalFormName3,
-        url = "TODO remove",
         technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
         mainAbbreviation = CommonValues.legalFormAbbreviation3,
-        language = language3
     )
 
     val statusType1 = TypeKeyNameUrlSaas(CommonValues.statusType1.name)

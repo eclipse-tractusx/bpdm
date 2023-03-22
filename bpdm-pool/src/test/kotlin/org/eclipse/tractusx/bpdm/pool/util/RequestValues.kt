@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -37,43 +36,37 @@ object RequestValues {
     val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
     val identifier1 = IdentifierDto(
-        CommonValues.identifierValue1,
-        CommonValues.identifierTypeTechnicalKey1,
-        CommonValues.issuingBody1,
+        value = CommonValues.identifierValue1,
+        type = CommonValues.identifierTypeTechnicalKey1,
+        issuingBody = CommonValues.issuingBody1,
     )
 
     val identifier2 = IdentifierDto(
-        CommonValues.identifierValue2,
-        CommonValues.identifierTypeTechnicalKey2,
-        CommonValues.issuingBody2,
+        value = CommonValues.identifierValue2,
+        type = CommonValues.identifierTypeTechnicalKey2,
+        issuingBody = CommonValues.issuingBody2,
     )
 
     val identifier3 = IdentifierDto(
-        CommonValues.identifierValue3,
-        CommonValues.identifierTypeTechnicalKey3,
-        CommonValues.issuingBody3,
+        value = CommonValues.identifierValue3,
+        type = CommonValues.identifierTypeTechnicalKey3,
+        issuingBody = CommonValues.issuingBody3,
     )
 
     val legalForm1 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormName1,
-        "TODO remove",
-        CommonValues.legalFormAbbreviation1,
-        LanguageCode.en
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
+        abbreviation = CommonValues.legalFormAbbreviation1,
     )
     val legalForm2 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormName2,
-        "TODO remove",
-        CommonValues.legalFormAbbreviation2,
-        LanguageCode.de
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
+        abbreviation = CommonValues.legalFormAbbreviation2,
     )
     val legalForm3 = LegalFormRequest(
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormName3,
-        "TODO remove",
-        CommonValues.legalFormAbbreviation3,
-        LanguageCode.zh
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
+        abbreviation = CommonValues.legalFormAbbreviation3,
     )
 
     val leStatus1 = LegalEntityStatusDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1)

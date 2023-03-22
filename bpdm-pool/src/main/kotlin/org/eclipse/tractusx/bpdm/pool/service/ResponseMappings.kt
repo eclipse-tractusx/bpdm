@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -87,11 +86,7 @@ fun Name.toDto(): NameResponse {
 }
 
 fun LegalForm.toDto(): LegalFormResponse {
-    return LegalFormResponse(technicalKey, name, mainAbbreviation)
-}
-
-fun LegalFormCategory.toDto(): TypeNameUrlDto {
-    return TypeNameUrlDto(name, url)
+    return LegalFormResponse(technicalKey, name, abbreviation)
 }
 
 fun BusinessStatus.toLegalEntityStatusDto(): LegalEntityStatusResponse {
