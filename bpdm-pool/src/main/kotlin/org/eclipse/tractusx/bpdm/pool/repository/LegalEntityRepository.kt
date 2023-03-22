@@ -46,8 +46,8 @@ interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>,
     @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
     fun joinIdentifiers(partners: Set<LegalEntity>): Set<LegalEntity>
 
-    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.stati WHERE p IN :partners")
-    fun joinStatuses(partners: Set<LegalEntity>): Set<LegalEntity>
+    @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.states WHERE p IN :partners")
+    fun joinStates(partners: Set<LegalEntity>): Set<LegalEntity>
 
     @Query("SELECT DISTINCT p FROM LegalEntity p LEFT JOIN FETCH p.classifications WHERE p IN :partners")
     fun joinClassifications(partners: Set<LegalEntity>): Set<LegalEntity>

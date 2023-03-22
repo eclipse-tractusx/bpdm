@@ -112,9 +112,9 @@ object CommonValues {
     val identifierValue2 = "Another ID Value"
     val identifierValue3 = "An ID Value"
 
-    val statusType1 = BusinessStatusType.ACTIVE
-    val statusType2 = BusinessStatusType.INACTIVE
-    val statusType3 = BusinessStatusType.ACTIVE         // TODO unknown?
+    val statusType1 = BusinessStateType.ACTIVE
+    val statusType2 = BusinessStateType.INACTIVE
+    val statusType3 = BusinessStateType.ACTIVE         // TODO unknown?
 
     val statusDenotation1 = "Active"
     val statusDenotation2 = "Dissolved"

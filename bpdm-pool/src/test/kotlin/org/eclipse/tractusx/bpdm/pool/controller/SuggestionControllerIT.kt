@@ -97,7 +97,7 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntity.legalName.value
                 ),
                 Arguments.of(
-                    expectedLegalEntity.status.first().officialDenotation,
+                    expectedLegalEntity.states.first().officialDenotation,
                     EndpointValues.CATENA_SUGGESTION_LE_STATUS_PATH,
                     expectedLegalEntityName
                 ),

@@ -17,13 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.model
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-enum class BusinessStatusType(private val statusName: String) : NamedType {
-    ACTIVE("Active"),
-    INACTIVE("Inactive");
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-    override fun getTypeName(): String {
-        return statusName
-    }
-}
+@Schema(name = "SiteStateResponse", description = "Status record of a site")
+data class SiteStateResponse(
+    @Schema(description = "Description of the status")
+    val description: String?,
+
+    @Schema(description = "Since when the status is/was valid")
+    val validFrom: LocalDateTime?,
+
+    @Schema(description = "Until the status was valid, if applicable")
+    val validTo: LocalDateTime?,
+
+    @Schema(description = "The type of this status")
+    val type: TypeKeyNameDto<BusinessStateType>
+)

@@ -34,7 +34,7 @@ data class LegalEntityDto(
     val legalForm: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val status: Collection<LegalEntityStatusDto> = emptyList(),
+    val states: Collection<LegalEntityStateDto> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
     val classifications: Collection<ClassificationDto> = emptyList(),

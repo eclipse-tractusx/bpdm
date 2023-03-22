@@ -38,7 +38,7 @@ class DocumentMappingService {
      * Maps [partner] to [LegalEntityDoc] representation
      */
     fun toDocument(partner: LegalEntity): LegalEntityDoc {
-        val partnerStatus = partner.stati.maxWithOrNull(compareBy { it.validFrom })
+        val partnerStatus = partner.states.maxWithOrNull(compareBy { it.validFrom })
         return LegalEntityDoc(
             bpn = partner.bpn,
             legalName = TextDoc(partner.legalName.value),

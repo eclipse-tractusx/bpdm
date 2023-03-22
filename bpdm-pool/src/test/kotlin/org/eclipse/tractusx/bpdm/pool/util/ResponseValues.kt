@@ -77,9 +77,9 @@ object ResponseValues {
     val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
     val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
 
-    val leStatus1 = LegalEntityStatusResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
-    val leStatus2 = LegalEntityStatusResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
-    val leStatus3 = LegalEntityStatusResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
+    val leStatus1 = LegalEntityStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
+    val leStatus2 = LegalEntityStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
+    val leStatus3 = LegalEntityStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
 
     val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
 
@@ -218,7 +218,7 @@ object ResponseValues {
     val site1 = SiteResponse(
         bpn = CommonValues.bpnS1,
         name = CommonValues.siteName1,
-        status = listOf(),
+        states = listOf(),
         bpnLegalEntity = CommonValues.bpnL1,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
@@ -227,7 +227,7 @@ object ResponseValues {
     val site2 = SiteResponse(
         bpn = CommonValues.bpnS2,
         name = CommonValues.siteName2,
-        status = listOf(),
+        states = listOf(),
         bpnLegalEntity = CommonValues.bpnL2,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
@@ -236,7 +236,7 @@ object ResponseValues {
     val site3 = SiteResponse(
         bpn = CommonValues.bpnS3,
         name = CommonValues.siteName3,
-        status = listOf(),
+        states = listOf(),
         bpnLegalEntity = CommonValues.bpnL3,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now
@@ -269,7 +269,7 @@ object ResponseValues {
         legalName = name1,
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
-        status = listOf(leStatus1),
+        states = listOf(leStatus1),
         classifications = listOf(classification1, classification2),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,
@@ -281,7 +281,7 @@ object ResponseValues {
         legalName = name3,
         identifiers = listOf(identifier2),
         legalForm = legalForm2,
-        status = listOf(leStatus2),
+        states = listOf(leStatus2),
         classifications = listOf(classification3, classification4),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,
@@ -293,7 +293,7 @@ object ResponseValues {
         legalName = name5,
         identifiers = listOf(identifier3),
         legalForm = legalForm3,
-        status = listOf(leStatus3),
+        states = listOf(leStatus3),
         classifications = listOf(classification5),
         currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
         createdAt = CommonValues.now,

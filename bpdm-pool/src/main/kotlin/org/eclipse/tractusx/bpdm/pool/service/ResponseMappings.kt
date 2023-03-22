@@ -54,7 +54,7 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         identifiers = identifiers.map { it.toDto() },
         legalName = legalName.toDto(),
         legalForm = legalForm?.toDto(),
-        status = stati.map { it.toLegalEntityStatusDto() },
+        states = states.map { it.toLegalEntityStatusDto() },
         classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
@@ -88,12 +88,12 @@ fun LegalForm.toDto(): LegalFormResponse {
     return LegalFormResponse(technicalKey, name, abbreviation)
 }
 
-fun BusinessStatus.toLegalEntityStatusDto(): LegalEntityStatusResponse {
-    return LegalEntityStatusResponse(description, validFrom, validTo, type.toDto())
+fun BusinessState.toLegalEntityStatusDto(): LegalEntityStateResponse {
+    return LegalEntityStateResponse(description, validFrom, validTo, type.toDto())
 }
 
-fun BusinessStatus.toSiteStatusDto(): SiteStatusResponse {
-    return SiteStatusResponse(description, validFrom, validTo, type.toDto())
+fun BusinessState.toSiteStatusDto(): SiteStateResponse {
+    return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
 fun AddressPartner.toDto(): AddressPartnerResponse {
@@ -174,7 +174,7 @@ fun Site.toDto(): SiteResponse {
     return SiteResponse(
         bpn,
         name,
-        status = listOf(),
+        states = listOf(),
         bpnLegalEntity = legalEntity.bpn,
         createdAt = createdAt,
         updatedAt = updatedAt
