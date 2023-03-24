@@ -19,8 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotfound
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
@@ -51,7 +52,8 @@ class MetadataMappingService(
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
     fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
-        return mapIdentifierTypes(partners.flatMap { it.identifiers.map { id -> id.type } }.toSet())
+        val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
+        return mapIdentifierTypes(IdentifierLsaType.LEGAL_ENTITY, technicalKeys)
     }
 
     /**
@@ -62,8 +64,8 @@ class MetadataMappingService(
     }
 
 
-    private fun mapIdentifierTypes(keys: Set<String>): Map<String, IdentifierType>{
-        val typeMap = identifierTypeRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
+    private fun mapIdentifierTypes(lsaType: IdentifierLsaType, keys: Set<String>): Map<String, IdentifierType>{
+        val typeMap = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(lsaType, keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }
@@ -76,7 +78,7 @@ class MetadataMappingService(
 
     private inline fun <reified T> assertKeysFound(keys: Set<String>, typeMap: Map<String, T>){
         val keysNotfound = keys.minus(typeMap.keys)
-        if(keysNotfound.isNotEmpty()) throw BpdmMultipleNotfound(T::class.simpleName!!, keysNotfound )
+        if(keysNotfound.isNotEmpty()) throw BpdmMultipleNotFoundException(T::class.simpleName!!, keysNotfound )
     }
 
 }

@@ -21,6 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDetailDto
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -76,11 +78,16 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
 }
 
 fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody)
+    return IdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
-fun IdentifierType.toDto(): TypeKeyNameDto<String> {
+fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
+}
+
+fun IdentifierType.toDto(): IdentifierTypeDto {
+    return IdentifierTypeDto(technicalKey, lsaType, name,
+        details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 
 fun Name.toDto(): NameResponse {

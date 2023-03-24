@@ -17,17 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.exception
+package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import kotlin.reflect.KClass
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.springframework.data.jpa.repository.JpaRepository
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-class BpdmNotFoundException(
-    objectType: String,
-    identifier: String
-) : BpdmMultipleNotFoundException(objectType, listOf(identifier)) {
-    constructor(objectType: KClass<*>, identifier: String)
-            : this(objectType.simpleName ?: objectType.toString(), identifier)
+interface IdentifierTypeDetailRepository : JpaRepository<IdentifierTypeDetail, Long> {
 }

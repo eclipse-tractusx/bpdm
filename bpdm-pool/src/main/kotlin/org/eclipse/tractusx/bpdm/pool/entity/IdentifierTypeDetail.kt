@@ -17,12 +17,34 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.pool.entity
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.pool.entity.CountryIdentifierType
-import org.springframework.data.jpa.repository.JpaRepository
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
-interface CountryIdentifierTypeRepository : JpaRepository<CountryIdentifierType, Long> {
-    fun findByCountryCodeInOrCountryCodeIsNull(countryCodes: Set<CountryCode>): Set<CountryIdentifierType>
-}
+/**
+ * Represents identifier type validity details specific to a country
+ */
+@Entity
+@Table(
+    name = "identifier_type_details",
+    uniqueConstraints = [UniqueConstraint(
+        name = "uc_identifier_type_details_country_code_identifier_type_id",
+        columnNames = ["country_code", "identifier_type_id"]
+    )]
+)
+class IdentifierTypeDetail(
+    @ManyToOne
+    @JoinColumn(name = "identifier_type_id", nullable = false)
+    var identifierType: IdentifierType,
+
+    // null for universal identifiers
+    @Column(name = "country_code", nullable = true)
+    @Enumerated(EnumType.STRING)
+    var countryCode: CountryCode?,
+
+    @Column(name = "mandatory", nullable = false)
+    var mandatory: Boolean
+
+) : BaseEntity()

@@ -57,5 +57,5 @@ interface PoolBpnApi  {
     )
     @PostMapping("/search")
     @PostExchange("/search")
-    fun findBpnsByIdentifiers(@RequestBody identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>>
+    fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>>
 }

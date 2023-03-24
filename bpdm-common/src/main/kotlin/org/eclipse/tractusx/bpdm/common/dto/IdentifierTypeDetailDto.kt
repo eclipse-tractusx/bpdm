@@ -17,30 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.CountryCode
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import io.swagger.v3.oas.annotations.media.Schema
 
-/**
- * Represents valid identifier types for a country
- */
-@Entity
-@Table(
-    name = "country_identifier_types",
-    uniqueConstraints = [UniqueConstraint(
-        name = "uc_country_identifier_types_country_code_identifier_type_id",
-        columnNames = ["country_code", "identifier_type_id"]
-    )]
+@Schema(name = "IdentifierTypeDetailDto", description = "Identifier type validity details")
+data class IdentifierTypeDetailDto(
+    @Schema(description = "Country in which this identifier is valid, null for universal identifiers")
+    val country: CountryCode?,
+
+    @Schema(description = "True if identifier is mandatory in this country")
+    val mandatory: Boolean
 )
-class CountryIdentifierType(
-    @Column(name = "country_code", nullable = true) // null for "common" identifiers
-    @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode?,
-    @ManyToOne
-    @JoinColumn(name = "identifier_type_id", nullable = false)
-    var identifierType: IdentifierType,
-    @Column(name = "mandatory", nullable = false)
-    var mandatory: Boolean
-) : BaseEntity()

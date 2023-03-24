@@ -193,7 +193,6 @@ class LegalEntityControllerIT @Autowired constructor(
 
         // 1 update okay
         assertThat(response.entities.size).isEqualTo(1)
-        // TODO fix issuingBody mismatch
         assertThatModifiedLegalEntitiesEqual(response.entities, listOf(expected))
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)

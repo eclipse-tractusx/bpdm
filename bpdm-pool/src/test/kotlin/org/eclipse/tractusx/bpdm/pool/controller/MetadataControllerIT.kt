@@ -22,16 +22,16 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
-import org.eclipse.tractusx.bpdm.pool.entity.CountryIdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.repository.CountryIdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,12 +60,12 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
 class MetadataControllerIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val webTestClient: WebTestClient,
-    private val countryIdentifierTypeRepository: CountryIdentifierTypeRepository,
     private val identifierTypeRepository: IdentifierTypeRepository
 ) {
     companion object {
 
-        private val identifierTypes = listOf(RequestValues.identifierType1, RequestValues.identifierType2, RequestValues.identifierType3)
+        private val identifierTypeDtos = listOf(RequestValues.identifierTypeDto1, RequestValues.identifierTypeDto2, RequestValues.identifierTypeDto3)
+
         private val legalFormRequests = listOf(
             RequestValues.legalForm1,
             RequestValues.legalForm2,
@@ -77,20 +77,31 @@ class MetadataControllerIT @Autowired constructor(
             ResponseValues.legalForm3
         )
 
-        private fun postIdentifierType(client: WebTestClient, type: TypeKeyNameDto<String>) =
+        private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
             postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int) =
-            getMetadata<PageResponse<TypeKeyNameDto<String>>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
+        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageResponse<IdentifierTypeDto> =
+//            getMetadata<PageResponse<IdentifierTypeDto>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
+            client.invokeGetEndpoint(
+                EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
+                Pair("lsaType", IdentifierLsaType.LEGAL_ENTITY.name),
+                Pair(PaginationRequest::page.name, page.toString()),
+                Pair(PaginationRequest::size.name, size.toString())
+            )
 
-        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: TypeKeyNameDto<String>) =
+        private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: IdentifierTypeDto) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
         private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
             postMetadata<LegalFormRequest, LegalFormResponse>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
 
-        private fun getLegalForms(client: WebTestClient, page: Int, size: Int) =
-            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
+        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageResponse<LegalFormResponse> =
+//            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
+            client.invokeGetEndpoint(
+                EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH,
+                Pair(PaginationRequest::page.name, page.toString()),
+                Pair(PaginationRequest::size.name, size.toString())
+            )
 
         private fun postLegalFormWithoutExpectation(client: WebTestClient, type: LegalFormRequest) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
@@ -104,14 +115,6 @@ class MetadataControllerIT @Autowired constructor(
             return client.invokePostEndpoint(endpointPath, metadata)
         }
 
-        private inline fun <reified T : Any> getMetadata(client: WebTestClient, page: Int, size: Int, endpointPath: String): T {
-            return client.invokeGetEndpoint(
-                endpointPath,
-                Pair(PaginationRequest::page.name, page.toString()),
-                Pair(PaginationRequest::size.name, size.toString())
-            )
-        }
-
         private inline fun <reified T : Any> postMetadataWithoutExpectation(client: WebTestClient, type: T, endpointPath: String): WebTestClient.ResponseSpec {
             return client.post().uri(endpointPath)
                 .body(BodyInserters.fromValue(type))
@@ -122,8 +125,8 @@ class MetadataControllerIT @Autowired constructor(
         fun creationTestArguments(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
-                    RequestValues.identifierType1,
-                    RequestValues.identifierType1,
+                    RequestValues.identifierTypeDto1,
+                    RequestValues.identifierTypeDto1,
                     ::postIdentifierType
                 ),
                 Arguments.of(
@@ -137,8 +140,8 @@ class MetadataControllerIT @Autowired constructor(
         fun conflictTestArguments(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
-                    RequestValues.identifierType1,
-                    RequestValues.identifierType1,
+                    RequestValues.identifierTypeDto1,
+                    RequestValues.identifierTypeDto1,
                     ::postIdentifierTypeWithoutExpectation,
                     ::getIdentifierTypes
                 ),
@@ -154,8 +157,8 @@ class MetadataControllerIT @Autowired constructor(
         fun paginationTestArguments(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
-                    identifierTypes,
-                    identifierTypes,
+                    identifierTypeDtos,
+                    identifierTypeDtos,
                     ::postIdentifierType,
                     ::getIdentifierTypes
                 ),
@@ -300,29 +303,42 @@ class MetadataControllerIT @Autowired constructor(
      */
     @Test
     fun getValidIdentifiersForCountry() {
-        val identifierType1 = IdentifierType(name = CommonValues.identifierTypeName1, technicalKey = CommonValues.identifierTypeTechnicalKey1)
-        val identifierType2 = IdentifierType(name = CommonValues.identifierTypeName2, technicalKey = CommonValues.identifierTypeTechnicalKey2)
-        val identifierType3 = IdentifierType(name = CommonValues.identifierTypeName3, technicalKey = CommonValues.identifierTypeTechnicalKey3)
+        val identifierType1 = IdentifierType(
+            technicalKey = CommonValues.identifierTypeTechnicalKey1,
+            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            name = CommonValues.identifierTypeName1,
+        )
+        identifierType1.details.add(IdentifierTypeDetail(identifierType1, null, true))
+
+        val identifierType2 = IdentifierType(
+            technicalKey = CommonValues.identifierTypeTechnicalKey2,
+            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            name = CommonValues.identifierTypeName2
+        )
+        identifierType2.details.add(IdentifierTypeDetail(identifierType2, CountryCode.UK, false))
+
+        val identifierType3 = IdentifierType(
+            technicalKey = CommonValues.identifierTypeTechnicalKey3,
+            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            name = CommonValues.identifierTypeName3
+        )
+        identifierType3.details.add(IdentifierTypeDetail(identifierType3, CountryCode.PL, false))
+
         val givenIdentifierTypes = listOf(identifierType1, identifierType2, identifierType3)
 
-        val countryIdentifierType1 = CountryIdentifierType(null, identifierType1, true)
-        val countryIdentifierType2 = CountryIdentifierType(CountryCode.UK, identifierType2, false)
-        val countryIdentifierType3 = CountryIdentifierType(CountryCode.PL, identifierType3, false)
-        val givenCountryIdentifierTypes = listOf(countryIdentifierType1, countryIdentifierType2, countryIdentifierType3)
+        identifierTypeRepository.saveAll(givenIdentifierTypes)
 
         val expected = listOf(
-            CountryIdentifierTypeResponse(TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1), true),
-            CountryIdentifierTypeResponse(TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3), false)
+            identifierType1.toDto(),
+            identifierType3.toDto()
         )
 
-        identifierTypeRepository.saveAll(givenIdentifierTypes)
-        countryIdentifierTypeRepository.saveAll(givenCountryIdentifierTypes)
-
-        val resultCountryIdentifierTypes = webTestClient.invokeGetEndpointWithArrayResponse<CountryIdentifierTypeResponse>(
-            EndpointValues.CATENA_METADATA_IDENTIFIER_TYPES_FOR_COUNTRY_PATH,
+        val result = webTestClient.invokeGetEndpoint<PageResponse<IdentifierTypeDto>>(
+            EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
+            Pair("lsaType", IdentifierLsaType.LEGAL_ENTITY.name),
             Pair("country", CountryCode.PL.alpha2)
         )
 
-        assertThat(resultCountryIdentifierTypes).containsExactlyInAnyOrderElementsOf(expected)
+        assertThat(result.content).containsExactlyInAnyOrderElementsOf(expected)
     }
 }

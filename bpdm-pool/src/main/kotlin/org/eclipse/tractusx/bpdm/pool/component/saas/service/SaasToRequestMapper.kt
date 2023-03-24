@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
@@ -146,6 +148,10 @@ class SaasToRequestMapper {
             name = legalForm.name!!,
             abbreviation = legalForm.mainAbbreviation
         )
+    }
+
+    fun toIdentifierTypeDto(it: TypeKeyNameUrlSaas, lsaType: IdentifierLsaType): IdentifierTypeDto {
+        return IdentifierTypeDto(it.technicalKey!!, lsaType, it.name ?: it.technicalKey!!, listOf())
     }
 
 }
