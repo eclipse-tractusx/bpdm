@@ -19,11 +19,50 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface IdentifierTypeRepository : PagingAndSortingRepository<IdentifierType, Long>, CrudRepository<IdentifierType, Long> {
-    fun findByTechnicalKey(key: String): IdentifierType?
-    fun findByTechnicalKeyIn(technicalKeys: Set<String>): Set<IdentifierType>
+interface IdentifierTypeRepository :
+    PagingAndSortingRepository<IdentifierType, Long>, CrudRepository<IdentifierType, Long>, JpaSpecificationExecutor<IdentifierType> {
+
+    object Specs {
+        fun byLsaType(lsaType: IdentifierLsaType) =
+            Specification<IdentifierType> { root, _, builder ->
+                builder.equal(root.get<IdentifierLsaType>(IdentifierType::lsaType.name), lsaType)
+            }
+
+        fun byCountry(countryCode: CountryCode?) =
+            countryCode?.let {
+                Specification<IdentifierType> { root, query, builder ->
+                    val subquery = query.subquery(IdentifierTypeDetail::class.java)
+                    val subRoot = subquery.from(subquery.resultType)
+
+                    // Check if an IdentifierTypeDetail exists for the IdentifierType where the countryCode is null or equal to given countryCode
+                    builder.exists(
+                        subquery.where(
+                            builder.equal(
+                                subRoot.get<IdentifierType>(IdentifierTypeDetail::identifierType.name),
+                                root
+                            ),
+                            builder.or(
+                                subRoot.get<CountryCode>(IdentifierTypeDetail::countryCode.name).isNull,
+                                builder.equal(
+                                    subRoot.get<CountryCode>(IdentifierTypeDetail::countryCode.name),
+                                    countryCode
+                                )
+                            )
+                        )
+                    )
+                }
+            }
+    }
+
+    fun findByLsaTypeAndTechnicalKey(lsaType: IdentifierLsaType, key: String): IdentifierType?
+    fun findByLsaTypeAndTechnicalKeyIn(lsaType: IdentifierLsaType, technicalKeys: Set<String>): Set<IdentifierType>
 }

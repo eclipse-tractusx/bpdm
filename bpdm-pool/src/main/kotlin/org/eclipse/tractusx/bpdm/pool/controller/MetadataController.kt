@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest
 import org.springframework.web.bind.annotation.RestController
@@ -36,16 +36,12 @@ class MetadataController(
     val metadataService: MetadataService
 ) : PoolMetadataApi {
 
-    override fun createIdentifierType(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        return metadataService.createIdentifierType(type)
+    override fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto {
+        return metadataService.createIdentifierType(identifierType)
     }
 
-    override fun getIdentifierTypes(paginationRequest: PaginationRequest): PageResponse<TypeKeyNameDto<String>> {
-        return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size))
-    }
-
-    override fun getValidIdentifierTypesForCountry(country: CountryCode): Collection<CountryIdentifierTypeResponse> {
-        return metadataService.getValidIdentifierTypesForCountry(country)
+    override fun getIdentifierTypes(paginationRequest: PaginationRequest, lsaType: IdentifierLsaType, country: CountryCode?): PageResponse<IdentifierTypeDto> {
+        return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), lsaType, country)
     }
 
     override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {

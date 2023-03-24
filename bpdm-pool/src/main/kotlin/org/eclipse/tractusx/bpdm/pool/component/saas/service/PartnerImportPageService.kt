@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
@@ -86,14 +87,26 @@ class PartnerImportPageService(
     }
 
     private fun addNewMetadata(partners: Collection<BusinessPartnerSaas>){
-        partners
-            .flatMap { it.identifiers.mapNotNull { id -> if (id.type?.technicalKey == null) null else id.type } }
-            .associateBy { it.technicalKey }
-            .minus(metadataService.getIdentifierTypes(Pageable.unpaged()).content.map { it.technicalKey }.toSet())
-            .values
-            .map { mappingService.toRequest(it) }
-            .forEach { metadataService.createIdentifierType(it) }
+        val (legalEntitiesSaas, _, addressesSaas) = partitionIntoLSA(partners) { it.extractLsaType() }
 
+        addNewMetadataIdentifierTypes(legalEntitiesSaas, IdentifierLsaType.LEGAL_ENTITY)
+        addNewMetadataIdentifierTypes(addressesSaas, IdentifierLsaType.ADDRESS)
+
+        addNewMetadataLegalForms(legalEntitiesSaas)
+    }
+
+    private fun addNewMetadataIdentifierTypes(partners: Collection<BusinessPartnerSaas>, lsaType: IdentifierLsaType) {
+        partners
+            .flatMap { it.identifiers }
+            .mapNotNull { if (it.type?.technicalKey == null) null else it.type }
+            .associateBy { it.technicalKey }
+            .minus(metadataService.getIdentifierTypes(Pageable.unpaged(), lsaType).content.map { it.technicalKey }.toSet())
+            .values
+            .map { mappingService.toIdentifierTypeDto(it, lsaType) }
+            .forEach { metadataService.createIdentifierType(it) }
+    }
+
+    private fun addNewMetadataLegalForms(partners: Collection<BusinessPartnerSaas>) {
         partners
             .filter { it.legalForm?.technicalKey != null }
             .map { it.legalForm!! to it }

@@ -21,18 +21,19 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.CountryIdentifierTypeResponse
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
-import org.eclipse.tractusx.bpdm.pool.repository.CountryIdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -43,28 +44,34 @@ import org.springframework.transaction.annotation.Transactional
 class MetadataService(
     val identifierTypeRepository: IdentifierTypeRepository,
     val legalFormRepository: LegalFormRepository,
-    val countryIdentifierTypeRepository: CountryIdentifierTypeRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createIdentifierType(type: TypeKeyNameDto<String>): TypeKeyNameDto<String> {
-        if (identifierTypeRepository.findByTechnicalKey(type.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, type.technicalKey)
+    fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
+        if (identifierTypeRepository.findByLsaTypeAndTechnicalKey(type.lsaType, type.technicalKey) != null)
+            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, "${type.technicalKey}/${type.lsaType}")
 
-        logger.info { "Create new Identifier-Type with key ${type.technicalKey} and name ${type.name}" }
-        return identifierTypeRepository.save(IdentifierType(type.name, type.technicalKey)).toDto()
+        logger.info { "Create new Identifier-Type with key ${type.technicalKey}, lsaType ${type.lsaType} and name ${type.name}" }
+        val entity = IdentifierType(
+            technicalKey = type.technicalKey,
+            lsaType = type.lsaType,
+            name = type.name
+        )
+        entity.details.addAll(
+            type.details.map { IdentifierTypeDetail(entity, it.country, it.mandatory) }.toSet()
+        )
+        return identifierTypeRepository.save(entity).toDto()
     }
 
-    fun getIdentifierTypes(pageRequest: Pageable): PageResponse<TypeKeyNameDto<String>> {
-        val page = identifierTypeRepository.findAll(pageRequest)
+    fun getIdentifierTypes(pageRequest: Pageable, lsaType: IdentifierLsaType, country: CountryCode? = null): PageResponse<IdentifierTypeDto> {
+        val spec = Specification.allOf(
+            IdentifierTypeRepository.Specs.byLsaType(lsaType),
+            IdentifierTypeRepository.Specs.byCountry(country)
+        )
+        val page = identifierTypeRepository.findAll(spec, pageRequest)
         return page.toDto(page.content.map { it.toDto() })
-    }
-
-    fun getValidIdentifierTypesForCountry(countryCode: CountryCode): Collection<CountryIdentifierTypeResponse> {
-        val countryIdentifierTypes = countryIdentifierTypeRepository.findByCountryCodeInOrCountryCodeIsNull(setOf(countryCode))
-        return countryIdentifierTypes.map { CountryIdentifierTypeResponse(it.identifierType.toDto(), it.mandatory) }
     }
 
     @Transactional
@@ -85,6 +92,6 @@ class MetadataService(
 
     fun getLegalForms(pageRequest: Pageable): PageResponse<LegalFormResponse> {
         val page = legalFormRepository.findAll(pageRequest)
-        return page.toDto( page.content.map { it.toDto() } )
+        return page.toDto(page.content.map { it.toDto() })
     }
 }

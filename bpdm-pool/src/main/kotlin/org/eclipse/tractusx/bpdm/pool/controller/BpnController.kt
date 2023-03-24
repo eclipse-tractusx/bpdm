@@ -35,11 +35,11 @@ class BpnController(
     val controllerConfigProperties: ControllerConfigProperties
 ) : PoolBpnApi {
 
-    override fun findBpnsByIdentifiers(@RequestBody identifiersSearchRequest: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>> {
-        if (identifiersSearchRequest.idValues.size > controllerConfigProperties.searchRequestLimit) {
+    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingResponse>> {
+        if (request.idValues.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val bpnIdentifierMappings = businessPartnerFetchService.findBpnsByIdentifiers(identifiersSearchRequest.idType, identifiersSearchRequest.idValues)
+        val bpnIdentifierMappings = businessPartnerFetchService.findBpnsByIdentifiers(request.idType, request.lsaType, request.idValues)
         return ResponseEntity(bpnIdentifierMappings, HttpStatus.OK)
     }
 }

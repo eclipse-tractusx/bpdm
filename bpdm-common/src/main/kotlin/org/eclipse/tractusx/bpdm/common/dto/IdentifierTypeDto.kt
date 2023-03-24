@@ -17,15 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
-@Schema(name = "CountryIdentifierTypeResponse", description = "Valid identifiers for a country")
-data class CountryIdentifierTypeResponse(
-    @Schema(description = "Type of the identifier")
-    val identifierType: TypeKeyNameDto<String>,
-    @Schema(description = "True if identifier is mandatory")
-    val mandatory: Boolean
+@Schema(name = "IdentifierTypeDto", description = "Identifier type definition for legal entity or address")
+data class IdentifierTypeDto(
+    @Schema(description = "Unique key (in combination with lsaType) to be used as reference")
+    val technicalKey: String,
+
+    @Schema(description = "Specifies if this identifier type is valid for legal entities (L) or addresses (A)")
+    val lsaType: IdentifierLsaType,
+
+    @Schema(description = "Full name")
+    val name: String,
+
+    @Schema(description = "Validity details")
+    val details: Collection<IdentifierTypeDetailDto> = listOf()
 )

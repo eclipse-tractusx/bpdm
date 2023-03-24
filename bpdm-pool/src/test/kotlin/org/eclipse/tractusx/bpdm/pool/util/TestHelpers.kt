@@ -32,7 +32,10 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
@@ -46,8 +49,6 @@ import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
@@ -201,9 +202,9 @@ class TestHelpers(
         poolClient.metadata().createLegalForm(RequestValues.legalForm2)
         poolClient.metadata().createLegalForm(RequestValues.legalForm3)
 
-        poolClient.metadata().createIdentifierType(RequestValues.identifierType1)
-        poolClient.metadata().createIdentifierType(RequestValues.identifierType2)
-        poolClient.metadata().createIdentifierType(RequestValues.identifierType3)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto1)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto2)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto3)
     }
 
 
