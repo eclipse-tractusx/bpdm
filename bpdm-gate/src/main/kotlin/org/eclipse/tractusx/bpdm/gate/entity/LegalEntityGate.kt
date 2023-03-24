@@ -68,8 +68,8 @@ class LegalEntityGate(
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<AddressPartnerGate> = mutableSetOf()
 
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val sites: MutableSet<SiteGate> = mutableSetOf()
+//    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    val sites: MutableSet<SiteGate> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val classification: MutableSet<ClassificationGate> = mutableSetOf()

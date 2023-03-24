@@ -57,11 +57,11 @@ class AddressGate(
     var geoCoordinates: GeographicCoordinateGate?,
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
-    @Column(name = "legal_entity_external_id", nullable = true, unique = true)
+    @Column(name = "legal_entity_external_id", nullable = true)
     var legalEntityExternalId: String,
-    @Column(name = "site_external_id", nullable = true, unique = true)
+    @Column(name = "site_external_id", nullable = true)
     var siteExternalId: String,
-    @Column(name = "bpn", nullable = true, unique = true)
+    @Column(name = "bpn", nullable = true)
     var bpn: String,
 ) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)

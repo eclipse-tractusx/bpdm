@@ -33,9 +33,9 @@ class SiteGate(
     var externalId: String,
     @Column(name = "legal_entity_external_id", nullable = true, unique = true)
     var legalEntityExternalId: String,
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntityGate,
+//    @ManyToOne
+//    @JoinColumn(name = "legal_entity_id", nullable = false)
+//    var legalEntity: LegalEntityGate,
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     var mainAddress: AddressGate

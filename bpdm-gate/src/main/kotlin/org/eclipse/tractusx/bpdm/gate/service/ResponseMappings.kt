@@ -19,15 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
-import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.gate.entity.AddressGate
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 
 
@@ -35,32 +33,100 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-//fun AddressGate.toAddressGateInputRequest(): AddressGateInputRequest {
-//
-//    return AddressGateInputRequest(
-//        AddressGate.toDto(),
-//        this.externalId,
-//        this.legalEntityExternalId,
-//        this.siteExternalId,
-//        this.bpn
-//    )
-//}
-//fun AddressGateInputRequest.toAddressGate(): AddressGate {
-//
-//
-//    return AddressGate(
-//        this.address,
-//        this.externalId,
-//        this.legalEntityExternalId,
-//        this.siteExternalId,
-//        this.bpn
-//    )
-//}
-//
+fun AddressGate.toAddressGateInputRequest(): AddressGateInputRequest {
+
+    return AddressGateInputRequest(
+        AddressDto(),
+        this.externalId,
+        this.legalEntityExternalId,
+        this.siteExternalId,
+        this.bpn
+    )
+}
+
+fun AddressDto.toAddressGateDto(): AddressGate {
+
+    val geoCoords = this.geographicCoordinates?.let {
+        GeoCoordinateDto(
+            it.longitude,
+            it.latitude,
+            it.altitude
+        ).toGeographicCoordinateGate()
+    }
+
+    return AddressGate(
+        this.careOf,
+        this.contexts.toMutableSet(),
+        this.country,
+        this.types.toMutableSet(),
+        this.version.toAddressVersionGate(),
+        geoCoords,
+        "",
+        "",
+        "",
+        ""
+    )
+}
+
+fun AddressGateInputRequest.toAddressGate(): AddressGate {
+
+    val geoCoords = this.address.geographicCoordinates?.let {
+        GeoCoordinateDto(
+            it.longitude,
+            it.latitude,
+            it.altitude
+        ).toGeographicCoordinateGate()
+    }
+
+    return AddressGate(
+        this.address.careOf,
+        this.address.contexts.toMutableSet(),
+        this.address.country,
+        this.address.types.toMutableSet(),
+        this.address.version.toAddressVersionGate(),
+        geoCoords,
+        this.externalId,
+        this.legalEntityExternalId.toString(),
+        this.siteExternalId.toString(),
+        this.bpn.toString()
+    )
+
+}
+
+fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
+
+    return GeographicCoordinateGate(
+        this.longitude,
+        this.latitude,
+        this.altitude
+    )
+
+}
+
+fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
+
+    return AddressVersionGate(
+        this.characterSet,
+        this.language
+    )
+
+}
+
+fun AddressVersionGate.toAddressDto(): AddressVersionDto {
+
+    return AddressVersionDto(
+        this.characterSet,
+        this.language
+    )
+}
+
+//Legal Entities
+
 //fun LegalEntityGate.LegalEntityGateInputRequest(): LegalEntityGateInputRequest {
 //
 //    return LegalEntityGateInputRequest(
-//        LegalEntityDto.toDto(),
+//        LegalEntityDto(),
+//        this.externalId,
 //        this.bpn,
 //    )
 //
@@ -69,12 +135,36 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 //fun LegalEntityGateInputRequest.toLegalEntityGate(): LegalEntityGate {
 //
 //    return LegalEntityGate(
-//        this.bpn,
+//        this.bpn.toString(),
+//        this.legalEntity.legalForm,
+//        this.legalEntity.types,
 //        this.legalEntity,
 //        this.externalId,
 //    )
-//
 //}
+
+// Site Mappers
+fun SiteGate.toSiteGateInputRequest(): SiteGateInputRequest {
+
+    return SiteGateInputRequest(
+        SiteDto(this.name, AddressDto()),
+        this.bpn,
+        this.legalEntityExternalId,
+        this.externalId
+    )
+}
+
+fun SiteGateInputRequest.toSiteGate(): SiteGate {
+
+    return SiteGate(
+        this.bpn.toString(),
+        this.site.name,
+        this.externalId,
+        this.legalEntityExternalId,
+        this.site.mainAddress.toAddressGateDto(),
+    )
+}
+
 
 fun ChangelogEntry.toGateDto(): ChangelogResponse {
     return ChangelogResponse(
@@ -83,5 +173,3 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
         createdAt
     )
 }
-
-
