@@ -20,21 +20,15 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-@Schema(name = "AddressStatusResponse", description = "Status record of a legal entity")
-data class AddressStatusResponse(
-    @Schema(description = "Exact, official denotation of the status")
-    val officialDenotation: String?,
+@Schema(name = "AlternativePostalAddress", description = "Alternative Postal Address Part")
+data class AlternativePostalAddressResponse(
 
-    @Schema(description = "Since when the status is/was valid")
-    val validFrom: LocalDateTime?,
+    @Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
+    val derliveryServiceNumber: String = "",
 
-    @Schema(description = "Until the status was valid, if applicable")
-    val validTo: LocalDateTime?,
+    @Schema(description = "The type of this specified delivery")
+    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX
 
-    @Schema(description = "The type of this status")
-    val type: TypeKeyNameDto<BusinessStateType>
 )

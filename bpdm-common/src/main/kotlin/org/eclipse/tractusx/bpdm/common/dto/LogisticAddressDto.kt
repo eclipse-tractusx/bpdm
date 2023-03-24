@@ -30,7 +30,7 @@ data class LogisticAddressDto(
     val addressName: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
-    val status: Collection<AddressStatusDto> = emptyList(),
+    val status: Collection<AddressStateDto> = emptyList(),
 
     @Schema(description = "This indicates if the given BPNA is the main address to a site")
     val isSiteMainAddress: Boolean?,

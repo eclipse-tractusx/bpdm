@@ -109,58 +109,42 @@ object RequestValues {
         type = CommonValues.classificationType
     )
 
-    val addressVersion1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language1)
-    val addressVersion2 = AddressVersionDto(CommonValues.characterSet2, CommonValues.language2)
-
-    val adminArea1 = AdministrativeAreaDto(value = CommonValues.adminArea1, type = CommonValues.adminAreaType1)
-    val adminArea2 = AdministrativeAreaDto(value = CommonValues.adminArea2, type = CommonValues.adminAreaType2)
-
-    val postCode1 = PostCodeDto(value = CommonValues.postCode1, type = CommonValues.postCodeType1)
-    val postCode2 = PostCodeDto(value = CommonValues.postCode2, type = CommonValues.postCodeType2)
-
-    val locality1 = LocalityDto(value = CommonValues.locality1, type = CommonValues.localityType1)
-    val locality2 = LocalityDto(value = CommonValues.locality2, type = CommonValues.localityType2)
-
-    val thoroughfare1 = ThoroughfareDto(value = CommonValues.thoroughfare1, type = CommonValues.thoroughfareType1)
-    val thoroughfare2 = ThoroughfareDto(value = CommonValues.thoroughfare2, type = CommonValues.thoroughfareType2)
-
-    val premise1 = PremiseDto(value = CommonValues.premise1, type = CommonValues.premiseType1)
-    val premise2 = PremiseDto(value = CommonValues.premise2, type = CommonValues.premiseType2)
-
-    val postalDeliveryPoint1 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint1, type = CommonValues.postalDeliveryPointType1)
-    val postalDeliveryPoint2 = PostalDeliveryPointDto(value = CommonValues.postalDeliveryPoint2, type = CommonValues.postalDeliveryPointType2)
-
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
+    val postalAddress1 = PostalAddressDto(
+        geographicCoordinates = geoCoordinate1,
+        country = CommonValues.country1,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+        administrativeAreaLevel2 = CommonValues.county1,
+        postCode = CommonValues.postCode1,
+        city = CommonValues.city1,
+        districtLevel1 = CommonValues.districtLevel1_1,
+        districtLevel2 = CommonValues.districtLevel2_1,
+        street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
+    )
+
+    val postalAddress2 = PostalAddressDto(
+        geographicCoordinates = geoCoordinate2,
+        country = CommonValues.country2,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+        administrativeAreaLevel2 = CommonValues.county2,
+        postCode = CommonValues.postCode2,
+        city = CommonValues.city2,
+        street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
+    )
+
     val address1 = LogisticAddressDto(
-        addressVersion1,
-        CommonValues.careOf1,
-        listOf(CommonValues.context1),
-        CommonValues.country1,
-        listOf(adminArea1),
-        listOf(postCode1),
-        listOf(locality1),
-        listOf(thoroughfare1),
-        listOf(premise1),
-        listOf(postalDeliveryPoint1),
-        geoCoordinate1,
-        listOf(AddressType.HEADQUARTER)
+        postalAddress = postalAddress1,
+        isSiteMainAddress = true
     )
 
     val address2 = LogisticAddressDto(
-        addressVersion2,
-        CommonValues.careOf2,
-        listOf(CommonValues.context2),
-        CommonValues.country2,
-        listOf(adminArea2),
-        listOf(postCode2),
-        listOf(locality2),
-        listOf(thoroughfare2),
-        listOf(premise2),
-        listOf(postalDeliveryPoint2),
-        geoCoordinate2,
-        listOf(AddressType.HEADQUARTER)
+        postalAddress = postalAddress2,
+        isSiteMainAddress = true
+
     )
 
 

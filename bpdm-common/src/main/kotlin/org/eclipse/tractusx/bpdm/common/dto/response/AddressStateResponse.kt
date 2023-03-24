@@ -19,25 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LogisticAddressResponse", description = "Logistic address ")
-data class LogisticAddressResponse(
-    @Schema(description = "Business Partner Number of this address")
-    val bpn: String,
+@Schema(name = "AddressStateResponse", description = "Status record of a legal entity")
+data class AddressStateResponse(
+    @Schema(description = "Exact, official denotation of the status")
+    val officialDenotation: String?,
 
-    @field:JsonUnwrapped
-    val postalAddress: PostalAddressResponse,
+    @Schema(description = "Since when the status is/was valid")
+    val validFrom: LocalDateTime?,
 
-    @ArraySchema(arraySchema = Schema(description = "Address status"))
-    val status: Collection<AddressStateResponse> = emptyList(),
+    @Schema(description = "Until the status was valid, if applicable")
+    val validTo: LocalDateTime?,
 
-    @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
-    val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
-
-    )
+    @Schema(description = "The type of this status")
+    val type: TypeKeyNameDto<BusinessStateType>
+)
