@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
 @Schema(name = "AddressState", description = "Status record for a address")
-data class AddressStatusDto(
+data class AddressStateDto(
     @Schema(description = "Description of the status")
     val description: String?,
 
