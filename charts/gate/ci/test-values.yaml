@@ -1,0 +1,5 @@
+image:
+  registry: kind-registry:5000
+  repository: gate
+  tag: test
+  pullPolicy: Always

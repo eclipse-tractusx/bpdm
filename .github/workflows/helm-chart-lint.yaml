@@ -1,18 +1,9 @@
 name: Lint and Test Charts
 
-# Run chart linting and tests on each pull request
 on:
-  push:
-    branches:
-      - main
-      - rc/**
-    paths:
-      - .github/workflows/**
-      - charts/**
   pull_request:
-    paths:
-      - .github/workflows/**
-      - charts/**
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
 
 jobs:
   lint-test:
@@ -23,15 +14,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Kubernetes KinD Cluster
+        uses: container-tools/kind-action@v1
+
       - name: Set up Helm
         uses: azure/setup-helm@v3
         with:
-          version: v3.10.3
+          version: v3.9.3
 
-      # Setup python as a prerequisite for chart linting
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: '3.9'
+          check-latest: true
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.3.1
@@ -41,20 +35,30 @@ jobs:
         run: |
           changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
           if [[ -n "$changed" ]]; then
-            echo "CHART_CHANGED=true" >> $GITHUB_ENV
+             echo "::set-output name=changed::true"
           fi
 
-      # run chart linting
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config charts/config/chart-testing-config.yaml
+        run: ct lint --validate-maintainers=false --target-branch ${{ github.event.repository.default_branch }} --config charts/config/chart-testing-config.yaml
 
-      # Preparing a kind cluster to install and test charts on
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.4.0
-        if: ${{ env.CHART_CHANGED == 'true' }}
+      - name: Build pool image
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: kind-registry:5000/pool:test
+          file: ./bpdm-pool/Dockerfile
 
-      # install the chart to the kind cluster and run helm test
-      # define charts to test with the --charts parameter
+      - name: Build gate image
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: kind-registry:5000/gate:test
+          file: ./bpdm-gate/Dockerfile
+
       - name: Run chart-testing (install)
         run: ct install --charts charts/pool,charts/gate --config charts/config/chart-testing-config.yaml
-        if: ${{ env.CHART_CHANGED == 'true' }}
+        if: steps.list-changed.outputs.changed == 'true'

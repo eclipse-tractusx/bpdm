@@ -24,3 +24,5 @@
 # Accept only values.yaml
 values-*.yaml
 values-*.yml
+# Ignore chart testing configurations
+ci
