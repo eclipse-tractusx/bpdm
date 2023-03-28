@@ -39,5 +39,5 @@ data class LogisticAddressDto(
     val physicalPostalAddress: PhysicalPostalAddressDto,
 
     @Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressDto?
+    val alternativePostalAddress: AlternativePostalAddressDto? = null
 )

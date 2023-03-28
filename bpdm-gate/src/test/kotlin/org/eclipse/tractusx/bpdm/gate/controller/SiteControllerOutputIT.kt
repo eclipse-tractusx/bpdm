@@ -102,8 +102,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
             ResponseValues.siteResponse2
         )
         val mainAddressesPool = listOf(
-            ResponseValues.mainAddressSearchResponse1,
-            ResponseValues.mainAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -215,8 +215,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
             ResponseValues.siteResponse2
         )
         val mainAddressesPool = listOf(
-            ResponseValues.mainAddressSearchResponse1,
-            ResponseValues.mainAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2

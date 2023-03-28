@@ -126,7 +126,7 @@ class TestHelpers(
             partnerStructures
                 .flatMap { it.siteStructures }
                 .flatMap {
-                    it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.bpn) }
+                    it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.site.bpn) }
                 }
 
         val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities

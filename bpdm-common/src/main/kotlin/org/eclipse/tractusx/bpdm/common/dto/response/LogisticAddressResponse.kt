@@ -43,7 +43,7 @@ data class LogisticAddressResponse(
     val physicalPostalAddress: PhysicalPostalAddressResponse,
 
     @Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressResponse?,
+    val alternativePostalAddress: AlternativePostalAddressResponse? = null,
 
     @Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,

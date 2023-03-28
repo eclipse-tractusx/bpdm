@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import java.time.Instant
 
 object ResponseValues {
     val language1 = TypeKeyNameDto(
@@ -163,40 +164,58 @@ object ResponseValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val address1 = BasePostalAddressResponse(
-        geographicCoordinates = geoCoordinate1,
-        country = country1,
-        administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_1,CommonValues.adminAreaLevel1Name_2),
-        administrativeAreaLevel2 = CommonValues.county1,
-        postCode = CommonValues.postCode1,
-        city = CommonValues.city1,
-        districtLevel1 = CommonValues.districtLevel1_1,
-        districtLevel2 = CommonValues.districtLevel2_1,
-        street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
-        physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
+    val address1 = PhysicalPostalAddressResponse(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geoCoordinate1,
+            country = country1,
+            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_1, CommonValues.adminAreaLevel1Name_2),
+            administrativeAreaLevel2 = CommonValues.county1,
+            postCode = CommonValues.postCode1,
+            city = CommonValues.city1,
+            districtLevel1 = CommonValues.districtLevel1_1,
+            districtLevel2 = CommonValues.districtLevel2_1,
+            street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        )
     )
 
-    val address2 = BasePostalAddressResponse(
-        geographicCoordinates = geoCoordinate2,
-        country = country2,
-        administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_2,CommonValues.adminAreaLevel1Name_2),
-        administrativeAreaLevel2 = CommonValues.county2,
-        postCode = CommonValues.postCode2,
-        city = CommonValues.city2,
-        districtLevel1 = CommonValues.districtLevel1_2,
-        districtLevel2 = CommonValues.districtLevel2_2,
-        street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
-        physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
+    val address2 = PhysicalPostalAddressResponse(
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geoCoordinate2,
+            country = country2,
+            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_2, CommonValues.adminAreaLevel1Name_2),
+            administrativeAreaLevel2 = CommonValues.county2,
+            postCode = CommonValues.postCode2,
+            city = CommonValues.city2,
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
+            street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        )
     )
 
     val logisticAddress1 = LogisticAddressResponse(
         bpn = CommonValues.bpnAddress1,
-        postalAddress = address1
+        physicalPostalAddress = address1,
+        bpnLegalEntity = CommonValues.bpn1,
+        bpnSite = null,
+        createdAt = Instant.now(),
+        updatedAt = Instant.now()
     )
 
     val logisticAddress2 = LogisticAddressResponse(
         bpn = CommonValues.bpnAddress2,
-        postalAddress = address2
+        physicalPostalAddress = address2,
+        bpnLegalEntity = CommonValues.bpn2,
+        bpnSite = null,
+        createdAt = Instant.now(),
+        updatedAt = Instant.now()
     )
 
 
@@ -240,13 +259,13 @@ object ResponseValues {
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
         legalEntity = legalEntityResponse1,
-        legalAddress = address1,
+        legalAddress = logisticAddress1,
         externalId = CommonValues.externalId1
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
         legalEntity = legalEntityResponse2,
-        legalAddress = address2,
+        legalAddress = logisticAddress2,
         externalId = CommonValues.externalId2
     )
 
@@ -283,9 +302,6 @@ object ResponseValues {
         processStartedAt = SaasValues.modificationTime2,
     )
 
-    val mainAddressSearchResponse1 = MainAddressSearchResponse(parentBpn = CommonValues.bpnSite1, mainAddress = logisticAddress1)
-    val mainAddressSearchResponse2 = MainAddressSearchResponse(parentBpn = CommonValues.bpnSite2, mainAddress = logisticAddress2)
-
     val siteGateOutput1 = SiteGateOutput(
         site = siteResponse1,
         mainAddress = logisticAddress1,
@@ -313,21 +329,11 @@ object ResponseValues {
     )
 
     val addressGateOutput1 = AddressGateOutput(
-        bpn = CommonValues.bpnAddress1,
-        address = address1,
+        address = logisticAddress1,
         externalId = CommonValues.externalIdAddress1,
-        legalEntityBpn = CommonValues.bpn1
     )
     val addressGateOutput2 = AddressGateOutput(
-        bpn = CommonValues.bpnAddress2,
-        address = address2,
+        address = logisticAddress2,
         externalId = CommonValues.externalIdAddress2,
-        legalEntityBpn = CommonValues.bpn2
     )
-
-    val addressPartnerResponse1 = LogisticAddressResponse(bpn = CommonValues.bpnAddress1, postalAddress = address1)
-    val addressPartnerResponse2 = LogisticAddressResponse(bpn = CommonValues.bpnAddress2, postalAddress = address2)
-
-    val addressPartnerSearchResponse1 = AddressPartnerSearchResponse(address = addressPartnerResponse1, bpnLegalEntity = CommonValues.bpn1)
-    val  addressPartnerSearchResponse2 = AddressPartnerSearchResponse(address = addressPartnerResponse2, bpnLegalEntity = CommonValues.bpn2)
 }
