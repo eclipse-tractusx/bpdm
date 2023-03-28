@@ -163,7 +163,7 @@ object ResponseValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val address1 = PostalAddressResponse(
+    val address1 = BasePostalAddressResponse(
         geographicCoordinates = geoCoordinate1,
         country = country1,
         administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_1,CommonValues.adminAreaLevel1Name_2),
@@ -176,7 +176,7 @@ object ResponseValues {
         physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
     )
 
-    val address2 = PostalAddressResponse(
+    val address2 = BasePostalAddressResponse(
         geographicCoordinates = geoCoordinate2,
         country = country2,
         administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_2,CommonValues.adminAreaLevel1Name_2),

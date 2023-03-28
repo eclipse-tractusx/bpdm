@@ -21,10 +21,9 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
 @Schema(name = "PostalAdress", description = "Address record for a business partner")
-data class PostalAddressDto(
+data class BasePostalAddressDto(
 
     @Schema(description = "Geographic coordinates to find this location")
     val geographicCoordinates: GeoCoordinateDto? = null,
@@ -59,7 +58,4 @@ data class PostalAddressDto(
     @Schema(description = "Address country")
     val street: StreetDto? = null,
 
-    val physicalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
-
-    val alternativeAddress: AlternativePostalAddressDto? = AlternativePostalAddressDto()
 )

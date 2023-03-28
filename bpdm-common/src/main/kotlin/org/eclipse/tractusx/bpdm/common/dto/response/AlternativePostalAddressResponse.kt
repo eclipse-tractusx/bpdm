@@ -19,16 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "AlternativePostalAddress", description = "Alternative Postal Address Part")
 data class AlternativePostalAddressResponse(
 
     @Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
-    val derliveryServiceNumber: String = "",
+    val deliveryServiceNumber: String = "",
 
     @Schema(description = "The type of this specified delivery")
-    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX
+    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX,
 
+    @field:JsonUnwrapped
+    val baseAddress: BasePostalAddressResponse,
 )

@@ -93,7 +93,7 @@ object ResponseValues {
     val classification4 = ClassificationResponse(CommonValues.classification4, null, classificationType)
     val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
-    val address1 = PostalAddressResponse(
+    val address1 = BasePostalAddressResponse(
         geographicCoordinates = null,
         country = country1,
         administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_1,CommonValues.adminAreaLevel1Name_1),
@@ -105,7 +105,7 @@ object ResponseValues {
         street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
         physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
     )
-    val address2 = PostalAddressResponse(
+    val address2 = BasePostalAddressResponse(
         geographicCoordinates = null,
         country = country2,
         administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_2,CommonValues.adminAreaLevel1Name_2),
@@ -118,7 +118,7 @@ object ResponseValues {
         physicalAddress = PhysicalPostalAddressResponse(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
     )
 
-    val address3 = PostalAddressResponse(
+    val address3 = BasePostalAddressResponse(
         geographicCoordinates = null,
         country = country3,
         administrativeAreaLevel1 = NameRegioncodeDto( CommonValues.adminAreaLevel1RegionCode_3,CommonValues.adminAreaLevel1Name_3),

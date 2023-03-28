@@ -19,8 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
 data class PhysicalPostalAddressDto (
 
@@ -35,5 +39,8 @@ data class PhysicalPostalAddressDto (
 
     @Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
     val door: String? = null,
+
+    @field:JsonUnwrapped
+    val baseAddress: BasePostalAddressDto,
 )
 

@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PostalAddressResponse
 
 @Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
 data class SitePartnerCreateResponse(

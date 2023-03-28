@@ -177,7 +177,7 @@ object SaasMappings {
     fun toDto(address: AddressSaas): LogisticAddressDto {
         // TODO Map sass to DTO
         return LogisticAddressDto(
-            postalAddress = PostalAddressDto(city = "", country = CountryCode.AD),
+            postalAddress = BasePostalAddressDto(city = "", country = CountryCode.AD),
             isSiteMainAddress = false
 //            toDto(address.version),
 //            address.careOf?.value,

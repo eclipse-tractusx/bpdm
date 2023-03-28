@@ -23,7 +23,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.PostalAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.BasePostalAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
@@ -34,7 +34,7 @@ data class LegalEntityGateOutput(
     val legalEntity: LegalEntityResponse,
 
     @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: PostalAddressResponse,
+    val legalAddress: BasePostalAddressResponse,
 
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String
