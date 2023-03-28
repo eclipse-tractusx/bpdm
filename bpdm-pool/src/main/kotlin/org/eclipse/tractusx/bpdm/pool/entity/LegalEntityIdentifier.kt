@@ -24,13 +24,13 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
-    name = "identifiers",
+    name = "legal_entity_identifiers",
     indexes = [
         Index(columnList = "legal_entity_id"),
         Index(columnList = "type_id")
     ]
 )
-class Identifier(
+class LegalEntityIdentifier(
     @Column(name = "`value`", nullable = false)
     var value: String,
 

@@ -77,7 +77,7 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
     )
 }
 
-fun Identifier.toDto(): LegalEntityIdentifierResponse {
+fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierResponse {
     return LegalEntityIdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
 }
 

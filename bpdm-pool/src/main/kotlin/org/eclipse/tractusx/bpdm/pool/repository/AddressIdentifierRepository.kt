@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.entity.Identifier
+import org.eclipse.tractusx.bpdm.pool.entity.AddressIdentifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
-interface IdentifierRepository : CrudRepository<Identifier, Long> {
-    fun findByValueIn(identifierValues: Collection<String>): Set<Identifier>
+interface AddressIdentifierRepository : CrudRepository<AddressIdentifier, Long> {
+    fun findByValueIn(identifierValues: Collection<String>): Set<AddressIdentifier>
 
-    @Query("SELECT DISTINCT i FROM Identifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
-    fun joinType(identifiers: Set<Identifier>): Set<Identifier>
+    @Query("SELECT DISTINCT i FROM AddressIdentifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
+    fun joinType(identifiers: Set<AddressIdentifier>): Set<AddressIdentifier>
 
-    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.legalEntity.bpn) FROM Identifier i WHERE i.type = :identifierType AND i.value in :values")
+    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.address.bpn) FROM AddressIdentifier i WHERE i.type = :identifierType AND i.value in :values")
     fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingResponse>
 
 }

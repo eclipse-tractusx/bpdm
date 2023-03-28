@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
@@ -51,7 +51,7 @@ class BusinessPartnerBuildService(
     private val changelogService: PartnerChangelogService,
     private val siteRepository: SiteRepository,
     private val addressPartnerRepository: AddressPartnerRepository,
-    private val identifierRepository: IdentifierRepository
+    private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -433,8 +433,8 @@ class BusinessPartnerBuildService(
         dto: LegalEntityIdentifierDto,
         metadataMap: MetadataMappingDto,
         partner: LegalEntity
-    ): Identifier {
-        return Identifier(
+    ): LegalEntityIdentifier {
+        return LegalEntityIdentifier(
             value = dto.value,
             type = metadataMap.idTypes[dto.type]!!,
             issuingBody = dto.issuingBody,
@@ -454,7 +454,7 @@ class BusinessPartnerBuildService(
         requests: Collection<LegalEntityPartnerCreateRequest>, errors: MutableList<ErrorInfo<LegalEntityCreateError>>): Collection<LegalEntityPartnerCreateRequest> {
 
         val idValues = requests.flatMap { it.properties.identifiers }.map { it.value }
-        val idsInDb = identifierRepository.findByValueIn(idValues).map { Pair(it.value, it.type.technicalKey) }.toHashSet()
+        val idsInDb = legalEntityIdentifierRepository.findByValueIn(idValues).map { Pair(it.value, it.type.technicalKey) }.toHashSet()
 
         val (invalidRequests, validRequests) = requests.partition {
             it.properties.identifiers.map { id -> Pair(id.value, id.type) }.any { id -> idsInDb.contains(id) }

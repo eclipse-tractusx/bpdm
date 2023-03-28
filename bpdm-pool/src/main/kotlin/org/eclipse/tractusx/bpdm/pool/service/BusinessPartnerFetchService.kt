@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.entity.Identifier
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.repository.IdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional
 class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val identifierRepository: IdentifierRepository,
+    private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository,
     private val addressService: AddressService
 ) {
 
@@ -93,7 +93,7 @@ class BusinessPartnerFetchService(
     fun findBpnsByIdentifiers(identifierTypeKey: String, lsaType: IdentifierLsaType, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, lsaType)
         return when (lsaType) {
-            IdentifierLsaType.LEGAL_ENTITY -> identifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
+            IdentifierLsaType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
             IdentifierLsaType.ADDRESS -> TODO("Not yet implemented for addresses")
         }
     }
@@ -121,8 +121,8 @@ class BusinessPartnerFetchService(
         return partners
     }
 
-    fun fetchIdentifierDependencies(identifiers: Set<Identifier>): Set<Identifier> {
-        identifierRepository.joinType(identifiers)
+    fun fetchIdentifierDependencies(identifiers: Set<LegalEntityIdentifier>): Set<LegalEntityIdentifier> {
+        legalEntityIdentifierRepository.joinType(identifiers)
 
         return identifiers
     }
