@@ -84,7 +84,7 @@ object SaasMappings {
         val legalName = toNameDto()
             ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
         return LegalEntityDto(
-            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
+            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toLegalEntityIdentifierDto(it) },
             legalName = legalName,
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatusDtos(status),
@@ -111,11 +111,19 @@ object SaasMappings {
             .firstOrNull()
     }
 
-    fun toDto(identifier: IdentifierSaas): LegalEntityIdentifierDto {
+    fun toLegalEntityIdentifierDto(identifier: IdentifierSaas): LegalEntityIdentifierDto {
         return LegalEntityIdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, LegalEntityIdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type),
             issuingBody = identifier.issuingBody?.name
+        )
+    }
+
+    // TODO still unused!
+    fun toAddressIdentifierDto(identifier: IdentifierSaas): AddressIdentifierDto {
+        return AddressIdentifierDto(
+            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, AddressIdentifierDto::class, IdentifierSaas::value),
+            type = toReference(identifier.type)
         )
     }
 

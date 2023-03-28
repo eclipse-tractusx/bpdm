@@ -126,6 +126,14 @@ class SaasRequestMappingService(
         )
     }
 
+    // TODO still unused!
+    private fun AddressIdentifierDto.toSaasModel(): IdentifierSaas {
+        return IdentifierSaas(
+            type = TypeKeyNameUrlSaas(type),
+            value = value
+        )
+    }
+
     private fun toSaasModel(address: LogisticAddressDto): AddressSaas {
         return with(address) {
             AddressSaas(

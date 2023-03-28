@@ -21,8 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMultipleNotFoundException
-import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
@@ -41,10 +43,20 @@ class MetadataMappingService(
     /**
      * Fetch metadata entities referenced in [partners] and map them by their referenced keys
      */
-    fun mapRequests(partners: Collection<LegalEntityDto>): MetadataMappingDto {
-        return MetadataMappingDto(
+    fun mapRequests(partners: Collection<LegalEntityDto>): LegalEntityMetadataMappingDto {
+        return LegalEntityMetadataMappingDto(
             idTypes = mapIdentifierTypes(partners),
             legalForms = mapLegalForms(partners)
+        )
+    }
+
+    /**
+     * Fetch metadata entities referenced in [partners] and map them by their referenced keys
+     */
+    // TODO still unused!
+    fun mapRequests(partners: Collection<LogisticAddressDto>): AddressMetadataMappingDto {
+        return AddressMetadataMappingDto(
+            idTypes = mapIdentifierTypes(partners),
         )
     }
 
@@ -54,6 +66,14 @@ class MetadataMappingService(
     fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
         val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.LEGAL_ENTITY, technicalKeys)
+    }
+
+    /**
+     * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
+     */
+    fun mapIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
+        val technicalKeys = partners.flatMap { it.addressIdentifier.map { id -> id.type } }.toSet()
+        return mapIdentifierTypes(IdentifierLsaType.ADDRESS, technicalKeys)
     }
 
     /**
