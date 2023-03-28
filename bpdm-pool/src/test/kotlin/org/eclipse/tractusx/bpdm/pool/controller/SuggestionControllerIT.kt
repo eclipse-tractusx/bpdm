@@ -112,32 +112,32 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.administrativeAreaLevel1,
+                    expectedLegalAddress.postalAddress.administrativeAreaLevel1,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postCode,
+                    expectedLegalAddress.postalAddress.postCode,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.city,
+                    expectedLegalAddress.postalAddress.city,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.street,
+                    expectedLegalAddress.postalAddress.street!!.name,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.physicalAddress.building,
+                    expectedLegalAddress.postalAddress.physicalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.alternativeAddress!!.derliveryServiceNumber,
+                    expectedLegalAddress.postalAddress.alternativeAddress!!.derliveryServiceNumber,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
                     expectedLegalEntityName
                 )
@@ -149,12 +149,12 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
                 Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
-                Arguments.of(nonlatinLegalAddress.administrativeAreaLevel1, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
-                Arguments.of(nonlatinLegalAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
-                Arguments.of(nonlatinLegalAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
-                Arguments.of(nonlatinLegalAddress.street, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.physicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
-                Arguments.of(nonlatinLegalAddress.alternativeAddress!!.derliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinLegalAddress.postalAddress.administrativeAreaLevel1, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.postalAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.postalAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.postalAddress.street, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.postalAddress.physicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.postalAddress.alternativeAddress!!.derliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 

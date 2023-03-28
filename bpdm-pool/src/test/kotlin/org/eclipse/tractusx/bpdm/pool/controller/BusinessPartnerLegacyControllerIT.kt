@@ -160,7 +160,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         return BusinessPartnerResponse(
             "",
             toConvert.legalEntity,
-            listOf(LogisticAddressResponse("", toConvert.legalAddress)),
+            listOf(toConvert.legalAddress),
             emptyList()
         )
     }

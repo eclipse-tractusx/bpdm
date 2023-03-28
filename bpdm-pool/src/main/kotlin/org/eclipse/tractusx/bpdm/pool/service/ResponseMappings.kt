@@ -47,7 +47,7 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
     return LegalEntityPartnerCreateResponse(
         // TODO Mapping
         legalEntity = toDto(),
-        legalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
+        legalAddress = LogisticAddressResponse(bpn = "TODO", postalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")),
         index = entryId
     )
 }
@@ -132,7 +132,7 @@ fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
     return LegalAddressSearchResponse(
         // TODO mapping
         bpnL,
-        legalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
+        legalAddress = LogisticAddressResponse(bpn = "TODO", PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"))
     )
 }
 

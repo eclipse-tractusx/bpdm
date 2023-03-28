@@ -26,5 +26,5 @@ data class LegalAddressSearchResponse(
     @Schema(description = "BPNL of the legal entity this legal address belongs to")
     val legalEntity: String,
     @Schema(description = "Address properties")
-    val legalAddress: PostalAddressResponse
+    val legalAddress: LogisticAddressResponse
 )

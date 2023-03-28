@@ -251,19 +251,19 @@ object ResponseValues {
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity1,
-        legalAddress = address1,
+        legalAddress = addressPartner1,
         index = CommonValues.index1
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity2,
-        legalAddress = address2,
+        legalAddress = addressPartner2,
         index = CommonValues.index2
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity3,
-        legalAddress = address3,
+        legalAddress = addressPartner3,
         index = CommonValues.index3
     )
 
