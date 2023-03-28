@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.BasePostalAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -31,14 +31,9 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
             "Only one of either legal entity or site external id can be set for an address."
 )
 data class AddressGateOutput(
-    @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
     @field:JsonUnwrapped
-    val address: BasePostalAddressResponse,
+    val address: LogisticAddressResponse,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
-    val externalId: String,
-    @Schema(description = "External id of the related legal entity")
-    val legalEntityBpn: String? = null,
-    @Schema(description = "External id of the related site")
-    val siteBpn: String? = null
+    val externalId: String
 )

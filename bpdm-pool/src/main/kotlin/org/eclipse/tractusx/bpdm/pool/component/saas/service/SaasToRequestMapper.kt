@@ -73,7 +73,7 @@ class SaasToRequestMapper {
     fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             site = partnerWithParent.partner.toSiteDto(),
-            legalEntity = partnerWithParent.parentBpn,
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -106,8 +106,8 @@ class SaasToRequestMapper {
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            properties = toDto(partnerWithParent.partner.addresses.first()),
-            parent = partnerWithParent.parentBpn,
+            address = toDto(partnerWithParent.partner.addresses.first()),
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -124,7 +124,7 @@ class SaasToRequestMapper {
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
             partnerWithBpn.bpn,
-            properties = toDto(partnerWithBpn.partner.addresses.first())
+            address = toDto(partnerWithBpn.partner.addresses.first())
         )
     }
 

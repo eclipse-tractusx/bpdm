@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
@@ -43,7 +43,7 @@ class SiteController(
 
     override fun searchMainAddresses(
         bpnS: Collection<String>
-    ): Collection<MainAddressSearchResponse> {
+    ): Collection<LogisticAddressResponse> {
         return addressService.findMainAddresses(bpnS)
     }
 

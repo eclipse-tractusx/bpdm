@@ -64,21 +64,21 @@ class BpnControllerIT @Autowired constructor(
         }
     }
 
-    val identifierType = RequestValues.legalEntityCreate1.properties.identifiers.first().type
-    val identifierValue1 = RequestValues.legalEntityCreate1.properties.identifiers.first().value
-    val identifierValue2 = RequestValues.legalEntityCreate2.properties.identifiers.first().value
-    val identifierValue3 = RequestValues.legalEntityCreate3.properties.identifiers.first().value
+    val identifierType = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().type
+    val identifierValue1 = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().value
+    val identifierValue2 = RequestValues.legalEntityCreate2.legalEntity.identifiers.first().value
+    val identifierValue3 = RequestValues.legalEntityCreate3.legalEntity.identifiers.first().value
 
     @BeforeEach
     fun beforeEach() {
         // ensure LE1 and 2 have same identifierType
         val legalEntityCreate1 = with(RequestValues.legalEntityCreate1) { copy(
-            properties = properties.copy(
+            legalEntity = legalEntity.copy(
                 identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
             )
         ) }
         val legalEntityCreate2 = with(RequestValues.legalEntityCreate2) { copy(
-            properties = properties.copy(
+            legalEntity = legalEntity.copy(
                 identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
             )
         ) }

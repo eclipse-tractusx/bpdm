@@ -148,19 +148,19 @@ object ResponseValues {
 
     val addressPartnerCreate1 = AddressPartnerCreateResponse(
         bpn = addressPartner1.bpn,
-        properties = addressPartner1.postalAddress,
+        address = addressPartner1.postalAddress,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressPartnerCreateResponse(
         bpn = addressPartner2.bpn,
-        properties = addressPartner2.postalAddress,
+        address = addressPartner2.postalAddress,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressPartnerCreateResponse(
         bpn = addressPartner3.bpn,
-        properties = addressPartner3.postalAddress,
+        address = addressPartner3.postalAddress,
         index = CommonValues.index3
     )
 

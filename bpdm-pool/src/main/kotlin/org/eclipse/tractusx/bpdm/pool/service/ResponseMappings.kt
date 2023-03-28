@@ -47,7 +47,7 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
     return LegalEntityPartnerCreateResponse(
         // TODO Mapping
         legalEntity = toDto(),
-        legalAddress = LogisticAddressResponse(bpn = "TODO", postalAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")),
+        legalAddress = legalAddress.toDto(),
         index = entryId
     )
 }
@@ -69,10 +69,9 @@ fun LegalEntity.toDto(): LegalEntityResponse {
 
 fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
     return BusinessPartnerResponse(
-        //TODO Mapping
         uuid = "",
         legalEntity = toDto(),
-        addresses = listOf(LogisticAddressResponse("", BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),)),
+        addresses = listOf(legalAddress.toDto()),
         sites = emptyList(),
     )
 }
@@ -111,75 +110,61 @@ fun SiteState.toSiteStatusDto(): SiteStateResponse {
     return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
+// TODO consolidate AddressPartner.toDto() and Address.toDto()
 fun AddressPartner.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
         //TODO mapping
-        bpn,
-        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
+        bpn = bpn,
+        physicalPostalAddress = address.toPhysicalPostalAddressDto(),
+        alternativePostalAddress = address.toAlternativePostalAddressDto(),
+        bpnLegalEntity = legalEntity?.bpn,
+        bpnSite = site?.bpn,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
 fun Address.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
-
-        // TODO mapping
+        //TODO mapping
         bpn = "TODO",
-        postalAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
-        )
+        physicalPostalAddress = toPhysicalPostalAddressDto(),
+        alternativePostalAddress = toAlternativePostalAddressDto(),
+        bpnLegalEntity = null,
+        bpnSite = null,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
 }
 
-fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
-    return LegalAddressSearchResponse(
+fun Address.toPhysicalPostalAddressDto(): PhysicalPostalAddressResponse {
+    return PhysicalPostalAddressResponse(
         // TODO mapping
-        bpnL,
-        legalAddress = LogisticAddressResponse(bpn = "TODO", BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"))
+        baseAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
     )
 }
 
-fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
-    return MainAddressSearchResponse(
-        //TODO
-        site = bpnS,
-        mainAddress = LogisticAddressResponse(bpn = "TODO", BasePostalAddressResponse(city="TODO", country = this.country.toDto()))
-    )
+fun Address.toAlternativePostalAddressDto(): AlternativePostalAddressResponse? {
+    // TODO mapping
+    return null
 }
 
 fun AddressPartner.toMatchDto(score: Float): AddressMatchResponse {
-    return AddressMatchResponse(score, this.toDtoWithReference())
-}
-
-fun AddressPartner.toPoolDto(): LogisticAddressResponse {
-    return LogisticAddressResponse(
-        //TODO mapping
-        bpn,
-        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
-    )
+    return AddressMatchResponse(score, this.toDto())
 }
 
 fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateResponse {
     return AddressPartnerCreateResponse(
-        //TODO mapping
-        bpn,
-        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
-        index
+        address = toDto(),
+        index = index
     )
 }
-
-fun AddressPartner.toDtoWithReference(): AddressPartnerSearchResponse {
-    return AddressPartnerSearchResponse(
-        toDto(),
-        legalEntity?.bpn,
-        site?.bpn
-    )
-}
-
 
 fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
     return SitePartnerCreateResponse(
-        bpn,
-        name,
-        mainAddress.toDto(),
-        entryId
+        site = toDto(),
+        mainAddress = mainAddress.toDto(),
+        index = entryId
     )
 }
 

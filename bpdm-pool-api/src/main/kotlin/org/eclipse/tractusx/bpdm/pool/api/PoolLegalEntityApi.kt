@@ -182,7 +182,7 @@ interface PoolLegalEntityApi {
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
-    ): Collection<LegalAddressSearchResponse>
+    ): Collection<LogisticAddressResponse>
 
     @Operation(
         summary = "Create new legal entity business partners",

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.NameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -55,7 +54,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     val partnerStructures = listOf(
         LegalEntityStructureRequest(legalEntity = with(RequestValues.legalEntityCreate1) {
             copy(
-                properties = properties.copy(
+                legalEntity = legalEntity.copy(
                     legalName = NameDto(
                         uniqueName,
                         null
