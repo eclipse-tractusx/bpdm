@@ -50,16 +50,16 @@ class AddressService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByBpn(bpn: String): AddressPartnerSearchResponse {
+    fun findByBpn(bpn: String): LogisticAddressResponse {
         val address = addressPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
-        return address.toDtoWithReference()
+        return address.toDto()
     }
 
     @Transactional
     fun findByPartnerAndSiteBpns(
         searchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<AddressPartnerSearchResponse> {
+    ): PageResponse<LogisticAddressResponse> {
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
@@ -70,23 +70,23 @@ class AddressService(
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
         fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
-        return addressPage.toDto(addressPage.content.map { it.toDtoWithReference() })
+        return addressPage.toDto(addressPage.content.map { it.toDto() })
     }
 
-    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressSearchResponse> {
+    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LogisticAddressResponse> {
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
         legalEntityRepository.joinLegalAddresses(legalEntities)
-        val bpnAddressPairs = legalEntities.map { Pair(it.bpn, it.legalAddress) }
-        fetchAddressDependencies(bpnAddressPairs.map { (_, legalAddress) -> legalAddress }.toSet())
-        return bpnAddressPairs.map { (bpn, legalAddress) -> legalAddress.toLegalSearchResponse(bpn) }
+        val addresses = legalEntities.map { it.legalAddress }
+        fetchAddressDependencies(addresses.toSet())
+        return addresses.map { it.toDto() }
     }
 
-    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressSearchResponse> {
+    fun findMainAddresses(bpnS: Collection<String>): Collection<LogisticAddressResponse> {
         val sites = siteRepository.findDistinctByBpnIn(bpnS)
         siteRepository.joinAddresses(sites)
-        val bpnAddressPairs = sites.map { Pair(it.bpn, it.mainAddress) }
-        fetchAddressDependencies(bpnAddressPairs.map { (_, mainAddress) -> mainAddress }.toSet())
-        return bpnAddressPairs.map { (bpn, legalAddress) -> legalAddress.toMainSearchResponse(bpn) }
+        val addresses = sites.map { it.mainAddress }
+        fetchAddressDependencies(addresses.toSet())
+        return addresses.map { it.toDto() }
     }
 
     fun fetchPartnerAddressDependencies(addressPartners: Set<AddressPartner>): Set<AddressPartner> {

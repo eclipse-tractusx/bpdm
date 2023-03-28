@@ -25,7 +25,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressBpnResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
@@ -279,9 +278,9 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val toCreate = listOf(
-            RequestValues.addressPartnerCreate1.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate2.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate3.copy(parent = bpnS)
+            RequestValues.addressPartnerCreate1.copy(bpnParent = bpnL),
+            RequestValues.addressPartnerCreate2.copy(bpnParent = bpnL),
+            RequestValues.addressPartnerCreate3.copy(bpnParent = bpnS)
         )
 
         val response = poolClient.addresses().createAddresses(toCreate)
@@ -311,10 +310,10 @@ class AddressControllerIT @Autowired constructor(
         val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
         val completelyInvalidBpn = "XYZ"
         val toCreate = listOf(
-            RequestValues.addressPartnerCreate1.copy(parent = bpnL),
-            RequestValues.addressPartnerCreate1.copy(parent = invalidSiteBpn),
-            RequestValues.addressPartnerCreate2.copy(parent = invalidLegalEntityBpn),
-            RequestValues.addressPartnerCreate3.copy(parent = completelyInvalidBpn),
+            RequestValues.addressPartnerCreate1.copy(bpnParent = bpnL),
+            RequestValues.addressPartnerCreate1.copy(bpnParent = invalidSiteBpn),
+            RequestValues.addressPartnerCreate2.copy(bpnParent = invalidLegalEntityBpn),
+            RequestValues.addressPartnerCreate3.copy(bpnParent = completelyInvalidBpn),
         )
 
         val response = poolClient.addresses().createAddresses(toCreate)

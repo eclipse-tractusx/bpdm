@@ -250,15 +250,6 @@ object ResponseValues {
         externalId = CommonValues.externalId2
     )
 
-    val legalAddressSearchResponse1 = LegalAddressSearchResponse(
-        legalEntity = CommonValues.bpn1,
-        legalAddress = address1
-    )
-    val legalAddressSearchResponse2 = LegalAddressSearchResponse(
-        legalEntity = CommonValues.bpn2,
-        legalAddress = address2
-    )
-
     val siteResponse1 = SiteResponse(
         bpn = CommonValues.bpnSite1,
         name = CommonValues.nameSite1,
@@ -292,8 +283,8 @@ object ResponseValues {
         processStartedAt = SaasValues.modificationTime2,
     )
 
-    val mainAddressSearchResponse1 = MainAddressSearchResponse(site = CommonValues.bpnSite1, mainAddress = logisticAddress1)
-    val mainAddressSearchResponse2 = MainAddressSearchResponse(site = CommonValues.bpnSite2, mainAddress = logisticAddress2)
+    val mainAddressSearchResponse1 = MainAddressSearchResponse(parentBpn = CommonValues.bpnSite1, mainAddress = logisticAddress1)
+    val mainAddressSearchResponse2 = MainAddressSearchResponse(parentBpn = CommonValues.bpnSite2, mainAddress = logisticAddress2)
 
     val siteGateOutput1 = SiteGateOutput(
         site = siteResponse1,

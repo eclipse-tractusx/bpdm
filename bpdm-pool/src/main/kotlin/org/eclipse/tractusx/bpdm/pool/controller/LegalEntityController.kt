@@ -99,7 +99,7 @@ class LegalEntityController(
 
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressSearchResponse> {
+    ): Collection<LogisticAddressResponse> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

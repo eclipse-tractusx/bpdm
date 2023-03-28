@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
@@ -62,7 +62,7 @@ interface PoolSiteApi  {
     fun searchMainAddresses(
         @RequestBody
         bpnS: Collection<String>
-    ): Collection<MainAddressSearchResponse>
+    ): Collection<LogisticAddressResponse>
 
     @Operation(
         summary = "Get site partners by bpn",

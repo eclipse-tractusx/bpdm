@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalAddressSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -125,7 +124,7 @@ class LegalEntityControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create legal entity with same identifier`() {
-        val given = with(RequestValues.legalEntityCreate1) { copy(properties = properties.copy(identifiers = listOf(RequestValues.identifier1))) }
+        val given = with(RequestValues.legalEntityCreate1) { copy(legalEntity = legalEntity.copy(identifiers = listOf(RequestValues.identifier1))) }
         poolClient.legalEntities().createBusinessPartners(listOf(given))
         val expected = listOf(ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
 
@@ -213,7 +212,7 @@ class LegalEntityControllerIT @Autowired constructor(
         )
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
-        val expected = givenLegalEntities.map { LegalAddressSearchResponse(it.legalEntity.bpn, it.legalAddress) }
+        val expected = givenLegalEntities.map { it.legalAddress }
 
         val bpnsToSearch = givenLegalEntities.map { it.legalEntity.bpn }
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
@@ -239,11 +238,9 @@ class LegalEntityControllerIT @Autowired constructor(
         )
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
-        val expected = givenLegalEntities.map {
-            LegalAddressSearchResponse(it.legalEntity.bpn, it.legalAddress)
-        }.take(2)
+        val expected = givenLegalEntities.map { it.legalAddress }.take(2)
 
-        val bpnsToSearch = expected.map { it.legalEntity }.plus("NONEXISTENT")
+        val bpnsToSearch = expected.map { it.bpnLegalEntity!! }.plus("NONEXISTENT")
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
         assertThat(response)
             .usingRecursiveComparison()

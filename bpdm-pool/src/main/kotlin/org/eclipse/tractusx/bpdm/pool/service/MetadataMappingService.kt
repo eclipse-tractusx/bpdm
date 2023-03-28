@@ -45,7 +45,7 @@ class MetadataMappingService(
      */
     fun mapRequests(partners: Collection<LegalEntityDto>): LegalEntityMetadataMappingDto {
         return LegalEntityMetadataMappingDto(
-            idTypes = mapIdentifierTypes(partners),
+            idTypes = mapLegalEntityIdentifierTypes(partners),
             legalForms = mapLegalForms(partners)
         )
     }
@@ -56,14 +56,14 @@ class MetadataMappingService(
     // TODO still unused!
     fun mapRequests(partners: Collection<LogisticAddressDto>): AddressMetadataMappingDto {
         return AddressMetadataMappingDto(
-            idTypes = mapIdentifierTypes(partners),
+            idTypes = mapAddressIdentifierTypes(partners),
         )
     }
 
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
+    fun mapLegalEntityIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
         val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.LEGAL_ENTITY, technicalKeys)
     }
@@ -71,7 +71,7 @@ class MetadataMappingService(
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
+    fun mapAddressIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
         val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.ADDRESS, technicalKeys)
     }

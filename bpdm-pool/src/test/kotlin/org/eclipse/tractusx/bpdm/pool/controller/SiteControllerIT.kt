@@ -169,9 +169,9 @@ class SiteControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2, ResponseValues.siteUpsert3)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(legalEntity = bpnL1),
-            RequestValues.siteCreate2.copy(legalEntity = bpnL2),
-            RequestValues.siteCreate3.copy(legalEntity = bpnL2)
+            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnParent = bpnL2)
         )
 
         val response = poolClient.sites().createSite(toCreate)
@@ -198,9 +198,9 @@ class SiteControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(legalEntity = bpnL1),
-            RequestValues.siteCreate2.copy(legalEntity = bpnL2),
-            RequestValues.siteCreate3.copy(legalEntity = "NONEXISTENT")
+            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnParent = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
 
@@ -313,7 +313,7 @@ class SiteControllerIT @Autowired constructor(
 
         val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
 
-        val toSearch = expected.map { it.site }
+        val toSearch = expected.map { it.parentBpn }
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
@@ -341,7 +341,7 @@ class SiteControllerIT @Autowired constructor(
 
         val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
 
-        val toSearch = expected.map { it.site }.plus("NON-EXISTENT")
+        val toSearch = expected.map { it.parentBpn }.plus("NON-EXISTENT")
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)

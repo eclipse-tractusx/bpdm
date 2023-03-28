@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
 
 @Schema(name = "LogisticAddressResponse", description = "Logistic address ")
@@ -38,9 +39,21 @@ data class LogisticAddressResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
     val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
 
-    @Schema(description = "Physical postal address ")
+    @Schema(description = "Physical postal address")
     val physicalPostalAddress: PhysicalPostalAddressResponse,
 
-    @Schema(description = "Alternative postal address ")
+    @Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressResponse?,
-    )
+
+    @Schema(description = "BPN of the related legal entity, if available")
+    val bpnLegalEntity: String?,
+
+    @Schema(description = "BPN of the related site, if available")
+    val bpnSite: String?,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
+)
