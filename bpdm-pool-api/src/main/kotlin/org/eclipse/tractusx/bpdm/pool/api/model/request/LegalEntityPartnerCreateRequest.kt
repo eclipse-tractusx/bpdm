@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -32,4 +33,4 @@ data class LegalEntityPartnerCreateRequest(
     val properties: LegalEntityDto,
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
-)
+ )

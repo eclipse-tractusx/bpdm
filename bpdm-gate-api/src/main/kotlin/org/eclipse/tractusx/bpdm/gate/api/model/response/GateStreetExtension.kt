@@ -17,29 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "LegalEntity")
-data class LegalEntityDto(
-    @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
-    val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+data class GateStreetExtension(
+    @Schema(description = "Additional information for street 1")
+    val addName1: String?,
 
-    @Schema(description = "Legal name the partner goes by")
-    val legalName: NameDto,
+    @Schema(description = "Additional information for street 2")
+    val addName2: String?,
 
-    @Schema(description = "Technical key of the legal form")
-    val legalForm: String? = null,
+    @Schema(description = "Additional information for street 3")
+    val addName3: String?,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<LegalEntityStateDto> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
-    val classifications: Collection<ClassificationDto> = emptyList(),
-
-    @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressDto,
-
+    @Schema(description = "Additional information for street 4")
+    val addName4: String?,
 )

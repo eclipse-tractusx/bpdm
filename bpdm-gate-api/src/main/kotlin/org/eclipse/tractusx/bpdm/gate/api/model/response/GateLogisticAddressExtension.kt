@@ -17,29 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "LegalEntity")
-data class LegalEntityDto(
-    @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
-    val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+data class GateLogisticAddressExtension(
+    //TODO use enum for this
+    @Schema(description = "IsCustomer: true, IsSupplier: false")
+    val role: Boolean?,
 
-    @Schema(description = "Legal name the partner goes by")
-    val legalName: NameDto,
+    @Schema(description = "This is the internalID of the sharing member in their own ERP systems. This is necessary for the correct mapping on the way back to the sharing member.")
+    val sharingMemberExternalID: String,
 
-    @Schema(description = "Technical key of the legal form")
-    val legalForm: String? = null,
+    // TODO BPNL ?
+    @Schema(description = "This is the sharing member who has uploaded the data set. e.g. Schaeffler uploads a BMW-data set which leads Schaeffler as the UploadingEntity but not as the owner.")
+    val uploadingEntity: String,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<LegalEntityStateDto> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
-    val classifications: Collection<ClassificationDto> = emptyList(),
-
-    @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressDto,
-
+    // TODO BPNL ?
+    @Schema(description = "This is the owner of the described legal entity in the data set.")
+    val legalEntityOwner: String,
 )
