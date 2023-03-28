@@ -20,11 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
-import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
@@ -47,11 +45,11 @@ object ResponseValues {
     val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
 
     val identifier1 =
-        IdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)
     val identifier2 =
-        IdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
     val identifier3 =
-        IdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
 
     val name1 = NameResponse(value = CommonValues.name1)
     val name2 = NameResponse(value = CommonValues.name2)
