@@ -81,6 +81,11 @@ fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierResponse {
     return LegalEntityIdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
+// TODO still unused!
+fun AddressIdentifier.toDto(): AddressIdentifierResponse {
+    return AddressIdentifierResponse(value, type.toTypeKeyNameDto())
+}
+
 fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }

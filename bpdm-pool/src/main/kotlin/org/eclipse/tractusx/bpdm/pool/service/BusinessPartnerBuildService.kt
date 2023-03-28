@@ -27,8 +27,9 @@ import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
-import org.eclipse.tractusx.bpdm.pool.dto.MetadataMappingDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
@@ -259,7 +260,7 @@ class BusinessPartnerBuildService(
     private fun createLegalEntity(
         request: LegalEntityDto,
         bpnL: String,
-        metadataMap: MetadataMappingDto
+        metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
         val legalName = toEntity(request.legalName)
         val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
@@ -299,7 +300,7 @@ class BusinessPartnerBuildService(
     private fun updateLegalEntity(
         partner: LegalEntity,
         request: LegalEntityDto,
-        metadataMap: MetadataMappingDto
+        metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
 
         partner.currentness = createCurrentnessTimestamp()
@@ -431,14 +432,27 @@ class BusinessPartnerBuildService(
 
     private fun toEntity(
         dto: LegalEntityIdentifierDto,
-        metadataMap: MetadataMappingDto,
+        metadataMap: LegalEntityMetadataMappingDto,
         partner: LegalEntity
     ): LegalEntityIdentifier {
         return LegalEntityIdentifier(
             value = dto.value,
-            type = metadataMap.idTypes[dto.type]!!,
+            type = metadataMap.idTypes[dto.type] ?: throw BpdmNotFoundException(IdentifierType::class, dto.type),
             issuingBody = dto.issuingBody,
             legalEntity = partner
+        )
+    }
+
+    // TODO still unused!
+    private fun toEntity(
+        dto: AddressIdentifierDto,
+        metadataMap: AddressMetadataMappingDto,
+        partner: AddressPartner
+    ): AddressIdentifier {
+        return AddressIdentifier(
+            value = dto.value,
+            type = metadataMap.idTypes[dto.type] ?: throw BpdmNotFoundException(IdentifierType::class, dto.type),
+            address = partner
         )
     }
 
