@@ -22,23 +22,24 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
+
 @Schema(name = "LogisticAddressDto", description = "Address record for a business partner")
 data class LogisticAddressDto(
 
-    @Schema(description = "Name of the logistic address of the business partner. This is notaccording to official\n" +
+    @Schema(description = "Name of the logistic address of the business partner. This is not according to official\n" +
             "registers but according to the name the uploading sharing member chooses.")
-    val addressName: String? = null,
+    val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
-    val status: Collection<AddressStateDto> = emptyList(),
-
-    @Schema(description = "This indicates if the given BPNA is the main address to a site")
-    val isSiteMainAddress: Boolean?,
+    val states: Collection<AddressStateDto> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "List of identifiers"))
-    val addressIdentifier: Collection<AddressIdentifierDto> = emptyList(),
+    val identifiers: Collection<AddressIdentifierDto> = emptyList(),
 
-    @Schema(description = "Postal address")
-    val postalAddress: PostalAddressDto
+    @Schema(description = "Physical postal address")
+    val physicalPostalAddress: PhysicalPostalAddressDto,
+
+    @Schema(description = "Alternative postal address")
+    val alternativePostalAddress: AlternativePostalAddressDto?
 
 )

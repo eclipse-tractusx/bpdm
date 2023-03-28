@@ -19,25 +19,28 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+
 @Schema(name = "LogisticAddressResponse", description = "Logistic address ")
 data class LogisticAddressResponse(
     @Schema(description = "Business Partner Number of this address")
     val bpn: String,
 
-    @field:JsonUnwrapped
-    val postalAddress: PostalAddressResponse,
+    @Schema(description = "Name of the logistic address of the business partner. This is not according to official\n" +
+            "registers but according to the name the uploading sharing member chooses.")
+    val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Address status"))
-    val status: Collection<AddressStateResponse> = emptyList(),
+    val states: Collection<AddressStateResponse> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
     val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
 
+    @Schema(description = "Physical postal address ")
+    val physicalPostalAddress: PhysicalPostalAddressResponse,
+
+    @Schema(description = "Alternative postal address ")
+    val alternativePostalAddress: AlternativePostalAddressResponse?,
     )

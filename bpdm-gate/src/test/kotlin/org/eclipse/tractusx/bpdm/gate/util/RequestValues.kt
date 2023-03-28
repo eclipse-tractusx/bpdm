@@ -117,7 +117,7 @@ object RequestValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val postalAddress1 = PostalAddressDto(
+    val postalAddress1 = BasePostalAddressDto(
         geographicCoordinates = geoCoordinate1,
         country = CommonValues.country1,
         administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
@@ -130,7 +130,7 @@ object RequestValues {
         physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
     )
 
-    val postalAddress2 = PostalAddressDto(
+    val postalAddress2 = BasePostalAddressDto(
         geographicCoordinates = geoCoordinate2,
         country = CommonValues.country2,
         administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,

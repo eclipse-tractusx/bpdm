@@ -72,7 +72,7 @@ class MetadataMappingService(
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
     fun mapIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
-        val technicalKeys = partners.flatMap { it.addressIdentifier.map { id -> id.type } }.toSet()
+        val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.ADDRESS, technicalKeys)
     }
 

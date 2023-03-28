@@ -47,7 +47,7 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
     return LegalEntityPartnerCreateResponse(
         // TODO Mapping
         legalEntity = toDto(),
-        legalAddress = LogisticAddressResponse(bpn = "TODO", postalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")),
+        legalAddress = LogisticAddressResponse(bpn = "TODO", postalAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")),
         index = entryId
     )
 }
@@ -72,7 +72,7 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
         //TODO Mapping
         uuid = "",
         legalEntity = toDto(),
-        addresses = listOf(LogisticAddressResponse("", PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),)),
+        addresses = listOf(LogisticAddressResponse("", BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),)),
         sites = emptyList(),
     )
 }
@@ -115,7 +115,7 @@ fun AddressPartner.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
         //TODO mapping
         bpn,
-        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
+        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
     )
 }
 
@@ -124,7 +124,7 @@ fun Address.toDto(): LogisticAddressResponse {
 
         // TODO mapping
         bpn = "TODO",
-        postalAddress = PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
+        postalAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
         )
 }
 
@@ -132,7 +132,7 @@ fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
     return LegalAddressSearchResponse(
         // TODO mapping
         bpnL,
-        legalAddress = LogisticAddressResponse(bpn = "TODO", PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"))
+        legalAddress = LogisticAddressResponse(bpn = "TODO", BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"))
     )
 }
 
@@ -140,7 +140,7 @@ fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
     return MainAddressSearchResponse(
         //TODO
         site = bpnS,
-        mainAddress = LogisticAddressResponse(bpn = "TODO", PostalAddressResponse(city="TODO", country = this.country.toDto()))
+        mainAddress = LogisticAddressResponse(bpn = "TODO", BasePostalAddressResponse(city="TODO", country = this.country.toDto()))
     )
 }
 
@@ -152,7 +152,7 @@ fun AddressPartner.toPoolDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
         //TODO mapping
         bpn,
-        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
+        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO")
     )
 }
 
@@ -160,7 +160,7 @@ fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateRespons
     return AddressPartnerCreateResponse(
         //TODO mapping
         bpn,
-        PostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
+        BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
         index
     )
 }
