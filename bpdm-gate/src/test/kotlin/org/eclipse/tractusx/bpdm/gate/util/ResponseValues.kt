@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.AddressType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 
@@ -40,7 +38,7 @@ object ResponseValues {
         name = CommonValues.language2.getName()
     )
 
-    val identifier1 = IdentifierResponse(
+    val identifier1 = LegalEntityIdentifierResponse(
         value = CommonValues.identifierValue1,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
@@ -48,7 +46,7 @@ object ResponseValues {
         ),
         issuingBody = CommonValues.identifierIssuingBody1
     )
-    val identifier2 = IdentifierResponse(
+    val identifier2 = LegalEntityIdentifierResponse(
         value = CommonValues.identifierValue2,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
@@ -57,7 +55,7 @@ object ResponseValues {
         issuingBody = CommonValues.identifierIssuingBody2
 
     )
-    val identifier3 = IdentifierResponse(
+    val identifier3 = LegalEntityIdentifierResponse(
         value = CommonValues.identifierValue3,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
@@ -66,7 +64,7 @@ object ResponseValues {
         issuingBody = CommonValues.identifierIssuingBody3
 
     )
-    val identifier4 = IdentifierResponse(
+    val identifier4 = LegalEntityIdentifierResponse(
         value = CommonValues.identifierValue4,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey4,

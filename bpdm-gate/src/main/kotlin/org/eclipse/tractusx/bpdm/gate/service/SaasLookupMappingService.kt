@@ -19,8 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.GenericIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.springframework.stereotype.Service
@@ -39,7 +40,10 @@ class SaasLookupMappingService {
         }
     }
 
-    private fun toSaas(identifier: IdentifierDto): IdentifierLookupSaas =
+    private fun toSaas(identifier: LegalEntityIdentifierDto): IdentifierLookupSaas =
+        IdentifierLookupSaas(identifier.value, TechnicalKeyLookupSaas(identifier.type))
+
+    private fun toSaas(identifier: GenericIdentifierDto): IdentifierLookupSaas =
         IdentifierLookupSaas(identifier.value, TechnicalKeyLookupSaas(identifier.type))
 
     private fun toSaas(address: LogisticAddressDto): AddressLookupSaas =

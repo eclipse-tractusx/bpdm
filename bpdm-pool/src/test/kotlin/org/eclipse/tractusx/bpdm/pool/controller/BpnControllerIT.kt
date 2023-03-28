@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -74,12 +74,12 @@ class BpnControllerIT @Autowired constructor(
         // ensure LE1 and 2 have same identifierType
         val legalEntityCreate1 = with(RequestValues.legalEntityCreate1) { copy(
             properties = properties.copy(
-                identifiers = listOf(IdentifierDto(identifierValue1, identifierType, null))
+                identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
             )
         ) }
         val legalEntityCreate2 = with(RequestValues.legalEntityCreate2) { copy(
             properties = properties.copy(
-                identifiers = listOf(IdentifierDto(identifierValue2, identifierType, null))
+                identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
             )
         ) }
         val legalEntityCreate3 = RequestValues.legalEntityCreate3

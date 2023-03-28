@@ -39,19 +39,19 @@ object RequestValues {
     val identifierTypeDto2 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
     val identifierTypeDto3 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey3, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
 
-    val identifier1 = IdentifierDto(
+    val identifier1 = LegalEntityIdentifierDto(
         value = CommonValues.identifierValue1,
         type = CommonValues.identifierTypeTechnicalKey1,
         issuingBody = CommonValues.issuingBody1,
     )
 
-    val identifier2 = IdentifierDto(
+    val identifier2 = LegalEntityIdentifierDto(
         value = CommonValues.identifierValue2,
         type = CommonValues.identifierTypeTechnicalKey2,
         issuingBody = CommonValues.issuingBody2,
     )
 
-    val identifier3 = IdentifierDto(
+    val identifier3 = LegalEntityIdentifierDto(
         value = CommonValues.identifierValue3,
         type = CommonValues.identifierTypeTechnicalKey3,
         issuingBody = CommonValues.issuingBody3,

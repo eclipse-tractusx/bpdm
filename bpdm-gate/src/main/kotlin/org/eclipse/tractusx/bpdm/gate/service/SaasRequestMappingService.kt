@@ -93,7 +93,7 @@ class SaasRequestMappingService(
 
     private fun LegalEntityStateDto.toSaasModel(): BusinessPartnerStatusSaas {
         return BusinessPartnerStatusSaas(
-            type = type?.let { TypeKeyNameUrlSaas(it.name) },
+            type = TypeKeyNameUrlSaas(type.name),
             officialDenotation = officialDenotation,
             validFrom = validFrom,
             validUntil = validTo
@@ -118,7 +118,7 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun IdentifierDto.toSaasModel(): IdentifierSaas {
+    private fun LegalEntityIdentifierDto.toSaasModel(): IdentifierSaas {
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
             value = value,
@@ -152,7 +152,7 @@ class SaasRequestMappingService(
     private fun toSaasModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =
         geoCoordinate?.let { GeoCoordinatesSaas(it.longitude, it.latitude) }
 
-    private fun toIdentifiersSaas(identifiers: Collection<IdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
+    private fun toIdentifiersSaas(identifiers: Collection<LegalEntityIdentifierDto>, bpn: String?): Collection<IdentifierSaas> {
         var identifiersSaas = identifiers.map { it.toSaasModel() }
         if (bpn != null) {
             identifiersSaas = identifiersSaas.plus(createBpnIdentifierSaas(bpn))

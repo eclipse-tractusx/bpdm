@@ -17,24 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.GenericIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.NameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
-data class BusinessPartnerCandidateDto(
-    @ArraySchema(arraySchema = Schema(description = "Identifiers of this partner candidate", required = false))
-    val identifiers: Collection<GenericIdentifierDto> = emptyList(),
+@Schema(name = "LegalEntityIdentifierResponse", description = "Identifier record of a legal entity")
+data class LegalEntityIdentifierResponse(
+    @Schema(description = "Value of the identifier")
+    val value: String,
 
-    @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
-    val names: Collection<NameDto>,
+    @Schema(description = "Type of the identifier")
+    val type: TypeKeyNameDto<String>,
 
-    @Schema(description = "Technical key of the legal form")
-    val legalForm: String? = null,
-
-    @Schema(description = "Address of this partner")
-    val address: LogisticAddressDto
+    @Schema(description = "Body which issued the identifier")
+    val issuingBody: String? = null
 )

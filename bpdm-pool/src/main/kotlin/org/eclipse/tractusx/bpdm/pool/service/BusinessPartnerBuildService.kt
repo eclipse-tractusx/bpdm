@@ -430,7 +430,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun toEntity(
-        dto: IdentifierDto,
+        dto: LegalEntityIdentifierDto,
         metadataMap: MetadataMappingDto,
         partner: LegalEntity
     ): Identifier {

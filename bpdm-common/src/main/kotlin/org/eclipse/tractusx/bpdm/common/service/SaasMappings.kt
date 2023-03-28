@@ -111,9 +111,9 @@ object SaasMappings {
             .firstOrNull()
     }
 
-    fun toDto(identifier: IdentifierSaas): IdentifierDto {
-        return IdentifierDto(
-            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, IdentifierDto::class, IdentifierSaas::value),
+    fun toDto(identifier: IdentifierSaas): LegalEntityIdentifierDto {
+        return LegalEntityIdentifierDto(
+            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, LegalEntityIdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type),
             issuingBody = identifier.issuingBody?.name
         )
