@@ -107,37 +107,37 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedSite.name,
+                    expectedSite.site.name,
                     EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.administrativeAreaLevel1,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.administrativeAreaLevel1,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.postCode,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.postCode,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.city,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.city,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.street!!.name,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.street!!.name,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.physicalAddress.building,
+                    expectedLegalAddress.physicalPostalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postalAddress.alternativeAddress!!.derliveryServiceNumber,
+                    expectedLegalAddress.alternativePostalAddress!!.deliveryServiceNumber,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
                     expectedLegalEntityName
                 )
@@ -148,13 +148,13 @@ class SuggestionControllerIT @Autowired constructor(
             Stream.of(
                 Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
-                Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.administrativeAreaLevel1, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.street, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.physicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalAddress.alternativeAddress!!.derliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinSite.site.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.administrativeAreaLevel1, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.street, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.alternativePostalAddress!!.deliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 

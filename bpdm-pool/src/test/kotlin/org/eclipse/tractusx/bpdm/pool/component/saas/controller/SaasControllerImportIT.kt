@@ -217,9 +217,9 @@ class SaasControllerImportIT @Autowired constructor(
         //Assert actual with expected
         val actual = getAddresses(addressBpns).content
         val expected = listOf(
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner1, bpnSite = importedSiteBpn),
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner2, bpnLegalEntity = bpnL2),
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner3, bpnSite = notImportedSiteParentBpn)
+            ResponseValues.addressPartner1,
+            ResponseValues.addressPartner2,
+            ResponseValues.addressPartner3
         )
 
         testHelpers.assertRecursively(actual).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expected)
@@ -555,9 +555,9 @@ class SaasControllerImportIT @Autowired constructor(
 
         //assert actual is expected
         val expectedPartners = listOf(
-            AddressPartnerSearchResponse(ResponseValues.addressPartner1.copy(bpn = bpnA2), bpnL2),
-            AddressPartnerSearchResponse(ResponseValues.addressPartner2.copy(bpn = bpnA3), bpnL3),
-            AddressPartnerSearchResponse(ResponseValues.addressPartner3.copy(bpn = bpnA1), bpnL1)
+            ResponseValues.addressPartner1.copy(bpn = bpnA2),
+            ResponseValues.addressPartner2.copy(bpn = bpnA3),
+            ResponseValues.addressPartner3.copy(bpn = bpnA1)
         )
         val actual = getAddresses(bpns).content
         testHelpers.assertRecursively(actual).isEqualTo(expectedPartners)
@@ -587,7 +587,7 @@ class SaasControllerImportIT @Autowired constructor(
     private fun getSites(bpns: Collection<String>): PageResponse<SiteResponse> =
         poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns), PaginationRequest())
 
-    private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
+    private fun getAddresses(bpns: Collection<String>): PageResponse<LogisticAddressResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
 
     private fun importPartners(
         partnersToImport: List<BusinessPartnerSaas>,

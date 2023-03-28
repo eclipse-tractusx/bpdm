@@ -63,9 +63,9 @@ class AddressControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenAddress1: AddressPartnerSearchResponse
-    private lateinit var givenAddress2: AddressPartnerSearchResponse
-    private lateinit var givenAddress3: AddressPartnerSearchResponse
+    private lateinit var givenAddress1: LogisticAddressResponse
+    private lateinit var givenAddress2: LogisticAddressResponse
+    private lateinit var givenAddress3: LogisticAddressResponse
 
 
     @BeforeEach
@@ -76,24 +76,9 @@ class AddressControllerSearchIT @Autowired constructor(
         testHelpers.createTestMetadata()
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
-        givenAddress1 = with(givenStructure[0].addresses[0]) {
-            AddressPartnerSearchResponse(
-                address = LogisticAddressResponse(bpn, address),
-                bpnLegalEntity = givenStructure[0].legalEntity.legalEntity.bpn
-            )
-        }
-        givenAddress2 = with(givenStructure[0].addresses[1]) {
-            AddressPartnerSearchResponse(
-                address = LogisticAddressResponse(bpn, address),
-                bpnLegalEntity = givenStructure[0].legalEntity.legalEntity.bpn
-            )
-        }
-        givenAddress3 = with(givenStructure[1].siteStructures[0].addresses[0]) {
-            AddressPartnerSearchResponse(
-                address = LogisticAddressResponse(bpn, address),
-                bpnSite = givenStructure[1].siteStructures[0].site.bpn
-            )
-        }
+        givenAddress1 = givenStructure[0].addresses[0].address
+        givenAddress2 = givenStructure[0].addresses[1].address
+        givenAddress3 = givenStructure[1].siteStructures[0].addresses[0].address
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
@@ -111,7 +96,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.postalAddress.administrativeAreaLevel1
+        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel1
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -132,7 +117,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.postalAddress.postCode
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -153,7 +138,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.locality = RequestValues.addressPartnerCreate1.address.postalAddress.city
+        addressSearchRequest.locality = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.city
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -172,7 +157,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(null,null,null,RequestValues.addressPartnerCreate1.address.postalAddress.street!!.name,
+        val addressSearchRequest = AddressPartnerSearchRequest(null,null,null,RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.street!!.name,
         null,null,null)
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -193,7 +178,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.premise = RequestValues.addressPartnerCreate1.address.postalAddress.physicalAddress.building
+        addressSearchRequest.premise = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.building
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -213,7 +198,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.postalAddress.alternativeAddress!!.derliveryServiceNumber
+        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -232,7 +217,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(countryCode = RequestValues.addressPartnerCreate1.address.postalAddress.country)
+        val addressSearchRequest = AddressPartnerSearchRequest(countryCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.country)
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -255,8 +240,8 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.postalAddress.alternativeAddress!!.derliveryServiceNumber
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.postalAddress.postCode
+        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -276,7 +261,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.postalAddress.postCode
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
         addressSearchRequest.administrativeArea = "someNonexistentValue"
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -316,7 +301,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate2.address.postalAddress.postCode
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate2.address.physicalPostalAddress.baseAddress.postCode
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)

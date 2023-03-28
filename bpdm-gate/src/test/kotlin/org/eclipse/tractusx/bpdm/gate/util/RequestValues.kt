@@ -117,39 +117,46 @@ object RequestValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val postalAddress1 = BasePostalAddressDto(
-        geographicCoordinates = geoCoordinate1,
-        country = CommonValues.country1,
-        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
-        administrativeAreaLevel2 = CommonValues.county1,
-        postCode = CommonValues.postCode1,
-        city = CommonValues.city1,
-        districtLevel1 = CommonValues.districtLevel1_1,
-        districtLevel2 = CommonValues.districtLevel2_1,
-        street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
-        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone1, building = CommonValues.building1, floor = CommonValues.floor1, door = CommonValues.door1),
+    val postalAddress1 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate1,
+            country = CommonValues.country1,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+            administrativeAreaLevel2 = CommonValues.county1,
+            postCode = CommonValues.postCode1,
+            city = CommonValues.city1,
+            districtLevel1 = CommonValues.districtLevel1_1,
+            districtLevel2 = CommonValues.districtLevel2_1,
+            street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+        )
     )
 
-    val postalAddress2 = BasePostalAddressDto(
-        geographicCoordinates = geoCoordinate2,
-        country = CommonValues.country2,
-        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
-        administrativeAreaLevel2 = CommonValues.county2,
-        postCode = CommonValues.postCode2,
-        city = CommonValues.city2,
-        street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
-        physicalAddress = PhysicalPostalAddressDto(industrialZone = CommonValues.industrialZone2, building = CommonValues.building2, floor = CommonValues.floor2, door = CommonValues.door2),
+    val postalAddress2 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate2,
+            country = CommonValues.country2,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+            administrativeAreaLevel2 = CommonValues.county2,
+            postCode = CommonValues.postCode2,
+            city = CommonValues.city2,
+            street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+        )
     )
 
     val address1 = LogisticAddressDto(
-        postalAddress = postalAddress1,
-        isSiteMainAddress = true
+        physicalPostalAddress = postalAddress1,
     )
 
     val address2 = LogisticAddressDto(
-        postalAddress = postalAddress2,
-        isSiteMainAddress = true
-
+        physicalPostalAddress = postalAddress2,
     )
 
 

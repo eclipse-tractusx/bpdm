@@ -103,8 +103,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityResponse2
         )
         val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -207,8 +207,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityResponse2
         )
         val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2

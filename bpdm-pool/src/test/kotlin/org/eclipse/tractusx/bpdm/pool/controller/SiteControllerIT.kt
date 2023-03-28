@@ -99,8 +99,8 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = createdStructures[0].siteStructures[0].site.bpn
-        val bpnS2 = createdStructures[0].siteStructures[1].site.bpn
+        val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpn
+        val bpnS2 = createdStructures[0].siteStructures[1].site.site.bpn
         val bpnL = createdStructures[0].legalEntity.legalEntity.bpn
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
@@ -231,14 +231,14 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
-        val bpnS2 = givenStructure[1].siteStructures[0].site.bpn
-        val bpnS3 = givenStructure[1].siteStructures[1].site.bpn
+        val bpnS1 = givenStructure[0].siteStructures[0].site.site.bpn
+        val bpnS2 = givenStructure[1].siteStructures[0].site.site.bpn
+        val bpnS3 = givenStructure[1].siteStructures[1].site.site.bpn
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.copy(bpn = bpnS3, index = null),
-            ResponseValues.siteUpsert2.copy(bpn = bpnS1, index = null),
-            ResponseValues.siteUpsert3.copy(bpn = bpnS2, index = null)
+            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn=bpnS1), index = null) },
+            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn=bpnS1), index = null) },
+            ResponseValues.siteUpsert3.run { copy(site = site.copy(bpn=bpnS2), index = null) },
         )
 
         val toUpdate = listOf(
@@ -269,12 +269,12 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = givenStructure[0].siteStructures[0].site.bpn
-        val bpnS2 = givenStructure[0].siteStructures[1].site.bpn
+        val bpnS1 = givenStructure[0].siteStructures[0].site.site.bpn
+        val bpnS2 = givenStructure[0].siteStructures[1].site.site.bpn
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.copy(bpn = bpnS2, index = null),
-            ResponseValues.siteUpsert2.copy(bpn = bpnS1, index = null)
+            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn=bpnS2), index = null) },
+            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn=bpnS1), index = null) },
         )
 
         val toUpdate = listOf(
@@ -311,9 +311,9 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
+        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
 
-        val toSearch = expected.map { it.parentBpn }
+        val toSearch = expected.map { it.bpnSite!! }
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
@@ -339,18 +339,18 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val expected = givenStructure.flatMap { it.siteStructures }.map { MainAddressSearchResponse(it.site.bpn, it.site.mainAddress) }
+        val expected = givenStructure.flatMap { it.siteStructures }.map { it.site.mainAddress }
 
-        val toSearch = expected.map { it.parentBpn }.plus("NON-EXISTENT")
+        val toSearch = expected.map { it.bpnSite!! }.plus("NON-EXISTENT")
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateResponse>, expected: Collection<SitePartnerCreateResponse>) {
-        actuals.forEach { assertThat(it.bpn).matches(testHelpers.bpnSPattern) }
+        actuals.forEach { assertThat(it.site.bpn).matches(testHelpers.bpnSPattern) }
 
-        testHelpers.assertRecursively(actuals).ignoringFields(SitePartnerCreateResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(actuals).ignoringFields(SiteResponse::bpn.name).isEqualTo(expected)
     }
 
     private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
