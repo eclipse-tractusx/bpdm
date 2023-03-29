@@ -31,9 +31,6 @@ class Site(
     @Column(name = "name", nullable = false)
     var name: String,
 
-    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val states: MutableSet<SiteState> = mutableSetOf(),
-
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity,
@@ -43,6 +40,9 @@ class Site(
     var mainAddress: Address
 
 ) : BaseEntity() {
+
+    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val states: MutableSet<SiteState> = mutableSetOf()
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<AddressPartner> = mutableSetOf()

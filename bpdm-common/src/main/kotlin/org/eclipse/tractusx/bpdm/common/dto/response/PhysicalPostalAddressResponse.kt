@@ -37,7 +37,7 @@ data class PhysicalPostalAddressResponse (
     @Schema(description = "Describes the floor/level the delivery shall take place")
     val floor: String? = null,
 
-    @Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
+    @Schema(description = "Describes the door/room/suite on the respective floor the delivery shall take place")
     val door: String? = null,
 
     @field:JsonUnwrapped
