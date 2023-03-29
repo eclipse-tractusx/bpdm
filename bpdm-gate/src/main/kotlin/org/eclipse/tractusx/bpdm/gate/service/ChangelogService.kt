@@ -29,42 +29,45 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaType
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
+
 import java.time.Instant
+import kotlin.math.ceil
 
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogByExternalId(externalIds: Collection<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
+    fun getChangeLogByExternalId(externalIds: Set<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
 
         val spec = Specification.allOf(byExternalIdsIn(externalIds = externalIds), byCreatedAtGreaterThan(createdAt = createdAt))
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
+        val setDistinctList = changelogRepository.findExternalIdsInListDistinct(externalIds)
 
 
         val pageDto = pageResponse.map {
             it.toGateDto()
         }
 
-        val errorInfoSet = externalIds.filterNot { id ->
-            pageDto.content.any { it.externalId == id }
-        }.map {
+        val errorList = (externalIds - setDistinctList).map {
             ErrorInfo(
                 ChangeLogOutputError.ExternalIdNotFound,
                 "$it not found",
                 it
             )
-        }.toSet()
+        }
+
 
         return PageChangeLogResponse(
             page = page, totalElements = pageDto.totalElements,
             totalPages = pageDto.totalPages,
             contentSize = pageDto.content.size,
             content = pageDto.content,
-            invalidEntries = errorInfoSet.size,
-            errors = errorInfoSet
+            invalidEntries = errorList.size,
+            errors = errorList
         )
     }
 
@@ -86,4 +89,5 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             content = pageDto.content,
         )
     }
+
 }

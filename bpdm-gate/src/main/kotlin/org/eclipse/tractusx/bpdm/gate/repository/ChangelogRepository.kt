@@ -19,11 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import io.swagger.v3.oas.annotations.Parameter
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
 
@@ -63,6 +65,9 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecifi
                 }
             }
     }
+
+    @Query("select distinct u.externalId from ChangelogEntity u where u.externalId in :externalIdList")
+    fun findExternalIdsInListDistinct(externalIdList: Collection<String>): Set<String>
 
 
 }

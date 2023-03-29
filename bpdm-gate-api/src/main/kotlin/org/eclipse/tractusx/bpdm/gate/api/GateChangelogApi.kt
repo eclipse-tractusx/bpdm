@@ -58,7 +58,7 @@ interface GateChangelogApi {
     fun getChangelogEntriesExternalId(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
-        @RequestBody(required = true)  @NotEmpty(message = "Input externalIds list cannot be empty.") externalIds: Collection<String>
+        @RequestBody(required = true) @NotEmpty(message = "Input externalIds list cannot be empty.") externalIds: Set<String>
     ): PageChangeLogResponse<ChangelogResponse>
 
     @Operation(

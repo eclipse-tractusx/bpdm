@@ -37,7 +37,7 @@ class ChangelogController(
 ) : GateChangelogApi {
 
     override fun getChangelogEntriesExternalId(
-        paginationRequest: PaginationRequest, fromTime: Instant?, externalIds: Collection<String>
+        paginationRequest: PaginationRequest, fromTime: Instant?, externalIds: Set<String>
     ): PageChangeLogResponse<ChangelogResponse> {
         return changelogService.getChangeLogByExternalId(externalIds, fromTime, paginationRequest.page, paginationRequest.size)
     }

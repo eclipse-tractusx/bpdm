@@ -116,7 +116,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, listOf(CommonValues.externalIdAddress1))
+        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, setOf(CommonValues.externalIdAddress1))
 
         assertRecursively(searchResult.content)
             .ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
@@ -133,7 +133,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id not found`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, listOf("NONEXIST"))
+        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, setOf("NONEXIST"))
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -164,7 +164,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id and timeStamp`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), instant, listOf(CommonValues.externalIdAddress1))
+        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), instant, setOf(CommonValues.externalIdAddress1))
 
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
