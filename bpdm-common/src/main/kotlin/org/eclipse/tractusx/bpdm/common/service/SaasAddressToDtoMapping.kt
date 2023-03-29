@@ -27,106 +27,105 @@ import org.eclipse.tractusx.bpdm.common.model.*
 
 class SaasAddressToDtoMapping(private val address: AddressSaas) {
 
-    private fun <T:TypeValueSaas> findType(values: Collection<T>, enumType: NamedType): T? {
+    private fun <T : TypeValueSaas> findType(values: Collection<T>, enumType: NamedType): T? {
         return values.find { it.type?.equals(enumType.getTypeName()) ?: false }
     }
 
     fun geoCoordinates(): GeoCoordinateDto? {
+        return when {
+            address.geographicCoordinates?.longitude != null && address.geographicCoordinates.latitude != null ->
+                GeoCoordinateDto(address.geographicCoordinates.longitude, address.geographicCoordinates.latitude, null)
 
-        return if (address.geographicCoordinates?.longitude != null
-                    && address.geographicCoordinates.latitude != null)
-                 GeoCoordinateDto(address.geographicCoordinates.longitude, address.geographicCoordinates.latitude, null)
-            else
-                null
+            else -> null
+        }
     }
 
     fun countryCode(): CountryCode? {
-
-        return this.address.country?.shortName;
+        return address.country?.shortName
     }
 
     fun adminAreaLevel1(): String? {
-        val adminArea = findType( this.address.administrativeAreas, SaasAdministrativeAreaType.REGION)
-        return adminArea?.value;
+        val adminArea = findType(address.administrativeAreas, SaasAdministrativeAreaType.REGION)
+        return adminArea?.value
     }
 
     fun adminAreaLevel2(): String? {
-        val adminArea = findType( this.address.administrativeAreas, SaasAdministrativeAreaType.COUNTY)
-        return adminArea?.value;
+        val adminArea = findType(address.administrativeAreas, SaasAdministrativeAreaType.COUNTY)
+        return adminArea?.value
     }
 
     fun postcode(): String? {
-        val postcode = findType( this.address.postCodes, SaasPostCodeType.REGULAR)
-        return postcode?.value;
+        val postcode = findType(address.postCodes, SaasPostCodeType.REGULAR)
+        return postcode?.value
     }
 
     fun city(): String? {
-        val locality = findType( this.address.localities, SaasLocalityType.CITY)
-        return locality?.value;
+        val locality = findType(address.localities, SaasLocalityType.CITY)
+        return locality?.value
     }
 
     fun districtLevel1(): String? {
-        val locality = findType( this.address.localities, SaasLocalityType.DISTRICT)
-        return locality?.value;
+        val locality = findType(address.localities, SaasLocalityType.DISTRICT)
+        return locality?.value
     }
 
     fun districtLevel2(): String? {
-        val locality = findType( this.address.localities, SaasLocalityType.QUARTER)
-        return locality?.value;
+        val locality = findType(address.localities, SaasLocalityType.QUARTER)
+        return locality?.value
     }
 
     fun streetName(): String? {
-        val thoroughfare = findType( this.address.thoroughfares, SaasThoroughfareType.STREET)
-        return thoroughfare?.name;
+        val thoroughfare = findType(address.thoroughfares, SaasThoroughfareType.STREET)
+        return thoroughfare?.name
     }
 
     fun streetHouseNumber(): String? {
-        val thoroughfare = findType( this.address.thoroughfares, SaasThoroughfareType.STREET)
-        return thoroughfare?.number;
+        val thoroughfare = findType(address.thoroughfares, SaasThoroughfareType.STREET)
+        return thoroughfare?.number
     }
 
     fun streetMilestone(): String? {
-        val thoroughfare = findType( this.address.thoroughfares, SaasThoroughfareType.STREET)
-        return thoroughfare?.shortName;
+        val thoroughfare = findType(address.thoroughfares, SaasThoroughfareType.STREET)
+        return thoroughfare?.shortName
     }
 
     fun streetDirection(): String? {
-        val thoroughfare = findType( this.address.thoroughfares, SaasThoroughfareType.STREET)
-        return thoroughfare?.direction;
+        val thoroughfare = findType(address.thoroughfares, SaasThoroughfareType.STREET)
+        return thoroughfare?.direction
     }
 
     fun companyPostCode(): String? {
-        val postcode = findType( this.address.postCodes, SaasPostCodeType.LARGE_MAIL_USER)
-        return postcode?.value;
+        val postcode = findType(address.postCodes, SaasPostCodeType.LARGE_MAIL_USER)
+        return postcode?.value
     }
 
     fun industrialZone(): String? {
-        val thoroughfare = findType( this.address.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)
-        return thoroughfare?.name;
+        val thoroughfare = findType(address.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)
+        return thoroughfare?.name
     }
 
     fun building(): String? {
-        val premise = findType( this.address.premises, SaasPremiseType.BUILDING)
-        return premise?.value;
+        val premise = findType(address.premises, SaasPremiseType.BUILDING)
+        return premise?.value
     }
 
     fun floor(): String? {
-        val premise = findType( this.address.premises, SaasPremiseType.LEVEL)
-        return premise?.value;
+        val premise = findType(address.premises, SaasPremiseType.LEVEL)
+        return premise?.value
     }
 
     fun door(): String? {
-        val premise = findType( this.address.premises, SaasPremiseType.ROOM)
-        return premise?.value;
+        val premise = findType(address.premises, SaasPremiseType.ROOM)
+        return premise?.value
     }
 
-    fun deliveryServiceTypePrivateBag (): String? {
-        val postalDeliveryPoint = findType( this.address.postalDeliveryPoints, SaasPostalDeliveryPointType.MAILBOX)
-        return postalDeliveryPoint?.value;
+    fun deliveryServiceTypePrivateBag(): String? {
+        val postalDeliveryPoint = findType(address.postalDeliveryPoints, SaasPostalDeliveryPointType.MAILBOX)
+        return postalDeliveryPoint?.value
     }
 
     fun deliveryServiceTypePoBox(): String? {
-        val postalDeliveryPoint = findType( this.address.postalDeliveryPoints, SaasPostalDeliveryPointType.POST_OFFICE_BOX)
-        return postalDeliveryPoint?.value;
+        val postalDeliveryPoint = findType(address.postalDeliveryPoints, SaasPostalDeliveryPointType.POST_OFFICE_BOX)
+        return postalDeliveryPoint?.value
     }
 }
