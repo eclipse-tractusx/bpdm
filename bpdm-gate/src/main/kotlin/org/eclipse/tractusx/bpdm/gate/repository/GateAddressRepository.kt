@@ -25,6 +25,6 @@ import org.springframework.data.repository.CrudRepository
 
 interface GateAddressRepository : JpaRepository<AddressGate, Long>, CrudRepository<AddressGate, Long> {
 
-    fun findAllByExternalId(externalIds: String): List<AddressGate>
+    fun findByExternalIdIn(externalId: Collection<String>): Set<AddressGate>
 
 }

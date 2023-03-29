@@ -36,7 +36,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
-import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -48,8 +47,8 @@ class AddressService(
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val typeMatchingService: TypeMatchingService,
-    private val gateAddressRepository: GateAddressRepository,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val addressPersistenceService: AddressPersistenceService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -158,11 +157,7 @@ class AddressService(
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
 
-        addresses.forEach {
-            if(gateAddressRepository.findAllByExternalId(it.externalId).isEmpty() ) {
-                gateAddressRepository.save(it.toAddressGate())
-            }
-        }
+        addressPersistenceService.persistAddressBP(addresses)
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
@@ -172,6 +167,7 @@ class AddressService(
         deleteParentRelationsOfAddresses(addresses)
 
         upsertParentRelations(addresses)
+
     }
 
     /**

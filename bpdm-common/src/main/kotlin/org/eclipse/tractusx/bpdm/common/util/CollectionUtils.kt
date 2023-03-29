@@ -17,18 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.common.util
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-
-@Entity
-@Table(name = "identifier_status")
-class IdentifierStatusGate(
-    @Column(name = "name", nullable = false)
-    val name: String,
-    @Column(name = "technicalKey", nullable = false, unique = true)
-    val technicalKey: String
-) : BaseEntity()
+fun <T> MutableCollection<T>.replace(elements: Collection<T>) {
+    clear()
+    addAll(elements)
+}
