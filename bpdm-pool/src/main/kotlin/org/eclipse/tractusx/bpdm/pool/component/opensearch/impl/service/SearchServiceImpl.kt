@@ -37,11 +37,11 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.Addre
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
-import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchUserException
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.*
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
@@ -57,7 +57,7 @@ class SearchServiceImpl(
     val legalEntityDocSearchRepository: LegalEntityDocSearchRepository,
     val addressDocSearchRepository: AddressDocSearchRepository,
     val legalEntityRepository: LegalEntityRepository,
-    val addressPartnerRepository: AddressPartnerRepository,
+    val logisticAddressRepository: LogisticAddressRepository,
     val addressService: AddressService,
     val textDocSearchRepository: TextDocSearchRepository,
     val businessPartnerFetchService: BusinessPartnerFetchService,
@@ -95,7 +95,7 @@ class SearchServiceImpl(
     override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchResponse> {
         val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
 
-        addressService.fetchPartnerAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
+        addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
 
         return with(addressPage) {
             PageResponse(totalElements, totalPages, page, contentSize,
@@ -170,7 +170,7 @@ class SearchServiceImpl(
     private fun searchAndPreparePage(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<Pair<Float, AddressPartner>> {
+    ): PageResponse<Pair<Float, LogisticAddress>> {
 
         return if (searchRequest == AddressPartnerSearchRequest.EmptySearchRequest) {
             paginateAddressPartner(paginationRequest)
@@ -186,9 +186,9 @@ class SearchServiceImpl(
         return legalEntityPage.toDto(legalEntityPage.content.map { Pair(0f, it) }) // assign 0 score as no search has been conducted
     }
 
-    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageResponse<Pair<Float, AddressPartner>> {
+    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageResponse<Pair<Float, LogisticAddress>> {
         logger.debug { "Paginate database for address partners" }
-        val addressPage = addressPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val addressPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         return addressPage.toDto(addressPage.content.map { Pair(0f, it) }) // assign 0 score as no search has been conducted
     }
@@ -227,6 +227,14 @@ class SearchServiceImpl(
     private fun searchIndex(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
+    ): PageResponse<Pair<Float, LogisticAddress>> {
+        TODO("Re-implement for Open Search for LogisticAddress")
+    }
+
+/*
+    private fun searchIndex(
+        searchRequest: AddressPartnerSearchRequest,
+        paginationRequest: PaginationRequest
     ): PageResponse<Pair<Float, AddressPartner>> {
         logger.debug { "Search index for addresses" }
 
@@ -254,4 +262,5 @@ class SearchServiceImpl(
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
         return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
     }
+*/
 }

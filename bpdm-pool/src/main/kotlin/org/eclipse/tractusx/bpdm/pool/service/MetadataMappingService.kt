@@ -27,8 +27,10 @@ import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
+import org.eclipse.tractusx.bpdm.pool.entity.Region
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.springframework.stereotype.Service
 
 /**
@@ -37,7 +39,8 @@ import org.springframework.stereotype.Service
 @Service
 class MetadataMappingService(
     private val identifierTypeRepository: IdentifierTypeRepository,
-    private val legalFormRepository: LegalFormRepository
+    private val legalFormRepository: LegalFormRepository,
+    private val regionRepository: RegionRepository
 ) {
 
     /**
@@ -53,10 +56,10 @@ class MetadataMappingService(
     /**
      * Fetch metadata entities referenced in [partners] and map them by their referenced keys
      */
-    // TODO still unused!
     fun mapRequests(partners: Collection<LogisticAddressDto>): AddressMetadataMappingDto {
         return AddressMetadataMappingDto(
             idTypes = mapAddressIdentifierTypes(partners),
+            regions = mapAddressRegions(partners)
         )
     }
 
@@ -81,6 +84,18 @@ class MetadataMappingService(
      */
     fun mapLegalForms(partners: Collection<LegalEntityDto>): Map<String, LegalForm>{
         return mapLegalForms(partners.mapNotNull { it.legalForm }.toSet())
+    }
+
+    fun mapAddressRegions(partners: Collection<LogisticAddressDto>): Map<String, Region> {
+        val regionCodes = partners.mapNotNull { it.physicalPostalAddress.baseAddress.administrativeAreaLevel1 }
+            .plus(partners.mapNotNull { it.alternativePostalAddress?.baseAddress?.administrativeAreaLevel1 })
+            .toSet()
+
+        return regionRepository.findByRegionCodeIn(regionCodes)
+            .associateBy { it.regionCode }
+            .also {
+                assertKeysFound(regionCodes, it)
+            }
     }
 
 

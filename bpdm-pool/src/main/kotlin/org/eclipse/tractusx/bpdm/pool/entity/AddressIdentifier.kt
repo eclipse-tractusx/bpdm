@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
@@ -39,6 +40,6 @@ class AddressIdentifier(
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: AddressPartner
+    var address: LogisticAddress
 
 ) : BaseEntity()

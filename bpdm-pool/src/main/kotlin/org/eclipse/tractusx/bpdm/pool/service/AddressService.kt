@@ -23,35 +23,34 @@ import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.entity.Address
-import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
-import org.eclipse.tractusx.bpdm.pool.repository.AddressRepository
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val addressPartnerRepository: AddressPartnerRepository,
+    private val logisticAddressRepository: LogisticAddressRepository,
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
-    private val addressRepository: AddressRepository
 ) {
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<LogisticAddressResponse> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
 
-        val page = addressPartnerRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
-        fetchPartnerAddressDependencies(page.map { it }.toSet())
+        val page = logisticAddressRepository.findByLegalEntityBpn(bpn, PageRequest.of(pageIndex, pageSize))
+        fetchLogisticAddressDependencies(page.map { it }.toSet())
         return page.toDto(page.content.map { it.toDto() })
     }
 
     fun findByBpn(bpn: String): LogisticAddressResponse {
-        val address = addressPartnerRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
+        val address = logisticAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDto()
     }
 
@@ -63,13 +62,13 @@ class AddressService(
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
-        val addressPage = addressPartnerRepository.findByLegalEntityInOrSiteInOrBpnIn(
-            partners,
-            sites,
-            searchRequest.addresses,
-            PageRequest.of(paginationRequest.page, paginationRequest.size)
+        val addressPage = logisticAddressRepository.findByLegalEntityInOrSiteInOrBpnIn(
+            legalEntities = partners,
+            sites = sites,
+            bpns = searchRequest.addresses,
+            pageable = PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
-        fetchPartnerAddressDependencies(addressPage.map { it }.toSet())
+        fetchLogisticAddressDependencies(addressPage.map { it }.toSet())
         return addressPage.toDto(addressPage.content.map { it.toDto() })
     }
 
@@ -77,7 +76,7 @@ class AddressService(
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
         legalEntityRepository.joinLegalAddresses(legalEntities)
         val addresses = legalEntities.map { it.legalAddress }
-        fetchAddressDependencies(addresses.toSet())
+        fetchLogisticAddressDependencies(addresses.toSet())
         return addresses.map { it.toDto() }
     }
 
@@ -85,30 +84,14 @@ class AddressService(
         val sites = siteRepository.findDistinctByBpnIn(bpnS)
         siteRepository.joinAddresses(sites)
         val addresses = sites.map { it.mainAddress }
-        fetchAddressDependencies(addresses.toSet())
+        fetchLogisticAddressDependencies(addresses.toSet())
         return addresses.map { it.toDto() }
     }
 
-    fun fetchPartnerAddressDependencies(addressPartners: Set<AddressPartner>): Set<AddressPartner> {
-        addressPartnerRepository.joinLegalEntities(addressPartners)
-        addressPartnerRepository.joinSites(addressPartners)
-        addressPartnerRepository.joinAddresses(addressPartners)
-
-        fetchAddressDependencies(addressPartners.map { it.address }.toSet())
-
-        return addressPartners
-    }
-
-    fun fetchAddressDependencies(addresses: Set<Address>): Set<Address> {
-        addressRepository.joinContexts(addresses)
-        addressRepository.joinTypes(addresses)
-        addressRepository.joinVersions(addresses)
-        addressRepository.joinAdminAreas(addresses)
-        addressRepository.joinPostCodes(addresses)
-        addressRepository.joinLocalities(addresses)
-        addressRepository.joinPremises(addresses)
-        addressRepository.joinPostalDeliveryPoints(addresses)
-        addressRepository.joinThoroughfares(addresses)
+    fun fetchLogisticAddressDependencies(addresses: Set<LogisticAddress>): Set<LogisticAddress> {
+        logisticAddressRepository.joinLegalEntities(addresses)
+        logisticAddressRepository.joinSites(addresses)
+        logisticAddressRepository.joinRegions(addresses)
 
         return addresses
     }

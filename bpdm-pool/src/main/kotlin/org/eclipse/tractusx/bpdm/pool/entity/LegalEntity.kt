@@ -40,11 +40,7 @@ class LegalEntity(
     var legalForm: LegalForm?,
 
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant,
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "legal_address_id", nullable = false)
-    var legalAddress: Address
+    var currentness: Instant
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -54,7 +50,7 @@ class LegalEntity(
     val states: MutableSet<LegalEntityState> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<AddressPartner> = mutableSetOf()
+    val addresses: MutableSet<LogisticAddress> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()
@@ -67,4 +63,8 @@ class LegalEntity(
 
     @OneToMany(mappedBy = "endNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val endNodeRelations: MutableSet<Relation> = mutableSetOf()
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "legal_address_id", nullable = false)
+    lateinit var legalAddress: LogisticAddress
 }

@@ -29,7 +29,7 @@ class AlternativePostalAddress(
     @AttributeOverride(name = "latitude", column = Column(name = "alt_latitude"))
     @AttributeOverride(name = "longitude", column = Column(name = "alt_longitude"))
     @AttributeOverride(name = "altitude", column = Column(name = "alt_altitude"))
-    val geographicCoordinates: GeographicCoordinate,
+    val geographicCoordinates: GeographicCoordinate?,
 
     @Column(name = "alt_country")
     @Enumerated(EnumType.STRING)

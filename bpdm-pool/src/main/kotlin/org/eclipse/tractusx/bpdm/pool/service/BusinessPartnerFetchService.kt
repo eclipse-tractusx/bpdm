@@ -101,7 +101,7 @@ class BusinessPartnerFetchService(
     fun fetchDependenciesWithLegalAddress(partners: Set<LegalEntity>): Set<LegalEntity> {
         fetchLegalEntityDependencies(partners)
         legalEntityRepository.joinLegalAddresses(partners)
-        addressService.fetchAddressDependencies(partners.map { it.legalAddress }.toSet())
+        addressService.fetchLogisticAddressDependencies(partners.map { it.legalAddress }.toSet())
         return partners
     }
 

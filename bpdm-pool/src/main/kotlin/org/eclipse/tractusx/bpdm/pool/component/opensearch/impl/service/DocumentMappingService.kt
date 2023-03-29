@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.entity.Address
 import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.springframework.stereotype.Service
 
 /**
@@ -44,10 +45,18 @@ class DocumentMappingService {
             legalName = TextDoc(partner.legalName.value),
             legalForm = partner.legalForm?.name?.let { TextDoc(it) },
             status = partnerStatus?.officialDenotation?.let { TextDoc(it) },
-            addresses = listOf(toDocument(partner.legalAddress)),
+//            addresses = listOf(toDocument(partner.legalAddress)),     // TODO fix
+            addresses = listOf(),
             classifications = partner.classifications.mapNotNull { classif -> classif.value?.let { TextDoc(it) } },
             sites = partner.sites.map { TextDoc(it.name) }
         )
+    }
+
+    /**
+     * Maps [address] to [AddressDoc] representation
+     */
+    fun toDocument(address: LogisticAddress): AddressDoc {
+        TODO("implement")
     }
 
     /**

@@ -47,6 +47,6 @@ class AddressState (
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: Address
+    var address: LogisticAddress
 
 ) : BaseEntity()

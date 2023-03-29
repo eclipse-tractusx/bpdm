@@ -19,8 +19,36 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.entity.Site
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long>
+interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long> {
+    fun findByBpn(bpn: String): LogisticAddress?
+
+    fun findDistinctByBpnIn(bpns: Collection<String>): Set<LogisticAddress>
+
+    @Query("SELECT a FROM LogisticAddress a join a.legalEntity p where p.bpn=:bpn")
+    fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<LogisticAddress>
+
+    fun findByLegalEntityInOrSiteInOrBpnIn(
+        legalEntities: Collection<LegalEntity>,
+        sites: Collection<Site>,
+        bpns: Collection<String>,
+        pageable: Pageable
+    ): Page<LogisticAddress>
+
+    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.legalEntity WHERE a IN :addresses")
+    fun joinLegalEntities(addresses: Set<LogisticAddress>): Set<LogisticAddress>
+
+    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.site WHERE a IN :addresses")
+    fun joinSites(addresses: Set<LogisticAddress>): Set<LogisticAddress>
+
+    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 WHERE a IN :addresses")
+    fun joinRegions(addresses: Set<LogisticAddress>): Set<LogisticAddress>
+}

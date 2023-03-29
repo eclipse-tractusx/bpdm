@@ -19,11 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -31,9 +29,9 @@ import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -51,7 +49,7 @@ class BusinessPartnerBuildService(
     private val metadataMappingService: MetadataMappingService,
     private val changelogService: PartnerChangelogService,
     private val siteRepository: SiteRepository,
-    private val addressPartnerRepository: AddressPartnerRepository,
+    private val logisticAddressRepository: LogisticAddressRepository,
     private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository
 ) {
 
@@ -67,14 +65,20 @@ class BusinessPartnerBuildService(
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         val validRequests = filterLegalEntityDuplicatesByIdentifier(requests, errors)
 
-        val metadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalEntity })
+        val legalEntityMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalEntity })
+        val addressMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalEntity.legalAddress })
 
         val bpnLs = bpnIssuingService.issueLegalEntityBpns(validRequests.size)
-        val requestWithBpnPairs = validRequests.zip(bpnLs)
+        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
 
-        val legalEntityWithIndexByBpnMap = requestWithBpnPairs
-            .map { (request, bpnL) -> Pair(createLegalEntity(request.legalEntity, bpnL, metadataMap), request.index) }
+        val legalEntityWithIndexByBpnMap = validRequests
+            .mapIndexed { i, request ->
+                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[i], legalEntityMetadataMap)
+                legalEntity.legalAddress = createLogisticAddress(request.legalEntity.legalAddress, bpnAs[i], legalEntity, addressMetadataMap)
+                Pair(legalEntity, request.index)
+            }
             .associateBy { (legalEntity, _) -> legalEntity.bpn }
+        
         val legalEntities = legalEntityWithIndexByBpnMap.values.map { (legalEntity, _) -> legalEntity }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
@@ -97,17 +101,25 @@ class BusinessPartnerBuildService(
             ErrorInfo(SiteCreateError.LegalEntityNotFound, "Site not created: parent legal entity ${it.bpnParent} not found", it.index)
         }
 
+        val addressMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.site.mainAddress })
+
         val bpnSs = bpnIssuingService.issueSiteBpns(validRequests.size)
-        val requestBpnPairs = validRequests.zip(bpnSs)
-        val bpnsMap = requestBpnPairs
-            .map { (request, bpns) -> Pair(createSite(request.site, bpns, legalEntityMap[request.bpnParent]!!), request.index) }
+        val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
+
+        val siteWithIndexByBpnMap = validRequests
+            .mapIndexed { i, request ->
+                val legalEntity = legalEntityMap[request.bpnParent]!!
+                val site = createSite(request.site, bpnSs[i], legalEntity)
+                site.mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[i], site, addressMetadataMap)
+                Pair(site, request.index)
+            }
             .associateBy { (site, _) -> site.bpn }
-        val sites = bpnsMap.values.map { (site, _) -> site }
+        val sites = siteWithIndexByBpnMap.values.map { (site, _) -> site }
 
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
         siteRepository.saveAll(sites)
 
-        val validEntities = sites.map { it.toUpsertDto(bpnsMap[it.bpn]!!.second) }
+        val validEntities = sites.map { it.toUpsertDto(siteWithIndexByBpnMap[it.bpn]!!.second) }
 
         return EntitiesWithErrors(validEntities, errors)
     }
@@ -121,12 +133,16 @@ class BusinessPartnerBuildService(
         val (legalEntityRequests, otherAddresses) = requests.partition { isLegalEntityRequest(it) }
         val (siteRequests, invalidAddresses) = otherAddresses.partition { isSiteRequest(it) }
 
+        val validRequests = legalEntityRequests.plus(siteRequests)
+        val metadataMap = metadataMappingService.mapRequests(validRequests.map { it.address })
+
         val errors = mutableListOf<ErrorInfo<AddressCreateError>>()
         invalidAddresses.map {
             ErrorInfo(AddressCreateError.BpnNotValid, "Address not created: parent ${it.bpnParent} is not a valid BPNL/BPNS", it.index)
         }.forEach(errors::add)
-        val addressResponses = createSiteAddressResponses(siteRequests, errors).toMutableList()
-        addressResponses.addAll(createLegalEntityAddressResponses(legalEntityRequests, errors))
+
+        val addressResponses = createAddressesForSite(siteRequests, errors, metadataMap)
+            .plus(createAddressesForLegalEntity(legalEntityRequests, errors, metadataMap))
 
         changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.address.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
@@ -139,7 +155,9 @@ class BusinessPartnerBuildService(
     @Transactional
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }
-        val metadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
+        
+        val legalEntityMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
+        val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity.legalAddress })
 
         val bpnsToFetch = requests.map { it.bpn }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -151,7 +169,11 @@ class BusinessPartnerBuildService(
         }
 
         val requestByBpnMap = requests.associateBy { it.bpn }
-        legalEntities.forEach { updateLegalEntity(it, requestByBpnMap.get(it.bpn)!!.legalEntity, metadataMap) }
+        legalEntities.forEach { 
+            val request = requestByBpnMap.get(it.bpn)!!
+            updateLegalEntity(it, request.legalEntity, legalEntityMetadataMap)
+            updateLogisticAddress(it.legalAddress, request.legalEntity.legalAddress, addressMetadataMap)
+        }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
 
@@ -164,6 +186,8 @@ class BusinessPartnerBuildService(
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} sites" }
 
+        val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.site.mainAddress })
+
         val bpnsToFetch = requests.map { it.bpn }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
 
@@ -175,7 +199,11 @@ class BusinessPartnerBuildService(
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
 
         val requestByBpnMap = requests.associateBy { it.bpn }
-        sites.forEach { updateSite(it, requestByBpnMap[it.bpn]!!.site) }
+        sites.forEach {
+            val request = requestByBpnMap[it.bpn]!!
+            updateSite(it, request.site)
+            updateLogisticAddress(it.mainAddress, request.site.mainAddress, addressMetadataMap)
+        }
         val validEntities = siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
 
         return EntitiesWithErrors(validEntities, errors)
@@ -184,18 +212,21 @@ class BusinessPartnerBuildService(
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }
 
-        val validAddresses = addressPartnerRepository.findDistinctByBpnIn(requests.map { it.bpn })
+        val validAddresses = logisticAddressRepository.findDistinctByBpnIn(requests.map { it.bpn })
         val validBpns = validAddresses.map { it.bpn }.toHashSet()
-        val errors = requests.filter { !validBpns.contains(it.bpn) }.map {
+        val (validRequests, invalidRequests) = requests.partition { validBpns.contains(it.bpn) }
+        val errors = invalidRequests.map {
             ErrorInfo(AddressUpdateError.AddressNotFound, "Address ${it.bpn} not updated: BPNA not found", it.bpn)
         }
 
-        val requestMap = requests.associateBy { it.bpn }
-        validAddresses.forEach { updateAddress(it.address, requestMap[it.bpn]!!.address) }
+        val requestByBpnMap = requests.associateBy { it.bpn }
+        val metadataMap = metadataMappingService.mapRequests(validRequests.map { it.address })
+
+        validAddresses.forEach { updateLogisticAddress(it, requestByBpnMap[it.bpn]!!.address, metadataMap) }
 
         changelogService.createChangelogEntries(validAddresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
-        val addressResponses =  addressPartnerRepository.saveAll(validAddresses).map { it.toDto() }
+        val addressResponses = logisticAddressRepository.saveAll(validAddresses).map { it.toDto() }
         return EntitiesWithErrors(addressResponses, errors)
     }
 
@@ -207,8 +238,11 @@ class BusinessPartnerBuildService(
         legalEntityRepository.save(partner)
     }
 
-    private fun createLegalEntityAddressResponses(requests: Collection<AddressPartnerCreateRequest>,
-                                                  errors: MutableList<ErrorInfo<AddressCreateError>>): Collection<AddressPartnerCreateResponse> {
+    private fun createAddressesForLegalEntity(
+        requests: Collection<AddressPartnerCreateRequest>,
+        errors: MutableList<ErrorInfo<AddressCreateError>>,
+        metadataMap: AddressMetadataMappingDto
+    ): Collection<AddressPartnerCreateResponse> {
 
         fun findValidLegalEnities(requests: Collection<AddressPartnerCreateRequest>): Map<String, LegalEntity> {
             val bpnLsToFetch = requests.map { it.bpnParent }
@@ -217,44 +251,51 @@ class BusinessPartnerBuildService(
             return bpnl2LegalEntityMap
         }
 
-        val bpnl2LegalEntityMap = findValidLegalEnities(requests)
-        val (validRequests, invalidRequests) = requests.partition { bpnl2LegalEntityMap[it.bpnParent] != null }
+        val legalEntityByBpnMap = findValidLegalEnities(requests)
+        val (validRequests, invalidRequests) = requests.partition { legalEntityByBpnMap[it.bpnParent] != null }
 
         errors.addAll(invalidRequests.map {
             ErrorInfo(AddressCreateError.LegalEntityNotFound, "Address not created: parent legal entity ${it.bpnParent} not found", it.index)
         })
 
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
-        val validAddressesByIndex = validRequests
-            .zip(bpnAs)
-            .map { (request, bpna) -> Pair(request.index, createPartnerAddress(request.address, bpna, bpnl2LegalEntityMap[request.bpnParent], null)) }
-        addressPartnerRepository.saveAll(validAddressesByIndex.map{it.second})
-        return validAddressesByIndex.map { it.second.toCreateResponse(it.first) }
+        val addressesWithIndex = validRequests
+            .mapIndexed { i, request ->
+                val legalEntity = legalEntityByBpnMap[request.bpnParent]!!
+                val address = createLogisticAddress(request.address, bpnAs[i], legalEntity, metadataMap)
+                Pair(address, request.index)
+            }
+
+        logisticAddressRepository.saveAll(addressesWithIndex.map { (address, _) -> address })
+        return addressesWithIndex.map { (address, index) -> address.toCreateResponse(index) }
     }
 
-    private fun createSiteAddressResponses(requests: Collection<AddressPartnerCreateRequest>,
-                                           errors: MutableList<ErrorInfo<AddressCreateError>>): List<AddressPartnerCreateResponse> {
+    private fun createAddressesForSite(
+        requests: Collection<AddressPartnerCreateRequest>,
+        errors: MutableList<ErrorInfo<AddressCreateError>>,
+        metadataMap: AddressMetadataMappingDto
+    ): List<AddressPartnerCreateResponse> {
 
-        fun findValidSites(requests: Collection<AddressPartnerCreateRequest>): Map<String, Site> {
-            val bpnsToFetch = requests.map { it.bpnParent }
-            val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
-            val bpns2SiteMap = sites.associateBy { it.bpn }
-            return bpns2SiteMap
-        }
+        val bpnsToFetch = requests.map { it.bpnParent }
+        val siteByBpnMap = siteRepository
+            .findDistinctByBpnIn(bpnsToFetch)
+            .associateBy { it.bpn }
 
-        val bpns2SiteMap = findValidSites(requests)
-        val (validRequests, invalidRequests) = requests.partition { bpns2SiteMap[it.bpnParent] != null }
+        val (validRequests, invalidRequests) = requests.partition { siteByBpnMap[it.bpnParent] != null }
         errors.addAll(invalidRequests.map {
             ErrorInfo(AddressCreateError.SiteNotFound, "Address not created: site ${it.bpnParent} not found", it.index)
         })
 
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
-        val validAddressesByIndex = validRequests
-            .zip(bpnAs)
-            .map { (request, bpna) -> Pair(request.index, createPartnerAddress(request.address, bpna, null, bpns2SiteMap[request.bpnParent])) }
+        val addressesWithIndex = validRequests
+            .mapIndexed { i, request ->
+                val site = siteByBpnMap[request.bpnParent]!!
+                val address = createLogisticAddress(request.address, bpnAs[i], site, metadataMap)
+                Pair(address, request.index)
+            }
 
-        addressPartnerRepository.saveAll(validAddressesByIndex.map{it.second})
-        return validAddressesByIndex.map { it.second.toCreateResponse(it.first) }
+        logisticAddressRepository.saveAll(addressesWithIndex.map { (address, _) -> address })
+        return addressesWithIndex.map { (address, index) -> address.toCreateResponse(index) }
     }
 
     private fun createLegalEntity(
@@ -264,14 +305,12 @@ class BusinessPartnerBuildService(
     ): LegalEntity {
         val legalName = toEntity(request.legalName)
         val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
-        val legalAddress = createAddress(request.legalAddress)
 
         val partner = LegalEntity(
             bpn = bpnL,
             legalName = legalName,
             legalForm = legalForm,
             currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-            legalAddress = legalAddress
         )
 
         return updateLegalEntity(partner, request, metadataMap)
@@ -282,13 +321,10 @@ class BusinessPartnerBuildService(
         bpnS: String,
         partner: LegalEntity
     ): Site {
-        val mainAddress = createAddress(request.mainAddress)
-
         val site = Site(
             bpn = bpnS,
             name = request.name,
             legalEntity = partner,
-            mainAddress = mainAddress
         )
 
         site.states.addAll(request.states.map { toEntity(it, site) })
@@ -316,8 +352,6 @@ class BusinessPartnerBuildService(
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
         partner.classifications.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
 
-        updateAddress(partner.legalAddress, request.legalAddress)
-
         return partner
     }
 
@@ -325,73 +359,111 @@ class BusinessPartnerBuildService(
         site.name = request.name
 
         site.states.clear()
-
         site.states.addAll(request.states.map { toEntity(it, site) })
-
-        updateAddress(site.mainAddress, request.mainAddress)
 
         return site
     }
 
-    private fun createAddress(
-        dto: LogisticAddressDto
-    ): Address {
-        val address = Address(
-            // TODO map dto
-            careOf = "dto.careOf",
-            contexts = mutableSetOf(),
-            country = dto.physicalPostalAddress.baseAddress.country,
-            types =  mutableSetOf(),
-            version = AddressVersion(CharacterSet.CHINESE,LanguageCode.aa),
-            geoCoordinates = dto.physicalPostalAddress.baseAddress.geographicCoordinates?.let { toEntity(it) }
-        )
-
-        return updateAddress(address, dto)
-    }
-
-    private fun createPartnerAddress(
+    private fun createLogisticAddress(
         dto: LogisticAddressDto,
         bpn: String,
-        partner: LegalEntity?,
-        site: Site?
-    ): AddressPartner {
-        val addressPartner = AddressPartner(
-            bpn,
-            partner,
-            site,
-            createAddress(dto)
+        legalEntity: LegalEntity,
+        metadataMap: AddressMetadataMappingDto
+    ) = createLogisticAddressInternal(dto, bpn, metadataMap)
+            .also { it.legalEntity = legalEntity }
+
+    private fun createLogisticAddress(
+        dto: LogisticAddressDto,
+        bpn: String,
+        site: Site,
+        metadataMap: AddressMetadataMappingDto
+    ) = createLogisticAddressInternal(dto, bpn, metadataMap)
+            .also { it.site = site }
+
+    private fun createLogisticAddressInternal(
+        dto: LogisticAddressDto,
+        bpn: String,
+        metadataMap: AddressMetadataMappingDto
+    ): LogisticAddress {
+        val address = LogisticAddress(
+            bpn = bpn,
+            legalEntity = null,
+            site = null,
+            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap),
+            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
         )
 
-        updateAddress(addressPartner.address, dto)
-
-        return addressPartner
-    }
-
-    private fun updateAddress(address: Address, dto: LogisticAddressDto): Address{
-        //TODO update addresses
-//        address.careOf = dto.careOf
-//        address.country = dto.country
-//        address.geoCoordinates =  dto.geographicCoordinates?.let { toEntity(dto.geographicCoordinates!!) }
-
-        address.administrativeAreas.clear()
-        address.postCodes.clear()
-        address.thoroughfares.clear()
-        address.localities.clear()
-        address.premises.clear()
-        address.postalDeliveryPoints.clear()
-        address.contexts.clear()
-        address.types.clear()
-
-//        address.administrativeAreas.addAll(dto.administrativeAreas.map { toEntity(it, address) }.toSet())
-//        address.postCodes.addAll(dto.postCodes.map { toEntity(it, address) }.toSet())
-//        address.thoroughfares.addAll(dto.thoroughfares.map { toEntity(it, address) }.toSet())
-//        address.localities.addAll(dto.localities.map { toEntity(it, address) }.toSet())
-//        address.premises.addAll(dto.premises.map { toEntity(it, address) }.toSet())
-//        address.postalDeliveryPoints.addAll(dto.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
-//        address.contexts.addAll(dto.contexts)
-//        address.types.addAll(dto.types)
+        updateLogisticAddress(address, dto, metadataMap)
 
         return address
+    }
+
+    private fun updateLogisticAddress(address: LogisticAddress, dto: LogisticAddressDto, metadataMap: AddressMetadataMappingDto) {
+        address.name = dto.name
+        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap)
+        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
+
+        address.identifiers.apply {
+            clear()
+            addAll(dto.identifiers.map { toEntity(it, metadataMap, address) })
+        }
+        address.states.apply {
+            clear()
+            addAll(dto.states.map { toEntity(it, address) })
+        }
+    }
+
+    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMappingDto): PhysicalPostalAddress {
+        val baseAddress = physicalAddress.baseAddress
+        return PhysicalPostalAddress(
+            geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
+            country = baseAddress.country,
+            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
+                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
+            },
+            administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+            administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+            administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+            postCode = baseAddress.postCode,
+            city = baseAddress.city,
+            districtLevel1 = baseAddress.districtLevel1,
+            districtLevel2 = baseAddress.districtLevel2,
+            street = baseAddress.street?.let { createStreet(it) },
+            industrialZone = physicalAddress.industrialZone,
+            building = physicalAddress.building,
+            floor = physicalAddress.floor,
+            door = physicalAddress.door
+        )
+    }
+
+    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMappingDto): AlternativePostalAddress {
+        val baseAddress = alternativeAddress.baseAddress
+        return AlternativePostalAddress(
+            geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
+            country = baseAddress.country,
+            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
+                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
+            },
+            administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+            administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+            administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+            postCode = baseAddress.postCode,
+            city = baseAddress.city,
+            districtLevel1 = baseAddress.districtLevel1,
+            districtLevel2 = baseAddress.districtLevel2,
+            street = baseAddress.street?.let { createStreet(it) },
+            deliveryServiceType = alternativeAddress.type,
+            deliveryServiceNumber = alternativeAddress.deliveryServiceNumber
+        )
+    }
+
+    private fun createStreet(dto: StreetDto): Street {
+        return Street(
+            name = dto.name,
+            houseNumber = dto.houseNumber,
+            milestone = dto.milestone,
+            direction = dto.direction
+        )
     }
 
     private fun toEntity(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
@@ -411,6 +483,16 @@ class BusinessPartnerBuildService(
             validTo = dto.validTo,
             type = dto.type,
             site = site
+        )
+    }
+
+    private fun toEntity(dto: AddressStateDto, address: LogisticAddress): AddressState {
+        return AddressState(
+            description = dto.description,
+            validFrom = dto.validFrom,
+            validTo = dto.validTo,
+            type = dto.type,
+            address = address
         )
     }
 
@@ -447,7 +529,7 @@ class BusinessPartnerBuildService(
     private fun toEntity(
         dto: AddressIdentifierDto,
         metadataMap: AddressMetadataMappingDto,
-        partner: AddressPartner
+        partner: LogisticAddress
     ): AddressIdentifier {
         return AddressIdentifier(
             value = dto.value,
@@ -465,7 +547,8 @@ class BusinessPartnerBuildService(
     }
 
     private fun filterLegalEntityDuplicatesByIdentifier(
-        requests: Collection<LegalEntityPartnerCreateRequest>, errors: MutableList<ErrorInfo<LegalEntityCreateError>>): Collection<LegalEntityPartnerCreateRequest> {
+        requests: Collection<LegalEntityPartnerCreateRequest>, errors: MutableList<ErrorInfo<LegalEntityCreateError>>
+    ): Collection<LegalEntityPartnerCreateRequest> {
 
         val idValues = requests.flatMap { it.legalEntity.identifiers }.map { it.value }
         val idsInDb = legalEntityIdentifierRepository.findByValueIn(idValues).map { Pair(it.value, it.type.technicalKey) }.toHashSet()
@@ -474,14 +557,14 @@ class BusinessPartnerBuildService(
             it.legalEntity.identifiers.map { id -> Pair(id.value, id.type) }.any { id -> idsInDb.contains(id) }
         }
 
-        invalidRequests.map { 
+        invalidRequests.map {
             ErrorInfo(LegalEntityCreateError.LegalEntityDuplicateIdentifier, "Legal entity not created: duplicate identifier", it.index)
         }.forEach(errors::add)
 
         return validRequests
     }
 
-    private fun createCurrentnessTimestamp(): Instant{
+    private fun createCurrentnessTimestamp(): Instant {
         return Instant.now().truncatedTo(ChronoUnit.MICROS)
     }
 }
