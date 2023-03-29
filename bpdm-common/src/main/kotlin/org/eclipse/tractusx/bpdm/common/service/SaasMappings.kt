@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object SaasMappings {
@@ -89,7 +90,7 @@ object SaasMappings {
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatusDtos(status),
             classifications = toDto(profile),
-            legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
+            legalAddress = convertSaasAdressesToDto(addresses, this.id)
         )
     }
 
@@ -99,7 +100,7 @@ object SaasMappings {
         return SiteDto(
             name = name.value,
             states = toSiteStatusDtos(status),
-            mainAddress = toDto(addresses.first())
+            mainAddress = convertSaasAdressesToDto(addresses, this.id)
         )
     }
 
@@ -174,25 +175,113 @@ object SaasMappings {
         }
     }
 
-    fun toDto(address: AddressSaas): LogisticAddressDto {
-        // TODO Map sass to DTO
+    fun convertSaasAdressesToDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
+
+        val mapping = SaasAddressesMapping(addresses)
+        val physicalAddressMapping = mapping.saasPhysicalAddressMapp();
+        if (physicalAddressMapping == null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
+        }
+
         return LogisticAddressDto(
-            physicalPostalAddress = PhysicalPostalAddressDto(baseAddress = BasePostalAddressDto(city = "", country = CountryCode.AD)),
-            alternativePostalAddress = null,
-//            toDto(address.version),
-//            address.careOf?.value,
-//            address.contexts.mapNotNull { it.value },
-//            toCountryCode(address.country),
-//            address.administrativeAreas.map { toDto(it) },
-//            address.postCodes.map { toDto(it) },
-//            address.localities.map { toDto(it) },
-//            address.thoroughfares.map { toDto(it) },
-//            address.premises.map { toDto(it) },
-//            address.postalDeliveryPoints.map { toDto(it) },
-//            if (address.geographicCoordinates != null) toDto(address.geographicCoordinates) else null,
-//            address.types.map { toTypeOrDefault(it) }
+            name = "TODO",
+            states = emptyList(),
+            identifiers = emptyList(),
+            physicalPostalAddress = toPhysicalAddress(physicalAddressMapping, id),
+            alternativePostalAddress = toAlternativeAddress(mapping.saasAlternativePostalAddress(), id),
         )
     }
+
+    fun toPhysicalAddress(map:SaasAddressToDtoMapping, id: String?): PhysicalPostalAddressDto {
+
+        val city = map.city()
+        val country = map.countryCode()
+        if (city == null || country == null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid physical address", id ?: "Unknown")
+        }
+
+        return PhysicalPostalAddressDto(
+            industrialZone = map.industrialZone(),
+            building = map.building(),
+            floor = map.floor(),
+            door = map.door(),
+            baseAddress = BasePostalAddressDto(
+                geographicCoordinates = map.geoCoordinates(),
+                city = city,
+                country = country,
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                administrativeAreaLevel2 = map.adminAreaLevel2(),
+                administrativeAreaLevel3 = null,
+                administrativeAreaLevel4 = null,
+                postCode = map.postcode(),
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+                street = toStreetDto(map),
+            )
+        )
+    }
+
+    private fun toStreetDto(map: SaasAddressToDtoMapping): StreetDto? {
+        var streetDto: StreetDto? = null;
+        if (map.streetName() != null) {
+            streetDto = StreetDto(
+                name = map.streetName(),
+                houseNumber = map.streetHouseNumber(),
+                milestone = map.streetMilestone(),
+                direction = map.streetDirection()
+            )
+        }
+        return streetDto
+    }
+
+    fun toAlternativeAddress(map: SaasAddressToDtoMapping?, id: String?): AlternativePostalAddressDto? {
+
+        if(map == null) {
+            return null;
+        }
+        val city = map.city()
+        val country = map.countryCode()
+        if (city == null || country == null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
+        }
+
+        val poBoxValue =  map.deliveryServiceTypePoBox();
+        val privateBagValue =  map.deliveryServiceTypePrivateBag()
+
+        var deliveryType: DeliveryServiceType? = null
+        var deliveryValue: String? = null;
+        if (poBoxValue != null) {
+            deliveryType = DeliveryServiceType.PO_BOX
+            deliveryValue = poBoxValue
+        }
+        if (privateBagValue != null) {
+            deliveryType = DeliveryServiceType.PRIVATE_BAG
+            deliveryValue = privateBagValue
+        }
+
+        if(deliveryValue == null || deliveryType== null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
+        }
+
+        return AlternativePostalAddressDto(
+            deliveryServiceNumber = deliveryValue,
+            type = deliveryType,
+            baseAddress = BasePostalAddressDto(
+                geographicCoordinates = map.geoCoordinates(),
+                city = city,
+                country = country,
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                administrativeAreaLevel2 = map.adminAreaLevel2(),
+                administrativeAreaLevel3 = null,
+                administrativeAreaLevel4 = null,
+                postCode = map.postcode(),
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+                street = toStreetDto(map),
+            )
+        )
+    }
+
 
     fun toDto(version: AddressVersionSaas?): AddressVersionDto {
         return AddressVersionDto(toTypeOrDefault(version?.characterSet), toLanguageCode(version?.language))
@@ -216,4 +305,5 @@ object SaasMappings {
             )
         )
     }
+
 }

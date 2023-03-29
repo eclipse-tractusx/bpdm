@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PostCodeType
+import org.eclipse.tractusx.bpdm.common.model.SaasPostCodeType
 
 @Entity
 @Table(
@@ -36,7 +36,7 @@ class PostCode (
     val value: String,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: PostCodeType,
+    val type: SaasPostCodeType,
     @Column(name = "country", nullable = false)
     @Enumerated(EnumType.STRING)
     val countryCode: CountryCode,

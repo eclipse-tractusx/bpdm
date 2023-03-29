@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.SaasAdministrativeAreaType
 
 @Entity
 @Table(
@@ -41,7 +41,7 @@ class AdministrativeArea(
     val fipsCode: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: AdministrativeAreaType,
+    val type: SaasAdministrativeAreaType,
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,

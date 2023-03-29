@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.LocalityType
+import org.eclipse.tractusx.bpdm.common.model.SaasLocalityType
 
 @Entity
 @Table(
@@ -38,7 +38,7 @@ class Locality (
     val shortName: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val localityType: LocalityType,
+    val localityType: SaasLocalityType,
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,

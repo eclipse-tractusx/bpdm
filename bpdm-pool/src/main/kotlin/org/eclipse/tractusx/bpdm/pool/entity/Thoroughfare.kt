@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.ThoroughfareType
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
 
 @Entity
 @Table(
@@ -44,7 +44,7 @@ class Thoroughfare (
     val direction: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: ThoroughfareType,
+    val type: SaasThoroughfareType,
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,
