@@ -57,7 +57,7 @@ data class BasePostalAddressResponse(
     @Schema(description =  "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
     val districtLevel2: String? = null,
 
-    @Schema(description = "Address country")
+    @Schema(description = "Street")
     val street: StreetDto? = null,
 
 )
