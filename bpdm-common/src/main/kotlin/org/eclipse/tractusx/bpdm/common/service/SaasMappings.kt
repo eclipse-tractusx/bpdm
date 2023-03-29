@@ -178,21 +178,20 @@ object SaasMappings {
     fun convertSaasAdressesToDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
 
         val mapping = SaasAddressesMapping(addresses)
-        val physicalAddressMapping = mapping.saasPhysicalAddressMapp();
-        if (physicalAddressMapping == null) {
-            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
-        }
+        val physicalAddressMapping = mapping.saasPhysicalAddressMapping()
+            ?: throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
+        val alternativeAddressMapping = mapping.saasAlternativeAddressMapping()
 
         return LogisticAddressDto(
             name = "TODO",
             states = emptyList(),
             identifiers = emptyList(),
             physicalPostalAddress = toPhysicalAddress(physicalAddressMapping, id),
-            alternativePostalAddress = toAlternativeAddress(mapping.saasAlternativePostalAddress(), id),
+            alternativePostalAddress = alternativeAddressMapping?.let { toAlternativeAddress(it, id) },
         )
     }
 
-    fun toPhysicalAddress(map:SaasAddressToDtoMapping, id: String?): PhysicalPostalAddressDto {
+    fun toPhysicalAddress(map: SaasAddressToDtoMapping, id: String?): PhysicalPostalAddressDto {
 
         val city = map.city()
         val country = map.countryCode()
@@ -222,7 +221,7 @@ object SaasMappings {
     }
 
     private fun toStreetDto(map: SaasAddressToDtoMapping): StreetDto? {
-        var streetDto: StreetDto? = null;
+        var streetDto: StreetDto? = null
         if (map.streetName() != null) {
             streetDto = StreetDto(
                 name = map.streetName(),
@@ -234,22 +233,19 @@ object SaasMappings {
         return streetDto
     }
 
-    fun toAlternativeAddress(map: SaasAddressToDtoMapping?, id: String?): AlternativePostalAddressDto? {
+    fun toAlternativeAddress(map: SaasAddressToDtoMapping, id: String?): AlternativePostalAddressDto {
 
-        if(map == null) {
-            return null;
-        }
         val city = map.city()
         val country = map.countryCode()
         if (city == null || country == null) {
             throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
         }
 
-        val poBoxValue =  map.deliveryServiceTypePoBox();
-        val privateBagValue =  map.deliveryServiceTypePrivateBag()
+        val poBoxValue = map.deliveryServiceTypePoBox()
+        val privateBagValue = map.deliveryServiceTypePrivateBag()
 
         var deliveryType: DeliveryServiceType? = null
-        var deliveryValue: String? = null;
+        var deliveryValue: String? = null
         if (poBoxValue != null) {
             deliveryType = DeliveryServiceType.PO_BOX
             deliveryValue = poBoxValue
@@ -259,7 +255,7 @@ object SaasMappings {
             deliveryValue = privateBagValue
         }
 
-        if(deliveryValue == null || deliveryType== null) {
+        if (deliveryValue == null || deliveryType == null) {
             throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
         }
 
@@ -286,7 +282,6 @@ object SaasMappings {
     fun toDto(version: AddressVersionSaas?): AddressVersionDto {
         return AddressVersionDto(toTypeOrDefault(version?.characterSet), toLanguageCode(version?.language))
     }
-
 
 
     fun toDto(geoCoords: GeoCoordinatesSaas): GeoCoordinateDto? {

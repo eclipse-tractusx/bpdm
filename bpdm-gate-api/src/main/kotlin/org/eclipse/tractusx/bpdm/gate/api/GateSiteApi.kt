@@ -59,7 +59,7 @@ interface GateSiteApi {
     )
     @PutMapping("/input/sites")
     @PutExchange("/input/sites")
-    fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Any>
+    fun upsertSites(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
         summary = "Get site by external identifier",

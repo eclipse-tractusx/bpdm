@@ -23,16 +23,13 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
 
 class SaasAddressesMapping(val addresses: Collection<AddressSaas>) {
 
-    fun saasAlternativePostalAddress() : SaasAddressToDtoMapping? {
-
-        val address =  this.addresses.find { address -> address.types.any{it.name == "Alternative Legal Address" } }
-
-        return if (address != null) SaasAddressToDtoMapping(address) else null;
+    fun saasAlternativeAddressMapping(): SaasAddressToDtoMapping? {
+        val address = addresses.find { address -> address.types.any { it.name == "Alternative Legal Address" } }
+        return address?.let { SaasAddressToDtoMapping(it) }
     }
 
-    fun saasPhysicalAddressMapp() : SaasAddressToDtoMapping? {
-
-        val address =   this.addresses.find { address -> address.types.any{it.name == "Legal Address" } }
-        return if (address != null) SaasAddressToDtoMapping(address) else null;
+    fun saasPhysicalAddressMapping(): SaasAddressToDtoMapping? {
+        val address = addresses.find { address -> address.types.any { it.name == "Legal Address" } }
+        return address?.let { SaasAddressToDtoMapping(it) }
     }
 }
