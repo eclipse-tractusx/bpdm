@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
 
 @Schema(name = "NameRegioncodeDto", description = "Region within a country")
 data class NameRegioncodeDto(

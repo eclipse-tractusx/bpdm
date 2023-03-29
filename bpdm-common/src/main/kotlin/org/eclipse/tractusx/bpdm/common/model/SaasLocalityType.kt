@@ -19,15 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class PremiseType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<PremiseType> {
-    BUILDING("Building", ""),
-    OTHER("Other type", ""),
-    LEVEL("Level", ""),
-    HARBOUR("Harbour", ""),
-    ROOM("Room", ""),
-    SUITE("Suite", ""),
-    UNIT("Unit", ""),
-    WAREHOUSE("Warehouse", "");
+enum class SaasLocalityType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasLocalityType> {
+    BLOCK("Block", ""),
+    CITY("City", ""),
+    DISTRICT("District", ""),
+    OTHER("Other", ""),
+    POST_OFFICE_CITY("Post Office City", ""),
+    QUARTER("Quarter", "");
 
     override fun getTypeName(): String {
         return typeName
@@ -37,7 +35,7 @@ enum class PremiseType(private val typeName: String, private val url: String) : 
         return url
     }
 
-    override fun getDefault(): PremiseType {
+    override fun getDefault(): SaasLocalityType {
         return OTHER
     }
 }

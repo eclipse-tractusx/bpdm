@@ -223,8 +223,8 @@ object CommonValues {
     const val postCode1 = "70546 "
     const val postCode2 = "70547"
 
-    val postCodeType1 = PostCodeType.REGULAR
-    val postCodeType2 = PostCodeType.POST_BOX
+    val postCodeType1 = SaasPostCodeType.REGULAR
+    val postCodeType2 = SaasPostCodeType.POST_BOX
 
     val geoCoordinates1 = Triple(0f, 0f, 0f)
     val geoCoordinates2 = Triple(1f, 1f, 0f)
@@ -236,28 +236,28 @@ object CommonValues {
     const val locality1 = "Stuttgart"
     const val locality2 = "Vaihingen"
 
-    val localityType1 = LocalityType.CITY
-    val localityType2 = LocalityType.DISTRICT
+    val localityType1 = SaasLocalityType.CITY
+    val localityType2 = SaasLocalityType.DISTRICT
 
     const val thoroughfare1 = "Mercedesstraße 120"
     const val thoroughfare2 = "Werk 1"
 
-    val thoroughfareType1 = ThoroughfareType.STREET
-    val thoroughfareType2 = ThoroughfareType.INDUSTRIAL_ZONE
+    val thoroughfareType1 = SaasThoroughfareType.STREET
+    val thoroughfareType2 = SaasThoroughfareType.INDUSTRIAL_ZONE
 
     const val premise1 = "Bauteil A"
     const val premise2 = "Etage 1"
 
-    val premiseType1 = PremiseType.BUILDING
-    val premiseType2 = PremiseType.WAREHOUSE
+    val premiseType1 = SaasPremiseType.BUILDING
+    val premiseType2 = SaasPremiseType.WAREHOUSE
 
 
-    val postalDeliveryPointType1 = PostalDeliveryPointType.MAILBOX
-    val postalDeliveryPointType2 = PostalDeliveryPointType.POST_OFFICE_BOX
+    val postalDeliveryPointType1 = SaasPostalDeliveryPointType.MAILBOX
+    val postalDeliveryPointType2 = SaasPostalDeliveryPointType.POST_OFFICE_BOX
 
     const val adminArea1 = "Baden-Württemberg"
     const val adminArea2 = "Stuttgart"
 
-    val adminAreaType1 = AdministrativeAreaType.COUNTY
-    val adminAreaType2 = AdministrativeAreaType.REGION
+    val adminAreaType1 = SaasAdministrativeAreaType.COUNTY
+    val adminAreaType2 = SaasAdministrativeAreaType.REGION
 }

@@ -17,22 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.model
+package org.eclipse.tractusx.bpdm.common.service
 
-enum class AdministrativeAreaType(private val areaName: String, private val url: String) : NamedUrlType, HasDefaultValue<AdministrativeAreaType> {
-    COUNTY("County", ""),
-    REGION("Region", ""),
-    OTHER("Other", "");
+import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
 
-    override fun getTypeName(): String {
-        return areaName
+class SaasAddressesMapping(val addresses: Collection<AddressSaas>) {
+
+    fun saasAlternativePostalAddress() : SaasAddressToDtoMapping? {
+
+        val address =  this.addresses.find { address -> address.types.any{it.name == "Alternative Legal Address" } }
+
+        return if (address != null) SaasAddressToDtoMapping(address) else null;
     }
 
-    override fun getUrl(): String {
-        return url
-    }
+    fun saasPhysicalAddressMapp() : SaasAddressToDtoMapping? {
 
-    override fun getDefault(): AdministrativeAreaType {
-        return OTHER
+        val address =   this.addresses.find { address -> address.types.any{it.name == "Legal Address" } }
+        return if (address != null) SaasAddressToDtoMapping(address) else null;
     }
 }

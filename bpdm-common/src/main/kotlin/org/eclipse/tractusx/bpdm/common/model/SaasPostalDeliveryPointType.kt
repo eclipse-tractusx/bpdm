@@ -19,13 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class LocalityType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<LocalityType> {
-    BLOCK("Block", ""),
-    CITY("City", ""),
-    DISTRICT("District", ""),
-    OTHER("Other", ""),
-    POST_OFFICE_CITY("Post Office City", ""),
-    QUARTER("Quarter", "");
+enum class SaasPostalDeliveryPointType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasPostalDeliveryPointType> {
+    INTERURBAN_DELIVERY_POINT("Interurban Delivery Point", ""),
+    MAIL_STATION("Mail Station", ""),
+    MAILBOX("Mailbox", ""),
+    OTHER("Other Type", ""),
+    POST_OFFICE_BOX("Post Office Box", "");
 
     override fun getTypeName(): String {
         return typeName
@@ -35,7 +34,7 @@ enum class LocalityType(private val typeName: String, private val url: String) :
         return url
     }
 
-    override fun getDefault(): LocalityType {
+    override fun getDefault(): SaasPostalDeliveryPointType {
         return OTHER
     }
 }

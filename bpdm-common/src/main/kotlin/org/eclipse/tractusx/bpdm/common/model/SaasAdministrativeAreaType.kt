@@ -17,14 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.saas
+package org.eclipse.tractusx.bpdm.common.model
 
-data class ThoroughfareSaas(
-    override var type: TypeKeyNameUrlSaas? = null,
-    val shortName: String? = null,
-    val number: String? = null,
-    override val value: String? = null,
-    val name: String? = null,
-    val direction: String? = null,
-    var language: LanguageSaas? = null
-) : TypeValueSaas
+enum class SaasAdministrativeAreaType(private val areaName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasAdministrativeAreaType> {
+    COUNTY("County", ""),
+    REGION("Region", ""),
+    OTHER("Other", "");
+
+    override fun getTypeName(): String {
+        return areaName
+    }
+
+    override fun getUrl(): String {
+        return url
+    }
+
+    override fun getDefault(): SaasAdministrativeAreaType {
+        return OTHER
+    }
+}

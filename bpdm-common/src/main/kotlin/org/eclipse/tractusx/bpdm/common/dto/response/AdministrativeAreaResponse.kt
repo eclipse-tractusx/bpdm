@@ -23,7 +23,7 @@ import com.neovisionaries.i18n.LanguageCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.AdministrativeAreaType
+import org.eclipse.tractusx.bpdm.common.model.SaasAdministrativeAreaType
 
 @Schema(name = "AdministrativeAreaResponse", description = "Area of an address such as country region or county")
 data class AdministrativeAreaResponse (
@@ -34,7 +34,7 @@ data class AdministrativeAreaResponse (
     @Schema(description = "FIPS code if applicable")
     val fipsCode: String? = null,
     @Schema(description = "Type of specified area")
-    val type: TypeKeyNameUrlDto<AdministrativeAreaType>,
+    val type: TypeKeyNameUrlDto<SaasAdministrativeAreaType>,
     @Schema(description = "Language the area is specified in")
     val language: TypeKeyNameDto<LanguageCode>
 )

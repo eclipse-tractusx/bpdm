@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
+import org.eclipse.tractusx.bpdm.common.model.SaasPostalDeliveryPointType
 
 @Entity
 @Table(
@@ -40,7 +40,7 @@ class PostalDeliveryPoint(
     val number: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: PostalDeliveryPointType,
+    val type: SaasPostalDeliveryPointType,
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,

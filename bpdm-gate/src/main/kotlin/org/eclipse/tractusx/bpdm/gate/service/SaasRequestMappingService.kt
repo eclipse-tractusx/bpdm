@@ -46,7 +46,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             names = listOf(NameSaas(value = request.site.name)),
             status = request.site.states.map { it.toSaasModel() }.firstOrNull(),
-            addresses = listOf(toSaasModel(request.site.mainAddress)),
+            addresses = toSaasModel(request.site.mainAddress),
             identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
@@ -56,7 +56,7 @@ class SaasRequestMappingService(
         return BusinessPartnerSaas(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
-            addresses = listOf(toSaasModel(request.address)),
+            addresses = toSaasModel(request.address),
             identifiers = request.bpn?.let { listOf(createBpnIdentifierSaas(it)) } ?: emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
@@ -72,7 +72,7 @@ class SaasRequestMappingService(
             status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
             profile = toPartnerProfileSaas(legalEntity.classifications),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-            addresses = listOf(toSaasModel(legalEntity.legalAddress))
+            addresses = toSaasModel(legalEntity.legalAddress)
         )
     }
 
@@ -134,12 +134,57 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toSaasModel(address: LogisticAddressDto): AddressSaas {
-        return with(address) {
+    private fun toSaasModel(address: LogisticAddressDto): Collection<AddressSaas> {
+
+        val mapPhysicalAddress = SaasDtoToSaasAddressMapping(address.physicalPostalAddress.baseAddress);
+
+        val addresses: MutableList<AddressSaas> = mutableListOf()
+        addresses.add(
             AddressSaas(
-                // TODO Mapping
-            )
+                 id = "0",
+             externalId = null,
+             saasId = null,
+             version = null,
+             identifyingName = null,
+             careOf = null,
+             contexts = emptyList(),
+             country = mapPhysicalAddress.country(),
+             administrativeAreas = mapPhysicalAddress.administrativeAreas(),
+             postCodes = mapPhysicalAddress.postcodes(),
+             localities = mapPhysicalAddress.localities(),
+             thoroughfares = mapPhysicalAddress.thoroughfares(address.physicalPostalAddress),
+             premises = mapPhysicalAddress.premesis(address.physicalPostalAddress),
+             postalDeliveryPoints = listOf(PostalDeliveryPointSaas()),
+             geographicCoordinates = mapPhysicalAddress.geoCoordinates(),
+             types = listOf(TypeKeyNameUrlSaas()),
+             metadataSaas = AddressMetadataSaas()
+            ))
+
+        if (address.alternativePostalAddress != null) {
+            val mapAlternativeAddress = SaasDtoToSaasAddressMapping(address.alternativePostalAddress!!.baseAddress);
+            addresses.add(
+                AddressSaas(
+                    id = "0",
+                    externalId = null,
+                    saasId = null,
+                    version = null,
+                    identifyingName = null,
+                    careOf = null,
+                    contexts = emptyList(),
+                    country = mapAlternativeAddress.country(),
+                    administrativeAreas = mapAlternativeAddress.administrativeAreas(),
+                    postCodes = mapAlternativeAddress.postcodes(),
+                    localities = mapAlternativeAddress.localities(),
+                    thoroughfares = mapAlternativeAddress.thoroughfares(physicalAddress = null),
+                    premises = mapAlternativeAddress.premesis(physicalAddress = null),
+                    postalDeliveryPoints = mapAlternativeAddress.postalDeliveryPoints(address.alternativePostalAddress),
+                    geographicCoordinates = mapAlternativeAddress.geoCoordinates(),
+                    types = emptyList(),
+                    metadataSaas = AddressMetadataSaas()
+                ))
         }
+
+        return addresses;
     }
 
     private fun toSaasModel(version: AddressVersionDto): AddressVersionSaas? {

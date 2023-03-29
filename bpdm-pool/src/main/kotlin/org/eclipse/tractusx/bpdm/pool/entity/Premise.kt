@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 import com.neovisionaries.i18n.LanguageCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PremiseType
+import org.eclipse.tractusx.bpdm.common.model.SaasPremiseType
 
 @Entity
 @Table(
@@ -40,7 +40,7 @@ class Premise(
     val number: String?,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: PremiseType,
+    val type: SaasPremiseType,
     @Column(name = "language", nullable = false)
     @Enumerated(EnumType.STRING)
     val language: LanguageCode,
