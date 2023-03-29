@@ -34,33 +34,33 @@ object CommonValues {
 
     val now = Instant.now()
 
-    val externalId1 = "external-1"
-    val externalId2 = "external-2"
-    val externalId3 = "external-3"
-    val externalId4 = "external-4"
-    val externalId5 = "external-5"
+    const val externalId1 = "external-1"
+    const val externalId2 = "external-2"
+    const val externalId3 = "external-3"
+    const val externalId4 = "external-4"
+    const val externalId5 = "external-5"
 
     val lsaTypeParam = LsaType.Address
     val lsaTypeParamNotFound = LsaType.Site
     val lsaNone = OptionalLsaType.None
 
-    val externalIdSite1 = "site-external-1"
-    val externalIdSite2 = "site-external-2"
+    const val externalIdSite1 = "site-external-1"
+    const val externalIdSite2 = "site-external-2"
 
-    val externalIdAddress1 = "address-external-1"
-    val externalIdAddress2 = "address-external-2"
+    const val externalIdAddress1 = "address-external-1"
+    const val externalIdAddress2 = "address-external-2"
 
-    val bpn1 = "BPNL0000000000XY"
-    val bpn2 = "BPNL0000000001XZ"
-    val bpn3 = "BPNL0000000002XY"
+    const val bpn1 = "BPNL0000000000XY"
+    const val bpn2 = "BPNL0000000001XZ"
+    const val bpn3 = "BPNL0000000002XY"
 
-    val bpnSite1 = "BPNS0000000001XY"
-    val bpnSite2 = "BPNS0000000002XY"
-    val bpnSite3 = "BPNS0000000003X9"
+    const val bpnSite1 = "BPNS0000000001XY"
+    const val bpnSite2 = "BPNS0000000002XY"
+    const val bpnSite3 = "BPNS0000000003X9"
 
-    val bpnAddress1 = "BPNA0000000001XY"
-    val bpnAddress2 = "BPNA0000000002XY"
-    val bpnAddress3 = "BPNA0000000003X9"
+    const val bpnAddress1 = "BPNA0000000001XY"
+    const val bpnAddress2 = "BPNA0000000002XY"
+    const val bpnAddress3 = "BPNA0000000003X9"
 
     val language1 = LanguageCode.de
     val language2 = LanguageCode.en
@@ -71,83 +71,83 @@ object CommonValues {
     val country1 = CountryCode.DE
     val country2 = CountryCode.US
 
-    val name1 = "Business Partner Name"
-    val name2 = "Company ABC AG"
-    val name3 = "Another Organisation Corp"
-    val name4 = "Catena Test Name"
+    const val name1 = "Business Partner Name"
+    const val name2 = "Company ABC AG"
+    const val name3 = "Another Organisation Corp"
+    const val name4 = "Catena Test Name"
 
-    val nameSite1 = "Site A"
-    val nameSite2 = "Site B"
+    const val nameSite1 = "Site A"
+    const val nameSite2 = "Site B"
 
-    val identifierValue1 = "DE123456789"
-    val identifierValue2 = "US123456789"
-    val identifierValue3 = "FR123456789"
-    val identifierValue4 = "NL123456789"
+    const val identifierValue1 = "DE123456789"
+    const val identifierValue2 = "US123456789"
+    const val identifierValue3 = "FR123456789"
+    const val identifierValue4 = "NL123456789"
 
-    val identifierIssuingBodyTechnicalKey1 = "issuing body 1"
-    val identifierIssuingBodyTechnicalKey2 = "issuing body 2"
-    val identifierIssuingBodyTechnicalKey3 = "issuing body 3"
-    val identifierIssuingBodyTechnicalKey4 = "issuing body 4"
+    const val identifierIssuingBodyTechnicalKey1 = "issuing body 1"
+    const val identifierIssuingBodyTechnicalKey2 = "issuing body 2"
+    const val identifierIssuingBodyTechnicalKey3 = "issuing body 3"
+    const val identifierIssuingBodyTechnicalKey4 = "issuing body 4"
 
-    val identifierIssuingBodyName1 = "Agency X"
-    val identifierIssuingBodyName2 = "Body Y"
-    val identifierIssuingBodyName3 = "Official Z"
-    val identifierIssuingBodyName4 = "Gov A"
+    const val identifierIssuingBodyName1 = "Agency X"
+    const val identifierIssuingBodyName2 = "Body Y"
+    const val identifierIssuingBodyName3 = "Official Z"
+    const val identifierIssuingBodyName4 = "Gov A"
 
-    val identifierIssuingBody1 = "Agency X"
-    val identifierIssuingBody2 = "Body Y"
-    val identifierIssuingBody3 = "Official Z"
-    val identifierIssuingBody4 = "Gov A"
+    const val identifierIssuingBody1 = "Agency X"
+    const val identifierIssuingBody2 = "Body Y"
+    const val identifierIssuingBody3 = "Official Z"
+    const val identifierIssuingBody4 = "Gov A"
 
-    val identifierIssuingBodyUrl1 = "http://catenax-host/issuing-body1"
-    val identifierIssuingBodyUrl2 = "http://catenax-host/issuing-body2"
-    val identifierIssuingBodyUrl3 = "http://catenax-host/issuing-body3"
-    val identifierIssuingBodyUrl4 = "http://catenax-host/issuing-body4"
+    const val identifierIssuingBodyUrl1 = "http://catenax-host/issuing-body1"
+    const val identifierIssuingBodyUrl2 = "http://catenax-host/issuing-body2"
+    const val identifierIssuingBodyUrl3 = "http://catenax-host/issuing-body3"
+    const val identifierIssuingBodyUrl4 = "http://catenax-host/issuing-body4"
 
-    val identifierStatusTechnicalKey1 = "ACTIVE"
-    val identifierStatusTechnicalKey2 = "EXPIRED"
-    val identifierStatusTechnicalKey3 = "PENDING"
-    val identifierStatusTechnicalKey4 = "UNKNOWN"
+    const val identifierStatusTechnicalKey1 = "ACTIVE"
+    const val identifierStatusTechnicalKey2 = "EXPIRED"
+    const val identifierStatusTechnicalKey3 = "PENDING"
+    const val identifierStatusTechnicalKey4 = "UNKNOWN"
 
-    val identifierStatusName1 = "Active"
-    val identifierStatusName2 = "Expired"
-    val identifierStatusName3 = "Pending"
-    val identifierStatusName4 = "Unknown Status"
+    const val identifierStatusName1 = "Active"
+    const val identifierStatusName2 = "Expired"
+    const val identifierStatusName3 = "Pending"
+    const val identifierStatusName4 = "Unknown Status"
 
-    val identifierTypeName1 = "Steuernummer"
-    val identifierTypeName2 = "VAT USA"
-    val identifierTypeName3 = "VAT France"
-    val identifierTypeName4 = "VAT Netherlands"
+    const val identifierTypeName1 = "Steuernummer"
+    const val identifierTypeName2 = "VAT USA"
+    const val identifierTypeName3 = "VAT France"
+    const val identifierTypeName4 = "VAT Netherlands"
 
-    val identifierTypeUrl1 = "http://catenax-host/id-type1"
-    val identifierTypeUrl2 = "http://catenax-host/id-type2"
-    val identifierTypeUrl3 = "http://catenax-host/id-type3"
-    val identifierTypeUrl4 = "http://catenax-host/id-type4"
+    const val identifierTypeUrl1 = "http://catenax-host/id-type1"
+    const val identifierTypeUrl2 = "http://catenax-host/id-type2"
+    const val identifierTypeUrl3 = "http://catenax-host/id-type3"
+    const val identifierTypeUrl4 = "http://catenax-host/id-type4"
 
-    val identifierTypeTechnicalKey1 = "VAT_DE"
-    val identifierTypeTechnicalKey2 = "VAT_US"
-    val identifierTypeTechnicalKey3 = "VAT_FR"
-    val identifierTypeTechnicalKey4 = "VAT_NL"
+    const val identifierTypeTechnicalKey1 = "VAT_DE"
+    const val identifierTypeTechnicalKey2 = "VAT_US"
+    const val identifierTypeTechnicalKey3 = "VAT_FR"
+    const val identifierTypeTechnicalKey4 = "VAT_NL"
 
     val nameType1 = NameType.OTHER
 
-    val shortName1 = "short1"
-    val shortName2 = "short2"
-    val shortName3 = "short3"
-    val shortName4 = "short4"
+    const val shortName1 = "short1"
+    const val shortName2 = "short2"
+    const val shortName3 = "short3"
+    const val shortName4 = "short4"
 
 
-    val legalFormTechnicalKey1 = "LF1"
-    val legalFormTechnicalKey2 = "LF2"
+    const val legalFormTechnicalKey1 = "LF1"
+    const val legalFormTechnicalKey2 = "LF2"
 
-    val legalFormName1 = "Limited Liability Company"
-    val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
+    const val legalFormName1 = "Limited Liability Company"
+    const val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
 
-    val legalFormAbbreviation1 = "LLC"
-    val legalFormAbbreviation2 = "GmbH"
+    const val legalFormAbbreviation1 = "LLC"
+    const val legalFormAbbreviation2 = "GmbH"
 
-    val businessStatusOfficialDenotation1 = "Active"
-    val businessStatusOfficialDenotation2 = "Insolvent"
+    const val businessStatusOfficialDenotation1 = "Active"
+    const val businessStatusOfficialDenotation2 = "Insolvent"
 
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)
@@ -160,68 +160,68 @@ object CommonValues {
 
     val classificationType = ClassificationType.NACE
 
-    val classificationValue1 = "Sale of motor vehicles"
-    val classificationValue2 = "Data processing, hosting and related activities"
-    val classificationValue3 = "Other information service activities"
-    val classificationValue4 = "Financial and insurance activities"
+    const val classificationValue1 = "Sale of motor vehicles"
+    const val classificationValue2 = "Data processing, hosting and related activities"
+    const val classificationValue3 = "Other information service activities"
+    const val classificationValue4 = "Financial and insurance activities"
 
-    val classificationCode1 = "code1"
-    val classificationCode2 = "code2"
-    val classificationCode3 = "code3"
-    val classificationCode4 = "code4"
+    const val classificationCode1 = "code1"
+    const val classificationCode2 = "code2"
+    const val classificationCode3 = "code3"
+    const val classificationCode4 = "code4"
 
-    val careOf1 = "Caring Entity Co"
-    val careOf2 = "Another Caring Entity"
+    const val careOf1 = "Caring Entity Co"
+    const val careOf2 = "Another Caring Entity"
 
-    val context1 = "Context1"
-    val context2 = "Context2"
+    const val context1 = "Context1"
+    const val context2 = "Context2"
 
-    val adminAreaLevel1Name_1 = "Baden-Württemberg"
-    val adminAreaLevel1RegionCode_1 = "BW"
-    val adminAreaLevel1Name_2 = "Georgia"
-    val adminAreaLevel1RegionCode_2 = "GA"
+    const val adminAreaLevel1Name_1 = "Baden-Württemberg"
+    const val adminAreaLevel1RegionCode_1 = "BW"
+    const val adminAreaLevel1Name_2 = "Georgia"
+    const val adminAreaLevel1RegionCode_2 = "GA"
 
-    val county1 = "Stuttgart"
-    val county2 = " Fulton County"
+    const val county1 = "Stuttgart"
+    const val county2 = " Fulton County"
 
-    val city1 = "Stuttgart"
-    val city2 = "Atlanta"
+    const val city1 = "Stuttgart"
+    const val city2 = "Atlanta"
 
 
-    val districtLevel1_1 = "Vaihingen"
-    val districtLevel1_2 = "TODO"
-    val districtLevel1_3= "TODO"
+    const val districtLevel1_1 = "Vaihingen"
+    const val districtLevel1_2 = "TODO"
+    const val districtLevel1_3= "TODO"
 
-    val districtLevel2_1 = "Vaihingen-Level2"
-    val districtLevel2_2 = "TODO"
-    val districtLevel2_3 = "TODO"
+    const val districtLevel2_1 = "Vaihingen-Level2"
+    const val districtLevel2_2 = "TODO"
+    const val districtLevel2_3 = "TODO"
 
-    val street1 = "Mercedesstraße 120"
-    val street2 = "TODO"
-    val street3 = "TODO"
+    const val street1 = "Mercedesstraße 120"
+    const val street2 = "TODO"
+    const val street3 = "TODO"
 
-    val houseNumber1 = ""
-    val houseNumber2 = ""
-    val houseNumber3 = ""
+    const val houseNumber1 = ""
+    const val houseNumber2 = ""
+    const val houseNumber3 = ""
 
-    val industrialZone1 = "Werk 1"
-    val industrialZone2 = "Industrial Zone Two"
-    val industrialZone3 = "Industrial Zone Three"
+    const val industrialZone1 = "Werk 1"
+    const val industrialZone2 = "Industrial Zone Two"
+    const val industrialZone3 = "Industrial Zone Three"
 
-    val building1 = "Bauteil A"
-    val building2 = "Building Two"
-    val building3 = "Building Two"
+    const val building1 = "Bauteil A"
+    const val building2 = "Building Two"
+    const val building3 = "Building Two"
 
-    val floor1 = "Etage 1"
-    val floor2 = "Floor Two"
-    val floor3 = "Floor Two"
+    const val floor1 = "Etage 1"
+    const val floor2 = "Floor Two"
+    const val floor3 = "Floor Two"
 
-    val door1 = "Door One"
-    val door2 = "Door Two"
-    val door3 = "Door Two"
+    const val door1 = "Door One"
+    const val door2 = "Door Two"
+    const val door3 = "Door Two"
 
-    val postCode1 = "70546 "
-    val postCode2 = "70547"
+    const val postCode1 = "70546 "
+    const val postCode2 = "70547"
 
     val postCodeType1 = PostCodeType.REGULAR
     val postCodeType2 = PostCodeType.POST_BOX
@@ -229,7 +229,35 @@ object CommonValues {
     val geoCoordinates1 = Triple(0f, 0f, 0f)
     val geoCoordinates2 = Triple(1f, 1f, 0f)
 
-    val postalDeliveryPoint1 = "Postal Delivery point"
-    val postalDeliveryPoint2 = "Mailbox Premise Street"
+    const val postalDeliveryPoint1 = "Postal Delivery point"
+    const val postalDeliveryPoint2 = "Mailbox Premise Street"
 
+    // Saas test values
+    const val locality1 = "Stuttgart"
+    const val locality2 = "Vaihingen"
+
+    val localityType1 = LocalityType.CITY
+    val localityType2 = LocalityType.DISTRICT
+
+    const val thoroughfare1 = "Mercedesstraße 120"
+    const val thoroughfare2 = "Werk 1"
+
+    val thoroughfareType1 = ThoroughfareType.STREET
+    val thoroughfareType2 = ThoroughfareType.INDUSTRIAL_ZONE
+
+    const val premise1 = "Bauteil A"
+    const val premise2 = "Etage 1"
+
+    val premiseType1 = PremiseType.BUILDING
+    val premiseType2 = PremiseType.WAREHOUSE
+
+
+    val postalDeliveryPointType1 = PostalDeliveryPointType.MAILBOX
+    val postalDeliveryPointType2 = PostalDeliveryPointType.POST_OFFICE_BOX
+
+    const val adminArea1 = "Baden-Württemberg"
+    const val adminArea2 = "Stuttgart"
+
+    val adminAreaType1 = AdministrativeAreaType.COUNTY
+    val adminAreaType2 = AdministrativeAreaType.REGION
 }
