@@ -32,7 +32,7 @@ data class AddressStateDto(
     val validFrom: LocalDateTime?,
 
     @Schema(description = "Until the status was valid, if applicable")
-    val validUntil: LocalDateTime?,
+    val validTo: LocalDateTime?,
 
     @Schema(description = "The type of this specified status")
     val type: BusinessStateType

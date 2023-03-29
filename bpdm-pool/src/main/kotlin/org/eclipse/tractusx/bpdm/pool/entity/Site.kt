@@ -35,15 +35,15 @@ class Site(
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity,
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "main_address_id", nullable = false)
-    var mainAddress: Address
-
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<SiteState> = mutableSetOf()
 
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<AddressPartner> = mutableSetOf()
+    val addresses: MutableSet<LogisticAddress> = mutableSetOf()
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "main_address_id", nullable = false)
+    lateinit var mainAddress: LogisticAddress
 }

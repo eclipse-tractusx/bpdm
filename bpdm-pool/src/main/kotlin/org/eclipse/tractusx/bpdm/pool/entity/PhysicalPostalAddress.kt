@@ -28,7 +28,7 @@ class PhysicalPostalAddress(
     @AttributeOverride(name = "latitude", column = Column(name = "phy_latitude"))
     @AttributeOverride(name = "longitude", column = Column(name = "phy_longitude"))
     @AttributeOverride(name = "altitude", column = Column(name = "phy_altitude"))
-    val geographicCoordinates: GeographicCoordinate,
+    val geographicCoordinates: GeographicCoordinate?,
 
     @Column(name = "phy_country")
     @Enumerated(EnumType.STRING)

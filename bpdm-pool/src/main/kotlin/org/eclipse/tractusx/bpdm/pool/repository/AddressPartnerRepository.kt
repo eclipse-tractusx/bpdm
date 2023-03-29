@@ -34,7 +34,7 @@ interface AddressPartnerRepository : PagingAndSortingRepository<AddressPartner, 
     fun findByLegalEntityBpn(bpn: String, pageable: Pageable): Page<AddressPartner>
 
     fun findByLegalEntityInOrSiteInOrBpnIn(
-        partners: Collection<LegalEntity>,
+        legalEntities: Collection<LegalEntity>,
         sites: Collection<Site>,
         bpns: Collection<String>,
         pageable: Pageable

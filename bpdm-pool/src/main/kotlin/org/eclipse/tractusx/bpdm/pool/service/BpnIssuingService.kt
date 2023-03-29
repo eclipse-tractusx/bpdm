@@ -42,22 +42,22 @@ class BpnIssuingService(
     val bpnAPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.addressChar}"
 
     @Transactional
-    fun issueLegalEntityBpns(count: Int): Collection<String> {
+    fun issueLegalEntityBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.legalEntityChar, bpnConfigProperties.counterKeyLegalEntities)
     }
 
     @Transactional
-    fun issueAddressBpns(count: Int): Collection<String> {
+    fun issueAddressBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.addressChar, bpnConfigProperties.counterKeyAddresses)
     }
 
     @Transactional
-    fun issueSiteBpns(count: Int): Collection<String> {
+    fun issueSiteBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.siteChar, bpnConfigProperties.counterKeySites)
     }
 
 
-    private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): Collection<String> {
+    private fun issueBpns(count: Int, bpnChar: Char, bpnCounterKey: String): List<String> {
         if (count == 0) return emptyList()
 
         logger.info { "Issuing $count new BPNs of type $bpnChar" }

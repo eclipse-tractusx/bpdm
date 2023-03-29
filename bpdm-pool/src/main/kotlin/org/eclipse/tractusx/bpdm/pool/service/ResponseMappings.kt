@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDetailDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -45,7 +42,6 @@ fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchRes
 
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
-        // TODO Mapping
         legalEntity = toDto(),
         legalAddress = legalAddress.toDto(),
         index = entryId
@@ -58,7 +54,7 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         identifiers = identifiers.map { it.toDto() },
         legalName = legalName.toDto(),
         legalForm = legalForm?.toDto(),
-        states = states.map { it.toLegalEntityStatusDto() },
+        states = states.map { it.toDto() },
         classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
@@ -102,58 +98,89 @@ fun LegalForm.toDto(): LegalFormResponse {
     return LegalFormResponse(technicalKey, name, abbreviation)
 }
 
-fun LegalEntityState.toLegalEntityStatusDto(): LegalEntityStateResponse {
+fun LegalEntityState.toDto(): LegalEntityStateResponse {
     return LegalEntityStateResponse(officialDenotation, validFrom, validTo, type.toDto())
 }
 
-fun SiteState.toSiteStatusDto(): SiteStateResponse {
+fun SiteState.toDto(): SiteStateResponse {
     return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
-// TODO consolidate AddressPartner.toDto() and Address.toDto()
-fun AddressPartner.toDto(): LogisticAddressResponse {
+fun AddressState.toDto(): AddressStateResponse {
+    return AddressStateResponse(description, validFrom, validTo, type.toDto())
+}
+
+fun LogisticAddress.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
-        //TODO mapping
         bpn = bpn,
-        physicalPostalAddress = address.toPhysicalPostalAddressDto(),
-        alternativePostalAddress = address.toAlternativePostalAddressDto(),
         bpnLegalEntity = legalEntity?.bpn,
         bpnSite = site?.bpn,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        name = name,
+        states = states.map { it.toDto() },
+        identifiers = identifiers.map { it.toDto() },
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto()
     )
 }
 
-fun Address.toDto(): LogisticAddressResponse {
-    return LogisticAddressResponse(
-        //TODO mapping
-        bpn = "TODO",
-        physicalPostalAddress = toPhysicalPostalAddressDto(),
-        alternativePostalAddress = toAlternativePostalAddressDto(),
-        bpnLegalEntity = null,
-        bpnSite = null,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
-}
-
-fun Address.toPhysicalPostalAddressDto(): PhysicalPostalAddressResponse {
+fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
     return PhysicalPostalAddressResponse(
-        // TODO mapping
-        baseAddress = BasePostalAddressResponse(country = TypeKeyNameDto(CountryCode.DE,CountryCode.DE.name), city="TODO"),
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geographicCoordinates?.toDto(),
+            country = country.toDto(),
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel2 = administrativeAreaLevel2,
+            administrativeAreaLevel3 = administrativeAreaLevel3,
+            administrativeAreaLevel4 = administrativeAreaLevel4,
+            postCode = postCode,
+            city = city,
+            districtLevel1 = districtLevel1,
+            districtLevel2 = districtLevel2,
+            street = street?.toDto()
+        ),
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door
     )
 }
 
-fun Address.toAlternativePostalAddressDto(): AlternativePostalAddressResponse? {
-    // TODO mapping
-    return null
+fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
+    return AlternativePostalAddressResponse(
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geographicCoordinates?.toDto(),
+            country = country.toDto(),
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel2 = administrativeAreaLevel2,
+            administrativeAreaLevel3 = administrativeAreaLevel3,
+            administrativeAreaLevel4 = administrativeAreaLevel4,
+            postCode = postCode,
+            city = city,
+            districtLevel1 = districtLevel1,
+            districtLevel2 = districtLevel2,
+            street = street?.toDto()
+        ),
+        type = deliveryServiceType,
+        deliveryServiceNumber = deliveryServiceNumber
+    )
 }
 
-fun AddressPartner.toMatchDto(score: Float): AddressMatchResponse {
+private fun Street.toDto(): StreetDto {
+    return StreetDto(
+        name = name,
+        houseNumber = houseNumber,
+        milestone = milestone,
+        direction = direction
+    )
+}
+
+fun LogisticAddress.toMatchDto(score: Float): AddressMatchResponse {
     return AddressMatchResponse(score, this.toDto())
 }
 
-fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
     return AddressPartnerCreateResponse(
         address = toDto(),
         index = index
@@ -172,7 +199,7 @@ fun Site.toDto(): SiteResponse {
     return SiteResponse(
         bpn,
         name,
-        states = states.map { it.toSiteStatusDto() },
+        states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
         createdAt = createdAt,
         updatedAt = updatedAt

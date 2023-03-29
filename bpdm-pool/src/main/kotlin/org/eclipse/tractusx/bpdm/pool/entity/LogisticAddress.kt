@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
@@ -42,7 +43,7 @@ class LogisticAddress(
     var site: Site?,
 
     @Column(name = "name")
-    var name: String?,
+    var name: String? = null,
 
     @Embedded
     var physicalPostalAddress: PhysicalPostalAddress,

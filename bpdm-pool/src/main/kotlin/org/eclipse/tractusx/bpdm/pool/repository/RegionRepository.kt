@@ -22,4 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.repository
 import org.eclipse.tractusx.bpdm.pool.entity.Region
 import org.springframework.data.repository.CrudRepository
 
-interface RegionRepository : CrudRepository<Region, Long>
+interface RegionRepository : CrudRepository<Region, Long> {
+    fun findByRegionCodeIn(regionCodes: Set<String>): Set<Region>
+}
