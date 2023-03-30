@@ -19,12 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
-import org.eclipse.tractusx.bpdm.pool.entity.Address
-import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.springframework.stereotype.Service
@@ -53,40 +50,40 @@ class DocumentMappingService {
     }
 
     /**
-     * Maps [address] to [AddressDoc] representation
+     * Maps [address] to [AddressPartnerDoc] representation
      */
-    fun toDocument(address: LogisticAddress): AddressDoc {
+    fun toDocument(address: LogisticAddress): AddressPartnerDoc {
         TODO("implement")
     }
 
-    /**
-     * Maps [address] to [AddressDoc] representation
-     */
-    fun toDocument(address: Address): AddressDoc {
-        return AddressDoc(
-            address.administrativeAreas.map { TextDoc(it.value) },
-            address.postCodes.map { TextDoc(it.value) },
-            address.localities.map { TextDoc(it.value) },
-            address.thoroughfares.map { TextDoc(it.value) },
-            address.premises.map { TextDoc(it.value) },
-            address.postalDeliveryPoints.map { TextDoc(it.value) }
-        )
-    }
-
-    /**
-     * Maps [addressPartner] to [AddressPartnerDoc] representation
-     */
-    fun toDocument(addressPartner: AddressPartner): AddressPartnerDoc {
-        return AddressPartnerDoc(
-            bpn = addressPartner.bpn,
-            administrativeAreas = addressPartner.address.administrativeAreas.map { it.value },
-            postCodes = addressPartner.address.postCodes.map { it.value },
-            localities = addressPartner.address.localities.map { it.value },
-            thoroughfares = addressPartner.address.thoroughfares.map { it.value },
-            premises = addressPartner.address.premises.map { it.value },
-            postalDeliveryPoints = addressPartner.address.postalDeliveryPoints.map { it.value },
-            countryCode = addressPartner.address.country.name
-        )
-    }
+//    /**
+//     * Maps [address] to [AddressDoc] representation
+//     */
+//    fun toDocument(address: Address): AddressDoc {
+//        return AddressDoc(
+//            address.administrativeAreas.map { TextDoc(it.value) },
+//            address.postCodes.map { TextDoc(it.value) },
+//            address.localities.map { TextDoc(it.value) },
+//            address.thoroughfares.map { TextDoc(it.value) },
+//            address.premises.map { TextDoc(it.value) },
+//            address.postalDeliveryPoints.map { TextDoc(it.value) }
+//        )
+//    }
+//
+//    /**
+//     * Maps [addressPartner] to [AddressPartnerDoc] representation
+//     */
+//    fun toDocument(addressPartner: AddressPartner): AddressPartnerDoc {
+//        return AddressPartnerDoc(
+//            bpn = addressPartner.bpn,
+//            administrativeAreas = addressPartner.address.administrativeAreas.map { it.value },
+//            postCodes = addressPartner.address.postCodes.map { it.value },
+//            localities = addressPartner.address.localities.map { it.value },
+//            thoroughfares = addressPartner.address.thoroughfares.map { it.value },
+//            premises = addressPartner.address.premises.map { it.value },
+//            postalDeliveryPoints = addressPartner.address.postalDeliveryPoints.map { it.value },
+//            countryCode = addressPartner.address.country.name
+//        )
+//    }
 
 }

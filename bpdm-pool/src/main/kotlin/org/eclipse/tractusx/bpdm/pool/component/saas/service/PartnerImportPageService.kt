@@ -30,9 +30,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateRespon
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.component.saas.dto.*
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
@@ -51,7 +51,7 @@ class PartnerImportPageService(
     private val saasClient: SaasClient,
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
-    private val addressPartnerRepository: AddressPartnerRepository
+    private val logisticAddressRepository: LogisticAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -313,9 +313,10 @@ class PartnerImportPageService(
         val partnersByBpn = partners.associateBy { it.bpn }
         val (bpnLs, bpnSs, bpnAs) = partitionLSA(partnersByBpn.keys)
 
+        // TODO use BPN projection as optimization
         val foundBpnLs = legalEntityRepository.findDistinctByBpnIn(bpnLs).map { it.bpn }
         val foundBpnSs = siteRepository.findDistinctByBpnIn(bpnSs).map { it.bpn }
-        val foundBpnAs = addressPartnerRepository.findDistinctByBpnIn(bpnAs).map { it.bpn }
+        val foundBpnAs = logisticAddressRepository.findDistinctByBpnIn(bpnAs).map { it.bpn }
 
         val foundBpns = foundBpnLs + foundBpnSs + foundBpnAs
         val bpnMissing = partnersByBpn - foundBpns.toSet()
