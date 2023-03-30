@@ -28,9 +28,9 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
     name = "regions",
 )
 class Region(
-    @Column(name = "country")
+    @Column(name = "country_code")
     @Enumerated(EnumType.STRING)
-    val country: CountryCode,
+    val countryCode: CountryCode,
 
     @Column(name = "region_code")
     val regionCode: String,
