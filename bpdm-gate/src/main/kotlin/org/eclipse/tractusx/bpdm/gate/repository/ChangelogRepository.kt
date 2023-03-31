@@ -19,9 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import io.swagger.v3.oas.annotations.Parameter
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -29,7 +28,7 @@ import org.springframework.data.jpa.repository.Query
 import java.time.Instant
 
 
-interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecificationExecutor<ChangelogEntity> {
+interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecificationExecutor<ChangelogEntry> {
 
     object Specs {
 
@@ -37,10 +36,10 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecifi
          * Restrict to entries with any one of the given ExternalIds; ignore if null
          */
         fun byExternalIdsIn(externalIds: Collection<String>) =
-            Specification<ChangelogEntity> { root, _, _ ->
+            Specification<ChangelogEntry> { root, _, _ ->
 
                 externalIds.let {
-                    root.get<String>(ChangelogEntity::externalId.name).`in`(externalIds.map { externalId -> externalId })
+                    root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds.map { externalId -> externalId })
                 }
 
             }
@@ -49,9 +48,9 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecifi
          * Restrict to entries created at or after the given instant; ignore if null
          */
         fun byCreatedAtGreaterThan(createdAt: Instant?) =
-            Specification<ChangelogEntity> { root, _, builder ->
+            Specification<ChangelogEntry> { root, _, builder ->
                 createdAt?.let {
-                    builder.greaterThanOrEqualTo(root.get(ChangelogEntity::createdAt.name), createdAt)
+                    builder.greaterThanOrEqualTo(root.get(ChangelogEntry::createdAt.name), createdAt)
                 }
             }
 
@@ -59,14 +58,14 @@ interface ChangelogRepository : JpaRepository<ChangelogEntity, Long>, JpaSpecifi
          * Restrict to entries for the LsaType; ignore if null
          */
         fun byLsaType(lsaType: LsaType?) =
-            Specification<ChangelogEntity> { root, _, builder ->
+            Specification<ChangelogEntry> { root, _, builder ->
                 lsaType?.let {
-                    builder.equal(root.get<LsaType>(ChangelogEntity::businessPartnerType.name), lsaType)
+                    builder.equal(root.get<LsaType>(ChangelogEntry::businessPartnerType.name), lsaType)
                 }
             }
     }
 
-    @Query("select distinct u.externalId from ChangelogEntity u where u.externalId in :externalIdList")
+    @Query("select distinct u.externalId from ChangelogEntry u where u.externalId in :externalIdList")
     fun findExternalIdsInListDistinct(externalIdList: Collection<String>): Set<String>
 
 

@@ -33,7 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -146,7 +146,7 @@ class SiteService(
 
         // create changelog entry if all goes well from saasClient
         sites.forEach { site ->
-            changelogRepository.save(ChangelogEntity(site.externalId, LsaType.Site))
+            changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
         }
 
         deleteParentRelationsOfSites(sites)

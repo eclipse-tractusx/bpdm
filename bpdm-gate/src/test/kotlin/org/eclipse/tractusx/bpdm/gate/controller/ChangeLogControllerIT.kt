@@ -53,7 +53,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 
 import org.eclipse.tractusx.bpdm.gate.util.*
 
@@ -139,10 +139,10 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
-            .isEqualTo(emptyList<ChangelogEntity>())
+            .isEqualTo(emptyList<ChangelogEntry>())
 
         assertRecursively(searchResult.content)
-            .isEqualTo(emptyList<ChangelogEntity>())
+            .isEqualTo(emptyList<ChangelogEntry>())
 
         assertRecursively(searchResult.errors)
             .isEqualTo(listOf(
@@ -196,7 +196,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog().getChangelogEntriesLsaType(PaginationRequest(), null, lsaTypeParamNotFound)
 
         assertRecursively(searchResult.content)
-            .isEqualTo(emptyList<ChangelogEntity>())
+            .isEqualTo(emptyList<ChangelogEntry>())
     }
 
     /**

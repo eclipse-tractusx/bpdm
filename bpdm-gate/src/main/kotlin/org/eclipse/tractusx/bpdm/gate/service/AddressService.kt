@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -158,7 +158,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntity(address.externalId, LsaType.Address))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
         }
 
         deleteParentRelationsOfAddresses(addresses)

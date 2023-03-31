@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntity
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 
@@ -56,7 +56,7 @@ class LegalEntityService(
 
         // create changelog entry if all goes well from saasClient
         legalEntities.forEach { legalEntity ->
-            changelogRepository.save(ChangelogEntity(legalEntity.externalId, LsaType.LegalEntity))
+            changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
     }
 

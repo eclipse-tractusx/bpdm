@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 
 @Entity
 @Table(name = "changelog_entries")
-class ChangelogEntity(
+class ChangelogEntry(
 
     @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,
