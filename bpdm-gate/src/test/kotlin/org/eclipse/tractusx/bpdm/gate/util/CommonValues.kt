@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import java.time.LocalDateTime
 
 /**
@@ -33,6 +35,10 @@ object CommonValues {
     val externalId3 = "external-3"
     val externalId4 = "external-4"
     val externalId5 = "external-5"
+
+    val lsaTypeParam = LsaType.Address
+    val lsaTypeParamNotFound = LsaType.Site
+    val lsaNone = OptionalLsaType.None
 
     val externalIdSite1 = "site-external-1"
     val externalIdSite2 = "site-external-2"
@@ -223,5 +229,6 @@ object CommonValues {
 
     val geoCoordinates1 = Triple(0f, 0f, 0f)
     val geoCoordinates2 = Triple(1f, 1f, 0f)
+
 
 }

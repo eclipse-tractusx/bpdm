@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.client
 
-import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
-import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
-import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
-import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
+import org.eclipse.tractusx.bpdm.gate.api.*
 
 interface GateClient {
 
@@ -33,5 +30,7 @@ interface GateClient {
     fun legalEntities(): GateLegalEntityApi
 
     fun sites(): GateSiteApi
+
+    fun changelog(): GateChangelogApi
 
 }

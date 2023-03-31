@@ -45,11 +45,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
@@ -63,12 +63,14 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class AddressControllerInputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val saasConfigProperties: SaasConfigProperties,
@@ -175,10 +177,10 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.addresses().getAddressByExternalId("NONEXISTENT_BPN")
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.NOT_FOUND,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
     }
 
@@ -193,9 +195,9 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             gateClient.addresses().getAddressByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             Assertions.assertTrue(statusCodeValue in 500..599)
@@ -228,9 +230,9 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.addresses().getAddressByExternalId(SaasValues.addressBusinessPartnerWithRelations1.externalId.toString())
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             Assertions.assertTrue(statusCodeValue in 500..599)
@@ -414,9 +416,9 @@ internal class AddressControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             gateClient.addresses().getAddresses(PaginationStartAfterRequest(""))
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             Assertions.assertTrue(statusCodeValue in 500..599)
@@ -431,12 +433,12 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get addresses, pagination limit exceeded`() {
 
-        val paginationRequest = PaginationStartAfterRequest( "" ,limit = 999999)
+        val paginationRequest = PaginationStartAfterRequest("", limit = 999999)
 
-        try{
+        try {
             gateClient.addresses().getAddresses(paginationRequest)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }
@@ -605,17 +607,18 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.OK,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.OK, e.statusCode)
         }
 
         val upsertAddressesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertAddresses, objectMapper).single()
         assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
 
         // check that "delete relations" was called in SaaS as expected
-        val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
+        val deleteRelationsRequestSaas =
+            wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
         assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
         val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
@@ -652,10 +655,10 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }
@@ -696,12 +699,6 @@ internal class AddressControllerInputIT @Autowired constructor(
             assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
         }
 
-        /*webTestClient.put().uri(GATE_API_INPUT_ADDRESSES_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(objectMapper.writeValueAsString(addresses))
-            .exchange()
-            .expectStatus()
-            .isBadRequest*/
     }
 
     /**
@@ -717,10 +714,10 @@ internal class AddressControllerInputIT @Autowired constructor(
             )
         )
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }
@@ -738,10 +735,10 @@ internal class AddressControllerInputIT @Autowired constructor(
             )
         )
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }

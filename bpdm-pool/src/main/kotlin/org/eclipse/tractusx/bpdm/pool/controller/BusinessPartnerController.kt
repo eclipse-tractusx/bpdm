@@ -19,17 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springdoc.core.annotations.ParameterObject
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.Instant

@@ -17,18 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.request
 
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.PositiveOrZero
 
-@Schema(description = "Paginated collection of results")
-data class PageStartAfterResponse<T>(
-    @Schema(description = "Total number of all results in all pages")
-    val total: Int,
-    @Schema(description = "Value to be used as startAfter in request for next page. Value is only sent if more data exists for a next page.")
-    val nextStartAfter: String?,
-    @Schema(description = "Collection of results in the page")
-    val content: Collection<T>,
-    @Schema(description = "Number of entries in the page that have been omitted due to being invalid")
-    val invalidEntries: Int
+@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
+data class PaginationRequest (
+    @field:Parameter(
+        description = "Number of page to get results from", schema =
+        Schema(defaultValue = "0"))
+    @field:PositiveOrZero
+    val page: Int=0,
+    @field:Parameter(description = "Size of each page", schema =
+    Schema(defaultValue = "10"))
+    @field:Min(0)
+    @field:Max(100)
+    val size: Int=10
 )

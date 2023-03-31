@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @MappedSuperclass
 abstract class BaseNamedEntity(

@@ -45,10 +45,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
+import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.gate.util.RequestValues
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -59,6 +60,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -66,6 +68,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BusinessPartnerControllerIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val typeMatchConfigProperties: TypeMatchConfigProperties,
@@ -101,7 +104,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         }
 
         val expectedScore = typeMatchConfigProperties.legalEntityThreshold
-        val expected = TypeMatchResponse(expectedScore, LsaType.LegalEntity)
+        val expected = TypeMatchResponse(expectedScore, OptionalLsaType.LegalEntity)
 
         setLookupMockResponse(expectedScore)
 
@@ -126,7 +129,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         }
 
         val mockedScore = (typeMatchConfigProperties.legalEntityThreshold - 1.0f).coerceAtLeast(0.0f)
-        val expected = TypeMatchResponse(1f - mockedScore, LsaType.None)
+        val expected = TypeMatchResponse(1f - mockedScore, OptionalLsaType.None)
 
         setLookupMockResponse(mockedScore)
 
@@ -152,10 +155,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        try{
+        try {
             gateClient.businessPartners().determineLsaType(givenCandidate)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.OK,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.OK, e.statusCode)
         }
 
     }
@@ -177,10 +180,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        try{
+        try {
             gateClient.businessPartners().determineLsaType(givenCandidate)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.OK,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.OK, e.statusCode)
         }
 
     }
@@ -202,9 +205,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         setLookupMockResponse(0.5f)
 
-        try{
+        try {
             gateClient.businessPartners().determineLsaType(givenCandidate)
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 400..499)

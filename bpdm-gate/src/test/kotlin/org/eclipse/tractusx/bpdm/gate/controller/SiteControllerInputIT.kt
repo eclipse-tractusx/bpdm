@@ -26,11 +26,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH
@@ -44,12 +44,14 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class SiteControllerInputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val saasConfigProperties: SaasConfigProperties,
@@ -121,9 +123,9 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.sites().getSiteByExternalId("nonexistent-externalid123")
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
 
@@ -140,9 +142,9 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        try{
+        try {
             gateClient.sites().getSiteByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -175,9 +177,9 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.sites().getSiteByExternalId(SaasValues.siteBusinessPartnerWithRelations1.externalId.toString())
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
@@ -227,7 +229,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter,limit)
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
         val pageResponse = gateClient.sites().getSites(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -285,7 +287,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter,limit)
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
         val pageResponse = gateClient.sites().getSites(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -309,20 +311,16 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        val paginationValue = PaginationStartAfterRequest("",10)
+        val paginationValue = PaginationStartAfterRequest("", 10)
 
-        try{
+        try {
             gateClient.sites().getSites(paginationValue)
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
             assertTrue(statusCodeValue in 500..599)
         }
 
-//        webTestClient.get().uri(GATE_API_INPUT_SITES_PATH)
-//            .exchange()
-//            .expectStatus()
-//            .is5xxServerError
     }
 
     /**
@@ -332,11 +330,11 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites, pagination limit exceeded`() {
 
-        val paginationValue = PaginationStartAfterRequest("",999999)
+        val paginationValue = PaginationStartAfterRequest("", 999999)
 
-        try{
+        try {
             gateClient.sites().getSites(paginationValue)
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
@@ -485,9 +483,9 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.sites().upsertSites(sites)
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }
 
@@ -496,7 +494,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         assertThat(upsertSitesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedSites)
 
         // check that "delete relations" was called in SaaS as expected
-        val deleteRelationsRequestSaas = wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
+        val deleteRelationsRequestSaas =
+            wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
         assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
 
         // check that "upsert relations" was called in SaaS as expected
@@ -539,9 +538,9 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        try{
+        try {
             gateClient.sites().upsertSites(sites)
-        }catch (e: WebClientResponseException){
+        } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 

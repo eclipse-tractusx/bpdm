@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

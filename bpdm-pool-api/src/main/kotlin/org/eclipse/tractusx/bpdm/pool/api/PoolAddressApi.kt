@@ -25,12 +25,12 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.*

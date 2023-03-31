@@ -26,6 +26,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.Scenario
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
@@ -34,7 +35,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.repository.ImportEntryRepository
@@ -585,7 +585,9 @@ class SaasControllerImportIT @Autowired constructor(
     private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> = poolClient.legalEntities().searchSites(bpns).body!!
 
 
-    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),PaginationRequest())
+    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),
+        PaginationRequest()
+    )
 
 
     private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())

@@ -17,23 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.dto
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
-data class LegalEntityGateInputRequest(
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
 
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
+@Entity
+@Table(name = "changelog_entries")
+class ChangelogEntry(
+
+    @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "business_partner_type", nullable = false, updatable = false)
+    val businessPartnerType: LsaType
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
-)
+) : BaseEntity()
+
+
+

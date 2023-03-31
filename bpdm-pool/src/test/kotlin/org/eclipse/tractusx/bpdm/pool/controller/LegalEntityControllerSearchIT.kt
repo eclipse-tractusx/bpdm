@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -163,7 +163,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
         return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest,PaginationRequest(page, size))
+            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest, PaginationRequest(page, size)
+        )
 
 
     }

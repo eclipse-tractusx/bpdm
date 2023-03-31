@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.springdoc.core.annotations.ParameterObject

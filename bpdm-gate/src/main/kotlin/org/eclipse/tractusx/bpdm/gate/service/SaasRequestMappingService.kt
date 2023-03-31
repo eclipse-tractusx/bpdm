@@ -24,11 +24,11 @@ import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -46,7 +46,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             names = listOf(NameSaas(value = site.site.name)),
             addresses = listOf(toSaasModel(site.site.mainAddress)),
-            identifiers = if (site.bpn != null) listOf(createBpnIdentifierSaas(site.bpn)) else emptyList(),
+            identifiers = if (site.bpn != null) listOf(createBpnIdentifierSaas(site.bpn!!)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name))
         )
     }
@@ -56,7 +56,7 @@ class SaasRequestMappingService(
             externalId = address.externalId,
             dataSource = saasConfigProperties.datasource,
             addresses = listOf(toSaasModel(address.address)),
-            identifiers = if (address.bpn != null) listOf(createBpnIdentifierSaas(address.bpn)) else emptyList(),
+            identifiers = if (address.bpn != null) listOf(createBpnIdentifierSaas(address.bpn!!)) else emptyList(),
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name))
         )
     }

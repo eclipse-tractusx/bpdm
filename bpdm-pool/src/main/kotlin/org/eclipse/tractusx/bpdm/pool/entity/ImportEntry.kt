@@ -23,6 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Index
 import jakarta.persistence.Table
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(

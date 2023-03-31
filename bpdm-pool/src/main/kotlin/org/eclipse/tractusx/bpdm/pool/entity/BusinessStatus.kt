@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.BusinessStatusType
 import java.time.LocalDateTime
 

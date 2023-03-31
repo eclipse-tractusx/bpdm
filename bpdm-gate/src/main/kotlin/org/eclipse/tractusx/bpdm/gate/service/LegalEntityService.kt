@@ -26,11 +26,14 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -40,13 +43,21 @@ class LegalEntityService(
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
+    private val changelogRepository: ChangelogRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
+
+
         val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
         saasClient.upsertLegalEntities(legalEntitiesSaas)
+
+        // create changelog entry if all goes well from saasClient
+        legalEntities.forEach { legalEntity ->
+            changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
+        }
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {

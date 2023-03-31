@@ -27,27 +27,26 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.dto.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
-import org.eclipse.tractusx.bpdm.gate.util.CommonValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
-import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
-import org.eclipse.tractusx.bpdm.gate.util.SaasValues
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class LegalEntityControllerOutputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     val gateClient: GateClient

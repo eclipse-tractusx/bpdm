@@ -25,9 +25,9 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.SharingStatusSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.exception.BusinessPartnerOutputError
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
 import org.eclipse.tractusx.bpdm.gate.model.BusinessPartnerSaasWithBpn
 import org.eclipse.tractusx.bpdm.gate.model.BusinessPartnerSaasWithExternalId

@@ -24,15 +24,18 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchRespons
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.dto.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.springframework.stereotype.Service
 
 @Service
@@ -43,7 +46,8 @@ class AddressService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val typeMatchingService: TypeMatchingService
+    private val typeMatchingService: TypeMatchingService,
+    private val changelogRepository: ChangelogRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -148,8 +152,14 @@ class AddressService(
      * - Upserting the new relations
      */
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
+
         val addressesSaas = toSaasModels(addresses)
         saasClient.upsertAddresses(addressesSaas)
+
+        // create changelog entry if all goes well from saasClient
+        addresses.forEach { address ->
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
+        }
 
         deleteParentRelationsOfAddresses(addresses)
 
@@ -244,8 +254,8 @@ class AddressService(
         val parentType = parentId?.let { saasClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
 
         return when (parentType) {
-            LsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
-            LsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
+            OptionalLsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
+            OptionalLsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
             else -> throw SaasInvalidRecordException(parentId)
         }
     }

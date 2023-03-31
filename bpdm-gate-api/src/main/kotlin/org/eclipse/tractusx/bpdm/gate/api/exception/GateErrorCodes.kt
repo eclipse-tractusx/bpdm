@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.api.exception
 
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -32,4 +32,9 @@ enum class BusinessPartnerOutputError : ErrorCode {
     SharingProcessError,
     SharingTimeout,
     BpnNotInPool,
+}
+
+@Schema(description = "ChangeLogOutputError")
+enum class ChangeLogOutputError : ErrorCode {
+    ExternalIdNotFound,
 }

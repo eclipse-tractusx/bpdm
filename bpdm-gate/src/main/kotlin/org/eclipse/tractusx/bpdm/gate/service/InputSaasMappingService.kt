@@ -24,11 +24,11 @@ import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputResponse
 import org.springframework.stereotype.Service
 
 @Service

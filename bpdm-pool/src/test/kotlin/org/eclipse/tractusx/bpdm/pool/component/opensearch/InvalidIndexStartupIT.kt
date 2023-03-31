@@ -22,12 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -130,7 +129,8 @@ class InvalidIndexStartupIT @Autowired constructor(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest
             , AddressPropertiesSearchRequest.EmptySearchRequest
             , SitePropertiesSearchRequest.EmptySearchRequest
-            , PaginationRequest())
+            , PaginationRequest()
+        )
 
         assertThat(searchResult.content).isNotEmpty
         assertThat(searchResult.contentSize).isEqualTo(1)

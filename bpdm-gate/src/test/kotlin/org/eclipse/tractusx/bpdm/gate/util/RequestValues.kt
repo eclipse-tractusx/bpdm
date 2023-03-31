@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CurrencyCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.AddressType
-import org.eclipse.tractusx.bpdm.gate.dto.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.BusinessPartnerCandidateDto
-import org.eclipse.tractusx.bpdm.gate.dto.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.dto.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 
 object RequestValues {
     val identifier1 =

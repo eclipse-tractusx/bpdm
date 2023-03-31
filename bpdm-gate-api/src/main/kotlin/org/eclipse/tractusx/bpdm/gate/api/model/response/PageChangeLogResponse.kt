@@ -17,19 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.exception
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 
-/**
- * For every combination of possible errors a separate enum class is defined extending this marker interface.
- * We need separate enum classes in order to get the correct error codes for each endpoint in the Swagger schema.
- */
-interface ErrorCode
 
-@Schema(description = "BusinessPartnerOutputError")
-enum class BusinessPartnerOutputError : ErrorCode {
-    SharingProcessError,
-    SharingTimeout,
-    BpnNotInPool
-}
+@Schema(description = "Paginated collection of results")
+data class PageChangeLogResponse<T>(
+    @Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+    @Schema(description = "Total number pages")
+    val totalPages: Int,
+    @Schema(description = "Current page number")
+    val page: Int,
+    @Schema(description = "Number of results in the page")
+    val contentSize: Int,
+    @Schema(description = "Collection of results in the page")
+    val content: Collection<T>,
+    @Schema(description = "Number of entries in the page that have been omitted due to being invalid (error)")
+    val invalidEntries: Int,
+    @Schema(description = "Infos about the entries with errors")
+    val errors: Collection<ErrorInfo<ChangeLogOutputError>>,
+)
+
