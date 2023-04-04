@@ -525,7 +525,6 @@ class BusinessPartnerBuildService(
         )
     }
 
-    // TODO still unused!
     private fun toEntity(
         dto: AddressIdentifierDto,
         metadataMap: AddressMetadataMappingDto,
