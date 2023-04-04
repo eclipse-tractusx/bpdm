@@ -130,10 +130,10 @@ object ResponseValues {
     )
 
     val address3 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
+        industrialZone = CommonValues.industrialZone3,
+        building = CommonValues.building3,
+        floor = CommonValues.floor3,
+        door = CommonValues.door3,
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country3,
