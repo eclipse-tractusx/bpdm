@@ -20,10 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
 data class SitePartnerCreateResponse(
     @field:JsonUnwrapped
