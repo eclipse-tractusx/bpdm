@@ -182,6 +182,7 @@ object SaasMappings {
             ?: throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
         val alternativeAddressMapping = mapping.saasAlternativeAddressMapping()
 
+        // TODO map name, states, identifiers
         return LogisticAddressDto(
             name = "TODO",
             states = emptyList(),

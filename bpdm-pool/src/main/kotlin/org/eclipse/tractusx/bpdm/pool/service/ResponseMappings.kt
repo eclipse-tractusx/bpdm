@@ -76,7 +76,6 @@ fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierResponse {
     return LegalEntityIdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
-// TODO still unused!
 fun AddressIdentifier.toDto(): AddressIdentifierResponse {
     return AddressIdentifierResponse(value, type.toTypeKeyNameDto())
 }
@@ -206,14 +205,6 @@ fun Site.toDto(): SiteResponse {
     )
 }
 
-
-fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
-    return AdministrativeAreaResponse(value, shortName, fipsCode, type.toDto(), language.toDto())
-}
-
-fun PostCode.toDto(): PostCodeResponse {
-    return PostCodeResponse(value, type.toDto())
-}
 
 fun GeographicCoordinate.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)

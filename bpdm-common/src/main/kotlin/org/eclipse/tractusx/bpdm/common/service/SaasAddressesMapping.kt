@@ -23,6 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
 
 class SaasAddressesMapping(val addresses: Collection<AddressSaas>) {
 
+    // TODO change to technicalKey == ...
     fun saasAlternativeAddressMapping(): SaasAddressToDtoMapping? {
         val address = addresses.find { address -> address.types.any { it.name == "Alternative Legal Address" } }
         return address?.let { SaasAddressToDtoMapping(it) }
