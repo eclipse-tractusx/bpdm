@@ -120,6 +120,8 @@ object RequestValues {
             administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
             street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
         )
     )
@@ -136,6 +138,8 @@ object RequestValues {
             administrativeAreaLevel2 = CommonValues.county3,
             postCode = CommonValues.postCode3,
             city = CommonValues.city3,
+            districtLevel1 = CommonValues.districtLevel1_3,
+            districtLevel2 = CommonValues.districtLevel2_3,
             street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
         )
     )

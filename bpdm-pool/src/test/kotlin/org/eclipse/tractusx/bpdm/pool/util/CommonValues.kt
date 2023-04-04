@@ -39,7 +39,7 @@ object CommonValues {
     //The BPNs should match the first generated BPNs from the Issuer in order
     val bpnL1 = "BPNL000000000001"
     val bpnL2 = "BPNL0000000001YN"
-    val bpnL3 = "BPNS0000000002XY"
+    val bpnL3 = "BPNL0000000002XY"
 
     val bpnA1 = "BPNA000000000001"
     val bpnA2 = "BPNA0000000001YN"
@@ -159,12 +159,12 @@ object CommonValues {
     val city3 = "Atlanta"
 
     val districtLevel1_1 = "Sindelfingen-Ost"
-    val districtLevel1_2 = ""
-    val districtLevel1_3= ""
+    val districtLevel1_2 = "District Level 1"
+    val districtLevel1_3 = "DL 1"
 
     val districtLevel2_1 = "Sindelfingen-Ost-Level2"
-    val districtLevel2_2 = ""
-    val districtLevel2_3 = ""
+    val districtLevel2_2 = "District Level 2"
+    val districtLevel2_3 = "DL 2"
 
     val street1 = "Bela-Barenyi-Straße"
     val street2 = ""
