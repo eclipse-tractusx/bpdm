@@ -59,7 +59,9 @@ class MetadataMappingService(
     fun mapRequests(partners: Collection<LogisticAddressDto>): AddressMetadataMappingDto {
         return AddressMetadataMappingDto(
             idTypes = mapAddressIdentifierTypes(partners),
-            regions = mapAddressRegions(partners)
+            // TODO enable regionCodes later
+//            regions = mapAddressRegions(partners)
+            regions = mapOf()
         )
     }
 

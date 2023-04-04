@@ -418,9 +418,11 @@ class BusinessPartnerBuildService(
         return PhysicalPostalAddress(
             geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
             country = baseAddress.country,
-            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
-                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
-            },
+            // TODO enable regionCodes later
+//            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
+//                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
+//            },
+            administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
             administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,

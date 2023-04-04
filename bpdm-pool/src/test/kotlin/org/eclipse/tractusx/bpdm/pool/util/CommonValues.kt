@@ -21,7 +21,10 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
@@ -132,12 +135,20 @@ object CommonValues {
     val classification4 = "Financial and insurance activities"
     val classification5 = "Accounting, bookkeeping and auditing activities; tax consultancy"
 
-    val adminAreaLevel1Name_1 = "Baden-Württemberg"
-    val adminAreaLevel1RegionCode_1 = "BW"
-    val adminAreaLevel1Name_2 = "Georgia"
-    val adminAreaLevel1RegionCode_2 = "GA"
-    val adminAreaLevel1Name_3 = "Georgia"
-    val adminAreaLevel1RegionCode_3 = "GA"
+    // TODO enable regionCodes later
+//    val adminAreaLevel1RegionCode_1 = "BW"
+//    val adminAreaLevel1Region1 = NameRegioncodeDto(adminAreaLevel1RegionCode_1, "Baden-Württemberg")
+//    val adminAreaLevel1RegionCode_2 = "GA"
+//    val adminAreaLevel1Region2 = NameRegioncodeDto(adminAreaLevel1RegionCode_2, "Georgia")
+//    val adminAreaLevel1RegionCode_3 = "GA"
+//    val adminAreaLevel1Region3 = NameRegioncodeDto(adminAreaLevel1RegionCode_3, "Georgia")
+
+    val adminAreaLevel1RegionCode_1: String? = null
+    val adminAreaLevel1Region1: NameRegioncodeDto? = null
+    val adminAreaLevel1RegionCode_2: String? = null
+    val adminAreaLevel1Region2: NameRegioncodeDto? = null
+    val adminAreaLevel1RegionCode_3: String? = null
+    val adminAreaLevel1Region3: NameRegioncodeDto? = null
 
     val county1 = "Böblingen"
     val county2 = " Fulton County"

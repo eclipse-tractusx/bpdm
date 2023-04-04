@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
@@ -102,7 +101,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country1,
-            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_1, CommonValues.adminAreaLevel1Name_1),
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
@@ -120,7 +119,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country2,
-            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_2, CommonValues.adminAreaLevel1Name_2),
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
@@ -138,7 +137,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country3,
-            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_3, CommonValues.adminAreaLevel1Name_3),
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
             administrativeAreaLevel2 = CommonValues.county3,
             postCode = CommonValues.postCode3,
             city = CommonValues.city3,
