@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
@@ -176,10 +177,16 @@ object CommonValues {
     const val context1 = "Context1"
     const val context2 = "Context2"
 
-    const val adminAreaLevel1Name_1 = "Baden-Württemberg"
-    const val adminAreaLevel1RegionCode_1 = "BW"
-    const val adminAreaLevel1Name_2 = "Georgia"
-    const val adminAreaLevel1RegionCode_2 = "GA"
+    // TODO enable regionCodes later
+//    val adminAreaLevel1RegionCode_1 = "BW"
+//    val adminAreaLevel1Region1 = NameRegioncodeDto(adminAreaLevel1RegionCode_1, "Baden-Württemberg")
+//    val adminAreaLevel1RegionCode_2 = "GA"
+//    val adminAreaLevel1Region2 = NameRegioncodeDto(adminAreaLevel1RegionCode_2, "Georgia")
+
+    val adminAreaLevel1RegionCode_1: String? = null
+    val adminAreaLevel1Region1: NameRegioncodeDto? = null
+    val adminAreaLevel1RegionCode_2: String? = null
+    val adminAreaLevel1Region2: NameRegioncodeDto? = null
 
     const val county1 = "Stuttgart"
     const val county2 = " Fulton County"

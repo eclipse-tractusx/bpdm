@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
@@ -172,7 +171,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate1,
             country = country1,
-            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_1, CommonValues.adminAreaLevel1Name_2),
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
@@ -190,7 +189,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate2,
             country = country2,
-            administrativeAreaLevel1 = NameRegioncodeDto(CommonValues.adminAreaLevel1RegionCode_2, CommonValues.adminAreaLevel1Name_2),
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
