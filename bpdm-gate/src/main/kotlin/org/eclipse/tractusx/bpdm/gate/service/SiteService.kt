@@ -140,6 +140,8 @@ class SiteService(
         val sitesSaas = toSaasModels(sites)
         saasClient.upsertSites(sitesSaas)
 
+        sitePersistenceService.persistSitesBP(sites)
+
         // create changelog entry if all goes well from saasClient
         sites.forEach { site ->
             changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
