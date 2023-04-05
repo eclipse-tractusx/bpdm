@@ -20,28 +20,29 @@
 package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PremiseType
 
 @Entity
 @Table(
-    name = "premises",
-    indexes = [
-        Index(columnList = "address_id")
-    ]
+    name = "identifier_types",
+    uniqueConstraints = [UniqueConstraint(
+        name = "uc_identifier_types_technical_key_lsa_type",
+        columnNames = ["technical_key", "lsa_type"]
+    )]
 )
-class PremiseGate(
-    @Column(name = "`value`", nullable = false)
-    val value: String,
-    @Column(name = "short_name")
-    val shortName: String?,
-    @Column(name = "number")
-    val number: String?,
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val type: PremiseType,
-    @ManyToOne
-    @JoinColumn(name="address_id", nullable=false)
-    var address: AddressGate
-) : BaseEntity()
+class IdentifierType(
+    @Column(name = "technical_key", nullable = false)
+    val technicalKey: String,
 
+    @Column(name = "lsa_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val lsaType: IdentifierLsaType,
+
+    @Column(name = "name", nullable = false)
+    val name: String,
+
+    ) : BaseEntity() {
+    @OneToMany(mappedBy = "identifierType", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val details: MutableSet<IdentifierTypeDetail> = mutableSetOf()
+}

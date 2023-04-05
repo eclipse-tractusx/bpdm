@@ -1,186 +1,180 @@
--- Addresses
-CREATE TABLE addresses
-  (
-     id                       INT8 NOT NULL,
-     created_at               TIMESTAMP WITH time zone NOT NULL,
-     updated_at               TIMESTAMP WITH time zone NOT NULL,
-     uuid                     UUID NOT NULL,
-     bpn                      VARCHAR(255) NULL,
-     care_of                  VARCHAR(255) NULL,
-     country                  VARCHAR(255) NOT NULL,
-     external_id              VARCHAR(255) NOT NULL,
-     altitude                 FLOAT4 NULL,
-     latitude                 FLOAT4 NULL,
-     longitude                FLOAT4 NULL,
-     legal_entity_external_id VARCHAR(255) NULL,
-     site_external_id         VARCHAR(255) NULL,
-     character_set            VARCHAR(255) NOT NULL,
-     "language"               VARCHAR(255) NOT NULL,
-     CONSTRAINT pk_addresses PRIMARY KEY (id),
-     CONSTRAINT uc_addresses_uuid UNIQUE (uuid),
-     CONSTRAINT uc_addresses_external_id UNIQUE (external_id)
-  );
 
---Address Type
-CREATE TABLE address_types
-  (
-     address_id INT8 NOT NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     CONSTRAINT pk_address_types PRIMARY KEY (address_id, type),
-     CONSTRAINT fk_address_types_on_address FOREIGN KEY (address_id) REFERENCES
-     addresses(id)
-  );
-CREATE INDEX idx_1crcquumt5redip9eiycd75re ON address_types USING btree (address_id);
-
--- Address Context
-CREATE TABLE address_contexts
-  (
-     address_id INT8 NOT NULL,
-     context    VARCHAR(255) NOT NULL,
-     CONSTRAINT pk_address_contexts PRIMARY KEY (address_id, context),
-     CONSTRAINT fk_address_contexts_on_address FOREIGN KEY (address_id)
-     REFERENCES addresses(id)
-  );
-CREATE INDEX idx_dyvn52j9bpwuaj3vqa31p1g75 ON address_contexts USING btree (address_id);
-
--- Administrative Areas
-CREATE TABLE administrative_areas
-  (
-     id         INT8 NOT NULL,
-     created_at TIMESTAMP WITH time zone NOT NULL,
-     updated_at TIMESTAMP WITH time zone NOT NULL,
-     uuid       UUID NOT NULL,
-     country    VARCHAR(255) NOT NULL,
-     fips_code  VARCHAR(255) NULL,
-     "language" VARCHAR(255) NOT NULL,
-     short_name VARCHAR(255) NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     value      VARCHAR(255) NOT NULL,
-     address_id INT8 NOT NULL,
-     CONSTRAINT pk_administrative_areas PRIMARY KEY (id),
-     CONSTRAINT uc_administrative_areas_uuid UNIQUE (uuid),
-     CONSTRAINT fk_administrative_areas_on_address FOREIGN KEY (address_id)
-     REFERENCES addresses(id)
-  );
-CREATE INDEX idx_l6bj1ysuij6hm73m0r8cypyd9 ON administrative_areas USING btree (address_id);
-
--- Localities Table
-CREATE TABLE localities (
-	id INT8                   NOT NULL,
-	created_at                TIMESTAMP WITH time zone NOT NULL,
-	updated_at                TIMESTAMP WITH time zone NOT NULL,
-	uuid UUID                 NOT NULL,
-	"type"                    VARCHAR(255) NOT NULL,
-	short_name                VARCHAR(255) NULL,
-	value                     VARCHAR(255) NOT NULL,
-	address_id INT8           NOT NULL,
-	CONSTRAINT pk_localities  PRIMARY KEY (id)
+CREATE TABLE address_identifiers (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  "value" VARCHAR(255) NOT NULL,
+  address_id BIGINT NOT NULL,
+  type_id BIGINT NOT NULL,
+  PRIMARY KEY (id)
 );
 
-CREATE INDEX idx_qsn69x58x1ks64jhmcs1l796k ON localities USING btree (address_id);
+CREATE TABLE address_states (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  description VARCHAR(255),
+  type VARCHAR(255) NOT NULL,
+  valid_from TIMESTAMP,
+  valid_to TIMESTAMP,
+  address_id BIGINT NOT NULL,
+  PRIMARY KEY (id)
+);
 
-ALTER TABLE localities
-    ADD CONSTRAINT uc_localities_uuid UNIQUE (uuid);
+CREATE TABLE identifier_type_details (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  country_code VARCHAR(255),
+  mandatory BOOLEAN NOT NULL,
+  identifier_type_id BIGINT NOT NULL,
+  PRIMARY KEY (id)
+);
 
-ALTER TABLE localities
-    ADD CONSTRAINT FK_LOCALITIES_ON_ADDRESS FOREIGN KEY (address_id) REFERENCES addresses (id);
+CREATE TABLE identifier_types (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  lsa_type VARCHAR(255) NOT NULL,
+  NAME VARCHAR(255) NOT NULL,
+  technical_key VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+);
 
--- Postal Delivery Points Table
-CREATE TABLE postal_delivery_points
-  (
-     id         INT8 NOT NULL,
-     created_at TIMESTAMP WITH time zone NOT NULL,
-     updated_at TIMESTAMP WITH time zone NOT NULL,
-     uuid       UUID NOT NULL,
-     "number"   VARCHAR(255) NULL,
-     short_name VARCHAR(255) NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     value      VARCHAR(255) NOT NULL,
-     address_id INT8 NOT NULL,
-     CONSTRAINT pk_postal_delivery_points PRIMARY KEY (id)
+CREATE TABLE logistic_addresses (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  alt_admin_area_l2 VARCHAR(255),
+  alt_admin_area_l3 VARCHAR(255),
+  alt_admin_area_l4 VARCHAR(255),
+  alt_city VARCHAR(255),
+  alt_country VARCHAR(255),
+  alt_delivery_service_number VARCHAR(255),
+  alt_delivery_service_type VARCHAR(255),
+  alt_district_l1 VARCHAR(255),
+  alt_district_l2 VARCHAR(255),
+  alt_altitude FLOAT4,
+  alt_latitude FLOAT4,
+  alt_longitude FLOAT4,
+  alt_postcode VARCHAR(255),
+  alt_street_direction VARCHAR(255),
+  alt_street_number VARCHAR(255),
+  alt_street_milestone VARCHAR(255),
+  alt_street_name VARCHAR(255),
+  bpn VARCHAR(255) NOT NULL,
+  external_id VARCHAR(255) NOT NULL,
+  legal_entity_external_id VARCHAR(255),
+  NAME VARCHAR(255),
+  phy_admin_area_l2 VARCHAR(255),
+  phy_admin_area_l3 VARCHAR(255),
+  phy_admin_area_l4 VARCHAR(255),
+  phy_building VARCHAR(255),
+  phy_city VARCHAR(255),
+  phy_country VARCHAR(255),
+  phy_district_l1 VARCHAR(255),
+  phy_district_l2 VARCHAR(255),
+  phy_door VARCHAR(255),
+  phy_floor VARCHAR(255),
+  phy_altitude FLOAT4,
+  phy_latitude FLOAT4,
+  phy_longitude FLOAT4,
+  phy_industrial_zone VARCHAR(255),
+  phy_postcode VARCHAR(255),
+  phy_street_direction VARCHAR(255),
+  phy_street_number VARCHAR(255),
+  phy_street_milestone VARCHAR(255),
+  phy_street_name VARCHAR(255),
+  site_external_id VARCHAR(255),
+  alt_admin_area_l1_region BIGINT,
+  phy_admin_area_l1_region BIGINT,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE regions (
+  id BIGINT NOT NULL,
+  created_at TIMESTAMP WITH time zone NOT NULL,
+  updated_at TIMESTAMP WITH time zone NOT NULL,
+  uuid UUID NOT NULL,
+  country_code VARCHAR(255),
+  region_code VARCHAR(255),
+  region_name VARCHAR(255),
+  PRIMARY KEY (id)
+);
+
+CREATE INDEX idxt1nfv727tjqujqr7b0hxggbq5 ON address_identifiers (address_id);
+CREATE INDEX idxnoqawqkh3fhrrys3n2tahghvn ON address_identifiers (type_id);
+
+ALTER TABLE IF EXISTS address_identifiers
+ADD
+  CONSTRAINT uk_rcrdyqidxxabhh6hgajyd5g9b UNIQUE (uuid);
+
+CREATE INDEX idx6nuoy4ynerttj0kmrx9h0o9w1 ON address_states (address_id);
+
+ALTER TABLE IF EXISTS address_states
+ADD
+  CONSTRAINT uk_2hleh9jm9ef1eq6851bp30v1r UNIQUE (uuid);
+
+ALTER TABLE IF EXISTS identifier_type_details
+ADD
+  CONSTRAINT uc_identifier_type_details_country_code_identifier_type_id UNIQUE (
+    country_code, identifier_type_id
   );
 
-CREATE INDEX idx_ho27o3xxdc5b3yeur262pprq1 ON postal_delivery_points USING btree (address_id);
+ALTER TABLE IF EXISTS identifier_type_details
+ADD
+  CONSTRAINT uk_8gjim536wkekxgepc1k8nrbjg UNIQUE (uuid);
 
-ALTER TABLE postal_delivery_points
-    ADD CONSTRAINT uc_postal_delivery_points_uuid UNIQUE (uuid);
+ALTER TABLE IF EXISTS identifier_types
+ADD
+  CONSTRAINT uc_identifier_types_technical_key_lsa_type UNIQUE (technical_key, lsa_type);
 
-ALTER TABLE postal_delivery_points
-    ADD CONSTRAINT FK_POSTAL_DELIVERY_POINTS_ON_ADDRESS FOREIGN KEY (address_id) REFERENCES addresses (id);
+ALTER TABLE IF EXISTS identifier_types
+ADD
+  CONSTRAINT uk_fnqds7oura6e9ctqgcaqvlp8l UNIQUE (uuid);
 
--- Post Codes Table
-CREATE TABLE post_codes
-  (
-     id         INT8 NOT NULL,
-     created_at TIMESTAMP WITH time zone NOT NULL,
-     updated_at TIMESTAMP WITH time zone NOT NULL,
-     uuid       UUID NOT NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     value      VARCHAR(255) NOT NULL,
-     address_id INT8 NOT NULL,
-     CONSTRAINT pk_post_codes PRIMARY KEY (id)
-  );
-CREATE INDEX idx_jf0olkcrrt1dd3d5lc5mc34ft ON post_codes USING btree (address_id);
+ALTER TABLE IF EXISTS logistic_addresses
+ADD
+  CONSTRAINT uk_fbtqvm8vt1nx20nxlr0ixpsi8 UNIQUE (uuid);
 
-ALTER TABLE post_codes
-    ADD CONSTRAINT uc_post_codes_uuid UNIQUE (uuid);
+ALTER TABLE IF EXISTS logistic_addresses
+ADD
+  CONSTRAINT uk_a2n9sw8djucdywjcnuvkpkssr UNIQUE (bpn);
 
-ALTER TABLE post_codes
-    ADD CONSTRAINT FK_POST_CODES_ON_ADDRESS FOREIGN KEY (address_id) REFERENCES addresses (id);
+ALTER TABLE IF EXISTS logistic_addresses
+ADD
+  CONSTRAINT uk_7xolefhhm30nlfrp5fc25a3i2 UNIQUE (external_id);
 
--- Premises Table
-CREATE TABLE premises
-  (
-     id         INT8 NOT NULL,
-     created_at TIMESTAMP WITH time zone NOT NULL,
-     updated_at TIMESTAMP WITH time zone NOT NULL,
-     uuid       UUID NOT NULL,
-     "number"   VARCHAR(255) NULL,
-     short_name VARCHAR(255) NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     value      VARCHAR(255) NOT NULL,
-     address_id INT8 NOT NULL,
-     CONSTRAINT pk_premises PRIMARY KEY (id)
-  );
+ALTER TABLE IF EXISTS regions
+ADD
+  CONSTRAINT uk_po9lr0ewg38m4xhdaxo9t2hmt UNIQUE (uuid);
 
-CREATE INDEX idx_f1ppnm80ih8b4gqo91scd3k5k ON premises USING btree (address_id);
+ALTER TABLE IF EXISTS address_identifiers
+ADD
+  CONSTRAINT fkfiidrdbv4um8eaxwdb7737cs5 FOREIGN KEY (address_id) REFERENCES logistic_addresses;
 
-ALTER TABLE premises
-    ADD CONSTRAINT uc_premises_uuid UNIQUE (uuid);
+ALTER TABLE IF EXISTS address_identifiers
+ADD
+  CONSTRAINT fkkmeh3id8prkjtxe3xktxclfj3 FOREIGN KEY (type_id) REFERENCES identifier_types;
 
-ALTER TABLE premises
-    ADD CONSTRAINT FK_PREMISES_ON_ADDRESS FOREIGN KEY (address_id) REFERENCES addresses (id);
+ALTER TABLE IF EXISTS address_states
+ADD
+  CONSTRAINT fk6mrebbkx9qe0mnbi9fxrj0d0j FOREIGN KEY (address_id) REFERENCES logistic_addresses;
 
--- Thoroughfares Table
-CREATE TABLE thoroughfares
-  (
-     id         INT8 NOT NULL,
-     created_at TIMESTAMP WITH time zone NOT NULL,
-     updated_at TIMESTAMP WITH time zone NOT NULL,
-     uuid       UUID NOT NULL,
-     direction  VARCHAR(255) NULL,
-     "name"     VARCHAR(255) NULL,
-     "number"   VARCHAR(255) NULL,
-     short_name VARCHAR(255) NULL,
-     "type"     VARCHAR(255) NOT NULL,
-     value      VARCHAR(255) NOT NULL,
-     address_id INT8 NOT NULL,
-     CONSTRAINT pk_thoroughfares PRIMARY KEY (id)
-  );
-CREATE INDEX idx_r37crovik7xrvr8mfk9wfimmh ON thoroughfares USING btree (address_id);
+ALTER TABLE IF EXISTS identifier_type_details
+ADD
+  CONSTRAINT fk8lq6qbrj6gs40quveqnksk0d3 FOREIGN KEY (identifier_type_id) REFERENCES identifier_types;
 
-ALTER TABLE thoroughfares
-    ADD CONSTRAINT uc_thoroughfares_uuid UNIQUE (uuid);
+ALTER TABLE IF EXISTS logistic_addresses
+ADD
+  CONSTRAINT fk1msrc2opgg7y8hllv9mxydm41 FOREIGN KEY (alt_admin_area_l1_region) REFERENCES regions;
 
-ALTER TABLE thoroughfares
-    ADD CONSTRAINT FK_THOROUGHFARES_ON_ADDRESS FOREIGN KEY (address_id) REFERENCES addresses (id);
-
-
-
-
-
-
-
-
-
+ALTER TABLE IF EXISTS logistic_addresses
+ADD
+  CONSTRAINT fkejpo9hh93uu777fbmmixh8v2f FOREIGN KEY (phy_admin_area_l1_region) REFERENCES regions;
 

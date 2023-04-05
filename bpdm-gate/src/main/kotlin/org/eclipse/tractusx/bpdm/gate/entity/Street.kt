@@ -17,14 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.repository
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.CrudRepository
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
 
-interface GateAddressRepository : JpaRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long> {
+@Embeddable
+class Street(
+    @Column
+    val name: String? = null,
 
-    fun findByExternalIdIn(externalId: Collection<String>): Set<LogisticAddress>
+    @Column
+    val houseNumber: String? = null,
 
-}
+    /**
+     * The Milestone is relevant for long roads without specific house numbers.
+     */
+    @Column
+    val milestone: String? = null,
+
+    @Column
+    val direction: String? = null
+)

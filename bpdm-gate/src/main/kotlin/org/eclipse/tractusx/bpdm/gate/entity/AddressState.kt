@@ -21,23 +21,32 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PostCodeType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
 @Entity
 @Table(
-    name = "post_codes",
+    name = "address_states",
     indexes = [
         Index(columnList = "address_id")
     ]
 )
-class PostCodeGate (
-    @Column(name = "`value`", nullable = false)
-    val value: String,
+class AddressState(
+    @Column(name = "description")
+    val description: String?,
+
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
+
+    @Column(name = "valid_to")
+    val validTo: LocalDateTime?,
+
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: PostCodeType,
+    val type: BusinessStateType,
+
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: AddressGate
-) : BaseEntity()
+    var address: LogisticAddress
 
+) : BaseEntity()

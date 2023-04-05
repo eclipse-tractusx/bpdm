@@ -19,29 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.gate.entity
 
+import com.neovisionaries.i18n.CountryCode
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.PostalDeliveryPointType
 
 @Entity
 @Table(
-    name = "postal_delivery_points",
-    indexes = [
-        Index(columnList = "address_id")
-    ]
+    name = "regions",
 )
-class PostalDeliveryPointGate(
-    @Column(name = "`value`", nullable = false)
-    val value: String,
-    @Column(name = "short_name")
-    val shortName: String?,
-    @Column(name = "number")
-    val number: String?,
-    @Column(name = "type", nullable = false)
+class Region(
+    @Column(name = "country_code")
     @Enumerated(EnumType.STRING)
-    val type: PostalDeliveryPointType,
-    @ManyToOne
-    @JoinColumn(name="address_id", nullable=false)
-    var address: AddressGate
-) : BaseEntity()
+    val countryCode: CountryCode,
 
+    @Column(name = "region_code")
+    val regionCode: String,
+
+    @Column(name = "region_name")
+    val regionName: String
+) : BaseEntity()

@@ -24,72 +24,89 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 
-fun AddressGateInputRequest.toAddressGate(): AddressGate {
+fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
 
-    val address = AddressGate(
-        careOf = address.careOf,
-        country = address.country,
-        version = address.version.toAddressVersionGate(),
-        geoCoordinates = address.geographicCoordinates?.toGeographicCoordinateGate(),
+    val logisticAddress = LogisticAddress(
+        bpn = bpn.toString(),
         externalId = externalId,
         legalEntityExternalId = legalEntityExternalId.toString(),
         siteExternalId = siteExternalId.toString(),
-        bpn = bpn.toString(),
+        name = address.name,
+        physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
+        alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity()
     )
 
-    address.postCodes.addAll(this.address.postCodes.map { toEntity(it, address) }.toSet())
-    address.administrativeAreas.addAll(this.address.administrativeAreas.map { toEntity(it, address) }.toSet())
-    address.thoroughfares.addAll(this.address.thoroughfares.map { toEntity(it, address) }.toSet())
-    address.localities.addAll(this.address.localities.map { toEntity(it, address) }.toSet())
-    address.premises.addAll(this.address.premises.map { toEntity(it, address) }.toSet())
-    address.postalDeliveryPoints.addAll(this.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
-    address.contexts.addAll(this.address.contexts)
-    address.types.addAll(this.address.types)
+    //logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
+    logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
 
-    return address
+    return logisticAddress
 }
 
-fun toEntity(dto: PostCodeDto, address: AddressGate): PostCodeGate {
-    return PostCodeGate(dto.value, dto.type, address)
+fun toEntityAddress(dto: AddressStateDto, address: LogisticAddress): AddressState {
+    return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
 }
 
-fun toEntity(dto: AdministrativeAreaDto, address: AddressGate): AdministrativeAreaGate {
-    return AdministrativeAreaGate(dto.value, dto.shortName, dto.fipsCode, dto.type, address.version.language, address.country, address)
-}
+//fun toEntityIdentifier(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
+//    return AddressIdentifier(dto.value, toIdentifierType(dto.type), address)
+//}
+//
+//fun toIdentifierType(technicalKey: String): IdentifierType {
+//    return IdentifierType(technicalKey, lsaType = null,"")
+//}
 
-fun toEntity(dto: ThoroughfareDto, address: AddressGate): ThoroughfareGate {
-    return ThoroughfareGate(dto.value, dto.name, dto.shortName, dto.number, dto.direction, dto.type, address)
-}
+fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativePostalAddress {
 
-fun toEntity(dto: LocalityDto, address: AddressGate): LocalityGate {
-    return LocalityGate(dto.value, dto.shortName, dto.type, address)
-}
-
-fun toEntity(dto: PremiseDto, address: AddressGate): PremiseGate {
-    return PremiseGate(dto.value, dto.shortName, dto.number, dto.type, address)
-}
-
-fun toEntity(dto: PostalDeliveryPointDto, address: AddressGate): PostalDeliveryPointGate {
-    return PostalDeliveryPointGate(dto.value, dto.shortName, dto.number, dto.type, address)
-}
-
-fun GeoCoordinateDto.toGeographicCoordinateGate(): GeographicCoordinateGate {
-
-    return GeographicCoordinateGate(
-        this.longitude,
-        this.latitude,
-        this.altitude
+    return AlternativePostalAddress(
+        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = baseAddress.country,
+        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+        administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+        postCode = baseAddress.postCode,
+        city = baseAddress.city,
+        districtLevel1 = baseAddress.districtLevel1,
+        districtLevel2 = baseAddress.districtLevel2,
+        street = baseAddress.street?.toStreetEntity(),
+        deliveryServiceType = type,
+        deliveryServiceNumber = deliveryServiceNumber
     )
 
 }
 
-fun AddressVersionDto.toAddressVersionGate(): AddressVersionGate {
+fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddress {
 
-    return AddressVersionGate(
-        this.characterSet,
-        this.language
+    return PhysicalPostalAddress(
+        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = baseAddress.country,
+        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+        administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+        postCode = baseAddress.postCode,
+        city = baseAddress.city,
+        districtLevel1 = baseAddress.districtLevel1,
+        districtLevel2 = baseAddress.districtLevel2,
+        street = baseAddress.street?.toStreetEntity(),
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door
     )
 
+}
+
+fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
+    return GeographicCoordinate(longitude, latitude, altitude)
+}
+
+private fun StreetDto.toStreetEntity(): Street {
+    return Street(
+        name = name,
+        houseNumber = houseNumber,
+        milestone = milestone,
+        direction = direction
+    )
 }
 
 fun ChangelogEntry.toGateDto(): ChangelogResponse {

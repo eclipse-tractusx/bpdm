@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.AddressGate
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.stereotype.Service
 
@@ -48,25 +48,18 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         }
     }
 
-    private fun updateAddress(address: AddressGate, addressRequest: AddressGateInputRequest) {
+    private fun updateAddress(address: LogisticAddress, addressRequest: AddressGateInputRequest) {
 
-        address.careOf = addressRequest.address.careOf
-        address.country = addressRequest.address.country
-        address.version = addressRequest.address.version.toAddressVersionGate()
-        address.geoCoordinates = addressRequest.address.geographicCoordinates?.toGeographicCoordinateGate()
+        address.name = addressRequest.address.name
+        address.bpn = addressRequest.bpn.toString()
         address.externalId = addressRequest.externalId
         address.legalEntityExternalId = addressRequest.legalEntityExternalId.toString()
         address.siteExternalId = addressRequest.siteExternalId.toString()
-        address.bpn = addressRequest.bpn.toString()
+        address.physicalPostalAddress = addressRequest.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
+        address.alternativePostalAddress = addressRequest.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
-        address.postCodes.replace(addressRequest.address.postCodes.map { toEntity(it, address) }.toSet())
-        address.administrativeAreas.replace(addressRequest.address.administrativeAreas.map { toEntity(it, address) }.toSet())
-        address.thoroughfares.replace(addressRequest.address.thoroughfares.map { toEntity(it, address) }.toSet())
-        address.localities.replace(addressRequest.address.localities.map { toEntity(it, address) }.toSet())
-        address.premises.replace(addressRequest.address.premises.map { toEntity(it, address) }.toSet())
-        address.postalDeliveryPoints.replace(addressRequest.address.postalDeliveryPoints.map { toEntity(it, address) }.toSet())
-        address.contexts.replace(addressRequest.address.contexts)
-        address.types.replace(addressRequest.address.types)
+//        address.identifiers.replace(addressRequest.address.identifiers.map { toEntityIdentifier(it, address) }.toSet())
+        address.states.replace(addressRequest.address.states.map { toEntityAddress(it, address) }.toSet())
 
     }
 

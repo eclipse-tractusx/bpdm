@@ -21,31 +21,25 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.ThoroughfareType
 
 @Entity
 @Table(
-    name = "thoroughfares",
+    name = "address_identifiers",
     indexes = [
-        Index(columnList = "address_id")
+        Index(columnList = "address_id"),
+        Index(columnList = "type_id")
     ]
 )
-class ThoroughfareGate (
+class AddressIdentifier(
     @Column(name = "`value`", nullable = false)
-    val value: String,
-    @Column(name = "name")
-    val name: String?,
-    @Column(name = "short_name")
-    val shortName: String?,
-    @Column(name = "number")
-    val number: String?,
-    @Column(name = "direction")
-    val direction: String?,
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val type: ThoroughfareType,
+    var value: String,
+
+    @ManyToOne
+    @JoinColumn(name = "type_id", nullable = false)
+    var type: IdentifierType,
+
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
-    var address: AddressGate
-) : BaseEntity()
+    var address: LogisticAddress
 
+) : BaseEntity()

@@ -42,7 +42,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-data class GeographicCoordinateGate(
+data class GeographicCoordinate(
     @Column(name = "latitude")
     val latitude: Float,
     @Column(name = "longitude")
