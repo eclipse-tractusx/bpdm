@@ -43,10 +43,10 @@ interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddress
         pageable: Pageable
     ): Page<LogisticAddress>
 
-    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.legalEntity WHERE a IN :addresses")
+    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.legalEntity LEFT JOIN FETCH a.legalEntity.legalAddress WHERE a IN :addresses")
     fun joinLegalEntities(addresses: Set<LogisticAddress>): Set<LogisticAddress>
 
-    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.site WHERE a IN :addresses")
+    @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.site LEFT JOIN FETCH a.site.mainAddress WHERE a IN :addresses")
     fun joinSites(addresses: Set<LogisticAddress>): Set<LogisticAddress>
 
     @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 WHERE a IN :addresses")

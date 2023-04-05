@@ -113,7 +113,9 @@ fun LogisticAddress.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
         bpn = bpn,
         bpnLegalEntity = legalEntity?.bpn,
+        isLegalAddress = legalEntity?.legalAddress == this,
         bpnSite = site?.bpn,
+        isMainAddress = site?.mainAddress == this,
         createdAt = createdAt,
         updatedAt = updatedAt,
         name = name,
