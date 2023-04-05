@@ -219,7 +219,8 @@ object ResponseValues {
     val siteUpsert1 = SitePartnerCreateResponse(
         site = site1,
         mainAddress = addressPartner1.copy(
-            bpnSite = site1.bpn
+            bpnSite = site1.bpn,
+            isMainAddress = true
         ),
         index = CommonValues.index1
     )
@@ -227,7 +228,8 @@ object ResponseValues {
     val siteUpsert2 = SitePartnerCreateResponse(
         site = site2,
         mainAddress = addressPartner2.copy(
-            bpnSite = site2.bpn
+            bpnSite = site2.bpn,
+            isMainAddress = true
         ),
         index = CommonValues.index2
     )
@@ -235,7 +237,8 @@ object ResponseValues {
     val siteUpsert3 = SitePartnerCreateResponse(
         site = site3,
         mainAddress = addressPartner3.copy(
-            bpnSite = site3.bpn
+            bpnSite = site3.bpn,
+            isMainAddress = true
         ),
         index = CommonValues.index3
     )
@@ -280,7 +283,8 @@ object ResponseValues {
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity1,
         legalAddress = addressPartner1.copy(
-            bpnLegalEntity = legalEntity1.bpn
+            bpnLegalEntity = legalEntity1.bpn,
+            isLegalAddress = true
         ),
         index = CommonValues.index1
     )
@@ -288,7 +292,8 @@ object ResponseValues {
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity2,
         legalAddress = addressPartner2.copy(
-            bpnLegalEntity = legalEntity2.bpn
+            bpnLegalEntity = legalEntity2.bpn,
+            isLegalAddress = true
         ),
         index = CommonValues.index2
     )
@@ -296,7 +301,8 @@ object ResponseValues {
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity3,
         legalAddress = addressPartner3.copy(
-            bpnLegalEntity = legalEntity3.bpn
+            bpnLegalEntity = legalEntity3.bpn,
+            isLegalAddress = true
         ),
         index = CommonValues.index3
     )

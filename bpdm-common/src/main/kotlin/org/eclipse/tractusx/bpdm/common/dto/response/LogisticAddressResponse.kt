@@ -48,8 +48,14 @@ data class LogisticAddressResponse(
     @Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,
 
+    @Schema(description = "Flag if this is the legal address of its related legal entity")
+    val isLegalAddress: Boolean = false,
+
     @Schema(description = "BPN of the related site, if available")
     val bpnSite: String?,
+
+    @Schema(description = "Flag if this is the main address of its related site")
+    val isMainAddress: Boolean = false,
 
     @Schema(description = "The timestamp the business partner data was created")
     val createdAt: Instant,

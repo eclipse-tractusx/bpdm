@@ -87,17 +87,18 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val importedPartner = createdStructures.single().legalEntity
-        val addressesOfLegalEntityResponse = importedPartner.legalEntity.bpn
-            .let { bpn -> requestAddressesOfLegalEntity(bpn).content }
+        val addressesByBpnL = importedPartner.legalEntity.bpn
+            .let { bpnL -> requestAddressesOfLegalEntity(bpnL).content }
         // 1 legal address, 1 regular address
-        assertThat(addressesOfLegalEntityResponse.size).isEqualTo(2)
+        assertThat(addressesByBpnL.size).isEqualTo(2)
+        assertThat(addressesByBpnL.count { it.isLegalAddress }).isEqualTo(1)
 
         // Same address if we use the address-by-BPNA method
-        addressesOfLegalEntityResponse
+        addressesByBpnL
             .forEach { address ->
-                val addressResponse = requestAddress(address.bpn)
-                assertThat(addressResponse.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
-                assertThat(addressResponse).isEqualTo(address)
+                val addressByBpnA = requestAddress(address.bpn)
+                assertThat(addressByBpnA.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
+                assertThat(addressByBpnA).isEqualTo(address)
             }
     }
 
@@ -176,11 +177,10 @@ class AddressControllerIT @Autowired constructor(
         val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
 
         val searchRequest = AddressPartnerBpnSearchRequest(legalEntities = listOf(bpnL2))
-
         val searchResult = poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            ResponseValues.addressPartner2,
+            ResponseValues.addressPartner2.copy(isLegalAddress = true),
             ResponseValues.addressPartner3
         )
 
@@ -220,39 +220,44 @@ class AddressControllerIT @Autowired constructor(
         val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpn
         val bpnS2 = createdStructures[1].siteStructures[0].site.site.bpn
 
-        AddressPartnerBpnSearchRequest(sites = listOf(bpnS1))       // search for site1
+        // search for site1 -> main address and 2 regular addresses
+        AddressPartnerBpnSearchRequest(sites = listOf(bpnS1))
             .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        ResponseValues.addressPartner1,     // site1 - main address
-                        ResponseValues.addressPartner1,     // site1 - 1st regular address
-                        ResponseValues.addressPartner2,     // site1 - 2nd regular address
+                        ResponseValues.addressPartner1.copy(isMainAddress = true),
+                        ResponseValues.addressPartner1,
+                        ResponseValues.addressPartner2,
                     )
                 )
             }
 
+        // search for site2 -> main address and 1 regular address
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS2))       // search for site2
             .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        ResponseValues.addressPartner2,     // site2 - main address
-                        ResponseValues.addressPartner3,     // site2 - regular address
+                        ResponseValues.addressPartner2.copy(isMainAddress = true),
+                        ResponseValues.addressPartner3,
                     )
                 )
             }
 
+        // search for site1 and site2 -> 2 main addresses and 3 regular addresses
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS2, bpnS1))    // search for site1 and site2
             .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        ResponseValues.addressPartner1,     // site1 - main address
-                        ResponseValues.addressPartner1,     // site1 - 1st regular address
-                        ResponseValues.addressPartner2,     // site1 - 2nd regular address
-                        ResponseValues.addressPartner2,     // site2 - main address
-                        ResponseValues.addressPartner3,     // site2 - regular address
+                        // site1
+                        ResponseValues.addressPartner1.copy(isMainAddress = true),
+                        ResponseValues.addressPartner1,
+                        ResponseValues.addressPartner2,
+                        // site2
+                        ResponseValues.addressPartner2.copy(isMainAddress = true),
+                        ResponseValues.addressPartner3,
                     )
                 )
             }
