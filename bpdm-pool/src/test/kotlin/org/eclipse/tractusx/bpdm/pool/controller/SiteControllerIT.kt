@@ -236,9 +236,9 @@ class SiteControllerIT @Autowired constructor(
         val bpnS3 = givenStructure[1].siteStructures[1].site.site.bpn
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn=bpnS1), index = null) },
-            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn=bpnS1), index = null) },
-            ResponseValues.siteUpsert3.run { copy(site = site.copy(bpn=bpnS2), index = null) },
+            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpn = bpnS3), index = null) },
+            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpn = bpnS1), index = null) },
+            ResponseValues.siteUpsert3.run { copy(site = site.copy(bpn = bpnS2), index = null) },
         )
 
         val toUpdate = listOf(
@@ -249,7 +249,7 @@ class SiteControllerIT @Autowired constructor(
 
         val response = poolClient.sites().updateSite(toUpdate)
 
-        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
     }
 
@@ -285,7 +285,7 @@ class SiteControllerIT @Autowired constructor(
         val response = poolClient.sites().updateSite(toUpdate)
 
         // 2 entities okay
-        testHelpers.assertRecursively(response.entities).isEqualTo(expected)
+        assertThatCreatedSitesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
         testHelpers.assertErrorResponse(response.errors.first(), SiteUpdateError.SiteNotFound, "NONEXISTENT")
@@ -350,11 +350,12 @@ class SiteControllerIT @Autowired constructor(
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateResponse>, expected: Collection<SitePartnerCreateResponse>) {
         actuals.forEach { assertThat(it.site.bpn).matches(testHelpers.bpnSPattern) }
 
-        testHelpers.assertRecursively(actuals).ignoringFields(SiteResponse::bpn.name).isEqualTo(expected)
+        testHelpers.assertRecursively(actuals)
+            .ignoringFields("site.bpn", "site.bpnLegalEntity", "mainAddress.bpn", "mainAddress.bpnSite")
+            .isEqualTo(expected)
     }
 
     private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
-
 
     private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn, PaginationRequest())
 

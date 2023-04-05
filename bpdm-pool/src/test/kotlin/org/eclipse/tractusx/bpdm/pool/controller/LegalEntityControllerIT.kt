@@ -23,8 +23,10 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
@@ -181,15 +183,25 @@ class LegalEntityControllerIT @Autowired constructor(
     @Test
     fun `ignore invalid legal entity update`() {
         val given = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
-        poolClient.legalEntities().createBusinessPartners(given)
+
+        val createResponse = poolClient.legalEntities().createBusinessPartners(given)
+        val createdEntity = createResponse.entities.toList()[1]
+        val bpnL = createdEntity.legalEntity.bpn
+        val bpnA = createdEntity.legalAddress.bpn
+
         val toUpdate = listOf(
             RequestValues.legalEntityUpdate3.copy(bpn = "NONEXISTENT"),
-            RequestValues.legalEntityUpdate3.copy(bpn = CommonValues.bpnL2)
+            RequestValues.legalEntityUpdate3.copy(bpn = bpnL)
         )
+
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
                 legalEntity = legalEntity.copy(
-                    bpn = CommonValues.bpnL2
+                    bpn = bpnL
+                ),
+                legalAddress = legalAddress.copy(
+                    bpn = bpnA,
+                    bpnLegalEntity = bpnL
                 )
             )
         }
@@ -218,7 +230,8 @@ class LegalEntityControllerIT @Autowired constructor(
         )
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
-        val expected = givenLegalEntities.map { it.legalAddress }
+        val expected = givenLegalEntities
+            .map { toLegalAddressResponse(it.legalAddress) }
 
         val bpnsToSearch = givenLegalEntities.map { it.legalEntity.bpn }
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
@@ -227,6 +240,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -244,14 +258,18 @@ class LegalEntityControllerIT @Autowired constructor(
         )
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
-        val expected = givenLegalEntities.map { it.legalAddress }.take(2)
+        val expected = givenLegalEntities
+            .map { toLegalAddressResponse(it.legalAddress) }
+            .take(2)
 
-        val bpnsToSearch = expected.map { it.bpnLegalEntity!! }.plus("NONEXISTENT")
+        val bpnsToSearch = expected.map { it.bpnLegalEntity }.plus("NONEXISTENT")
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
+
         assertThat(response)
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expected)
     }
 
@@ -501,4 +519,12 @@ class LegalEntityControllerIT @Autowired constructor(
         else
             throw IllegalArgumentException("Can't change case of string $value")
     }
+
+    private fun toLegalAddressResponse(it: LogisticAddressResponse) = LegalAddressResponse(
+        physicalPostalAddress = it.physicalPostalAddress,
+        alternativePostalAddress = it.alternativePostalAddress,
+        bpnLegalEntity = it.bpnLegalEntity!!,
+        createdAt = it.createdAt,
+        updatedAt = it.updatedAt
+    )
 }

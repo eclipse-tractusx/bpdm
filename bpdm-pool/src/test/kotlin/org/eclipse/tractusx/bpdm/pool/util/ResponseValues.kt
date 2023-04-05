@@ -150,7 +150,7 @@ object ResponseValues {
     val addressPartner1 = LogisticAddressResponse(
         bpn = CommonValues.bpnA1,
         physicalPostalAddress = address1,
-        bpnLegalEntity = CommonValues.bpnL1,
+        bpnLegalEntity = null,
         bpnSite = null,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
@@ -159,7 +159,7 @@ object ResponseValues {
     val addressPartner2 = LogisticAddressResponse(
         bpn = CommonValues.bpnA2,
         physicalPostalAddress = address2,
-        bpnLegalEntity = CommonValues.bpnL2,
+        bpnLegalEntity = null,
         bpnSite = null,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
@@ -168,7 +168,7 @@ object ResponseValues {
     val addressPartner3 = LogisticAddressResponse(
         bpn = CommonValues.bpnA3,
         physicalPostalAddress = address3,
-        bpnLegalEntity = CommonValues.bpnL3,
+        bpnLegalEntity = null,
         bpnSite = null,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
@@ -218,19 +218,25 @@ object ResponseValues {
 
     val siteUpsert1 = SitePartnerCreateResponse(
         site = site1,
-        mainAddress = addressPartner1,
+        mainAddress = addressPartner1.copy(
+            bpnSite = site1.bpn
+        ),
         index = CommonValues.index1
     )
 
     val siteUpsert2 = SitePartnerCreateResponse(
         site = site2,
-        mainAddress = addressPartner2,
+        mainAddress = addressPartner2.copy(
+            bpnSite = site2.bpn
+        ),
         index = CommonValues.index2
     )
 
     val siteUpsert3 = SitePartnerCreateResponse(
         site = site3,
-        mainAddress = addressPartner3,
+        mainAddress = addressPartner3.copy(
+            bpnSite = site3.bpn
+        ),
         index = CommonValues.index3
     )
 
@@ -273,19 +279,25 @@ object ResponseValues {
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity1,
-        legalAddress = addressPartner1,
+        legalAddress = addressPartner1.copy(
+            bpnLegalEntity = legalEntity1.bpn
+        ),
         index = CommonValues.index1
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity2,
-        legalAddress = addressPartner2,
+        legalAddress = addressPartner2.copy(
+            bpnLegalEntity = legalEntity2.bpn
+        ),
         index = CommonValues.index2
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
         legalEntity = legalEntity3,
-        legalAddress = addressPartner3,
+        legalAddress = addressPartner3.copy(
+            bpnLegalEntity = legalEntity3.bpn
+        ),
         index = CommonValues.index3
     )
 
