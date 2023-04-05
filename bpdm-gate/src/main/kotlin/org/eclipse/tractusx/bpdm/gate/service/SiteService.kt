@@ -46,7 +46,8 @@ class SiteService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val sitePersistenceService: SitePersistenceService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -138,6 +139,8 @@ class SiteService(
 
         val sitesSaas = toSaasModels(sites)
         saasClient.upsertSites(sitesSaas)
+
+        sitePersistenceService.persistSitesBP(sites)
 
         // create changelog entry if all goes well from saasClient
         sites.forEach { site ->

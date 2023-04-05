@@ -20,14 +20,19 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.SiteState
 
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAddress {
 
@@ -115,6 +120,26 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
+// Site Mappers
+fun SiteGateInputRequest.toSiteGate(): Site {
+
+    val site = Site(
+        bpn.toString(),
+        site.name,
+        externalId,
+        legalEntityExternalId
+        //TODO (Needs LegalEntity Logic)
+    )
+
+    site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
+
+    return site
+}
+
+fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
+    return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
+}
+
 fun ChangelogEntry.toGateDto(): ChangelogResponse {
     return ChangelogResponse(
         externalId,
@@ -122,6 +147,13 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
         createdAt
     )
 }
+fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
+
+    val addressInputRequest =AddressGateInputRequest(
+        address= legalEntity.legalAddress,
+        externalId= externalId+"_legalAddress",
+        legalEntityExternalId= externalId
+    )
 
 fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
