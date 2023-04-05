@@ -124,6 +124,26 @@ fun LogisticAddress.toDto(): LogisticAddressResponse {
     )
 }
 
+fun LogisticAddress.toLegalAddressResponse(): LegalAddressResponse {
+    return LegalAddressResponse(
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto(),
+        bpnLegalEntity = legalEntity?.bpn!!,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
+}
+
+fun LogisticAddress.toMainAddressResponse(): MainAddressResponse {
+    return MainAddressResponse(
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto(),
+        bpnSite = site?.bpn!!,
+        createdAt = createdAt,
+        updatedAt = updatedAt
+    )
+}
+
 fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
     return PhysicalPostalAddressResponse(
         baseAddress = BasePostalAddressResponse(
