@@ -26,17 +26,15 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 @Table(
     name = "address_identifiers",
     indexes = [
-        Index(columnList = "address_id"),
-        Index(columnList = "type_id")
+        Index(columnList = "address_id")
     ]
 )
 class AddressIdentifier(
     @Column(name = "`value`", nullable = false)
     var value: String,
 
-    @ManyToOne
-    @JoinColumn(name = "type_id", nullable = false)
-    var type: IdentifierType,
+    @Column(name = "identifier_type_key", nullable = false)
+    var type: String,
 
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)

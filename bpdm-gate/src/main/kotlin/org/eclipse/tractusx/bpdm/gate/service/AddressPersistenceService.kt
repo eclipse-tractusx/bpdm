@@ -58,7 +58,7 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         address.physicalPostalAddress = addressRequest.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = addressRequest.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
-//        address.identifiers.replace(addressRequest.address.identifiers.map { toEntityIdentifier(it, address) }.toSet())
+        address.identifiers.replace(addressRequest.address.identifiers.map { toEntityIdentifier(it, address) }.toSet())
         address.states.replace(addressRequest.address.states.map { toEntityAddress(it, address) }.toSet())
 
     }

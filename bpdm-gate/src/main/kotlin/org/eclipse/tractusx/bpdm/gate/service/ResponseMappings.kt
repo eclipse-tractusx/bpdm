@@ -36,7 +36,7 @@ fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity()
     )
 
-    //logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
+    logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
 
     return logisticAddress
@@ -46,13 +46,9 @@ fun toEntityAddress(dto: AddressStateDto, address: LogisticAddress): AddressStat
     return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
 }
 
-//fun toEntityIdentifier(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
-//    return AddressIdentifier(dto.value, toIdentifierType(dto.type), address)
-//}
-//
-//fun toIdentifierType(technicalKey: String): IdentifierType {
-//    return IdentifierType(technicalKey, lsaType = null,"")
-//}
+fun toEntityIdentifier(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
+    return AddressIdentifier(dto.value, dto.type, address)
+}
 
 fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativePostalAddress {
 
