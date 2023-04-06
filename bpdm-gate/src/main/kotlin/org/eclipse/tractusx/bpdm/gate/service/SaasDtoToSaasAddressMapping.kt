@@ -110,7 +110,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         return thoroughfares;
     }
 
-    fun premesis(physicalAddress: PhysicalPostalAddressDto? ): Collection<PremiseSaas> {
+    fun premises(physicalAddress: PhysicalPostalAddressDto? ): Collection<PremiseSaas> {
 
         val premesis: MutableList<PremiseSaas> = mutableListOf()
 
