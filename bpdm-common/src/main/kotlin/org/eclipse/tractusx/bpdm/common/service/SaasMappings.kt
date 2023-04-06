@@ -88,9 +88,10 @@ object SaasMappings {
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toLegalEntityIdentifierDto(it) },
             legalName = legalName,
             legalForm = toOptionalReference(legalForm),
-            states = toLegalEntityStatusDtos(status),
+            states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),
-            legalAddress = convertSaasAdressesToDto(addresses, this.id)
+            // Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
+            legalAddress = convertSaasAdressesToDtoInternal(addresses, id)
         )
     }
 
@@ -99,9 +100,20 @@ object SaasMappings {
             ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", externalId ?: "Unknown")
         return SiteDto(
             name = name.value,
-            states = toSiteStatusDtos(status),
-            mainAddress = convertSaasAdressesToDto(addresses, this.id)
+            states = toSiteStatesDtos(status),
+            // Known issue: For now the main address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
+            mainAddress = convertSaasAdressesToDtoInternal(addresses, id)
         )
+    }
+
+    fun BusinessPartnerSaas.toAddressDto(): LogisticAddressDto {
+        // partial LogisticAddressDto is enriched with info from BusinessPartnerSaas
+        return convertSaasAdressesToDtoInternal(addresses, id)
+            .copy(
+                name = toNameDto()?.value,
+                states = toAddressStatesDtos(status),
+                identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toAddressIdentifierDto(it) }
+            )
     }
 
     private fun BusinessPartnerSaas.toNameDto(): NameDto? {
@@ -120,7 +132,6 @@ object SaasMappings {
         )
     }
 
-    // TODO still unused!
     fun toAddressIdentifierDto(identifier: IdentifierSaas): AddressIdentifierDto {
         return AddressIdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, AddressIdentifierDto::class, IdentifierSaas::value),
@@ -135,31 +146,41 @@ object SaasMappings {
         )
     }
 
-    fun toLegalEntityStatusDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStateDto> =
-        status?.type?.let {
-            listOf(
+    fun toLegalEntityStatesDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStateDto> =
+        listOfNotNull(
+            status?.type?.let {
                 LegalEntityStateDto(
                     officialDenotation = status.officialDenotation,
                     validFrom = status.validFrom,
                     validTo = status.validUntil,
                     type = toType(status.type)
                 )
-            )
-        }
-            ?: listOf()
+            }
+        )
 
-    fun toSiteStatusDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStateDto> =
-        status?.type?.let {
-            listOf(
+    fun toSiteStatesDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStateDto> =
+        listOfNotNull(
+            status?.type?.let {
                 SiteStateDto(
                     description = status.officialDenotation,
                     validFrom = status.validFrom,
                     validTo = status.validUntil,
                     type = toType(status.type)
                 )
-            )
-        }
-            ?: listOf()
+            }
+        )
+
+    fun toAddressStatesDtos(status: BusinessPartnerStatusSaas?): Collection<AddressStateDto> =
+        listOfNotNull(
+            status?.type?.let {
+                AddressStateDto(
+                    description = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validTo = status.validUntil,
+                    type = toType(status.type)
+                )
+            }
+        )
 
     fun toDto(profile: PartnerProfileSaas?): Collection<ClassificationDto> {
         return profile?.classifications?.mapNotNull { toDto(it) } ?: emptyList()
@@ -175,16 +196,24 @@ object SaasMappings {
         }
     }
 
-    fun convertSaasAdressesToDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
+    /**
+     * For now a legal/main address is not represented as a full-fledged business partner like a regular address, but as a sub-address of its
+     * leading business partner (LE or site).
+     *
+     * This entails some limitations for legal/main addresses compared to regular addresses:
+     * - name, states, identifiers are missing in SaaS
+     * - a generated BPN-A can't be returned back to the Gate
+     */
+    private fun convertSaasAdressesToDtoInternal(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
 
         val mapping = SaasAddressesMapping(addresses)
         val physicalAddressMapping = mapping.saasPhysicalAddressMapping()
             ?: throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
         val alternativeAddressMapping = mapping.saasAlternativeAddressMapping()
 
-        // TODO map name, states, identifiers
+        // info for name, states, identifiers is contained in BusinessPartnerSaas and can't be filled in here
         return LogisticAddressDto(
-            name = "TODO",
+            name = null,
             states = emptyList(),
             identifiers = emptyList(),
             physicalPostalAddress = toPhysicalAddress(physicalAddressMapping, id),

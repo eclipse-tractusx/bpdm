@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.convertSaasAdressesToDto
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toAddressDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -40,8 +40,8 @@ class SaasToRequestMapper {
 
     fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerSaas): LegalEntityPartnerCreateRequest {
         return LegalEntityPartnerCreateRequest(
-            partnerWithImportId.toLegalEntityDto(),
-            partnerWithImportId.externalId
+            legalEntity = partnerWithImportId.toLegalEntityDto(),
+            index = partnerWithImportId.externalId
         )
     }
 
@@ -56,8 +56,8 @@ class SaasToRequestMapper {
 
     fun toLegalEntityUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest {
         return LegalEntityPartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            partnerWithBpn.partner.toLegalEntityDto()
+            bpn = partnerWithBpn.bpn,
+            legalEntity = partnerWithBpn.partner.toLegalEntityDto()
         )
     }
 
@@ -90,8 +90,8 @@ class SaasToRequestMapper {
 
     fun toSiteUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest {
         return SitePartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            partnerWithBpn.partner.toSiteDto()
+            bpn = partnerWithBpn.bpn,
+            site = partnerWithBpn.partner.toSiteDto()
         )
     }
 
@@ -106,7 +106,7 @@ class SaasToRequestMapper {
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            address = convertSaasAdressesToDto(partnerWithParent.partner.addresses, null),
+            address = partnerWithParent.partner.toAddressDto(),
             bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
@@ -123,8 +123,8 @@ class SaasToRequestMapper {
 
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            address = convertSaasAdressesToDto(partnerWithBpn.partner.addresses, null)
+            bpn = partnerWithBpn.bpn,
+            address = partnerWithBpn.partner.toAddressDto()
         )
     }
 
