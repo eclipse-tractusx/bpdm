@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toAddressDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
@@ -47,7 +48,7 @@ class InputSaasMappingService(
 
     fun toInputAddress(businessPartner: BusinessPartnerSaas, legalEntityExternalId: String?, siteExternalId: String?): AddressGateInputResponse {
         return AddressGateInputResponse(
-            address = SaasMappings.convertSaasAdressesToDto(businessPartner.addresses, businessPartner.id),
+            address = businessPartner.toAddressDto(),
             externalId = businessPartner.externalId!!,
             legalEntityExternalId = legalEntityExternalId,
             siteExternalId = siteExternalId,
