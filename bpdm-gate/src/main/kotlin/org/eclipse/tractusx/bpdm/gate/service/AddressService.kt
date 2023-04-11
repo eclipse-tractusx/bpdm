@@ -63,7 +63,7 @@ class AddressService(
         val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
         val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
 
-        val inputAddresses = addressesWithParent.mapNotNull { (address, parentId) ->
+        val addressGateInputResponse = addressesWithParent.mapNotNull { (address, parentId) ->
             when {
                 legalEntityParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, parentId, null)
                 siteParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, null, parentId)
@@ -77,8 +77,8 @@ class AddressService(
         return PageStartAfterResponse(
             total = addressesPage.total,
             nextStartAfter = addressesPage.nextStartAfter,
-            content = inputAddresses,
-            invalidEntries = addressesPage.values.size - inputAddresses.size
+            content = addressGateInputResponse,
+            invalidEntries = addressesPage.values.size - addressGateInputResponse.size
         )
     }
 

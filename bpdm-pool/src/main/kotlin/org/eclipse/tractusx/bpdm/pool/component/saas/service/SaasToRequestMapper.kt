@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toAddressDto
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -106,7 +106,7 @@ class SaasToRequestMapper {
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            address = partnerWithParent.partner.toAddressDto(),
+            address = partnerWithParent.partner.toLogisticAddressDto(),
             bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
@@ -124,7 +124,7 @@ class SaasToRequestMapper {
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
             bpn = partnerWithBpn.bpn,
-            address = partnerWithBpn.partner.toAddressDto()
+            address = partnerWithBpn.partner.toLogisticAddressDto()
         )
     }
 

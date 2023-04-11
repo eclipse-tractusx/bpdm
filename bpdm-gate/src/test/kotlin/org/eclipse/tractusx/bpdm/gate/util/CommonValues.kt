@@ -183,9 +183,9 @@ object CommonValues {
 //    val adminAreaLevel1RegionCode_2 = "GA"
 //    val adminAreaLevel1Region2 = NameRegioncodeDto(adminAreaLevel1RegionCode_2, "Georgia")
 
-    val adminAreaLevel1RegionCode_1: String? = null
+    val adminAreaLevel1RegionCode_1: String = "adminAreaLevel1RegionCode_1"
     val adminAreaLevel1Region1: NameRegioncodeDto? = null
-    val adminAreaLevel1RegionCode_2: String? = null
+    val adminAreaLevel1RegionCode_2: String = "adminAreaLevel1RegionCode_2"
     val adminAreaLevel1Region2: NameRegioncodeDto? = null
 
     const val county1 = "Stuttgart"
@@ -203,13 +203,16 @@ object CommonValues {
     const val districtLevel2_2 = "TODO"
     const val districtLevel2_3 = "TODO"
 
-    const val street1 = "Mercedesstraße 120"
+    const val street1 = "Mercedesstraße"
     const val street2 = "TODO"
     const val street3 = "TODO"
 
     const val houseNumber1 = ""
     const val houseNumber2 = ""
     const val houseNumber3 = ""
+
+    const val direction1 = "direction1"
+    const val direction2 = "direction1"
 
     const val industrialZone1 = "Werk 1"
     const val industrialZone2 = "Industrial Zone Two"
@@ -230,41 +233,7 @@ object CommonValues {
     const val postCode1 = "70546 "
     const val postCode2 = "70547"
 
-    val postCodeType1 = SaasPostCodeType.REGULAR
-    val postCodeType2 = SaasPostCodeType.POST_BOX
-
     val geoCoordinates1 = Triple(0f, 0f, 0f)
     val geoCoordinates2 = Triple(1f, 1f, 0f)
 
-    const val postalDeliveryPoint1 = "Postal Delivery point"
-    const val postalDeliveryPoint2 = "Mailbox Premise Street"
-
-    // Saas test values
-    const val locality1 = "Stuttgart"
-    const val locality2 = "Vaihingen"
-
-    val localityType1 = SaasLocalityType.CITY
-    val localityType2 = SaasLocalityType.DISTRICT
-
-    const val thoroughfare1 = "Mercedesstraße 120"
-    const val thoroughfare2 = "Werk 1"
-
-    val thoroughfareType1 = SaasThoroughfareType.STREET
-    val thoroughfareType2 = SaasThoroughfareType.INDUSTRIAL_ZONE
-
-    const val premise1 = "Bauteil A"
-    const val premise2 = "Etage 1"
-
-    val premiseType1 = SaasPremiseType.BUILDING
-    val premiseType2 = SaasPremiseType.WAREHOUSE
-
-
-    val postalDeliveryPointType1 = SaasPostalDeliveryPointType.MAILBOX
-    val postalDeliveryPointType2 = SaasPostalDeliveryPointType.POST_OFFICE_BOX
-
-    const val adminArea1 = "Baden-Württemberg"
-    const val adminArea2 = "Stuttgart"
-
-    val adminAreaType1 = SaasAdministrativeAreaType.COUNTY
-    val adminAreaType2 = SaasAdministrativeAreaType.REGION
 }

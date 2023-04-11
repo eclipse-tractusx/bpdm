@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.common.model.*
 class SaasAddressToDtoMapping(private val address: AddressSaas) {
 
     private fun <T : TypeValueSaas> findType(values: Collection<T>, enumType: NamedType): T? {
-        return values.find { it.type?.equals(enumType.getTypeName()) ?: false }
+        return values.find { it.type?.technicalKey.equals(enumType.getTypeName()) ?: false }
     }
 
     fun geoCoordinates(): GeoCoordinateDto? {

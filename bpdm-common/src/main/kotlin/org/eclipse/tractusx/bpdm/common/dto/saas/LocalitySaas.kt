@@ -19,9 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
+import org.eclipse.tractusx.bpdm.common.model.SaasLocalityType
+import org.eclipse.tractusx.bpdm.common.model.SaasPremiseType
+
 data class LocalitySaas(
     override val type: TypeKeyNameUrlSaas? = null,
     val shortName: String? = null,
     override val value: String? = null,
     val language: LanguageSaas? = null
-) : TypeValueSaas
+) : TypeValueSaas {
+    constructor(sassValue: String, sassType : SaasLocalityType, sassLanguage: LanguageSaas?)
+            : this(value = sassValue, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = sassLanguage) { }
+}

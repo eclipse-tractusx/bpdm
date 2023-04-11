@@ -157,23 +157,23 @@ class SaasRequestMappingService(
     private fun toPhysicalAddressSaasModel(address: PhysicalPostalAddressDto): AddressSaas {
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
-            id = "0",
-            externalId = null,
-            saasId = null,
-            version = null,
-            identifyingName = null,
-            careOf = null,
-            contexts = emptyList(),
-            country = mapping.country(),
-            administrativeAreas = mapping.administrativeAreas(),
-            postCodes = mapping.postcodes(),
-            localities = mapping.localities(),
-            thoroughfares = mapping.thoroughfares(physicalAddress = address),
-            premises = mapping.premises(physicalAddress = address),
-            postalDeliveryPoints = listOf(PostalDeliveryPointSaas()),
-            geographicCoordinates = mapping.geoCoordinates(),
-            types = listOf(TypeKeyNameUrlSaas()),
-            metadataSaas = AddressMetadataSaas()
+                 id = "0",
+             externalId = null,
+             saasId = null,
+             version = null,
+             identifyingName = null,
+             careOf = null,
+             contexts = emptyList(),
+             country = mapping.country(),
+             administrativeAreas = mapping.administrativeAreas(),
+             postCodes = mapping.postcodes(),
+             localities = mapping.localities(),
+             thoroughfares = mapping.thoroughfares(address),
+             premises = mapping.premises(address),
+             postalDeliveryPoints =  emptyList(),
+             geographicCoordinates = mapping.geoCoordinates(),
+             types = emptyList(),
+             metadataSaas = AddressMetadataSaas()
         )
     }
 

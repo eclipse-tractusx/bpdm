@@ -19,10 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
+import org.eclipse.tractusx.bpdm.common.model.SaasPremiseType
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
+
 data class PremiseSaas(
     override val type: TypeKeyNameUrlSaas? = null,
     val shortName: String? = null,
     val number: String? = null,
     override val value: String? = null,
     val language: LanguageSaas? = null
-) : TypeValueSaas
+) : TypeValueSaas {
+    constructor(sassValue: String, sassType : SaasPremiseType, sassLanguage: LanguageSaas?)
+            : this(value = sassValue, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = sassLanguage) { }
+}
