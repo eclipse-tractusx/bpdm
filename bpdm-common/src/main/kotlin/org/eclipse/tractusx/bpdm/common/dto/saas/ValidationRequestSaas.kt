@@ -37,7 +37,7 @@ data class AddressValidationSaas(
     val postalDeliveryPoints: Collection<ValueValidationSaas>,
     val postCodes: Collection<ValueValidationSaas>,
     val premises: Collection<ValueValidationSaas>,
-    val thoroughfares: Collection<ValueValidationSaas>
+    val thoroughfares: Collection<NameValidationSaas>
 )
 
 data class IdentifierValidationSaas(

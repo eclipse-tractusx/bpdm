@@ -20,17 +20,18 @@
 package org.eclipse.tractusx.bpdm.common.service
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
+import org.eclipse.tractusx.bpdm.common.model.SassAddressType
 
 class SaasAddressesMapping(val addresses: Collection<AddressSaas>) {
 
     // TODO change to technicalKey == ...
     fun saasAlternativeAddressMapping(): SaasAddressToDtoMapping? {
-        val address = addresses.find { address -> address.types.any { it.name == "Alternative Legal Address" } }
+        val address = addresses.find { address -> address.types.any { it.name == SassAddressType.ALTERNATIVE_LEGAL.getTypeName() } }
         return address?.let { SaasAddressToDtoMapping(it) }
     }
 
     fun saasPhysicalAddressMapping(): SaasAddressToDtoMapping? {
-        val address = addresses.find { address -> address.types.any { it.name == "Legal Address" } }
+        val address = addresses.find { address -> address.types.any { it.technicalKey == SassAddressType.LEGAL_ADDRESS.getTypeName() } }
         return address?.let { SaasAddressToDtoMapping(it) }
     }
 }

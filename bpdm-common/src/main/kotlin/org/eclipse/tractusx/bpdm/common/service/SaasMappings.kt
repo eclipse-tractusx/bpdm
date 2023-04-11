@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
@@ -43,24 +44,12 @@ object SaasMappings {
         return type!!.technicalKey!!
     }
 
-    private fun toOptionalReference(type: TypeKeyNameUrlSaas?): String? {
-        return type?.technicalKey
-    }
-
-    private fun toOptionalReference(type: TypeKeyNameSaas?): String? {
-        return type?.technicalKey
-    }
-
     fun toOptionalReference(legalForm: LegalFormSaas?): String? {
         return legalForm?.technicalKey
     }
 
     private inline fun <reified T> toType(type: TypeKeyNameUrlSaas): T where T : Enum<T> {
         return enumValueOf(type.technicalKey!!)
-    }
-
-    inline fun <reified T> toTypeOrDefault(type: TypeKeyNameUrlSaas?): T where T : Enum<T>, T : HasDefaultValue<T> {
-        return technicalKeyToType(type?.technicalKey)
     }
 
     inline fun <reified T> technicalKeyToType(technicalKey: String?): T where T : Enum<T>, T : HasDefaultValue<T> {
@@ -77,10 +66,6 @@ object SaasMappings {
         return technicalKeyToType(type?.technicalKey)
     }
 
-    fun toCountryCode(country: CountrySaas?): CountryCode {
-        return country?.shortName ?: CountryCode.UNDEFINED
-    }
-
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
         val legalName = toNameDto()
             ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
@@ -91,7 +76,7 @@ object SaasMappings {
             states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),
             // Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
-            legalAddress = convertSaasAdressesToDtoInternal(addresses, id)
+            legalAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 
@@ -102,13 +87,13 @@ object SaasMappings {
             name = name.value,
             states = toSiteStatesDtos(status),
             // Known issue: For now the main address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
-            mainAddress = convertSaasAdressesToDtoInternal(addresses, id)
+            mainAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 
-    fun BusinessPartnerSaas.toAddressDto(): LogisticAddressDto {
+    fun BusinessPartnerSaas.toLogisticAddressDto(): LogisticAddressDto {
         // partial LogisticAddressDto is enriched with info from BusinessPartnerSaas
-        return convertSaasAdressesToDtoInternal(addresses, id)
+        return convertSaasAdressesToLogisticAddressDto(addresses, id)
             .copy(
                 name = toNameDto()?.value,
                 states = toAddressStatesDtos(status),
@@ -128,7 +113,7 @@ object SaasMappings {
         return LegalEntityIdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, LegalEntityIdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type),
-            issuingBody = identifier.issuingBody?.name
+            issuingBody = identifier.issuingBody?.technicalKey // TODO technicalKey or name ?
         )
     }
 
@@ -165,7 +150,7 @@ object SaasMappings {
                     description = status.officialDenotation,
                     validFrom = status.validFrom,
                     validTo = status.validUntil,
-                    type = toType(status.type)
+                    type = BusinessStateType.valueOf(status.type.technicalKey!!)
                 )
             }
         )
@@ -204,7 +189,7 @@ object SaasMappings {
      * - name, states, identifiers are missing in SaaS
      * - a generated BPN-A can't be returned back to the Gate
      */
-    private fun convertSaasAdressesToDtoInternal(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
+    fun convertSaasAdressesToLogisticAddressDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
 
         val mapping = SaasAddressesMapping(addresses)
         val physicalAddressMapping = mapping.saasPhysicalAddressMapping()

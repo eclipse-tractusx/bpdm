@@ -46,7 +46,8 @@ class ValidationMapper {
                 postalDeliveryPoints = postalDeliveryPoints.map { ValueValidationSaas(it.value!!) },
                 postCodes = postCodes.map { ValueValidationSaas(it.value!!) },
                 premises = premises.map { ValueValidationSaas(it.value!!) },
-                thoroughfares = thoroughfares.map { ValueValidationSaas(it.value!!) }
+                // TODO map thoroughfare number, direction, shortname thoroughfares = thoroughfares.map { NameValidationSaas(it.name!!) }
+                thoroughfares = emptyList()
             )
         }
 

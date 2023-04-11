@@ -19,17 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class AddressType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<AddressType> {
-    BRANCH_OFFICE("Branch Office", ""),
-    CARE_OF("Care of (c/o) Address", ""),
-    HEADQUARTER("Headquarter", ""),
-    LEGAL_ALTERNATIVE("Legal Alternative", ""),
-    PO_BOX("Post Office Box", ""),
-    REGISTERED("Registered", ""),
-    REGISTERED_AGENT_MAIL("Registered Agent Mail", ""),
-    REGISTERED_AGENT_PHYSICAL("Registered Agent Physical", ""),
-    VAT_REGISTERED("Vat Registered", ""),
-    UNSPECIFIC("Unspecified", "");
+enum class SassAddressType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SassAddressType>  {
+
+    ALTERNATIVE_LEGAL("Alternative Legal Address ", ""),
+    BRANCH_OFFICE("Branch Office Address ", ""),
+    HEADQUARTER("Headquarter Address", ""),
+    LEGAL_ADDRESS("Legal Address", ""),
+    LOCAL_ADDRESS("Local Address", ""),
+    REGISTERED("Registered Address", ""),
+    REGISTERED_AGENT_MAIL("Registered Agent Mail Address", ""),
+    REGISTERED_AGENT_PHYSICAL("Registered Agent Registered Address", ""),
+    VAT_REGISTERED("VAT Registered Address ", ""),
+    UNSPECIFIC("Unspecific Address Type ", "");
 
     override fun getTypeName(): String {
         return typeName
@@ -39,7 +40,7 @@ enum class AddressType(private val typeName: String, private val url: String) : 
         return url
     }
 
-    override fun getDefault(): AddressType {
+    override fun getDefault(): SassAddressType {
         return UNSPECIFIC
     }
 }

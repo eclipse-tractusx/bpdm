@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
@@ -203,7 +204,7 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress1,
         physicalPostalAddress = address1,
         bpnLegalEntity = CommonValues.bpn1,
-        bpnSite = null,
+        bpnSite = "BPNS0000000001XY",
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
@@ -212,7 +213,7 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress2,
         physicalPostalAddress = address2,
         bpnLegalEntity = CommonValues.bpn2,
-        bpnSite = null,
+        bpnSite = "BPNS0000000002XY",
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
@@ -313,15 +314,25 @@ object ResponseValues {
     )
 
     val addressGateInputResponse1 = AddressGateInputResponse(
-        address = RequestValues.address1,
+        address = RequestValues.address1
+            .copy(name = CommonValues.name1,
+                identifiers = listOf(AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
+                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
+                )
+            ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
         bpn = CommonValues.bpnAddress1,
         processStartedAt = SaasValues.modificationTime1,
     )
     val addressGateInputResponse2 = AddressGateInputResponse(
-        address = RequestValues.address2,
-        externalId = CommonValues.externalIdAddress2,
+
+        address = RequestValues.address2
+            .copy(name = CommonValues.nameSite1,
+                identifiers = listOf(AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
+                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
+                )
+            ),       externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
         bpn = CommonValues.bpnAddress2,
         processStartedAt = SaasValues.modificationTime2,

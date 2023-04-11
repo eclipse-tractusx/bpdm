@@ -28,27 +28,27 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 object RequestValues {
     val identifier1 =
         LegalEntityIdentifierDto(
-            CommonValues.identifierValue1,
-            CommonValues.identifierTypeTechnicalKey1,
-            CommonValues.identifierIssuingBodyTechnicalKey1,
+            value = CommonValues.identifierValue1,
+            type = CommonValues.identifierTypeTechnicalKey1,
+            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey1,
         )
     val identifier2 =
         LegalEntityIdentifierDto(
-            CommonValues.identifierValue2,
+            value = CommonValues.identifierValue2,
             CommonValues.identifierTypeTechnicalKey2,
             CommonValues.identifierIssuingBodyTechnicalKey2,
         )
     val identifier3 =
         LegalEntityIdentifierDto(
-            CommonValues.identifierValue3,
-            CommonValues.identifierTypeTechnicalKey3,
-            CommonValues.identifierIssuingBodyTechnicalKey3,
+            value = CommonValues.identifierValue3,
+            type = CommonValues.identifierTypeTechnicalKey3,
+            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey3,
         )
     val identifier4 =
         LegalEntityIdentifierDto(
-            CommonValues.identifierValue4,
-            CommonValues.identifierTypeTechnicalKey4,
-            CommonValues.identifierIssuingBodyTechnicalKey4,
+            value = CommonValues.identifierValue4,
+            type = CommonValues.identifierTypeTechnicalKey4,
+            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey4,
         )
 
     val genericIdentifier =
@@ -131,7 +131,7 @@ object RequestValues {
             city = CommonValues.city1,
             districtLevel1 = CommonValues.districtLevel1_1,
             districtLevel2 = CommonValues.districtLevel2_1,
-            street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
+            street = StreetDto(name= CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1)
         )
     )
 
@@ -147,7 +147,9 @@ object RequestValues {
             administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
+            street = StreetDto(name= CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
         )
     )
 

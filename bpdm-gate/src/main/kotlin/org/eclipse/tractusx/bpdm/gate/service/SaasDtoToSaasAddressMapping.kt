@@ -103,7 +103,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
             thoroughfares.add(street)
         }
         if (physicalAddress?.industrialZone != null) {
-            thoroughfares.add(ThoroughfareSaas(name = physicalAddress.industrialZone
+            thoroughfares.add(ThoroughfareSaas(value = physicalAddress.industrialZone
                 , type = TypeKeyNameUrlSaas(SaasThoroughfareType.INDUSTRIAL_ZONE.getTypeName())))
         }
 

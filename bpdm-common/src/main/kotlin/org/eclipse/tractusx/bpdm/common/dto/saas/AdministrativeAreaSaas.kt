@@ -19,9 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
+import org.eclipse.tractusx.bpdm.common.model.SaasAdministrativeAreaType
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
+
 data class AdministrativeAreaSaas(
     override val value: String? = null,
     val shortName: String? = null,
     override val type: TypeKeyNameUrlSaas? = null,
     val language: LanguageSaas? = null
-) : TypeValueSaas
+) : TypeValueSaas {
+    constructor(value: String, sassType : SaasAdministrativeAreaType, language: LanguageSaas? = null):
+            this(value = value, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = language)
+}

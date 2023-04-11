@@ -19,10 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
+import org.eclipse.tractusx.bpdm.common.model.SaasPostalDeliveryPointType
+
 data class PostalDeliveryPointSaas(
     override val type: TypeKeyNameUrlSaas? = null,
     val shortName: String? = null,
     val number: String? = null,
     override val value: String? = null,
     val language: LanguageSaas? = null
-) : TypeValueSaas
+) : TypeValueSaas {
+    constructor(sassValue: String, sassType : SaasPostalDeliveryPointType, sassLanguage: LanguageSaas?)
+            : this(value = sassValue, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = sassLanguage) { }
+}
