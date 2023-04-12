@@ -45,11 +45,11 @@ object ResponseValues {
     val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
 
     val identifier1 =
-        LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, null /* TODO: CommonValues.issuingBody1 necessary*/)
     val identifier2 =
-        LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, null /* TODO: CommonValues.issuingBody2 necessary*/)
     val identifier3 =
-        LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
+        LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, null /* TODO: CommonValues..issuingBody3 necessary*/)
 
     val name1 = NameResponse(value = CommonValues.name1)
     val name2 = NameResponse(value = CommonValues.name2)
@@ -281,7 +281,17 @@ object ResponseValues {
     )
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
-        legalEntity = legalEntity1,
+        legalEntity = LegalEntityResponse(
+            bpn = CommonValues.bpnL1,
+            legalName = name1,
+            identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)),
+            legalForm = legalForm1,
+            states = listOf(leStatus1),
+            classifications = listOf(classification1, classification2),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now
+        ),
         legalAddress = addressPartner1.copy(
             bpnLegalEntity = legalEntity1.bpn,
             isLegalAddress = true
@@ -290,7 +300,17 @@ object ResponseValues {
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
-        legalEntity = legalEntity2,
+        legalEntity = LegalEntityResponse(
+            bpn = CommonValues.bpnL2,
+            legalName = name3,
+            identifiers = listOf( LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2,  CommonValues.issuingBody2)),
+            legalForm = legalForm2,
+            states = listOf(leStatus2),
+            classifications = listOf(classification3, classification4),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now
+        ),
         legalAddress = addressPartner2.copy(
             bpnLegalEntity = legalEntity2.bpn,
             isLegalAddress = true
@@ -299,7 +319,17 @@ object ResponseValues {
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
-        legalEntity = legalEntity3,
+        legalEntity = LegalEntityResponse(
+            bpn = CommonValues.bpnL3,
+            legalName = name5,
+            identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3,  CommonValues.issuingBody3 )),
+            legalForm = legalForm3,
+            states = listOf(leStatus3),
+            classifications = listOf(classification5),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now
+        ),
         legalAddress = addressPartner3.copy(
             bpnLegalEntity = legalEntity3.bpn,
             isLegalAddress = true

@@ -48,7 +48,8 @@ class SaasToRequestMapper {
     fun toLegalEntityCreateRequestOrNull(partnerWithImportId: BusinessPartnerSaas): LegalEntityPartnerCreateRequest? {
         return try {
             toLegalEntityCreateRequest(partnerWithImportId)
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            logger.info("Reason:", e)
             logger.warn { "Business Partner with ID ${partnerWithImportId.externalId} could not be mapped to ${LegalEntityPartnerCreateRequest::class.simpleName}" }
             null
         }
