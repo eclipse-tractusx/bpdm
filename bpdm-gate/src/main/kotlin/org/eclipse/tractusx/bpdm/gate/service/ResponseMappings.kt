@@ -19,10 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
@@ -38,3 +45,37 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
 }
 
 
+fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
+
+    val legalEntity= LegalEntity(
+        bpn = bpn.toString(),
+        externalId= externalId,
+        currentness = createCurrentnessTimestamp(),
+        legalForm = legalEntity.legalForm,
+        legalName = legalEntity.legalName.toName()
+    )
+    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
+
+
+
+
+    return legalEntity;
+
+}
+fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
+    return LegalEntityIdentifier(dto.value, dto.type,dto.issuingBody, legalEntity)
+}
+fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+    return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity);
+}
+fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
+    return Classification(dto.value,dto.code,dto.type,legalEntity);
+}
+fun NameDto.toName(): Name{
+    return Name(value, shortName)
+}
+private fun createCurrentnessTimestamp(): Instant {
+    return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}

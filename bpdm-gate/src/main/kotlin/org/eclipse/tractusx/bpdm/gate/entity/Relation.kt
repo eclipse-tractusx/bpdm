@@ -17,21 +17,39 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.RelationType
+import java.time.LocalDateTime
 
-@Schema(name = "Street", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
-data class StreetDto(
-    @Schema(description = "Describes the official Name of the Street.")
-    val name: String? = null,
-
-    @Schema(description = "Describes the House Number")
-    val houseNumber: String? = null,
-
-    @Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
-    val milestone: String? = null,
-
-    @Schema(description = "Describes the direction")
-    val direction: String?  = null
+@Entity
+@Table(
+    name = "relations",
+    indexes = [
+        Index(columnList = "start_node_id"),
+        Index(columnList = "end_node_id")
+    ]
 )
+class Relation (
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val type: RelationType,
+
+    @ManyToOne
+    @JoinColumn(name = "start_node_id", nullable = false)
+    val startNode: LegalEntity,
+
+    @ManyToOne
+    @JoinColumn(name = "end_node_id", nullable = false)
+    val endNode: LegalEntity,
+
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
+
+    @Column(name = "valid_to")
+    val validTo: LocalDateTime?
+
+) : BaseEntity()
+
