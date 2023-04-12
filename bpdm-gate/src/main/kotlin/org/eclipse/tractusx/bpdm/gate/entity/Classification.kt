@@ -17,21 +17,32 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(name = "Street", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
-data class StreetDto(
-    @Schema(description = "Describes the official Name of the Street.")
-    val name: String? = null,
-
-    @Schema(description = "Describes the House Number")
-    val houseNumber: String? = null,
-
-    @Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
-    val milestone: String? = null,
-
-    @Schema(description = "Describes the direction")
-    val direction: String?  = null
+@Entity
+@Table(
+    name = "classifications",
+    indexes = [
+        Index(columnList = "legal_entity_id")
+    ]
 )
+class Classification (
+    @Column(name = "`value`")
+    val value: String?,
+
+    @Column(name = "code")
+    val code: String?,
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    val type: ClassificationType,
+
+    @ManyToOne
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
+
+) : BaseEntity()
