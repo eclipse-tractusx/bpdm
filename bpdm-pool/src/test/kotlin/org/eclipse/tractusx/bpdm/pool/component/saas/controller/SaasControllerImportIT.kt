@@ -183,6 +183,10 @@ class SaasControllerImportIT @Autowired constructor(
     @Test
     fun `import new address partners`() {
 
+        val importReadyAddress1 = SaasValues.addressPartnerSaas1.copy(externalId = addressImportId1)
+        val importReadyAddress2 = SaasValues.addressPartnerSaas2.copy(externalId = addressImportId2)
+        val importReadyAddress3 = SaasValues.addressPartnerSaas3.copy(externalId = addressImportId3)
+
         //Import the given parent legal entities first
         val legalEntityParents = listOf(
             importReadyLegalEntity1,
@@ -222,7 +226,8 @@ class SaasControllerImportIT @Autowired constructor(
             ResponseValues.addressPartner3
         )
 
-        testHelpers.assertRecursively(actual).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expected)
+        testHelpers.assertRecursively(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
+            .ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
     }
 
     /**
@@ -527,9 +532,9 @@ class SaasControllerImportIT @Autowired constructor(
     fun `import updated address partners`() {
         //First create sites
         val addressesToCreate = listOf(
-            importReadyAddress1.copyWithParent(importReadyLegalEntity1.externalId!!),
-            importReadyAddress2.copyWithParent(importReadyLegalEntity2.externalId!!),
-            importReadyAddress3.copyWithParent(importReadyLegalEntity3.externalId!!)
+            SaasValues.addressPartnerSaas1.copy(externalId = addressImportId1).copyWithParent(importReadyLegalEntity1.externalId!!),
+            SaasValues.addressPartnerSaas2.copy(externalId = addressImportId2).copyWithParent(importReadyLegalEntity2.externalId!!),
+            SaasValues.addressPartnerSaas3.copy(externalId = addressImportId3).copyWithParent(importReadyLegalEntity3.externalId!!)
         )
 
         val parents = listOf(importReadyLegalEntity1, importReadyLegalEntity2, importReadyLegalEntity3)
@@ -560,7 +565,8 @@ class SaasControllerImportIT @Autowired constructor(
             ResponseValues.addressPartner3.copy(bpn = bpnA1)
         )
         val actual = getAddresses(bpns).content
-        testHelpers.assertRecursively(actual).isEqualTo(expectedPartners)
+        testHelpers.assertRecursively(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
+            .ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
     }
 
     private fun assertLegalEntityResponseEquals(
@@ -578,7 +584,9 @@ class SaasControllerImportIT @Autowired constructor(
 
     private fun getImportedBpns(partners: List<BusinessPartnerSaas>): List<String> {
         val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.externalId!! })
-        return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
+        return partners.map {
+            importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!!
+        }
     }
 
     private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityResponse> =
