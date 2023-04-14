@@ -22,9 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
+import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
@@ -180,15 +182,15 @@ object CommonValues {
 
     val building1 = "Building One"
     val building2 = "Building Two"
-    val building3 = "Building Two"
+    val building3 = "Building Three"
 
     val floor1 = "Floor One"
     val floor2 = "Floor Two"
-    val floor3 = "Floor Two"
+    val floor3 = "Floor Three"
 
     val door1 = "Door One"
     val door2 = "Door Two"
-    val door3 = "Door Two"
+    val door3 = "Door Three"
 
     val postCode1 = "71059 "
     val postCode2 = "70547"

@@ -24,6 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
@@ -206,8 +208,11 @@ class PartnerImportPageService(
     }
 
     private fun isValid(partner: BusinessPartnerSaas): Boolean {
-        if (partner.addresses.any { address -> address.thoroughfares.any { thoroughfare -> thoroughfare.value == null } }) {
-            logger.warn { "SaaS Partner with id ${partner.id} is invalid: Contains thoroughfare without ${ThoroughfareSaas::value.name} field specified." }
+
+        try {
+            SaasMappings.convertSaasAdressesToLogisticAddressDto(partner.addresses, partner.externalId)
+        } catch(e: BpdmMappingException) {
+            logger.warn { "SaaS Partner with id ${partner.id} is invalid. Message: ${e.localizedMessage}" }
             return false
         }
 

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
