@@ -93,6 +93,8 @@ class AddressService(
         logisticAddressRepository.joinLegalEntities(addresses)
         logisticAddressRepository.joinSites(addresses)
         logisticAddressRepository.joinRegions(addresses)
+        logisticAddressRepository.joinIdentifiers(addresses)
+        logisticAddressRepository.joinStates(addresses)
 
         return addresses
     }
