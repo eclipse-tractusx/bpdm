@@ -91,13 +91,13 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
                     name = it.name,
                     number = it.houseNumber,
                     shortName = it.milestone,
-                    direction = it.direction,
+                    direction = it.direction
                 )
             },
             physicalAddress?.industrialZone?.let {
                 ThoroughfareSaas(
-                    value = it,
-                    type = SaasThoroughfareType.INDUSTRIAL_ZONE.toSaasTypeDto()
+                    type = SaasThoroughfareType.INDUSTRIAL_ZONE.toSaasTypeDto(),
+                    name = it
                 )
             }
         )

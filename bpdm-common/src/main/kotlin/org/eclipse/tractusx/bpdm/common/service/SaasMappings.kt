@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.service
 
-import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
@@ -113,7 +112,7 @@ object SaasMappings {
         return LegalEntityIdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, LegalEntityIdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type),
-            issuingBody = identifier.issuingBody?.technicalKey // TODO technicalKey or name ?
+            issuingBody = identifier.issuingBody?.name
         )
     }
 
@@ -190,7 +189,6 @@ object SaasMappings {
      * - a generated BPN-A can't be returned back to the Gate
      */
     fun convertSaasAdressesToLogisticAddressDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
-
         val mapping = SaasAddressesMapping(addresses)
         val physicalAddressMapping = mapping.saasPhysicalAddressMapping()
             ?: throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
@@ -207,7 +205,6 @@ object SaasMappings {
     }
 
     fun toPhysicalAddress(map: SaasAddressToDtoMapping, id: String?): PhysicalPostalAddressDto {
-
         val city = map.city()
         val country = map.countryCode()
         if (city == null || country == null) {
@@ -235,21 +232,7 @@ object SaasMappings {
         )
     }
 
-    private fun toStreetDto(map: SaasAddressToDtoMapping): StreetDto? {
-        var streetDto: StreetDto? = null
-        if (map.streetName() != null) {
-            streetDto = StreetDto(
-                name = map.streetName(),
-                houseNumber = map.streetHouseNumber(),
-                milestone = map.streetMilestone(),
-                direction = map.streetDirection()
-            )
-        }
-        return streetDto
-    }
-
     fun toAlternativeAddress(map: SaasAddressToDtoMapping, id: String?): AlternativePostalAddressDto {
-
         val city = map.city()
         val country = map.countryCode()
         if (city == null || country == null) {
@@ -259,24 +242,15 @@ object SaasMappings {
         val poBoxValue = map.deliveryServiceTypePoBox()
         val privateBagValue = map.deliveryServiceTypePrivateBag()
 
-        var deliveryType: DeliveryServiceType? = null
-        var deliveryValue: String? = null
-        if (poBoxValue != null) {
-            deliveryType = DeliveryServiceType.PO_BOX
-            deliveryValue = poBoxValue
-        }
-        if (privateBagValue != null) {
-            deliveryType = DeliveryServiceType.PRIVATE_BAG
-            deliveryValue = privateBagValue
-        }
-
-        if (deliveryValue == null || deliveryType == null) {
-            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
+        val (deliveryServiceType, deliveryServiceNumber) = when {
+            poBoxValue != null -> Pair(DeliveryServiceType.PO_BOX, poBoxValue)
+            privateBagValue != null -> Pair(DeliveryServiceType.PRIVATE_BAG, privateBagValue)
+            else -> throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
         }
 
         return AlternativePostalAddressDto(
-            deliveryServiceNumber = deliveryValue,
-            type = deliveryType,
+            deliveryServiceNumber = deliveryServiceNumber,
+            type = deliveryServiceType,
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
@@ -290,6 +264,18 @@ object SaasMappings {
                 districtLevel2 = map.districtLevel2(),
                 street = toStreetDto(map),
             )
+        )
+    }
+
+    private fun toStreetDto(map: SaasAddressToDtoMapping): StreetDto? {
+        if (map.streetName() == null) {
+            return null
+        }
+        return StreetDto(
+            name = map.streetName(),
+            houseNumber = map.streetHouseNumber(),
+            milestone = map.streetMilestone(),
+            direction = map.streetDirection()
         )
     }
 
