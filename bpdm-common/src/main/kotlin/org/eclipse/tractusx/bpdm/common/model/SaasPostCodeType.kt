@@ -19,19 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasPostCodeType(private val codeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasPostCodeType> {
-    CEDEX("Courrier d’Entreprise à Distribution Exceptionnelle", ""),
-    LARGE_MAIL_USER("Large mail user", ""),
-    OTHER("Other type", ""),
-    POST_BOX("Post Box", ""),
-    REGULAR("Regular", "");
+enum class SaasPostCodeType(private val codeName: String) : SaasType, HasDefaultValue<SaasPostCodeType> {
+    CEDEX("Courrier d’Entreprise à Distribution Exceptionnelle"),
+    LARGE_MAIL_USER("Large mail user"),
+    OTHER("Other type"),
+    POST_BOX("Post Box"),
+    REGULAR("Regular");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return codeName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasPostCodeType {

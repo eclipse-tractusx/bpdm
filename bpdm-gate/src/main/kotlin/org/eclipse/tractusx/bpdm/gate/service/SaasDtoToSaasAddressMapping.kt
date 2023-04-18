@@ -30,14 +30,17 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
     fun geoCoordinates(): GeoCoordinatesSaas? {
 
         return if (postalAdress.geographicCoordinates?.longitude != null
-                        && postalAdress.geographicCoordinates?.latitude != null)
-            GeoCoordinatesSaas(longitude = postalAdress.geographicCoordinates!!.longitude,
-                latitude = postalAdress.geographicCoordinates!!.latitude)
+            && postalAdress.geographicCoordinates?.latitude != null
+        )
+            GeoCoordinatesSaas(
+                longitude = postalAdress.geographicCoordinates!!.longitude,
+                latitude = postalAdress.geographicCoordinates!!.latitude
+            )
         else
             null
     }
 
-    fun country(): CountrySaas{
+    fun country(): CountrySaas {
 
         return CountrySaas(shortName = postalAdress.country, value = postalAdress.country.getName())
     }
@@ -47,14 +50,20 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         val areas: MutableList<AdministrativeAreaSaas> = mutableListOf()
 
         if (postalAdress.administrativeAreaLevel1 != null) {
-            areas.add(AdministrativeAreaSaas(value = postalAdress.administrativeAreaLevel1
-                , type = TypeKeyNameUrlSaas(SaasAdministrativeAreaType.REGION.getTypeName())))
+            areas.add(
+                AdministrativeAreaSaas(
+                    value = postalAdress.administrativeAreaLevel1, type = SaasAdministrativeAreaType.REGION.toSaasTypeDto()
+                )
+            )
         }
         if (postalAdress.administrativeAreaLevel2 != null) {
-            areas.add(AdministrativeAreaSaas(value = postalAdress.administrativeAreaLevel2
-                , type = TypeKeyNameUrlSaas(SaasAdministrativeAreaType.COUNTY.getTypeName())))
+            areas.add(
+                AdministrativeAreaSaas(
+                    value = postalAdress.administrativeAreaLevel2, type = SaasAdministrativeAreaType.COUNTY.toSaasTypeDto()
+                )
+            )
         }
-        return areas;
+        return areas
     }
 
     fun postcodes(): Collection<PostCodeSaas> {
@@ -62,39 +71,51 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         val postcodes: MutableList<PostCodeSaas> = mutableListOf()
 
         if (postalAdress.postCode != null) {
-            postcodes.add(PostCodeSaas(value = postalAdress.postCode
-                , type = TypeKeyNameUrlSaas(SaasPostCodeType.REGULAR.getTypeName())))
+            postcodes.add(
+                PostCodeSaas(
+                    value = postalAdress.postCode, type = SaasPostCodeType.REGULAR.toSaasTypeDto()
+                )
+            )
         }
 
-        return postcodes;
+        return postcodes
     }
 
     fun localities(): Collection<LocalitySaas> {
 
         val localities: MutableList<LocalitySaas> = mutableListOf()
 
-        localities.add(LocalitySaas(value = postalAdress.postCode
-            , type = TypeKeyNameUrlSaas(SaasLocalityType.CITY.getTypeName())))
+        localities.add(
+            LocalitySaas(
+                value = postalAdress.postCode, type = SaasLocalityType.CITY.toSaasTypeDto()
+            )
+        )
 
         if (postalAdress.districtLevel1 != null) {
-            localities.add(LocalitySaas(value = postalAdress.districtLevel1
-                , type = TypeKeyNameUrlSaas(SaasLocalityType.DISTRICT.getTypeName())))
+            localities.add(
+                LocalitySaas(
+                    value = postalAdress.districtLevel1, type = SaasLocalityType.DISTRICT.toSaasTypeDto()
+                )
+            )
         }
         if (postalAdress.districtLevel2 != null) {
-            localities.add(LocalitySaas(value = postalAdress.districtLevel1
-                , type = TypeKeyNameUrlSaas(SaasLocalityType.QUARTER.getTypeName())))
+            localities.add(
+                LocalitySaas(
+                    value = postalAdress.districtLevel1, type = SaasLocalityType.QUARTER.toSaasTypeDto()
+                )
+            )
         }
-        return localities;
+        return localities
     }
 
-    fun thoroughfares(physicalAddress: PhysicalPostalAddressDto? ): Collection<ThoroughfareSaas> {
+    fun thoroughfares(physicalAddress: PhysicalPostalAddressDto?): Collection<ThoroughfareSaas> {
 
         val thoroughfares: MutableList<ThoroughfareSaas> = mutableListOf()
 
         if (postalAdress.street != null) {
 
             val street = ThoroughfareSaas(
-                type = TypeKeyNameUrlSaas(SaasThoroughfareType.STREET.getTypeName()),
+                type = SaasThoroughfareType.STREET.toSaasTypeDto(),
                 name = postalAdress.street?.name,
                 number = postalAdress.street?.houseNumber,
                 shortName = postalAdress.street?.milestone,
@@ -103,43 +124,59 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
             thoroughfares.add(street)
         }
         if (physicalAddress?.industrialZone != null) {
-            thoroughfares.add(ThoroughfareSaas(value = physicalAddress.industrialZone
-                , type = TypeKeyNameUrlSaas(SaasThoroughfareType.INDUSTRIAL_ZONE.getTypeName())))
+            thoroughfares.add(
+                ThoroughfareSaas(
+                    value = physicalAddress.industrialZone, type = SaasThoroughfareType.INDUSTRIAL_ZONE.toSaasTypeDto()
+                )
+            )
         }
 
-        return thoroughfares;
+        return thoroughfares
     }
 
-    fun premises(physicalAddress: PhysicalPostalAddressDto? ): Collection<PremiseSaas> {
+    fun premises(physicalAddress: PhysicalPostalAddressDto?): Collection<PremiseSaas> {
 
         val premesis: MutableList<PremiseSaas> = mutableListOf()
 
         if (physicalAddress?.building != null) {
-            premesis.add(PremiseSaas(value = physicalAddress.building
-                , type = TypeKeyNameUrlSaas(SaasPremiseType.BUILDING.getTypeName())))
+            premesis.add(
+                PremiseSaas(
+                    value = physicalAddress.building, type = SaasPremiseType.BUILDING.toSaasTypeDto()
+                )
+            )
         }
         if (physicalAddress?.floor != null) {
-            premesis.add(PremiseSaas(value = physicalAddress.floor
-                , type = TypeKeyNameUrlSaas(SaasPremiseType.LEVEL.getTypeName())))
+            premesis.add(
+                PremiseSaas(
+                    value = physicalAddress.floor, type = SaasPremiseType.LEVEL.toSaasTypeDto()
+                )
+            )
         }
         if (physicalAddress?.door != null) {
-            premesis.add(PremiseSaas(value = physicalAddress.door
-                , type = TypeKeyNameUrlSaas(SaasPremiseType.ROOM.getTypeName())))
+            premesis.add(
+                PremiseSaas(
+                    value = physicalAddress.door, type = SaasPremiseType.ROOM.toSaasTypeDto()
+                )
+            )
         }
 
-        return premesis;
+        return premesis
     }
 
-    fun postalDeliveryPoints(alternativeAddress : AlternativePostalAddressDto?): Collection<PostalDeliveryPointSaas> {
+    fun postalDeliveryPoints(alternativeAddress: AlternativePostalAddressDto?): Collection<PostalDeliveryPointSaas> {
 
         val postalDeliveryPoints: MutableList<PostalDeliveryPointSaas> = mutableListOf()
 
         if (alternativeAddress != null) {
-            postalDeliveryPoints.add(PostalDeliveryPointSaas(value = alternativeAddress.deliveryServiceNumber
-                , type = TypeKeyNameUrlSaas(alternativeAddress.type.getTypeName())))
+            postalDeliveryPoints.add(
+                PostalDeliveryPointSaas(
+                    value = alternativeAddress.deliveryServiceNumber,
+                    type = alternativeAddress.type.let { TypeKeyNameUrlSaas(technicalKey = it.getTechnicalKey(), name = it.getTypeName()) }
+                )
+            )
         }
 
-        return postalDeliveryPoints;
+        return postalDeliveryPoints
     }
 
 }

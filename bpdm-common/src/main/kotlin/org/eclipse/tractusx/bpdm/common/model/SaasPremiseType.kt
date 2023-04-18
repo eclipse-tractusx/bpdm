@@ -19,22 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasPremiseType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasPremiseType> {
-    BUILDING("Building", ""),
-    OTHER("Other type", ""),
-    LEVEL("Level", ""),
-    HARBOUR("Harbour", ""),
-    ROOM("Room", ""),
-    SUITE("Suite", ""),
-    UNIT("Unit", ""),
-    WAREHOUSE("Warehouse", "");
+enum class SaasPremiseType(private val typeName: String) : SaasType, HasDefaultValue<SaasPremiseType> {
+    BUILDING("Building"),
+    OTHER("Other type"),
+    LEVEL("Level"),
+    HARBOUR("Harbour"),
+    ROOM("Room"),
+    SUITE("Suite"),
+    UNIT("Unit"),
+    WAREHOUSE("Warehouse");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasPremiseType {

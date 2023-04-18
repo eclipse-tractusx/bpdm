@@ -324,7 +324,7 @@ object SaasValues {
         thoroughfares = listOf(thoroughfareZone1, thoroughfareStreet1),
         premises = listOf(premiseBuilding1, premiseRoom1, premiseLevel1),
         postalDeliveryPoints = listOf(postalDeliveryPoint1),
-        types = listOf(TypeKeyNameUrlSaas(technicalKey = SaasAddressType.LEGAL_ADDRESS.getTypeName())),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
         geographicCoordinates = geoCoordinate1
     )
 
@@ -339,7 +339,7 @@ object SaasValues {
         thoroughfares = listOf(thoroughfareZone2, thoroughfareStreet2),
         premises = listOf(premiseBuilding2, premiseRoom2, premiseLevel2),
         postalDeliveryPoints = listOf(postalDeliveryPoint2),
-        types = listOf(TypeKeyNameUrlSaas(technicalKey = SaasAddressType.LEGAL_ADDRESS.getTypeName())),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
         geographicCoordinates = geoCoordinate2
     )
 

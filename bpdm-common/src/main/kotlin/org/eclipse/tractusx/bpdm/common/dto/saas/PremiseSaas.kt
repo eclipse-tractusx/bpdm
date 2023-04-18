@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 import org.eclipse.tractusx.bpdm.common.model.SaasPremiseType
+import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
 
 data class PremiseSaas(
     override val type: TypeKeyNameUrlSaas? = null,
@@ -28,6 +29,7 @@ data class PremiseSaas(
     override val value: String? = null,
     val language: LanguageSaas? = null
 ) : TypeValueSaas {
-    constructor(saasValue: String, saasType : SaasPremiseType, saasLanguage: LanguageSaas?)
-            : this(value = saasValue, type = TypeKeyNameUrlSaas(technicalKey = saasType.getTypeName()), language = saasLanguage) { }
+    constructor(saasValue: String, saasType: SaasPremiseType, saasLanguage: LanguageSaas?)
+            : this(value = saasValue, type = saasType.toSaasTypeDto(), language = saasLanguage) {
+    }
 }

@@ -19,20 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasLocalityType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasLocalityType> {
-    BLOCK("Block", ""),
-    CITY("City", ""),
-    DISTRICT("District", ""),
-    OTHER("Other", ""),
-    POST_OFFICE_CITY("Post Office City", ""),
-    QUARTER("Quarter", "");
+enum class SaasLocalityType(private val typeName: String) : SaasType, HasDefaultValue<SaasLocalityType> {
+    BLOCK("Block"),
+    CITY("City"),
+    DISTRICT("District"),
+    OTHER("Other"),
+    POST_OFFICE_CITY("Post Office City"),
+    QUARTER("Quarter");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasLocalityType {

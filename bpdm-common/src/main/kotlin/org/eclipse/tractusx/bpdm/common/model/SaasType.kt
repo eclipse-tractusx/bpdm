@@ -17,15 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.saas
+package org.eclipse.tractusx.bpdm.common.model
 
-import org.eclipse.tractusx.bpdm.common.model.SaasPostCodeType
-import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
 
-data class PostCodeSaas(
-    override val value: String? = null,
-    override val type: TypeKeyNameUrlSaas? = null
-) : TypeValueSaas {
-    constructor(saasValue: String, saasType: SaasPostCodeType)
-            : this(value = saasValue, type = saasType.toSaasTypeDto())
+/**
+ * Our representation of a SaaS enum type which consists of a technical key (enum name) and name.
+ * It can be converted to SaaS's internal DTO TypeKeyNameUrlSaas.
+ */
+interface SaasType : NamedType {
+    fun getTechnicalKey(): String
+}
+
+fun SaasType.toSaasTypeDto() =
+    TypeKeyNameUrlSaas(technicalKey = getTechnicalKey(), name = getTypeName())
+
+inline fun <reified T> TypeKeyNameUrlSaas.toSaasType(): T?
+        where T : Enum<T>, T : SaasType {
+    return technicalKey?.let { enumValueOf<T>(it) }
 }
