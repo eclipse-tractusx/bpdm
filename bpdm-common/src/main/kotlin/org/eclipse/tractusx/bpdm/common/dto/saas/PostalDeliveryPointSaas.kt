@@ -28,6 +28,6 @@ data class PostalDeliveryPointSaas(
     override val value: String? = null,
     val language: LanguageSaas? = null
 ) : TypeValueSaas {
-    constructor(sassValue: String, sassType : SaasPostalDeliveryPointType, sassLanguage: LanguageSaas?)
-            : this(value = sassValue, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = sassLanguage) { }
+    constructor(saasValue: String, saasType : SaasPostalDeliveryPointType, saasLanguage: LanguageSaas?)
+            : this(value = saasValue, type = TypeKeyNameUrlSaas(technicalKey = saasType.getTypeName()), language = saasLanguage) { }
 }
