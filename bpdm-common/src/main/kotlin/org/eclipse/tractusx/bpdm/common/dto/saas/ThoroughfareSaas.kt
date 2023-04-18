@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
 import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
+import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
 
 data class ThoroughfareSaas(
     override var type: TypeKeyNameUrlSaas? = null,
@@ -30,7 +31,20 @@ data class ThoroughfareSaas(
     val direction: String? = null,
     var language: LanguageSaas? = null
 ) : TypeValueSaas {
-    constructor(value: String? = null, name: String? = null, direction: String? = null, number: String? = null, saasType : SaasThoroughfareType, language: LanguageSaas?)
-            : this(value = value, name = name, direction = direction, number = number, type = TypeKeyNameUrlSaas(technicalKey = saasType.getTypeName()), language = language)
+    constructor(
+        value: String? = null,
+        name: String? = null,
+        direction: String? = null,
+        number: String? = null,
+        saasType: SaasThoroughfareType,
+        language: LanguageSaas?
+    ) : this(
+        value = value,
+        name = name,
+        direction = direction,
+        number = number,
+        type = saasType.toSaasTypeDto(),
+        language = language
+    )
 
 }

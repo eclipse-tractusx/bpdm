@@ -99,12 +99,11 @@ class SaasAddressToDtoMappingTest {
         Assertions.assertThat(physicalAddressDto.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
     }
 
-    private fun <T : TypeValueSaas> findValue(values: Collection<T>, enumType: NamedType): String? {
-        val valueObject = values.find { it.type?.technicalKey.equals(enumType.getTypeName()) }
-        return valueObject?.value
+    private fun <T : TypeValueSaas> findValue(values: Collection<T>, enumType: SaasType): String? {
+        return findObject(values, enumType)?.value
     }
-    private fun <T : TypeValueSaas> findObject(values: Collection<T>, enumType: NamedType): T? {
-        val valueObject = values.find { it.type?.technicalKey.equals(enumType.getTypeName()) }
-        return valueObject
+
+    private fun <T : TypeValueSaas> findObject(values: Collection<T>, enumType: SaasType): T? {
+        return values.find { it.type?.technicalKey == enumType.getTechnicalKey() }
     }
 }

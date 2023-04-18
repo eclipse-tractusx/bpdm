@@ -19,17 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasAdministrativeAreaType(private val areaName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasAdministrativeAreaType> {
-    COUNTY("County", ""),
-    REGION("Region", ""),
-    OTHER("Other", "");
+enum class SaasAdministrativeAreaType(private val areaName: String) : SaasType, HasDefaultValue<SaasAdministrativeAreaType> {
+    COUNTY("County"),
+    REGION("Region"),
+    OTHER("Other");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return areaName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasAdministrativeAreaType {

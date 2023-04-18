@@ -19,25 +19,25 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasAddressType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasAddressType>  {
+enum class SaasAddressType(private val typeName: String) : SaasType, HasDefaultValue<SaasAddressType> {
 
-    ALTERNATIVE_LEGAL("Alternative Legal Address ", ""),
-    BRANCH_OFFICE("Branch Office Address ", ""),
-    HEADQUARTER("Headquarter Address", ""),
-    LEGAL_ADDRESS("Legal Address", ""),
-    LOCAL_ADDRESS("Local Address", ""),
-    REGISTERED("Registered Address", ""),
-    REGISTERED_AGENT_MAIL("Registered Agent Mail Address", ""),
-    REGISTERED_AGENT_PHYSICAL("Registered Agent Registered Address", ""),
-    VAT_REGISTERED("VAT Registered Address ", ""),
-    UNSPECIFIC("Unspecific Address Type ", "");
+    LEGAL_ALTERNATIVE("Alternative Legal Address"),
+    BRANCH_OFFICE("Branch Office Address"),
+    HEADQUARTER("Headquarter Address"),
+    LEGAL("Legal Address"),
+    LOCAL_ADDRESS("Local Address"),
+    REGISTERED("Registered Address"),
+    REGISTERED_AGENT_MAIL("Registered Agent Mail Address"),
+    REGISTERED_AGENT_PHYSICAL("Registered Agent Registered Address"),
+    VAT_REGISTERED("VAT Registered Address "),
+    UNSPECIFIC("Unspecific Address Type ");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasAddressType {

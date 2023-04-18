@@ -19,11 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.common.model.CharacterSet
+import org.eclipse.tractusx.bpdm.common.model.SaasAddressType
+import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
@@ -157,36 +156,21 @@ class SaasRequestMappingService(
     private fun toPhysicalAddressSaasModel(address: PhysicalPostalAddressDto): AddressSaas {
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
-                 id = "0",
-             externalId = null,
-             saasId = null,
-             version = null,
-             identifyingName = null,
-             careOf = null,
-             contexts = emptyList(),
-             country = mapping.country(),
-             administrativeAreas = mapping.administrativeAreas(),
-             postCodes = mapping.postcodes(),
-             localities = mapping.localities(),
-             thoroughfares = mapping.thoroughfares(address),
-             premises = mapping.premises(address),
-             postalDeliveryPoints =  emptyList(),
-             geographicCoordinates = mapping.geoCoordinates(),
-             types = emptyList(),
-             metadataSaas = AddressMetadataSaas()
+            country = mapping.country(),
+            administrativeAreas = mapping.administrativeAreas(),
+            postCodes = mapping.postcodes(),
+            localities = mapping.localities(),
+            thoroughfares = mapping.thoroughfares(physicalAddress = address),
+            premises = mapping.premises(physicalAddress = address),
+            postalDeliveryPoints = emptyList(),
+            geographicCoordinates = mapping.geoCoordinates(),
+            types = listOf(SaasAddressType.LEGAL.toSaasTypeDto())
         )
     }
 
     private fun toAlternativeAddressSaasModel(address: AlternativePostalAddressDto): AddressSaas {
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
-            id = "0",
-            externalId = null,
-            saasId = null,
-            version = null,
-            identifyingName = null,
-            careOf = null,
-            contexts = emptyList(),
             country = mapping.country(),
             administrativeAreas = mapping.administrativeAreas(),
             postCodes = mapping.postcodes(),
@@ -195,28 +179,9 @@ class SaasRequestMappingService(
             premises = mapping.premises(physicalAddress = null),
             postalDeliveryPoints = mapping.postalDeliveryPoints(address),
             geographicCoordinates = mapping.geoCoordinates(),
-            types = emptyList(),
-            metadataSaas = AddressMetadataSaas()
+            types = listOf(SaasAddressType.LEGAL_ALTERNATIVE.toSaasTypeDto())
         )
     }
-
-    private fun toSaasModel(version: AddressVersionDto): AddressVersionSaas? {
-        val languageSaas = toLanguageSaas(version.language)
-        val characterSetSaas = toCharacterSetSaas(version.characterSet)
-
-        return if (languageSaas == null && characterSetSaas == null) null else AddressVersionSaas(languageSaas, characterSetSaas)
-    }
-
-
-    private fun toCareOfSaas(careOf: String?): WrappedValueSaas? =
-        if (careOf != null) WrappedValueSaas(careOf) else null
-
-    private fun toContextSaas(context: String): WrappedValueSaas =
-        WrappedValueSaas(context)
-
-
-    private fun toSaasModel(geoCoordinate: GeoCoordinateDto?): GeoCoordinatesSaas? =
-        geoCoordinate?.let { GeoCoordinatesSaas(it.longitude, it.latitude) }
 
     private fun toNamesSaas(nameDto: NameDto): List<NameSaas> =
         listOf(nameDto.toSaasModel())
@@ -250,19 +215,4 @@ class SaasRequestMappingService(
             issuingBody = TypeKeyNameUrlSaas(name = bpnConfigProperties.agencyName)
         )
     }
-
-    private inline fun <reified T> toKeyNameTypeSaas(type: Enum<T>): TypeKeyNameSaas where T : Enum<T> =
-        TypeKeyNameSaas(type.name, null)
-
-    private inline fun <reified T> toKeyNameUrlTypeSaas(type: Enum<T>): TypeKeyNameUrlSaas where T : Enum<T> =
-        TypeKeyNameUrlSaas(type.name, null)
-
-    private fun toLanguageSaas(technicalKey: LanguageCode) =
-        if (technicalKey != LanguageCode.undefined) LanguageSaas(technicalKey, null) else null
-
-    private fun toCountrySaas(countryCode: CountryCode) =
-        if (countryCode != CountryCode.UNDEFINED) CountrySaas(countryCode, null) else null
-
-    private fun toCharacterSetSaas(characterSet: CharacterSet) =
-        if (characterSet != CharacterSet.UNDEFINED) toKeyNameTypeSaas(characterSet) else null
 }

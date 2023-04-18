@@ -19,19 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasThoroughfareType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasThoroughfareType> {
-    INDUSTRIAL_ZONE("An industrial zone", ""),
-    OTHER("Other type", ""),
-    RIVER("River", ""),
-    SQUARE("Square", ""),
-    STREET("Street", "");
+enum class SaasThoroughfareType(private val typeName: String) : SaasType, HasDefaultValue<SaasThoroughfareType> {
+    INDUSTRIAL_ZONE("An industrial zone"),
+    OTHER("Other type"),
+    RIVER("River"),
+    SQUARE("Square"),
+    STREET("Street");
+
+    override fun getTechnicalKey(): String {
+        return name
+    }
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getUrl(): String {
-        return url
     }
 
     override fun getDefault(): SaasThoroughfareType {
