@@ -323,6 +323,90 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
     }
 
+
+    /**
+     * Given addresses exists in SaaS
+     * When getting addresses page based on external id list
+     * Then addresses page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get addresses filter by external ids`() {
+        val addressesSaas = listOf(
+            SaasValues.addressBusinessPartnerWithRelations1,
+            SaasValues.addressBusinessPartnerWithRelations2
+        )
+
+        val parentsSaas = listOf(
+            SaasValues.legalEntityResponse1,
+            SaasValues.siteBusinessPartner1
+        )
+
+        val expectedAddresses = listOf(
+            ResponseValues.addressGateInputResponse1,
+            ResponseValues.addressGateInputResponse2,
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", absent())
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = addressesSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", matching(".*"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = parentsSaas.size,
+                                    startAfter = null,
+                                    nextStartAfter = null,
+                                    total = parentsSaas.size,
+                                    values = parentsSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClient.addresses().getAddresses(paginationValue)
+        val listExternalIds = addressesSaas.mapNotNull { it.externalId }
+        gateClient.addresses().getAddressesByExternalIds(paginationValue, listExternalIds)
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedAddresses,
+                invalidEntries = invalidEntries
+            )
+        )
+    }
+
     /**
      * Given invalid addresses in SaaS
      * When getting addresses page

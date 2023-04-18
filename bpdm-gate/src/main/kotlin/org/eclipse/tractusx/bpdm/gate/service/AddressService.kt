@@ -51,8 +51,8 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(limit: Int, startAfter: String?): PageStartAfterResponse<AddressGateInputResponse> {
-        val addressesPage = saasClient.getAddresses(limit, startAfter)
+    fun getAddresses(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<AddressGateInputResponse> {
+        val addressesPage = saasClient.getAddresses(limit, startAfter, externalIds)
         val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
 
         val addressesWithParent = validEntries.map { Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!) }
