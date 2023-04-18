@@ -19,11 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SaasPostalDeliveryPointType(private val typeName: String) : SaasType, HasDefaultValue<SaasPostalDeliveryPointType> {
+enum class SaasPostalDeliveryPointType(private val typeName: String) : SaasType {
     INTERURBAN_DELIVERY_POINT("Interurban Delivery Point"),
     MAIL_STATION("Mail Station"),
     MAILBOX("Mailbox"),
-    OTHER("Other Type"),
     POST_OFFICE_BOX("Post Office Box");
 
     override fun getTechnicalKey(): String {
@@ -32,9 +31,5 @@ enum class SaasPostalDeliveryPointType(private val typeName: String) : SaasType,
 
     override fun getTypeName(): String {
         return typeName
-    }
-
-    override fun getDefault(): SaasPostalDeliveryPointType {
-        return OTHER
     }
 }

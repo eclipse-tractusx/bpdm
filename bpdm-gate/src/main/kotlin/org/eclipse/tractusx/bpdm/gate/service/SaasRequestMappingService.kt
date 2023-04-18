@@ -177,7 +177,7 @@ class SaasRequestMappingService(
             localities = mapping.localities(),
             thoroughfares = mapping.thoroughfares(physicalAddress = null),
             premises = mapping.premises(physicalAddress = null),
-            postalDeliveryPoints = mapping.postalDeliveryPoints(address),
+            postalDeliveryPoints = mapping.postalDeliveryPoints(alternativeAddress = address),
             geographicCoordinates = mapping.geoCoordinates(),
             types = listOf(SaasAddressType.LEGAL_ALTERNATIVE.toSaasTypeDto())
         )
