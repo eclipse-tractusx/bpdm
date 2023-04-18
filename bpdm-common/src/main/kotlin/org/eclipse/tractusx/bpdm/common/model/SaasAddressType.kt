@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SassAddressType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SassAddressType>  {
+enum class SaasAddressType(private val typeName: String, private val url: String) : NamedUrlType, HasDefaultValue<SaasAddressType>  {
 
     ALTERNATIVE_LEGAL("Alternative Legal Address ", ""),
     BRANCH_OFFICE("Branch Office Address ", ""),
@@ -40,7 +40,7 @@ enum class SassAddressType(private val typeName: String, private val url: String
         return url
     }
 
-    override fun getDefault(): SassAddressType {
+    override fun getDefault(): SaasAddressType {
         return UNSPECIFIC
     }
 }

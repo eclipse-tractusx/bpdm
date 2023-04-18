@@ -291,12 +291,12 @@ object SaasValues {
     private val localityDistrict2 = LocalitySaas(CommonValues.districtLevel1_2, SaasLocalityType.DISTRICT, language2)
     private val localityQuarter2 = LocalitySaas(CommonValues.districtLevel2_2, SaasLocalityType.QUARTER, language2)
 
-    private val thoroughfareZone1 = ThoroughfareSaas(name = CommonValues.industrialZone1, sassType = INDUSTRIAL_ZONE, language = language1)
+    private val thoroughfareZone1 = ThoroughfareSaas(name = CommonValues.industrialZone1, saasType = INDUSTRIAL_ZONE, language = language1)
     private val thoroughfareStreet1 = ThoroughfareSaas(name = CommonValues.street1, direction = CommonValues.direction1
-        , number = CommonValues.houseNumber1, sassType = STREET, language = language1)
-    private val thoroughfareZone2 = ThoroughfareSaas(name = CommonValues.industrialZone2, sassType = INDUSTRIAL_ZONE, language = language2)
+        , number = CommonValues.houseNumber1, saasType = STREET, language = language1)
+    private val thoroughfareZone2 = ThoroughfareSaas(name = CommonValues.industrialZone2, saasType = INDUSTRIAL_ZONE, language = language2)
     private val thoroughfareStreet2 = ThoroughfareSaas(name = CommonValues.street2, direction = CommonValues.direction2
-        , number = CommonValues.houseNumber2, sassType = STREET, language = language2)
+        , number = CommonValues.houseNumber2, saasType = STREET, language = language2)
 
 
     private val premiseBuilding1 = PremiseSaas(CommonValues.building1, SaasPremiseType.BUILDING, language1)
@@ -324,7 +324,7 @@ object SaasValues {
         thoroughfares = listOf(thoroughfareZone1, thoroughfareStreet1),
         premises = listOf(premiseBuilding1, premiseRoom1, premiseLevel1),
         postalDeliveryPoints = listOf(postalDeliveryPoint1),
-        types = listOf(TypeKeyNameUrlSaas(technicalKey = SassAddressType.LEGAL_ADDRESS.getTypeName())),
+        types = listOf(TypeKeyNameUrlSaas(technicalKey = SaasAddressType.LEGAL_ADDRESS.getTypeName())),
         geographicCoordinates = geoCoordinate1
     )
 
@@ -339,7 +339,7 @@ object SaasValues {
         thoroughfares = listOf(thoroughfareZone2, thoroughfareStreet2),
         premises = listOf(premiseBuilding2, premiseRoom2, premiseLevel2),
         postalDeliveryPoints = listOf(postalDeliveryPoint2),
-        types = listOf(TypeKeyNameUrlSaas(technicalKey = SassAddressType.LEGAL_ADDRESS.getTypeName())),
+        types = listOf(TypeKeyNameUrlSaas(technicalKey = SaasAddressType.LEGAL_ADDRESS.getTypeName())),
         geographicCoordinates = geoCoordinate2
     )
 

@@ -30,7 +30,7 @@ data class ThoroughfareSaas(
     val direction: String? = null,
     var language: LanguageSaas? = null
 ) : TypeValueSaas {
-    constructor(value: String? = null, name: String? = null, direction: String? = null, number: String? = null, sassType : SaasThoroughfareType, language: LanguageSaas?)
-            : this(value = value, name = name, direction = direction, number = number, type = TypeKeyNameUrlSaas(technicalKey = sassType.getTypeName()), language = language)
+    constructor(value: String? = null, name: String? = null, direction: String? = null, number: String? = null, saasType : SaasThoroughfareType, language: LanguageSaas?)
+            : this(value = value, name = name, direction = direction, number = number, type = TypeKeyNameUrlSaas(technicalKey = saasType.getTypeName()), language = language)
 
 }
