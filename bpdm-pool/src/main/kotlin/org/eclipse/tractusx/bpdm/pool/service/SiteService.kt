@@ -62,6 +62,7 @@ class SiteService(
 
     private fun fetchSiteDependencies(sites: Set<Site>) {
         siteRepository.joinAddresses(sites)
+        siteRepository.joinStates(sites)
         val addresses = sites.flatMap { it.addresses }.toSet()
         addressService.fetchLogisticAddressDependencies(addresses)
     }

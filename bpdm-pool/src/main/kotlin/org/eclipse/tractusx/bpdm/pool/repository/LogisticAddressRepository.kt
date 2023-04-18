@@ -51,4 +51,10 @@ interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddress
 
     @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.physicalPostalAddress.administrativeAreaLevel1 LEFT JOIN FETCH a.alternativePostalAddress.administrativeAreaLevel1 WHERE a IN :addresses")
     fun joinRegions(addresses: Set<LogisticAddress>): Set<LogisticAddress>
+
+    @Query("SELECT DISTINCT p FROM LogisticAddress p LEFT JOIN FETCH p.identifiers WHERE p IN :partners")
+    fun joinIdentifiers(partners: Set<LogisticAddress>): Set<LogisticAddress>
+
+    @Query("SELECT DISTINCT p FROM LogisticAddress p LEFT JOIN FETCH p.states WHERE p IN :partners")
+    fun joinStates(partners: Set<LogisticAddress>): Set<LogisticAddress>
 }

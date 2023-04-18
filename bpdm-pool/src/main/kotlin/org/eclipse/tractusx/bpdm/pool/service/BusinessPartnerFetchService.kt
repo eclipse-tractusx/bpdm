@@ -24,11 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
+import org.eclipse.tractusx.bpdm.pool.repository.AddressIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,6 +42,7 @@ class BusinessPartnerFetchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val identifierTypeRepository: IdentifierTypeRepository,
     private val legalEntityIdentifierRepository: LegalEntityIdentifierRepository,
+    private val addressIdentifierRepository: AddressIdentifierRepository,
     private val addressService: AddressService
 ) {
 
@@ -94,7 +96,7 @@ class BusinessPartnerFetchService(
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, lsaType)
         return when (lsaType) {
             IdentifierLsaType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
-            IdentifierLsaType.ADDRESS -> TODO("Not yet implemented for addresses")
+            IdentifierLsaType.ADDRESS -> addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
         }
     }
 
