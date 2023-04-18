@@ -50,6 +50,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
+
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
@@ -352,9 +353,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         val total = 10
         val invalidEntries = 0
 
+
+
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", absent())
+                .withQueryParam("externalId", matching(".*"))
+                .withQueryParam("typeTechnicalKeys", matching(".*"))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -375,6 +379,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .withQueryParam("externalId", matching(".*"))
+                .withQueryParam("typeTechnicalKeys", absent())
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -392,10 +397,10 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val pageResponse = gateClient.addresses().getAddresses(paginationValue)
         val listExternalIds = addressesSaas.mapNotNull { it.externalId }
-        gateClient.addresses().getAddressesByExternalIds(paginationValue, listExternalIds)
+
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClient.addresses().getAddressesByExternalIds(paginationValue, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(
