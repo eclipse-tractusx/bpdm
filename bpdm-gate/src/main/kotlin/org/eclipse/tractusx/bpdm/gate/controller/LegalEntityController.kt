@@ -54,6 +54,13 @@ class LegalEntityController(
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
+    override fun getLegalEntitiesByExternalIds(
+        paginationRequest: PaginationStartAfterRequest,
+        externalIds: Collection<String>
+    ): PageStartAfterResponse<LegalEntityGateInputResponse> {
+        return legalEntityService.getLegalEntities(limit = paginationRequest.limit, startAfter = paginationRequest.startAfter, externalIds = externalIds)
+    }
+
     override fun getLegalEntities(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
     }
