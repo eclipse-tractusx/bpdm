@@ -76,6 +76,23 @@ interface GateSiteApi {
     fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputResponse
 
     @Operation(
+        summary = "Get page of sites filtered by a collection of externalIds",
+        description = "Get page of sites filtered by a collection of externalIds."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of sites"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/sites/search")
+    @PostExchange("/input/sites/search")
+    fun getSitesByExternalIds(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @RequestBody externalIds: Collection<String>
+    ): PageStartAfterResponse<SiteGateInputResponse>
+
+    @Operation(
         summary = "Get page of sites",
         description = "Get page of sites."
     )

@@ -54,6 +54,13 @@ class SiteController(
         return siteService.getSiteByExternalId(externalId)
     }
 
+    override fun getSitesByExternalIds(
+        paginationRequest: PaginationStartAfterRequest,
+        externalIds: Collection<String>
+    ): PageStartAfterResponse<SiteGateInputResponse> {
+        return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter, externalIds)
+    }
+
     override fun getSites(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse> {
         return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
     }
