@@ -27,7 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -96,7 +98,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel1
+        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel2
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -190,6 +192,7 @@ class AddressControllerSearchIT @Autowired constructor(
      * Then the matching address is returned
      */
     @Test
+    @Disabled("TODO create alternative address")
     fun `search address via postal delivery point`() {
         val expected = PageResponse(
             1, 1, 0, 1, listOf(
@@ -231,6 +234,7 @@ class AddressControllerSearchIT @Autowired constructor(
      * Then the matching address is returned
      */
     @Test
+    @Disabled("TODO create alternative address")
     fun `search address via multiple criteria`() {
         val expected = PageResponse(
             1, 1, 0, 1, listOf(

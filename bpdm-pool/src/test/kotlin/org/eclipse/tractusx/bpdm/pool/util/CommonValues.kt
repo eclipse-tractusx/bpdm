@@ -180,17 +180,17 @@ object CommonValues {
     val industrialZone2 = "Industrial Zone Two"
     val industrialZone3 = "Industrial Zone Three"
 
-    val building1 = "Building One"
+    val building1 = "Gebäude eins"
     val building2 = "Building Two"
-    val building3 = "Building Three"
+    val building3 = "tedifício  três"
 
-    val floor1 = "Floor One"
+    val floor1 = "Stockerk eins"
     val floor2 = "Floor Two"
-    val floor3 = "Floor Three"
+    val floor3 = "piso três"
 
-    val door1 = "Door One"
+    val door1 = "Raum eins"
     val door2 = "Door Two"
-    val door3 = "Door Three"
+    val door3 = "peça três"
 
     val postCode1 = "71059 "
     val postCode2 = "70547"

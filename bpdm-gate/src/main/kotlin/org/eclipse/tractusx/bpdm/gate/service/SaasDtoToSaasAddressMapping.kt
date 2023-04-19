@@ -72,6 +72,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
     }
 
     fun localities(): Collection<LocalitySaas> {
+
         return listOfNotNull(
             LocalitySaas(
                 value = postalAdress.city, type = SaasLocalityType.CITY.toSaasTypeDto()

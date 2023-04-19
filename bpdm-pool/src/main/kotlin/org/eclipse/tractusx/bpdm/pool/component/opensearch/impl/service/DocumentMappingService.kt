@@ -19,11 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.entity.PhysicalPostalAddress
 import org.springframework.stereotype.Service
 
 /**
@@ -33,7 +35,7 @@ import org.springframework.stereotype.Service
 class DocumentMappingService {
 
     /**
-     * Maps [partner] to [LegalEntityDoc] representation
+     * Maps [LegalEntity] to [LegalEntityDoc] representation
      */
     fun toDocument(partner: LegalEntity): LegalEntityDoc {
         val partnerStatus = partner.states.maxWithOrNull(compareBy { it.validFrom })
@@ -42,48 +44,65 @@ class DocumentMappingService {
             legalName = TextDoc(partner.legalName.value),
             legalForm = partner.legalForm?.name?.let { TextDoc(it) },
             status = partnerStatus?.officialDenotation?.let { TextDoc(it) },
-//            addresses = listOf(toDocument(partner.legalAddress)),     // TODO fix
-            addresses = listOf(),
+            addresses = toAddresses(partner.legalAddress),
             classifications = partner.classifications.mapNotNull { classif -> classif.value?.let { TextDoc(it) } },
             sites = partner.sites.map { TextDoc(it.name) }
         )
     }
 
     /**
-     * Maps [address] to [AddressPartnerDoc] representation
+     * Maps [LogisticAddress] to [AddressPartnerDoc] representation
      */
-    fun toDocument(address: LogisticAddress): AddressPartnerDoc {
-        TODO("implement")
+    fun toDocument(logisticAddress: LogisticAddress): Collection<AddressPartnerDoc> {
+
+        val addresses: MutableList<AddressPartnerDoc> = mutableListOf()
+
+        addresses.add(toAddressPartnerDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress)), logisticAddress.bpn))
+        if (logisticAddress.alternativePostalAddress != null) {
+            addresses.add(toAddressPartnerDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!)), logisticAddress.bpn))
+        }
+
+        return addresses;
     }
 
-//    /**
-//     * Maps [address] to [AddressDoc] representation
-//     */
-//    fun toDocument(address: Address): AddressDoc {
-//        return AddressDoc(
-//            address.administrativeAreas.map { TextDoc(it.value) },
-//            address.postCodes.map { TextDoc(it.value) },
-//            address.localities.map { TextDoc(it.value) },
-//            address.thoroughfares.map { TextDoc(it.value) },
-//            address.premises.map { TextDoc(it.value) },
-//            address.postalDeliveryPoints.map { TextDoc(it.value) }
-//        )
-//    }
-//
-//    /**
-//     * Maps [addressPartner] to [AddressPartnerDoc] representation
-//     */
-//    fun toDocument(addressPartner: AddressPartner): AddressPartnerDoc {
-//        return AddressPartnerDoc(
-//            bpn = addressPartner.bpn,
-//            administrativeAreas = addressPartner.address.administrativeAreas.map { it.value },
-//            postCodes = addressPartner.address.postCodes.map { it.value },
-//            localities = addressPartner.address.localities.map { it.value },
-//            thoroughfares = addressPartner.address.thoroughfares.map { it.value },
-//            premises = addressPartner.address.premises.map { it.value },
-//            postalDeliveryPoints = addressPartner.address.postalDeliveryPoints.map { it.value },
-//            countryCode = addressPartner.address.country.name
-//        )
-//    }
+    /**
+     * Maps [address] to [AddressPartnerDoc] representation
+     */
+    fun toAddresses(logisticAddress: LogisticAddress): Collection<AddressDoc> {
+
+       val addresses: MutableList<AddressDoc> = mutableListOf()
+
+        addresses.add(toAddressDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress))))
+        if (logisticAddress.alternativePostalAddress != null) {
+            addresses.add(toAddressDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!))))
+        }
+
+        return addresses;
+    }
+
+    fun toAddressPartnerDoc(address: AddressToSaasMapping, bpn: String): AddressPartnerDoc {
+        return AddressPartnerDoc(
+            bpn = bpn,
+            administrativeAreas = address.administrativeAreas().map { it },
+            postCodes = address.postcodes().map { it },
+            localities = address.localities().map { it },
+            thoroughfares = address.thoroughfares().map { it },
+            premises = address.premises().map { it },
+            postalDeliveryPoints = address.postalDeliveryPoints().map { it },
+            countryCode = address.country()
+        )
+    }
+
+    fun toAddressDoc(address: AddressToSaasMapping): AddressDoc {
+        return AddressDoc(
+            administrativeAreas = address.administrativeAreas().map { TextDoc(it) },
+            postCodes = address.postcodes().map { TextDoc(it) },
+            localities = address.localities().map { TextDoc(it) },
+            thoroughfares = address.thoroughfares().map { TextDoc(it) },
+            premises = address.premises().map { TextDoc(it) },
+            postalDeliveryPoints = address.postalDeliveryPoints().map { TextDoc(it) }
+        )
+    }
+
 
 }

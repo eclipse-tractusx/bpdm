@@ -228,14 +228,6 @@ class SearchServiceImpl(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<Pair<Float, LogisticAddress>> {
-        TODO("Re-implement for Open Search for LogisticAddress")
-    }
-
-/*
-    private fun searchIndex(
-        searchRequest: AddressPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageResponse<Pair<Float, AddressPartner>> {
         logger.debug { "Search index for addresses" }
 
         if (paginationRequest.page > openSearchConfigProperties.maxPage)
@@ -246,11 +238,11 @@ class SearchServiceImpl(
             PageRequest.of(paginationRequest.page, paginationRequest.size)
         )
 
-        logger.debug { "Found ${searchResult.hits.size} addresses in OpenSearch. (${searchResult.totalHits} in total)" }
+        logger.info { "Found ${searchResult.hits.size} addresses in OpenSearch. (${searchResult.totalHits} in total)" }
 
         val bpnHitMap = searchResult.associateBy { it.id }
 
-        val addresses = addressPartnerRepository.findDistinctByBpnIn(bpnHitMap.keys)
+        val addresses = logisticAddressRepository.findDistinctByBpnIn(bpnHitMap.keys)
         val missingPartners = bpnHitMap.keys.minus(addresses.map { it.bpn }.toSet())
 
         if (missingPartners.isNotEmpty())
@@ -260,7 +252,7 @@ class SearchServiceImpl(
 
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
-        return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
+       return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
     }
-*/
+
 }

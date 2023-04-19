@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocRepository
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
@@ -62,7 +63,7 @@ class OpenSearchSyncPageService(
         if (!addressBpns.isNullOrEmpty()) {
             val addressesToExport = logisticAddressRepository.findDistinctByBpnIn(addressBpns)
             logger.debug { "Exporting ${addressesToExport.size} address records" }
-            val addressPartnerDocs = addressesToExport.map { documentMappingService.toDocument(it) }
+            val addressPartnerDocs : Collection<AddressPartnerDoc> = addressesToExport.flatMap { documentMappingService.toDocument(it) }
             addressPartnerDocRepository.saveAll(addressPartnerDocs)
         }
 
