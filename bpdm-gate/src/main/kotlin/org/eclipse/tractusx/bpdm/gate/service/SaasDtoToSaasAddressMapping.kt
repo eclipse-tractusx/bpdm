@@ -127,7 +127,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
     }
 
     fun postalDeliveryPoints(alternativeAddress: AlternativePostalAddressDto?): Collection<PostalDeliveryPointSaas> {
-        val postalDeliveryPointSaas = when (alternativeAddress?.type) {
+        val postalDeliveryPointSaas = when (alternativeAddress?.deliveryServiceType) {
             DeliveryServiceType.PO_BOX ->
                 PostalDeliveryPointSaas(
                     value = alternativeAddress.deliveryServiceNumber,
