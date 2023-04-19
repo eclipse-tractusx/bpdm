@@ -93,6 +93,12 @@ class PhysicalPostalAddress(
     // specific for PhysicalPostalAddress
 
     /**
+     * A separate postal code for a company, also known as postcode, PIN or ZIP Code
+     */
+    @Column(name = "phy_company_postcode")
+    val companyPostCode: String? = null,
+
+    /**
      * The practice of designating an area for industrial development
      */
     @Column(name = "phy_industrial_zone")
@@ -116,4 +122,4 @@ class PhysicalPostalAddress(
     @Column(name = "phy_door")
     val door: String? = null,
 
-)
+    )

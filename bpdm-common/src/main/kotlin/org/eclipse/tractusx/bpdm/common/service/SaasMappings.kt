@@ -212,6 +212,7 @@ object SaasMappings {
         }
 
         return PhysicalPostalAddressDto(
+            companyPostCode = map.companyPostCode(),
             industrialZone = map.industrialZone(),
             building = map.building(),
             floor = map.floor(),

@@ -28,6 +28,12 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
 data class PhysicalPostalAddressDto (
 
+    @field:JsonUnwrapped
+    val baseAddress: BasePostalAddressDto,
+
+    @Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
+    val companyPostCode: String? = null,
+
     @Schema(description = "The practice of designating an area for industrial development")
     val industrialZone: String? = null,
 
@@ -39,7 +45,4 @@ data class PhysicalPostalAddressDto (
 
     @Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
     val door: String? = null,
-
-    @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressDto,
 )

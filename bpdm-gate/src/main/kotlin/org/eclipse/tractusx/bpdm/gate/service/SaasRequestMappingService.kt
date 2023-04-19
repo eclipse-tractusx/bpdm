@@ -158,7 +158,7 @@ class SaasRequestMappingService(
         return AddressSaas(
             country = mapping.country(),
             administrativeAreas = mapping.administrativeAreas(),
-            postCodes = mapping.postcodes(),
+            postCodes = mapping.postcodes(physicalAddress = address),
             localities = mapping.localities(),
             thoroughfares = mapping.thoroughfares(physicalAddress = address),
             premises = mapping.premises(physicalAddress = address),
@@ -173,7 +173,7 @@ class SaasRequestMappingService(
         return AddressSaas(
             country = mapping.country(),
             administrativeAreas = mapping.administrativeAreas(),
-            postCodes = mapping.postcodes(),
+            postCodes = mapping.postcodes(physicalAddress = null),
             localities = mapping.localities(),
             thoroughfares = mapping.thoroughfares(physicalAddress = null),
             premises = mapping.premises(physicalAddress = null),

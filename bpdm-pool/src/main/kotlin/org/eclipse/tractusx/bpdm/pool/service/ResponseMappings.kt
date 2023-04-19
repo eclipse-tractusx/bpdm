@@ -161,6 +161,7 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
             districtLevel2 = districtLevel2,
             street = street?.toDto()
         ),
+        companyPostCode = companyPostCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
