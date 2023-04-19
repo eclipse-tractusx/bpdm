@@ -250,7 +250,7 @@ object SaasMappings {
 
         return AlternativePostalAddressDto(
             deliveryServiceNumber = deliveryServiceNumber,
-            type = deliveryServiceType,
+            deliveryServiceType = deliveryServiceType,
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,

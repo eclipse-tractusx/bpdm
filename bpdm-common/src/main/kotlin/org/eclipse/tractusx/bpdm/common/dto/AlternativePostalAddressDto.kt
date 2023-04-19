@@ -33,7 +33,7 @@ data class AlternativePostalAddressDto(
     val deliveryServiceNumber: String = "",
 
     @Schema(description = "The type of this specified delivery")
-    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX,
+    val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
 
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressDto,

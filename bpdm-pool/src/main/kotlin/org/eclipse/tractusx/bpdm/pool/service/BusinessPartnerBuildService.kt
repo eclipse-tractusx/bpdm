@@ -454,7 +454,7 @@ class BusinessPartnerBuildService(
             districtLevel1 = baseAddress.districtLevel1,
             districtLevel2 = baseAddress.districtLevel2,
             street = baseAddress.street?.let { createStreet(it) },
-            deliveryServiceType = alternativeAddress.type,
+            deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber
         )
     }
