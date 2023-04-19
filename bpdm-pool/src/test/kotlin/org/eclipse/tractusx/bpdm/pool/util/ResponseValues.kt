@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
@@ -95,6 +94,7 @@ object ResponseValues {
     val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
     val address1 = PhysicalPostalAddressResponse(
+        companyPostCode = CommonValues.postCode2,
         industrialZone = CommonValues.industrialZone1,
         building = CommonValues.building1,
         floor = CommonValues.floor1,

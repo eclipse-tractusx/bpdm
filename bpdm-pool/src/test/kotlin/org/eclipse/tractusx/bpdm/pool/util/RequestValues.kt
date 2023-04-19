@@ -91,6 +91,7 @@ object RequestValues {
     val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
 
     val postalAddress1 = PhysicalPostalAddressDto(
+        companyPostCode = CommonValues.postCode2,
         industrialZone = CommonValues.industrialZone1,
         building = CommonValues.building1,
         floor = CommonValues.floor1,
