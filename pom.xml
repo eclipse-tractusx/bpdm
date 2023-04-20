@@ -127,6 +127,12 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>2.0</version>
             </dependency>
+            <!-- Override spring expression version used by transitive dependencies due to security issue -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>6.0.8</version>
+            </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock-jre8-standalone</artifactId>
