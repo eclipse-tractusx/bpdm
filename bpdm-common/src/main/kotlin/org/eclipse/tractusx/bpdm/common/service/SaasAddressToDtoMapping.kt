@@ -33,7 +33,7 @@ class SaasAddressToDtoMapping(private val address: AddressSaas) {
 
     fun geoCoordinates(): GeoCoordinateDto? {
         return when {
-            address.geographicCoordinates?.longitude != null && address.geographicCoordinates.latitude != null ->
+            (address.geographicCoordinates?.longitude != null) && (address.geographicCoordinates.latitude != null) ->
                 GeoCoordinateDto(address.geographicCoordinates.longitude, address.geographicCoordinates.latitude, null)
 
             else -> null

@@ -19,116 +19,81 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.dto.saas.GeoCoordinatesSaas
 import org.eclipse.tractusx.bpdm.pool.entity.PhysicalPostalAddress
 
 class PhysicalPostalAddressToSaasMapping(private val postalAdress: PhysicalPostalAddress) : AddressToSaasMapping {
 
     override fun geoCoordinates(): GeoCoordinatesSaas? {
 
-        return if (postalAdress.geographicCoordinates?.longitude != null)
-            GeoCoordinatesSaas(longitude = postalAdress.geographicCoordinates.longitude,
-                latitude = postalAdress.geographicCoordinates.latitude)
-        else
-            null
+        return (postalAdress.geographicCoordinates?.longitude).let {
+
+            GeoCoordinatesSaas(
+                longitude = postalAdress.geographicCoordinates?.longitude,
+                latitude = postalAdress.geographicCoordinates?.latitude
+            )
+        }
     }
 
     override fun country(): String {
 
-        return postalAdress.country.alpha2;
+        return postalAdress.country.alpha2
     }
 
     override fun administrativeAreas(): Collection<String> {
 
-        val areas: MutableList<String> = mutableListOf()
+        return listOfNotNull(
 
-        if (postalAdress.administrativeAreaLevel1 != null) {
-            areas.add(postalAdress.administrativeAreaLevel1.regionCode)
-        }
-        if (postalAdress.administrativeAreaLevel2 != null) {
-            areas.add(postalAdress.administrativeAreaLevel2)
-        }
-        return areas;
+            (postalAdress.administrativeAreaLevel1)?.let {
+                postalAdress.administrativeAreaLevel1.regionCode
+            },
+            postalAdress.administrativeAreaLevel2
+        )
     }
 
     override fun postcodes(): Collection<String> {
 
-        val postcodes: MutableList<String> = mutableListOf()
+        return listOfNotNull(
 
-        if (postalAdress.postCode != null) {
-            postcodes.add(postalAdress.postCode)
-        }
-
-        return postcodes;
+            postalAdress.postCode
+        )
     }
 
     override fun localities(): Collection<String> {
 
-        val localities: MutableList<String> = mutableListOf()
+        return listOfNotNull(
 
-        if (postalAdress.postCode != null) {
-            localities.add(postalAdress.city)
-        }
-
-        if (postalAdress.districtLevel1 != null) {
-            localities.add(postalAdress.districtLevel1)
-        }
-        if (postalAdress.districtLevel2 != null) {
-            localities.add(postalAdress.districtLevel2)
-        }
-        return localities;
+            postalAdress.city,
+            postalAdress.districtLevel1,
+            postalAdress.districtLevel2
+        )
     }
 
-    override fun thoroughfares( ): Collection<String> {
+    override fun thoroughfares(): Collection<String> {
 
-        val thoroughfares: MutableList<String> = mutableListOf()
+        return listOfNotNull(
 
-        if (postalAdress.street != null) {
-
-            if (postalAdress.street.name != null) {
-                thoroughfares.add(postalAdress.street.name,)
-            }
-            if (postalAdress.street.houseNumber != null) {
-                thoroughfares.add(postalAdress.street.houseNumber,)
-            }
-            if (postalAdress.street.milestone != null) {
-                thoroughfares.add(postalAdress.street.milestone,)
-            }
-            if (postalAdress.street.direction != null) {
-                thoroughfares.add(postalAdress.street.direction,)
-            }
-
-        }
-        if (postalAdress.industrialZone != null) {
-            thoroughfares.add(postalAdress.industrialZone)
-        }
-
-        return thoroughfares;
+            postalAdress.street?.name,
+            postalAdress.street?.houseNumber,
+            postalAdress.street?.milestone,
+            postalAdress.street?.direction,
+            postalAdress.industrialZone
+        )
     }
 
-    override fun premises( ): Collection<String> {
+    override fun premises(): Collection<String> {
 
-        val premesis: MutableList<String> = mutableListOf()
+        return listOfNotNull(
 
-        if (postalAdress.building != null) {
-            premesis.add(postalAdress.building)
-        }
-        if (postalAdress.floor != null) {
-            premesis.add(postalAdress.floor)
-        }
-        if (postalAdress.door != null) {
-            premesis.add(postalAdress.door)
-        }
-
-        return premesis;
+            postalAdress.building,
+            postalAdress.floor,
+            postalAdress.door
+        )
     }
 
     override fun postalDeliveryPoints(): Collection<String> {
 
-        return listOf();
+        return listOf()
     }
 
 }
