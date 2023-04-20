@@ -30,25 +30,25 @@ object RequestValues {
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue1,
             type = CommonValues.identifierTypeTechnicalKey1,
-            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey1,
+            issuingBody = CommonValues.identifierIssuingBodyName1,
         )
     val identifier2 =
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue2,
             CommonValues.identifierTypeTechnicalKey2,
-            CommonValues.identifierIssuingBodyTechnicalKey2,
+            CommonValues.identifierIssuingBodyName2,
         )
     val identifier3 =
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue3,
             type = CommonValues.identifierTypeTechnicalKey3,
-            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey3,
+            issuingBody = CommonValues.identifierIssuingBodyName3,
         )
     val identifier4 =
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue4,
             type = CommonValues.identifierTypeTechnicalKey4,
-            issuingBody = CommonValues.identifierIssuingBodyTechnicalKey4,
+            issuingBody = CommonValues.identifierIssuingBodyName4,
         )
 
     val genericIdentifier =

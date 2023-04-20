@@ -48,7 +48,7 @@ object SaasValues {
     val identifier1 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey1),
         value = CommonValues.identifierValue1,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey1),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName1),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey1)
     )
 
@@ -69,7 +69,7 @@ object SaasValues {
     val identifier2 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey2),
         value = CommonValues.identifierValue2,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey2),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName2),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey2)
     )
 
@@ -90,7 +90,7 @@ object SaasValues {
     private val identifier3 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey3),
         value = CommonValues.identifierValue3,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey3),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName3),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey3)
     )
 
@@ -111,7 +111,7 @@ object SaasValues {
     private val identifier4 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey4),
         value = CommonValues.identifierValue4,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey4),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName4),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey4)
     )
 
