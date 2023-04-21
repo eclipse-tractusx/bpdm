@@ -78,6 +78,23 @@ interface GateAddressApi {
     @GetExchange("/input/addresses/{externalId}")
     fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInputResponse
 
+    @Operation(
+        summary = "Get page of addresses filtered by a collection of externalIds",
+        description = "Get page of addresses filtered by a collection of externalIds."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of addresses"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/addresses/search")
+    @PostExchange("/input/addresses/search")
+    fun getAddressesByExternalIds(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @RequestBody externalIds: Collection<String>
+    ): PageStartAfterResponse<AddressGateInputResponse>
+
 
     @Operation(
         summary = "Get page of addresses",

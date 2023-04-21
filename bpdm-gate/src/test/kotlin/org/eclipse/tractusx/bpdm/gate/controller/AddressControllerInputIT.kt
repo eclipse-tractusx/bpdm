@@ -50,6 +50,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
+
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
@@ -312,6 +313,94 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val paginationValue = PaginationStartAfterRequest(startAfter, limit)
         val pageResponse = gateClient.addresses().getAddresses(paginationValue)
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedAddresses,
+                invalidEntries = invalidEntries
+            )
+        )
+    }
+
+
+    /**
+     * Given addresses exists in SaaS
+     * When getting addresses page based on external id list
+     * Then addresses page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get addresses filter by external ids`() {
+        val addressesSaas = listOf(
+            SaasValues.addressBusinessPartnerWithRelations1,
+            SaasValues.addressBusinessPartnerWithRelations2
+        )
+
+        val parentsSaas = listOf(
+            SaasValues.legalEntityResponse1,
+            SaasValues.siteBusinessPartner1
+        )
+
+        val expectedAddresses = listOf(
+            ResponseValues.addressGateInputResponse1,
+            ResponseValues.addressGateInputResponse2,
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", matching(".*"))
+                .withQueryParam("typeTechnicalKeys", matching(".*"))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = addressesSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .withQueryParam("externalId", matching(".*"))
+                .withQueryParam("typeTechnicalKeys", absent())
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = parentsSaas.size,
+                                    startAfter = null,
+                                    nextStartAfter = null,
+                                    total = parentsSaas.size,
+                                    values = parentsSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        val listExternalIds = addressesSaas.mapNotNull { it.externalId }
+
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClient.addresses().getAddressesByExternalIds(paginationValue, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
             PageStartAfterResponse(

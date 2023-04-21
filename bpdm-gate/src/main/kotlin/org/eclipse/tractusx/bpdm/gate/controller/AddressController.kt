@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
@@ -57,6 +59,13 @@ class AddressController(
 
     override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
         return addressService.getAddressByExternalId(externalId)
+    }
+
+    override fun getAddressesByExternalIds(
+        paginationRequest: PaginationStartAfterRequest,
+        externalIds: Collection<String>
+    ): PageStartAfterResponse<AddressGateInputResponse> {
+        return addressService.getAddresses(limit = paginationRequest.limit, startAfter = paginationRequest.startAfter, externalIds = externalIds)
     }
 
     override fun getAddresses(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInputResponse> {
