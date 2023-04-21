@@ -28,7 +28,7 @@ data class SiteDto(
     val name: String,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<SiteStateDto>,
+    val states: Collection<SiteStateDto> = emptyList(),
 
     @Schema(description = "Main address where this site resides")
     val mainAddress: LogisticAddressDto
