@@ -374,6 +374,63 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
     }
 
+
+    /**
+     * Given legal entity exists in SaaS
+     * When getting legal entities page based on external id list
+     * Then legal entities page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get legal entity filter by external ids`() {
+        val legalEntitiesSaas = listOf(
+            SaasValues.legalEntityResponse1,
+            SaasValues.legalEntityResponse2,
+        )
+
+        val expectedLegalEntities = listOf(
+            ResponseValues.legalEntityGateInputResponse1,
+            ResponseValues.legalEntityGateInputResponse2,
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = legalEntitiesSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val listExternalIds = legalEntitiesSaas.mapNotNull { it.externalId }
+        val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedLegalEntities,
+                invalidEntries = invalidEntries
+            )
+        )
+    }
+
     /**
      * Given legal entity without legal address in SaaS
      * When getting legal entities page

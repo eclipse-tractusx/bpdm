@@ -76,6 +76,23 @@ interface GateLegalEntityApi {
     fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputResponse
 
     @Operation(
+        summary = "Get page of legal-entities filtered by a collection of externalIds",
+        description = "Get page of legal-entities filtered by a collection of externalIds."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of legal-entities"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/input/legal-entities/search")
+    @PostExchange("/input/legal-entities/search")
+    fun getLegalEntitiesByExternalIds(
+        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @RequestBody externalIds: Collection<String>
+    ): PageStartAfterResponse<LegalEntityGateInputResponse>
+
+    @Operation(
         summary = "Get page of legal entities",
         description = "Get page of legal entities."
     )

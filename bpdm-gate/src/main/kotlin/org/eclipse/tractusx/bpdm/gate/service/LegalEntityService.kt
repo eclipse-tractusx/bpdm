@@ -69,8 +69,8 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?): PageStartAfterResponse<LegalEntityGateInputResponse> {
-        val partnerCollection = saasClient.getLegalEntities(limit, startAfter)
+    fun getLegalEntities(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<LegalEntityGateInputResponse> {
+        val partnerCollection = saasClient.getLegalEntities(limit, startAfter, externalIds)
 
         val validEntries = toValidLegalEntities(partnerCollection.values)
 
