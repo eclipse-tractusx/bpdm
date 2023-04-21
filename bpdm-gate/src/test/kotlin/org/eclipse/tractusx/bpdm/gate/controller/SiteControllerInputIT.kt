@@ -243,6 +243,62 @@ internal class SiteControllerInputIT @Autowired constructor(
     }
 
     /**
+     * Given sites exists in SaaS
+     * When getting sites page based on externalId
+     * Then sites page mapped to the catena data model should be returned
+     */
+    @Test
+    fun `get sites by external id`() {
+        val sitesSaas = listOf(
+            SaasValues.siteBusinessPartnerWithRelations1,
+            SaasValues.siteBusinessPartnerWithRelations2
+        )
+
+        val expectedSites = listOf(
+            ResponseValues.siteGateInputResponse1,
+            ResponseValues.siteGateInputResponse2
+        )
+
+        val limit = 2
+        val startAfter = "Aaa111"
+        val nextStartAfter = "Aaa222"
+        val total = 10
+        val invalidEntries = 0
+
+        wireMockServer.stubFor(
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                PagedResponseSaas(
+                                    limit = limit,
+                                    startAfter = startAfter,
+                                    nextStartAfter = nextStartAfter,
+                                    total = total,
+                                    values = sitesSaas
+                                )
+                            )
+                        )
+                )
+        )
+
+        val externalIds = sitesSaas.mapNotNull { it.externalId }
+        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val pageResponse = gateClient.sites().getSitesByExternalIds(paginationValue, externalIds)
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedSites,
+                invalidEntries = invalidEntries
+            )
+        )
+    }
+
+    /**
      * Given invalid sites in SaaS
      * When getting sites page
      * Then only valid sites on page returned

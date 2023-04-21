@@ -51,8 +51,8 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(limit: Int, startAfter: String?): PageStartAfterResponse<SiteGateInputResponse> {
-        val sitesPage = saasClient.getSites(limit, startAfter)
+    fun getSites(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<SiteGateInputResponse> {
+        val sitesPage = saasClient.getSites(limit, startAfter, externalIds)
 
         val validEntries = sitesPage.values.filter { validateSiteBusinessPartner(it) }
 
