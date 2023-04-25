@@ -78,10 +78,12 @@ class BusinessPartnerBuildService(
                 Pair(legalEntity, request.index)
             }
             .associateBy { (legalEntity, _) -> legalEntity.bpn }
-        
+
         val legalEntities = legalEntityWithIndexByBpnMap.values.map { (legalEntity, _) -> legalEntity }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.legalAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+
         legalEntityRepository.saveAll(legalEntities)
 
         val validEntities = legalEntities.map { it.toUpsertDto(legalEntityWithIndexByBpnMap[it.bpn]!!.second) }
@@ -117,6 +119,8 @@ class BusinessPartnerBuildService(
         val sites = siteWithIndexByBpnMap.values.map { (site, _) -> site }
 
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.mainAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+
         siteRepository.saveAll(sites)
 
         val validEntities = sites.map { it.toUpsertDto(siteWithIndexByBpnMap[it.bpn]!!.second) }
@@ -176,6 +180,7 @@ class BusinessPartnerBuildService(
         }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.legalAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         val validEntities = legalEntityRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
 
@@ -197,6 +202,7 @@ class BusinessPartnerBuildService(
         }
 
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.mainAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         val requestByBpnMap = requests.associateBy { it.bpn }
         sites.forEach {
