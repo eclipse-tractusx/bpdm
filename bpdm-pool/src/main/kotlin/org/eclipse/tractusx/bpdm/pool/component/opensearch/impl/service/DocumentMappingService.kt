@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityD
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.pool.entity.PhysicalPostalAddress
 import org.springframework.stereotype.Service
 
 /**
@@ -58,15 +57,17 @@ class DocumentMappingService {
         val addresses: MutableList<AddressPartnerDoc> = mutableListOf()
 
         addresses.add(toAddressPartnerDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress)), logisticAddress.bpn))
-        if (logisticAddress.alternativePostalAddress != null) {
-            addresses.add(toAddressPartnerDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!)), logisticAddress.bpn))
-        }
+        // TODO OpenSearch indexing doesn't work as expected when creating two AddressPartnerDocs with the same BPN (which is the ID), only last is indexed!
+        //  For now don't index alternativePostalAddress, since this would override (more important) physicalPostalAddress!
+//        if (logisticAddress.alternativePostalAddress != null) {
+//            addresses.add(toAddressPartnerDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!)), logisticAddress.bpn))
+//        }
 
-        return addresses;
+        return addresses
     }
 
     /**
-     * Maps [address] to [AddressPartnerDoc] representation
+     * Maps [logisticAddress] to [AddressPartnerDoc] representation
      */
     fun toAddresses(logisticAddress: LogisticAddress): Collection<AddressDoc> {
 
@@ -77,7 +78,7 @@ class DocumentMappingService {
             addresses.add(toAddressDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!))))
         }
 
-        return addresses;
+        return addresses
     }
 
     fun toAddressPartnerDoc(address: AddressToSaasMapping, bpn: String): AddressPartnerDoc {
