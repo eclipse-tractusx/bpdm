@@ -23,6 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
@@ -53,26 +54,8 @@ class AddressService(
 
     fun getAddresses(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<AddressGateInputResponse> {
         val addressesPage = saasClient.getAddresses(limit, startAfter, externalIds)
-        val validEntries = addressesPage.values.filter { validateAddressBusinessPartner(it) }
 
-        val addressesWithParent = validEntries.map { Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!) }
-
-        val parents =
-            if (addressesWithParent.isNotEmpty()) saasClient.getBusinessPartners(externalIds = addressesWithParent.map { (_, parentId) -> parentId }).values else emptyList()
-        val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
-        val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
-        val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
-
-        val addressGateInputResponse = addressesWithParent.mapNotNull { (address, parentId) ->
-            when {
-                legalEntityParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, parentId, null)
-                siteParentIds.contains(parentId) -> inputSaasMappingService.toInputAddress(address, null, parentId)
-                else -> {
-                    logger.warn { "Could not fetch parent for SaaS address record with ID ${address.id}" }
-                    null
-                }
-            }
-        }
+        val addressGateInputResponse = toValidAddresses(addressesPage)
 
         return PageStartAfterResponse(
             total = addressesPage.total,
@@ -80,6 +63,47 @@ class AddressService(
             content = addressGateInputResponse,
             invalidEntries = addressesPage.values.size - addressGateInputResponse.size
         )
+    }
+
+    private fun toValidAddresses(addressesPage: PagedResponseSaas<BusinessPartnerSaas>): List<AddressGateInputResponse> {
+        val validEntries = addressesPage.values
+            .filter { validateAddressBusinessPartner(it) }
+
+        val addressesWithParent = validEntries.map {
+            Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!)
+        }
+
+        val parents = if (addressesWithParent.isNotEmpty())
+            saasClient.getBusinessPartners(
+                externalIds = addressesWithParent.map { (_, parentId) -> parentId }
+            ).values
+        else
+            emptyList()
+
+        val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
+        val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
+        val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
+
+        return addressesWithParent.mapNotNull { (address, parentId) ->
+            try {
+                when {
+                    legalEntityParentIds.contains(parentId) ->
+                        inputSaasMappingService.toInputAddress(address, parentId, null)
+
+                    siteParentIds.contains(parentId) ->
+                        inputSaasMappingService.toInputAddress(address, null, parentId)
+
+                    else -> {
+                        logger.warn { "Could not fetch parent for SaaS address record with ID ${address.id}" }
+                        null
+                    }
+                }
+
+            } catch (e: RuntimeException) {
+                logger.warn { "SaaS address record with ID ${address.id} will be ignored: ${e.message}" }
+                null
+            }
+        }
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
