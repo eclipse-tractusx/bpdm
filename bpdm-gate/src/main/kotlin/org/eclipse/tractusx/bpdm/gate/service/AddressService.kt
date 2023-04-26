@@ -263,6 +263,7 @@ class AddressService(
         val addressSaas = saasRequestMappingService.toSaasModel(address)
         val parentNames = (parentLegalEntity ?: parentSite!!).names
         val parentIdentifiersWithoutBpn = (parentLegalEntity ?: parentSite!!).identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
+        // TODO Is this still okay? Address has its own name and identifiers with different valid types from LEs!
         return addressSaas.copy(identifiers = addressSaas.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
