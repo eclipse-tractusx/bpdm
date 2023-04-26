@@ -44,10 +44,11 @@ class SaasRequestMappingService(
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
             identifiers = toLegalEntityIdentifiersSaas(legalEntity.identifiers, request.bpn),
             names = toNamesSaas(legalEntity.legalName),
+            // TODO Only the first state is passed to SaaS, any others are ignored
             status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
             legalForm = toLegalFormSaas(legalEntity.legalForm),
             profile = toPartnerProfileSaas(legalEntity.classifications),
-            // Known issue: name, state, BPN-A and identifiers of the legal address are not transferred to SaaS yet!!
+            // TODO Known issue: name, state, BPN-A and identifiers of the legal address are not transferred to SaaS yet!!
             addresses = toAddressesSaasModel(legalEntity.legalAddress)
         )
     }
@@ -61,7 +62,7 @@ class SaasRequestMappingService(
             identifiers = toIdentifiersSaas(request.bpn),
             names = toNamesSaas(site.name),
             status = site.states.map { it.toSaasModel() }.firstOrNull(),
-            // Known issue: Name, state, BPN-A and identifiers of the main address are not transferred to SaaS yet!!
+            // TODO Known issue: Name, state, BPN-A and identifiers of the main address are not transferred to SaaS yet!!
             addresses = toAddressesSaasModel(site.mainAddress)
         )
         // Parent relation is updated later in SiteService.upsertParentRelations()
