@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
-import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -49,6 +48,13 @@ class AddressControllerSearchIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
+
+    // TODO Improve and reorganize our testdata
+    //  Currently our testdata is very limited, e.g. the same physical address (postalAddress1) is shared between regular address addressPartnerCreate1,
+    //  the legal address from legalEntityCreate1 and the main address from siteCreate1. This leads to unexpected results in the test cases.
+    //  Furthermore, it's not transparent in the test cases why some text search query should lead to some results. For that you need to dig through the
+    //  shared test data. Probably it would be better if each test case created its own test data with explicit values specific to the test case and
+    //  the expected result, ideally with minimal effort utilizing helper functions or probably Kotlin's powerful builders.
 
     val partnerStructure1 = LegalEntityStructureRequest(
         legalEntity = RequestValues.legalEntityCreate1,
@@ -78,9 +84,9 @@ class AddressControllerSearchIT @Autowired constructor(
         testHelpers.createTestMetadata()
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
-        givenAddress1 = givenStructure[0].addresses[0].address
-        givenAddress2 = givenStructure[0].addresses[1].address
-        givenAddress3 = givenStructure[1].siteStructures[0].addresses[0].address
+        givenAddress1 = givenStructure[0].addresses[0].address                      // addressPartnerCreate1
+        givenAddress2 = givenStructure[1].siteStructures[0].addresses[0].address    // addressPartnerCreate2
+        givenAddress3 = givenStructure[0].addresses[1].address                      // addressPartnerCreate3
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
@@ -93,12 +99,15 @@ class AddressControllerSearchIT @Autowired constructor(
     @Test
     fun `search address via administrative area`() {
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel2
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel2
+        )
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -112,14 +121,18 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via post code`() {
+        // regular, legal and site main address
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            postCode = givenAddress1.physicalPostalAddress.baseAddress.postCode
+        )
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -133,14 +146,18 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via locality`() {
+        // regular, legal and site main address
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.locality = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.city
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            locality = givenAddress1.physicalPostalAddress.baseAddress.city
+        )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -153,14 +170,18 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via thoroughfare`() {
+        // regular, legal and site main address
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(null,null,null,RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.street!!.name,
-        null,null,null)
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            thoroughfare = givenAddress1.physicalPostalAddress.baseAddress.street!!.name
+        )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -173,14 +194,18 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via premise`() {
+        // regular, legal and site main address
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.premise = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.building
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            premise = givenAddress1.physicalPostalAddress.building
+        )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -214,13 +239,18 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via country code`() {
+        // regular, legal and site main address
         val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
+            3, 1, 0, 3, listOf(
+                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
+                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
+                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(countryCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.country)
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            countryCode = givenAddress1.physicalPostalAddress.baseAddress.country.technicalKey
+        )
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -304,8 +334,9 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate2.address.physicalPostalAddress.baseAddress.postCode
+        val addressSearchRequest = AddressPartnerSearchRequest(
+            postCode = givenAddress3.physicalPostalAddress.baseAddress.postCode
+        )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
