@@ -80,6 +80,7 @@ class OpenSearchControllerIT @Autowired constructor(
         }
     }
 
+    // We import 3 legal entities which result in 6 OpenSearch records: 3 for the LEs itself and 3 for the corresponding legal addresses.
     val partnerDocs = listOf(
         SaasValues.legalEntity1,
         SaasValues.legalEntity2,
@@ -122,7 +123,7 @@ class OpenSearchControllerIT @Autowired constructor(
         //export once to get partners into opensearch for given system state
         var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        assertThat(exportResponse.count).isEqualTo(3)
+        assertThat(exportResponse.count).isEqualTo(6)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
         //export now to check behaviour
@@ -140,7 +141,8 @@ class OpenSearchControllerIT @Autowired constructor(
     fun `can search exported partners`() {
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        assertThat(exportResponse.count).isEqualTo(3)
+        // We have
+        assertThat(exportResponse.count).isEqualTo(6)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
     }
 
@@ -156,7 +158,7 @@ class OpenSearchControllerIT @Autowired constructor(
         // fill the opensearch index
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        assertThat(exportResponse.count).isEqualTo(3)
+        assertThat(exportResponse.count).isEqualTo(6)
         assertSearchableByNames(names)
 
         //clear the index
@@ -185,7 +187,7 @@ class OpenSearchControllerIT @Autowired constructor(
         //export partners again
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        assertThat(exportResponse.count).isEqualTo(3)
+        assertThat(exportResponse.count).isEqualTo(6)
         assertSearchableByNames(partnerDocs.map { it.names.first().value })
 
     }
