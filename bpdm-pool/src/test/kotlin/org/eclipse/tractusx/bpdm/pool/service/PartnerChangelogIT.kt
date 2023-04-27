@@ -102,9 +102,12 @@ class PartnerChangelogIT @Autowired constructor(
         webTestClient.invokePutWithoutResponse(EndpointValues.CATENA_LEGAL_ENTITY_PATH, modifiedPartnersToImport)
 
 
-        // no restrictions for BPNs and timestamp
+        // For every LE we create, we get one changelog entry for the LE itself and one for the corresponding legal address.
+        // Altogether 3 LEs were created initially and 1 updated. So we get 6 create entries and 2 update entries.
+
+        // no restrictions for BPNs and timestamp (BPNLs and BPNAs)
         retrieveChangelog(null, null).content
-            .also(checkNumberCreatedAndUpdated(3, 1))
+            .also(checkNumberCreatedAndUpdated(6, 2))
             .also(checkTimestampAscending())
 
         // no restrictions for timestamp, but limited to multiple BPNs
@@ -120,9 +123,9 @@ class PartnerChangelogIT @Autowired constructor(
         retrieveChangelog(null, listOf(bpnL2)).content
             .let(checkNumberCreatedAndUpdated(1, 0))
 
-        // filter out CREATED changelogs, only return one UPDATED changelog for BPNL1
+        // filter out CREATED changelogs, only return two UPDATED changelog for BPNL1 and corresponding BPNA
         retrieveChangelog(timestampBetweenCreateAndUpdate, null).content
-            .let(checkNumberCreatedAndUpdated(0, 1))
+            .let(checkNumberCreatedAndUpdated(0, 2))
 
         // filter out all changelogs
         retrieveChangelog(Instant.now(), null).content
