@@ -43,9 +43,9 @@ class LegalEntityController(
 ) : GateLegalEntityApi {
 
     override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {
-        if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
-        }
+//        if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
+//            return ResponseEntity(HttpStatus.BAD_REQUEST)
+//        }
         legalEntityService.upsertLegalEntities(legalEntities)
         return ResponseEntity(HttpStatus.OK)
     }

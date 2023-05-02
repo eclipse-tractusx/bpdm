@@ -22,8 +22,11 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import org.springframework.data.domain.Page
 
 fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
@@ -35,7 +38,8 @@ fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
         siteExternalId = siteExternalId.toString(),
         name = address.name,
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
-        alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity()
+        alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
+        legalEntity = null,
     )
 
     logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
@@ -119,5 +123,43 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
         createdAt
     )
 }
+fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
+
+    val addressInputRequest =AddressGateInputRequest(
+        address= legalEntity.legalAddress,
+        externalId= externalId+"_legalAddress",
+        legalEntityExternalId= externalId
+    )
+
+    val legalEntity= LegalEntity(
+        bpn = bpn.toString(),
+        externalId= externalId,
+        currentness = createCurrentnessTimestamp(),
+        legalForm = legalEntity.legalForm,
+        legalName = legalEntity.legalName.toName()
+    )
+    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
+    legalEntity.legalAddress = addressInputRequest.toAddressGate();
 
 
+
+    return legalEntity;
+
+}
+fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
+    return LegalEntityIdentifier(dto.value, dto.type,dto.issuingBody, legalEntity)
+}
+fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+    return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity);
+}
+fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
+    return Classification(dto.value,dto.code,dto.type,legalEntity);
+}
+fun NameDto.toName(): Name{
+    return Name(value, shortName)
+}
+private fun createCurrentnessTimestamp(): Instant {
+    return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}
