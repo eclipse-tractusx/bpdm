@@ -2,17 +2,17 @@
 
 ## Project Description
 
-This repository is part of the overarching Catena-X project.
+This repository is part of the overarching Eclipse Tractus-X project.
 
 BPDM is an acronym for business partner data management.
-This project provides core services for querying, adding and changing business partner base information in the Catena-X landscape.
+This project provides core services for querying, adding and changing business partner base information in the Eclipse Tractus-X landscape.
 
 Currently, BPDM consists of the Pool and Gate services.
 
 ## BPDM Pool
 
-The BPDM Pool is the single source of truth in Catena-X for business partner base information such as addresses and official identifiers.
-Each record in the Pool has a unique identifier with which it can be referenced across the entire Catena-X landscape, the business partner number.
+The BPDM Pool is the single source of truth in Eclipse Tractus-X for business partner base information such as addresses and official identifiers.
+Each record in the Pool has a unique identifier with which it can be referenced across the entire Eclipse Tractus-X landscape, the business partner number.
 Business partner records are divided into legal entities, sites and partner addresses.
 Self-explanatory, a legal entity record represents the legal entity information about a business partner.
 A site may represent legal entity's plant or campus which is big enough to contain several contact/delivery addresses.
@@ -24,7 +24,8 @@ The Pool offers an API to query these business partner records by BPN, other ide
 
 ## BPDM Gate
 
-The BPDM Gate offers an API for Catena-X members to share their own business partner data with Catena-X. Such members are called sharing members.
+The BPDM Gate offers an API for Eclipse Tractus-X members to share their own business partner data with Eclipse Tractus-X. Such members are called sharing
+members.
 Via the Gate service they can add their own business partner records but also retrieve cleaned and enhanced data back in return over the sharing process.
 Shared business partner records that have successfully gone through the sharing process end up in the BPDM Pool and will receive a BPN there (or merge with an
 existing record).
