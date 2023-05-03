@@ -19,10 +19,15 @@
 
 package com.catenax.bpdm.bridge.dummy
 
+import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.ContextConfiguration
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class ApplicationTests {
 
 	@Test
