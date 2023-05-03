@@ -26,6 +26,5 @@ import org.springframework.data.repository.CrudRepository
 interface LegalEntityRepository : JpaRepository<LegalEntity, Long>, CrudRepository<LegalEntity, Long> {
 
     fun findDistinctByExternalIdIn(externalId: Collection<String>): Set<LegalEntity>
-
     fun findByExternalId(externalId: String): LegalEntity?
 }
