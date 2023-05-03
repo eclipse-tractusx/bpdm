@@ -19,11 +19,93 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 
+fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
+
+    val logisticAddress = LogisticAddress(
+        bpn = bpn.toString(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntityExternalId.toString(),
+        siteExternalId = siteExternalId.toString(),
+        name = address.name,
+        physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
+        alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity()
+    )
+
+    logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
+    logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
+
+    return logisticAddress
+}
+
+fun toEntityAddress(dto: AddressStateDto, address: LogisticAddress): AddressState {
+    return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
+}
+
+fun toEntityIdentifier(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
+    return AddressIdentifier(dto.value, dto.type, address)
+}
+
+fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativePostalAddress {
+
+    return AlternativePostalAddress(
+        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = baseAddress.country,
+        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+        administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+        postCode = baseAddress.postCode,
+        city = baseAddress.city,
+        districtLevel1 = baseAddress.districtLevel1,
+        districtLevel2 = baseAddress.districtLevel2,
+        street = baseAddress.street?.toStreetEntity(),
+        deliveryServiceType = deliveryServiceType,
+        deliveryServiceNumber = deliveryServiceNumber
+    )
+
+}
+
+fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddress {
+
+    return PhysicalPostalAddress(
+        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = baseAddress.country,
+        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
+        administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
+        postCode = baseAddress.postCode,
+        city = baseAddress.city,
+        districtLevel1 = baseAddress.districtLevel1,
+        districtLevel2 = baseAddress.districtLevel2,
+        street = baseAddress.street?.toStreetEntity(),
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door
+    )
+
+}
+
+fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
+    return GeographicCoordinate(longitude, latitude, altitude)
+}
+
+private fun StreetDto.toStreetEntity(): Street {
+    return Street(
+        name = name,
+        houseNumber = houseNumber,
+        milestone = milestone,
+        direction = direction
+    )
+}
 
 fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)

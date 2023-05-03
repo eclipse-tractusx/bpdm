@@ -48,7 +48,8 @@ class AddressService(
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val typeMatchingService: TypeMatchingService,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val addressPersistenceService: AddressPersistenceService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -185,6 +186,8 @@ class AddressService(
         deleteParentRelationsOfAddresses(addresses)
 
         upsertParentRelations(addresses)
+
+        addressPersistenceService.persistAddressBP(addresses)
     }
 
     /**
