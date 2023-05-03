@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -28,10 +29,8 @@ import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
 @Service
-class AddressPersistenceService(
-    private val gateAddressRepository: GateAddressRepository,
-    private val legalEntityRepository: LegalEntityRepository,
-) {
+class AddressPersistenceService(private val gateAddressRepository: GateAddressRepository,
+                                private val legalEntityRepository: LegalEntityRepository) {
 
     @Transactional
     fun persistAddressBP(addresses: Collection<AddressGateInputRequest>) {
@@ -42,13 +41,11 @@ class AddressPersistenceService(
         val addressRecord = gateAddressRepository.findByExternalIdIn(externalIdColl)
 
         addresses.forEach { address ->
-
-            val legalEntityRecord =
-                address.legalEntityExternalId?.let { legalEntityRepository.findByExternalId(it) }
+            val legalEntityRecord = address.legalEntityExternalId?.let {legalEntityRepository.findByExternalId(it)?:throw BpdmNotFoundException("Business Partner", it)  }
 
             val fullAddress = address.toAddressGate(legalEntityRecord)
             addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
-                updateAddress(existingAddress, address)
+                updateAddress(existingAddress, fullAddress)
                 gateAddressRepository.save(existingAddress)
             } ?: run {
                 gateAddressRepository.save(fullAddress)
@@ -56,17 +53,18 @@ class AddressPersistenceService(
         }
     }
 
-    private fun updateAddress(address: LogisticAddress, addressRequest: AddressGateInputRequest) {
+    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
 
-        address.name = addressRequest.address.name
-        address.bpn = addressRequest.bpn.toString()
-        address.externalId = addressRequest.externalId
-        address.siteExternalId = addressRequest.siteExternalId.toString()
-        address.physicalPostalAddress = addressRequest.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
-        address.alternativePostalAddress = addressRequest.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
+        address.name = changeAddress.name
+        address.bpn = changeAddress.bpn
+        address.externalId = changeAddress.externalId
+        address.legalEntity= changeAddress.legalEntity
+        address.siteExternalId = changeAddress.siteExternalId
+        address.physicalPostalAddress = changeAddress.physicalPostalAddress
+        address.alternativePostalAddress = changeAddress.alternativePostalAddress
 
-        address.identifiers.replace(addressRequest.address.identifiers.map { toEntityIdentifier(it, address) }.toSet())
-        address.states.replace(addressRequest.address.states.map { toEntityAddress(it, address) }.toSet())
+        address.identifiers.replace(changeAddress.identifiers)
+        address.states.replace(changeAddress.states)
 
     }
 
