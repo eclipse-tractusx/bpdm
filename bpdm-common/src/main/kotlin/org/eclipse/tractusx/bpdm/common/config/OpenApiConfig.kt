@@ -58,7 +58,7 @@ class OpenApiConfig(
 
     fun sortSchemaCustomiser(): OpenApiCustomizer {
         return OpenApiCustomizer { openApi: OpenAPI ->
-            openApi.components(with(openApi.components) { schemas(schemas.values.sortedBy { it.name }.associateBy { it.name }) })
+            openApi.components(with(openApi.components) { schemas(schemas?.values?.sortedBy { it.name }?.associateBy { it.name }) })
         }
     }
 
