@@ -17,16 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy
+package com.catenax.bpdm.bridge.dummy.config
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.runApplication
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@SpringBootApplication
-@ConfigurationPropertiesScan
-class Application
 
-fun main(args: Array<String>) {
-    runApplication<Application>(*args)
-}
+@ConfigurationProperties(prefix = "bpdm.pool")
+data class PoolConfigProperties(
+    val baseUrl: String = "http://localhost:8080/",
+)
