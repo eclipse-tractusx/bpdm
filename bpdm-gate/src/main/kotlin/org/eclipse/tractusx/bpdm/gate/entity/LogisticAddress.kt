@@ -37,9 +37,6 @@ class LogisticAddress(
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
 
-    @Column(name = "legal_entity_external_id", nullable = true)
-    var legalEntityExternalId: String,
-
     @Column(name = "site_external_id", nullable = true)
     var siteExternalId: String,
 

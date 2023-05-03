@@ -29,17 +29,16 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import org.springframework.data.domain.Page
 
-fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
+fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         bpn = bpn,
         externalId = externalId,
-        legalEntityExternalId = legalEntityExternalId.toString(),
         siteExternalId = siteExternalId.toString(),
         name = address.name,
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
-        legalEntity = null,
+        legalEntity = legalEntity,
     )
 
     logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
@@ -141,21 +140,21 @@ fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
-    legalEntity.legalAddress = addressInputRequest.toAddressGate();
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity)
 
 
 
-    return legalEntity;
+    return legalEntity
 
 }
 fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
     return LegalEntityIdentifier(dto.value, dto.type,dto.issuingBody, legalEntity)
 }
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
-    return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity);
+    return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity)
 }
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
-    return Classification(dto.value,dto.code,dto.type,legalEntity);
+    return Classification(dto.value,dto.code,dto.type,legalEntity)
 }
 fun NameDto.toName(): Name{
     return Name(value, shortName)

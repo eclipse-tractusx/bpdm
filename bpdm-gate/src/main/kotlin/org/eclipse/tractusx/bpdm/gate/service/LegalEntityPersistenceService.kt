@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 
 @Service
 class LegalEntityPersistenceService(
@@ -43,9 +42,11 @@ class LegalEntityPersistenceService(
         legalEntities.forEach { legalEntity ->
             val fullLegalEntity = legalEntity.toLegalEntity()
             legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
+
                 updateLegalEntity(existingLegalEntity, fullLegalEntity)
                 gateLegalEntityRepository.save(existingLegalEntity)
             } ?: run {
+
                 gateLegalEntityRepository.save(fullLegalEntity)
             }
 
@@ -54,15 +55,16 @@ class LegalEntityPersistenceService(
 
 
     private fun updateLegalEntity(legalEntity: LegalEntity, legalEntityRequest:LegalEntity): LegalEntity {
-        legalEntity.bpn = legalEntityRequest.bpn.toString();
-        legalEntity.externalId = legalEntityRequest.externalId;
-        legalEntity.legalForm = legalEntityRequest.legalForm.toString();
-        legalEntity.legalName= legalEntityRequest.legalName;
-        legalEntity.identifiers.replace(legalEntityRequest.identifiers);
-        legalEntity.states.replace(legalEntityRequest.states);
+        legalEntity.bpn = legalEntityRequest.bpn
+        legalEntity.externalId = legalEntityRequest.externalId
+        legalEntity.legalForm = legalEntityRequest.legalForm
+        legalEntity.legalName= legalEntityRequest.legalName
+        legalEntity.identifiers.replace(legalEntityRequest.identifiers)
+        legalEntity.states.replace(legalEntityRequest.states)
         legalEntity.classifications.replace(legalEntityRequest.classifications)
-        legalEntity.legalAddress = legalEntityRequest.legalAddress;
-        return legalEntity;
+        legalEntity.legalAddress = legalEntityRequest.legalAddress
+        legalEntity.legalAddress.legalEntity= legalEntity
+        return legalEntity
     }
 
 }
