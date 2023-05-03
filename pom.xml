@@ -35,12 +35,13 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.5</version>
     </parent>
+
     <modules>
+        <module>bpdm-common</module>
         <module>bpdm-pool-api</module>
         <module>bpdm-pool</module>
-        <module>bpdm-gate</module>
-        <module>bpdm-common</module>
         <module>bpdm-gate-api</module>
+        <module>bpdm-gate</module>
     </modules>
 
     <properties>
@@ -60,7 +61,11 @@
         <sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
         <sonar.version>3.9.1.2184</sonar.version>
         <jacoco.version>0.8.7</jacoco.version>
+        <testcontainers.version>1.17.2</testcontainers.version>
+        <opensearch.version>2.5.0</opensearch.version>
+        <opensearch-java.version>2.0.0</opensearch-java.version>
     </properties>
+
     <pluginRepositories>
         <pluginRepository>
             <id>dash-licenses-snapshots</id>
@@ -140,6 +145,23 @@
                 <version>6.0.8</version>
             </dependency>
             <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-high-level-client</artifactId>
+                <version>${opensearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-client</artifactId>
+                <version>${opensearch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-java</artifactId>
+                <version>${opensearch-java.version}</version>
+            </dependency>
+
+            <!-- Test -->
+            <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock-jre8-standalone</artifactId>
                 <version>${wiremock.version}</version>
@@ -157,8 +179,16 @@
                 <version>${assertj.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
