@@ -48,7 +48,7 @@ class SitePersistenceService(
             //if (legalEntity.bpn == site.legalEntityExternalId) {
             val fullSite = site.toSiteGate() //TODO (Needs to receive an Legal Entity)
             siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
-                updateSite(existingSite, site)
+                updateSite(existingSite, fullSite)
                 siteRepository.save(existingSite)
             } ?: run {
                 siteRepository.save(fullSite)
@@ -59,15 +59,14 @@ class SitePersistenceService(
     }
 
 
-    private fun updateSite(site: Site, sitesRequest: SiteGateInputRequest) {
+    private fun updateSite(site: Site, updatedSite: Site) {
 
-        site.bpn = sitesRequest.bpn.toString()
-        site.name = sitesRequest.site.name
-        site.externalId = sitesRequest.externalId
-        site.legalEntityExternalId = sitesRequest.legalEntityExternalId
+        site.bpn = updatedSite.bpn
+        site.name = updatedSite.name
+        site.externalId = updatedSite.externalId
+        site.legalEntityExternalId = updatedSite.legalEntityExternalId
         //TODO (Needs LegalEntity Logic)
-
-        site.states.replace(sitesRequest.site.states.map { toEntityAddress(it, site) }.toSet())
+        site.states.replace(updatedSite.states)
 
     }
 
