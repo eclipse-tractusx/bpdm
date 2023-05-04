@@ -12,8 +12,8 @@ CREATE TABLE bpdmgate.legal_entities (
 	name_value varchar(255) NOT NULL,
 	CONSTRAINT legal_entities_pkey PRIMARY KEY (id),
 	CONSTRAINT uk_fn3cbtgn4mcc8qprvf6nc33rb UNIQUE (external_id),
-	CONSTRAINT uk_kr9fdq30p6pldlbqktqd6g58c UNIQUE (uuid),
-	CONSTRAINT uk_rs7me2py7dlci6yupo8bes1rc UNIQUE (bpn)
+	CONSTRAINT uk_kr9fdq30p6pldlbqktqd6g58c UNIQUE (uuid)
+
 );
 CREATE INDEX idxm9ojfna20safop6xndvj1510n ON bpdmgate.legal_entities USING btree (legal_form_id);
 
