@@ -20,16 +20,21 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.neovisionaries.i18n.CountryCode
+import com.neovisionaries.i18n.CountryCode.*
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
+import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -60,7 +65,9 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
 class MetadataControllerIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val webTestClient: WebTestClient,
-    private val identifierTypeRepository: IdentifierTypeRepository
+    private val identifierTypeRepository: IdentifierTypeRepository,
+    private val fieldQualityRuleRepository: FieldQualityRuleRepository,
+    val poolClient: PoolClientImpl
 ) {
     companion object {
 
@@ -340,5 +347,35 @@ class MetadataControllerIT @Autowired constructor(
         )
 
         assertThat(result.content).containsExactlyInAnyOrderElementsOf(expected)
+    }
+
+    @Test
+    fun `get field quality rules`() {
+
+        val rulePL1 = addressRuleMandatory(country = PL, field = "path1.field1")
+        val rulePL2 = addressRuleMandatory(country = PL, field = "path1.field2")
+        val ruleDE1 = addressRuleMandatory(country = DE, field = "path1.field1")
+        fieldQualityRuleRepository.saveAll(listOf(rulePL1, rulePL2, ruleDE1))
+
+        val resultPl = poolClient.metadata().getFieldQualityRules(PL).body
+        assertThat(resultPl?.size).isEqualTo(2)
+        assertThat(resultPl?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1", "path1.field2")
+
+        val resultDe = poolClient.metadata().getFieldQualityRules(DE).body
+        assertThat(resultDe?.size).isEqualTo(1)
+        assertThat(resultDe?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1")
+
+        val resultUs = poolClient.metadata().getFieldQualityRules(US).body
+        assertThat(resultUs?.size).isEqualTo(0)
+    }
+
+    private fun addressRuleMandatory(country: CountryCode, field: String): FieldQualityRule {
+        val rule = FieldQualityRule(
+            countryCode = country,
+            fieldPath = field,
+            schemaName = "address",
+            qualityLevel = QualityLevel.MANDATORY
+        )
+        return rule
     }
 }

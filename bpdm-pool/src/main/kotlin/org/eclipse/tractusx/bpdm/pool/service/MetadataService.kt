@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
@@ -30,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
 import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
+import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.springframework.data.domain.Pageable
@@ -44,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional
 class MetadataService(
     val identifierTypeRepository: IdentifierTypeRepository,
     val legalFormRepository: LegalFormRepository,
+    val fieldQualityRuleRepository: FieldQualityRuleRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -94,4 +97,18 @@ class MetadataService(
         val page = legalFormRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }
+
+    fun getFieldQualityRules(country: CountryCode): Collection<FieldQualityRuleDto> {
+
+        val rules = fieldQualityRuleRepository.findByCountryCode(country)
+        return rules.map { rule ->
+            FieldQualityRuleDto(
+                fieldPath = rule.fieldPath,
+                schemaName = rule.schemaName,
+                country = rule.countryCode,
+                qualityLevel = rule.qualityLevel
+            )
+        }
+    }
+
 }
