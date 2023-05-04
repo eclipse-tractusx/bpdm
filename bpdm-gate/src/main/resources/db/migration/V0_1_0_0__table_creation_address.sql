@@ -45,7 +45,7 @@ CREATE TABLE logistic_addresses (
   alt_street_number VARCHAR(255),
   alt_street_milestone VARCHAR(255),
   alt_street_name VARCHAR(255),
-  bpn VARCHAR(255) NOT NULL,
+  bpn VARCHAR(255) NULL,
   external_id VARCHAR(255) NOT NULL,
   legal_entity_external_id VARCHAR(255),
   NAME VARCHAR(255),
@@ -97,9 +97,6 @@ ADD CONSTRAINT uk_2hleh9jm9ef1eq6851bp30v1r UNIQUE (uuid);
 
 ALTER TABLE IF EXISTS logistic_addresses
 ADD CONSTRAINT uk_fbtqvm8vt1nx20nxlr0ixpsi8 UNIQUE (uuid);
-
-ALTER TABLE IF EXISTS logistic_addresses
-ADD CONSTRAINT uk_a2n9sw8djucdywjcnuvkpkssr UNIQUE (bpn);
 
 ALTER TABLE IF EXISTS logistic_addresses
 ADD CONSTRAINT uk_7xolefhhm30nlfrp5fc25a3i2 UNIQUE (external_id);

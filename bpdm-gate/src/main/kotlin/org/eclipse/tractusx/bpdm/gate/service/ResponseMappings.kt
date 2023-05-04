@@ -29,7 +29,7 @@ import org.springframework.data.domain.Page
 fun AddressGateInputRequest.toAddressGate(): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
-        bpn = bpn.toString(),
+        bpn = bpn,
         externalId = externalId,
         legalEntityExternalId = legalEntityExternalId.toString(),
         siteExternalId = siteExternalId.toString(),

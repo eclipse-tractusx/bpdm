@@ -31,8 +31,8 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 //    ]
 )
 class LogisticAddress(
-    @Column(name = "bpn", nullable = false, unique = true)
-    var bpn: String,
+    @Column(name = "bpn")
+    var bpn: String?,
 
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
