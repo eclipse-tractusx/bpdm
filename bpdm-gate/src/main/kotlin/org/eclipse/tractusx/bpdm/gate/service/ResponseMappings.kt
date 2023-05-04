@@ -160,9 +160,9 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalName = legalEntity.legalName.toName()
     )
 
-    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
-    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 
@@ -177,6 +177,7 @@ fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity):
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
     return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
+
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
 }
