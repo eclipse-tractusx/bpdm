@@ -35,13 +35,12 @@ class PoolClientImpl(
             .builder(WebClientAdapter.forClient(webClientProvider()))
             .customArgumentResolver(ParameterObjectArgumentResolver())
             .build()
-
     }
 
 
     private val poolClientAddress by lazy { httpServiceProxyFactory.createClient(PoolAddressApi::class.java) }
     private val poolClientBpn by lazy { httpServiceProxyFactory.createClient(PoolBpnApi::class.java) }
-    private val oolClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(PoolBusinessPartnerApi::class.java) }
+    private val poolClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(PoolBusinessPartnerApi::class.java) }
     private val poolClientLegalEntity by lazy { httpServiceProxyFactory.createClient(PoolLegalEntityApi::class.java) }
     private val poolClientMetadata by lazy { httpServiceProxyFactory.createClient(PoolMetadataApi::class.java) }
     private val poolClientSite by lazy { httpServiceProxyFactory.createClient(PoolSiteApi::class.java) }
@@ -53,7 +52,7 @@ class PoolClientImpl(
 
     override fun bpns() = poolClientBpn
 
-    override fun businessPartners() = oolClientBusinessPartner
+    override fun businessPartners() = poolClientBusinessPartner
 
     override fun legalEntities() = poolClientLegalEntity
 
