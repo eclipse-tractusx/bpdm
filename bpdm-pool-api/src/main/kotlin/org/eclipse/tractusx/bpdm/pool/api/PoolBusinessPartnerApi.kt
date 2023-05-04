@@ -26,12 +26,13 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import java.time.Instant
@@ -54,8 +55,8 @@ interface PoolBusinessPartnerApi  {
     @GetMapping("/changelog")
     @GetExchange("/changelog")
     fun getChangelogEntries(
-        @Parameter(description = "BPN values") bpn: Array<String>?,
-        @Parameter(description = "Modified after") modifiedAfter: Instant?,
+        @Parameter(description = "BPN values") @RequestParam(required = false) bpn: Array<String>?,
+        @Parameter(description = "Modified after") @RequestParam(required = false) modifiedAfter: Instant?,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse>
 }
