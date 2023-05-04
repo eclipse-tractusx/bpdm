@@ -24,5 +24,4 @@ target
 /charts/gate/charts
 /charts/gate/Chart.lock
 #Developer application properties
-/bpdm-pool/src/main/resources/application-developer.properties
-/bpdm-gate/src/main/resources/application-developer.properties
+application-developer.properties
