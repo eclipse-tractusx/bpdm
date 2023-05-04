@@ -42,7 +42,7 @@ class LegalEntityPersistenceService(
     fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         //finds Legal Entity by External ID
-        val legalEntityRecord = gateLegalEntityRepository.findDistinctByExternalIdIn(legalEntities.map { it.externalId })
+        val legalEntityRecord = gateLegalEntityRepository.findDistinctByBpnIn(legalEntities.map { it.externalId })
 
         //Business Partner persist
         legalEntities.forEach { legalEntity ->

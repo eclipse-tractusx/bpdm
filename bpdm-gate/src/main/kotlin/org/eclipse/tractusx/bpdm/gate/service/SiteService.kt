@@ -137,8 +137,8 @@ class SiteService(
      */
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        val sitesSaas = toSaasModels(sites)
-        saasClient.upsertSites(sitesSaas)
+//        val sitesSaas = toSaasModels(sites)
+//        saasClient.upsertSites(sitesSaas)
 
         sitePersistenceService.persistSitesBP(sites)
 
@@ -147,9 +147,9 @@ class SiteService(
             changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
         }
 
-        deleteParentRelationsOfSites(sites)
-
-        upsertParentRelations(sites)
+//        deleteParentRelationsOfSites(sites)
+//
+//        upsertParentRelations(sites)
     }
 
     /**

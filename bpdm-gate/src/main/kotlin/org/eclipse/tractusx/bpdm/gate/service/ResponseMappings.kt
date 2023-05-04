@@ -34,7 +34,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.entity.SiteState
 
-fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAddress {
+fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         bpn = bpn,
@@ -44,6 +44,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAd
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
+        site = site
     )
 
     logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
@@ -121,17 +122,24 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 }
 
 // Site Mappers
-fun SiteGateInputRequest.toSiteGate(): Site {
+fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
+
+    val addressInputRequest = AddressGateInputRequest(
+        address = site.mainAddress,
+        externalId = externalId + "_sites",
+        legalEntityExternalId = externalId,
+        bpn = bpn
+    )
 
     val site = Site(
-        bpn.toString(),
-        site.name,
-        externalId,
-        legalEntityExternalId
-        //TODO (Needs LegalEntity Logic)
+        bpn = bpn.toString(),
+        name = site.name,
+        externalId = externalId,
+        legalEntity = legalEntity
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
+    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site)
 
     return site
 }
@@ -147,13 +155,6 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
         createdAt
     )
 }
-fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
-
-    val addressInputRequest =AddressGateInputRequest(
-        address= legalEntity.legalAddress,
-        externalId= externalId+"_legalAddress",
-        legalEntityExternalId= externalId
-    )
 
 fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
@@ -174,7 +175,8 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
-    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity)
+
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 
     return legalEntity
 

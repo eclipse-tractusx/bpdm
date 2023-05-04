@@ -18,7 +18,6 @@ create table sites (
   uuid uuid not null,
   bpn varchar(255) not null,
   external_id varchar(255) not null,
-  legal_entity_external_id varchar(255),
   name varchar(255) not null,
   primary key (id)
 );

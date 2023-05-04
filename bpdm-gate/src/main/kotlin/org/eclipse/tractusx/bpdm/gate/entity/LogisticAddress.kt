@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
     name = "logistic_addresses",
     indexes = [
         Index(columnList = "legal_entity_id"),
-     //   Index(columnList = "site_id"),
+        Index(columnList = "site_id"),
     ]
 )
 class LogisticAddress(
@@ -44,9 +44,9 @@ class LogisticAddress(
     @JoinColumn(name = "legal_entity_id")
     var legalEntity: LegalEntity?,
 
-//    @ManyToOne
-//    @JoinColumn(name = "site_id")
-//    var site: Site?,
+    @ManyToOne
+    @JoinColumn(name = "site_id")
+    var site: Site?,
 
     @Column(name = "name")
     var name: String? = null,

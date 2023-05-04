@@ -19,9 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SitePersistenceService(
     private val siteRepository: SiteRepository,
-    //private val gateLegalEntityRepository: GateLegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository
 ) {
 
     @Transactional
@@ -45,8 +47,13 @@ class SitePersistenceService(
 
         // for (legalEntity in legalEntities) {
         sites.forEach { site ->
-            //if (legalEntity.bpn == site.legalEntityExternalId) {
-            val fullSite = site.toSiteGate() //TODO (Needs to receive an Legal Entity)
+
+            val legalEntityRecord =
+                site.legalEntityExternalId.let {
+                    legalEntityRepository.findByExternalId(site.legalEntityExternalId) ?: throw BpdmNotFoundException("Business Partner", it)
+                }
+
+            val fullSite = site.toSiteGate(legalEntityRecord) //TODO (Needs to receive an Legal Entity)
             siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
                 updateSite(existingSite, fullSite)
                 siteRepository.save(existingSite)
@@ -64,8 +71,7 @@ class SitePersistenceService(
         site.bpn = updatedSite.bpn
         site.name = updatedSite.name
         site.externalId = updatedSite.externalId
-        site.legalEntityExternalId = updatedSite.legalEntityExternalId
-        //TODO (Needs LegalEntity Logic)
+        site.legalEntity = updatedSite.legalEntity
         site.states.replace(updatedSite.states)
 
     }

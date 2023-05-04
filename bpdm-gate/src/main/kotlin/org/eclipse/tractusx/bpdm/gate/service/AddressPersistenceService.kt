@@ -26,11 +26,15 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.stereotype.Service
 
 @Service
-class AddressPersistenceService(private val gateAddressRepository: GateAddressRepository,
-                                private val legalEntityRepository: LegalEntityRepository) {
+class AddressPersistenceService(
+    private val gateAddressRepository: GateAddressRepository,
+    private val legalEntityRepository: LegalEntityRepository,
+    private val siteEntityRepository: SiteRepository
+) {
 
     @Transactional
     fun persistAddressBP(addresses: Collection<AddressGateInputRequest>) {
@@ -41,9 +45,11 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         val addressRecord = gateAddressRepository.findByExternalIdIn(externalIdColl)
 
         addresses.forEach { address ->
-            val legalEntityRecord = address.legalEntityExternalId?.let {legalEntityRepository.findByExternalId(it)?:throw BpdmNotFoundException("Business Partner", it)  }
+            val legalEntityRecord =
+                address.legalEntityExternalId?.let { legalEntityRepository.findByExternalId(it) ?: throw BpdmNotFoundException("Business Partner", it) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalId(it) ?: throw BpdmNotFoundException("Business Partner", it) }
 
-            val fullAddress = address.toAddressGate(legalEntityRecord)
+            val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord)
             addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
                 updateAddress(existingAddress, fullAddress)
                 gateAddressRepository.save(existingAddress)

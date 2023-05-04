@@ -27,4 +27,6 @@ interface SiteRepository : JpaRepository<Site, Long>, CrudRepository<Site, Long>
 
     fun findByExternalIdIn(externalId: Collection<String>): Set<Site>
 
+    fun findByExternalId(externalId: String): Site?
+
 }
