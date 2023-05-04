@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
@@ -30,9 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.Site
-import org.eclipse.tractusx.bpdm.gate.entity.SiteState
 
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
@@ -126,13 +122,12 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
 
     val addressInputRequest = AddressGateInputRequest(
         address = site.mainAddress,
-        externalId = externalId + "_sites",
-        legalEntityExternalId = externalId,
-        bpn = bpn
+        externalId = externalId + "_mainAddress",
+        legalEntityExternalId = externalId
     )
 
     val site = Site(
-        bpn = bpn.toString(),
+        bpn = bpn,
         name = site.name,
         externalId = externalId,
         legalEntity = legalEntity
