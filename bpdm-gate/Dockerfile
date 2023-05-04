@@ -6,8 +6,12 @@ RUN mvn -B -U clean package -pl bpdm-gate -am -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 COPY --from=build /home/app/bpdm-gate/target/bpdm-gate.jar /usr/local/lib/bpdm/app.jar
 RUN apk update && apk upgrade libssl3 libcrypto3
-RUN addgroup -S bpdm && adduser -S bpdm -G bpdm
-USER bpdm
+ARG USERNAME=bpdm
+ARG USERID=10001
+ARG GID=3000
+RUN addgroup -g $GID -S $USERNAME
+RUN adduser -u $USERID -S $USERNAME $USERNAME
+USER $USERNAME
 WORKDIR /usr/local/lib/bpdm
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
