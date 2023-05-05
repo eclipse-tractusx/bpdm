@@ -86,6 +86,7 @@ fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddr
         districtLevel1 = baseAddress.districtLevel1,
         districtLevel2 = baseAddress.districtLevel2,
         street = baseAddress.street?.toStreetEntity(),
+        companyPostCode = companyPostCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,

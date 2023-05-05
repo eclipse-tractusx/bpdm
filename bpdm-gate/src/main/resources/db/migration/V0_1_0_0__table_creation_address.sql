@@ -64,6 +64,7 @@ CREATE TABLE logistic_addresses (
   phy_longitude FLOAT4,
   phy_industrial_zone VARCHAR(255),
   phy_postcode VARCHAR(255),
+  phy_company_postcode VARCHAR(255),
   phy_street_direction VARCHAR(255),
   phy_street_number VARCHAR(255),
   phy_street_milestone VARCHAR(255),
