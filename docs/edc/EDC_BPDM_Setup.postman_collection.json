@@ -1,0 +1,661 @@
+{
+  "info": {
+    "_postman_id": "de00b289-a903-447c-a437-e79d5c37c6ea",
+    "name": "EDC BPDM Setup",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "1816771"
+  },
+  "item": [
+    {
+      "name": "Create Assets",
+      "item": [
+        {
+          "name": "GET Legal Entity Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"GET_BPL_INPUT\",\n            \"asset:prop:description\": \"GET Legal Entity Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/legal-entity-controller/getLegalEntities)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/legal-entities\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Site Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"GET_BPS_INPUT\",\n            \"asset:prop:description\": \"GET Site Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/site-controller/getSites)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/sites\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Addess Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"GET_BPA_INPUT\",\n            \"asset:prop:description\": \"GET Address Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/address-controller/getAddresses)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/addresses\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Legal Entity Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"PUT_BPL_INPUT\",\n            \"asset:prop:description\": \"PUT Legal Entity Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/legal-entity-controller/upsertLegalEntities)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/legal-entities\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"PUT\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Site Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"PUT_BPS_INPUT\",\n            \"asset:prop:description\": \"Upsert Site Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/site-controller/upsertSites)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/sites\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"PUT\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Address Input",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"PUT_BPA_INPUT\",\n            \"asset:prop:description\": \"Upsert Address Input ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/address-controller/upsertAddresses)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/addresses\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"PUT\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Legal Entity Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPL_VALID\",\n            \"asset:prop:description\": \"POST Legal Entity Validation ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/site-controller/validateSite)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/legal-entities/validation\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Site Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPS_VALID\",\n            \"asset:prop:description\": \"POST Site Validation ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/site-controller/validateSite)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/sites/validation\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Address Validation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPA_VALID\",\n            \"asset:prop:description\": \"POST Address Validation ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/address-controller/validateSite_1)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/input/addresses/validation\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Legal Entity Output Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPL_OUT\",\n            \"asset:prop:description\": \"POST Legal Entity Output Search ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/legal-entity-controller/getLegalEntitiesOutput)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/output/legal-entities/search\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Site Output Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPS_OUT\",\n            \"asset:prop:description\": \"POST Site Output Search ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/site-controller/getSitesOutput)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/output/sites/search\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Address Output Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BPA_OUT\",\n            \"asset:prop:description\": \"POST Address Output Search ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/address-controller/getAddressesOutput)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/output/addresses/search\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\",\n            \"proxyQueryParams\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Business Partner Type Match",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"asset\": {\n        \"properties\": {\n            \"asset:prop:id\": \"POST_BP_TYPE_MATCH\",\n            \"asset:prop:description\": \"POST Business Partner Type Analysis ({{BPDM_GATE_URL}}/ui/swagger-ui/index.html#/business-partner-controller/determineLsaType)\",\n            \"asset:prop:company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"properties\": {\n            \"type\": \"HttpData\",\n            \"baseUrl\": \"{{BPDM_GATE_URL}}/api/catena/business-partners/type-match\",\n            \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n            \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n            \"oauth2:clientSecret\": \"{{ASSET_CLIENT_SECRET}}\",\n            \"method\": \"POST\",\n            \"proxyBody\": \"true\"\n        }\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{EDC_MANAGEMENT_URL}}/data/assets",
+              "host": [
+                "{{EDC_MANAGEMENT_URL}}"
+              ],
+              "path": [
+                "data",
+                "assets"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Policy",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"MEMBER_BPN_ACCESS\",\n    \"policy\": {\n        \"prohibitions\": [],\n        \"obligations\": [],\n        \"permissions\": [\n            {\n                \"edctype\": \"dataspaceconnector:permission\",\n                \"action\": {\n                    \"type\": \"USE\"\n                },\n                \"constraints\": [\n                    {\n                        \"edctype\": \"AtomicConstraint\",\n                        \"leftExpression\": {\n                            \"edctype\": \"dataspaceconnector:literalexpression\",\n                            \"value\": \"BusinessPartnerNumber\"\n                        },\n                        \"rightExpression\": {\n                            \"edctype\": \"dataspaceconnector:literalexpression\",\n                            \"value\": \"{{POLICY_BPN}}\"\n                        },\n                        \"operator\": \"EQ\"\n                    }\n                ]\n            }\n        ]\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{PROVIDER_DATAMGMT_URL}}/data/policydefinitions",
+          "host": [
+            "{{PROVIDER_DATAMGMT_URL}}"
+          ],
+          "path": [
+            "data",
+            "policydefinitions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Contract Definition",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"MEMBER_BPN_ACCESS_{{COMPANY_ID}}\",\n    \"criteria\": [\n        {\n            \"operandLeft\": \"asset:prop:company\",\n            \"operator\": \"=\",\n            \"operandRight\": \"{{COMPANY_ID}}\"\n        }\n    ],\n    \"accessPolicyId\": \"MEMBER_BPN_ACCESS\",\n    \"contractPolicyId\": \"MEMBER_BPN_ACCESS\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{PROVIDER_DATAMGMT_URL}}/data/contractdefinitions",
+          "host": [
+            "{{PROVIDER_DATAMGMT_URL}}"
+          ],
+          "path": [
+            "data",
+            "contractdefinitions"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "{{EDC_API_KEY}}",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "X-Api-Key",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "ASSET_CLIENT_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ASSET_CLIENT_SECRET",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ASSET_TOKEN_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "EDC_MANAGEMENT_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "BPDM_GATE_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "COMPANY_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "EDC_API_KEY",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
