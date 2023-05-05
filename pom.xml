@@ -33,7 +33,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.5</version>
+        <version>3.0.6</version>
     </parent>
     <modules>
         <module>bpdm-pool-api</module>
@@ -115,29 +115,17 @@
                 <artifactId>springdoc-openapi-starter-common</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-            <!-- Kotlin wrapper for slf4j (Logging)-->
-            <dependency>
-                <groupId>io.github.microutils</groupId>
-                <artifactId>kotlin-logging-jvm</artifactId>
-                <version>${kotlinlogging.version}</version>
-            </dependency>
             <!-- Override snakeyaml version used by transitive dependencies due to security issue -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>2.0</version>
             </dependency>
-            <!-- Override spring expression version used by transitive dependencies due to security issue -->
+            <!-- Kotlin wrapper for slf4j (Logging)-->
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-expression</artifactId>
-                <version>6.0.8</version>
-            </dependency>
-            <!-- Override spring core version used by transitive dependencies due to security issue -->
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>6.0.8</version>
+                <groupId>io.github.microutils</groupId>
+                <artifactId>kotlin-logging-jvm</artifactId>
+                <version>${kotlinlogging.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tomakehurst</groupId>
