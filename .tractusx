@@ -1,0 +1,4 @@
+product: "BPDM"
+leadingRepository: "https://github.com/eclipse-tractusx/bpdm"
+  - name: "BPDM"
+    usage: "Mono-Repository for the Business Partner Data Management services"
