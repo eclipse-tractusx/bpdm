@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
 import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springframework.http.HttpStatus
@@ -42,9 +43,9 @@ class SiteController(
 ) : GateSiteApi {
 
     override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
-//        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
-//            return ResponseEntity(HttpStatus.BAD_REQUEST)
-//        }
+        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
         siteService.upsertSites(sites)
         return ResponseEntity(HttpStatus.OK)
     }
