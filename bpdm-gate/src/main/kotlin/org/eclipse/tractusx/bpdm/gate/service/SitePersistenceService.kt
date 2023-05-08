@@ -22,7 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.stereotype.Service
@@ -31,21 +32,18 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SitePersistenceService(
     private val siteRepository: SiteRepository,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
+    private val addressRepository: GateAddressRepository
 ) {
 
     @Transactional
     fun persistSitesBP(sites: Collection<SiteGateInputRequest>) {
-
-        //finds Legal Entity by External ID
-        //val legalEntities = gateLegalEntityRepository.findDistinctByBpnIn(sites.map { it.legalEntityExternalId })
 
         //Finds Site in DB
         val externalIdColl: MutableCollection<String> = mutableListOf()
         sites.forEach { externalIdColl.add(it.externalId) }
         val siteRecord = siteRepository.findByExternalIdIn(externalIdColl)
 
-        // for (legalEntity in legalEntities) {
         sites.forEach { site ->
 
             val legalEntityRecord =
@@ -53,16 +51,21 @@ class SitePersistenceService(
                     legalEntityRepository.findByExternalId(site.legalEntityExternalId) ?: throw BpdmNotFoundException("Business Partner", it)
                 }
 
-            val fullSite = site.toSiteGate(legalEntityRecord) //TODO (Needs to receive an Legal Entity)
+            val fullSite = site.toSiteGate(legalEntityRecord)
+
             siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
+
+                val logisticAddressRecord =
+                    addressRepository.findByExternalId(site.externalId + "_site") ?: throw BpdmNotFoundException("Business Partner", "Error")
+
+                updateAddress(logisticAddressRecord, fullSite.mainAddress)
+
                 updateSite(existingSite, fullSite)
                 siteRepository.save(existingSite)
             } ?: run {
                 siteRepository.save(fullSite)
             }
-            //}
         }
-        //}
     }
 
 
@@ -72,8 +75,35 @@ class SitePersistenceService(
         site.name = updatedSite.name
         site.externalId = updatedSite.externalId
         site.legalEntity = updatedSite.legalEntity
-        site.states.replace(updatedSite.states)
+        site.states.replace(updatedSite.states.map { toEntityAddress(it, site) })
 
+    }
+
+    fun toEntityAddress(dto: SiteState, site: Site): SiteState {
+        return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
+    }
+
+    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
+
+        address.name = changeAddress.name
+        address.bpn = changeAddress.bpn
+        address.externalId = changeAddress.externalId
+        address.legalEntity = changeAddress.legalEntity
+        address.siteExternalId = changeAddress.siteExternalId
+        address.physicalPostalAddress = changeAddress.physicalPostalAddress
+        address.alternativePostalAddress = changeAddress.alternativePostalAddress
+
+        address.identifiers.replace(changeAddress.identifiers.map { toEntityIdentifier(it, address) })
+        address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
+
+    }
+
+    fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
+        return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
+    }
+
+    fun toEntityIdentifier(dto: AddressIdentifier, address: LogisticAddress): AddressIdentifier {
+        return AddressIdentifier(dto.value, dto.type, address)
     }
 
 }

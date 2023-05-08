@@ -122,7 +122,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
 
     val addressInputRequest = AddressGateInputRequest(
         address = site.mainAddress,
-        externalId = externalId + "_mainAddress",
+        externalId = externalId + "_site",
         legalEntityExternalId = externalId
     )
 

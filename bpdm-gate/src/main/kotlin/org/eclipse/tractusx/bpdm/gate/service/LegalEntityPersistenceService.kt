@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.AddressState
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,20 +43,21 @@ class LegalEntityPersistenceService(
     fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         //finds Legal Entity by External ID
-        val legalEntityRecord = gateLegalEntityRepository.findDistinctByBpnIn(legalEntities.map { it.externalId })
+        val legalEntityRecord = gateLegalEntityRepository.findDistinctByExternalIdIn(legalEntities.map { it.externalId })
 
         //Business Partner persist
         legalEntities.forEach { legalEntity ->
             val fullLegalEntity = legalEntity.toLegalEntity()
             legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
 
-val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
+                val logisticAddressRecord = gateAddressRepository.findByExternalId(existingLegalEntity.externalId + "_legalAddress")
                     ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
 
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
                 gateLegalEntityRepository.save(existingLegalEntity)
+
             } ?: run {
 
                 gateLegalEntityRepository.save(fullLegalEntity)
@@ -76,7 +78,6 @@ val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddres
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity
-
         return legalEntity
     }
 

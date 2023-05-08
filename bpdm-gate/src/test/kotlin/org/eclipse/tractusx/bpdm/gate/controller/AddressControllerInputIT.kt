@@ -547,6 +547,14 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+        )
+
+        val sites = listOf(
+            RequestValues.siteGateInputRequest1,
+        )
+
         val parentLegalEntitiesSaas = listOf(
             SaasValues.legalEntityResponse1
         )
