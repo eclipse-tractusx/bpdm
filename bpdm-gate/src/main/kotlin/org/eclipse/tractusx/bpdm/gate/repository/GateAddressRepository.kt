@@ -27,4 +27,6 @@ interface GateAddressRepository : JpaRepository<LogisticAddress, Long>, CrudRepo
 
     fun findByExternalIdIn(externalId: Collection<String>): Set<LogisticAddress>
 
+    fun findByExternalId(externalId: String): LogisticAddress?
+
 }
