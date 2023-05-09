@@ -122,7 +122,8 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
         createdAt
     )
 }
-fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
+
+fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
     val addressInputRequest =AddressGateInputRequest(
         address= legalEntity.legalAddress,
@@ -137,12 +138,11 @@ fun LegalEntityGateInputRequest.toLegalEntity():LegalEntity{
         legalForm = legalEntity.legalForm,
         legalName = legalEntity.legalName.toName()
     )
+
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity)
-
-
 
     return legalEntity
 

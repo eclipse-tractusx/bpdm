@@ -50,7 +50,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
-import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
@@ -77,8 +76,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 internal class AddressControllerInputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val saasConfigProperties: SaasConfigProperties,
-    val gateClient: GateClient,
-    private val gateAddressRepository: GateAddressRepository
+    val gateClient: GateClient
 ) {
     companion object {
         @RegisterExtension

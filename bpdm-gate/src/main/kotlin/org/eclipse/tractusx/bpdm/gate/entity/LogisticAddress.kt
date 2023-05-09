@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 @Entity
 @Table(
     name = "logistic_addresses",
-//    indexes = [
-//        Index(columnList = "legal_entity_id"),
-//        Index(columnList = "site_id"),
-//    ]
+    indexes = [
+        Index(columnList = "legal_entity_id"),
+     //   Index(columnList = "site_id"),
+    ]
 )
 class LogisticAddress(
     @Column(name = "bpn")

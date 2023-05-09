@@ -51,15 +51,14 @@ class LegalEntityService(
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-
-       // val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
-       // saasClient.upsertLegalEntities(legalEntitiesSaas)
+        val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
+        saasClient.upsertLegalEntities(legalEntitiesSaas)
 
         // create changelog entry if all goes well from saasClient
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
-        legalEntityPersistenceService.persistLegalEntytiesBP(legalEntities);
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities);
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
