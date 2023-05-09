@@ -25,6 +25,11 @@ import org.springframework.data.repository.CrudRepository
 
 interface FieldQualityRuleRepository : CrudRepository<FieldQualityRule, Long> {
 
-    fun findByCountryCode(countryCode: CountryCode): List<FieldQualityRule>
+    fun findByCountryCodeOrderBySchemaNameAscFieldPathAsc(countryCode: CountryCode): List<FieldQualityRule>
+
+    /**
+     * Find country independent default rules
+     */
+    fun findByCountryCodeIsNullOrderBySchemaNameAscFieldPathAsc(): List<FieldQualityRule>
 
 }

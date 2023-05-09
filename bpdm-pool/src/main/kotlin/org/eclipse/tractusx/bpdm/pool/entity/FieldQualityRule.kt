@@ -36,7 +36,7 @@ class FieldQualityRule(
 
     @Column(name = "country_code", nullable = false)
     @Enumerated(EnumType.STRING)
-    var countryCode: CountryCode,
+    var countryCode: CountryCode?,
 
     @Column(name = "schema_name", nullable = false)
     var schemaName: String,

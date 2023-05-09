@@ -369,12 +369,59 @@ class MetadataControllerIT @Autowired constructor(
         assertThat(resultUs?.size).isEqualTo(0)
     }
 
-    private fun addressRuleMandatory(country: CountryCode, field: String): FieldQualityRule {
+    @Test
+    fun `check merge field quality rules `() {
+
+        val ruleDefault1 = addressRuleMandatory(null, field = "path1.field1")
+        val ruleDefault2 = addressRuleMandatory(null, field = "path1.field2")
+        val ruleDefault3 = addressRuleOptional(null, field = "path1.field3")
+        val ruleDefault4 = addressRuleOptional(null, field = "path1.field4")
+
+        val rulePL1 = addressRuleOptional(country = PL, field = "path1.field1")
+        val rulePL2 = addressRuleForbidden(country = PL, field = "path1.field4")
+        val ruleDE1 = addressRuleMandatory(country = DE, field = "path1.field1")
+        fieldQualityRuleRepository.saveAll(listOf(ruleDefault1, ruleDefault2, ruleDefault3, ruleDefault4, rulePL1, rulePL2, ruleDE1))
+
+        val resultPl = poolClient.metadata().getFieldQualityRules(PL).body
+        assertThat(resultPl?.size).isEqualTo(3)
+        assertThat(resultPl?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1", "path1.field2", "path1.field3")
+        assertThat(resultPl?.filter { it.fieldPath == "path1.field1" }?.map { it.qualityLevel }).describedAs("PL optional overwrites default mandatory")
+            .containsExactlyInAnyOrder(QualityLevel.OPTIONAL)
+        assertThat(resultPl?.filter { it.fieldPath == "path1.field2" }?.map { it.qualityLevel }).describedAs("no PL rule use default mandatory")
+            .containsExactlyInAnyOrder(QualityLevel.MANDATORY)
+        assertThat(resultPl?.filter { it.fieldPath == "path1.field3" }?.map { it.qualityLevel }).describedAs("no PL rule use default optional")
+            .containsExactlyInAnyOrder(QualityLevel.OPTIONAL)
+        assertThat(resultPl?.filter { it.fieldPath == "path1.field4" }).describedAs("PL rule forbidden overwrites default")
+            .isEmpty()
+    }
+
+
+    private fun addressRuleMandatory(country: CountryCode?, field: String): FieldQualityRule {
         val rule = FieldQualityRule(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
             qualityLevel = QualityLevel.MANDATORY
+        )
+        return rule
+    }
+
+    private fun addressRuleForbidden(country: CountryCode?, field: String): FieldQualityRule {
+        val rule = FieldQualityRule(
+            countryCode = country,
+            fieldPath = field,
+            schemaName = "address",
+            qualityLevel = QualityLevel.FORBIDDEN
+        )
+        return rule
+    }
+
+    private fun addressRuleOptional(country: CountryCode?, field: String): FieldQualityRule {
+        val rule = FieldQualityRule(
+            countryCode = country,
+            fieldPath = field,
+            schemaName = "address",
+            qualityLevel = QualityLevel.OPTIONAL
         )
         return rule
     }
