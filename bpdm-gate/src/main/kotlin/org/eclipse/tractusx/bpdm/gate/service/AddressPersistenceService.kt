@@ -40,7 +40,7 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         addresses.forEach { address ->
             val fullAddress = address.toAddressGate()
             addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
-                updateAddress(existingAddress, fullAddress)
+                updateAddress(existingAddress, address)
                 gateAddressRepository.save(existingAddress)
             } ?: run {
                 gateAddressRepository.save(fullAddress)
@@ -48,18 +48,18 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         }
     }
 
-    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
+    private fun updateAddress(address: LogisticAddress, addressRequest: AddressGateInputRequest) {
 
-        address.name = changeAddress.name
-        address.bpn = changeAddress.bpn
-        address.externalId = changeAddress.externalId
-        address.legalEntityExternalId = changeAddress.legalEntityExternalId
-        address.siteExternalId = changeAddress.siteExternalId
-        address.physicalPostalAddress = changeAddress.physicalPostalAddress
-        address.alternativePostalAddress = changeAddress.alternativePostalAddress
+        address.name = addressRequest.address.name
+        address.bpn = addressRequest.bpn.toString()
+        address.externalId = addressRequest.externalId
+        address.legalEntityExternalId = addressRequest.legalEntityExternalId.toString()
+        address.siteExternalId = addressRequest.siteExternalId.toString()
+        address.physicalPostalAddress = addressRequest.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
+        address.alternativePostalAddress = addressRequest.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
-        address.identifiers.replace(changeAddress.identifiers)
-        address.states.replace(changeAddress.states)
+        address.identifiers.replace(addressRequest.address.identifiers.map { toEntityIdentifier(it, address) }.toSet())
+        address.states.replace(addressRequest.address.states.map { toEntityAddress(it, address) }.toSet())
 
     }
 
