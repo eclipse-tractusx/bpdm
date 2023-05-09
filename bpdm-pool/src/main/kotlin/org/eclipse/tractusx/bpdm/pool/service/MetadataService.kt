@@ -142,10 +142,10 @@ class MetadataService(
     private fun mergeRules(defaultRule: FieldQualityRule?, countryRule: FieldQualityRule?): FieldQualityRule? {
 
         if (countryRule == null) {
-            return defaultRule;
+            return defaultRule
         }
 
-        return countryRule;
+        return countryRule
     }
 
 }
