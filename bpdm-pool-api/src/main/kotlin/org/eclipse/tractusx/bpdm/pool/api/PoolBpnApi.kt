@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api
 
 
-
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -34,9 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@RequestMapping("/api/catena/bpn")
+@RequestMapping("/api/catena/bpn", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/bpn")
-interface PoolBpnApi  {
+interface PoolBpnApi {
 
     @Operation(
         summary = "Find business partner numbers by identifiers",

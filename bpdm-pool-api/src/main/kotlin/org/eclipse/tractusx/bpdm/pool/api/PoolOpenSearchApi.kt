@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.api
 
 
-
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -36,9 +36,9 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
 
-@RequestMapping("/api/opensearch")
+@RequestMapping("/api/opensearch", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/opensearch")
-interface PoolOpenSearchApi  {
+interface PoolOpenSearchApi {
 
     @Operation(
         summary = "Index new business partner records on OpenSearch",
@@ -54,6 +54,7 @@ interface PoolOpenSearchApi  {
     @PostMapping("/business-partner")
     @PostExchange("/business-partner")
     fun export(): SyncResponse
+
     @Operation(
         summary = "Fetch information about the latest OpenSearch export",
         description = "Fetch information about the latest export (either ongoing or already finished)"

@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.api
 
 
-
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -36,15 +35,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@RequestMapping("/api/catena/sites")
+@RequestMapping("/api/catena/sites", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/sites")
-interface PoolSiteApi  {
+interface PoolSiteApi {
 
 
     @Operation(
@@ -57,7 +57,7 @@ interface PoolSiteApi  {
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
         ]
     )
-    @PostMapping("/main-addresses/search")
+    @PostMapping("/main-addresses/search", produces = ["application/json"])
     @PostExchange("/main-addresses/search")
     fun searchMainAddresses(
         @RequestBody
@@ -115,7 +115,7 @@ interface PoolSiteApi  {
     fun createSite(
         @RequestBody
         requests: Collection<SitePartnerCreateRequest>
-    ) : SitePartnerCreateResponseWrapper
+    ): SitePartnerCreateResponseWrapper
 
     @Operation(
         summary = "Update existing site business partners",
