@@ -27,8 +27,8 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 interface ErrorCode
 
-@Schema(description = "BusinessPartnerOutputError")
-enum class BusinessPartnerOutputError : ErrorCode {
+@Schema(description = "BusinessPartnerSharingError")
+enum class BusinessPartnerSharingError : ErrorCode {
     SharingProcessError,
     SharingTimeout,
     BpnNotInPool,

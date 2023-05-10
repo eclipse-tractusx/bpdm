@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 
 @Schema(description = "Paginated collection of results")
 data class PageOutputResponse<T>(
@@ -35,5 +35,5 @@ data class PageOutputResponse<T>(
     @Schema(description = "External ids of the entries which are still pending")
     val pending: Collection<String>,
     @Schema(description = "Infos about the entries with errors")
-    val errors: Collection<ErrorInfo<BusinessPartnerOutputError>>,
+    val errors: Collection<ErrorInfo<BusinessPartnerSharingError>>,
 )

@@ -27,7 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
@@ -82,8 +82,16 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             ResponseValues.legalEntityGateOutput2
         )
         val expectedErrors = listOf(
-            ErrorInfo(BusinessPartnerOutputError.BpnNotInPool, "BPNL0000000002XY not found in pool", SaasValues.legalEntityAugmentedNotInPoolResponse.externalId),
-            ErrorInfo(BusinessPartnerOutputError.SharingProcessError, "SaaS sharing process error: Error message", SaasValues.legalEntityAugmentedSharingErrorResponse.externalId),
+            ErrorInfo(
+                BusinessPartnerSharingError.BpnNotInPool,
+                "BPNL0000000002XY not found in pool",
+                SaasValues.legalEntityAugmentedNotInPoolResponse.externalId
+            ),
+            ErrorInfo(
+                BusinessPartnerSharingError.SharingProcessError,
+                "SaaS sharing process error: Error message",
+                SaasValues.legalEntityAugmentedSharingErrorResponse.externalId
+            ),
         )
         val expectedPending = listOf(SaasValues.legalEntityAugmentedPendingResponse.externalId!!)
 

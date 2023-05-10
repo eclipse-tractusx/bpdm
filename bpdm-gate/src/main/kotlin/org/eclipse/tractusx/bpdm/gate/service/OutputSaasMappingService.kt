@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.SharingStatusSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.isError
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.filterNotNullKeys
@@ -68,7 +68,7 @@ class OutputSaasMappingService(
 
         /// We sort all the entries in one of 3 buckets: valid content, errors or still pending
         val validExternalIds = mutableListOf<String>()
-        val errors = mutableListOf<ErrorInfo<BusinessPartnerOutputError>>()
+        val errors = mutableListOf<ErrorInfo<BusinessPartnerSharingError>>()
         val pendingExternalIds = mutableListOf<String>()
 
         partnersWithExternalId.forEach { partnerWithId ->
@@ -133,27 +133,27 @@ class OutputSaasMappingService(
     fun isSharingTimeoutReached(partner: BusinessPartnerSaas) =
         partner.lastModifiedAt?.isBefore(LocalDateTime.now().minus(saasConfigProperties.sharingTimeout)) ?: true
 
-    fun buildErrorInfoSharingProcessError(externalId: String, sharingStatus: SharingStatusSaas?): ErrorInfo<BusinessPartnerOutputError> {
+    fun buildErrorInfoSharingProcessError(externalId: String, sharingStatus: SharingStatusSaas?): ErrorInfo<BusinessPartnerSharingError> {
         val message =
             if (sharingStatus == null) "No SaaS sharing status available"
             else "SaaS sharing process error: ${sharingStatus.description}"
         return ErrorInfo(
-            errorCode = BusinessPartnerOutputError.SharingProcessError,
+            errorCode = BusinessPartnerSharingError.SharingProcessError,
             message = message,
             entityKey = externalId
         )
     }
 
-    fun buildErrorInfoBpnNotInPool(externalId: String, bpn: String): ErrorInfo<BusinessPartnerOutputError> =
+    fun buildErrorInfoBpnNotInPool(externalId: String, bpn: String): ErrorInfo<BusinessPartnerSharingError> =
         ErrorInfo(
-            errorCode = BusinessPartnerOutputError.BpnNotInPool,
+            errorCode = BusinessPartnerSharingError.BpnNotInPool,
             message = "$bpn not found in pool",
             entityKey = externalId
         )
 
-    fun buildErrorInfoSharingTimeout(externalId: String, lastModifiedAt: LocalDateTime?): ErrorInfo<BusinessPartnerOutputError> =
+    fun buildErrorInfoSharingTimeout(externalId: String, lastModifiedAt: LocalDateTime?): ErrorInfo<BusinessPartnerSharingError> =
         ErrorInfo(
-            errorCode = BusinessPartnerOutputError.SharingTimeout,
+            errorCode = BusinessPartnerSharingError.SharingTimeout,
             message = "SaaS sharing timeout: Last modified ${lastModifiedAt}",
             entityKey = externalId
         )
