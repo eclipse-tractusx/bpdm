@@ -33,4 +33,6 @@ interface GateClient {
 
     fun changelog(): GateChangelogApi
 
+    fun sharingState(): GateSharingStateApi
+
 }

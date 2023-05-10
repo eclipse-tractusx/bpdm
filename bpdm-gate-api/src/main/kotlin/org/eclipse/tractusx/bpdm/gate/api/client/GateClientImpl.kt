@@ -41,6 +41,7 @@ class GateClientImpl(
     private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateLegalEntityApi::class.java) }
     private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateSiteApi::class.java) }
     private val gateClientChangelog by lazy { httpServiceProxyFactory.createClient(GateChangelogApi::class.java) }
+    private val gateClientSharingState by lazy { httpServiceProxyFactory.createClient(GateSharingStateApi::class.java) }
 
     override fun addresses() = gateClientAddress
 
@@ -52,6 +53,7 @@ class GateClientImpl(
 
     override fun changelog() = gateClientChangelog
 
+    override fun sharingState() = gateClientSharingState
 
 }
 
