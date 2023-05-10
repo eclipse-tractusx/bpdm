@@ -67,7 +67,9 @@ class LegalEntityPersistenceService(
     }
 
     private fun updateLegalEntity(
-        legalEntity: LegalEntity, legalEntityRequest: LegalEntityGateInputRequest, logisticAddressRecord: LogisticAddress
+        legalEntity: LegalEntity,
+        legalEntityRequest: LegalEntityGateInputRequest,
+        logisticAddressRecord: LogisticAddress
     ): LegalEntity {
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId

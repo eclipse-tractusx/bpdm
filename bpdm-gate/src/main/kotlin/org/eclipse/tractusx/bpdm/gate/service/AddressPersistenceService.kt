@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.gate.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.AddressIdentifier
-import org.eclipse.tractusx.bpdm.gate.entity.AddressState
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
@@ -56,7 +56,7 @@ class AddressPersistenceService(
 
             val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord)
             addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
-                updateAddress(existingAddress, fullAddress)
+                updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
                 gateAddressRepository.save(existingAddress)
             } ?: run {
                 gateAddressRepository.save(fullAddress)
@@ -64,27 +64,20 @@ class AddressPersistenceService(
         }
     }
 
-    private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
+    private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
 
-        address.name = changeAddress.name
+        address.name = changeAddress.address.name
         address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
-        address.legalEntity = changeAddress.legalEntity
-        address.siteExternalId = changeAddress.siteExternalId
-        address.physicalPostalAddress = changeAddress.physicalPostalAddress
-        address.alternativePostalAddress = changeAddress.alternativePostalAddress
+        address.legalEntity = legalEntityRecord
+        address.site = siteRecord
+        address.siteExternalId = changeAddress.siteExternalId.toString()
+        address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
+        address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
-        address.identifiers.replace(changeAddress.identifiers.map { toEntityIdentifier(it, address) })
-        address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
+        address.identifiers.replace(changeAddress.address.identifiers.map { toEntityIdentifier(it, address) })
+        address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
 
-    }
-
-    fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
-        return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
-    }
-
-    fun toEntityIdentifier(dto: AddressIdentifier, address: LogisticAddress): AddressIdentifier {
-        return AddressIdentifier(dto.value, dto.type, address)
     }
 
 }

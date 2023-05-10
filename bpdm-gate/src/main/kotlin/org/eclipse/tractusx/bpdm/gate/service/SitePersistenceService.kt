@@ -60,7 +60,8 @@ class SitePersistenceService(
 
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
 
-                updateSite(existingSite, fullSite)
+                updateSite(existingSite, site, legalEntityRecord)
+
                 siteRepository.save(existingSite)
             } ?: run {
                 siteRepository.save(fullSite)
@@ -68,19 +69,14 @@ class SitePersistenceService(
         }
     }
 
-
-    private fun updateSite(site: Site, updatedSite: Site) {
+    private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
 
         site.bpn = updatedSite.bpn
-        site.name = updatedSite.name
+        site.name = updatedSite.site.name
         site.externalId = updatedSite.externalId
-        site.legalEntity = updatedSite.legalEntity
-        site.states.replace(updatedSite.states.map { toEntityAddress(it, site) })
+        site.legalEntity = legalEntityRecord
+        site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
 
-    }
-
-    fun toEntityAddress(dto: SiteState, site: Site): SiteState {
-        return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
     }
 
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
