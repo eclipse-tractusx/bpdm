@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
@@ -27,10 +28,14 @@ import java.time.Instant
 @Schema(name = "LogisticAddressResponse", description = "Logistic address ")
 data class LogisticAddressResponse(
     @Schema(description = "Business Partner Number of this address")
+    @JsonProperty("bpn")
     val bpn: String,
 
-    @Schema(description = "Name of the logistic address of the business partner. This is not according to official\n" +
-            "registers but according to the name the uploading sharing member chooses.")
+    @Schema(
+        description = "Name of the logistic address of the business partner. This is not according to official\n" +
+                "registers but according to the name the uploading sharing member chooses."
+    )
+    @JsonProperty("name")
     val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Address status"))
@@ -46,20 +51,26 @@ data class LogisticAddressResponse(
     val alternativePostalAddress: AlternativePostalAddressResponse? = null,
 
     @Schema(description = "BPN of the related legal entity, if available")
+    @JsonProperty("bpnLegalEntity")
     val bpnLegalEntity: String?,
 
     @Schema(description = "Flag if this is the legal address of its related legal entity")
+    @get:JsonProperty("isLegalAddress")
     val isLegalAddress: Boolean = false,
 
     @Schema(description = "BPN of the related site, if available")
+    @JsonProperty("bpnSite")
     val bpnSite: String?,
 
     @Schema(description = "Flag if this is the main address of its related site")
+    @get:JsonProperty("isMainAddress")
     val isMainAddress: Boolean = false,
 
     @Schema(description = "The timestamp the business partner data was created")
+    @JsonProperty("createdAt")
     val createdAt: Instant,
 
     @Schema(description = "The timestamp the business partner data was last updated")
+    @JsonProperty("updatedAt")
     val updatedAt: Instant
 )
