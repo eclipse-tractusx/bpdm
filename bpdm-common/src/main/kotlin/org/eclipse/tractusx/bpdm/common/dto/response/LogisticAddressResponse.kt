@@ -27,15 +27,14 @@ import java.time.Instant
 
 @Schema(name = "LogisticAddressResponse", description = "Logistic address ")
 data class LogisticAddressResponse(
-    @Schema(description = "Business Partner Number of this address")
-    @JsonProperty("bpn")
+
+    @get:Schema(description = "Business Partner Number of this address")
     val bpn: String,
 
-    @Schema(
+    @get:Schema(
         description = "Name of the logistic address of the business partner. This is not according to official\n" +
                 "registers but according to the name the uploading sharing member chooses."
     )
-    @JsonProperty("name")
     val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Address status"))
@@ -50,27 +49,23 @@ data class LogisticAddressResponse(
     @Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressResponse? = null,
 
-    @Schema(description = "BPN of the related legal entity, if available")
-    @JsonProperty("bpnLegalEntity")
+    @get:Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,
 
-    @Schema(description = "Flag if this is the legal address of its related legal entity")
+    @get:Schema(description = "Flag if this is the legal address of its related legal entity")
     @get:JsonProperty("isLegalAddress")
     val isLegalAddress: Boolean = false,
 
-    @Schema(description = "BPN of the related site, if available")
-    @JsonProperty("bpnSite")
+    @get:Schema(description = "BPN of the related site, if available")
     val bpnSite: String?,
 
-    @Schema(description = "Flag if this is the main address of its related site")
+    @get:Schema(description = "Flag if this is the main address of its related site")
     @get:JsonProperty("isMainAddress")
     val isMainAddress: Boolean = false,
 
-    @Schema(description = "The timestamp the business partner data was created")
-    @JsonProperty("createdAt")
+    @get:Schema(description = "The timestamp the business partner data was created")
     val createdAt: Instant,
 
-    @Schema(description = "The timestamp the business partner data was last updated")
-    @JsonProperty("updatedAt")
+    @get:Schema(description = "The timestamp the business partner data was last updated")
     val updatedAt: Instant
 )
