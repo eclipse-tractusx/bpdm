@@ -19,6 +19,9 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
+import com.catenax.bpdm.bridge.dummy.dto.GateAddressInfo
+import com.catenax.bpdm.bridge.dummy.dto.GateLegalEntityInfo
+import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -51,7 +54,7 @@ class SyncService(
         externalIdsByType[LsaType.Address]?.let { syncAddresses(it) }
     }
 
-    private fun getChangedExternalIdsByLsaTypeFromGate(modifiedAfter: Instant?): Map<LsaType, Collection<String>> {
+    private fun getChangedExternalIdsByLsaTypeFromGate(modifiedAfter: Instant?): Map<LsaType, Set<String>> {
         // TODO use pagination properly
         val entriesGate = gateClient.changelog().getChangelogEntriesLsaType(
             lsaType = null,
@@ -72,9 +75,9 @@ class SyncService(
             }
     }
 
-    private fun syncLegalEntities(externalIdsRequested: Collection<String>) {
+    private fun syncLegalEntities(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
-        val entries = getLegalEntitiesFromGate(externalIdsRequested)
+        val entries = getLegalEntityInfosFromGate(externalIdsRequested)
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
@@ -86,9 +89,9 @@ class SyncService(
         }
     }
 
-    private fun syncSites(externalIdsRequested: Collection<String>) {
+    private fun syncSites(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
-        val entries = getSitesFromGate(externalIdsRequested)
+        val entries = getSiteInfosFromGate(externalIdsRequested)
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
@@ -100,9 +103,9 @@ class SyncService(
         }
     }
 
-    private fun syncAddresses(externalIdsRequested: Collection<String>) {
+    private fun syncAddresses(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
-        val entries = getAddressesFromGate(externalIdsRequested)
+        val entries = getAddressInfosFromGate(externalIdsRequested)
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
@@ -114,7 +117,50 @@ class SyncService(
         }
     }
 
-    private fun getLegalEntitiesFromGate(externalIds: Collection<String>): Collection<LegalEntityGateInputResponse> {
+
+    private fun getLegalEntityInfosFromGate(externalIds: Set<String>): Collection<GateLegalEntityInfo> {
+        val entries = getLegalEntitiesInputFromGate(externalIds)
+        val bpnByExternalId = getBpnByExternalIdFromGate(LsaType.LegalEntity, externalIds)
+
+        return entries.map {
+            GateLegalEntityInfo(
+                legalEntity = it.legalEntity,
+                externalId = it.externalId,
+                bpn = bpnByExternalId[it.externalId]
+            )
+        }
+    }
+
+    private fun getSiteInfosFromGate(externalIds: Set<String>): Collection<GateSiteInfo> {
+        val entries = getSitesInputFromGate(externalIds)
+        val bpnByExternalId = getBpnByExternalIdFromGate(LsaType.Site, externalIds)
+
+        return entries.map {
+            GateSiteInfo(
+                site = it.site,
+                externalId = it.externalId,
+                legalEntityExternalId = it.legalEntityExternalId,
+                bpn = bpnByExternalId[it.externalId]
+            )
+        }
+    }
+
+    private fun getAddressInfosFromGate(externalIds: Set<String>): Collection<GateAddressInfo> {
+        val entries = getAddressesInputFromGate(externalIds)
+        val bpnByExternalId = getBpnByExternalIdFromGate(LsaType.Address, externalIds)
+
+        return entries.map {
+            GateAddressInfo(
+                address = it.address,
+                externalId = it.externalId,
+                legalEntityExternalId = it.legalEntityExternalId,
+                siteExternalId = it.siteExternalId,
+                bpn = bpnByExternalId[it.externalId]
+            )
+        }
+    }
+
+    private fun getLegalEntitiesInputFromGate(externalIds: Set<String>): Collection<LegalEntityGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
@@ -127,7 +173,7 @@ class SyncService(
         return response.content
     }
 
-    private fun getSitesFromGate(externalIds: Collection<String>): Collection<SiteGateInputResponse> {
+    private fun getSitesInputFromGate(externalIds: Set<String>): Collection<SiteGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
@@ -140,7 +186,7 @@ class SyncService(
         return response.content
     }
 
-    private fun getAddressesFromGate(externalIds: Collection<String>): Collection<AddressGateInputResponse> {
+    private fun getAddressesInputFromGate(externalIds: Set<String>): Collection<AddressGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
@@ -153,7 +199,24 @@ class SyncService(
         return response.content
     }
 
-    private fun createLegalEntitiesInPool(entriesToCreate: Collection<LegalEntityGateInputResponse>) {
+    private fun getBpnByExternalIdFromGate(lsaType: LsaType, externalIds: Set<String>): Map<String, String> {
+        if (externalIds.isEmpty()) {
+            return emptyMap()
+        }
+        // TODO use pagination properly
+        val page = gateClient.sharingState().getSharingStates(
+            lsaType = lsaType,
+            externalIds = externalIds,
+            paginationRequest = PaginationRequest(0, 100)
+        )
+        return page.content
+            .associateBy { it.externalId }
+            .filter { it.value.bpn != null }
+            .mapValues { it.value.bpn!! }
+    }
+
+
+    private fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>) {
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
                 legalEntity = it.legalEntity,
@@ -167,7 +230,7 @@ class SyncService(
         handleLegalEntityCreateResponse(responseWrapper)
     }
 
-    private fun updateLegalEntitiesInPool(entriesToUpdate: Collection<LegalEntityGateInputResponse>) {
+    private fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>) {
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
                 legalEntity = it.legalEntity,
@@ -182,13 +245,12 @@ class SyncService(
         handleLegalEntityUpdateResponse(responseWrapper, externalIdByBpn)
     }
 
-    private fun createSitesInPool(entriesToCreate: List<SiteGateInputResponse>) {
-        val leParentsByExternalId = entriesToCreate
+    private fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>) {
+        val leParentBpnByExternalId = entriesToCreate
             .map { it.legalEntityExternalId }
-            .let { getLegalEntitiesFromGate(it) }
-            .associateBy { it.externalId }
+            .let { getBpnByExternalIdFromGate(LsaType.LegalEntity, it.toSet()) }
         val createRequests = entriesToCreate.mapNotNull { entry ->
-            leParentsByExternalId[entry.legalEntityExternalId]?.bpn
+            leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     SitePartnerCreateRequest(
                         site = entry.site,
@@ -210,7 +272,7 @@ class SyncService(
         handleSiteCreateResponse(responseWrapper)
     }
 
-    private fun updateSitesInPool(entriesToUpdate: List<SiteGateInputResponse>) {
+    private fun updateSitesInPool(entriesToUpdate: Collection<GateSiteInfo>) {
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
                 site = it.site,
@@ -225,13 +287,12 @@ class SyncService(
         handleSiteUpdateResponse(responseWrapper, externalIdByBpn)
     }
 
-    private fun createAddressesInPool(entriesToCreate: List<AddressGateInputResponse>) {
-        val leParentsByExternalId = entriesToCreate
+    private fun createAddressesInPool(entriesToCreate: Collection<GateAddressInfo>) {
+        val leParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.legalEntityExternalId }
-            .let { getLegalEntitiesFromGate(it) }
-            .associateBy { it.externalId }
+            .let { getBpnByExternalIdFromGate(LsaType.LegalEntity, it.toSet()) }
         val leParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
-            leParentsByExternalId[entry.legalEntityExternalId]?.bpn
+            leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     AddressPartnerCreateRequest(
                         address = entry.address,
@@ -241,12 +302,11 @@ class SyncService(
                 }
         }
 
-        val siteParentsByExternalId = entriesToCreate
+        val siteParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.siteExternalId }
-            .let { getSitesFromGate(it) }
-            .associateBy { it.externalId }
+            .let { getBpnByExternalIdFromGate(LsaType.Site, it.toSet()) }
         val siteParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
-            siteParentsByExternalId[entry.siteExternalId]?.bpn
+            siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
                         address = entry.address,
@@ -269,7 +329,7 @@ class SyncService(
         handleAddressCreateResponse(responseWrapper)
     }
 
-    private fun updateAddressesInPool(entriesToUpdate: List<AddressGateInputResponse>) {
+    private fun updateAddressesInPool(entriesToUpdate: Collection<GateAddressInfo>) {
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
                 address = it.address,
