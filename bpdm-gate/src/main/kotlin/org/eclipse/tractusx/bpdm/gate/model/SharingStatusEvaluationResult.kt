@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.model
 
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerOutputError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 
 data class SharingStatusEvaluationResult(
     val validExternalIds: Collection<String>,
     val pendingExternalIds: Collection<String>,
-    val errors: Collection<ErrorInfo<BusinessPartnerOutputError>>
+    val errors: Collection<ErrorInfo<BusinessPartnerSharingError>>
 )

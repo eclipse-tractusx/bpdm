@@ -17,22 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.client
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import org.eclipse.tractusx.bpdm.gate.api.*
-
-interface GateClient {
-
-    fun addresses(): GateAddressApi
-
-    fun businessPartners(): GateBusinessPartnerApi
-
-    fun legalEntities(): GateLegalEntityApi
-
-    fun sites(): GateSiteApi
-
-    fun changelog(): GateChangelogApi
-
-    fun sharingState(): GateSharingStateApi
-
+enum class SharingStateType {
+    Pending,
+    Success,
+    Error
 }

@@ -17,23 +17,35 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import java.time.LocalDateTime
 
-@Schema(description = "Paginated collection of results")
-data class PageOutputResponse<T>(
-    @Schema(description = "Total number of all results in all pages")
-    val total: Int,
-    @Schema(description = "Value to be used as startAfter in request for next page. Value is only sent if more data exists for a next page.")
-    val nextStartAfter: String?,
-    @Schema(description = "Collection of results in the page")
-    val content: Collection<T>,
-    @Schema(description = "Number of entries in the page that have been omitted due to being invalid (error or still pending)")
-    val invalidEntries: Int,
-    @Schema(description = "External ids of the entries which are still pending")
-    val pending: Collection<String>,
-    @Schema(description = "Infos about the entries with errors")
-    val errors: Collection<ErrorInfo<BusinessPartnerSharingError>>,
+@Schema(
+    name = "SharingState"
+)
+data class SharingStateDto(
+    @get:Schema(description = "LSA Type")
+    val lsaType: LsaType,
+
+    @get:Schema(description = "External identifier")
+    val externalId: String,
+
+    @get:Schema(description = "Type of sharing state")
+    val sharingStateType: SharingStateType,
+
+    @get:Schema(description = "Sharing error code (for error)")
+    val sharingErrorCode: BusinessPartnerSharingError? = null,
+
+    @get:Schema(description = "Sharing error message (for error)")
+    val sharingErrorMessage: String? = null,
+
+    @get:Schema(description = "BPN (for success)")
+    val bpn: String? = null,
+
+    @get:Schema(description = "Sharing process started (not updated if null)")
+    val sharingProcessStarted: LocalDateTime? = null
 )
