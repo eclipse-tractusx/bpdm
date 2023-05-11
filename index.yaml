@@ -278,6 +278,32 @@ entries:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-5.0.0-alpha.1/bpdm-pool-5.0.0-alpha.1.tgz
     version: 5.0.0-alpha.1
   - apiVersion: v2
+    appVersion: 3.2.2
+    created: "2023-05-11T13:17:29.999032+02:00"
+    dependencies:
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.4.0
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM pool service
+    digest: f24ed8cd6b19f68635a457b7f05a03383475d4b9df1839880ada569c95ea8fc3
+    home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm-pool
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.3.1/bpdm-pool-4.3.1.tgz
+    version: 4.3.1
+  - apiVersion: v2
     appVersion: 3.2.0
     created: "2023-03-17T16:05:37.33239563Z"
     dependencies:
@@ -656,4 +682,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-05-10T07:12:37.802457506Z"
+generated: "2023-05-11T13:17:29.98808+02:00"
