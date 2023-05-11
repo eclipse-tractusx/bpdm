@@ -32,6 +32,21 @@ entries:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-4.0.0-alpha.1/bpdm-gate-4.0.0-alpha.1.tgz
     version: 4.0.0-alpha.1
   - apiVersion: v2
+    appVersion: 3.2.2
+    created: "2023-05-11T13:38:33.254131+02:00"
+    description: A Helm chart for deploying the BPDM gate service
+    digest: 853a37d2ddc8fe8959b96c2f956af14a801e5822ac173bf5df1ddb25b7b1c8c2
+    home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm-gate
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-3.3.1/bpdm-gate-3.3.1.tgz
+    version: 3.3.1
+  - apiVersion: v2
     appVersion: 3.2.0
     created: "2023-03-17T16:05:37.124026473Z"
     description: A Helm chart for deploying the BPDM gate service
@@ -682,4 +697,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-05-11T13:17:29.98808+02:00"
+generated: "2023-05-11T13:38:33.245873+02:00"
