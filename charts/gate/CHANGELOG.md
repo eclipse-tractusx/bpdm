@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [3.3.1] - 2023-05-11
+
+### Changed
+
+- increase to app version 3.2.2
+
+### Added
+
+- add license header to ingress template
+
 ## [3.3.0] - 2023-03-17
 
 ### Changed
