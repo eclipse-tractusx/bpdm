@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
@@ -52,15 +51,13 @@ data class LogisticAddressResponse(
     @get:Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,
 
-    @get:Schema(description = "Flag if this is the legal address of its related legal entity")
-    @get:JsonProperty("isLegalAddress")
+    @get:Schema(name = "isLegalAddress", description = "Flag if this is the legal address of its related legal entity")
     val isLegalAddress: Boolean = false,
 
     @get:Schema(description = "BPN of the related site, if available")
     val bpnSite: String?,
 
-    @get:Schema(description = "Flag if this is the main address of its related site")
-    @get:JsonProperty("isMainAddress")
+    @get:Schema(name = "isMainAddress", description = "Flag if this is the main address of its related site")
     val isMainAddress: Boolean = false,
 
     @get:Schema(description = "The timestamp the business partner data was created")
