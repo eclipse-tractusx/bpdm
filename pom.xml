@@ -42,7 +42,6 @@
         <module>bpdm-pool</module>
         <module>bpdm-gate-api</module>
         <module>bpdm-gate</module>
-        <module>bpdm-bridge-dummy</module>
     </modules>
 
     <properties>
