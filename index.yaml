@@ -3,6 +3,27 @@ entries:
   bpdm-gate:
   - apiVersion: v2
     appVersion: 4.0.0-alpha.1
+    created: "2023-05-12T12:04:13.22622239Z"
+    dependencies:
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.1
+    description: A Helm chart for deploying the BPDM gate service
+    digest: f98b7aa0661be2438bdf61ddd4338a598489061d64b346afad84fbff9d98fbf2
+    home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
+    maintainers:
+    - name: Nico Koprowski
+    name: bpdm-gate
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-gate-4.0.0-alpha.4/bpdm-gate-4.0.0-alpha.4.tgz
+    version: 4.0.0-alpha.4
+  - apiVersion: v2
+    appVersion: 4.0.0-alpha.1
     created: "2023-05-12T10:31:14.959587644Z"
     description: A Helm chart for deploying the BPDM gate service
     digest: a9b5a1d09d94ae2f061a06689335d1cdcbc87152efb4efedc9445e1a6f79f1c6
@@ -779,4 +800,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-05-12T13:16:31.757643+02:00"
+generated: "2023-05-12T12:04:13.226481295Z"
