@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.3.2] - 2023-05-12
+
+### Changed
+
+- move ingress license headers under metadata section for helmv2 backwards compatibility
+
 ## [4.3.1] - 2023-05-11
 
 ### Changed
