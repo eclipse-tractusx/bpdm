@@ -121,6 +121,17 @@ applicationConfig:
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
-#  bpdm:
-#    saas:
-#     api-key: ...
+  spring:
+    datasource:
+      # overwrite for security reasons
+      password: bpdm
+
+postgres:
+  enabled: true
+  auth:
+    database: bpdm
+    # overwrite for security reasons
+    postgresPassword: bpdm
+    username: bpdm
+    # overwrite for security reasons
+    password: bpdm
