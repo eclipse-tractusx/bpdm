@@ -119,8 +119,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
         )
 
         val addressesPool = listOf(
-            ResponseValues.addressPartnerSearchResponse1,
-            ResponseValues.addressPartnerSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -217,8 +217,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
         )
 
         val addressesPool = listOf(
-            ResponseValues.addressPartnerSearchResponse1,
-            ResponseValues.addressPartnerSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2

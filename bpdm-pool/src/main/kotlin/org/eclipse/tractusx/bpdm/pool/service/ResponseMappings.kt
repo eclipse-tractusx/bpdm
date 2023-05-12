@@ -19,12 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -36,230 +33,217 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 }
 
 fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
-    return LegalEntityMatchResponse(score, this.toPoolDto())
+    return LegalEntityMatchResponse(score, this.toDto())
 }
 
 fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchResponse {
     return BusinessPartnerMatchResponse(score, this.toBusinessPartnerDto())
 }
 
-fun LegalEntity.toPoolDto(): LegalEntityPartnerResponse {
-    return LegalEntityPartnerResponse(
-        bpn,
-        toDto(),
-        currentness
-    )
-}
-
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
-        bpn,
-        toDto(),
-        currentness,
-        legalAddress.toDto(),
-        entryId
+        legalEntity = toDto(),
+        legalAddress = legalAddress.toDto(),
+        index = entryId
     )
 }
 
 fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
-        identifiers.map { it.toDto() },
-        names.map { it.toDto() },
-        legalForm?.toDto(),
-        stati.maxWithOrNull(compareBy { it.validFrom })?.toDto(),
-        classification.map { it.toDto() },
-        types.map { it.toDto() },
-        bankAccounts.map { it.toDto() },
-        roles.map { it.toDto() },
-        startNodeRelations.map { it.toDto() }.plus(endNodeRelations.map { it.toDto() })
+        bpn = bpn,
+        identifiers = identifiers.map { it.toDto() },
+        legalName = legalName.toDto(),
+        legalForm = legalForm?.toDto(),
+        states = states.map { it.toDto() },
+        classifications = classifications.map { it.toDto() },
+        relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
+        currentness = currentness,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
 fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
     return BusinessPartnerResponse(
         uuid = "",
-        bpn = bpn,
-        properties = toDto(),
-        addresses = listOf(AddressPartnerResponse("", legalAddress.toDto())),
+        legalEntity = toDto(),
+        addresses = listOf(legalAddress.toDto()),
         sites = emptyList(),
-        currentness = currentness
     )
 }
 
-fun Identifier.toDto(): IdentifierResponse {
-    return IdentifierResponse(value, type.toDto(), issuingBody?.toDto(), status?.toDto())
+fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierResponse {
+    return LegalEntityIdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
-fun IdentifierType.toDto(): TypeKeyNameUrlDto<String> {
-    return TypeKeyNameUrlDto(technicalKey, name, url)
+fun AddressIdentifier.toDto(): AddressIdentifierResponse {
+    return AddressIdentifierResponse(value, type.toTypeKeyNameDto())
 }
 
-fun IdentifierStatus.toDto(): TypeKeyNameDto<String> {
+fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
     return TypeKeyNameDto(technicalKey, name)
 }
 
-fun IssuingBody.toDto(): TypeKeyNameUrlDto<String> {
-    return TypeKeyNameUrlDto(technicalKey, name, url)
+fun IdentifierType.toDto(): IdentifierTypeDto {
+    return IdentifierTypeDto(technicalKey, lsaType, name,
+        details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 
 fun Name.toDto(): NameResponse {
-    return NameResponse(value, shortName, type.toDto(), language.toDto())
+    return NameResponse(value, shortName)
 }
 
 fun LegalForm.toDto(): LegalFormResponse {
-    return LegalFormResponse(technicalKey, name, url, mainAbbreviation, language.toDto(), categories.map { it.toDto() })
+    return LegalFormResponse(technicalKey, name, abbreviation)
 }
 
-fun LegalFormCategory.toDto(): TypeNameUrlDto {
-    return TypeNameUrlDto(name, url)
+fun LegalEntityState.toDto(): LegalEntityStateResponse {
+    return LegalEntityStateResponse(officialDenotation, validFrom, validTo, type.toDto())
 }
 
-fun BusinessStatus.toDto(): BusinessStatusResponse {
-    return BusinessStatusResponse(officialDenotation, validFrom, validUntil, type.toDto())
+fun SiteState.toDto(): SiteStateResponse {
+    return SiteStateResponse(description, validFrom, validTo, type.toDto())
 }
 
-fun Role.toDto(): TypeKeyNameDto<String> {
-    return TypeKeyNameDto(technicalKey, name)
+fun AddressState.toDto(): AddressStateResponse {
+    return AddressStateResponse(description, validFrom, validTo, type.toDto())
 }
 
-
-fun AddressPartner.toDto(): AddressPartnerResponse {
-    return AddressPartnerResponse(
-        bpn,
-        address.toDto()
+fun LogisticAddress.toDto(): LogisticAddressResponse {
+    return LogisticAddressResponse(
+        bpn = bpn,
+        bpnLegalEntity = legalEntity?.bpn,
+        isLegalAddress = legalEntity?.legalAddress == this,
+        bpnSite = site?.bpn,
+        isMainAddress = site?.mainAddress == this,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        name = name,
+        states = states.map { it.toDto() },
+        identifiers = identifiers.map { it.toDto() },
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto()
     )
 }
 
-fun Address.toDto(): AddressResponse {
-    return AddressResponse(
-        version.toDto(),
-        careOf,
-        contexts,
-        country.toDto(),
-        administrativeAreas.map { it.toDto() },
-        postCodes.map { it.toDto() },
-        localities.map { it.toDto() },
-        thoroughfares.map { it.toDto() },
-        premises.map { it.toDto() },
-        postalDeliveryPoints.map { it.toDto() },
-        geoCoordinates?.toDto(),
-        types.map { it.toDto() })
-}
-
-fun Address.toLegalSearchResponse(bpnL: String): LegalAddressSearchResponse {
-    return LegalAddressSearchResponse(
-        bpnL,
-        this.toDto()
+fun LogisticAddress.toLegalAddressResponse(): LegalAddressResponse {
+    return LegalAddressResponse(
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto(),
+        bpnLegalEntity = legalEntity?.bpn!!,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
-fun Address.toMainSearchResponse(bpnS: String): MainAddressSearchResponse {
-    return MainAddressSearchResponse(
-        bpnS,
-        this.toDto()
+fun LogisticAddress.toMainAddressResponse(): MainAddressResponse {
+    return MainAddressResponse(
+        physicalPostalAddress = physicalPostalAddress.toDto(),
+        alternativePostalAddress = alternativePostalAddress?.toDto(),
+        bpnSite = site?.bpn!!,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
-fun AddressPartner.toMatchDto(score: Float): AddressMatchResponse {
-    return AddressMatchResponse(score, this.toDtoWithReference())
-}
-
-fun AddressPartner.toPoolDto(): AddressPartnerResponse {
-    return AddressPartnerResponse(
-        bpn,
-        address.toDto()
+fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
+    return PhysicalPostalAddressResponse(
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geographicCoordinates?.toDto(),
+            country = country.toDto(),
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel2 = administrativeAreaLevel2,
+            administrativeAreaLevel3 = administrativeAreaLevel3,
+            administrativeAreaLevel4 = administrativeAreaLevel4,
+            postCode = postCode,
+            city = city,
+            districtLevel1 = districtLevel1,
+            districtLevel2 = districtLevel2,
+            street = street?.toDto()
+        ),
+        companyPostCode = companyPostCode,
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door
     )
 }
 
-fun AddressPartner.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
+    return AlternativePostalAddressResponse(
+        baseAddress = BasePostalAddressResponse(
+            geographicCoordinates = geographicCoordinates?.toDto(),
+            country = country.toDto(),
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel2 = administrativeAreaLevel2,
+            administrativeAreaLevel3 = administrativeAreaLevel3,
+            administrativeAreaLevel4 = administrativeAreaLevel4,
+            postCode = postCode,
+            city = city,
+            districtLevel1 = districtLevel1,
+            districtLevel2 = districtLevel2,
+            street = street?.toDto()
+        ),
+        type = deliveryServiceType,
+        deliveryServiceNumber = deliveryServiceNumber
+    )
+}
+
+private fun Street.toDto(): StreetDto {
+    return StreetDto(
+        name = name,
+        houseNumber = houseNumber,
+        milestone = milestone,
+        direction = direction
+    )
+}
+
+fun LogisticAddress.toMatchDto(score: Float): AddressMatchResponse {
+    return AddressMatchResponse(score, this.toDto())
+}
+
+fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
     return AddressPartnerCreateResponse(
-        bpn,
-        address.toDto(),
-        index
+        address = toDto(),
+        index = index
     )
 }
-
-fun AddressPartner.toDtoWithReference(): AddressPartnerSearchResponse {
-    return AddressPartnerSearchResponse(
-        toDto(),
-        legalEntity?.bpn,
-        site?.bpn
-    )
-}
-
 
 fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
     return SitePartnerCreateResponse(
+        site = toDto(),
+        mainAddress = mainAddress.toDto(),
+        index = entryId
+    )
+}
+
+fun Site.toDto(): SiteResponse {
+    return SiteResponse(
         bpn,
         name,
-        mainAddress.toDto(),
-        entryId
+        states = states.map { it.toDto() },
+        bpnLegalEntity = legalEntity.bpn,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }
 
-fun Site.toDto(): SitePartnerResponse {
-    return SitePartnerResponse(
-        bpn,
-        name
-    )
-}
-
-fun Site.toWithReferenceDto(): SitePartnerSearchResponse {
-    return SitePartnerSearchResponse(
-        toDto(),
-        legalEntity.bpn
-    )
-}
-
-fun AdministrativeArea.toDto(): AdministrativeAreaResponse {
-    return AdministrativeAreaResponse(value, shortName, fipsCode, type.toDto(), language.toDto())
-}
-
-
-fun PostCode.toDto(): PostCodeResponse {
-    return PostCodeResponse(value, type.toDto())
-}
-
-fun Locality.toDto(): LocalityResponse {
-    return LocalityResponse(value, shortName, localityType.toDto(), language.toDto())
-}
-
-fun Thoroughfare.toDto(): ThoroughfareResponse {
-    return ThoroughfareResponse(value, name, shortName, number, direction, type.toDto(), language.toDto())
-}
-
-fun Premise.toDto(): PremiseResponse {
-    return PremiseResponse(value, shortName, number, type.toDto(), language.toDto())
-}
-
-fun PostalDeliveryPoint.toDto(): PostalDeliveryPointResponse {
-    return PostalDeliveryPointResponse(value, shortName, number, type.toDto(), language.toDto())
-}
-
-fun AddressVersion.toDto(): AddressVersionResponse {
-    return AddressVersionResponse(characterSet.toDto(), language.toDto())
-}
 
 fun GeographicCoordinate.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
 fun Classification.toDto(): ClassificationResponse {
-    return ClassificationResponse(value, code, type?.toDto())
-}
-
-fun ClassificationType.toDto(): TypeNameUrlDto {
-    return TypeNameUrlDto(name, url)
+    return ClassificationResponse(value, code, type.toDto())
 }
 
 fun Relation.toDto(): RelationResponse {
-    return RelationResponse(relationClass.toDto(), type.toDto(), startNode.bpn, endNode.bpn, startedAt, endedAt)
-}
-
-fun BankAccount.toDto(): BankAccountResponse {
-    return BankAccountResponse(
-        trustScores, currency.toDto(), internationalBankAccountIdentifier, internationalBankIdentifier,
-        nationalBankAccountIdentifier, nationalBankIdentifier
+    return RelationResponse(
+        type = type.toDto(),
+        startBpn = startNode.bpn,
+        endBpn = endNode.bpn,
+        validFrom = validFrom,
+        validTo = validTo
     )
 }
 

@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.RelationClass
 import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
 
@@ -34,21 +33,23 @@ import java.time.LocalDateTime
     ]
 )
 class Relation (
-    @Column(name = "class", nullable = false)
-    @Enumerated(EnumType.STRING)
-    val relationClass: RelationClass,
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val type: RelationType,
+
     @ManyToOne
     @JoinColumn(name = "start_node_id", nullable = false)
     val startNode: LegalEntity,
+
     @ManyToOne
     @JoinColumn(name = "end_node_id", nullable = false)
     val endNode: LegalEntity,
-    @Column(name = "started_at")
-    val startedAt: LocalDateTime?,
-    @Column(name = "ended_at")
-    val endedAt: LocalDateTime?
+
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
+
+    @Column(name = "valid_to")
+    val validTo: LocalDateTime?
+
 ) : BaseEntity()
 

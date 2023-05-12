@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -66,8 +66,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityPartnerResponse
-    private lateinit var givenPartner2: LegalEntityPartnerResponse
+    private lateinit var givenPartner1: LegalEntityResponse
+    private lateinit var givenPartner2: LegalEntityResponse
 
     @BeforeEach
     fun beforeEach() {
@@ -76,8 +76,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         poolClient.opensearch().clear()
         testHelpers.createTestMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
-        givenPartner1 = with(givenStructure[0].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
-        givenPartner2 = with(givenStructure[1].legalEntity) { LegalEntityPartnerResponse(bpn, properties, currentness) }
+        givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
+        givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }

@@ -46,11 +46,21 @@ class ValidationMapper {
                 postalDeliveryPoints = postalDeliveryPoints.map { ValueValidationSaas(it.value!!) },
                 postCodes = postCodes.map { ValueValidationSaas(it.value!!) },
                 premises = premises.map { ValueValidationSaas(it.value!!) },
-                thoroughfares = thoroughfares.map { ValueValidationSaas(it.value!!) }
+                thoroughfares = thoroughfares.mapNotNull { toValidationSaas(it) }
             )
         }
 
     private fun toValidationSaas(identifier: IdentifierSaas) =
         IdentifierValidationSaas(TechnicalKeyValidationSaas(identifier.type?.technicalKey!!), identifier.value!!)
+
+    private fun toValidationSaas(thoroughfare: ThoroughfareSaas): ValueValidationSaas? {
+        // Validate only street name and number; ignore direction, shortName (milestone)
+        val validationString = listOfNotNull(thoroughfare.name, thoroughfare.number)
+            .joinToString(separator = " ")
+        return when (validationString) {
+            "" -> null
+            else -> ValueValidationSaas(validationString)
+        }
+    }
 
 }

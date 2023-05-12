@@ -30,8 +30,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchRespons
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service
 @Service
 class SearchServiceMock(
     val legalEntityRepository: LegalEntityRepository,
-    val addressPartnerRepository: AddressPartnerRepository
+    val logisticAddressRepository: LogisticAddressRepository
 ) : SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -71,8 +71,7 @@ class SearchServiceMock(
      * adding a default relevancy score to each entry
      */
     override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchResponse> {
-        val resultPage =
-            addressPartnerRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        val resultPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         logger.info { "Mock search: Returning ${resultPage.size} addresses from database" }
 

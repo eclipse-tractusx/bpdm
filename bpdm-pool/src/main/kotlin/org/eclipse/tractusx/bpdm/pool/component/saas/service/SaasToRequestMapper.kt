@@ -20,15 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.saas.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.LegalFormSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeKeyNameUrlSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toDto
+import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -42,15 +40,16 @@ class SaasToRequestMapper {
 
     fun toLegalEntityCreateRequest(partnerWithImportId: BusinessPartnerSaas): LegalEntityPartnerCreateRequest {
         return LegalEntityPartnerCreateRequest(
-            partnerWithImportId.toLegalEntityDto(),
-            partnerWithImportId.externalId
+            legalEntity = partnerWithImportId.toLegalEntityDto(),
+            index = partnerWithImportId.externalId
         )
     }
 
     fun toLegalEntityCreateRequestOrNull(partnerWithImportId: BusinessPartnerSaas): LegalEntityPartnerCreateRequest? {
         return try {
             toLegalEntityCreateRequest(partnerWithImportId)
-        } catch (_: Throwable) {
+        } catch (e: Throwable) {
+            logger.info("Reason:", e)
             logger.warn { "Business Partner with ID ${partnerWithImportId.externalId} could not be mapped to ${LegalEntityPartnerCreateRequest::class.simpleName}" }
             null
         }
@@ -58,8 +57,8 @@ class SaasToRequestMapper {
 
     fun toLegalEntityUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): LegalEntityPartnerUpdateRequest {
         return LegalEntityPartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            partnerWithBpn.partner.toLegalEntityDto()
+            bpn = partnerWithBpn.bpn,
+            legalEntity = partnerWithBpn.partner.toLegalEntityDto()
         )
     }
 
@@ -75,7 +74,7 @@ class SaasToRequestMapper {
     fun toSiteCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): SitePartnerCreateRequest {
         return SitePartnerCreateRequest(
             site = partnerWithParent.partner.toSiteDto(),
-            legalEntity = partnerWithParent.parentBpn,
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -92,8 +91,8 @@ class SaasToRequestMapper {
 
     fun toSiteUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): SitePartnerUpdateRequest {
         return SitePartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            partnerWithBpn.partner.toSiteDto()
+            bpn = partnerWithBpn.bpn,
+            site = partnerWithBpn.partner.toSiteDto()
         )
     }
 
@@ -108,8 +107,8 @@ class SaasToRequestMapper {
 
     fun toAddressCreateRequest(partnerWithParent: BusinessPartnerWithParentBpn): AddressPartnerCreateRequest {
         return AddressPartnerCreateRequest(
-            properties = toDto(partnerWithParent.partner.addresses.first()),
-            parent = partnerWithParent.parentBpn,
+            address = partnerWithParent.partner.toLogisticAddressDto(),
+            bpnParent = partnerWithParent.parentBpn,
             index = partnerWithParent.partner.externalId
         )
     }
@@ -125,8 +124,8 @@ class SaasToRequestMapper {
 
     fun toAddressUpdateRequest(partnerWithBpn: BusinessPartnerWithBpn): AddressPartnerUpdateRequest {
         return AddressPartnerUpdateRequest(
-            partnerWithBpn.bpn,
-            properties = toDto(partnerWithBpn.partner.addresses.first())
+            bpn = partnerWithBpn.bpn,
+            address = partnerWithBpn.partner.toLogisticAddressDto()
         )
     }
 
@@ -140,27 +139,20 @@ class SaasToRequestMapper {
     }
 
 
-    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameUrlDto<String> {
-        return TypeKeyNameUrlDto(idType.technicalKey!!, idType.name ?: "", idType.url)
-    }
-
-    fun toRequest(idStatus: TypeKeyNameSaas): TypeKeyNameDto<String> {
-        return TypeKeyNameDto(idStatus.technicalKey!!, idStatus.name ?: "")
+    fun toRequest(idType: TypeKeyNameUrlSaas): TypeKeyNameDto<String> {
+        return TypeKeyNameDto(idType.technicalKey!!, idType.name ?: "")
     }
 
     fun toRequest(legalForm: LegalFormSaas, partner: BusinessPartnerSaas): LegalFormRequest {
         return LegalFormRequest(
-            legalForm.technicalKey!!,
-            legalForm.name,
-            legalForm.url,
-            legalForm.mainAbbreviation,
-            SaasMappings.toLanguageCode(legalForm.language),
-            partner.categories.map { toCategoryRequest(it) }
+            technicalKey = legalForm.technicalKey!!,
+            name = legalForm.name!!,
+            abbreviation = legalForm.mainAbbreviation
         )
     }
 
-    fun toCategoryRequest(category: TypeKeyNameUrlSaas): TypeNameUrlDto {
-        return TypeNameUrlDto(category.name!!, category.url)
+    fun toIdentifierTypeDto(it: TypeKeyNameUrlSaas, lsaType: IdentifierLsaType): IdentifierTypeDto {
+        return IdentifierTypeDto(it.technicalKey!!, lsaType, it.name ?: it.technicalKey!!, listOf())
     }
 
 }

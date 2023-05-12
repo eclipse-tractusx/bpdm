@@ -61,19 +61,19 @@ class SuggestionControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
-
+    // TODO handle new data model
     companion object {
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.properties
-        private val expectedLegalEntityName = expectedLegalEntity.names.first().value
+        private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.legalEntity
+        private val expectedLegalEntityName = expectedLegalEntity.legalName.value
         private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
-        private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.properties
+        private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.legalEntity
         private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
         private val nonlatinSite = ResponseValues.siteUpsert3
 
@@ -94,67 +94,69 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(
                     expectedLegalEntity.legalForm!!.name,
                     EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH,
-                    expectedLegalEntity.names.first().value
+                    expectedLegalEntity.legalName.value
                 ),
                 Arguments.of(
-                    expectedLegalEntity.status!!.officialDenotation,
+                    expectedLegalEntity.states.first().officialDenotation,
                     EndpointValues.CATENA_SUGGESTION_LE_STATUS_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalEntity.profileClassifications.first().value,
+                    expectedLegalEntity.classifications.first().value,
                     EndpointValues.CATENA_SUGGESTION_LE_CLASSIFICATION_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedSite.name,
+                    expectedSite.site.name,
                     EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.administrativeAreas.first().value,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.administrativeAreaLevel2,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.postCodes.first().value,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.postCode,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.localities.first().value,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.city,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.thoroughfares.first().value,
+                    expectedLegalAddress.physicalPostalAddress.baseAddress.street!!.name,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH,
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.premises.first().value,
+                    expectedLegalAddress.physicalPostalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
-                Arguments.of(
-                    expectedLegalAddress.postalDeliveryPoints.first().value,
-                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
-                    expectedLegalEntityName
-                )
+                // TODO check alternativePostalAddress
+//                Arguments.of(
+//                    expectedLegalAddress.alternativePostalAddress!!.deliveryServiceNumber,
+//                    EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH,
+//                    expectedLegalEntityName
+//                )
             )
 
         @JvmStatic
         fun argumentsSuggestPropertyValuesNonLatin(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(nonlatinLegalEntity.names.first().value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
+                Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
-                Arguments.of(nonlatinSite.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
-                Arguments.of(nonlatinLegalAddress.administrativeAreas.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
-                Arguments.of(nonlatinLegalAddress.postCodes.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
-                Arguments.of(nonlatinLegalAddress.localities.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
-                Arguments.of(nonlatinLegalAddress.thoroughfares.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.premises.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
-                Arguments.of(nonlatinLegalAddress.postalDeliveryPoints.first().value, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
+                Arguments.of(nonlatinSite.site.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.administrativeAreaLevel2, EndpointValues.CATENA_SUGGESTION_ADDRESS_ADMIN_AREA_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.postCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.street!!.name, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                // TODO check alternativePostalAddress
+                // Arguments.of(nonlatinLegalAddress.alternativePostalAddress!!.deliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )
     }
 
@@ -328,7 +330,7 @@ class SuggestionControllerIT @Autowired constructor(
         val page = webTestClient.get()
             .uri { builder ->
                 builder.path(endpointPath)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()
@@ -352,7 +354,7 @@ class SuggestionControllerIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()
@@ -378,7 +380,7 @@ class SuggestionControllerIT @Autowired constructor(
             .uri { builder ->
                 builder.path(endpointPath)
                     .queryParam(EndpointValues.TEXT_PARAM_NAME, expectedSuggestionValue)
-                    .queryParam(LegalEntityPropertiesSearchRequest::name.name, filterName)
+                    .queryParam(LegalEntityPropertiesSearchRequest::legalName.name, filterName)
                     .build()
             }
             .exchange()

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
+import org.eclipse.tractusx.bpdm.common.model.*
 import java.time.LocalDateTime
 
 /**
@@ -48,10 +49,6 @@ object SaasValues {
     val language2 = LanguageSaas(LanguageCode.de, LanguageCode.de.getName())
     val language3 = LanguageSaas(LanguageCode.zh, LanguageCode.zh.getName())
 
-    val country1 = CountrySaas(CommonValues.country1, CommonValues.country1.getName())
-    val country2 = CountrySaas(CommonValues.country2, CommonValues.country2.getName())
-    val country3 = CountrySaas(CommonValues.country3, CommonValues.country3.getName())
-
     val legalEntityName1 = NameSaas(CommonValues.name1)
     val legalEntityName2 = NameSaas(CommonValues.name2)
     val legalEntityName3 = NameSaas(CommonValues.name3)
@@ -62,36 +59,34 @@ object SaasValues {
     val siteName2 = NameSaas(CommonValues.siteName2)
     val siteName3 = NameSaas(CommonValues.siteName3)
 
-    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1, CommonValues.identifierTypeUrl1)
+    val identifierType1 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameUrlSaas(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val issuingBody1 = TypeKeyNameUrlSaas(CommonValues.issuingBodyKey1, CommonValues.issuingBodyName1, CommonValues.issuingBodyUrl1)
+    val issuingBody1 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody1)
+    val issuingBody2 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody2)
+    val issuingBody3 = TypeKeyNameUrlSaas(name=CommonValues.issuingBody3)
 
-    val identifierStatus1 = TypeKeyNameSaas(CommonValues.identifierStatusKey1, CommonValues.identifierStatusName1)
+    val identifierStatus1 = TypeKeyNameSaas("identifierstatuskey", "identifierstatusname")
 
     val identifier1 = IdentifierSaas(identifierType1, CommonValues.identifierValue1, issuingBody1, identifierStatus1)
-    val identifier2 = IdentifierSaas(identifierType1, CommonValues.identifierValue2, issuingBody1, identifierStatus1)
-    val identifier3 = IdentifierSaas(identifierType1, CommonValues.identifierValue3, issuingBody1, identifierStatus1)
+    val identifier2 = IdentifierSaas(identifierType2, CommonValues.identifierValue2, issuingBody2, identifierStatus1)
+    val identifier3 = IdentifierSaas(identifierType3, CommonValues.identifierValue3, issuingBody3, identifierStatus1)
 
     val legalForm1 = LegalFormSaas(
-        CommonValues.legalFormName1,
-        CommonValues.legalFormUrl1,
-        CommonValues.legalFormTechnicalKey1,
-        CommonValues.legalFormAbbreviation1,
-        language1
+        technicalKey = CommonValues.legalFormTechnicalKey1,
+        name = CommonValues.legalFormName1,
+        mainAbbreviation = CommonValues.legalFormAbbreviation1,
     )
     val legalForm2 = LegalFormSaas(
-        CommonValues.legalFormName2,
-        CommonValues.legalFormUrl2,
-        CommonValues.legalFormTechnicalKey2,
-        CommonValues.legalFormAbbreviation2,
-        language2
+        technicalKey = CommonValues.legalFormTechnicalKey2,
+        name = CommonValues.legalFormName2,
+        mainAbbreviation = CommonValues.legalFormAbbreviation2,
     )
     val legalForm3 = LegalFormSaas(
-        CommonValues.legalFormName3,
-        CommonValues.legalFormUrl3,
-        CommonValues.legalFormTechnicalKey3,
-        CommonValues.legalFormAbbreviation3,
-        language3
+        technicalKey = CommonValues.legalFormTechnicalKey3,
+        name = CommonValues.legalFormName3,
+        mainAbbreviation = CommonValues.legalFormAbbreviation3,
     )
 
     val statusType1 = TypeKeyNameUrlSaas(CommonValues.statusType1.name)
@@ -110,43 +105,18 @@ object SaasValues {
     val classification4 = ClassificationSaas(value = CommonValues.classification4, type = classificationType)
     val classification5 = ClassificationSaas(value = CommonValues.classification5, type = classificationType)
 
-    val profile1 = PartnerProfileSaas(classifications = listOf(classification1, classification2))
-    val profile2 = PartnerProfileSaas(classifications = listOf(classification3, classification4))
-    val profile3 = PartnerProfileSaas(classifications = listOf(classification5))
-
     val addressId1 = "address-saas-1"
     val addressId2 = "address-saas-2"
     val addressId3 = "address-saas-3"
 
-    val adminArea1 = AdministrativeAreaSaas(CommonValues.adminArea1)
-    val adminArea2 = AdministrativeAreaSaas(CommonValues.adminArea2)
-    val adminArea3 = AdministrativeAreaSaas(CommonValues.adminArea3)
-    val adminArea4 = AdministrativeAreaSaas(CommonValues.adminArea4)
-    val adminArea5 = AdministrativeAreaSaas(CommonValues.adminArea5)
-
-    val postCode1 = PostCodeSaas(CommonValues.postCode1)
-    val postCode2 = PostCodeSaas(CommonValues.postCode2)
-    val postCode3 = PostCodeSaas(CommonValues.postCode3)
-    val postCode4 = PostCodeSaas(CommonValues.postCode4)
-    val postCode5 = PostCodeSaas(CommonValues.postCode5)
-
-    val locality1 = LocalitySaas(value = CommonValues.locality1)
+    val locality1 = LocalitySaas(saasValue = CommonValues.locality1, saasType = SaasLocalityType.CITY, saasLanguage = language1)
     val locality2 = LocalitySaas(value = CommonValues.locality2)
-    val locality3 = LocalitySaas(value = CommonValues.locality3)
+    val locality3 = LocalitySaas(saasValue = CommonValues.locality3, saasType = SaasLocalityType.CITY, saasLanguage = language1)
     val locality4 = LocalitySaas(value = CommonValues.locality4)
-    val locality5 = LocalitySaas(value = CommonValues.locality5)
 
-    val thoroughfare1 = ThoroughfareSaas(value = CommonValues.thoroughfare1)
-    val thoroughfare2 = ThoroughfareSaas(value = CommonValues.thoroughfare2)
-    val thoroughfare3 = ThoroughfareSaas(value = CommonValues.thoroughfare3)
-    val thoroughfare4 = ThoroughfareSaas(value = CommonValues.thoroughfare4)
-    val thoroughfare5 = ThoroughfareSaas(value = CommonValues.thoroughfare5)
-
-    val premise1 = PremiseSaas(value = CommonValues.premise1)
-    val premise2 = PremiseSaas(value = CommonValues.premise2)
-    val premise3 = PremiseSaas(value = CommonValues.premise3)
-    val premise4 = PremiseSaas(value = CommonValues.premise4)
-    val premise5 = PremiseSaas(value = CommonValues.premise5)
+    val city1 = LocalitySaas(saasValue = CommonValues.city1, saasType = SaasLocalityType.CITY, saasLanguage = language1)
+    val city2 = LocalitySaas(saasValue = CommonValues.city2, saasType = SaasLocalityType.CITY, saasLanguage = language2)
+    val city3 = LocalitySaas(saasValue = CommonValues.city3, saasType = SaasLocalityType.CITY, saasLanguage = language3)
 
     val postalDeliveryPoint1 = PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint1)
     val postalDeliveryPoint2 = PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint2)
@@ -160,6 +130,7 @@ object SaasValues {
     val siteType = TypeKeyNameUrlSaas("ORGANIZATIONAL_UNIT")
     val addressType = TypeKeyNameUrlSaas("BP_ADDRESS")
 
+
     val parentRelation = RelationSaas(
         type = parentRelationType,
         startNode = CommonValues.bpnL1,
@@ -172,39 +143,42 @@ object SaasValues {
         id = addressId1,
         externalId = addressId1,
         saasId = addressId1,
-        country = country1,
-        administrativeAreas = listOf(adminArea1, adminArea2),
-        postCodes = listOf(postCode1, postCode2),
+        country = CountrySaas(CommonValues.country1, CommonValues.country1.getName()),
+        administrativeAreas = listOf(AdministrativeAreaSaas(CommonValues.adminArea1), AdministrativeAreaSaas(CommonValues.adminArea2)),
+        postCodes = listOf(PostCodeSaas(CommonValues.postCode1), PostCodeSaas(CommonValues.postCode2)),
         localities = listOf(locality1, locality2),
-        thoroughfares = listOf(thoroughfare1, thoroughfare2),
-        premises = listOf(premise1, premise2),
-        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2)
+        thoroughfares = listOf(ThoroughfareSaas(value = CommonValues.thoroughfare1), ThoroughfareSaas(value = CommonValues.thoroughfare2)),
+        premises = listOf(PremiseSaas(value = CommonValues.premise1), PremiseSaas(value = CommonValues.premise2)),
+        postalDeliveryPoints = listOf(postalDeliveryPoint1, postalDeliveryPoint2),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
     )
 
     val address2 = AddressSaas(
         id = addressId2,
         externalId = addressId2,
         saasId = addressId2,
-        country = country2,
-        administrativeAreas = listOf(adminArea3, adminArea4),
-        postCodes = listOf(postCode3, postCode4),
+        country = CountrySaas(CommonValues.country2, CommonValues.country2.getName()),
+        administrativeAreas = listOf(AdministrativeAreaSaas(CommonValues.adminArea3), AdministrativeAreaSaas(CommonValues.adminArea4)),
+        postCodes = listOf(PostCodeSaas(CommonValues.postCode3), PostCodeSaas(CommonValues.postCode4)),
         localities = listOf(locality3, locality4),
-        thoroughfares = listOf(thoroughfare3, thoroughfare4),
-        premises = listOf(premise3, premise4),
-        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4)
+        thoroughfares = listOf(ThoroughfareSaas(value = CommonValues.thoroughfare3), ThoroughfareSaas(value = CommonValues.thoroughfare4)),
+        premises = listOf(PremiseSaas(value = CommonValues.premise3), PremiseSaas(value = CommonValues.premise4)),
+        postalDeliveryPoints = listOf(postalDeliveryPoint3, postalDeliveryPoint4),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
     )
 
     val address3 = AddressSaas(
         id = addressId3,
         externalId = addressId3,
         saasId = addressId3,
-        country = country3,
-        administrativeAreas = listOf(adminArea5),
-        postCodes = listOf(postCode5),
-        localities = listOf(locality5),
-        thoroughfares = listOf(thoroughfare5),
-        premises = listOf(premise5),
-        postalDeliveryPoints = listOf(postalDeliveryPoint5)
+        country = CountrySaas(CommonValues.country3, CommonValues.country3.getName()),
+        administrativeAreas = listOf(AdministrativeAreaSaas(CommonValues.adminArea5)),
+        postCodes = listOf(PostCodeSaas(CommonValues.postCode5)),
+        localities = listOf(LocalitySaas(saasValue = CommonValues.locality5, saasType = SaasLocalityType.CITY, saasLanguage = language1)),
+        thoroughfares = listOf(ThoroughfareSaas(value = CommonValues.thoroughfare5)),
+        premises = listOf(PremiseSaas(value = CommonValues.premise5)),
+        postalDeliveryPoints = listOf(postalDeliveryPoint5),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
     )
 
 
@@ -218,7 +192,7 @@ object SaasValues {
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
         status = status1,
-        profile = profile1,
+        profile = PartnerProfileSaas(classifications = listOf(classification1, classification2)),
         addresses = listOf(address1),
         types = listOf(legalEntityType)
     )
@@ -233,7 +207,7 @@ object SaasValues {
         identifiers = listOf(identifier2),
         legalForm = legalForm2,
         status = status2,
-        profile = profile2,
+        profile = PartnerProfileSaas(classifications = listOf(classification3, classification4)),
         addresses = listOf(address2),
         types = listOf(legalEntityType)
     )
@@ -248,7 +222,7 @@ object SaasValues {
         identifiers = listOf(identifier3),
         legalForm = legalForm3,
         status = status3,
-        profile = profile3,
+        profile =  PartnerProfileSaas(classifications = listOf(classification5)),
         addresses = listOf(address3),
         types = listOf(legalEntityType)
     )
@@ -260,6 +234,7 @@ object SaasValues {
         externalId = partnerId4,
         dataSource = datasource1,
         names = listOf(siteName1),
+        status = status1,
         addresses = listOf(address1),
         types = listOf(siteType),
         relations = listOf(
@@ -280,6 +255,7 @@ object SaasValues {
         externalId = partnerId5,
         dataSource = datasource1,
         names = listOf(siteName2),
+        status = status2,
         addresses = listOf(address2),
         types = listOf(siteType),
         relations = listOf(
@@ -300,6 +276,7 @@ object SaasValues {
         externalId = partnerId6,
         dataSource = datasource1,
         names = listOf(siteName3),
+        status = status3,
         addresses = listOf(address3),
         types = listOf(siteType),
         relations = listOf(
@@ -312,6 +289,7 @@ object SaasValues {
             )
         )
     )
+
 
     val addressPartner1 = BusinessPartnerSaas(
         id = partnerId7,
@@ -358,6 +336,149 @@ object SaasValues {
         externalId = partnerId9,
         dataSource = datasource1,
         addresses = listOf(address3),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationSaas(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL3,
+                endNode = CommonValues.bpnA3,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    private val thoroughfareZone1 = ThoroughfareSaas(name = CommonValues.industrialZone1, saasType = SaasThoroughfareType.INDUSTRIAL_ZONE, language = language1)
+    private val thoroughfareStreet1 = ThoroughfareSaas(name = CommonValues.street1, direction = null
+        , number = CommonValues.houseNumber1, saasType = SaasThoroughfareType.STREET, language = language1
+    )
+    private val thoroughfareZone2 = ThoroughfareSaas(name = CommonValues.industrialZone2, saasType = SaasThoroughfareType.INDUSTRIAL_ZONE, language = language2)
+    private val thoroughfareStreet2 = ThoroughfareSaas(name = CommonValues.street2, direction = null
+        , number = CommonValues.houseNumber2, saasType = SaasThoroughfareType.STREET, language = language2
+    )
+    private val thoroughfareZone3 = ThoroughfareSaas(name = CommonValues.industrialZone3, saasType = SaasThoroughfareType.INDUSTRIAL_ZONE, language = language3)
+    private val thoroughfareStreet3 = ThoroughfareSaas(name = CommonValues.street3, direction = null
+        , number = CommonValues.houseNumber3, saasType = SaasThoroughfareType.STREET, language = language3
+    )
+
+
+    val addressPartnerSaas1 = BusinessPartnerSaas(
+        id = partnerId7,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId7,
+        dataSource = datasource1,
+        addresses = listOf( AddressSaas(
+            id = addressId1,
+            externalId = addressId1,
+            saasId = addressId1,
+            country = CountrySaas(CommonValues.country1, CommonValues.country1.getName()),
+            administrativeAreas = listOf(
+                AdministrativeAreaSaas(CommonValues.adminArea1, SaasAdministrativeAreaType.REGION, language1),
+                AdministrativeAreaSaas(CommonValues.county1, SaasAdministrativeAreaType.COUNTY, language1)
+            ),
+            postCodes = listOf(PostCodeSaas(CommonValues.postCode1, SaasPostCodeType.REGULAR)),
+            localities = listOf(
+                city1, LocalitySaas(CommonValues.districtLevel1_1, SaasLocalityType.DISTRICT, language1),
+                LocalitySaas(CommonValues.districtLevel2_1, SaasLocalityType.QUARTER, language1)
+            ),
+            thoroughfares = listOf(thoroughfareZone1, thoroughfareStreet1),
+            premises = listOf(
+                PremiseSaas(CommonValues.building1, SaasPremiseType.BUILDING, language1),
+                PremiseSaas(CommonValues.door1, SaasPremiseType.ROOM, language1),
+                PremiseSaas(CommonValues.floor1, SaasPremiseType.LEVEL, language1)
+            ),
+            postalDeliveryPoints = listOf(
+                PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint1), PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint2)
+            ),
+            types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
+        )),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationSaas(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL1,
+                endNode = CommonValues.bpnA1,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val addressPartnerSaas2 = BusinessPartnerSaas(
+        id = partnerId8,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId8,
+        dataSource = datasource1,
+        addresses = listOf(AddressSaas(
+            id = addressId2,
+            externalId = addressId2,
+            saasId = addressId2,
+            country = CountrySaas(CommonValues.country2, CommonValues.country2.getName()),
+            administrativeAreas = listOf(
+                AdministrativeAreaSaas(CommonValues.adminArea2, SaasAdministrativeAreaType.REGION, language2),
+                AdministrativeAreaSaas(CommonValues.county2, SaasAdministrativeAreaType.COUNTY, language2)
+            ),
+            postCodes = listOf(PostCodeSaas(CommonValues.postCode2, SaasPostCodeType.REGULAR)),
+            localities = listOf(
+                city2,
+                LocalitySaas(CommonValues.districtLevel1_2, SaasLocalityType.DISTRICT, language1),
+                LocalitySaas(CommonValues.districtLevel2_2, SaasLocalityType.QUARTER, language1)
+            ),
+            thoroughfares = listOf(thoroughfareZone2, thoroughfareStreet2),
+            premises = listOf(
+                PremiseSaas(CommonValues.building2, SaasPremiseType.BUILDING, language2),
+                PremiseSaas(CommonValues.door2, SaasPremiseType.ROOM, language2),
+                PremiseSaas(CommonValues.floor2, SaasPremiseType.LEVEL, language2)
+            ),
+            postalDeliveryPoints = listOf(
+                PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint3), PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint4)
+            ),
+            types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
+        )),
+        types = listOf(addressType),
+        relations = listOf(
+            RelationSaas(
+                type = parentRelationType,
+                startNode = CommonValues.bpnL2,
+                endNode = CommonValues.bpnA2,
+                startNodeDataSource = datasource1,
+                endNodeDataSource = datasource1
+            )
+        )
+    )
+
+    val addressPartnerSaas3 = BusinessPartnerSaas(
+        id = partnerId9,
+        createdAt = createdTime1,
+        lastModifiedAt = createdTime1,
+        externalId = partnerId9,
+        dataSource = datasource1,
+        addresses = listOf(AddressSaas(
+            id = addressId3,
+            externalId = addressId3,
+            saasId = addressId3,
+            country = CountrySaas(CommonValues.country3, CommonValues.country3.getName()),
+            administrativeAreas = listOf(
+                AdministrativeAreaSaas(CommonValues.adminArea3, SaasAdministrativeAreaType.REGION, language3),
+                AdministrativeAreaSaas(CommonValues.county3, SaasAdministrativeAreaType.COUNTY, language3)
+            ),
+            postCodes = listOf(PostCodeSaas(CommonValues.postCode3, SaasPostCodeType.REGULAR)),
+            localities = listOf(
+                city3,
+                LocalitySaas(CommonValues.districtLevel1_3, SaasLocalityType.DISTRICT, language1),
+                LocalitySaas(CommonValues.districtLevel2_3, SaasLocalityType.QUARTER, language1)
+            ),
+            thoroughfares = listOf(thoroughfareZone3, thoroughfareStreet3),
+            premises = listOf(
+                PremiseSaas(CommonValues.building3, SaasPremiseType.BUILDING, language2),
+                PremiseSaas(CommonValues.door3, SaasPremiseType.ROOM, language2),
+                PremiseSaas(CommonValues.floor3, SaasPremiseType.LEVEL, language2)
+            ),
+            postalDeliveryPoints = listOf(PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint5)),
+            types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
+        )),
         types = listOf(addressType),
         relations = listOf(
             RelationSaas(

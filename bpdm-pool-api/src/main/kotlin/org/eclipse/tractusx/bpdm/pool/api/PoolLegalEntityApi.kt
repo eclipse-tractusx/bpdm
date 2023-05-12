@@ -89,7 +89,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): LegalEntityPartnerResponse
+    ): LegalEntityResponse
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -129,7 +129,7 @@ interface PoolLegalEntityApi {
     @PostExchange("/search")
     fun searchSites(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityPartnerResponse>>
+    ): ResponseEntity<Collection<LegalEntityResponse>>
 
     @Operation(
         summary = "Get site partners of a legal entity",
@@ -147,7 +147,7 @@ interface PoolLegalEntityApi {
     fun getSites(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SitePartnerResponse>
+    ): PageResponse<SiteResponse>
 
     @Operation(
         summary = "Get address partners of a legal entity",
@@ -165,7 +165,7 @@ interface PoolLegalEntityApi {
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpn: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressPartnerResponse>
+    ): PageResponse<LogisticAddressResponse>
 
     @Operation(
         summary = "Search Legal Addresses",
@@ -182,7 +182,7 @@ interface PoolLegalEntityApi {
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
-    ): Collection<LegalAddressSearchResponse>
+    ): Collection<LegalAddressResponse>
 
     @Operation(
         summary = "Create new legal entity business partners",

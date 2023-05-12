@@ -19,9 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class ClassificationType(val url: String) {
-    NACE(""),
-    NAF(""),
-    NAICS(""),
-    SIC("")
+enum class ClassificationType(private val typeName: String) : NamedType {
+    NACE("NACE"),
+    NAF("NAF"),
+    NAICS("NAICS"),
+    SIC("SIC");
+
+    override fun getTypeName(): String = typeName
 }

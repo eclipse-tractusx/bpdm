@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
@@ -40,6 +41,7 @@ class AddressDocSearchRepository(
     val restHighLevelClient: RestHighLevelClient,
     val bpdmQueryBuilder: BpdmOpenSearchQueryBuilder
 ) {
+    private val logger = KotlinLogging.logger { }
 
     /**
      * Find [AddressPartnerDoc] entries by [partnerSearchRequest] field query texts.
@@ -102,8 +104,11 @@ class AddressDocSearchRepository(
         searchRequest.indices(ADDRESS_PARTNER_INDEX_NAME)
         searchRequest.source(searchSourceBuilder)
 
+        logger.info { searchRequest }
+        logger.info { restHighLevelClient.lowLevelClient.nodes.get(0).host.toHostString()}
         val searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT)
 
+        logger.info { searchResponse }
         return searchResponse.hits
     }
 }

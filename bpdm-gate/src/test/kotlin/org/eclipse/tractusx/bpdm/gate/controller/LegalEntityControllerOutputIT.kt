@@ -35,6 +35,9 @@ import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
+import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -104,12 +107,12 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityPartnerResponse1,
-            ResponseValues.legalEntityPartnerResponse2
+            ResponseValues.legalEntityResponse1,
+            ResponseValues.legalEntityResponse2
         )
         val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -136,7 +139,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -208,12 +211,12 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityPartnerResponse1,
-            ResponseValues.legalEntityPartnerResponse2
+            ResponseValues.legalEntityResponse1,
+            ResponseValues.legalEntityResponse2
         )
         val legalAddressesPool = listOf(
-            ResponseValues.legalAddressSearchResponse1,
-            ResponseValues.legalAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -241,7 +244,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")

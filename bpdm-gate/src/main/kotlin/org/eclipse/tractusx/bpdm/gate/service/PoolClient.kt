@@ -35,7 +35,7 @@ class PoolClient(
     private val webClient: WebClient,
     private val objectMapper: ObjectMapper
 ) {
-    fun searchLegalEntities(bpnLs: Collection<String>): Collection<LegalEntityPartnerResponse> {
+    fun searchLegalEntities(bpnLs: Collection<String>): Collection<LegalEntityResponse> {
         if (bpnLs.isEmpty()) return emptyList()
 
         val legalEntities = try {
@@ -44,7 +44,7 @@ class PoolClient(
                 .uri("/legal-entities/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnLs))
                 .retrieve()
-                .bodyToMono<Collection<LegalEntityPartnerResponse>>()
+                .bodyToMono<Collection<LegalEntityResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search legal entities failed.", e)
@@ -52,7 +52,7 @@ class PoolClient(
         return legalEntities
     }
 
-    fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressSearchResponse> {
+    fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LogisticAddressResponse> {
         if (bpnLs.isEmpty()) return emptyList()
 
         val legalAddresses = try {
@@ -61,7 +61,7 @@ class PoolClient(
                 .uri("/legal-entities/legal-addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnLs))
                 .retrieve()
-                .bodyToMono<Collection<LegalAddressSearchResponse>>()
+                .bodyToMono<Collection<LogisticAddressResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search legal addresses failed.", e)
@@ -69,7 +69,7 @@ class PoolClient(
         return legalAddresses
     }
 
-    fun searchSites(bpnSs: Collection<String>): Collection<SitePartnerSearchResponse> {
+    fun searchSites(bpnSs: Collection<String>): Collection<SiteResponse> {
         if (bpnSs.isEmpty()) return emptyList()
 
         val sites = try {
@@ -78,7 +78,7 @@ class PoolClient(
                 .uri("/sites/search")
                 .bodyValue(objectMapper.writeValueAsString(SiteBpnSearchRequest(sites = bpnSs)))
                 .retrieve()
-                .bodyToMono<PageResponse<SitePartnerSearchResponse>>()
+                .bodyToMono<PageResponse<SiteResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search sites failed.", e)
@@ -86,7 +86,7 @@ class PoolClient(
         return sites.content
     }
 
-    fun searchMainAddresses(bpnSs: Collection<String>): Collection<MainAddressSearchResponse> {
+    fun searchMainAddresses(bpnSs: Collection<String>): Collection<LogisticAddressResponse> {
         if (bpnSs.isEmpty()) return emptyList()
 
         val mainAddresses = try {
@@ -95,7 +95,7 @@ class PoolClient(
                 .uri("/sites/main-addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnSs))
                 .retrieve()
-                .bodyToMono<Collection<MainAddressSearchResponse>>()
+                .bodyToMono<Collection<LogisticAddressResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to main addresses of sites failed.", e)
@@ -103,7 +103,7 @@ class PoolClient(
         return mainAddresses
     }
 
-    fun searchAddresses(bpnAs: Collection<String>): Collection<AddressPartnerSearchResponse> {
+    fun searchAddresses(bpnAs: Collection<String>): Collection<LogisticAddressResponse> {
         if (bpnAs.isEmpty()) return emptyList()
 
         val addresses = try {
@@ -112,7 +112,7 @@ class PoolClient(
                 .uri("/addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(AddressPartnerBpnSearchRequest(addresses = bpnAs)))
                 .retrieve()
-                .bodyToMono<PageResponse<AddressPartnerSearchResponse>>()
+                .bodyToMono<PageResponse<LogisticAddressResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search addresses failed.", e)

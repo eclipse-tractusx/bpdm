@@ -32,7 +32,10 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
@@ -46,6 +49,7 @@ import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
+
 
 private const val ASYNC_TIMEOUT_IN_MS: Long = 5 * 1000 //5 seconds
 private const val ASYNC_CHECK_INTERVAL_IN_MS: Long = 200
@@ -104,14 +108,26 @@ class TestHelpers(
         val indexedLegalEntities = legalEntities.entities.associateBy { it.index }
 
         val assignedSiteRequests =
-            partnerStructures.flatMap { it.siteStructures.map { site -> site.site.copy(legalEntity = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
+            partnerStructures.flatMap {
+                it.siteStructures.map { site ->
+                    site.site.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpn)
+                }
+            }
         val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)
         val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
-            partnerStructures.flatMap { it.addresses.map { address -> address.copy(parent = indexedLegalEntities[it.legalEntity.index]!!.bpn) } }
+            partnerStructures.flatMap {
+                it.addresses.map { address ->
+                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpn)
+                }
+            }
         val assignedSiteAddresses =
-            partnerStructures.flatMap { it.siteStructures }.flatMap { it.addresses.map { address -> address.copy(parent = indexedSites[it.site.index]!!.bpn) } }
+            partnerStructures
+                .flatMap { it.siteStructures }
+                .flatMap {
+                    it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.site.bpn) }
+                }
 
         val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
 
@@ -183,23 +199,12 @@ class TestHelpers(
     fun createTestMetadata() {
 
         poolClient.metadata().createLegalForm(RequestValues.legalForm1)
-        poolClient.metadata()
         poolClient.metadata().createLegalForm(RequestValues.legalForm2)
         poolClient.metadata().createLegalForm(RequestValues.legalForm3)
 
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType1)
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType2)
-        poolClient.metadata().createIdentifierType( RequestValues.identifierType3)
-
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody1)
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody2)
-        poolClient.metadata().createIssuingBody(RequestValues.issuingBody3)
-
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus1)
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus2)
-        poolClient.metadata().createIdentifierStatus(RequestValues.identifierStatus3)
-
-
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto1)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto2)
+        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto3)
     }
 
 
@@ -266,6 +271,7 @@ class TestHelpers(
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
     }
 
     fun <ERROR : ErrorCode> assertErrorResponse(errorResponse: ErrorInfo<ERROR>, codeToCheck: ERROR, keyToCheck: String) {

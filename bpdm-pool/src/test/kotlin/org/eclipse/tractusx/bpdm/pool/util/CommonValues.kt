@@ -21,7 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
+import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
@@ -30,10 +36,12 @@ import java.util.*
  */
 object CommonValues {
 
+    val now = Instant.now()
+
     //The BPNs should match the first generated BPNs from the Issuer in order
     val bpnL1 = "BPNL000000000001"
     val bpnL2 = "BPNL0000000001YN"
-    val bpnL3 = "BPNS0000000002XY"
+    val bpnL3 = "BPNL0000000002XY"
 
     val bpnA1 = "BPNA000000000001"
     val bpnA2 = "BPNA0000000001YN"
@@ -60,8 +68,6 @@ object CommonValues {
     val country2 = CountryCode.FR
     val country3 = CountryCode.PL
 
-    val nameType1 = NameType.OTHER
-
     val name1 = "Business Partner Name"
     val name2 = "Company ABC AG"
     val name3 = "Another Organisation Corp"
@@ -83,10 +89,6 @@ object CommonValues {
     val legalFormName2 = "Gemeinschaft mit beschränkter Haftung"
     val legalFormName3 = "股份有限公司"
 
-    val legalFormUrl1 = "http://catenax-host/legal-form1"
-    val legalFormUrl2 = "http://catenax-host/legal-form2"
-    val legalFormUrl3 = "http://catenax-host/legal-form3"
-
     val legalFormAbbreviation1 = "LLC"
     val legalFormAbbreviation2 = "GmbH"
     val legalFormAbbreviation3 = "股份有限"
@@ -107,37 +109,17 @@ object CommonValues {
     val identifierTypeName2 = "VAT USA"
     val identifierTypeName3 = "VAT France"
 
-    val identifierTypeUrl1 = "http://catenax-host/id-type1"
-    val identifierTypeUrl2 = "http://catenax-host/id-type2"
-    val identifierTypeUrl3 = "http://catenax-host/id-type3"
-
-    val identifierStatusKey1 = "ACTIVE"
-    val identifierStatusKey2 = "EXPIRED"
-    val identifierStatusKey3 = "UNKNOWN"
-
-    val identifierStatusName1 = "Active"
-    val identifierStatusName2 = "Expired"
-    val identifierStatusName3 = "Unknown Status"
-
-    val issuingBodyKey1 = "AGENCYX"
-    val issuingBodyKey2 = "BODYY"
-    val issuingBodyKey3 = "OFFICIALZ"
-
-    val issuingBodyName1 = "Agency X"
-    val issuingBodyName2 = "Body Y"
-    val issuingBodyName3 = "Official Z"
-
-    val issuingBodyUrl1 = "http://catenax-host/issuing-body1"
-    val issuingBodyUrl2 = "http://catenax-host/issuing-body2"
-    val issuingBodyUrl3 = "http://catenax-host/issuing-body3"
+    val issuingBody1 = "Agency X"
+    val issuingBody2 = "Body Y"
+    val issuingBody3 = "Official Z"
 
     val identifierValue1 = "ID-XYZ"
     val identifierValue2 = "Another ID Value"
     val identifierValue3 = "An ID Value"
 
-    val statusType1 = BusinessStatusType.ACTIVE
-    val statusType2 = BusinessStatusType.DISSOLVED
-    val statusType3 = BusinessStatusType.INSOLVENCY
+    val statusType1 = BusinessStateType.ACTIVE
+    val statusType2 = BusinessStateType.INACTIVE
+    val statusType3 = BusinessStateType.ACTIVE         // TODO unknown?
 
     val statusDenotation1 = "Active"
     val statusDenotation2 = "Dissolved"
@@ -155,23 +137,72 @@ object CommonValues {
     val classification4 = "Financial and insurance activities"
     val classification5 = "Accounting, bookkeeping and auditing activities; tax consultancy"
 
-    val adminAreaType1 = AdministrativeAreaType.OTHER
+    // TODO enable regionCodes later
+//    val adminAreaLevel1RegionCode_1 = "BW"
+//    val adminAreaLevel1Region1 = NameRegioncodeDto(adminAreaLevel1RegionCode_1, "Baden-Württemberg")
+//    val adminAreaLevel1RegionCode_2 = "GA"
+//    val adminAreaLevel1Region2 = NameRegioncodeDto(adminAreaLevel1RegionCode_2, "Georgia")
+//    val adminAreaLevel1RegionCode_3 = "GA"
+//    val adminAreaLevel1Region3 = NameRegioncodeDto(adminAreaLevel1RegionCode_3, "Georgia")
 
-    val adminArea1 = "Baden-Württemberg"
-    val adminArea2 = "Stuttgart"
-    val adminArea3 = "Georgia"
-    val adminArea4 = "South Carolina"
-    val adminArea5 = "河北省"
+    val adminAreaLevel1RegionCode_1: String? = null
+    val adminAreaLevel1Region1: NameRegioncodeDto? = null
+    val adminAreaLevel1RegionCode_2: String? = null
+    val adminAreaLevel1Region2: NameRegioncodeDto? = null
+    val adminAreaLevel1RegionCode_3: String? = null
+    val adminAreaLevel1Region3: NameRegioncodeDto? = null
 
-    val postCodeType1 = PostCodeType.OTHER
+    val county1 = "Böblingen"
+    val county2 = " Fulton County"
+    val county3 = " Fulton County"
 
-    val postCode1 = "70546"
+    val city1 = "Böblingen"
+    val city2 = "Atlanta"
+    val city3 = "Atlanta"
+
+    val districtLevel1_1 = "Sindelfingen-Ost"
+    val districtLevel1_2 = "District Level 1"
+    val districtLevel1_3 = "DL 1"
+
+    val districtLevel2_1 = "Sindelfingen-Ost-Level2"
+    val districtLevel2_2 = "District Level 2"
+    val districtLevel2_3 = "DL 2"
+
+    val street1 = "Bela-Barenyi-Straße"
+    val street2 = ""
+    val street3 = ""
+
+    val houseNumber1 = ""
+    val houseNumber2 = ""
+    val houseNumber3 = ""
+
+    val industrialZone1 = "Industrial Zone One"
+    val industrialZone2 = "Industrial Zone Two"
+    val industrialZone3 = "Industrial Zone Three"
+
+    val building1 = "Gebäude eins"
+    val building2 = "Building Two"
+    val building3 = "tedifício  três"
+
+    val floor1 = "Stockerk eins"
+    val floor2 = "Floor Two"
+    val floor3 = "piso três"
+
+    val door1 = "Raum eins"
+    val door2 = "Door Two"
+    val door3 = "peça três"
+
+    val postCode1 = "71059 "
     val postCode2 = "70547"
     val postCode3 = "30346"
     val postCode4 = "07677-7731"
     val postCode5 = "511464"
 
-    val localityType1 = LocalityType.OTHER
+    val adminArea1 = "Stuttgart"
+    val adminArea2 = "Stuttgart"
+    val adminArea3 = "Georgia"
+    val adminArea4 = "South Carolina"
+    val adminArea5 = "河北省"
 
     val locality1 = "Stuttgart"
     val locality2 = "Vaihingen"
@@ -179,15 +210,11 @@ object CommonValues {
     val locality4 = "Woodcliff Lake"
     val locality5 = "北京市"
 
-    val thoroughfareType1 = ThoroughfareType.OTHER
-
     val thoroughfare1 = "Mercedesstraße 120"
     val thoroughfare2 = "Werk 1"
     val thoroughfare3 = "300 Chestnut Ridge Road"
     val thoroughfare4 = "Factory 1"
     val thoroughfare5 = "工人体育场东路"
-
-    val premiseType1 = PremiseType.OTHER
 
     val premise1 = "Bauteil A"
     val premise2 = "Etage 1"
@@ -195,8 +222,6 @@ object CommonValues {
     val premise4 = "First Floor"
     val premise5 = "主楼"
     val premise6 = "Komplex X"
-
-    val postalDeliveryPointType1 = PostalDeliveryPointType.OTHER
 
     val postalDeliveryPoint1 = "Postal Delivery point"
     val postalDeliveryPoint2 = "Mailbox Premise Street"

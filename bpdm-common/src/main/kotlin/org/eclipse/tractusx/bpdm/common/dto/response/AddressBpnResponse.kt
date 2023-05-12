@@ -30,5 +30,5 @@ data class AddressBpnResponse(
     @Schema(description = "Business Partner Number, main identifier value for addresses")
     val bpn: String,
     @field:JsonUnwrapped
-    val address: AddressResponse
+    val address: BasePostalAddressResponse
 )

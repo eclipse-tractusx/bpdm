@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -53,16 +53,16 @@ class AddressController(
 
     override fun getAddress(
         bpn: String
-    ): AddressPartnerSearchResponse {
+    ): LogisticAddressResponse {
         return addressService.findByBpn(bpn.uppercase())
     }
 
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
-        pageRequest: PaginationRequest
-    ): PageResponse<AddressPartnerSearchResponse> {
+        paginationRequest: PaginationRequest
+    ): PageResponse<LogisticAddressResponse> {
 
-        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, pageRequest)
+        return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 
 

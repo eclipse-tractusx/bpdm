@@ -23,9 +23,8 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
-import org.eclipse.tractusx.bpdm.pool.entity.Address
-import org.eclipse.tractusx.bpdm.pool.entity.AddressPartner
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.springframework.stereotype.Service
 
 /**
@@ -35,49 +34,76 @@ import org.springframework.stereotype.Service
 class DocumentMappingService {
 
     /**
-     * Maps [partner] to [LegalEntityDoc] representation
+     * Maps [LegalEntity] to [LegalEntityDoc] representation
      */
     fun toDocument(partner: LegalEntity): LegalEntityDoc {
-        val partnerStatus = partner.stati.maxWithOrNull(compareBy { it.validFrom })
+        val partnerStatus = partner.states.maxWithOrNull(compareBy { it.validFrom })
         return LegalEntityDoc(
-            partner.bpn,
-            partner.names.map { TextDoc(it.value) },
-            if (partner.legalForm?.name != null) TextDoc(partner.legalForm!!.name!!) else null,
-            if (partnerStatus?.officialDenotation != null) TextDoc(partnerStatus.officialDenotation) else null,
-            listOf(toDocument(partner.legalAddress)),
-            partner.classification.filter { it.value != null }.map { TextDoc(it.value!!) },
-            partner.sites.map { TextDoc(it.name) }
+            bpn = partner.bpn,
+            legalName = TextDoc(partner.legalName.value),
+            legalForm = partner.legalForm?.name?.let { TextDoc(it) },
+            status = partnerStatus?.officialDenotation?.let { TextDoc(it) },
+            addresses = toAddresses(partner.legalAddress),
+            classifications = partner.classifications.mapNotNull { classif -> classif.value?.let { TextDoc(it) } },
+            sites = partner.sites.map { TextDoc(it.name) }
         )
     }
 
     /**
-     * Maps [address] to [AddressDoc] representation
+     * Maps [LogisticAddress] to [AddressPartnerDoc] representation
      */
-    fun toDocument(address: Address): AddressDoc {
-        return AddressDoc(
-            address.administrativeAreas.map { TextDoc(it.value) },
-            address.postCodes.map { TextDoc(it.value) },
-            address.localities.map { TextDoc(it.value) },
-            address.thoroughfares.map { TextDoc(it.value) },
-            address.premises.map { TextDoc(it.value) },
-            address.postalDeliveryPoints.map { TextDoc(it.value) }
-        )
+    fun toDocument(logisticAddress: LogisticAddress): Collection<AddressPartnerDoc> {
+
+        val addresses: MutableList<AddressPartnerDoc> = mutableListOf()
+
+        addresses.add(toAddressPartnerDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress)), logisticAddress.bpn))
+        // TODO OpenSearch indexing doesn't work as expected when creating two AddressPartnerDocs with the same BPN (which is the ID), only last is indexed!
+        //  For now don't index alternativePostalAddress, since this would override (more important) physicalPostalAddress!
+//        if (logisticAddress.alternativePostalAddress != null) {
+//            addresses.add(toAddressPartnerDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!)), logisticAddress.bpn))
+//        }
+
+        return addresses
     }
 
     /**
-     * Maps [addressPartner] to [AddressPartnerDoc] representation
+     * Maps [logisticAddress] to [AddressPartnerDoc] representation
      */
-    fun toDocument(addressPartner: AddressPartner): AddressPartnerDoc {
+    fun toAddresses(logisticAddress: LogisticAddress): Collection<AddressDoc> {
+
+       val addresses: MutableList<AddressDoc> = mutableListOf()
+
+        addresses.add(toAddressDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress))))
+        if (logisticAddress.alternativePostalAddress != null) {
+            addresses.add(toAddressDoc((AlternativePostalAddressToSaasMapping(logisticAddress.alternativePostalAddress!!))))
+        }
+
+        return addresses
+    }
+
+    fun toAddressPartnerDoc(address: AddressToSaasMapping, bpn: String): AddressPartnerDoc {
         return AddressPartnerDoc(
-            bpn = addressPartner.bpn,
-            administrativeAreas = addressPartner.address.administrativeAreas.map { it.value },
-            postCodes = addressPartner.address.postCodes.map { it.value },
-            localities = addressPartner.address.localities.map { it.value },
-            thoroughfares = addressPartner.address.thoroughfares.map { it.value },
-            premises = addressPartner.address.premises.map { it.value },
-            postalDeliveryPoints = addressPartner.address.postalDeliveryPoints.map { it.value },
-            countryCode = addressPartner.address.country.name
+            bpn = bpn,
+            administrativeAreas = address.administrativeAreas().map { it },
+            postCodes = address.postcodes().map { it },
+            localities = address.localities().map { it },
+            thoroughfares = address.thoroughfares().map { it },
+            premises = address.premises().map { it },
+            postalDeliveryPoints = address.postalDeliveryPoints().map { it },
+            countryCode = address.country()
         )
     }
+
+    fun toAddressDoc(address: AddressToSaasMapping): AddressDoc {
+        return AddressDoc(
+            administrativeAreas = address.administrativeAreas().map { TextDoc(it) },
+            postCodes = address.postcodes().map { TextDoc(it) },
+            localities = address.localities().map { TextDoc(it) },
+            thoroughfares = address.thoroughfares().map { TextDoc(it) },
+            premises = address.premises().map { TextDoc(it) },
+            postalDeliveryPoints = address.postalDeliveryPoints().map { TextDoc(it) }
+        )
+    }
+
 
 }

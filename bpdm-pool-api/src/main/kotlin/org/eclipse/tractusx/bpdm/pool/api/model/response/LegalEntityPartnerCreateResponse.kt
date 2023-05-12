@@ -22,22 +22,19 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.Instant
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateResponse", description = "Created business partner of type legal entity")
 data class LegalEntityPartnerCreateResponse(
-    @Schema(description = "Business Partner Number of this legal entity")
-    val bpn: String,
     @field:JsonUnwrapped
-    val properties: LegalEntityResponse,
-    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
-    val currentness: Instant,
-    @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: AddressResponse,
+    val legalEntity: LegalEntityResponse,
+
+    @Schema(description = "Address of the official seat of this of the legal entity")
+    val legalAddress: LogisticAddressResponse,
+
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
 )

@@ -59,7 +59,7 @@ interface GateLegalEntityApi {
     )
     @PutMapping("/input/legal-entities")
     @PutExchange("/input/legal-entities")
-    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Any>
+    fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
         summary = "Get legal entity by external identifier",

@@ -20,7 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.common.model.AddressType
+import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType.INDUSTRIAL_ZONE
+import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType.STREET
 import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import java.time.LocalDateTime
 
@@ -29,19 +31,16 @@ import java.time.LocalDateTime
  * Numbered values should match with RequestValues numbered values for easier testing
  */
 object SaasValues {
-    val testDatasource = "test-saas-datasource"
+    private const val testDatasource = "test-saas-datasource"
 
-    val idTypeBpn = TypeKeyNameUrlSaas(SaasMappings.BPN_TECHNICAL_KEY, "Business Partner Number")
-    val issuerBpn = TypeKeyNameUrlSaas("CATENAX", "Catena-X")
+    private val idTypeBpn = TypeKeyNameUrlSaas(SaasMappings.BPN_TECHNICAL_KEY, "Business Partner Number")
+    private val issuerBpn = TypeKeyNameUrlSaas("CATENAX", "Catena-X")
 
-    val language1 = LanguageSaas(technicalKey = CommonValues.language1)
-    val language2 = LanguageSaas(technicalKey = CommonValues.language2)
+    private val language1 = LanguageSaas(technicalKey = CommonValues.language1)
+    private val language2 = LanguageSaas(technicalKey = CommonValues.language2)
 
-    val characterSet1 = TypeKeyNameSaas(CommonValues.characterSet1.name)
-    val characterSet2 = TypeKeyNameSaas(CommonValues.characterSet2.name)
-
-    val country1 = CountrySaas(shortName = CommonValues.country1)
-    val country2 = CountrySaas(shortName = CommonValues.country2)
+    private val characterSet1 = TypeKeyNameSaas(CommonValues.characterSet1.name)
+    private val characterSet2 = TypeKeyNameSaas(CommonValues.characterSet2.name)
 
     val modificationTime1 = LocalDateTime.of(2020, 1, 1, 2, 1)
     val modificationTime2 = LocalDateTime.of(2020, 1, 1, 3, 1)
@@ -49,11 +48,11 @@ object SaasValues {
     val identifier1 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey1),
         value = CommonValues.identifierValue1,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey1),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName1),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey1)
     )
 
-    val identifier1Response = identifier1.copy(
+    private val identifier1Response = identifier1.copy(
         type = identifier1.type!!.copy(
             name = CommonValues.identifierTypeName1,
             url = CommonValues.identifierTypeUrl1
@@ -70,11 +69,11 @@ object SaasValues {
     val identifier2 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey2),
         value = CommonValues.identifierValue2,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey2),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName2),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey2)
     )
 
-    val identifier2Response = identifier2.copy(
+    private val identifier2Response = identifier2.copy(
         type = identifier2.type!!.copy(
             name = CommonValues.identifierTypeName2,
             url = CommonValues.identifierTypeUrl2
@@ -88,14 +87,14 @@ object SaasValues {
         )
     )
 
-    val identifier3 = IdentifierSaas(
+    private val identifier3 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey3),
         value = CommonValues.identifierValue3,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey3),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName3),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey3)
     )
 
-    val identifier3Response = identifier3.copy(
+    private val identifier3Response = identifier3.copy(
         type = identifier3.type!!.copy(
             name = CommonValues.identifierTypeName3,
             url = CommonValues.identifierTypeUrl3
@@ -109,14 +108,14 @@ object SaasValues {
         )
     )
 
-    val identifier4 = IdentifierSaas(
+    private val identifier4 = IdentifierSaas(
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierTypeTechnicalKey4),
         value = CommonValues.identifierValue4,
-        issuingBody = TypeKeyNameUrlSaas(technicalKey = CommonValues.identifierIssuingBodyTechnicalKey4),
+        issuingBody = TypeKeyNameUrlSaas(name = CommonValues.identifierIssuingBodyName4),
         status = TypeKeyNameSaas(technicalKey = CommonValues.identifierStatusTechnicalKey4)
     )
 
-    val identifier4Response = identifier4.copy(
+    private val identifier4Response = identifier4.copy(
         type = identifier4.type!!.copy(
             name = CommonValues.identifierTypeName4,
             url = CommonValues.identifierTypeUrl4
@@ -130,82 +129,82 @@ object SaasValues {
         )
     )
 
-    val identifierBpn1 = IdentifierSaas(
+    private val identifierBpn1 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpn1,
         issuingBody = issuerBpn
     )
 
-    val identifierBpn2 = IdentifierSaas(
+    private val identifierBpn2 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpn2,
         issuingBody = issuerBpn
     )
 
-    val identifierBpn3 = IdentifierSaas(
+    private val identifierBpn3 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpn3,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnSite1 = IdentifierSaas(
+    private val identifierBpnSite1 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite1,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnSite2 = IdentifierSaas(
+    private val identifierBpnSite2 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite2,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnSite3 = IdentifierSaas(
+    private val identifierBpnSite3 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnSite3,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnAddress1 = IdentifierSaas(
+    private val identifierBpnAddress1 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnAddress1,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnAddress2 = IdentifierSaas(
+    private val identifierBpnAddress2 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnAddress2,
         issuingBody = issuerBpn
     )
 
-    val identifierBpnAddress3 = IdentifierSaas(
+    private val identifierBpnAddress3 = IdentifierSaas(
         type = idTypeBpn,
         value = CommonValues.bpnAddress3,
         issuingBody = issuerBpn
     )
 
-    val name1 = NameSaas(
+    private val name1 = NameSaas(
         value = CommonValues.name1,
         shortName = CommonValues.shortName1,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.nameType1.name),
         language = language1
     )
 
-    val name2 = NameSaas(
+    private val name2 = NameSaas(
         value = CommonValues.name2,
         shortName = CommonValues.shortName2,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.nameType1.name),
         language = language1
     )
 
-    val name3 = NameSaas(
+    private val name3 = NameSaas(
         value = CommonValues.name3,
         shortName = CommonValues.shortName3,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.nameType1.name),
         language = language1
     )
 
-    val name4 = NameSaas(
+    private val name4 = NameSaas(
         value = CommonValues.name4,
         shortName = CommonValues.shortName4,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.nameType1.name),
@@ -215,187 +214,132 @@ object SaasValues {
     val nameSite1 = NameSaas(value = CommonValues.nameSite1)
     val nameSite2 = NameSaas(value = CommonValues.nameSite2)
 
-    val legalFormCategory1 = TypeNameUrlSaas(
-        name = CommonValues.legalFormCategoryName1,
-        url = CommonValues.legalFormCategoryUrl1
-    )
+    private val legalForm1 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey1)
 
-    val legalFormCategory2 = TypeNameUrlSaas(
-        name = CommonValues.legalFormCategoryName2,
-        url = CommonValues.legalFormCategoryUrl2
-    )
-
-    val legalForm1 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey1)
-
-    val legalForm1Response = legalForm1.copy(
+    private val legalForm1Response = legalForm1.copy(
         name = CommonValues.legalFormName1,
-        url = CommonValues.legalFormUrl1,
         mainAbbreviation = CommonValues.legalFormAbbreviation1,
-        language = language1,
-        categories = listOf(legalFormCategory1)
     )
 
-    val legalForm2 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey2)
+    private val legalForm2 = LegalFormSaas(technicalKey = CommonValues.legalFormTechnicalKey2)
 
-    val legalForm2Response = legalForm2.copy(
+    private val legalForm2Response = legalForm2.copy(
         name = CommonValues.legalFormName2,
-        url = CommonValues.legalFormUrl2,
         mainAbbreviation = CommonValues.legalFormAbbreviation2,
-        language = language2,
-        categories = listOf(legalFormCategory2)
     )
 
-    val businessStatus1 = BusinessPartnerStatusSaas(
-        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStatusType1.name),
+    private val businessStatus1 = BusinessPartnerStatusSaas(
+        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStateType1.name),
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validUntil = CommonValues.businessStatusValidUntil1
     )
 
-    val businessStatus2 = BusinessPartnerStatusSaas(
-        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStatusType2.name),
+    private val businessStatus2 = BusinessPartnerStatusSaas(
+        type = TypeKeyNameUrlSaas(technicalKey = CommonValues.businessStateType2.name),
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validUntil = CommonValues.businessStatusValidUntil2
     )
 
-    val classification1 = ClassificationSaas(
+    private val classification1 = ClassificationSaas(
         value = CommonValues.classificationValue1,
         code = CommonValues.classificationCode1,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.classificationType.name)
     )
 
-    val classification2 = ClassificationSaas(
+    private val classification2 = ClassificationSaas(
         value = CommonValues.classificationValue2,
         code = CommonValues.classificationCode2,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.classificationType.name)
     )
 
-    val classification3 = ClassificationSaas(
+    private val classification3 = ClassificationSaas(
         value = CommonValues.classificationValue3,
         code = CommonValues.classificationCode3,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.classificationType.name)
     )
 
-    val classification4 = ClassificationSaas(
+    private val classification4 = ClassificationSaas(
         value = CommonValues.classificationValue4,
         code = CommonValues.classificationCode4,
         type = TypeKeyNameUrlSaas(technicalKey = CommonValues.classificationType.name)
     )
 
-    val profile1 = PartnerProfileSaas(
+    private val profile1 = PartnerProfileSaas(
         classifications = listOf(classification1, classification2)
     )
 
-    val profile2 = PartnerProfileSaas(
+    private val profile2 = PartnerProfileSaas(
         classifications = listOf(classification3, classification4)
     )
 
-    val bankAccount1 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier1,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier1,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
+    private val adminAreaRegion1 = AdministrativeAreaSaas(CommonValues.adminAreaLevel1RegionCode_1, SaasAdministrativeAreaType.REGION, language1)
+    private val adminAreaCounty1 = AdministrativeAreaSaas(CommonValues.county1, SaasAdministrativeAreaType.COUNTY, language1)
 
-    val bankAccount2 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier2,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier2,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
+    private val adminAreaRegion2 = AdministrativeAreaSaas(CommonValues.adminAreaLevel1RegionCode_2, SaasAdministrativeAreaType.REGION, language2)
+    private val adminAreaCounty2 = AdministrativeAreaSaas(CommonValues.county2, SaasAdministrativeAreaType.COUNTY, language2)
 
-    val bankAccount3 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier3,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier3,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
+    private val postCodeRegular1 = PostCodeSaas(CommonValues.postCode1, SaasPostCodeType.REGULAR)
+    private val postCodeRegular2 = PostCodeSaas(CommonValues.postCode2, SaasPostCodeType.REGULAR)
 
-    val bankAccount4 = BankAccountSaas(
-        internationalBankAccountIdentifier = CommonValues.internationalBankAccountIdentifier4,
-        internationalBankIdentifier = CommonValues.internationalBankIdentifier0,
-        nationalBankAccountIdentifier = CommonValues.nationalBankAccountIdentifier4,
-        nationalBankIdentifier = CommonValues.nationalBankIdentifier0
-    )
+    private val localityCity1 = LocalitySaas(CommonValues.city1, SaasLocalityType.CITY, language1)
+    private val localityDistrict1 = LocalitySaas(CommonValues.districtLevel1_1, SaasLocalityType.DISTRICT, language1)
+    private val localityQuarter1 = LocalitySaas(CommonValues.districtLevel2_1, SaasLocalityType.QUARTER, language1)
 
-    val version1 = AddressVersionSaas(language1, characterSet1)
-    val version2 = AddressVersionSaas(language2, characterSet2)
+    private val localityCity2 = LocalitySaas(CommonValues.city2,  SaasLocalityType.CITY, language2)
+    private val localityDistrict2 = LocalitySaas(CommonValues.districtLevel1_2, SaasLocalityType.DISTRICT, language2)
+    private val localityQuarter2 = LocalitySaas(CommonValues.districtLevel2_2, SaasLocalityType.QUARTER, language2)
 
-    val careOf1 = WrappedValueSaas(CommonValues.careOf1)
-    val careOf2 = WrappedValueSaas(CommonValues.careOf2)
+    private val thoroughfareZone1 = ThoroughfareSaas(name = CommonValues.industrialZone1, saasType = INDUSTRIAL_ZONE, language = language1)
+    private val thoroughfareStreet1 = ThoroughfareSaas(name = CommonValues.street1, direction = CommonValues.direction1
+        , number = CommonValues.houseNumber1, saasType = STREET, language = language1)
+    private val thoroughfareZone2 = ThoroughfareSaas(name = CommonValues.industrialZone2, saasType = INDUSTRIAL_ZONE, language = language2)
+    private val thoroughfareStreet2 = ThoroughfareSaas(name = CommonValues.street2, direction = CommonValues.direction2
+        , number = CommonValues.houseNumber2, saasType = STREET, language = language2)
 
-    val context1 = WrappedValueSaas(CommonValues.context1)
-    val context2 = WrappedValueSaas(CommonValues.context2)
 
-    val addressType1 = TypeKeyNameUrlSaas(technicalKey = AddressType.HEADQUARTER.name)
+    private val premiseBuilding1 = PremiseSaas(CommonValues.building1, SaasPremiseType.BUILDING, language1)
+    private val premiseRoom1 = PremiseSaas(CommonValues.door1, SaasPremiseType.ROOM, language1)
+    private val premiseLevel1 = PremiseSaas(CommonValues.floor1, SaasPremiseType.LEVEL, language1)
 
-    val adminAreaType1 = TypeKeyNameUrlSaas(CommonValues.adminAreaType1.name)
-    val adminAreaType2 = TypeKeyNameUrlSaas(CommonValues.adminAreaType2.name)
+    private val premiseBuilding2 = PremiseSaas(CommonValues.building2, SaasPremiseType.BUILDING, language2)
+    private val premiseRoom2 = PremiseSaas(CommonValues.door2, SaasPremiseType.ROOM, language2)
+    private val premiseLevel2 = PremiseSaas(CommonValues.floor2, SaasPremiseType.LEVEL, language2)
 
-    val adminArea1 = AdministrativeAreaSaas(CommonValues.adminArea1, type = adminAreaType1, language = language1)
-    val adminArea2 = AdministrativeAreaSaas(CommonValues.adminArea2, type = adminAreaType2, language = language2)
+    private val postalDeliveryPoint1 = PostalDeliveryPointSaas("Postal Delivery point", SaasPostalDeliveryPointType.MAILBOX, language1)
+    private val postalDeliveryPoint2 = PostalDeliveryPointSaas("Mailbox Premise Street", SaasPostalDeliveryPointType.POST_OFFICE_BOX, language2)
 
-    val postCodeType1 = TypeKeyNameUrlSaas(CommonValues.postCodeType1.name)
-    val postCodeType2 = TypeKeyNameUrlSaas(CommonValues.postCodeType2.name)
-
-    val postCode1 = PostCodeSaas(CommonValues.postCode1, postCodeType1)
-    val postCode2 = PostCodeSaas(CommonValues.postCode2, postCodeType2)
-
-    val localityType1 = TypeKeyNameUrlSaas(CommonValues.localityType1.name)
-    val localityType2 = TypeKeyNameUrlSaas(CommonValues.localityType2.name)
-
-    val locality1 = LocalitySaas(value = CommonValues.locality1, type = localityType1, language = language1)
-    val locality2 = LocalitySaas(value = CommonValues.locality2, type = localityType2, language = language2)
-
-    val thoroughfareType1 = TypeKeyNameUrlSaas(CommonValues.thoroughfareType1.name)
-    val thoroughfareType2 = TypeKeyNameUrlSaas(CommonValues.thoroughfareType2.name)
-
-    val thoroughfare1 = ThoroughfareSaas(value = CommonValues.thoroughfare1, type = thoroughfareType1, language = language1)
-    val thoroughfare2 = ThoroughfareSaas(value = CommonValues.thoroughfare2, type = thoroughfareType2, language = language2)
-
-    val premiseType1 = TypeKeyNameUrlSaas(CommonValues.premiseType1.name)
-    val premiseType2 = TypeKeyNameUrlSaas(CommonValues.premiseType2.name)
-
-    val premise1 = PremiseSaas(value = CommonValues.premise1, type = premiseType1, language = language1)
-    val premise2 = PremiseSaas(value = CommonValues.premise2, type = premiseType2, language = language2)
-
-    val postalDeliveryPointType1 = TypeKeyNameUrlSaas(CommonValues.postalDeliveryPointType1.name)
-    val postalDeliveryPointType2 = TypeKeyNameUrlSaas(CommonValues.postalDeliveryPointType2.name)
-
-    val postalDeliveryPoint1 = PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint1, type = postalDeliveryPointType1, language = language1)
-    val postalDeliveryPoint2 = PostalDeliveryPointSaas(value = CommonValues.postalDeliveryPoint2, type = postalDeliveryPointType2, language = language2)
-
-    val geoCoordinate1 = GeoCoordinatesSaas(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
-    val geoCoordinate2 = GeoCoordinatesSaas(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
+    private val geoCoordinate1 = GeoCoordinatesSaas(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
+    private val geoCoordinate2 = GeoCoordinatesSaas(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
     val address1 = AddressSaas(
-        version = version1,
-        country = country1,
-        careOf = careOf1,
-        contexts = listOf(context1),
-        administrativeAreas = listOf(adminArea1),
-        postCodes = listOf(postCode1),
-        localities = listOf(locality1),
-        thoroughfares = listOf(thoroughfare1),
-        premises = listOf(premise1),
+        //version = AddressVersionSaas(language1, characterSet1),
+        country = CountrySaas(shortName = CommonValues.country1),
+        //careOf = WrappedValueSaas(CommonValues.careOf1),
+        //contexts = listOf( WrappedValueSaas(CommonValues.context1)),
+        administrativeAreas = listOf(adminAreaRegion1, adminAreaCounty1),
+        postCodes = listOf(postCodeRegular1),
+        localities = listOf(localityCity1, localityDistrict1, localityQuarter1),
+        thoroughfares = listOf(thoroughfareZone1, thoroughfareStreet1),
+        premises = listOf(premiseBuilding1, premiseRoom1, premiseLevel1),
         postalDeliveryPoints = listOf(postalDeliveryPoint1),
-        types = listOf(addressType1),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
         geographicCoordinates = geoCoordinate1
     )
 
-    val address2 = AddressSaas(
-        country = country2,
-        version = version2,
-        careOf = careOf2,
-        contexts = listOf(context2),
-        administrativeAreas = listOf(adminArea2),
-        postCodes = listOf(postCode2),
-        localities = listOf(locality2),
-        thoroughfares = listOf(thoroughfare2),
-        premises = listOf(premise2),
+    private val address2 = AddressSaas(
+        version = AddressVersionSaas(language2, characterSet2),
+        country = CountrySaas(shortName = CommonValues.country2),
+        //careOf = WrappedValueSaas(CommonValues.careOf2),
+        //contexts = listOf( WrappedValueSaas(CommonValues.context2)),
+        administrativeAreas = listOf(adminAreaRegion2, adminAreaCounty2),
+        postCodes = listOf(postCodeRegular2),
+        localities = listOf(localityCity2, localityDistrict2, localityQuarter2),
+        thoroughfares = listOf(thoroughfareZone2, thoroughfareStreet2),
+        premises = listOf(premiseBuilding2, premiseRoom2, premiseLevel2),
         postalDeliveryPoints = listOf(postalDeliveryPoint2),
-        types = listOf(addressType1),
+        types = listOf(SaasAddressType.LEGAL.toSaasTypeDto()),
         geographicCoordinates = geoCoordinate2
     )
 
@@ -407,7 +351,6 @@ object SaasValues {
         status = businessStatus1,
         profile = profile1,
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount1, bankAccount2),
         addresses = listOf(address1),
         dataSource = testDatasource,
         lastModifiedAt = modificationTime1,
@@ -426,7 +369,6 @@ object SaasValues {
         status = businessStatus2,
         profile = profile2,
         types = listOf(TypeKeyNameUrlSaas(technicalKey = BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-        bankAccounts = listOf(bankAccount3, bankAccount4),
         addresses = listOf(address2),
         dataSource = testDatasource,
         lastModifiedAt = modificationTime2,
@@ -438,6 +380,8 @@ object SaasValues {
     )
 
     val siteBusinessPartner1 = BusinessPartnerSaas(
+        status = BusinessPartnerStatusSaas(type = TypeKeyNameUrlSaas(CommonValues.businessStateType1.name),
+            validFrom = CommonValues.businessStatusValidFrom1, validUntil = CommonValues.businessStatusValidUntil1, officialDenotation =  CommonValues.businessStatusOfficialDenotation1),
         externalId = CommonValues.externalIdSite1,
         identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
         names = listOf(nameSite1),
@@ -455,6 +399,8 @@ object SaasValues {
     )
 
     val siteBusinessPartner2 = BusinessPartnerSaas(
+        status = BusinessPartnerStatusSaas(type = TypeKeyNameUrlSaas(CommonValues.businessStateType2.name),
+            validFrom = CommonValues.businessStatusValidFrom2, validUntil = CommonValues.businessStatusValidUntil2, officialDenotation =  CommonValues.businessStatusOfficialDenotation2),
         externalId = CommonValues.externalIdSite2,
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
@@ -496,7 +442,7 @@ object SaasValues {
         ),
     )
 
-    val relationType = TypeKeyNameSaas(technicalKey = "PARENT")
+    private val relationType = TypeKeyNameSaas(technicalKey = "PARENT")
 
     val relationSite1ToLegalEntity = RelationSaas(
         startNode = legalEntityRequest1.externalId!!,
@@ -524,7 +470,7 @@ object SaasValues {
         lastModifiedAt = modificationTime1,
         metadata = BusinessPartnerMetadataSaas(
             sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_CONFIDENT_MATCH, "OK")
-        ),
+       ),
     )
 
     val addressBusinessPartnerRequest1 = addressBusinessPartner1.copy(

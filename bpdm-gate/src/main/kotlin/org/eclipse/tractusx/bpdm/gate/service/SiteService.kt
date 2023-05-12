@@ -20,8 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.MainAddressSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
@@ -54,12 +53,12 @@ class SiteService(
     fun getSites(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<SiteGateInputResponse> {
         val sitesPage = saasClient.getSites(limit, startAfter, externalIds)
 
-        val validEntries = sitesPage.values.filter { validateSiteBusinessPartner(it) }
+        val validEntries = toValidSites(sitesPage.values)
 
         return PageStartAfterResponse(
             total = sitesPage.total,
             nextStartAfter = sitesPage.nextStartAfter,
-            content = validEntries.map { inputSaasMappingService.toInputSite(it) },
+            content = validEntries,
             invalidEntries = sitesPage.values.size - validEntries.size
         )
     }
@@ -86,8 +85,8 @@ class SiteService(
         val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.site.bpn }
-        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.site }
+        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.bpn }
+        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.bpnSite }
 
         if (bpnSet.size > sitesByBpnMap.size) {
             logger.warn { "Requested ${bpnSet.size} sites from pool, but only ${sitesByBpnMap.size} were found." }
@@ -120,15 +119,11 @@ class SiteService(
         )
     }
 
-    fun toSiteOutput(externalId: String, site: SitePartnerSearchResponse, mainAddress: MainAddressSearchResponse) =
+    fun toSiteOutput(externalId: String, site: SiteResponse, mainAddress: LogisticAddressResponse) =
         SiteGateOutput(
-            site = SiteResponse(
-                name = site.site.name
-            ),
-            mainAddress = mainAddress.mainAddress,
-            externalId = externalId,
-            bpn = site.site.bpn,
-            legalEntityBpn = site.bpnLegalEntity
+            site = site,
+            mainAddress = mainAddress,
+            externalId = externalId
         )
 
     /**
@@ -177,6 +172,18 @@ class SiteService(
         saasClient.deleteParentRelations(sitesPage.values)
     }
 
+    private fun toValidSites(partners: Collection<BusinessPartnerSaas>): Collection<SiteGateInputResponse> {
+        return partners.mapNotNull {
+            try {
+                toValidSiteInput(it)
+
+            } catch (e: RuntimeException) {
+                logger.warn { "${getLogDescription(it)} will be ignored: ${e.message}" }
+                null
+            }
+        }
+    }
+
     private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInputResponse {
         if (!validateSiteBusinessPartner(partner)) {
             throw SaasInvalidRecordException(partner.id)
@@ -185,15 +192,14 @@ class SiteService(
     }
 
     private fun validateSiteBusinessPartner(partner: BusinessPartnerSaas): Boolean {
-        var valid = true
-        val logMessageStart = "SaaS business partner for site with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
-
-        valid = valid && validateAddresses(partner, logMessageStart)
-        valid = valid && validateLegalEntityParents(partner, logMessageStart)
-        valid = valid && validateNames(partner, logMessageStart)
-
-        return valid
+        val logMessageStart = getLogDescription(partner)
+        return validateAddresses(partner, logMessageStart)
+                && validateLegalEntityParents(partner, logMessageStart)
+                && validateNames(partner, logMessageStart)
     }
+
+    private fun getLogDescription(partner: BusinessPartnerSaas) =
+        "SaaS business partner for site with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
 
     private fun validateNames(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
         if (partner.names.size > 1) {

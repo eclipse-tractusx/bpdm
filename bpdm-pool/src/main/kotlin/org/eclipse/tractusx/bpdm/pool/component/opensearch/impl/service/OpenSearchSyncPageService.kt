@@ -20,12 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocRepository
 import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
-import org.eclipse.tractusx.bpdm.pool.repository.AddressPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
@@ -35,7 +36,7 @@ import java.time.Instant
 @Service
 class OpenSearchSyncPageService(
     val legalEntityRepository: LegalEntityRepository,
-    val addressPartnerRepository: AddressPartnerRepository,
+    val logisticAddressRepository: LogisticAddressRepository,
     val legalEntityDocRepository: LegalEntityDocRepository,
     val addressPartnerDocRepository: AddressPartnerDocRepository,
     val documentMappingService: DocumentMappingService,
@@ -60,9 +61,9 @@ class OpenSearchSyncPageService(
 
         val addressBpns = changelogEntriesBySubject[ChangelogSubject.ADDRESS]?.map { it.bpn }?.toSet()
         if (!addressBpns.isNullOrEmpty()) {
-            val addressesToExport = addressPartnerRepository.findDistinctByBpnIn(addressBpns)
+            val addressesToExport = logisticAddressRepository.findDistinctByBpnIn(addressBpns)
             logger.debug { "Exporting ${addressesToExport.size} address records" }
-            val addressPartnerDocs = addressesToExport.map { documentMappingService.toDocument(it) }
+            val addressPartnerDocs : Collection<AddressPartnerDoc> = addressesToExport.flatMap { documentMappingService.toDocument(it) }
             addressPartnerDocRepository.saveAll(addressPartnerDocs)
         }
 

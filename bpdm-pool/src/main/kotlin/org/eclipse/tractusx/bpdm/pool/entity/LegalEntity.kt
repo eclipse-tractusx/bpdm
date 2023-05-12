@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 import java.time.Instant
 
 @Entity
@@ -32,53 +31,40 @@ import java.time.Instant
 class LegalEntity(
     @Column(name = "bpn", nullable = false, unique = true)
     var bpn: String,
+
+    @Embedded
+    var legalName: Name,
+
     @ManyToOne
     @JoinColumn(name = "legal_form_id")
     var legalForm: LegalForm?,
-    @ElementCollection(targetClass = BusinessPartnerType::class)
-    @JoinTable(name = "legal_entity_types", joinColumns = [JoinColumn(name = "legal_entity_id")], indexes = [Index(columnList = "legal_entity_id")])
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var types: MutableSet<BusinessPartnerType>,
-    @ManyToMany(cascade = [CascadeType.ALL])
-    @JoinTable(
-        name = "legal_entity_roles",
-        joinColumns = [JoinColumn(name = "legal_entity_id")],
-        inverseJoinColumns = [JoinColumn(name = "role_id")],
-        indexes = [Index(columnList = "legal_entity_id")]
-    )
-    val roles: MutableSet<Role>,
+
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant,
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "legal_address_id", nullable = false)
-    var legalAddress: Address
+    var currentness: Instant
+
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val identifiers: MutableSet<Identifier> = mutableSetOf()
+    val identifiers: MutableSet<LegalEntityIdentifier> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val names: MutableSet<Name> = mutableSetOf()
+    val states: MutableSet<LegalEntityState> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val stati: MutableSet<BusinessStatus> = mutableSetOf()
-
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val addresses: MutableSet<AddressPartner> = mutableSetOf()
+    val addresses: MutableSet<LogisticAddress> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val sites: MutableSet<Site> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val classification: MutableSet<Classification> = mutableSetOf()
-
-    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val bankAccounts: MutableSet<BankAccount> = mutableSetOf()
+    val classifications: MutableSet<Classification> = mutableSetOf()
 
     @OneToMany(mappedBy = "startNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val startNodeRelations: MutableSet<Relation> = mutableSetOf()
 
     @OneToMany(mappedBy = "endNode", cascade = [CascadeType.ALL], orphanRemoval = true)
     val endNodeRelations: MutableSet<Relation> = mutableSetOf()
-}
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "legal_address_id", nullable = false)
+    lateinit var legalAddress: LogisticAddress
+}

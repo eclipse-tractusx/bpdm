@@ -28,10 +28,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.AddressPartnerSearchResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityPartnerResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SitePartnerSearchResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -49,6 +46,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.Instant
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
@@ -101,7 +99,7 @@ class SaasControllerImportIT @Autowired constructor(
     private val importReadyAddress3 = SaasValues.addressPartner3.copy(externalId = addressImportId3)
 
     private val idTypeBpn = TypeKeyNameUrlSaas(saasAdapterConfigProperties.bpnKey, bpnConfigProperties.name, "")
-    private val issuerBpn = TypeKeyNameUrlSaas(bpnConfigProperties.agencyKey, bpnConfigProperties.agencyName, "")
+    private val issuerBpn = TypeKeyNameUrlSaas(name = bpnConfigProperties.agencyName)
     private val statusBpn = TypeKeyNameSaas("UNKNOWN", "Unknown")
 
     @BeforeEach
@@ -168,9 +166,9 @@ class SaasControllerImportIT @Autowired constructor(
 
         //Assert actual created sites with expected
         val expectedSites = listOf(
-            SitePartnerSearchResponse(ResponseValues.site1, bpnL1),
-            SitePartnerSearchResponse(ResponseValues.site2, bpnL2),
-            SitePartnerSearchResponse(ResponseValues.site3, createdParentBpn)
+            ResponseValues.site1,
+            ResponseValues.site2,
+            ResponseValues.site3.copy(bpnLegalEntity = createdParentBpn)
         )
 
         val actualSites = getSites(bpnSs).content
@@ -184,6 +182,10 @@ class SaasControllerImportIT @Autowired constructor(
      */
     @Test
     fun `import new address partners`() {
+
+        val importReadyAddress1 = SaasValues.addressPartnerSaas1.copy(externalId = addressImportId1)
+        val importReadyAddress2 = SaasValues.addressPartnerSaas2.copy(externalId = addressImportId2)
+        val importReadyAddress3 = SaasValues.addressPartnerSaas3.copy(externalId = addressImportId3)
 
         //Import the given parent legal entities first
         val legalEntityParents = listOf(
@@ -219,12 +221,13 @@ class SaasControllerImportIT @Autowired constructor(
         //Assert actual with expected
         val actual = getAddresses(addressBpns).content
         val expected = listOf(
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner1, bpnSite = importedSiteBpn),
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner2, bpnLegalEntity = bpnL2),
-            AddressPartnerSearchResponse(address = ResponseValues.addressPartner3, bpnSite = notImportedSiteParentBpn)
+            ResponseValues.addressPartner1,
+            ResponseValues.addressPartner2,
+            ResponseValues.addressPartner3
         )
 
-        testHelpers.assertRecursively(actual).ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(expected)
+        testHelpers.assertRecursively(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
+            .ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
     }
 
     /**
@@ -512,9 +515,9 @@ class SaasControllerImportIT @Autowired constructor(
 
         //assert actual is expected
         val expectedPartners = listOf(
-            SitePartnerSearchResponse(ResponseValues.site1.copy(bpn = bpnS2), bpnL2),
-            SitePartnerSearchResponse(ResponseValues.site2.copy(bpn = bpnS3), bpnL3),
-            SitePartnerSearchResponse(ResponseValues.site3.copy(bpn = bpnS1), bpnL1)
+            ResponseValues.site1.copy(bpn = bpnS2, bpnLegalEntity = bpnL2),
+            ResponseValues.site2.copy(bpn = bpnS3, bpnLegalEntity = bpnL3),
+            ResponseValues.site3.copy(bpn = bpnS1, bpnLegalEntity = bpnL1),
         )
         val actual = getSites(bpns).content
         testHelpers.assertRecursively(actual).isEqualTo(expectedPartners)
@@ -529,9 +532,9 @@ class SaasControllerImportIT @Autowired constructor(
     fun `import updated address partners`() {
         //First create sites
         val addressesToCreate = listOf(
-            importReadyAddress1.copyWithParent(importReadyLegalEntity1.externalId!!),
-            importReadyAddress2.copyWithParent(importReadyLegalEntity2.externalId!!),
-            importReadyAddress3.copyWithParent(importReadyLegalEntity3.externalId!!)
+            SaasValues.addressPartnerSaas1.copy(externalId = addressImportId1).copyWithParent(importReadyLegalEntity1.externalId!!),
+            SaasValues.addressPartnerSaas2.copy(externalId = addressImportId2).copyWithParent(importReadyLegalEntity2.externalId!!),
+            SaasValues.addressPartnerSaas3.copy(externalId = addressImportId3).copyWithParent(importReadyLegalEntity3.externalId!!)
         )
 
         val parents = listOf(importReadyLegalEntity1, importReadyLegalEntity2, importReadyLegalEntity3)
@@ -557,42 +560,42 @@ class SaasControllerImportIT @Autowired constructor(
 
         //assert actual is expected
         val expectedPartners = listOf(
-            AddressPartnerSearchResponse(ResponseValues.addressPartner1.copy(bpn = bpnA2), bpnL2),
-            AddressPartnerSearchResponse(ResponseValues.addressPartner2.copy(bpn = bpnA3), bpnL3),
-            AddressPartnerSearchResponse(ResponseValues.addressPartner3.copy(bpn = bpnA1), bpnL1)
+            ResponseValues.addressPartner1.copy(bpn = bpnA2),
+            ResponseValues.addressPartner2.copy(bpn = bpnA3),
+            ResponseValues.addressPartner3.copy(bpn = bpnA1)
         )
         val actual = getAddresses(bpns).content
-        testHelpers.assertRecursively(actual).isEqualTo(expectedPartners)
+        testHelpers.assertRecursively(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
+            .ignoringFieldsMatchingRegexes(".*bpn").isEqualTo(actual.toList().sortedBy { it.physicalPostalAddress.industrialZone })
     }
 
     private fun assertLegalEntityResponseEquals(
-        actualPartners: Collection<LegalEntityPartnerResponse>,
-        expectedPartners: Collection<LegalEntityPartnerResponse>
+        actualPartners: Collection<LegalEntityResponse>,
+        expectedPartners: Collection<LegalEntityResponse>
     ) {
         assertThat(actualPartners)
             .usingRecursiveComparison()
-            .ignoringFieldsMatchingRegexes(".*uuid", ".*bpn", ".*currentness")
+            .ignoringFieldsMatchingRegexes(".*uuid", ".*bpn")
             .ignoringAllOverriddenEquals()
             .ignoringCollectionOrder()
+            .ignoringFieldsOfTypes(Instant::class.java)
             .isEqualTo(expectedPartners)
     }
 
     private fun getImportedBpns(partners: List<BusinessPartnerSaas>): List<String> {
         val importEntries = importEntryRepository.findByImportIdentifierIn(partners.map { it.externalId!! })
-        return partners.map { importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!! }
+        return partners.map {
+            importEntries.find { entry -> entry.importIdentifier == it.externalId }?.bpn!!
+        }
     }
 
-    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityPartnerResponse> = poolClient.legalEntities().searchSites(bpns).body!!
+    private fun getLegalEntities(bpns: Collection<String>): Collection<LegalEntityResponse> =
+        poolClient.legalEntities().searchSites(bpns).body!!
 
+    private fun getSites(bpns: Collection<String>): PageResponse<SiteResponse> =
+        poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns), PaginationRequest())
 
-    private fun getSites(bpns: Collection<String>): PageResponse<SitePartnerSearchResponse> = poolClient.sites().searchSites(SiteBpnSearchRequest(sites = bpns),
-        PaginationRequest()
-    )
-
-
-    private fun getAddresses(bpns: Collection<String>): PageResponse<AddressPartnerSearchResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
-
-
+    private fun getAddresses(bpns: Collection<String>): PageResponse<LogisticAddressResponse> = poolClient.addresses().searchAddresses(AddressPartnerBpnSearchRequest(addresses = bpns), PaginationRequest())
 
     private fun importPartners(
         partnersToImport: List<BusinessPartnerSaas>,

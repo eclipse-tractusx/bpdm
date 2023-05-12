@@ -19,7 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.saas
 
+import org.eclipse.tractusx.bpdm.common.model.SaasPostCodeType
+import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
+
 data class PostCodeSaas(
-    val value: String? = null,
-    val type: TypeKeyNameUrlSaas? = null
-)
+    override val value: String? = null,
+    override val type: TypeKeyNameUrlSaas? = null
+) : TypeValueSaas {
+    constructor(saasValue: String, saasType: SaasPostCodeType)
+            : this(value = saasValue, type = saasType.toSaasTypeDto())
+}

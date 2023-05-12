@@ -21,24 +21,25 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
 
 @Schema(name = "LegalEntity")
 data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
-    val identifiers: Collection<IdentifierDto> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
-    val names: Collection<NameDto>,
+    val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+
+    @Schema(description = "Legal name the partner goes by")
+    val legalName: NameDto,
+
     @Schema(description = "Technical key of the legal form")
     val legalForm: String? = null,
-    @Schema(description = "Current business status")
-    val status: BusinessStatusDto?,
-    @ArraySchema(arraySchema = Schema(description = "Profile classifications", required = false))
-    val profileClassifications: Collection<ClassificationDto> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The type of partner", required = false, defaultValue = "[]"))
-    val types: Collection<BusinessPartnerType> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner", required = false))
-    val bankAccounts: Collection<BankAccountDto> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    val states: Collection<LegalEntityStateDto> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
+    val classifications: Collection<ClassificationDto> = emptyList(),
+
     @Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: AddressDto
+    val legalAddress: LogisticAddressDto,
+
 )

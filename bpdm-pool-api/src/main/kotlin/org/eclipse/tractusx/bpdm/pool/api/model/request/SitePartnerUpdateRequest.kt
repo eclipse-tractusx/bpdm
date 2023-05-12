@@ -30,6 +30,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class SitePartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this site")
     val bpn: String,
+
     @field:JsonUnwrapped
     val site: SiteDto
 )

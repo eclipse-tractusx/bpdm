@@ -21,28 +21,38 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessPartnerType
+import java.time.Instant
 
+// TODO probably rename to LegalEntityDetailedDto
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
+    @Schema(description = "Business Partner Number of this legal entity")
+    val bpn: String,
+
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
-    val identifiers: Collection<IdentifierResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"))
-    val names: Collection<NameResponse> = emptyList(),
+    val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
+
+    @Schema(description = "Legal name the partner goes by")
+    val legalName: NameResponse,
+
     @Schema(description = "Legal form of the business partner")
     val legalForm: LegalFormResponse? = null,
-    @Schema(description = "Current business status")
-    val status: BusinessStatusResponse? = null,
-    @ArraySchema(arraySchema = Schema(description = "Profile classifications"))
-    val profileClassifications: Collection<ClassificationResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "The partner types"))
-    val types: Collection<TypeKeyNameUrlDto<BusinessPartnerType>> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Bank accounts of this partner"))
-    val bankAccounts: Collection<BankAccountResponse> = emptyList(),
-    @ArraySchema(arraySchema = Schema(description = "Roles the partner takes in the Catena network"))
-    val roles: Collection<TypeKeyNameDto<String>> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    val states: Collection<LegalEntityStateResponse> = emptyList(),
+
+    @ArraySchema(arraySchema = Schema(description = "Classifications"))
+    val classifications: Collection<ClassificationResponse> = emptyList(),
+
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
+
+    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    val currentness: Instant,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

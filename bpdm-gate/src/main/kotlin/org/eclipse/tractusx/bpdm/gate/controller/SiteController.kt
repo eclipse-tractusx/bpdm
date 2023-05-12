@@ -42,7 +42,7 @@ class SiteController(
     val validationService: ValidationService
 ) : GateSiteApi {
 
-    override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Any> {
+    override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -72,6 +72,5 @@ class SiteController(
     override fun validateSite(siteInput: SiteGateInputRequest): ValidationResponse {
         return validationService.validate(siteInput)
     }
-
 
 }

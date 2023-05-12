@@ -27,7 +27,7 @@ import kotlin.reflect.KClass
 class BpdmNotFoundException(
     objectType: String,
     identifier: String
-) : BpdmMultipleNotfound(objectType, listOf(identifier)) {
+) : BpdmMultipleNotFoundException(objectType, listOf(identifier)) {
     constructor(objectType: KClass<*>, identifier: String)
             : this(objectType.simpleName ?: objectType.toString(), identifier)
 }

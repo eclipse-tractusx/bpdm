@@ -19,17 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.common.service
 
-import com.neovisionaries.i18n.CountryCode
-import com.neovisionaries.i18n.CurrencyCode
 import com.neovisionaries.i18n.LanguageCode
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.model.HasDefaultValue
 
 object SaasMappings {
+
+    private val logger = KotlinLogging.logger { }
 
     const val BPN_TECHNICAL_KEY = "CX_BPN"
 
@@ -41,24 +43,12 @@ object SaasMappings {
         return type!!.technicalKey!!
     }
 
-    private fun toOptionalReference(type: TypeKeyNameUrlSaas?): String? {
-        return type?.technicalKey
-    }
-
-    private fun toOptionalReference(type: TypeKeyNameSaas?): String? {
-        return type?.technicalKey
-    }
-
     fun toOptionalReference(legalForm: LegalFormSaas?): String? {
         return legalForm?.technicalKey
     }
 
     private inline fun <reified T> toType(type: TypeKeyNameUrlSaas): T where T : Enum<T> {
         return enumValueOf(type.technicalKey!!)
-    }
-
-    inline fun <reified T> toTypeOrDefault(type: TypeKeyNameUrlSaas?): T where T : Enum<T>, T : HasDefaultValue<T> {
-        return technicalKeyToType(type?.technicalKey)
     }
 
     inline fun <reified T> technicalKeyToType(technicalKey: String?): T where T : Enum<T>, T : HasDefaultValue<T> {
@@ -75,148 +65,226 @@ object SaasMappings {
         return technicalKeyToType(type?.technicalKey)
     }
 
-    fun toCountryCode(country: CountrySaas?): CountryCode {
-        return country?.shortName ?: CountryCode.UNDEFINED
-    }
-
     fun BusinessPartnerSaas.toLegalEntityDto(): LegalEntityDto {
+        val legalName = toNameDto()
+            ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
         return LegalEntityDto(
-            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toDto(it) },
-            names = names.map { toDto(it) },
+            identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toLegalEntityIdentifierDto(it) },
+            legalName = legalName,
             legalForm = toOptionalReference(legalForm),
-            status = if (status != null) toDto(status) else null,
-            profileClassifications = toDto(profile),
-            bankAccounts = bankAccounts.map { toDto(it) },
-            legalAddress = toDto(addresses.firstOrNull() ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal address", id ?: "Unknown"))
+            states = toLegalEntityStatesDtos(status),
+            classifications = toDto(profile),
+            // TODO Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
+            legalAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 
     fun BusinessPartnerSaas.toSiteDto(): SiteDto {
+        val name = toNameDto()
+            ?: throw BpdmMappingException(this::class, SiteDto::class, "No name", externalId ?: "Unknown")
         return SiteDto(
-            name = names.first().value,
-            mainAddress = toDto(addresses.first())
+            name = name.value,
+            states = toSiteStatesDtos(status),
+            // TODO Known issue: For now the main address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
+            mainAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 
-    fun toDto(identifier: IdentifierSaas): IdentifierDto {
-        return IdentifierDto(
-            identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, IdentifierDto::class, IdentifierSaas::value),
-            toReference(identifier.type),
-            toOptionalReference(identifier.issuingBody),
-            toOptionalReference(identifier.status)
+    fun BusinessPartnerSaas.toLogisticAddressDto(): LogisticAddressDto {
+        // partial LogisticAddressDto is enriched with info from BusinessPartnerSaas
+        return convertSaasAdressesToLogisticAddressDto(addresses, id)
+            .copy(
+                name = toNameDto()?.value,
+                states = toAddressStatesDtos(status),
+                identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toAddressIdentifierDto(it) }
+            )
+    }
+
+    private fun BusinessPartnerSaas.toNameDto(): NameDto? {
+        if (names.size > 1) {
+            logger.warn { "Business Partner with ID $externalId has more than one name" }
+        }
+        return names.map { toDto(it) }
+            .firstOrNull()
+    }
+
+    fun toLegalEntityIdentifierDto(identifier: IdentifierSaas): LegalEntityIdentifierDto {
+        return LegalEntityIdentifierDto(
+            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, LegalEntityIdentifierDto::class, IdentifierSaas::value),
+            type = toReference(identifier.type),
+            issuingBody = identifier.issuingBody?.name
+        )
+    }
+
+    fun toAddressIdentifierDto(identifier: IdentifierSaas): AddressIdentifierDto {
+        return AddressIdentifierDto(
+            value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, AddressIdentifierDto::class, IdentifierSaas::value),
+            type = toReference(identifier.type)
         )
     }
 
     fun toDto(name: NameSaas): NameDto {
         return NameDto(
             name.value,
-            name.shortName,
-            toTypeOrDefault(name.type),
-            toLanguageCode(name.language)
+            name.shortName
         )
     }
 
-    fun toDto(status: BusinessPartnerStatusSaas): BusinessStatusDto {
-        return BusinessStatusDto(
-            status.officialDenotation,
-            status.validFrom,
-            status.validUntil,
-            toTypeOrDefault(status.type)
+    fun toLegalEntityStatesDtos(status: BusinessPartnerStatusSaas?): Collection<LegalEntityStateDto> =
+        listOfNotNull(
+            status?.type?.let {
+                LegalEntityStateDto(
+                    officialDenotation = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validTo = status.validUntil,
+                    type = toType(status.type)
+                )
+            }
         )
-    }
+
+    fun toSiteStatesDtos(status: BusinessPartnerStatusSaas?): Collection<SiteStateDto> =
+        listOfNotNull(
+            status?.type?.let {
+                SiteStateDto(
+                    description = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validTo = status.validUntil,
+                    type = BusinessStateType.valueOf(status.type.technicalKey!!)
+                )
+            }
+        )
+
+    fun toAddressStatesDtos(status: BusinessPartnerStatusSaas?): Collection<AddressStateDto> =
+        listOfNotNull(
+            status?.type?.let {
+                AddressStateDto(
+                    description = status.officialDenotation,
+                    validFrom = status.validFrom,
+                    validTo = status.validUntil,
+                    type = toType(status.type)
+                )
+            }
+        )
 
     fun toDto(profile: PartnerProfileSaas?): Collection<ClassificationDto> {
-        return profile?.classifications?.map { toDto(it) } ?: emptyList()
+        return profile?.classifications?.mapNotNull { toDto(it) } ?: emptyList()
     }
 
-    fun toDto(classification: ClassificationSaas): ClassificationDto {
-        return ClassificationDto(classification.value, classification.code, toType<ClassificationType>(classification.type!!))
+    fun toDto(classification: ClassificationSaas): ClassificationDto? {
+        return classification.type?.let {
+            ClassificationDto(
+                value = classification.value,
+                code = classification.code,
+                type = toType(it)
+            )
+        }
     }
 
-    fun toDto(account: BankAccountSaas): BankAccountDto {
-        return BankAccountDto(
-            emptyList(),
-            CurrencyCode.UNDEFINED,
-            account.internationalBankAccountIdentifier,
-            account.internationalBankIdentifier,
-            account.nationalBankAccountIdentifier,
-            account.nationalBankIdentifier
+    /**
+     * For now a legal/main address is not represented as a full-fledged business partner like a regular address, but as a sub-address of its
+     * leading business partner (LE or site).
+     *
+     * This entails some limitations for legal/main addresses compared to regular addresses:
+     * - name, states, identifiers are missing in SaaS
+     * - a generated BPN-A can't be returned back to the Gate
+     */
+    fun convertSaasAdressesToLogisticAddressDto(addresses: Collection<AddressSaas>, id: String?): LogisticAddressDto {
+        val mapping = SaasAddressesMapping(addresses)
+        val physicalAddressMapping = mapping.saasPhysicalAddressMapping()
+            ?: throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid legal address", id ?: "Unknown")
+        val alternativeAddressMapping = mapping.saasAlternativeAddressMapping()
+
+        // info for name, states, identifiers is contained in BusinessPartnerSaas and can't be filled in here
+        return LogisticAddressDto(
+            name = null,
+            states = emptyList(),
+            identifiers = emptyList(),
+            physicalPostalAddress = toPhysicalAddress(physicalAddressMapping, id),
+            alternativePostalAddress = alternativeAddressMapping?.let { toAlternativeAddress(it, id) },
         )
     }
 
-    fun toDto(address: AddressSaas): AddressDto {
-        return AddressDto(
-            toDto(address.version),
-            address.careOf?.value,
-            address.contexts.mapNotNull { it.value },
-            toCountryCode(address.country),
-            address.administrativeAreas.map { toDto(it) },
-            address.postCodes.map { toDto(it) },
-            address.localities.map { toDto(it) },
-            address.thoroughfares.map { toDto(it) },
-            address.premises.map { toDto(it) },
-            address.postalDeliveryPoints.map { toDto(it) },
-            if (address.geographicCoordinates != null) toDto(address.geographicCoordinates) else null,
-            address.types.map { toTypeOrDefault(it) }
+    fun toPhysicalAddress(map: SaasAddressToDtoMapping, id: String?): PhysicalPostalAddressDto {
+        val city = map.city()
+        val country = map.countryCode()
+        if (city == null || country == null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid physical address", id ?: "Unknown")
+        }
+
+        return PhysicalPostalAddressDto(
+            companyPostCode = map.companyPostCode(),
+            industrialZone = map.industrialZone(),
+            building = map.building(),
+            floor = map.floor(),
+            door = map.door(),
+            baseAddress = BasePostalAddressDto(
+                geographicCoordinates = map.geoCoordinates(),
+                city = city,
+                country = country,
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                administrativeAreaLevel2 = map.adminAreaLevel2(),
+                administrativeAreaLevel3 = null,
+                administrativeAreaLevel4 = null,
+                postCode = map.postcode(),
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+                street = toStreetDto(map),
+            )
         )
     }
+
+    fun toAlternativeAddress(map: SaasAddressToDtoMapping, id: String?): AlternativePostalAddressDto {
+        val city = map.city()
+        val country = map.countryCode()
+        if (city == null || country == null) {
+            throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
+        }
+
+        val poBoxValue = map.deliveryServiceTypePoBox()
+        val privateBagValue = map.deliveryServiceTypePrivateBag()
+
+        val (deliveryServiceType, deliveryServiceNumber) = when {
+            poBoxValue != null -> Pair(DeliveryServiceType.PO_BOX, poBoxValue)
+            privateBagValue != null -> Pair(DeliveryServiceType.PRIVATE_BAG, privateBagValue)
+            else -> throw BpdmMappingException(AddressSaas::class, LogisticAddressDto::class, "No valid alternativ address", id ?: "Unknown")
+        }
+
+        return AlternativePostalAddressDto(
+            deliveryServiceNumber = deliveryServiceNumber,
+            deliveryServiceType = deliveryServiceType,
+            baseAddress = BasePostalAddressDto(
+                geographicCoordinates = map.geoCoordinates(),
+                city = city,
+                country = country,
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                administrativeAreaLevel2 = map.adminAreaLevel2(),
+                administrativeAreaLevel3 = null,
+                administrativeAreaLevel4 = null,
+                postCode = map.postcode(),
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+                street = toStreetDto(map),
+            )
+        )
+    }
+
+    private fun toStreetDto(map: SaasAddressToDtoMapping): StreetDto? {
+        if (map.streetName() == null) {
+            return null
+        }
+        return StreetDto(
+            name = map.streetName(),
+            houseNumber = map.streetHouseNumber(),
+            milestone = map.streetMilestone(),
+            direction = map.streetDirection()
+        )
+    }
+
 
     fun toDto(version: AddressVersionSaas?): AddressVersionDto {
         return AddressVersionDto(toTypeOrDefault(version?.characterSet), toLanguageCode(version?.language))
     }
 
-    fun toDto(area: AdministrativeAreaSaas): AdministrativeAreaDto {
-        return AdministrativeAreaDto(
-            area.value ?: throw BpdmNullMappingException(area::class, AdministrativeAreaDto::class, area::value),
-            area.shortName,
-            null,
-            toTypeOrDefault(area.type)
-        )
-    }
-
-    fun toDto(postcode: PostCodeSaas): PostCodeDto {
-        return PostCodeDto(
-            postcode.value ?: throw BpdmNullMappingException(postcode::class, PostCodeDto::class, postcode::value),
-            toTypeOrDefault(postcode.type)
-        )
-    }
-
-    fun toDto(locality: LocalitySaas): LocalityDto {
-        return LocalityDto(
-            locality.value ?: throw BpdmNullMappingException(locality::class, LocalityDto::class, locality::value),
-            locality.shortName,
-            toTypeOrDefault(locality.type)
-        )
-    }
-
-    fun toDto(thoroughfare: ThoroughfareSaas): ThoroughfareDto {
-        return ThoroughfareDto(
-            thoroughfare.value ?: throw BpdmNullMappingException(thoroughfare::class, ThoroughfareDto::class, thoroughfare::value),
-            thoroughfare.name,
-            thoroughfare.shortName,
-            thoroughfare.number,
-            thoroughfare.direction,
-            toTypeOrDefault(thoroughfare.type)
-        )
-    }
-
-    fun toDto(premise: PremiseSaas): PremiseDto {
-        return PremiseDto(
-            premise.value ?: throw BpdmNullMappingException(premise::class, PremiseDto::class, premise::value),
-            premise.shortName,
-            premise.number,
-            toTypeOrDefault(premise.type)
-        )
-    }
-
-    fun toDto(deliveryPoint: PostalDeliveryPointSaas): PostalDeliveryPointDto {
-        return PostalDeliveryPointDto(
-            deliveryPoint.value ?: throw BpdmNullMappingException(deliveryPoint::class, PostalDeliveryPointDto::class, deliveryPoint::value),
-            deliveryPoint.shortName,
-            deliveryPoint.number,
-            toTypeOrDefault(deliveryPoint.type)
-        )
-    }
 
     fun toDto(geoCoords: GeoCoordinatesSaas): GeoCoordinateDto? {
         return if (geoCoords.latitude != null && geoCoords.longitude != null) GeoCoordinateDto(geoCoords.longitude, geoCoords.latitude, null) else null
@@ -234,4 +302,5 @@ object SaasMappings {
             )
         )
     }
+
 }

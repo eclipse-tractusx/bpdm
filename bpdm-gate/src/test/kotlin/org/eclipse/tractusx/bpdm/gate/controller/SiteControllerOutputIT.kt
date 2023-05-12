@@ -36,6 +36,7 @@ import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -101,12 +102,12 @@ internal class SiteControllerOutputIT @Autowired constructor(
         )
 
         val sitesPool = listOf(
-            ResponseValues.sitePartnerSearchResponse1,
-            ResponseValues.sitePartnerSearchResponse2
+            ResponseValues.siteResponse1,
+            ResponseValues.siteResponse2
         )
         val mainAddressesPool = listOf(
-            ResponseValues.mainAddressSearchResponse1,
-            ResponseValues.mainAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -133,7 +134,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
@@ -214,12 +215,12 @@ internal class SiteControllerOutputIT @Autowired constructor(
         )
 
         val sitesPool = listOf(
-            ResponseValues.sitePartnerSearchResponse1,
-            ResponseValues.sitePartnerSearchResponse2
+            ResponseValues.siteResponse1,
+            ResponseValues.siteResponse2
         )
         val mainAddressesPool = listOf(
-            ResponseValues.mainAddressSearchResponse1,
-            ResponseValues.mainAddressSearchResponse2
+            ResponseValues.logisticAddress1,
+            ResponseValues.logisticAddress2
         )
 
         val limit = 2
@@ -247,7 +248,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
         )
 
         wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
+            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
                 .willReturn(
                     aResponse()
                         .withHeader("Content-Type", "application/json")
