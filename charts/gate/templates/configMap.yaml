@@ -29,6 +29,8 @@ data:
     # Place for putting standard deployment configuration
     # which can be overwritten by external.yml
     bpdm:
+      datasource:
+        host: {{ include "bpdm.postgresDependency" . }}
       pool:
         base-url: http://pool-bpdm:8080/api/catena
   external.yml: |-
