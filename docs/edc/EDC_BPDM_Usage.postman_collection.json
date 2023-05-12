@@ -1,0 +1,742 @@
+{
+  "info": {
+    "_postman_id": "c0b541fd-d746-43f7-be3f-580e2cfc2414",
+    "name": "EDC BPDM Usage",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "1816771"
+  },
+  "item": [
+    {
+      "name": "Access Asset",
+      "item": [
+        {
+          "name": "Legal Entity Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "startAfter",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Site Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "startAfter",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Address Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "startAfter",
+                  "value": null,
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Legal Entity Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"identifiers\": [\n      {\n        \"value\": \"string\",\n        \"type\": \"string\",\n        \"issuingBody\": \"string\",\n        \"status\": \"string\"\n      }\n    ],\n    \"names\": [\n      {\n        \"value\": \"string\",\n        \"shortName\": \"string\",\n        \"type\": \"ACRONYM\",\n        \"language\": \"undefined\"\n      }\n    ],\n    \"legalForm\": \"string\",\n    \"status\": {\n      \"officialDenotation\": \"string\",\n      \"validFrom\": \"2023-03-21T13:47:05.538Z\",\n      \"validUntil\": \"2023-03-21T13:47:05.538Z\",\n      \"type\": \"ACTIVE\"\n    },\n    \"profileClassifications\": [\n      {\n        \"value\": \"string\",\n        \"code\": \"string\",\n        \"type\": \"NACE\"\n      }\n    ],\n    \"types\": [\n      \"BRAND\"\n    ],\n    \"bankAccounts\": [\n      {\n        \"trustScores\": [\n          0\n        ],\n        \"currency\": \"UNDEFINED\",\n        \"internationalBankAccountIdentifier\": \"string\",\n        \"internationalBankIdentifier\": \"string\",\n        \"nationalBankAccountIdentifier\": \"string\",\n        \"nationalBankIdentifier\": \"string\"\n      }\n    ],\n    \"legalAddress\": {\n      \"version\": {\n        \"characterSet\": \"ARABIC\",\n        \"language\": \"undefined\"\n      },\n      \"careOf\": \"string\",\n      \"contexts\": [\n        \"string\"\n      ],\n      \"country\": \"UNDEFINED\",\n      \"administrativeAreas\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"fipsCode\": \"string\",\n          \"type\": \"COUNTY\"\n        }\n      ],\n      \"postCodes\": [\n        {\n          \"value\": \"string\",\n          \"type\": \"CEDEX\"\n        }\n      ],\n      \"localities\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"type\": \"BLOCK\"\n        }\n      ],\n      \"thoroughfares\": [\n        {\n          \"value\": \"string\",\n          \"name\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"direction\": \"string\",\n          \"type\": \"INDUSTRIAL_ZONE\"\n        }\n      ],\n      \"premises\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"BUILDING\"\n        }\n      ],\n      \"postalDeliveryPoints\": [\n        {\n          \"value\": \"string\",\n          \"shortName\": \"string\",\n          \"number\": \"string\",\n          \"type\": \"INTERURBAN_DELIVERY_POINT\"\n        }\n      ],\n      \"geographicCoordinates\": {\n        \"longitude\": 0,\n        \"latitude\": 0,\n        \"altitude\": 0\n      },\n      \"types\": [\n        \"BRANCH_OFFICE\"\n      ]\n    },\n    \"externalId\": \"string\",\n    \"bpn\": \"string\"\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Site Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"name\": \"Lager und Warenausgabe Berlin\",\n    \"mainAddress\": {\n      \"version\": {\n        \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n        \"language\": \"de\"\n      },\n      \"careOf\": \"string\",\n      \"contexts\": [\n        \"string\"\n      ],\n      \"country\": \"DE\",\n      \"postCodes\": [\n        {\n          \"value\": \"13629\",\n          \"type\": \"CEDEX\"\n        }\n      ],\n      \"localities\": [\n        {\n          \"value\": \"Berlin\",\n          \"type\": \"CITY\"\n        }\n      ],\n      \"thoroughfares\": [\n        {\n          \"value\": \"Nonnendamm 101\",\n          \"type\": \"STREET\"\n        }\n      ]\n    },\n    \"externalId\": \"EXT_ID_1_S1\",\n    \"legalEntityExternalId\": \"EXT_ID_1\",\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Address Input",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"de\"\n        },\n        \"country\": \"DE\",\n        \"postCodes\": [\n            {\n                \"value\": \"13629\",\n                \"type\": \"CEDEX\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Berlin\",\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Nonnendamm 120\",\n                \"type\": \"STREET\"\n            }\n        ],\n        \"externalId\": \"EXT_ID_1_A1\",\n        \"siteExternalId\": \"EXT_ID_1_S1\"\n    }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Legal Entity Output Search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    \"string\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "startAfter",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Site Output Search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    \"string\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "startAfter",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Address Output Search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "value",
+                  "value": "{{TRANSFER_AUTH_KEY}}",
+                  "type": "string"
+                },
+                {
+                  "key": "key",
+                  "value": "Authorization",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    \"string\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{SHARING_MEMBER_EDC_URL}}/api/public?limit=10",
+              "host": [
+                "{{SHARING_MEMBER_EDC_URL}}"
+              ],
+              "path": [
+                "api",
+                "public"
+              ],
+              "query": [
+                {
+                  "key": "startAfter",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Asset Catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{SHARING_MEMBER_EDC_URL}}/data/catalog?providerUrl={{GATE_EDC_URL}}/api/v1/ids/data&size=50",
+          "host": [
+            "{{SHARING_MEMBER_EDC_URL}}"
+          ],
+          "path": [
+            "data",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "providerUrl",
+              "value": "{{GATE_EDC_URL}}/api/v1/ids/data"
+            },
+            {
+              "key": "size",
+              "value": "50"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Negotation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Body matches string\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set(\"NEGOTIATION_ID\", jsonData.id);",
+              "",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "var asset_id = pm.variables.get(\"ASSET_ID\");",
+              "pm.collectionVariables.set(\"CONTRACT_ID\", \"MEMBER_BPN_ACCESS_\" + asset_id);",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"connectorId\": \"foo\",\n    \"connectorAddress\": \"{{GATE_EDC_URL}}/api/v1/ids/data\",\n    \"offer\": {\n        \"offerId\": \"{{CONTRACT_ID}}:foo\",\n        \"assetId\": \"{{ASSET_ID}}\",\n        \"policy\": {\n            \"prohibitions\": [],\n            \"obligations\": [],\n            \"permissions\": [\n                {\n                    \"edctype\": \"dataspaceconnector:permission\",\n                    \"action\": {\n                        \"type\": \"USE\"\n                    },\n                    \"target\": \"{{ASSET_ID}}\",\n                    \"constraints\": [\n                        {\n                            \"edctype\": \"AtomicConstraint\",\n                            \"leftExpression\": {\n                                \"edctype\": \"dataspaceconnector:literalexpression\",\n                                \"value\": \"BusinessPartnerNumber\"\n                            },\n                            \"rightExpression\": {\n                                \"edctype\": \"dataspaceconnector:literalexpression\",\n                                \"value\": \"{{SHARING_MEMBER_BPN}}\"\n                            },\n                            \"operator\": \"EQ\"\n                        }\n                    ]\n                }\n            ]\n        }\n    }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{SHARING_MEMBER_EDC_URL}}/data/contractnegotiations",
+          "host": [
+            "{{SHARING_MEMBER_EDC_URL}}"
+          ],
+          "path": [
+            "data",
+            "contractnegotiations"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Fetch Agreement",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Body matches string\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set(\"AGREEMENT_ID\", jsonData.contractAgreementId);",
+              "",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{SHARING_MEMBER_EDC_URL}}/data/contractnegotiations/{{NEGOTIATION_ID}}",
+          "host": [
+            "{{SHARING_MEMBER_EDC_URL}}"
+          ],
+          "path": [
+            "data",
+            "contractnegotiations",
+            "{{NEGOTIATION_ID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Transfer",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"TRANSFER_ID\", Math.random());"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Body matches string\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.collectionVariables.set(\"TRANSFER_PROCESS_ID\", jsonData.id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"{{TRANSFER_ID}}\",\n    \"connectorId\": \"txdc-catalog\",\n    \"connectorAddress\": \"{{GATE_EDC_URL}}/api/v1/ids/data\",\n    \"contractId\": \"{{AGREEMENT_ID}}\",\n    \"assetId\": \"{{ASSET_ID}}\",\n    \"managedResources\": \"false\",\n    \"dataDestination\": {\n        \"type\": \"HttpProxy\"\n    },\n    \"properties\": {\n        \"receiver.http.endpoint\": \"{{BACKEND_EDC_URL}}\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{SHARING_MEMBER_EDC_URL}}/data/transferprocess",
+          "host": [
+            "{{SHARING_MEMBER_EDC_URL}}"
+          ],
+          "path": [
+            "data",
+            "transferprocess"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Fetch Transfer Status",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{SHARING_MEMBER_EDC_URL}}/data/transferprocess/{{TRANSFER_PROCESS_ID}}",
+          "host": [
+            "{{SHARING_MEMBER_EDC_URL}}"
+          ],
+          "path": [
+            "data",
+            "transferprocess",
+            "{{TRANSFER_PROCESS_ID}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Api-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{SHARING_MEMBER_EDC_API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "SHARING_MEMBER_EDC_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "GATE_EDC_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "CONTRACT_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ASSET_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "SHARING_MEMBER_BPN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "SHARING_MEMBER_EDC_API_KEY",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "TRANSFER_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "NEGOTIATION_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "AGREEMENT_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "BACKEND_EDC_URL",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "TRANSFER_PROCESS_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "TRANSFER_AUTH_KEY",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
