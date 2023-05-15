@@ -1,0 +1,86 @@
+bpdm-gate:
+  enabled: true
+  replicaCount: 1
+  image:
+    registry: ghcr.io
+    repository: catenax-ng/tx-bpdm/gate
+    pullPolicy: Always
+    tag: ""
+  # ... more configuration for bpdm-gate if need...
+  applicationConfig:
+    bpdm:
+      pool:
+        base-url: ""
+  postgres:
+    enabled: false
+
+bpdm-pool:
+  enabled: true
+  replicaCount: 1
+  image:
+    registry: ghcr.io
+    repository: catenax-ng/tx-bpdm/pool
+    pullPolicy: Always
+    tag: ""
+  opensearch:
+    enabled: false
+    masterService: ""
+    fullnameOverride: "bpdm-pool-opensearch"
+  postgres:
+    enabled: false
+
+opensearch:
+  masterService: ""
+  fullnameOverride: "bpdm-pool-opensearch"
+  enabled: true
+  replicas: 1
+  protocol: http
+  roles:
+    - master
+    - ingest
+    - data
+  resources:
+    limits:
+      cpu: 300m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 2Gi
+  config:
+    opensearch.yml: |
+      # Bind to all interfaces because we don't know what
+      # IP address Docker will assign to us.
+      network.host: 0.0.0.0
+      # Disable security
+      plugins.security.disabled: true
+  securityConfig:
+    enabled: false
+  extraInitContainers:
+    # Image that performs the sysctl operation to modify Kernel settings
+    # needed sometimes to avoid boot errors
+    - name: sysctl
+      image: docker.io/bitnami/bitnami-shell:10-debian-10-r199
+      imagePullPolicy: "IfNotPresent"
+      command:
+        - /bin/bash
+        - -ec
+        - |
+          CURRENT=`sysctl -n vm.max_map_count`;
+          DESIRED="262144";
+          if [ "$DESIRED" -gt "$CURRENT" ]; then
+              sysctl -w vm.max_map_count=262144;
+          fi;
+          CURRENT=`sysctl -n fs.file-max`;
+          DESIRED="65536";
+          if [ "$DESIRED" -gt "$CURRENT" ]; then
+              sysctl -w fs.file-max=65536;
+          fi;
+      securityContext:
+        runAsUser: 0
+        privileged: true
+
+postgres:
+  enabled: true
+  auth:
+    database: bpdm
+    username: bpdm

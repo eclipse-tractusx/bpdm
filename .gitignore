@@ -19,9 +19,9 @@ target
 #local database data
 /db
 #Helm dependencies
-/charts/pool/charts
-/charts/pool/Chart.lock
-/charts/gate/charts
-/charts/gate/Chart.lock
+/charts/bpdm/Chart.lock
+/charts/bpdm/charts/Chart.lock
+/charts/bpdm/charts/bpdm-gate/Chart.lock
+/charts/bpdm/charts/bpdm-pool/Chart.lock
 #Developer application properties
 application-developer.properties

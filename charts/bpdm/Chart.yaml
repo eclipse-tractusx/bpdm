@@ -18,23 +18,32 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{include "bpdm.fullname" .}}
-  labels:
-    {{- include "bpdm.labels" . | nindent 4 }}
-data:
-  deployment.yml: |-
-    # Place for putting standard deployment configuration
-    # which can be overwritten by external.yml
-    bpdm:
-      datasource:
-        host: {{ include "bpdm.postgresDependency" . }}
-      pool:
-        base-url: http://pool-bpdm:8080/api/catena
-  external.yml: |-
-    # External properties for overwriting application config
-    {{- if .Values.applicationConfig }}
-    {{- .Values.applicationConfig | toYaml | nindent 4 }}
-    {{- end }}
+apiVersion: v2
+name: bpdm umbrella-chart
+type: application
+description: A Helm chart for Kubernetes that deploys the gate and pool applications
+version: 0.1.0
+appVersion: 1.0.0
+home: https://github.com/eclipse-tractusx/bpdm
+sources:
+  - https://github.com/eclipse-tractusx/bpdm
+
+dependencies:
+  - name: bpdm-gate
+    version: 4.0.0-alpha.5
+    alias: bpdm-gate
+    condition: bpdm-gate.enabled
+  - name: bpdm-pool
+    version: 5.0.0-alpha.4
+    alias: bpdm-pool
+    condition: bpdm-pool.enabled
+  - name: opensearch
+    version: 2.*.*
+    repository: https://opensearch-project.github.io/helm-charts/
+    alias: opensearch
+    condition: opensearch.enabled
+  - name: postgresql
+    version: 11.*.*
+    repository: https://charts.bitnami.com/bitnami
+    alias: postgres
+    condition: postgres.enabled
