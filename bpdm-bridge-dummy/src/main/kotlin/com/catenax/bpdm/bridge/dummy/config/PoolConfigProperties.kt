@@ -25,4 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.pool")
 data class PoolConfigProperties(
     val baseUrl: String = "http://localhost:8080/",
+    val securityEnabled: Boolean = false,
+    val oauth2ClientRegistration: String?
 )

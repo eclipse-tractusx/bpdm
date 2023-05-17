@@ -25,4 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.gate")
 data class GateConfigProperties(
     val baseUrl: String = "http://localhost:8081/",
+    val securityEnabled: Boolean = false,
+    val oauth2ClientRegistration: String?
 )
