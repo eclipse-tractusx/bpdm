@@ -24,79 +24,28 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.service.AddressService
-import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
-import org.eclipse.tractusx.bpdm.gate.service.SiteService
+import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SharingStateController(
-    val legalEntityService: LegalEntityService,
-    val siteService: SiteService,
-    val addressService: AddressService
+    val sharingStateService: SharingStateService
 ) : GateSharingStateApi {
 
     private val logger = KotlinLogging.logger { }
 
     override fun getSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
-        // TODO Replace mock implementation using persistence:
-        //  For now only the BPN is collected from CDQ input. If there is none, no sharing status is returned.
-        //  For now lsaType is required!
+
         lsaType ?: throw IllegalArgumentException("lsaType is required")
         externalIds ?: throw IllegalArgumentException("externalIds is required")
 
-        val sharingStates = when (lsaType) {
-            LsaType.LegalEntity ->
-                legalEntityService.getLegalEntities(externalIds = externalIds, limit = paginationRequest.size, startAfter = null).content
-                    .filter { it.bpn != null }
-                    .map {
-                        SharingStateDto(
-                            lsaType = lsaType,
-                            externalId = it.externalId,
-                            bpn = it.bpn,
-                            sharingStateType = SharingStateType.Success
-                        )
-                    }
-
-            LsaType.Site ->
-                siteService.getSites(externalIds = externalIds, limit = paginationRequest.size, startAfter = null).content
-                    .filter { it.bpn != null }
-                    .map {
-                        SharingStateDto(
-                            lsaType = lsaType,
-                            externalId = it.externalId,
-                            bpn = it.bpn,
-                            sharingStateType = SharingStateType.Success
-                        )
-                    }
-
-            LsaType.Address ->
-                addressService.getAddresses(externalIds = externalIds, limit = paginationRequest.size, startAfter = null).content
-                    .filter { it.bpn != null }
-                    .map {
-                        SharingStateDto(
-                            lsaType = lsaType,
-                            externalId = it.externalId,
-                            bpn = it.bpn,
-                            sharingStateType = SharingStateType.Success
-                        )
-                    }
-        }
-
-        // TODO Not yet implemented
-        return PageResponse(
-            totalElements = sharingStates.size.toLong(),
-            totalPages = if (sharingStates.size > 0) 1 else 0,
-            page = 0,
-            contentSize = sharingStates.size,
-            content = sharingStates
-        )
+        return sharingStateService.findSharingStates(paginationRequest, lsaType, externalIds)
     }
 
     override fun upsertSharingState(request: SharingStateDto) {
         // TODO Not yet implemented
         logger.info { "upsertSharingState() called with $request" }
+        sharingStateService.upsertSharingState(request)
     }
 }

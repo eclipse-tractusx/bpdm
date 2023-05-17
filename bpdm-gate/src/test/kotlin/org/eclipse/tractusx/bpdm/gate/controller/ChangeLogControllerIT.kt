@@ -42,8 +42,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
@@ -54,9 +52,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-
 import org.eclipse.tractusx.bpdm.gate.util.*
-
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParam
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParamNotFound
 import org.junit.jupiter.api.BeforeEach
@@ -68,7 +64,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -78,7 +73,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     val gateClient: GateClient,
     private val objectMapper: ObjectMapper,
     val saasConfigProperties: SaasConfigProperties,
-    entityManagerFactory: EntityManagerFactory,
+    private val testHelpers: DbTestHelpers,
 ) {
     companion object {
         @RegisterExtension
@@ -96,13 +91,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
     val instant = Instant.now()
 
-    val BPDM_DB_SCHEMA_NAME: String = "bpdmgate"
-
-    val em: EntityManager = entityManagerFactory.createEntityManager()
-
     @BeforeEach
     fun beforeEach() {
-        truncateDbTables()
+        testHelpers.truncateDbTables()
         wireMockServer.resetAll()
         mockSaas()
         createChangeLogs()
@@ -122,7 +113,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
     }
-
 
 
     /**
@@ -145,13 +135,15 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .isEqualTo(emptyList<ChangelogEntry>())
 
         assertRecursively(searchResult.errors)
-            .isEqualTo(listOf(
-                ErrorInfo(
-                    ChangeLogOutputError.ExternalIdNotFound,
-                    "NONEXIST not found",
-                    "NONEXIST")
-            ))
-
+            .isEqualTo(
+                listOf(
+                    ErrorInfo(
+                        ChangeLogOutputError.ExternalIdNotFound,
+                        "NONEXIST not found",
+                        "NONEXIST"
+                    )
+                )
+            )
 
 
     }
@@ -239,7 +231,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val parentSitesSaas = listOf(
             SaasValues.siteBusinessPartner1
         )
-
 
 
         // mock "get parent legal entities"
@@ -353,26 +344,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         )
     }
 
-    fun truncateDbTables() {
-        em.transaction.begin()
-
-        em.createNativeQuery(
-            """
-            DO $$ DECLARE table_names RECORD;
-            BEGIN
-                FOR table_names IN SELECT table_name
-                    FROM information_schema.tables
-                    WHERE table_schema='${BPDM_DB_SCHEMA_NAME}'
-                    AND table_name NOT IN ('flyway_schema_history') 
-                LOOP 
-                    EXECUTE format('TRUNCATE TABLE ${BPDM_DB_SCHEMA_NAME}.%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
-                END LOOP;
-            END $$;
-        """.trimIndent()
-        ).executeUpdate()
-
-        em.transaction.commit()
-    }
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
         return assertThat(actual)
@@ -387,7 +358,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
      * Retains the order: All response objects will be in the same order as their request counterparts
      * Assumption: Changelog entities have unique indexes among them each
      */
-    fun createChangeLogs(){
+    fun createChangeLogs() {
         val addresses = listOf(
             RequestValues.addressGateInputRequest1
         )
