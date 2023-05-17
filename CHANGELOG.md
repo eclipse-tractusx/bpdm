@@ -10,6 +10,25 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 - Endpoint for retrieving changelog entries has now improved filtering (breaking API change)
 
+## [3.2.2] - 2023-05-12
+
+### Changed
+
+- Move license "header" of ingress under metadata
+- Increase chart versions and adapt changelogs on each chart folder
+  * [bpdm-gate](https://github.com/eclipse-tractusx/bpdm/commit/3139a201e78345f2233a24da6ed9cb444ac12f4b#diff-9d1af39984002e7b571d7b1ab9cd19064d00128c3506bf773c718277099e150a)
+  * [bpdm-pool](https://github.com/eclipse-tractusx/bpdm/commit/3139a201e78345f2233a24da6ed9cb444ac12f4b#diff-cf14cb4bb6951fd450b91b159c9bb90afc282ea13493c0e5bd317ab011537909)
+
+- Increase version release to 3.2.2
+
+## [3.2.1] - 2023-04-20
+
+### Changed
+
+- Changed increase to spring boot starter version 3.0.5
+- Override spring expression transitive dependency to versiomn to 6.0.8
+- Increase version release to 3.2.1
+
 ## [3.2.0] - 2023-03-17
 
 ### Added
