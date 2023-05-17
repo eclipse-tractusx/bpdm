@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
@@ -30,13 +31,17 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLogisticAddressResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -49,21 +54,53 @@ class AddressService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val typeMatchingService: TypeMatchingService,
     private val changelogRepository: ChangelogRepository,
-    private val addressPersistenceService: AddressPersistenceService
+    private val addressPersistenceService: AddressPersistenceService,
+    private val addressRepository: GateAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<AddressGateInputResponse> {
-        val addressesPage = saasClient.getAddresses(limit, startAfter, externalIds)
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageLogisticAddressResponse<AddressGateInputResponse> {
 
-        val addressGateInputResponse = toValidAddresses(addressesPage)
+        val logisticAddressPage = addressRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
 
-        return PageStartAfterResponse(
-            total = addressesPage.total,
-            nextStartAfter = addressesPage.nextStartAfter,
-            content = addressGateInputResponse,
-            invalidEntries = addressesPage.values.size - addressGateInputResponse.size
+        val logisticAddressGateInputResponse = toValidLogisticAddresses(logisticAddressPage)
+
+//        val logisticAddressPageDto = logisticAddressPage.map {
+//            it.toLogisticAddressDto()
+//        }
+
+        return PageLogisticAddressResponse(
+            page = page,
+            totalElements = logisticAddressPage.totalElements,
+            totalPages = logisticAddressPage.totalPages,
+            contentSize = logisticAddressPage.content.size,
+            content = logisticAddressGateInputResponse
         )
+
+    }
+
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputResponse> {
+
+        return logisticAddressPage.content.map { logisticAddress ->
+            val addressDto = LogisticAddressDto(
+                name = logisticAddress.name,
+                states = mapToDtoStates(logisticAddress.states),
+                identifiers = mapToDtoIdentifiers(logisticAddress.identifiers),
+                physicalPostalAddress = logisticAddress.physicalPostalAddress.toPhysicalPostalAddress(),
+                alternativePostalAddress = logisticAddress.alternativePostalAddress?.toAlternativePostalAddressDto()
+            )
+
+            AddressGateInputResponse(
+                address = addressDto,
+                externalId = logisticAddress.externalId,
+                legalEntityExternalId = logisticAddress.legalEntity?.externalId,
+                siteExternalId = logisticAddress.site?.externalId,
+                bpn = logisticAddress.bpn,
+                processStartedAt = null // Set your desired value here
+            )
+        }
+
+
     }
 
     private fun toValidAddresses(addressesPage: PagedResponseSaas<BusinessPartnerSaas>): List<AddressGateInputResponse> {
