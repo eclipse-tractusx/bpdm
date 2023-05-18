@@ -15,7 +15,7 @@ on:
     branches:
       - main
       - rc/**
-      - feat/Dockerfile_for_dummy_bridge
+      - feat/Dockfile_for_dummy_bridge
   pull_request:
     branches:
       - main

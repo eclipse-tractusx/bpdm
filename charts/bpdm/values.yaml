@@ -29,6 +29,23 @@ bpdm-pool:
   postgres:
     enabled: false
 
+bpdm-dummy-bridge:
+  enabled: true
+  replicaCount: 1
+  image:
+    registry: ghcr.io
+    repository: catenax-ng/tx-bpdm/dummy-bridge
+    pullPolicy: Always
+    tag: ""
+  applicationConfig:
+    bpdm:
+      pool:
+        base-url: ""
+      gate:
+        base-url: ""
+  postgres:
+    enabled: false
+
 opensearch:
   masterService: ""
   fullnameOverride: "bpdm-pool-opensearch"

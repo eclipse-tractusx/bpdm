@@ -19,35 +19,19 @@
 ################################################################################
 
 apiVersion: v2
-name: bpdm
 type: application
-description: A Helm chart for Kubernetes that deploys the gate and pool applications
-version: 3.0.0
-appVersion: 1.0.0
-home: https://github.com/eclipse-tractusx/bpdm
+name: bpdm-dummy-bridge
+appVersion: "4.0.0-alpha.2"
+version: 1.0.0
+description: A Helm chart for deploying the BPDM dummy bridge service
+home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
-
 dependencies:
-  - name: bpdm-gate
-    version: 4.0.0-alpha.5
-    alias: bpdm-gate
-    condition: bpdm-gate.enabled
-  - name: bpdm-pool
-    version: 5.0.0-alpha.4
-    alias: bpdm-pool
-    condition: bpdm-pool.enabled
-  - name: bpdm-dummy-bridge
-    version: 1.0.0
-    alias: bpdm-dummy-bridge
-    condition: bpdm-dummy-bridge.enabled
-  - name: opensearch
-    version: 2.*.*
-    repository: https://opensearch-project.github.io/helm-charts/
-    alias: opensearch
-    condition: opensearch.enabled
   - name: postgresql
-    version: 11.*.*
+    version: 11.9.1
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
+maintainers:
+  - name: Nico Koprowski
