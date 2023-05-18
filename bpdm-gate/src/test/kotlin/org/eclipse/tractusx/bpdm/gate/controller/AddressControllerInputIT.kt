@@ -269,6 +269,9 @@ internal class AddressControllerInputIT @Autowired constructor(
             ResponseValues.addressGateInputResponse2,
         )
 
+        val page = 0
+        val size = 10
+
         val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
@@ -315,17 +318,17 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-//        val pageResponse = gateClient.addresses().getAddresses(paginationValue)
-//
-//        assertThat(pageResponse).isEqualTo(
-//            PageStartAfterResponse(
-//                total = total,
-//                nextStartAfter = nextStartAfter,
-//                content = expectedAddresses,
-//                invalidEntries = invalidEntries
-//            )
-//        )
+        val paginationValue = PaginationRequest(page, size)
+        val pageResponse = gateClient.addresses().getAddresses(paginationValue)
+
+        assertThat(pageResponse).isEqualTo(
+            PageStartAfterResponse(
+                total = total,
+                nextStartAfter = nextStartAfter,
+                content = expectedAddresses,
+                invalidEntries = invalidEntries
+            )
+        )
     }
 
 

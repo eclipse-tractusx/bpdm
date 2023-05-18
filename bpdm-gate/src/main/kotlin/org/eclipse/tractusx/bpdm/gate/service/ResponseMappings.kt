@@ -180,7 +180,6 @@ fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity):
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
     return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
-
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
 }

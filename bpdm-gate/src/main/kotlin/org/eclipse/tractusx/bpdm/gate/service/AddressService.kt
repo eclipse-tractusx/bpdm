@@ -23,8 +23,6 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
@@ -65,10 +63,6 @@ class AddressService(
 
         val logisticAddressGateInputResponse = toValidLogisticAddresses(logisticAddressPage)
 
-//        val logisticAddressPageDto = logisticAddressPage.map {
-//            it.toLogisticAddressDto()
-//        }
-
         return PageLogisticAddressResponse(
             page = page,
             totalElements = logisticAddressPage.totalElements,
@@ -96,61 +90,35 @@ class AddressService(
                 legalEntityExternalId = logisticAddress.legalEntity?.externalId,
                 siteExternalId = logisticAddress.site?.externalId,
                 bpn = logisticAddress.bpn,
-                processStartedAt = null // Set your desired value here
+                processStartedAt = null //TODO Remove this?
             )
-        }
-
-
-    }
-
-    private fun toValidAddresses(addressesPage: PagedResponseSaas<BusinessPartnerSaas>): List<AddressGateInputResponse> {
-        val validEntries = addressesPage.values
-            .filter { validateAddressBusinessPartner(it) }
-
-        val addressesWithParent = validEntries.map {
-            Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!)
-        }
-
-        val parents = if (addressesWithParent.isNotEmpty())
-            saasClient.getBusinessPartners(
-                externalIds = addressesWithParent.map { (_, parentId) -> parentId }
-            ).values
-        else
-            emptyList()
-
-        val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
-        val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
-        val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
-
-        return addressesWithParent.mapNotNull { (address, parentId) ->
-            try {
-                when {
-                    legalEntityParentIds.contains(parentId) ->
-                        inputSaasMappingService.toInputAddress(address, parentId, null)
-
-                    siteParentIds.contains(parentId) ->
-                        inputSaasMappingService.toInputAddress(address, null, parentId)
-
-                    else -> {
-                        logger.warn { "Could not fetch parent for SaaS address record with ID ${address.id}" }
-                        null
-                    }
-                }
-
-            } catch (e: RuntimeException) {
-                logger.warn { "SaaS address record with ID ${address.id} will be ignored: ${e.message}" }
-                null
-            }
         }
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
+        //val fetchResponse = saasClient.getBusinessPartner(externalId)
 
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return toValidAddressInput(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Address", externalId)
-        }
+        val logisticAddress = addressRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Logistic Address", externalId)
+
+        return toValidSingleLogisticAddress(logisticAddress)
+
+//        when (fetchResponse.status) {
+//            FetchResponse.Status.OK -> return toValidAddressInput(fetchResponse.businessPartner!!)
+//            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Address", externalId)
+//        }
+
+    }
+
+    private fun toValidSingleLogisticAddress(logisticAddressRecord: LogisticAddress): AddressGateInputResponse {
+
+        return AddressGateInputResponse(
+            address = logisticAddressRecord.toLogisticAddressDto(),
+            externalId = logisticAddressRecord.externalId,
+            legalEntityExternalId = logisticAddressRecord.legalEntity?.externalId,
+            siteExternalId = logisticAddressRecord.site?.externalId,
+            bpn = logisticAddressRecord.bpn,
+            processStartedAt = null //TODO Remove this?
+        )
     }
 
     /**
