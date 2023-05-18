@@ -298,3 +298,31 @@ private fun Street.toStreetDto(): StreetDto {
         direction = direction
     )
 }
+
+fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
+    return LegalEntityDto(
+        legalName = legalName.toNameDto(),
+        legalForm = legalForm,
+        legalAddress = legalAddress.toLogisticAddressDto(),
+        states = mapToLegalEntityStateDto(states),
+        classifications = mapToLegalEntityClassificationsDto(classifications),
+        identifiers = mapToLegalEntityIdentifierDto(identifiers)
+    )
+
+}
+
+fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
+    return states.map { LegalEntityStateDto(it.officialDenotation, it.validFrom, it.validTo, it.type) }
+}
+
+fun mapToLegalEntityIdentifierDto(identifier: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
+    return identifier.map { LegalEntityIdentifierDto(it.value, it.type.toString(), it.issuingBody) }
+}
+
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
+    return classification.map { ClassificationDto(it.value, it.code, it.type) }
+}
+
+fun Name.toNameDto(): NameDto {
+    return NameDto(value, shortName)
+}

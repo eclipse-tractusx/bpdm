@@ -30,10 +30,14 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLegalEntityResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -44,7 +48,8 @@ class LegalEntityService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val changelogRepository: ChangelogRepository,
-    private val legalEntityPersistenceService: LegalEntityPersistenceService
+    private val legalEntityPersistenceService: LegalEntityPersistenceService,
+    private val legalEntityRepository: LegalEntityRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -58,7 +63,7 @@ class LegalEntityService(
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities);
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
@@ -70,16 +75,16 @@ class LegalEntityService(
         }
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<LegalEntityGateInputResponse> {
-        val partnerCollection = saasClient.getLegalEntities(limit, startAfter, externalIds)
+    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageLegalEntityResponse<LegalEntityGateInputResponse> {
 
-        val validEntries = toValidLegalEntities(partnerCollection.values)
-
-        return PageStartAfterResponse(
-            total = partnerCollection.total,
-            nextStartAfter = partnerCollection.nextStartAfter,
-            content = validEntries,
-            invalidEntries = partnerCollection.values.size - validEntries.size
+        val legalEntitiesPage = legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        val legalEntityGateInputResponse = toValidLegalEntities(legalEntitiesPage)
+        return PageLegalEntityResponse(
+            page = page,
+            totalElements = legalEntitiesPage.totalElements,
+            totalPages = legalEntitiesPage.totalPages,
+            contentSize = legalEntitiesPage.content.size,
+            content = legalEntityGateInputResponse
         )
     }
 
@@ -137,6 +142,21 @@ class LegalEntityService(
             legalAddress = legalAddress,
             externalId = externalId
         )
+
+    private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputResponse> {
+
+        return legalEntityPage.content.map { legalEntity ->
+            val legalEntityDto = legalEntity.toLegalEntityDto()
+            LegalEntityGateInputResponse(
+                legalEntity = legalEntityDto,
+                externalId = legalEntity.externalId,
+                bpn = legalEntity.bpn,
+                processStartedAt = null
+            )
+        }
+
+
+    }
 
     private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInputResponse> {
         return partners.mapNotNull {

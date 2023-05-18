@@ -17,19 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.repository
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.CrudRepository
+import io.swagger.v3.oas.annotations.media.Schema
 
-interface LegalEntityRepository : JpaRepository<LegalEntity, Long>, CrudRepository<LegalEntity, Long> {
-
-    fun findDistinctByExternalIdIn(externalId: Collection<String>): Set<LegalEntity>
-
-    fun findByExternalId(externalId: String): LegalEntity?
-
-    fun findByExternalIdIn(externalId: Collection<String>?, pageable: Pageable): Page<LegalEntity>
-}
+@Schema(description = "Paginated collection of Legal Entities")
+data class PageLegalEntityResponse<T>(
+    @Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+    @Schema(description = "Total number pages")
+    val totalPages: Int,
+    @Schema(description = "Current page number")
+    val page: Int,
+    @Schema(description = "Number of results in the page")
+    val contentSize: Int,
+    @Schema(description = "Collection of results in the page")
+    val content: Collection<T>,
+)
