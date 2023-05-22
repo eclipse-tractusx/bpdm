@@ -155,12 +155,63 @@ object RequestValues {
         )
     )
 
+
+    //Temporary Values for Logistic Addresses Tests
+    val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = null,
+            administrativeAreaLevel2 = CommonValues.county1,
+            districtLevel1 = CommonValues.districtLevel1_1,
+            districtLevel2 = CommonValues.districtLevel2_1,
+        ),
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate1,
+            country = CommonValues.country1,
+            postCode = CommonValues.postCode1,
+            city = CommonValues.city1,
+            street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1)
+        )
+    )
+
+    val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = null,
+            administrativeAreaLevel2 = CommonValues.county2,
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
+        ),
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate2,
+            country = CommonValues.country2,
+            postCode = CommonValues.postCode2,
+            city = CommonValues.city2,
+            street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
+        )
+    )
+
     val address1 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
     )
 
     val address2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
+    )
+
+    //Temporary Values for Logistic Address Tests
+    val Logisticaddress1 = LogisticAddressDto(
+        physicalPostalAddress = postalAddressLogisticAddress1,
+    )
+
+    val Logisticaddress2 = LogisticAddressDto(
+        physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
 

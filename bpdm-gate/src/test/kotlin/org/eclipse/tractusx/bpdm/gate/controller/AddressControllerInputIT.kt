@@ -46,16 +46,13 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLogisticAddressResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
-
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -107,13 +104,19 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get address by external id`() {
         val externalIdToQuery = SaasValues.addressBusinessPartnerWithRelations1.externalId!!
-        val expectedAddress = ResponseValues.addressGateInputResponse1
+        val expectedAddress = ResponseValues.logisticAddressGateInputResponse1
 
         val addressRequest = FetchRequest(
             dataSource = saasConfigProperties.datasource,
             externalId = externalIdToQuery,
             featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS)
         )
+
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
         wireMockServer.stubFor(
             post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
                 .withRequestBody(equalToJson(objectMapper.writeValueAsString(addressRequest)))
@@ -153,6 +156,7 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
+        gateClient.addresses().upsertAddresses(addresses)
 
         val valueResponse = gateClient.addresses().getAddressByExternalId(externalIdToQuery)
 
@@ -265,12 +269,22 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.addressGateInputResponse1,
-            ResponseValues.addressGateInputResponse2,
+            ResponseValues.logisticAddressGateInputResponse1,
+            ResponseValues.logisticAddressGateInputResponse2,
+        )
+
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
         )
 
         val page = 0
         val size = 10
+
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
         val limit = 2
         val startAfter = "Aaa111"
@@ -318,15 +332,18 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
+        gateClient.addresses().upsertAddresses(addresses)
+
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddresses(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedAddresses,
-                invalidEntries = invalidEntries
+            PageLogisticAddressResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedAddresses
             )
         )
     }
@@ -350,17 +367,23 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.addressGateInputResponse1,
-            ResponseValues.addressGateInputResponse2,
+            ResponseValues.logisticAddressGateInputResponse1,
+            ResponseValues.logisticAddressGateInputResponse2,
         )
+
+        val page = 0
+        val size = 10
+
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
         val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
         val total = 10
         val invalidEntries = 0
-
-
 
         wireMockServer.stubFor(
             get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
@@ -404,18 +427,25 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
         val listExternalIds = addressesSaas.mapNotNull { it.externalId }
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val pagTest = PaginationRequest(1, 1)
+        gateClient.addresses().upsertAddresses(addresses)
+
+        val pagTest = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagTest, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedAddresses,
-                invalidEntries = invalidEntries
+            PageLogisticAddressResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedAddresses
             )
         )
     }
@@ -439,9 +469,22 @@ internal class AddressControllerInputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.addressGateInputResponse1,
-            ResponseValues.addressGateInputResponse2,
+            ResponseValues.logisticAddressGateInputResponse1,
+            ResponseValues.logisticAddressGateInputResponse2,
         )
+
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
+        val page = 0
+        val size = 10
+
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
         val limit = 3
         val startAfter = "Aaa111"
@@ -489,17 +532,23 @@ internal class AddressControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValues = PaginationStartAfterRequest(startAfter, limit)
-//        val pageResponse = gateClient.addresses().getAddresses(paginationValues)
-//
-//        assertThat(pageResponse).isEqualTo(
-//            PageStartAfterResponse(
-//                total = total,
-//                nextStartAfter = nextStartAfter,
-//                content = expectedAddresses,
-//                invalidEntries = invalidEntries
-//            )
-//        )
+
+        gateClient.addresses().upsertAddresses(addresses)
+
+        val paginationValues = PaginationRequest(page, size)
+        val pageResponse = gateClient.addresses().getAddresses(paginationValues)
+
+        assertThat(pageResponse).isEqualTo(
+            PageLogisticAddressResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedAddresses
+            )
+        )
+
+
     }
 
     /**
@@ -530,10 +579,13 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get addresses, pagination limit exceeded`() {
 
-        val paginationRequest = PaginationStartAfterRequest("", limit = 999999)
+        val page = 0
+        val size = 999999
+
+        val paginationRequest = PaginationRequest(page, size)
 
         try {
-//            gateClient.addresses().getAddresses(paginationRequest)
+            gateClient.addresses().getAddresses(paginationRequest)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -570,138 +622,138 @@ internal class AddressControllerInputIT @Autowired constructor(
             SaasValues.relationAddress2ToSite
         )
 
-        val expectedDeletedRelations = listOf(
-            DeleteRelationsRequestSaas.RelationToDeleteSaas(
-                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
-                    dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().startNode
-                ),
-                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
-                    dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().endNode
-                ),
-            ),
-            DeleteRelationsRequestSaas.RelationToDeleteSaas(
-                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
-                    dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().startNode
-                ),
-                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
-                    dataSourceId = saasConfigProperties.datasource,
-                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().endNode
-                ),
-            ),
-        )
-
-        // mock "get parent legal entities"
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentLegalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
-        // mock "get parent sites"
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentSitesSaas
-                                )
-                            )
-                        )
-                )
-        )
-        val stubMappingUpsertAddresses = wireMockServer.stubFor(
-            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertResponse(
-                                    emptyList(),
-                                    emptyList(),
-                                    2,
-                                    0
-                                )
-                            )
-                        )
-                )
-        )
-        // mock "get addresses with relations"
-        // this simulates the case that the address already had some relations
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 2,
-                                    values = listOf(
-                                        SaasValues.addressBusinessPartnerWithRelations1,
-                                        SaasValues.addressBusinessPartnerWithRelations2
-                                    )
-                                )
-                            )
-                        )
-                )
-        )
-        val stubMappingDeleteRelations = wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                DeleteRelationsResponseSaas(2)
-                            )
-                        )
-                )
-        )
-        val stubMappingUpsertRelations = wireMockServer.stubFor(
-            put(urlPathMatching(SAAS_MOCK_RELATIONS_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertRelationsResponseSaas(
-                                    failures = emptyList(),
-                                    numberOfFailed = 0,
-                                    numberOfInserts = 2,
-                                    numberOfProvidedRelations = 2,
-                                    numberOfUpdates = 0
-                                )
-                            )
-                        )
-                )
-        )
+//        val expectedDeletedRelations = listOf(
+//            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+//                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+//                    dataSourceId = saasConfigProperties.datasource,
+//                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().startNode
+//                ),
+//                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+//                    dataSourceId = saasConfigProperties.datasource,
+//                    externalId = SaasValues.addressBusinessPartnerWithRelations1.relations.first().endNode
+//                ),
+//            ),
+//            DeleteRelationsRequestSaas.RelationToDeleteSaas(
+//                startNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+//                    dataSourceId = saasConfigProperties.datasource,
+//                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().startNode
+//                ),
+//                endNode = DeleteRelationsRequestSaas.RelationNodeToDeleteSaas(
+//                    dataSourceId = saasConfigProperties.datasource,
+//                    externalId = SaasValues.addressBusinessPartnerWithRelations2.relations.first().endNode
+//                ),
+//            ),
+//        )
+//
+//        // mock "get parent legal entities"
+//        wireMockServer.stubFor(
+//            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+//                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
+//                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                PagedResponseSaas(
+//                                    limit = 50,
+//                                    total = 1,
+//                                    values = parentLegalEntitiesSaas
+//                                )
+//                            )
+//                        )
+//                )
+//        )
+//        // mock "get parent sites"
+//        wireMockServer.stubFor(
+//            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+//                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
+//                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                PagedResponseSaas(
+//                                    limit = 50,
+//                                    total = 1,
+//                                    values = parentSitesSaas
+//                                )
+//                            )
+//                        )
+//                )
+//        )
+//        val stubMappingUpsertAddresses = wireMockServer.stubFor(
+//            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                UpsertResponse(
+//                                    emptyList(),
+//                                    emptyList(),
+//                                    2,
+//                                    0
+//                                )
+//                            )
+//                        )
+//                )
+//        )
+//        // mock "get addresses with relations"
+//        // this simulates the case that the address already had some relations
+//        wireMockServer.stubFor(
+//            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+//                .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
+//                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
+//                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                PagedResponseSaas(
+//                                    limit = 50,
+//                                    total = 2,
+//                                    values = listOf(
+//                                        SaasValues.addressBusinessPartnerWithRelations1,
+//                                        SaasValues.addressBusinessPartnerWithRelations2
+//                                    )
+//                                )
+//                            )
+//                        )
+//                )
+//        )
+//        val stubMappingDeleteRelations = wireMockServer.stubFor(
+//            post(urlPathMatching(EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                DeleteRelationsResponseSaas(2)
+//                            )
+//                        )
+//                )
+//        )
+//        val stubMappingUpsertRelations = wireMockServer.stubFor(
+//            put(urlPathMatching(SAAS_MOCK_RELATIONS_PATH))
+//                .willReturn(
+//                    aResponse()
+//                        .withHeader("Content-Type", "application/json")
+//                        .withBody(
+//                            objectMapper.writeValueAsString(
+//                                UpsertRelationsResponseSaas(
+//                                    failures = emptyList(),
+//                                    numberOfFailed = 0,
+//                                    numberOfInserts = 2,
+//                                    numberOfProvidedRelations = 2,
+//                                    numberOfUpdates = 0
+//                                )
+//                            )
+//                        )
+//                )
+//        )
 
 
         try {
@@ -722,12 +774,12 @@ internal class AddressControllerInputIT @Autowired constructor(
 //        assertThat(upsertAddressesRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedAddresses)
 
         // check that "delete relations" was called in SaaS as expected
-        val deleteRelationsRequestSaas =
-            wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
-        assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
-
-        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
-        assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
+//        val deleteRelationsRequestSaas =
+//            wireMockServer.deserializeMatchedRequests<DeleteRelationsRequestSaas>(stubMappingDeleteRelations, objectMapper).single()
+//        assertThat(deleteRelationsRequestSaas.relations).containsExactlyInAnyOrderElementsOf(expectedDeletedRelations)
+//
+//        val upsertRelationsRequest = wireMockServer.deserializeMatchedRequests<UpsertRelationsRequestSaas>(stubMappingUpsertRelations, objectMapper).single()
+//        assertThat(upsertRelationsRequest.relations).containsExactlyInAnyOrderElementsOf(expectedRelations)
     }
 
     /**

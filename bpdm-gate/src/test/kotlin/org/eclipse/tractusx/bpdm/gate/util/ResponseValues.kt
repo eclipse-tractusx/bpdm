@@ -353,4 +353,18 @@ object ResponseValues {
         address = logisticAddress2,
         externalId = CommonValues.externalIdAddress2,
     )
+
+    val logisticAddressGateInputResponse1 = AddressGateInputResponse(
+        address = RequestValues.Logisticaddress1,
+        externalId = CommonValues.externalIdAddress1,
+        bpn = CommonValues.bpnAddress1,
+        processStartedAt = null,
+    )
+    val logisticAddressGateInputResponse2 = AddressGateInputResponse(
+
+        address = RequestValues.Logisticaddress2,
+        externalId = CommonValues.externalIdAddress2,
+        bpn = CommonValues.bpnAddress2,
+        processStartedAt = null,
+    )
 }
