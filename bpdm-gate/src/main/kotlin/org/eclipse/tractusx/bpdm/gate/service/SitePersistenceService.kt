@@ -56,7 +56,10 @@ class SitePersistenceService(
             siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
 
                 val logisticAddressRecord =
-                    addressRepository.findByExternalId(site.externalId + "_site") ?: throw BpdmNotFoundException("Business Partner", "Error")
+                    addressRepository.findByExternalId(getMainAddressForSiteExternalId(site.externalId)) ?: throw BpdmNotFoundException(
+                        "Business Partner",
+                        "Error"
+                    )
 
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
 
