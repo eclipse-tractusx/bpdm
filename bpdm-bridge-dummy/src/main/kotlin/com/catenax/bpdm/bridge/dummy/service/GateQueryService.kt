@@ -199,9 +199,9 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.addresses().getAddressesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
             )
-            pageStartAfter = pageResponse.nextStartAfter
+            //pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
             invalidEntries += pageResponse.invalidEntries
         } while (pageStartAfter != null)

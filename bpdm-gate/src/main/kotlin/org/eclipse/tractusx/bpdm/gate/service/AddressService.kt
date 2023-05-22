@@ -57,11 +57,15 @@ class AddressService(
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageLogisticAddressResponse<AddressGateInputResponse> {
 
+        val findAllPageEntries = addressRepository.findAll(PageRequest.of(page, size))
+
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
         } else {
-            addressRepository.findAll(PageRequest.of(page, size))
+            findAllPageEntries
         }
+
+        val invalidValue = externalIds?.let { findAllPageEntries.totalElements - logisticAddressPage.totalElements } ?: 0
 
         val logisticAddressGateInputResponse = toValidLogisticAddresses(logisticAddressPage)
 
@@ -70,7 +74,8 @@ class AddressService(
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
             contentSize = logisticAddressPage.content.size,
-            content = logisticAddressGateInputResponse
+            content = logisticAddressGateInputResponse,
+            invalidEntries = invalidValue.toInt()
         )
     }
 

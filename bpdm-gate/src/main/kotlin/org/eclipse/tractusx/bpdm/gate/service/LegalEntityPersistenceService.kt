@@ -49,7 +49,7 @@ class LegalEntityPersistenceService(
             val fullLegalEntity = legalEntity.toLegalEntity()
             legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
 
-val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
+                val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
                     ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
