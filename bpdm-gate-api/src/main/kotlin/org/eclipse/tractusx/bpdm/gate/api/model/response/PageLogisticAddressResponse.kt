@@ -35,20 +35,3 @@ data class PageLogisticAddressResponse<T>(
     val content: Collection<T>,
 )
 
-//@Schema(description = "Paginated collection of results")
-//data class PageChangeLogResponse<T>(
-//    @Schema(description = "Total number of all results in all pages")
-//    val totalElements: Long,
-//    @Schema(description = "Total number pages")
-//    val totalPages: Int,
-//    @Schema(description = "Current page number")
-//    val page: Int,
-//    @Schema(description = "Number of results in the page")
-//    val contentSize: Int,
-//    @Schema(description = "Collection of results in the page")
-//    val content: Collection<T>,
-//    @Schema(description = "Number of entries in the page that have been omitted due to being invalid (error)")
-//    val invalidEntries: Int,
-//    @Schema(description = "Infos about the entries with errors")
-//    val errors: Collection<ErrorInfo<ChangeLogOutputError>>,
-//)
