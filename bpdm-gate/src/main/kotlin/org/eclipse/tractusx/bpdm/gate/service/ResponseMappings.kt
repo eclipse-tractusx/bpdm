@@ -126,9 +126,9 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
 fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
     val addressInputRequest =AddressGateInputRequest(
-        address= legalEntity.legalAddress,
-        externalId= externalId+"_legalAddress",
-        legalEntityExternalId= externalId
+        address = legalEntity.legalAddress,
+        externalId = getMainAddressForLegalEntityExternalId(externalId),
+        legalEntityExternalId = externalId
     )
 
     val legalEntity= LegalEntity(
@@ -147,18 +147,27 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
     return legalEntity
 
 }
+
 fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
     return LegalEntityIdentifier(dto.value, dto.type,dto.issuingBody, legalEntity)
 }
+
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
     return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity)
 }
+
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
-    return Classification(dto.value,dto.code,dto.type,legalEntity)
+    return Classification(dto.value, dto.code, dto.type, legalEntity)
 }
-fun NameDto.toName(): Name{
+
+fun NameDto.toName(): Name {
     return Name(value, shortName)
 }
+
 private fun createCurrentnessTimestamp(): Instant {
     return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}
+
+fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {
+    return siteExternalId + "_legalAddress"
 }

@@ -23,7 +23,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.entity.AddressIdentifier
+import org.eclipse.tractusx.bpdm.gate.entity.AddressState
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -46,12 +49,12 @@ class LegalEntityPersistenceService(
             val fullLegalEntity = legalEntity.toLegalEntity()
             legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
 
-                val logisticAddressRecord = gateAddressRepository.findByExternalId(existingLegalEntity.externalId + "_legalAddress")
+                val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
                     ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
 
-                updateLegalEntity(existingLegalEntity, fullLegalEntity, logisticAddressRecord)
+                updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
                 gateLegalEntityRepository.save(existingLegalEntity)
             } ?: run {
 
@@ -61,30 +64,20 @@ class LegalEntityPersistenceService(
         }
     }
 
-    private fun updateLegalEntity(legalEntity: LegalEntity, legalEntityRequest: LegalEntity, logisticAddressRecord: LogisticAddress): LegalEntity {
+    private fun updateLegalEntity(
+        legalEntity: LegalEntity, legalEntityRequest: LegalEntityGateInputRequest, logisticAddressRecord: LogisticAddress
+    ): LegalEntity {
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
-        legalEntity.legalForm = legalEntityRequest.legalForm
-        legalEntity.legalName = legalEntityRequest.legalName
-        legalEntity.identifiers.replace(legalEntityRequest.identifiers.map { toEntityIdentifier(it, legalEntity) })
-        legalEntity.states.replace(legalEntityRequest.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityRequest.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
+        legalEntity.legalName = legalEntityRequest.legalEntity.legalName.toName()
+        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
+        legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity
 
         return legalEntity
-    }
-
-    fun toEntityIdentifier(dto: LegalEntityIdentifier, legalEntity: LegalEntity): LegalEntityIdentifier {
-        return LegalEntityIdentifier(dto.value, dto.type, dto.issuingBody, legalEntity)
-    }
-
-    fun toEntityClassification(dto: Classification, legalEntity: LegalEntity): Classification {
-        return Classification(dto.value, dto.code, dto.type, legalEntity)
-    }
-
-    fun toEntityState(dto: LegalEntityState, legalEntity: LegalEntity): LegalEntityState {
-        return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
     }
 
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
