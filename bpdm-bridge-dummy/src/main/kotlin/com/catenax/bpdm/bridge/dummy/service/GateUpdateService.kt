@@ -44,8 +44,8 @@ class GateUpdateService(
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be an externalId
-            buildErrorSharingStateDto(LsaType.LegalEntity, errorInfo.entityKey, errorInfo, true)
+            val externalId = errorInfo.entityKey
+            buildErrorSharingStateDto(LsaType.LegalEntity, externalId, null, errorInfo, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new legal entities were updated in the Gate" }
@@ -56,9 +56,9 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be a BPN
-            val externalId = externalIdByBpn[errorInfo.entityKey]
-            buildErrorSharingStateDto(LsaType.LegalEntity, externalId, errorInfo, false)
+            val bpn = errorInfo.entityKey
+            val externalId = externalIdByBpn[bpn]
+            buildErrorSharingStateDto(LsaType.LegalEntity, externalId, bpn, errorInfo, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.errorCount} invalid modified legal entities were updated in the Gate" }
@@ -72,8 +72,8 @@ class GateUpdateService(
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be an externalId
-            buildErrorSharingStateDto(LsaType.Site, errorInfo.entityKey, errorInfo, true)
+            val externalId = errorInfo.entityKey
+            buildErrorSharingStateDto(LsaType.Site, externalId, null, errorInfo, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new sites were updated in the Gate" }
@@ -84,9 +84,9 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be a BPN
-            val externalId = externalIdByBpn[errorInfo.entityKey]
-            buildErrorSharingStateDto(LsaType.Site, externalId, errorInfo, false)
+            val bpn = errorInfo.entityKey
+            val externalId = externalIdByBpn[bpn]
+            buildErrorSharingStateDto(LsaType.Site, externalId, bpn, errorInfo, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.errorCount} invalid modified sites were updated in the Gate" }
@@ -100,8 +100,8 @@ class GateUpdateService(
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be an externalId
-            buildErrorSharingStateDto(LsaType.Address, errorInfo.entityKey, errorInfo, true)
+            val externalId = errorInfo.entityKey
+            buildErrorSharingStateDto(LsaType.Address, externalId, null, errorInfo, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new addresses were updated in the Gate" }
@@ -112,29 +112,35 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (errorInfo in responseWrapper.errors) {
-            // entityKey should be a BPN
-            val externalId = externalIdByBpn[errorInfo.entityKey]
-            buildErrorSharingStateDto(LsaType.Address, externalId, errorInfo, false)
+            val bpn = errorInfo.entityKey
+            val externalId = externalIdByBpn[bpn]
+            buildErrorSharingStateDto(LsaType.Address, externalId, bpn, errorInfo, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         logger.info { "Sharing states for ${responseWrapper.errorCount} invalid modified addresses were updated in the Gate" }
     }
 
-    private fun buildSuccessSharingStateDto(lsaType: LsaType, index: String?, bpn: String): SharingStateDto? {
-        if (index == null) {
-            logger.warn { "Encountered index=null in Pool response for $bpn, can't update the Gate sharing state" }
+    private fun buildSuccessSharingStateDto(lsaType: LsaType, externalId: String?, bpn: String): SharingStateDto? {
+        if (externalId == null) {
+            logger.warn { "Encountered externalId=null in Pool response for $bpn, can't update the Gate sharing state" }
             return null
         }
         return SharingStateDto(
             lsaType = lsaType,
-            externalId = index,
+            externalId = externalId,
             sharingStateType = SharingStateType.Success,
             bpn = bpn,
             sharingProcessStarted = LocalDateTime.now()
         )
     }
 
-    private fun buildErrorSharingStateDto(lsaType: LsaType, externalId: String?, errorInfo: ErrorInfo<*>, processStarted: Boolean): SharingStateDto? {
+    private fun buildErrorSharingStateDto(
+        lsaType: LsaType,
+        externalId: String?,
+        bpn: String?,
+        errorInfo: ErrorInfo<*>,
+        processStarted: Boolean
+    ): SharingStateDto? {
         if (externalId == null) {
             logger.warn { "Couldn't determine externalId for $errorInfo, can't update the Gate sharing state" }
             return null
@@ -143,6 +149,7 @@ class GateUpdateService(
             lsaType = lsaType,
             externalId = externalId,
             sharingStateType = SharingStateType.Error,
+            bpn = bpn,
             sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
             sharingErrorMessage = "${errorInfo.message} (${errorInfo.errorCode})",
             sharingProcessStarted = if (processStarted) LocalDateTime.now() else null
