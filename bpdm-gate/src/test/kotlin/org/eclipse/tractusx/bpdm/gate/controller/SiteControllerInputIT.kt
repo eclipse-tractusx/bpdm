@@ -31,10 +31,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
+import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_RELATIONS_PATH
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -55,7 +57,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 internal class SiteControllerInputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val saasConfigProperties: SaasConfigProperties,
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    private val siteRepository: SiteRepository
 ) {
     companion object {
         @RegisterExtension
@@ -408,6 +411,11 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInputRequest2
         )
 
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
+
         val parentLegalEntitiesSaas = listOf(
             SaasValues.legalEntityResponse1,
             SaasValues.legalEntityResponse2
@@ -540,10 +548,18 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntities)
             gateClient.sites().upsertSites(sites)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }
+
+        //Check if persisted site data
+        val siteExternal1 = siteRepository.findByExternalId("site-external-1")
+        Assertions.assertNotEquals(siteExternal1, null)
+
+        val siteExternal2 = siteRepository.findByExternalId("site-external-2")
+        Assertions.assertNotEquals(siteExternal2, null)
 
         // TODO: check that "upsert sites" was called in SaaS as expected
 //        val upsertSitesRequest = wireMockServer.deserializeMatchedRequests<UpsertRequest>(stubMappingUpsertSites, objectMapper).single()

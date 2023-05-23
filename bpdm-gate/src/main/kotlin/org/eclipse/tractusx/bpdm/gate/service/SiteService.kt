@@ -46,7 +46,8 @@ class SiteService(
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val sitePersistenceService: SitePersistenceService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -143,6 +144,8 @@ class SiteService(
         sites.forEach { site ->
             changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
         }
+
+        sitePersistenceService.persistSitesBP(sites)
 
         deleteParentRelationsOfSites(sites)
 

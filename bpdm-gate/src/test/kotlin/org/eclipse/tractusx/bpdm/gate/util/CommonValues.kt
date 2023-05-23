@@ -22,7 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
-import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.CharacterSet
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.NameType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import java.time.Instant

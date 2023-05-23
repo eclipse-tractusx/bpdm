@@ -23,13 +23,14 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAddress {
+fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         bpn = bpn,
@@ -39,6 +40,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?): LogisticAd
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
+        site = site
     )
 
     logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
@@ -115,6 +117,32 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
+// Site Mappers
+fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
+
+    val addressInputRequest = AddressGateInputRequest(
+        address = site.mainAddress,
+        externalId = getMainAddressForSiteExternalId(externalId),
+        legalEntityExternalId = externalId
+    )
+
+    val site = Site(
+        bpn = bpn,
+        name = site.name,
+        externalId = externalId,
+        legalEntity = legalEntity
+    )
+
+    site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
+    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site)
+
+    return site
+}
+
+fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
+    return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
+}
+
 fun ChangelogEntry.toGateDto(): ChangelogResponse {
     return ChangelogResponse(
         externalId,
@@ -142,18 +170,19 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
-    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity)
+
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 
     return legalEntity
 
 }
 
 fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
-    return LegalEntityIdentifier(dto.value, dto.type,dto.issuingBody, legalEntity)
+    return LegalEntityIdentifier(dto.value, dto.type, dto.issuingBody, legalEntity)
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
-    return LegalEntityState(dto.officialDenotation,dto.validFrom,dto.validTo,dto.type,legalEntity)
+    return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
@@ -166,6 +195,10 @@ fun NameDto.toName(): Name {
 
 private fun createCurrentnessTimestamp(): Instant {
     return Instant.now().truncatedTo(ChronoUnit.MICROS)
+}
+
+fun getMainAddressForSiteExternalId(siteExternalId: String): String {
+    return siteExternalId + "_site"
 }
 
 fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {

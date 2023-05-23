@@ -56,6 +56,7 @@ class LegalEntityPersistenceService(
 
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
                 gateLegalEntityRepository.save(existingLegalEntity)
+
             } ?: run {
 
                 gateLegalEntityRepository.save(fullLegalEntity)
@@ -65,7 +66,9 @@ class LegalEntityPersistenceService(
     }
 
     private fun updateLegalEntity(
-        legalEntity: LegalEntity, legalEntityRequest: LegalEntityGateInputRequest, logisticAddressRecord: LogisticAddress
+        legalEntity: LegalEntity,
+        legalEntityRequest: LegalEntityGateInputRequest,
+        logisticAddressRecord: LogisticAddress
     ): LegalEntity {
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
@@ -76,7 +79,6 @@ class LegalEntityPersistenceService(
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity
-
         return legalEntity
     }
 

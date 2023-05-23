@@ -36,8 +36,6 @@ import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_AD
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_LEGAL_ENTITIES_SEARCH_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.ResponseValues
-import org.eclipse.tractusx.bpdm.gate.util.SaasValues
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired

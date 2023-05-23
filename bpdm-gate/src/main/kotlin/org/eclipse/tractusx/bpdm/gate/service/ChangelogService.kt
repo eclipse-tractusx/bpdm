@@ -29,13 +29,10 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaType
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
-
 import java.time.Instant
-import kotlin.math.ceil
 
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
