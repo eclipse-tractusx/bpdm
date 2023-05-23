@@ -17,7 +17,6 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-<<<<<<<< HEAD:bpdm-bridge-dummy/src/main/kotlin/com/catenax/bpdm/bridge/dummy/controller/BridgeController.kt
 package com.catenax.bpdm.bridge.dummy.controller
 
 import com.catenax.bpdm.bridge.dummy.service.SyncService
@@ -43,26 +42,5 @@ class BridgeController(
         logger.info("Bridge sync started...")
         syncService.sync()
         logger.info("Bridge sync completed")
-========
-package org.eclipse.tractusx.bpdm.common.service
-
-import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
-import org.eclipse.tractusx.bpdm.common.model.SaasAddressType
-
-class SaasAddressesMapping(val addresses: Collection<AddressSaas>) {
-
-    fun saasAlternativeAddressMapping(): SaasAddressToDtoMapping? {
-        val address = addresses.find { address ->
-            address.types.any { it.technicalKey == SaasAddressType.LEGAL_ALTERNATIVE.getTechnicalKey() }
-        }
-        return address?.let { SaasAddressToDtoMapping(it) }
-    }
-
-    fun saasPhysicalAddressMapping(): SaasAddressToDtoMapping? {
-        val address = addresses.find { address ->
-            address.types.any { it.technicalKey == SaasAddressType.LEGAL.getTechnicalKey() }
-        }
-        return address?.let { SaasAddressToDtoMapping(it) }
->>>>>>>> cd7b397a (fix/feat(datamodel/pool):Data model implementation changes):bpdm-common/src/main/kotlin/org/eclipse/tractusx/bpdm/common/service/SaasAddressesMapping.kt
     }
 }
