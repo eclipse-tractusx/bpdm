@@ -44,7 +44,7 @@ class SharingStateController(
     }
 
     override fun upsertSharingState(request: SharingStateDto) {
-        // TODO Not yet implemented
+
         logger.info { "upsertSharingState() called with $request" }
         sharingStateService.upsertSharingState(request)
     }

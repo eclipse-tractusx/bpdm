@@ -19,9 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError.*
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import java.time.LocalDateTime
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -48,23 +51,114 @@ class SharingStateControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
     }
 
-    /**
-     * Given externalId exists in database
-     * When getting changeLog by external id
-     * Then changeLog mapped to the catena data model should be returned
-     */
     @Test
-    fun `get changeLog by external id`() {
+    fun `insert and get sharing states `() {
 
-        val state1 = SharingStateDto(
-            lsaType = LsaType.Address, externalId = "exId1", sharingStateType = SharingStateType.Success,
-            sharingErrorCode = null, sharingProcessStarted = null, sharingErrorMessage = null, bpn = null
-        )
-        gateClient.sharingState().upsertSharingState(state1)
+        val stateAddress = insertSharingStateSuccess(LsaType.Address, externalId = "exIdAddress")
+        val stateSite = insertSharingStateSuccess(LsaType.Site, externalId = "exIdSite")
+        insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity1")
+        val stateLegalEntity2 = insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity2")
 
-        val searchResult = gateClient.sharingState().getSharingStates(PaginationRequest(), LsaType.Address, listOf("exId1"))
-        Assertions.assertThat(searchResult.content.size).isEqualTo(1)
-        val searchResult2 = gateClient.sharingState().getSharingStates(PaginationRequest(), LsaType.Site, listOf("exId1"))
-        Assertions.assertThat(searchResult2.content.size).isEqualTo(0)
+        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress")
+        assertThat(searchAddress).hasSize(1)
+        assertThat(searchAddress.first()).isEqualTo(stateAddress)
+
+        val searchSites = readSharingStates(LsaType.Site, "exIdSite")
+        assertThat(searchSites).hasSize(1)
+        assertThat(searchSites.first()).isEqualTo(stateSite)
+
+        val searchWrongId = readSharingStates(LsaType.Address, "exIdEntity")
+        assertThat(searchWrongId).hasSize(0)
+
+        val searchEntityMultiple = readSharingStates(LsaType.LegalEntity, "exIdEntity1", "exIdEntity2")
+        assertThat(searchEntityMultiple).hasSize(2)
+
+        val searchEntitySingle = readSharingStates(LsaType.LegalEntity, "exIdEntity2")
+        assertThat(searchEntitySingle).hasSize(1)
+        assertThat(searchEntitySingle.first()).isEqualTo(stateLegalEntity2)
+
     }
+
+    @Test
+    fun `insert and get sharing states with error code`() {
+
+        val stateAddress1 = insertSharingStateError(LsaType.Address, externalId = "exIdAddress1", errorCode = SharingTimeout)
+        insertSharingStateError(LsaType.Address, externalId = "exIdAddress2", errorCode = SharingProcessError)
+        insertSharingStateError(LsaType.Address, externalId = "exIdAddress3", errorCode = BpnNotInPool)
+
+        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        assertThat(searchAddress).hasSize(1)
+        assertThat(searchAddress.first()).isEqualTo(stateAddress1)
+
+    }
+
+    @Test
+    fun `insert and update states`() {
+
+        val stateAddress1 = insertSharingStateError(LsaType.Address, externalId = "exIdAddress1", errorCode = SharingTimeout)
+        insertSharingStateError(LsaType.Address, externalId = "exIdAddress2", errorCode = SharingProcessError)
+        insertSharingStateError(LsaType.Address, externalId = "exIdAddress3", errorCode = BpnNotInPool)
+
+        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        assertThat(searchAddress).hasSize(1)
+        assertThat(searchAddress.first()).isEqualTo(stateAddress1)
+
+        val updatedAddress1 = stateAddress1.copy(
+            sharingStateType = SharingStateType.Success,
+            sharingErrorCode = BpnNotInPool,
+            sharingProcessStarted = LocalDateTime.now().withNano(0),
+            sharingErrorMessage = "Changed ",
+            bpn = null
+        )
+
+        gateClient.sharingState().upsertSharingState(updatedAddress1)
+
+        val readUpdatedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        assertThat(readUpdatedAddress).hasSize(1)
+        assertThat(readUpdatedAddress.first()).isEqualTo(updatedAddress1)
+    }
+
+
+    /**
+     * Insert Sharing State only with required fields filled
+     */
+    fun insertSharingStateSuccess(lsaType: LsaType, externalId: String): SharingStateDto {
+
+        val newState = SharingStateDto(
+            lsaType = lsaType,
+            externalId = externalId,
+            sharingStateType = SharingStateType.Success,
+            sharingErrorCode = null,
+            sharingProcessStarted = null,
+            sharingErrorMessage = null,
+            bpn = null
+        )
+        gateClient.sharingState().upsertSharingState(newState)
+        return newState
+    }
+
+    /**
+     * Insert Sharing State with all Fields Field
+     */
+    fun insertSharingStateError(lsaType: LsaType, externalId: String, errorCode: BusinessPartnerSharingError): SharingStateDto {
+
+        val newState = SharingStateDto(
+            lsaType = lsaType,
+            externalId = externalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = errorCode,
+            sharingProcessStarted = LocalDateTime.now().withNano(0),
+            sharingErrorMessage = "Error in $lsaType with external id $externalId",
+            bpn = "BPN" + externalId
+        )
+        gateClient.sharingState().upsertSharingState(newState)
+        return newState
+    }
+
+    fun readSharingStates(lsaType: LsaType, vararg externalIds: String): Collection<SharingStateDto> {
+
+        return gateClient.sharingState().getSharingStates(PaginationRequest(), lsaType, externalIds.asList()).content
+    }
+
+
 }
