@@ -19,6 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.springframework.stereotype.Service
 
@@ -29,9 +30,22 @@ class SyncService(
     val gateUpdateService: GateUpdateService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     // TODO For improved robustness we should maybe persistently track all sync entries (status) by LSAType/externalID.
 
     fun sync() {
+        logger.info("Bridge sync started...")
+        try {
+            syncInternal()
+            logger.info("Bridge sync completed")
+        } catch (e: Exception) {
+            logger.error("Bridge sync failed with critical error:", e)
+            throw e
+        }
+    }
+
+    private fun syncInternal() {
         // Check changelog entries from Gate (after last sync time)
         val externalIdsByType = gateQueryService.getChangedExternalIdsByLsaType(null)
         // TODO persist syncAfter=LocalDateTime.now()

@@ -21,7 +21,6 @@ package com.catenax.bpdm.bridge.dummy.controller
 
 import com.catenax.bpdm.bridge.dummy.service.SyncService
 import io.swagger.v3.oas.annotations.Operation
-import mu.KotlinLogging
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -32,15 +31,11 @@ class BridgeController(
     val syncService: SyncService
 ) {
 
-    private val logger = KotlinLogging.logger { }
-
     @Operation(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
     fun triggerSync() {
-        logger.info("Bridge sync started...")
         syncService.sync()
-        logger.info("Bridge sync completed")
     }
 }
