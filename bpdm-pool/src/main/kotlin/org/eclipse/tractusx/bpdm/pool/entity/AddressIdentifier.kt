@@ -24,17 +24,12 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
-<<<<<<<< HEAD:bpdm-pool/src/main/kotlin/org/eclipse/tractusx/bpdm/pool/entity/AddressIdentifier.kt
     name = "address_identifiers",
-========
-    name = "logistic_addresses",
->>>>>>>> cd7b397a (fix/feat(datamodel/pool):Data model implementation changes):bpdm-pool/src/main/kotlin/org/eclipse/tractusx/bpdm/pool/entity/LogisticAddress.kt
     indexes = [
         Index(columnList = "address_id"),
         Index(columnList = "type_id")
     ]
 )
-<<<<<<<< HEAD:bpdm-pool/src/main/kotlin/org/eclipse/tractusx/bpdm/pool/entity/AddressIdentifier.kt
 class AddressIdentifier(
     @Column(name = "`value`", nullable = false)
     var value: String,
@@ -48,33 +43,3 @@ class AddressIdentifier(
     var address: LogisticAddress
 
 ) : BaseEntity()
-========
-class LogisticAddress(
-    @Column(name = "bpn", nullable = false, unique = true)
-    var bpn: String,
-
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id")
-    var legalEntity: LegalEntity?,
-
-    @ManyToOne
-    @JoinColumn(name = "site_id")
-    var site: Site?,
-
-    @Column(name = "name")
-    var name: String? = null,
-
-    @Embedded
-    var physicalPostalAddress: PhysicalPostalAddress,
-
-    @Embedded
-    var alternativePostalAddress: AlternativePostalAddress?
-
-) : BaseEntity() {
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val identifiers: MutableSet<AddressIdentifier> = mutableSetOf()
-
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val states: MutableSet<AddressState> = mutableSetOf()
-}
->>>>>>>> cd7b397a (fix/feat(datamodel/pool):Data model implementation changes):bpdm-pool/src/main/kotlin/org/eclipse/tractusx/bpdm/pool/entity/LogisticAddress.kt

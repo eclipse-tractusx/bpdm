@@ -24,10 +24,14 @@ import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
+import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
 
 @Service
-class AddressPersistenceService(private val gateAddressRepository: GateAddressRepository) {
+class AddressPersistenceService(
+    private val gateAddressRepository: GateAddressRepository,
+    private val legalEntityRepository: LegalEntityRepository,
+) {
 
     @Transactional
     fun persistAddressBP(addresses: Collection<AddressGateInputRequest>) {
@@ -38,7 +42,11 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         val addressRecord = gateAddressRepository.findByExternalIdIn(externalIdColl)
 
         addresses.forEach { address ->
-            val fullAddress = address.toAddressGate()
+
+            val legalEntityRecord =
+                address.legalEntityExternalId?.let { legalEntityRepository.findByExternalId(it) }
+
+            val fullAddress = address.toAddressGate(legalEntityRecord)
             addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
                 updateAddress(existingAddress, address)
                 gateAddressRepository.save(existingAddress)
@@ -53,7 +61,6 @@ class AddressPersistenceService(private val gateAddressRepository: GateAddressRe
         address.name = addressRequest.address.name
         address.bpn = addressRequest.bpn.toString()
         address.externalId = addressRequest.externalId
-        address.legalEntityExternalId = addressRequest.legalEntityExternalId.toString()
         address.siteExternalId = addressRequest.siteExternalId.toString()
         address.physicalPostalAddress = addressRequest.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = addressRequest.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
