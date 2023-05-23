@@ -25,13 +25,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -78,9 +80,11 @@ interface PoolMetadataApi {
     )
     @GetMapping("/identifier-types")
     @GetExchange("/identifier-types")
-    fun getIdentifierTypes(@ParameterObject paginationRequest: PaginationRequest,
-                           @Parameter lsaType: IdentifierLsaType,
-                           @Parameter country: CountryCode?):
+    fun getIdentifierTypes(
+        @ParameterObject paginationRequest: PaginationRequest,
+        @Parameter lsaType: IdentifierLsaType,
+        @Parameter country: CountryCode?
+    ):
             PageResponse<IdentifierTypeDto>
 
 
@@ -100,8 +104,10 @@ interface PoolMetadataApi {
     @PostExchange("/legal-forms")
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormResponse
 
-    @Operation(summary = "Get page of legal forms",
-        description = "Lists all currently known legal forms in a paginated result")
+    @Operation(
+        summary = "Get page of legal forms",
+        description = "Lists all currently known legal forms in a paginated result"
+    )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Page of existing legal forms, may be empty"),
@@ -111,4 +117,20 @@ interface PoolMetadataApi {
     @GetMapping("/legal-forms")
     @GetExchange("/legal-forms")
     fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageResponse<LegalFormResponse>
+
+
+    @Operation(
+        summary = "Get all field quality rules filtered by country (specified by its ISO 3166-1 alpha-2 country code)",
+        description = "List the country specific data rules for entity fields." +
+                "All fields that are not in this list are considered to be forbidden."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "List of the existing rules for the given country"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/field-quality-rules/")
+    @GetExchange("/field-quality-rules/")
+    fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
 }
