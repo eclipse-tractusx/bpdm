@@ -27,6 +27,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
@@ -211,7 +212,12 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse1
+        val expectedLegalEntity = ResponseValues.newLegalEntityGateInputResponse1
+
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
 
         wireMockServer.stubFor(
             post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
@@ -229,6 +235,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
         val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
 
         assertThat(legalEntity).usingRecursiveComparison().isEqualTo(expectedLegalEntity)
@@ -338,6 +345,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             ResponseValues.legalEntityGateInputResponse2,
         )
 
+        val page = 0
+        val size = 10
+
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
         val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
@@ -363,7 +377,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -393,7 +407,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             ResponseValues.legalEntityGateInputResponse1,
             ResponseValues.legalEntityGateInputResponse2,
         )
+        val page = 0
+        val size = 10
 
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
         val limit = 2
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
@@ -419,7 +439,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(page, size)
         val listExternalIds = legalEntitiesSaas.mapNotNull { it.externalId }
         val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
 
@@ -450,7 +470,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             ResponseValues.legalEntityGateInputResponse1,
             ResponseValues.legalEntityGateInputResponse2,
         )
+        val page = 0
+        val size = 10
 
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
         val limit = 3
         val startAfter = "Aaa111"
         val nextStartAfter = "Aaa222"
@@ -476,7 +502,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -501,7 +527,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         try {
-            val paginationValue = PaginationStartAfterRequest("")
+            val paginationValue = PaginationRequest()
             gateClient.legalEntities().getLegalEntities(paginationValue)
         } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
@@ -523,7 +549,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     fun `get legal entities, pagination limit exceeded`() {
 
         try {
-            val paginationValue = PaginationStartAfterRequest("", 999999)
+            val paginationValue = PaginationRequest(0, 999999)
             gateClient.legalEntities().getLegalEntities(paginationValue)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
