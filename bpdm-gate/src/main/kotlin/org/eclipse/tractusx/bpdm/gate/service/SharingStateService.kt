@@ -62,7 +62,9 @@ class SharingStateService(private val stateRepository: SharingStaterRepository) 
         entity.sharingErrorCode = dto.sharingErrorCode
         entity.sharingErrorMessage = dto.sharingErrorMessage
         entity.bpn = dto.bpn
-        entity.sharingProcessStarted = dto.sharingProcessStarted
+        if (dto.sharingProcessStarted != null) {
+            entity.sharingProcessStarted = dto.sharingProcessStarted
+        }
 
         this.stateRepository.save(entity)
     }
