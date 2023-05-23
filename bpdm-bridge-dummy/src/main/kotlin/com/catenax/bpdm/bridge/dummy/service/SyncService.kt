@@ -156,7 +156,7 @@ class SyncService(
     private fun createLegalEntitiesInPool(entriesToCreate: Collection<LegalEntityGateInputResponse>) {
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
-                properties = it.legalEntity,
+                legalEntity = it.legalEntity,
                 index = it.externalId
             )
         }
@@ -169,7 +169,7 @@ class SyncService(
     private fun updateLegalEntitiesInPool(entriesToUpdate: Collection<LegalEntityGateInputResponse>) {
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
-                properties = it.legalEntity,
+                legalEntity = it.legalEntity,
                 bpn = it.bpn!!
             )
         }
@@ -190,7 +190,7 @@ class SyncService(
                     SitePartnerCreateRequest(
                         site = entry.site,
                         index = entry.externalId,
-                        legalEntity = leParentBpn
+                        bpnParent = leParentBpn
                     )
                 }
         }
@@ -228,9 +228,9 @@ class SyncService(
             leParentsByExternalId[entry.legalEntityExternalId]?.bpn
                 ?.let { leParentBpn ->
                     AddressPartnerCreateRequest(
-                        properties = entry.address,
+                        address = entry.address,
                         index = entry.externalId,
-                        parent = leParentBpn
+                        bpnParent = leParentBpn
                     )
                 }
         }
@@ -243,9 +243,9 @@ class SyncService(
             siteParentsByExternalId[entry.siteExternalId]?.bpn
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
-                        properties = entry.address,
+                        address = entry.address,
                         index = entry.externalId,
-                        parent = siteParentBpn
+                        bpnParent = siteParentBpn
                     )
                 }
         }
@@ -265,7 +265,7 @@ class SyncService(
     private fun updateAddressesInPool(entriesToUpdate: List<AddressGateInputResponse>) {
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
-                properties = it.address,
+                address = it.address,
                 bpn = it.bpn!!
             )
         }
