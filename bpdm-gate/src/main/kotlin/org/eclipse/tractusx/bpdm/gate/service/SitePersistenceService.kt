@@ -70,7 +70,6 @@ class SitePersistenceService(
                 siteRepository.save(fullSite)
             }
         }
-        //}
     }
 
     private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
