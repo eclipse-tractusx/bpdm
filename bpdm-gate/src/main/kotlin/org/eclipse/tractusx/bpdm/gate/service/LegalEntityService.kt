@@ -43,13 +43,13 @@ class LegalEntityService(
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val legalEntityPersistenceService: LegalEntityPersistenceService
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
-
 
         val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
         saasClient.upsertLegalEntities(legalEntitiesSaas)
@@ -58,6 +58,7 @@ class LegalEntityService(
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities);
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {

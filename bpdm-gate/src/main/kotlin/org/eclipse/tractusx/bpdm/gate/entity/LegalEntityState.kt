@@ -21,46 +21,32 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
 @Entity
 @Table(
-    name = "logistic_addresses",
+    name = "legal_entity_states",
     indexes = [
-        Index(columnList = "legal_entity_id"),
-     //   Index(columnList = "site_id"),
+        Index(columnList = "legal_entity_id")
     ]
 )
-class LogisticAddress(
-    @Column(name = "bpn")
-    var bpn: String?,
+class LegalEntityState (
+    @Column(name = "official_denotation")
+    val officialDenotation: String?,
 
-    @Column(name = "external_id", nullable = false, unique = true)
-    var externalId: String,
+    @Column(name = "valid_from")
+    val validFrom: LocalDateTime?,
 
-    @Column(name = "site_external_id", nullable = true)
-    var siteExternalId: String,
+    @Column(name = "valid_to")
+    val validTo: LocalDateTime?,
+
+    @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    val type: BusinessStateType,
 
     @ManyToOne
-    @JoinColumn(name = "legal_entity_id")
-    var legalEntity: LegalEntity?,
+    @JoinColumn(name = "legal_entity_id", nullable = false)
+    var legalEntity: LegalEntity
 
-//    @ManyToOne
-//    @JoinColumn(name = "site_id")
-//    var site: Site?,
-
-    @Column(name = "name")
-    var name: String? = null,
-
-    @Embedded
-    var physicalPostalAddress: PhysicalPostalAddress,
-
-    @Embedded
-    var alternativePostalAddress: AlternativePostalAddress?
-
-) : BaseEntity() {
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val identifiers: MutableSet<AddressIdentifier> = mutableSetOf()
-
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val states: MutableSet<AddressState> = mutableSetOf()
-}
+) : BaseEntity()

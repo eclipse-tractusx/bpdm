@@ -34,12 +34,12 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
+import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,7 +60,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 internal class LegalEntityControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    private val legalEntityRepository: LegalEntityRepository
 ) {
     companion object {
         @RegisterExtension
@@ -593,6 +594,54 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
 
         assertThat(actualResponse).isEqualTo(expectedResponse)
+
+    }
+
+    /**
+     * When upserting legal entities
+     * Then SaaS upsert api should be called with the legal entity data mapped to the SaaS data model
+     */
+    @Test
+    fun `upsert and persist legal entities`() {
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2,
+        )
+
+        val expectedLegalEntities = listOf(
+            SaasValues.legalEntityRequest1,
+            SaasValues.legalEntityRequest2,
+        )
+
+        wireMockServer.stubFor(
+            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
+                .willReturn(
+                    aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(
+                            objectMapper.writeValueAsString(
+                                UpsertResponse(
+                                    emptyList(),
+                                    emptyList(),
+                                    2,
+                                    0
+                                )
+                            )
+                        )
+                )
+        )
+
+        try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.OK, e.statusCode)
+        }
+
+        val legalEntityRecordExternal1 = legalEntityRepository.findByExternalId("external-1")
+        assertNotEquals(legalEntityRecordExternal1, null)
+
+        val legalEntityRecordExternal2 = legalEntityRepository.findByExternalId("external-2")
+        assertNotEquals(legalEntityRecordExternal2, null)
 
     }
 }

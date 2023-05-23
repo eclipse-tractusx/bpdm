@@ -116,4 +116,3 @@ ADD CONSTRAINT fk1msrc2opgg7y8hllv9mxydm41 FOREIGN KEY (alt_admin_area_l1_region
 
 ALTER TABLE IF EXISTS logistic_addresses
 ADD CONSTRAINT fkejpo9hh93uu777fbmmixh8v2f FOREIGN KEY (phy_admin_area_l1_region) REFERENCES regions;
-
