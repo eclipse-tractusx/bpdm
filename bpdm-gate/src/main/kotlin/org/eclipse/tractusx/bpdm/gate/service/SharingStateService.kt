@@ -24,12 +24,15 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStaterRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byLsaType
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 
 @Service
-class SharingStateService(private val stateRepository: SharingStaterRepository) {
+class SharingStateService(private val stateRepository: SharingStateRepository) {
 
     fun upsertSharingState(request: SharingStateDto) {
 
@@ -69,10 +72,11 @@ class SharingStateService(private val stateRepository: SharingStaterRepository) 
         this.stateRepository.save(entity)
     }
 
-    fun findSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType, externalIds: Collection<String>): PageResponse<SharingStateDto> {
+    fun findSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
 
-        val pageable = PageRequest.of(paginationRequest.page, paginationRequest.size)
-        val page = this.stateRepository.findByExternalIdInAndLsaType(externalIds, lsaType, pageable)
+        val spec = Specification.allOf(byLsaType(lsaType), byExternalIdsIn(externalIds))
+        val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
+        val page = stateRepository.findAll(spec, pageRequest)
 
         return page.toDto(page.content.map {
             SharingStateDto(

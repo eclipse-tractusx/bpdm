@@ -37,9 +37,6 @@ class SharingStateController(
 
     override fun getSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
 
-        lsaType ?: throw IllegalArgumentException("lsaType is required")
-        externalIds ?: throw IllegalArgumentException("externalIds is required")
-
         return sharingStateService.findSharingStates(paginationRequest, lsaType, externalIds)
     }
 

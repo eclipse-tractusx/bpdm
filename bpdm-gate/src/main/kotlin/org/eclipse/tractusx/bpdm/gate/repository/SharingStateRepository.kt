@@ -21,15 +21,35 @@ package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
-interface SharingStaterRepository : PagingAndSortingRepository<SharingState, Long>, CrudRepository<SharingState, Long> {
+interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long>, CrudRepository<SharingState, Long>, JpaSpecificationExecutor<SharingState> {
+
+    object Specs {
+        /**
+         * Restrict to entries with any one of the given externalIds; ignore if null
+         */
+        fun byExternalIdsIn(externalIds: Collection<String>?) =
+            Specification<SharingState> { root, _, _ ->
+                externalIds?.let {
+                    root.get<String>(SharingState::externalId.name).`in`(externalIds)
+                }
+            }
+
+        /**
+         * Restrict to entries with the given lsaType; ignore if null
+         */
+        fun byLsaType(lsaType: LsaType?) =
+            Specification<SharingState> { root, _, builder ->
+                lsaType?.let {
+                    builder.equal(root.get<LsaType>(SharingState::lsaType.name), lsaType)
+                }
+            }
+    }
 
     fun findByExternalIdAndLsaType(externalId: String, businessPartnerType: LsaType): SharingState?
-
-    fun findByExternalIdInAndLsaType(externalIds: Collection<String>, businessPartnerType: LsaType, pageable: Pageable): Page<SharingState>
 
 }
