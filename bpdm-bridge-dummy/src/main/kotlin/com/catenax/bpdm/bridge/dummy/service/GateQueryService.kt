@@ -27,11 +27,15 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.springframework.stereotype.Service
 import java.time.Instant
+
+private const val pageSize = 100
 
 @Service
 class GateQueryService(
@@ -41,14 +45,22 @@ class GateQueryService(
     private val logger = KotlinLogging.logger { }
 
     fun getChangedExternalIdsByLsaType(modifiedAfter: Instant?): Map<LsaType, Set<String>> {
-        // TODO use pagination properly
-        val entriesGate = gateClient.changelog().getChangelogEntriesLsaType(
-            lsaType = null,
-            fromTime = modifiedAfter,
-            paginationRequest = PaginationRequest(0, 100)
-        )
+        var page = 0
+        var totalPages: Int
+        val content = mutableListOf<ChangelogResponse>()
 
-        return entriesGate.content
+        do {
+            val pageResponse = gateClient.changelog().getChangelogEntriesLsaType(
+                lsaType = null,
+                fromTime = modifiedAfter,
+                paginationRequest = PaginationRequest(page, pageSize)
+            )
+            page++
+            totalPages = pageResponse.totalPages
+            content.addAll(pageResponse.content)
+        } while (page < totalPages)
+
+        return content
             .groupBy { it.businessPartnerType }
             .mapValues { (_, list) -> list.map { it.externalId }.toSet() }
             .also {
@@ -107,13 +119,23 @@ class GateQueryService(
         if (externalIds.isEmpty()) {
             return emptyMap()
         }
-        // TODO use pagination properly
-        val page = gateClient.sharingState().getSharingStates(
-            lsaType = lsaType,
-            externalIds = externalIds,
-            paginationRequest = PaginationRequest(0, 100)
-        )
-        return page.content
+
+        var page = 0
+        var totalPages: Int
+        val content = mutableListOf<SharingStateDto>()
+
+        do {
+            val pageResponse = gateClient.sharingState().getSharingStates(
+                lsaType = lsaType,
+                externalIds = externalIds,
+                paginationRequest = PaginationRequest(page, pageSize)
+            )
+            page++
+            totalPages = pageResponse.totalPages
+            content.addAll(pageResponse.content)
+        } while (page < totalPages)
+
+        return content
             .associateBy { it.externalId }
             .filter { it.value.bpn != null }
             .mapValues { it.value.bpn!! }
@@ -123,39 +145,69 @@ class GateQueryService(
         if (externalIds.isEmpty()) {
             return emptyList()
         }
-        // TODO use pagination properly
-        val response = gateClient.legalEntities().getLegalEntitiesByExternalIds(
-            externalIds = externalIds,
-            paginationRequest = PaginationStartAfterRequest(null, 100)
-        )
-        logger.info { "Gate returned ${response.content.size} valid legal entities, ${response.invalidEntries} were invalid" }
-        return response.content
+
+        var pageStartAfter: String? = null
+        val validContent = mutableListOf<LegalEntityGateInputResponse>()
+        var invalidEntries = 0
+
+        do {
+            val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
+                externalIds = externalIds,
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+            )
+            pageStartAfter = pageResponse.nextStartAfter
+            validContent.addAll(pageResponse.content)
+            invalidEntries += pageResponse.invalidEntries
+        } while (pageStartAfter != null)
+
+        logger.info { "Gate returned ${validContent.size} valid legal entities, $invalidEntries were invalid" }
+        return validContent
     }
 
     private fun getSitesInput(externalIds: Set<String>): Collection<SiteGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
-        // TODO use pagination properly
-        val response = gateClient.sites().getSitesByExternalIds(
-            externalIds = externalIds,
-            paginationRequest = PaginationStartAfterRequest(null, 100)
-        )
-        logger.info { "Gate returned ${response.content.size} valid sites, ${response.invalidEntries} were invalid" }
-        return response.content
+
+        var pageStartAfter: String? = null
+        val validContent = mutableListOf<SiteGateInputResponse>()
+        var invalidEntries = 0
+
+        do {
+            val pageResponse = gateClient.sites().getSitesByExternalIds(
+                externalIds = externalIds,
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+            )
+            pageStartAfter = pageResponse.nextStartAfter
+            validContent.addAll(pageResponse.content)
+            invalidEntries += pageResponse.invalidEntries
+        } while (pageStartAfter != null)
+
+        logger.info { "Gate returned ${validContent.size} valid sites, $invalidEntries were invalid" }
+        return validContent
     }
 
     private fun getAddressesInput(externalIds: Set<String>): Collection<AddressGateInputResponse> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
-        // TODO use pagination properly
-        val response = gateClient.addresses().getAddressesByExternalIds(
-            externalIds = externalIds,
-            paginationRequest = PaginationStartAfterRequest(null, 100)
-        )
-        logger.info { "Gate returned ${response.content.size} valid addresses, ${response.invalidEntries} were invalid" }
-        return response.content
+
+        var pageStartAfter: String? = null
+        val validContent = mutableListOf<AddressGateInputResponse>()
+        var invalidEntries = 0
+
+        do {
+            val pageResponse = gateClient.addresses().getAddressesByExternalIds(
+                externalIds = externalIds,
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+            )
+            pageStartAfter = pageResponse.nextStartAfter
+            validContent.addAll(pageResponse.content)
+            invalidEntries += pageResponse.invalidEntries
+        } while (pageStartAfter != null)
+
+        logger.info { "Gate returned ${validContent.size} valid addresses, $invalidEntries were invalid" }
+        return validContent
     }
 
 }
