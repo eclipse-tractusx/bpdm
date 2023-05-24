@@ -37,10 +37,10 @@ dependencies:
     version: 5.0.0-alpha.4
     alias: bpdm-pool
     condition: bpdm-pool.enabled
-  - name: bpdm-dummy-bridge
+  - name: bpdm-bridge-dummy
     version: 1.0.0
-    alias: bpdm-dummy-bridge
-    condition: bpdm-dummy-bridge.enabled
+    alias: bpdm-bridge-dummy
+    condition: bpdm-bridge-dummy.enabled
   - name: opensearch
     version: 2.*.*
     repository: https://opensearch-project.github.io/helm-charts/

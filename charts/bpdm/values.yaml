@@ -29,12 +29,12 @@ bpdm-pool:
   postgres:
     enabled: false
 
-bpdm-dummy-bridge:
+bpdm-bridge-dummy:
   enabled: true
   replicaCount: 1
   image:
     registry: ghcr.io
-    repository: catenax-ng/tx-bpdm/dummy-bridge
+    repository: catenax-ng/tx-bpdm/bridge-dummy
     pullPolicy: Always
     tag: ""
   applicationConfig:

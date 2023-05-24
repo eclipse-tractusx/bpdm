@@ -25,7 +25,7 @@ replicaCount: 1
 
 image:
   registry: ghcr.io
-  repository: catenax-ng/tx-bpdm/dummy-bridge
+  repository: catenax-ng/tx-bpdm/bridge-dummy
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
