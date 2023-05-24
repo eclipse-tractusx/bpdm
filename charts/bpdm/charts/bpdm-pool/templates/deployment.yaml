@@ -58,6 +58,11 @@ spec:
               value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name:  {{ include "bpdm.postgresDependency" . }}
+                  key: password
           ports:
             - name: http
               containerPort: 8080

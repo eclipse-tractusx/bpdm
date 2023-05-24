@@ -18,7 +18,23 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-validate-maintainers: false
-chart-repos:
-  - bitnami=https://charts.bitnami.com/bitnami
-  - opensearch=https://opensearch-project.github.io/helm-charts
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{include "bpdm.fullname" .}}
+  labels:
+    {{- include "bpdm.labels" . | nindent 4 }}
+data:
+  deployment.yml: |-
+    # Place for putting standard deployment configuration
+    # which can be overwritten by external.yml
+    bpdm:
+      datasource:
+        host: {{ include "bpdm.postgresDependency" . }}
+      pool:
+        base-url: {{include "bpdm-gate.poolServiceName" .}}
+  external.yml: |-
+    # External properties for overwriting application config
+    {{- if .Values.applicationConfig }}
+    {{- .Values.applicationConfig | toYaml | nindent 4 }}
+    {{- end }}

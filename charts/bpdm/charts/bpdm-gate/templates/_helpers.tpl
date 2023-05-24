@@ -61,6 +61,31 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
+{{- define "bpdm-gate.poolServiceName" -}}
+{{- $config := .Values.applicationConfig -}}
+{{- if and $config (not (empty $config.bpdm)) -}}
+    {{- $bpdm := $config.bpdm -}}
+    {{- if and $bpdm (not (empty $bpdm.pool)) -}}
+        {{- $pool := $bpdm.pool -}}
+        {{- if and $pool (not (empty (index $pool "base-url"))) -}}
+            {{- index $pool "base-url" -}}
+        {{- else -}}
+            {{- printf "%s-bpdm-pool" .Release.Name -}}
+        {{- end -}}
+    {{- else -}}
+        {{- printf "%s-bpdm-pool" .Release.Name -}}
+    {{- end -}}
+{{- else -}}
+    {{- printf "%s-bpdm-pool" .Release.Name -}}
+{{- end -}}
+{{- end }}
+
+
+
+
+
+
+
 {{/*
 Selector labels
 */}}
@@ -82,6 +107,7 @@ Determine postgres service/host name to connect to
 {{- define "bpdm.postgresDependency" -}}
         {{- include "includeWithPostgresContext" (list $ "postgresql.primary.fullname") }}
 {{- end }}}
+
 
 {{/*
 Invoke include on given definition with postgresql dependency context
