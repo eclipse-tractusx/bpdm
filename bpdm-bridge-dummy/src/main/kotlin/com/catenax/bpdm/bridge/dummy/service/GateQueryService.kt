@@ -19,6 +19,7 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
+import com.catenax.bpdm.bridge.dummy.config.BridgeConfigProperties
 import com.catenax.bpdm.bridge.dummy.dto.GateAddressInfo
 import com.catenax.bpdm.bridge.dummy.dto.GateLegalEntityInfo
 import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
@@ -35,11 +36,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.springframework.stereotype.Service
 import java.time.Instant
 
-private const val pageSize = 100
-
 @Service
 class GateQueryService(
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    val bridgeConfigProperties: BridgeConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -53,7 +53,7 @@ class GateQueryService(
             val pageResponse = gateClient.changelog().getChangelogEntriesLsaType(
                 lsaType = null,
                 fromTime = modifiedAfter,
-                paginationRequest = PaginationRequest(page, pageSize)
+                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
             page++
             totalPages = pageResponse.totalPages
@@ -128,7 +128,7 @@ class GateQueryService(
             val pageResponse = gateClient.sharingState().getSharingStates(
                 lsaType = lsaType,
                 externalIds = externalIds,
-                paginationRequest = PaginationRequest(page, pageSize)
+                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
             page++
             totalPages = pageResponse.totalPages
@@ -153,7 +153,7 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
             )
             pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
@@ -176,7 +176,7 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.sites().getSitesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
             )
             pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
@@ -199,7 +199,7 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.addresses().getAddressesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, pageSize)
+                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
             )
             pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
