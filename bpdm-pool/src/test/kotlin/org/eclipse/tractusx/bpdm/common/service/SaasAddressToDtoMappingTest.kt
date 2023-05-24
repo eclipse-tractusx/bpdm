@@ -56,7 +56,6 @@ class SaasAddressToDtoMappingTest {
 //TODO        Assertions.assertThat(baseAddressDto.administrativeAreaLevel1?.name).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
         Assertions.assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
         Assertions.assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
-        Assertions.assertThat(baseAddressDto.administrativeAreaLevel4).isEqualTo(null)
         Assertions.assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         Assertions.assertThat(baseAddressDto.country.technicalKey).isEqualTo(addressSaas.country?.shortName)
         Assertions.assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))

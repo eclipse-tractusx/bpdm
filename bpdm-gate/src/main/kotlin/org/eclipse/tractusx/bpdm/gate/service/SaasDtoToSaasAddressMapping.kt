@@ -51,7 +51,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
                     type = SaasAdministrativeAreaType.COUNTY.toSaasTypeDto()
                 )
             }
-            // TODO Where can administrativeAreaLevel3 and administrativeAreaLevel4 be stored in SaaS model? It's just ignored for now!
+            // TODO Where can administrativeAreaLevel3 be stored in SaaS model? It's just ignored for now!
         )
     }
 
