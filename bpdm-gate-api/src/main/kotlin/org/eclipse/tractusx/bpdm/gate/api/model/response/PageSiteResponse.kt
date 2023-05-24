@@ -17,20 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.repository
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import org.eclipse.tractusx.bpdm.gate.entity.Site
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.CrudRepository
+import io.swagger.v3.oas.annotations.media.Schema
 
-interface SiteRepository : JpaRepository<Site, Long>, CrudRepository<Site, Long> {
-
-    fun findByExternalIdIn(externalId: Collection<String>): Set<Site>
-
-    fun findByExternalId(externalId: String): Site?
-
-    fun findByExternalIdIn(externalId: Collection<String>?, pageable: Pageable): Page<Site>
-
-}
+@Schema(description = "Paginated collection of Logistic Addresses")
+data class PageSiteResponse<T>(
+    @Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+    @Schema(description = "Total number pages")
+    val totalPages: Int,
+    @Schema(description = "Current page number")
+    val page: Int,
+    @Schema(description = "Number of results in the page")
+    val contentSize: Int,
+    @Schema(description = "Collection of results in the page")
+    val content: Collection<T>,
+    @Schema(description = "Number of entries in the page that have been omitted due to being invalid")
+    val invalidEntries: Int
+)

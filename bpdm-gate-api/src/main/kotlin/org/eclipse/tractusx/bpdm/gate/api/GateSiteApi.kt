@@ -25,12 +25,13 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageSiteResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -89,9 +90,9 @@ interface GateSiteApi {
     @PostMapping("/input/sites/search")
     @PostExchange("/input/sites/search")
     fun getSitesByExternalIds(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageStartAfterResponse<SiteGateInputResponse>
+    ): PageSiteResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",
@@ -105,7 +106,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageSiteResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",

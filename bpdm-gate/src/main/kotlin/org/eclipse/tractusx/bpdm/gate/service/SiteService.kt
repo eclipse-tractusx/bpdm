@@ -20,22 +20,26 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageSiteResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -47,30 +51,65 @@ class SiteService(
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
-    private val sitePersistenceService: SitePersistenceService
+    private val sitePersistenceService: SitePersistenceService,
+    private val siteRepository: SiteRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<SiteGateInputResponse> {
-        val sitesPage = saasClient.getSites(limit, startAfter, externalIds)
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageSiteResponse<SiteGateInputResponse> {
 
-        val validEntries = toValidSites(sitesPage.values)
+        val sitesPage = if (externalIds != null) {
+            siteRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        } else {
+            siteRepository.findAll(PageRequest.of(page, size))
+        }
 
-        return PageStartAfterResponse(
-            total = sitesPage.total,
-            nextStartAfter = sitesPage.nextStartAfter,
-            content = validEntries,
-            invalidEntries = sitesPage.values.size - validEntries.size
+        val siteGateInputResponse = toValidSite(sitesPage)
+
+        return PageSiteResponse(
+            page = page,
+            totalElements = sitesPage.totalElements,
+            totalPages = sitesPage.totalPages,
+            contentSize = sitesPage.content.size,
+            content = siteGateInputResponse,
+            invalidEntries = 0
         )
     }
 
-    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
+    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputResponse> {
 
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return toValidSiteInput(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Site", externalId)
+        return sitePage.content.map { site ->
+            val siteMapDto = SiteDto(
+                name = site.name,
+                states = mapToDtoSitesStates(site.states),
+                mainAddress = site.mainAddress.toLogisticAddressDto()
+            )
+
+            SiteGateInputResponse(
+                site = siteMapDto,
+                externalId = site.externalId,
+                legalEntityExternalId = site.legalEntity.externalId,
+                bpn = site.bpn,
+                processStartedAt = null //TODO Remove this?
+            )
         }
+    }
+
+    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
+        val siteRecord = siteRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Site", externalId)
+
+        return toValidSingleSite(siteRecord)
+    }
+
+    private fun toValidSingleSite(siteRecord: Site): SiteGateInputResponse {
+
+        return SiteGateInputResponse(
+            site = siteRecord.toSiteDto(),
+            externalId = siteRecord.externalId,
+            legalEntityExternalId = siteRecord.legalEntity.externalId,
+            bpn = siteRecord.bpn,
+            processStartedAt = null //TODO Remove this?
+        )
     }
 
     /**

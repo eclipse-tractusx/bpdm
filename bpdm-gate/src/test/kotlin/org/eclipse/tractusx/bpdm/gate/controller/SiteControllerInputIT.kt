@@ -24,9 +24,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
@@ -232,7 +232,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(0, limit)
         val pageResponse = gateClient.sites().getSites(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -288,7 +288,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         val externalIds = sitesSaas.mapNotNull { it.externalId }
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(0, limit)
         val pageResponse = gateClient.sites().getSitesByExternalIds(paginationValue, externalIds)
 
         assertThat(pageResponse).isEqualTo(
@@ -346,7 +346,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(0, limit)
         val pageResponse = gateClient.sites().getSites(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
@@ -370,7 +370,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 .willReturn(badRequest())
         )
 
-        val paginationValue = PaginationStartAfterRequest("", 10)
+        val paginationValue = PaginationRequest(0, 10)
 
         try {
             gateClient.sites().getSites(paginationValue)
@@ -389,7 +389,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites, pagination limit exceeded`() {
 
-        val paginationValue = PaginationStartAfterRequest("", 999999)
+        val paginationValue = PaginationRequest(0, 999999)
 
         try {
             gateClient.sites().getSites(paginationValue)

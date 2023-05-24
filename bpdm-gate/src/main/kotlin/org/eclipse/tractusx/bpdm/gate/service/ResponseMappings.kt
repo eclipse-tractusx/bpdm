@@ -157,7 +157,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalEntityExternalId = externalId
     )
 
-    val legalEntity = LegalEntity(
+    val legalEntity= LegalEntity(
         bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
@@ -338,4 +338,17 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
         bpn = legalEntity.bpn,
         processStartedAt = null
     )
+}
+
+fun Site.toSiteDto(): SiteDto {
+
+    return SiteDto(
+        name = name,
+        states = mapToDtoSitesStates(states),
+        mainAddress = mainAddress.toLogisticAddressDto()
+    )
+}
+
+fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto> {
+    return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
