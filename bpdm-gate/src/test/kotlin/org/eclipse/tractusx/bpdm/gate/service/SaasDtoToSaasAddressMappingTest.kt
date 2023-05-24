@@ -23,7 +23,6 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(baseAddressDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, REGION))
         assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, COUNTY))
         assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
-        assertThat(baseAddressDto.administrativeAreaLevel4).isEqualTo(null)
         assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         assertThat(baseAddressDto.country).isEqualTo(addressSaas.country?.shortName)
         assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))
@@ -58,7 +57,6 @@ class SaasDtoToSaasAddressMappingTest {
     }
 
 
-
     @Test
     fun mappingAddressDto1Test() {
 
@@ -69,7 +67,6 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(baseAddressDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, REGION))
         assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, COUNTY))
         assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
-        assertThat(baseAddressDto.administrativeAreaLevel4).isEqualTo(null)
         assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         assertThat(baseAddressDto.country).isEqualTo(addressSaas.country?.shortName)
         assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))
@@ -98,7 +95,6 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(baseAddressDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, REGION))
         assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, COUNTY))
         assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
-        assertThat(baseAddressDto.administrativeAreaLevel4).isEqualTo(null)
         assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         assertThat(baseAddressDto.country).isEqualTo(addressSaas.country?.shortName)
         assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))

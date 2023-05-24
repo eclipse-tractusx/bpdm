@@ -65,7 +65,6 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
         administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
-        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
         postCode = baseAddress.postCode,
         city = baseAddress.city,
         districtLevel1 = baseAddress.districtLevel1,
@@ -85,7 +84,6 @@ fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddr
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
         administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
-        administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
         postCode = baseAddress.postCode,
         city = baseAddress.city,
         districtLevel1 = baseAddress.districtLevel1,
@@ -153,13 +151,13 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
 
 fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
-    val addressInputRequest =AddressGateInputRequest(
+    val addressInputRequest = AddressGateInputRequest(
         address = legalEntity.legalAddress,
         externalId = getMainAddressForLegalEntityExternalId(externalId),
         legalEntityExternalId = externalId
     )
 
-    val legalEntity= LegalEntity(
+    val legalEntity = LegalEntity(
         bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
@@ -167,9 +165,9 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalName = legalEntity.legalName.toName()
     )
 
-    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
-    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
+    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 

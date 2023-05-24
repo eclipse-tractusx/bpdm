@@ -34,9 +34,9 @@ class SaasAddressToDtoMappingTest {
     @Test
     fun addressPartnerTest() {
 
-        checkMappingResponsePhysicalAddress( ResponseValues.addressPartner1.physicalPostalAddress, SaasValues.addressPartnerSaas1.addresses.first())
-        checkMappingResponsePhysicalAddress( ResponseValues.addressPartner2.physicalPostalAddress, SaasValues.addressPartnerSaas2.addresses.first())
-        checkMappingResponsePhysicalAddress( ResponseValues.addressPartner3.physicalPostalAddress, SaasValues.addressPartnerSaas3.addresses.first())
+        checkMappingResponsePhysicalAddress(ResponseValues.addressPartner1.physicalPostalAddress, SaasValues.addressPartnerSaas1.addresses.first())
+        checkMappingResponsePhysicalAddress(ResponseValues.addressPartner2.physicalPostalAddress, SaasValues.addressPartnerSaas2.addresses.first())
+        checkMappingResponsePhysicalAddress(ResponseValues.addressPartner3.physicalPostalAddress, SaasValues.addressPartnerSaas3.addresses.first())
     }
 
     @Test
@@ -44,9 +44,9 @@ class SaasAddressToDtoMappingTest {
 
         val addressesMapping = SaasAddressesMapping(SaasValues.addressPartner1.addresses)
         val address = addressesMapping.saasPhysicalAddressMapping()!!
-        val physicalAddressDto = SaasMappings.toPhysicalAddress(address,  "")
+        val physicalAddressDto = SaasMappings.toPhysicalAddress(address, "")
 
-        checkMappingDtoPhysicalAddress( physicalAddressDto, SaasValues.addressPartner1.addresses.first())
+        checkMappingDtoPhysicalAddress(physicalAddressDto, SaasValues.addressPartner1.addresses.first())
 
     }
 
@@ -74,13 +74,13 @@ class SaasAddressToDtoMappingTest {
         Assertions.assertThat(physicalAddressDto.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
         Assertions.assertThat(physicalAddressDto.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
     }
+
     private fun checkMappingDtoPhysicalAddress(physicalAddressDto: PhysicalPostalAddressDto, addressSaas: AddressSaas) {
 
         val baseAddressDto = physicalAddressDto.baseAddress
         Assertions.assertThat(baseAddressDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
         Assertions.assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
         Assertions.assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
-        Assertions.assertThat(baseAddressDto.administrativeAreaLevel4).isEqualTo(null)
         Assertions.assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         Assertions.assertThat(baseAddressDto.country).isEqualTo(addressSaas.country?.shortName)
         Assertions.assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))

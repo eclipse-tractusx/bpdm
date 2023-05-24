@@ -42,22 +42,19 @@ data class BasePostalAddressResponse(
     @Schema(description = "Further possibility to describe the region/address(e.g. Township)")
     val administrativeAreaLevel3: String? = null,
 
-    @Schema(description = "Further possibility to describe the region/address(e.g. Sub-Province for China/Japan)")
-    val administrativeAreaLevel4: String? = null,
-
-    @Schema(description ="A postal code, also known as postcode, PIN or ZIP Code")
+    @Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
     val postCode: String? = null,
 
-    @Schema(description =  "The city of the address (Synonym: Town, village, municipality)")
+    @Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,
 
-    @Schema(description =  "Divides the city in several smaller areas")
+    @Schema(description = "Divides the city in several smaller areas")
     val districtLevel1: String? = null,
 
-    @Schema(description =  "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
+    @Schema(description = "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
     val districtLevel2: String? = null,
 
     @Schema(description = "Street")
     val street: StreetDto? = null,
 
-)
+    )
