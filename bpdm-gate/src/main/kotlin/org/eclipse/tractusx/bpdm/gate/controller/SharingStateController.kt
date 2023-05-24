@@ -25,26 +25,24 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class SharingStateController : GateSharingStateApi {
+class SharingStateController(
+    val sharingStateService: SharingStateService
+) : GateSharingStateApi {
 
     private val logger = KotlinLogging.logger { }
 
     override fun getSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
-        // TODO Not yet implemented
-        return PageResponse(
-            totalElements = 0,
-            totalPages = 0,
-            page = 0,
-            contentSize = 0,
-            content = emptyList()
-        )
+
+        return sharingStateService.findSharingStates(paginationRequest, lsaType, externalIds)
     }
 
     override fun upsertSharingState(request: SharingStateDto) {
-        // TODO Not yet implemented
+
         logger.info { "upsertSharingState() called with $request" }
+        sharingStateService.upsertSharingState(request)
     }
 }
