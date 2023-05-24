@@ -159,7 +159,7 @@ class BusinessPartnerBuildService(
     @Transactional
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }
-        
+
         val legalEntityMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
         val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity.legalAddress })
 
@@ -173,7 +173,7 @@ class BusinessPartnerBuildService(
         }
 
         val requestByBpnMap = requests.associateBy { it.bpn }
-        legalEntities.forEach { 
+        legalEntities.forEach {
             val request = requestByBpnMap.get(it.bpn)!!
             updateLegalEntity(it, request.legalEntity, legalEntityMetadataMap)
             updateLogisticAddress(it.legalAddress, request.legalEntity.legalAddress, addressMetadataMap)
@@ -376,7 +376,7 @@ class BusinessPartnerBuildService(
         legalEntity: LegalEntity,
         metadataMap: AddressMetadataMappingDto
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-            .also { it.legalEntity = legalEntity }
+        .also { it.legalEntity = legalEntity }
 
     private fun createLogisticAddress(
         dto: LogisticAddressDto,
@@ -384,7 +384,7 @@ class BusinessPartnerBuildService(
         site: Site,
         metadataMap: AddressMetadataMappingDto
     ) = createLogisticAddressInternal(dto, bpn, metadataMap)
-            .also { it.site = site }
+        .also { it.site = site }
 
     private fun createLogisticAddressInternal(
         dto: LogisticAddressDto,
@@ -431,7 +431,6 @@ class BusinessPartnerBuildService(
             administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
-            administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
             districtLevel1 = baseAddress.districtLevel1,
@@ -457,7 +456,6 @@ class BusinessPartnerBuildService(
             administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
-            administrativeAreaLevel4 = baseAddress.administrativeAreaLevel4,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
             districtLevel1 = baseAddress.districtLevel1,

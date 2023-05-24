@@ -25,37 +25,34 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(name = "PostalAdress", description = "Address record for a business partner")
 data class BasePostalAddressDto(
 
-    @Schema(description = "Geographic coordinates to find this location")
+    @get:Schema(description = "Geographic coordinates to find this location")
     val geographicCoordinates: GeoCoordinateDto? = null,
 
-    @Schema(description = "Describes the country")
+    @get:Schema(description = "Describes the country")
     val country: CountryCode,
 
-    @Schema(description = "Identifying code of the Region within the country (e.g. Bayern)")
+    @get:Schema(description = "Identifying code of the Region within the country (e.g. Bayern)")
     val administrativeAreaLevel1: String? = null,
 
-    @Schema(description = "Further possibility to describe the region/address(e.g. County/Landkreis)")
+    @get:Schema(description = "Further possibility to describe the region/address(e.g. County/Landkreis)")
     val administrativeAreaLevel2: String? = null,
 
-    @Schema(description = "Further possibility to describe the region/address(e.g. Township/Gemeinde)")
+    @get:Schema(description = "Further possibility to describe the region/address(e.g. Township/Gemeinde)")
     val administrativeAreaLevel3: String? = null,
-
-    @Schema(description = "Further possibility to describe the region/address(e.g. Sub-Province for China/Japan)")
-    val administrativeAreaLevel4: String? = null,
-
-    @Schema(description ="A postal code, also known as postcode, PIN or ZIP Code")
+    
+    @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
     val postCode: String? = null,
 
-    @Schema(description =  "The city of the address (Synonym: Town, village, municipality)")
+    @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,
 
-    @Schema(description =  "Divides the city in several smaller areas")
+    @get:Schema(description = "Divides the city in several smaller areas")
     val districtLevel1: String? = null,
 
-    @Schema(description =  "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
+    @get:Schema(description = "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
     val districtLevel2: String? = null,
 
-    @Schema(description = "Address country")
+    @get:Schema(description = "Address country")
     val street: StreetDto? = null,
 
-)
+    )
