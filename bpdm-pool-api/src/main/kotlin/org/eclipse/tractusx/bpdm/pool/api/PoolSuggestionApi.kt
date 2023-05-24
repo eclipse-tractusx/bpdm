@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSea
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -36,7 +37,7 @@ import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
 
 
-@RequestMapping("/api/catena/suggestions")
+@RequestMapping("/api/catena/suggestions", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/suggestions")
 interface PoolSuggestionApi {
     @Operation(
@@ -123,6 +124,7 @@ interface PoolSuggestionApi {
         @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject pageRequest: PaginationRequest
     ): PageResponse<SuggestionResponse>
+
     @Operation(
         summary = "Find best matches for given text in administrative areas",
         description = "Performs search on administrative area names in order to find the best matches for the given text. " +

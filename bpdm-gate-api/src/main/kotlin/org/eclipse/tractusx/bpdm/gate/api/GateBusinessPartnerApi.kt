@@ -25,13 +25,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@RequestMapping("/api/catena/business-partners")
+@RequestMapping("/api/catena/business-partners", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/business-partners")
 interface GateBusinessPartnerApi {
 

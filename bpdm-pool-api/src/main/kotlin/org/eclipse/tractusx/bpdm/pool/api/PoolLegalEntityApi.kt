@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -38,7 +39,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@RequestMapping("/api/catena/legal-entities")
+@RequestMapping("/api/catena/legal-entities", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/legal-entities")
 interface PoolLegalEntityApi {
 

@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
@@ -40,7 +41,7 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
-@RequestMapping("/api/catena")
+@RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena")
 interface GateAddressApi {
 
@@ -60,7 +61,7 @@ interface GateAddressApi {
     )
     @PutMapping("/input/addresses")
     @PutExchange("/input/addresses")
-    fun upsertAddresses (@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit>
+    fun upsertAddresses(@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit>
 
 
     @Operation(
@@ -124,7 +125,7 @@ interface GateAddressApi {
     @PostExchange("/output/addresses/search")
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
-        @RequestBody (required = false) externalIds: Collection<String>?
+        @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<AddressGateOutput>
 
     @Operation(

@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
  *
@@ -33,12 +32,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 import java.time.Instant
 
-@RequestMapping("/api/catena/business-partners/changelog")
+@RequestMapping("/api/catena/business-partners/changelog", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/business-partners/changelog")
 interface GateChangelogApi {
 

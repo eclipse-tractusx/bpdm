@@ -20,18 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.api
 
 
-
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -41,9 +41,9 @@ import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
 
-@RequestMapping("/api/saas")
+@RequestMapping("/api/saas", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/saas")
-interface PoolSaasApi  {
+interface PoolSaasApi {
 
     @Operation(
         summary = "Import new business partner records from SaaS",
@@ -60,7 +60,7 @@ interface PoolSaasApi  {
     )
     @PostMapping("/business-partner/sync")
     @PostExchange("/business-partner/sync")
-    fun importBusinessPartners() : SyncResponse
+    fun importBusinessPartners(): SyncResponse
 
     @Operation(
         summary = "Fetch information about the SaaS synchronization",

@@ -26,11 +26,14 @@ import java.time.Instant
 
 @Schema(name = "LogisticAddressResponse", description = "Logistic address ")
 data class LogisticAddressResponse(
-    @Schema(description = "Business Partner Number of this address")
+
+    @get:Schema(description = "Business Partner Number of this address")
     val bpn: String,
 
-    @Schema(description = "Name of the logistic address of the business partner. This is not according to official\n" +
-            "registers but according to the name the uploading sharing member chooses.")
+    @get:Schema(
+        description = "Name of the logistic address of the business partner. This is not according to official\n" +
+                "registers but according to the name the uploading sharing member chooses."
+    )
     val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Address status"))
@@ -45,21 +48,21 @@ data class LogisticAddressResponse(
     @Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressResponse? = null,
 
-    @Schema(description = "BPN of the related legal entity, if available")
+    @get:Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,
 
-    @Schema(description = "Flag if this is the legal address of its related legal entity")
+    @get:Schema(name = "isLegalAddress", description = "Flag if this is the legal address of its related legal entity")
     val isLegalAddress: Boolean = false,
 
-    @Schema(description = "BPN of the related site, if available")
+    @get:Schema(description = "BPN of the related site, if available")
     val bpnSite: String?,
 
-    @Schema(description = "Flag if this is the main address of its related site")
+    @get:Schema(name = "isMainAddress", description = "Flag if this is the main address of its related site")
     val isMainAddress: Boolean = false,
 
-    @Schema(description = "The timestamp the business partner data was created")
+    @get:Schema(description = "The timestamp the business partner data was created")
     val createdAt: Instant,
 
-    @Schema(description = "The timestamp the business partner data was last updated")
+    @get:Schema(description = "The timestamp the business partner data was last updated")
     val updatedAt: Instant
 )

@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -40,7 +41,7 @@ import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
 
-@RequestMapping("/api/catena/addresses")
+@RequestMapping("/api/catena/addresses", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/catena/addresses")
 interface PoolAddressApi {
 
@@ -80,6 +81,7 @@ interface PoolAddressApi {
     fun getAddress(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
     ): LogisticAddressResponse
+
     @Operation(
         summary = "Search address partners by BPNs and/or parent BPNs",
         description = "Search business partners of type address by their BPN or their parent partners BPN (BPNLs or BPNS)."
