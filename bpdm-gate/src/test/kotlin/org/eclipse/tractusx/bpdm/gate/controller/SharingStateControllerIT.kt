@@ -56,19 +56,22 @@ class SharingStateControllerIT @Autowired constructor(
 
         val stateAddress = insertSharingStateSuccess(LsaType.Address, externalId = "exIdAddress")
         val stateSite = insertSharingStateSuccess(LsaType.Site, externalId = "exIdSite")
-        insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity1")
+        val stateLegalEntity1 = insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity1")
         val stateLegalEntity2 = insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity2")
+        insertSharingStateSuccess(LsaType.Address, externalId = "exIdMultiple")
+        insertSharingStateSuccess(LsaType.Site, externalId = "exIdMultiple")
+        insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdMultiple")
 
-        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress")
-        assertThat(searchAddress).hasSize(1)
-        assertThat(searchAddress.first()).isEqualTo(stateAddress)
+        val searchAddressById = readSharingStates(LsaType.Address, "exIdAddress")
+        assertThat(searchAddressById).hasSize(1)
+        assertThat(searchAddressById.first()).isEqualTo(stateAddress)
 
-        val searchSites = readSharingStates(LsaType.Site, "exIdSite")
-        assertThat(searchSites).hasSize(1)
-        assertThat(searchSites.first()).isEqualTo(stateSite)
+        val searchSitesById = readSharingStates(LsaType.Site, "exIdSite")
+        assertThat(searchSitesById).hasSize(1)
+        assertThat(searchSitesById.first()).isEqualTo(stateSite)
 
-        val searchWrongId = readSharingStates(LsaType.Address, "exIdEntity")
-        assertThat(searchWrongId).hasSize(0)
+        val searchAddressWrongId = readSharingStates(LsaType.Address, "exIdEntity")
+        assertThat(searchAddressWrongId).hasSize(0)
 
         val searchEntityMultiple = readSharingStates(LsaType.LegalEntity, "exIdEntity1", "exIdEntity2")
         assertThat(searchEntityMultiple).hasSize(2)
@@ -76,6 +79,19 @@ class SharingStateControllerIT @Autowired constructor(
         val searchEntitySingle = readSharingStates(LsaType.LegalEntity, "exIdEntity2")
         assertThat(searchEntitySingle).hasSize(1)
         assertThat(searchEntitySingle.first()).isEqualTo(stateLegalEntity2)
+
+        val searchAll = readSharingStates(null)
+        assertThat(searchAll).hasSize(7)
+
+        val searchEntityAllLegalEntities = readSharingStates(LsaType.LegalEntity)
+        assertThat(searchEntityAllLegalEntities).hasSize(3)
+        assertThat(searchEntityAllLegalEntities).extracting(SharingStateDto::externalId.name)
+            .contains(stateLegalEntity1.externalId, stateLegalEntity2.externalId, "exIdMultiple")
+
+        val searchAllWithSameId = readSharingStates(null, "exIdMultiple")
+        assertThat(searchAllWithSameId).hasSize(3)
+        assertThat(searchAllWithSameId).extracting(SharingStateDto::externalId.name)
+            .containsOnly("exIdMultiple")
 
     }
 
@@ -89,7 +105,6 @@ class SharingStateControllerIT @Autowired constructor(
         val searchAddress = readSharingStates(LsaType.Address, "exIdAddress1")
         assertThat(searchAddress).hasSize(1)
         assertThat(searchAddress.first()).isEqualTo(stateAddress1)
-
     }
 
     @Test
@@ -118,18 +133,43 @@ class SharingStateControllerIT @Autowired constructor(
         assertThat(readUpdatedAddress.first()).isEqualTo(updatedAddress1)
     }
 
+    @Test
+    fun `insert and update states with sharingProcessStarted`() {
+
+        val startTime = LocalDateTime.now().withNano(0)
+        val stateAddress1 = insertSharingStateSuccess(
+            lsaType = LsaType.Address, externalId = "exIdAddress1",
+            sharingProcessStarted = startTime
+        )
+
+        val readInsertedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        assertThat(readInsertedAddress.first().sharingProcessStarted).isEqualTo(startTime)
+
+        val updatedWithEmpyStarted = stateAddress1.copy(
+            sharingStateType = SharingStateType.Error,
+            sharingProcessStarted = null,
+            sharingErrorMessage = "Changed",
+        )
+        gateClient.sharingState().upsertSharingState(updatedWithEmpyStarted)
+
+        val readUpdatedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        assertThat(readUpdatedAddress.first().sharingStateType).isEqualTo(SharingStateType.Error)
+        assertThat(readUpdatedAddress.first().sharingProcessStarted).isEqualTo(startTime).describedAs("Update with null - sharingProcessStarted not changed ")
+        assertThat(readUpdatedAddress.first().sharingErrorMessage).isEqualTo("Changed")
+
+    }
 
     /**
      * Insert Sharing State only with required fields filled
      */
-    fun insertSharingStateSuccess(lsaType: LsaType, externalId: String): SharingStateDto {
+    fun insertSharingStateSuccess(lsaType: LsaType, externalId: String, sharingProcessStarted: LocalDateTime? = null): SharingStateDto {
 
         val newState = SharingStateDto(
             lsaType = lsaType,
             externalId = externalId,
             sharingStateType = SharingStateType.Success,
             sharingErrorCode = null,
-            sharingProcessStarted = null,
+            sharingProcessStarted = sharingProcessStarted,
             sharingErrorMessage = null,
             bpn = null
         )
@@ -155,7 +195,7 @@ class SharingStateControllerIT @Autowired constructor(
         return newState
     }
 
-    fun readSharingStates(lsaType: LsaType, vararg externalIds: String): Collection<SharingStateDto> {
+    fun readSharingStates(lsaType: LsaType?, vararg externalIds: String): Collection<SharingStateDto> {
 
         return gateClient.sharingState().getSharingStates(PaginationRequest(), lsaType, externalIds.asList()).content
     }
