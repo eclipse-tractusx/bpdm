@@ -125,8 +125,7 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
             administrativeAreaLevel2 = CommonValues.county1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
+            district = CommonValues.district1,
         ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate1,
@@ -145,8 +144,7 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
             administrativeAreaLevel2 = CommonValues.county2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
+            district = CommonValues.district2,
         ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate2,

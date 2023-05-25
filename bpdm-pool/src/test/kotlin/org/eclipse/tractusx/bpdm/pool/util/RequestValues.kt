@@ -99,8 +99,7 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
             administrativeAreaLevel2 = CommonValues.county1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
+            district = CommonValues.district1,
         ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
@@ -119,8 +118,7 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
             administrativeAreaLevel2 = CommonValues.county2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
+            district = CommonValues.district2,
         ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
@@ -135,11 +133,11 @@ object RequestValues {
         industrialZone = CommonValues.industrialZone3,
         building = CommonValues.building3,
         floor = CommonValues.floor3,
-        door = CommonValues.door3, areaPart = AreaDistrictDto(
+        door = CommonValues.door3,
+        areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
             administrativeAreaLevel2 = CommonValues.county3,
-            districtLevel1 = CommonValues.districtLevel1_3,
-            districtLevel2 = CommonValues.districtLevel2_3,
+            district = CommonValues.district3,
         ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,

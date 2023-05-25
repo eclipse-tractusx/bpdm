@@ -42,10 +42,10 @@ data class LogisticAddressResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
     val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
 
-    @Schema(description = "Physical postal address")
+    @get:Schema(description = "Physical postal address")
     val physicalPostalAddress: PhysicalPostalAddressResponse,
 
-    @Schema(description = "Alternative postal address")
+    @get:Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressResponse? = null,
 
     @get:Schema(description = "BPN of the related legal entity, if available")

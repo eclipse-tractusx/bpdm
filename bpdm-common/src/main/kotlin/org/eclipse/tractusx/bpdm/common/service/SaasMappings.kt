@@ -221,8 +221,7 @@ object SaasMappings {
                 administrativeAreaLevel1 = map.adminAreaLevel1(),
                 administrativeAreaLevel2 = map.adminAreaLevel2(),
                 administrativeAreaLevel3 = null,
-                districtLevel1 = map.districtLevel1(),
-                districtLevel2 = map.districtLevel2(),
+                district = map.district(),
             ),
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),

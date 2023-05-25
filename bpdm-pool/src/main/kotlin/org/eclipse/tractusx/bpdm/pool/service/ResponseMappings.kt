@@ -151,14 +151,15 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
+            postCode = postCode,
+            city = city,
+            street = street?.toDto()
+        ),
+        areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
             administrativeAreaLevel2 = administrativeAreaLevel2,
             administrativeAreaLevel3 = administrativeAreaLevel3,
-            postCode = postCode,
-            city = city,
-            districtLevel1 = districtLevel1,
-            districtLevel2 = districtLevel2,
-            street = street?.toDto()
+            district = districtLevel1,
         ),
         companyPostCode = companyPostCode,
         industrialZone = industrialZone,
@@ -173,14 +174,12 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
-            administrativeAreaLevel2 = administrativeAreaLevel2,
-            administrativeAreaLevel3 = administrativeAreaLevel3,
             postCode = postCode,
             city = city,
-            districtLevel1 = districtLevel1,
-            districtLevel2 = districtLevel2,
             street = street?.toDto()
+        ),
+        areaPart = AreaDistrictAlternativResponse(
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
         ),
         type = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber

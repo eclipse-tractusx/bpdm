@@ -25,19 +25,19 @@ import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
 
 @Schema(name = "RelationResponse", description = "Directed relation between two business partners")
-data class RelationResponse (
-    @Schema(description = "Type of relation like predecessor or ownership relation")
+data class RelationResponse(
+    @get:Schema(description = "Type of relation like predecessor or ownership relation")
     val type: TypeKeyNameDto<RelationType>,
 
-    @Schema(description = "BPN of partner which is the source of the relation")
+    @get:Schema(description = "BPN of partner which is the source of the relation")
     val startBpn: String,
 
-    @Schema(description = "BPN of partner which is the target of the relation")
+    @get:Schema(description = "BPN of partner which is the target of the relation")
     val endBpn: String,
 
-    @Schema(description = "Time when the relation started")
+    @get:Schema(description = "Time when the relation started")
     val validFrom: LocalDateTime? = null,
 
-    @Schema(description = "Time when the relation ended")
+    @get:Schema(description = "Time when the relation ended")
     val validTo: LocalDateTime? = null
 )

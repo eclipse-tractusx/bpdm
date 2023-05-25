@@ -34,8 +34,5 @@ data class AreaDistrictDto(
     val administrativeAreaLevel3: String? = null,
 
     @get:Schema(description = "Divides the city in several smaller areas")
-    val districtLevel1: String? = null,
-
-    @get:Schema(description = "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
-    val districtLevel2: String? = null,
+    val district: String? = null,
 )

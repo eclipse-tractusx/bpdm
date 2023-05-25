@@ -64,12 +64,12 @@ class SaasAddressToDtoMapping(private val address: AddressSaas) {
         return locality?.value
     }
 
-    fun districtLevel1(): String? {
+    fun district(): String? {
         val locality = findType(address.localities, SaasLocalityType.DISTRICT)
         return locality?.value
     }
 
-    fun districtLevel2(): String? {
+    fun quarter(): String? {
         val locality = findType(address.localities, SaasLocalityType.QUARTER)
         return locality?.value
     }

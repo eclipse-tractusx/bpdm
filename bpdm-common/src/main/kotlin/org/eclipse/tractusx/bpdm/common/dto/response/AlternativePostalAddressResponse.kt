@@ -29,12 +29,15 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(name = "AlternativePostalAddress", description = "Alternative Postal Address Part")
 data class AlternativePostalAddressResponse(
 
-    @Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
-    val deliveryServiceNumber: String = "",
-
-    @Schema(description = "The type of this specified delivery")
-    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX,
-
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressResponse,
+
+    @field:JsonUnwrapped
+    val areaPart: AreaDistrictAlternativResponse,
+
+    @get:Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
+    val deliveryServiceNumber: String = "",
+
+    @get:Schema(description = "The type of this specified delivery")
+    val type: DeliveryServiceType = DeliveryServiceType.PO_BOX,
 )

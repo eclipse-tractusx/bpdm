@@ -22,11 +22,10 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
-@Schema(name = "PostalAddressResponse", description = "Aaddress record of a business partner")
+@Schema(name = "PostalAddressResponse", description = "Address record of a business partner")
 data class BasePostalAddressResponse(
 
     @get:Schema(description = "Geographic coordinates to find this location")
@@ -35,28 +34,12 @@ data class BasePostalAddressResponse(
     @get:Schema(description = "Describes the full name of the country")
     val country: TypeKeyNameDto<CountryCode>,
 
-    @get:Schema(description = "Region within the country")
-    val administrativeAreaLevel1: NameRegioncodeDto? = null,
-
-    @get:Schema(description = "Further possibility to describe the region/address(e.g. County)")
-    val administrativeAreaLevel2: String? = null,
-
-    @get:Schema(description = "Further possibility to describe the region/address(e.g. Township)")
-    val administrativeAreaLevel3: String? = null,
-
     @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
     val postCode: String? = null,
 
     @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,
 
-    @get:Schema(description = "Divides the city in several smaller areas")
-    val districtLevel1: String? = null,
-
-    @get:Schema(description = "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
-    val districtLevel2: String? = null,
-
     @get:Schema(description = "Street")
     val street: StreetDto? = null,
-
-    )
+)
