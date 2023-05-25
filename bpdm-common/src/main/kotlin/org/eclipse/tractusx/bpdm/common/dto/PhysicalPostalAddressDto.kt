@@ -38,7 +38,7 @@ data class PhysicalPostalAddressDto(
     val areaPart: AreaDistrictDto,
 
     @get:Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
-    val companyPostCode: String? = null,
+    val companyPostalCode: String? = null,
 
     @get:Schema(description = "The practice of designating an area for industrial development")
     val industrialZone: String? = null,

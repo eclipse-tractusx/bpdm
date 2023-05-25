@@ -151,7 +151,7 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
-            postCode = postCode,
+            postalCode = postCode,
             city = city,
         ),
         street = street?.toDto(),
@@ -161,7 +161,7 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
             administrativeAreaLevel3 = administrativeAreaLevel3,
             district = districtLevel1,
         ),
-        companyPostCode = companyPostCode,
+        companyPostalCode = companyPostCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
@@ -174,7 +174,7 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
-            postCode = postCode,
+            postalCode = postCode,
             city = city,
         ),
         areaPart = AreaDistrictAlternativResponse(

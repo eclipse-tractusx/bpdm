@@ -91,7 +91,7 @@ object RequestValues {
     val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
 
     val postalAddress1 = PhysicalPostalAddressDto(
-        companyPostCode = CommonValues.postCode2,
+        companyPostalCode = CommonValues.postCode2,
         industrialZone = CommonValues.industrialZone1,
         building = CommonValues.building1,
         floor = CommonValues.floor1,
@@ -105,7 +105,7 @@ object RequestValues {
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country1,
-            postCode = CommonValues.postCode1,
+            postalCode = CommonValues.postCode1,
             city = CommonValues.city1,
         )
     )
@@ -124,7 +124,7 @@ object RequestValues {
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country2,
-            postCode = CommonValues.postCode2,
+            postalCode = CommonValues.postCode2,
             city = CommonValues.city2,
         )
     )
@@ -143,7 +143,7 @@ object RequestValues {
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country3,
-            postCode = CommonValues.postCode3,
+            postalCode = CommonValues.postCode3,
             city = CommonValues.city3,
         )
     )

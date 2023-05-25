@@ -63,7 +63,7 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
         geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
         country = baseAddress.country,
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
-        postCode = baseAddress.postCode,
+        postCode = baseAddress.postalCode,
         city = baseAddress.city,
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber
@@ -79,11 +79,11 @@ fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddr
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         administrativeAreaLevel2 = areaPart.administrativeAreaLevel2,
         administrativeAreaLevel3 = areaPart.administrativeAreaLevel3,
-        postCode = baseAddress.postCode,
+        postCode = baseAddress.postalCode,
         city = baseAddress.city,
         districtLevel1 = areaPart.district,
         street = street?.toStreetEntity(),
-        companyPostCode = companyPostCode,
+        companyPostCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,

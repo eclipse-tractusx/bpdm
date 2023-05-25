@@ -34,7 +34,7 @@ data class BasePostalAddressResponse(
     val country: TypeKeyNameDto<CountryCode>,
 
     @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
-    val postCode: String? = null,
+    val postalCode: String? = null,
 
     @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,

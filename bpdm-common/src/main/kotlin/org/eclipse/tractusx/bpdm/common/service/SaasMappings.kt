@@ -212,7 +212,7 @@ object SaasMappings {
         }
 
         return PhysicalPostalAddressDto(
-            companyPostCode = map.companyPostCode(),
+            companyPostalCode = map.companyPostCode(),
             industrialZone = map.industrialZone(),
             building = map.building(),
             floor = map.floor(),
@@ -228,7 +228,7 @@ object SaasMappings {
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
                 country = country,
-                postCode = map.postcode(),
+                postalCode = map.postcode(),
             )
         )
     }
@@ -259,7 +259,7 @@ object SaasMappings {
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
                 country = country,
-                postCode = map.postcode(),
+                postalCode = map.postcode(),
             )
         )
     }
