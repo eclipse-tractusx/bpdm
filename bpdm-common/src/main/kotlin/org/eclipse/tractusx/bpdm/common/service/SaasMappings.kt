@@ -217,16 +217,18 @@ object SaasMappings {
             building = map.building(),
             floor = map.floor(),
             door = map.door(),
+            areaPart = AreaDistrictDto(
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                administrativeAreaLevel2 = map.adminAreaLevel2(),
+                administrativeAreaLevel3 = null,
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+            ),
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
                 country = country,
-                administrativeAreaLevel1 = map.adminAreaLevel1(),
-                administrativeAreaLevel2 = map.adminAreaLevel2(),
-                administrativeAreaLevel3 = null,
                 postCode = map.postcode(),
-                districtLevel1 = map.districtLevel1(),
-                districtLevel2 = map.districtLevel2(),
                 street = toStreetDto(map),
             )
         )
@@ -251,16 +253,16 @@ object SaasMappings {
         return AlternativePostalAddressDto(
             deliveryServiceNumber = deliveryServiceNumber,
             deliveryServiceType = deliveryServiceType,
+            areaPart = AreaDistrictAlternativDto(
+                administrativeAreaLevel1 = map.adminAreaLevel1(),
+                districtLevel1 = map.districtLevel1(),
+                districtLevel2 = map.districtLevel2(),
+            ),
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
                 country = country,
-                administrativeAreaLevel1 = map.adminAreaLevel1(),
-                administrativeAreaLevel2 = map.adminAreaLevel2(),
-                administrativeAreaLevel3 = null,
                 postCode = map.postcode(),
-                districtLevel1 = map.districtLevel1(),
-                districtLevel2 = map.districtLevel2(),
                 street = toStreetDto(map),
             )
         )

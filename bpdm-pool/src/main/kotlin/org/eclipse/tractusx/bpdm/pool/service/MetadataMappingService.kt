@@ -68,7 +68,7 @@ class MetadataMappingService(
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapLegalEntityIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType>{
+    fun mapLegalEntityIdentifierTypes(partners: Collection<LegalEntityDto>): Map<String, IdentifierType> {
         val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.LEGAL_ENTITY, technicalKeys)
     }
@@ -76,7 +76,7 @@ class MetadataMappingService(
     /**
      * Fetch [IdentifierType] referenced in [partners] and map them by their referenced keys
      */
-    fun mapAddressIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType>{
+    fun mapAddressIdentifierTypes(partners: Collection<LogisticAddressDto>): Map<String, IdentifierType> {
         val technicalKeys = partners.flatMap { it.identifiers.map { id -> id.type } }.toSet()
         return mapIdentifierTypes(IdentifierLsaType.ADDRESS, technicalKeys)
     }
@@ -84,13 +84,13 @@ class MetadataMappingService(
     /**
      * Fetch [LegalForm] referenced in [partners] and map them by their referenced keys
      */
-    fun mapLegalForms(partners: Collection<LegalEntityDto>): Map<String, LegalForm>{
+    fun mapLegalForms(partners: Collection<LegalEntityDto>): Map<String, LegalForm> {
         return mapLegalForms(partners.mapNotNull { it.legalForm }.toSet())
     }
 
     fun mapAddressRegions(partners: Collection<LogisticAddressDto>): Map<String, Region> {
-        val regionCodes = partners.mapNotNull { it.physicalPostalAddress.baseAddress.administrativeAreaLevel1 }
-            .plus(partners.mapNotNull { it.alternativePostalAddress?.baseAddress?.administrativeAreaLevel1 })
+        val regionCodes = partners.mapNotNull { it.physicalPostalAddress.areaPart.administrativeAreaLevel1 }
+            .plus(partners.mapNotNull { it.alternativePostalAddress?.areaPart?.administrativeAreaLevel1 })
             .toSet()
 
         return regionRepository.findByRegionCodeIn(regionCodes)
@@ -101,21 +101,21 @@ class MetadataMappingService(
     }
 
 
-    private fun mapIdentifierTypes(lsaType: IdentifierLsaType, keys: Set<String>): Map<String, IdentifierType>{
+    private fun mapIdentifierTypes(lsaType: IdentifierLsaType, keys: Set<String>): Map<String, IdentifierType> {
         val typeMap = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(lsaType, keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }
 
-    private fun mapLegalForms(keys: Set<String>): Map<String, LegalForm>{
+    private fun mapLegalForms(keys: Set<String>): Map<String, LegalForm> {
         val typeMap = legalFormRepository.findByTechnicalKeyIn(keys).associateBy { it.technicalKey }
         assertKeysFound(keys, typeMap)
         return typeMap
     }
 
-    private inline fun <reified T> assertKeysFound(keys: Set<String>, typeMap: Map<String, T>){
+    private inline fun <reified T> assertKeysFound(keys: Set<String>, typeMap: Map<String, T>) {
         val keysNotfound = keys.minus(typeMap.keys)
-        if(keysNotfound.isNotEmpty()) throw BpdmMultipleNotFoundException(T::class.simpleName!!, keysNotfound )
+        if (keysNotfound.isNotEmpty()) throw BpdmMultipleNotFoundException(T::class.simpleName!!, keysNotfound)
     }
 
 }

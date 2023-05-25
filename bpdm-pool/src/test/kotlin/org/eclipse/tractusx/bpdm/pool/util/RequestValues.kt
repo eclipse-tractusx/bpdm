@@ -96,15 +96,17 @@ object RequestValues {
         building = CommonValues.building1,
         floor = CommonValues.floor1,
         door = CommonValues.door1,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+            administrativeAreaLevel2 = CommonValues.county1,
+            districtLevel1 = CommonValues.districtLevel1_1,
+            districtLevel2 = CommonValues.districtLevel2_1,
+        ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country1,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
-            administrativeAreaLevel2 = CommonValues.county1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
             street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
         )
     )
@@ -114,15 +116,17 @@ object RequestValues {
         building = CommonValues.building2,
         floor = CommonValues.floor2,
         door = CommonValues.door2,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+            administrativeAreaLevel2 = CommonValues.county2,
+            districtLevel1 = CommonValues.districtLevel1_2,
+            districtLevel2 = CommonValues.districtLevel2_2,
+        ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country2,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
-            administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
             street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
         )
     )
@@ -131,16 +135,17 @@ object RequestValues {
         industrialZone = CommonValues.industrialZone3,
         building = CommonValues.building3,
         floor = CommonValues.floor3,
-        door = CommonValues.door3,
+        door = CommonValues.door3, areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
+            administrativeAreaLevel2 = CommonValues.county3,
+            districtLevel1 = CommonValues.districtLevel1_3,
+            districtLevel2 = CommonValues.districtLevel2_3,
+        ),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = null,
             country = CommonValues.country3,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
-            administrativeAreaLevel2 = CommonValues.county3,
             postCode = CommonValues.postCode3,
             city = CommonValues.city3,
-            districtLevel1 = CommonValues.districtLevel1_3,
-            districtLevel2 = CommonValues.districtLevel2_3,
             street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
         )
     )

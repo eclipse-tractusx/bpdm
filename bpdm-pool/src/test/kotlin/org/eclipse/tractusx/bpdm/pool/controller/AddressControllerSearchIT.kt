@@ -106,7 +106,7 @@ class AddressControllerSearchIT @Autowired constructor(
             )
         )
         val addressSearchRequest = AddressPartnerSearchRequest(
-            administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.administrativeAreaLevel2
+            administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.areaPart.administrativeAreaLevel2
         )
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())

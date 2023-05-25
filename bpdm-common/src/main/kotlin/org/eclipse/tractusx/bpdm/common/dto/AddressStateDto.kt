@@ -25,15 +25,15 @@ import java.time.LocalDateTime
 
 @Schema(name = "AddressState", description = "Status record for a address")
 data class AddressStateDto(
-    @Schema(description = "Description of the status")
+    @get:Schema(description = "Description of the status")
     val description: String?,
 
-    @Schema(description = "Since when the status is/was valid")
+    @get:Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
 
-    @Schema(description = "Until the status was valid, if applicable")
+    @get:Schema(description = "Until the status was valid, if applicable")
     val validTo: LocalDateTime?,
 
-    @Schema(description = "The type of this specified status")
+    @get:Schema(description = "The type of this specified status")
     val type: BusinessStateType
 )
