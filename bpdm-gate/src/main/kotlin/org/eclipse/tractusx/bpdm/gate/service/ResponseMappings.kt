@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -325,4 +326,13 @@ fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification
 
 fun Name.toNameDto(): NameDto {
     return NameDto(value, shortName)
+}
+
+fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+    return LegalEntityGateInputResponse(
+        legalEntity = legalEntity.toLegalEntityDto(),
+        externalId = legalEntity.externalId,
+        bpn = legalEntity.bpn,
+        processStartedAt = null
+    )
 }

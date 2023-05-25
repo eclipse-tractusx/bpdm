@@ -22,9 +22,6 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
@@ -43,7 +40,6 @@ import org.springframework.stereotype.Service
 @Service
 class LegalEntityService(
     private val saasRequestMappingService: SaasRequestMappingService,
-    private val inputSaasMappingService: InputSaasMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
@@ -67,24 +63,26 @@ class LegalEntityService(
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return inputSaasMappingService.toInputLegalEntity(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
-        }
+        val legalEntity = legalEntityRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("LegalEntity", externalId)
+        return toValidSingleLegalEntity(legalEntity)
     }
 
     fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageLegalEntityResponse<LegalEntityGateInputResponse> {
 
-        val legalEntitiesPage = legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
-        val legalEntityGateInputResponse = toValidLegalEntities(legalEntitiesPage)
+        val legalEntitiesPage = if (externalIds != null) {
+            legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        } else {
+            legalEntityRepository.findAll(PageRequest.of(page, size))
+        }
+
+
         return PageLegalEntityResponse(
             page = page,
             totalElements = legalEntitiesPage.totalElements,
             totalPages = legalEntitiesPage.totalPages,
             contentSize = legalEntitiesPage.content.size,
-            content = legalEntityGateInputResponse
+            content = toValidLegalEntities(legalEntitiesPage)
         )
     }
 
@@ -144,35 +142,18 @@ class LegalEntityService(
         )
 
     private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputResponse> {
-
         return legalEntityPage.content.map { legalEntity ->
-            val legalEntityDto = legalEntity.toLegalEntityDto()
-            LegalEntityGateInputResponse(
-                legalEntity = legalEntityDto,
-                externalId = legalEntity.externalId,
-                bpn = legalEntity.bpn,
-                processStartedAt = null
-            )
-        }
-
-
-    }
-
-    private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInputResponse> {
-        return partners.mapNotNull {
-            val logMessageStart =
-                "SaaS business partner for legal entity with ID ${it.id ?: "Unknown"}"
-
-            try {
-                if (it.addresses.size > 1) {
-                    logger.warn { "$logMessageStart has multiple legal addresses." }
-                }
-
-                inputSaasMappingService.toInputLegalEntity(it)
-            } catch (e: BpdmMappingException) {
-                logger.warn { "$logMessageStart will be ignored: ${e.message}" }
-                null
-            }
+            legalEntity.LegalEntityGateInputResponse(legalEntity)
         }
     }
+
+}
+
+private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+
+    return LegalEntityGateInputResponse(
+        legalEntity = legalEntity.toLegalEntityDto(),
+        bpn = legalEntity.bpn,
+        externalId = legalEntity.externalId
+    )
 }
