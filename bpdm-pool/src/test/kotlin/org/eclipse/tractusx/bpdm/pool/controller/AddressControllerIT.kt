@@ -87,7 +87,7 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val importedPartner = createdStructures.single().legalEntity
-        val addressesByBpnL = importedPartner.legalEntity.bpn
+        val addressesByBpnL = importedPartner.legalEntity.bpnl
             .let { bpnL -> requestAddressesOfLegalEntity(bpnL).content }
         // 1 legal address, 1 regular address
         assertThat(addressesByBpnL.size).isEqualTo(2)
@@ -96,8 +96,8 @@ class AddressControllerIT @Autowired constructor(
         // Same address if we use the address-by-BPNA method
         addressesByBpnL
             .forEach { address ->
-                val addressByBpnA = requestAddress(address.bpn)
-                assertThat(addressByBpnA.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpn)
+                val addressByBpnA = requestAddress(address.bpna)
+                assertThat(addressByBpnA.bpnLegalEntity).isEqualTo(importedPartner.legalEntity.bpnl)
                 assertThat(addressByBpnA).isEqualTo(address)
             }
     }
@@ -139,8 +139,8 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnA1 = createdStructures[0].addresses[0].address.bpn
-        val bpnA2 = createdStructures[0].addresses[1].address.bpn
+        val bpnA1 = createdStructures[0].addresses[0].address.bpna
+        val bpnA2 = createdStructures[0].addresses[1].address.bpna
 
         val searchRequest = AddressPartnerBpnSearchRequest(addresses = listOf(bpnA1, bpnA2))
         val searchResult =
@@ -174,7 +174,7 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
         val searchRequest = AddressPartnerBpnSearchRequest(legalEntities = listOf(bpnL2))
         val searchResult = poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
@@ -217,8 +217,8 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpn
-        val bpnS2 = createdStructures[1].siteStructures[0].site.site.bpn
+        val bpnS1 = createdStructures[0].siteStructures[0].site.site.bpns
+        val bpnS2 = createdStructures[1].siteStructures[0].site.site.bpns
 
         // search for site1 -> main address and 2 regular addresses
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS1))
@@ -280,8 +280,8 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnL = givenStructure[0].legalEntity.legalEntity.bpn
-        val bpnS = givenStructure[0].siteStructures[0].site.site.bpn
+        val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
+        val bpnS = givenStructure[0].siteStructures[0].site.site.bpns
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,
@@ -313,7 +313,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `don't create addresses with non-existent parent`() {
         val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1))
-            .entities.single().legalEntity.bpn
+            .entities.single().legalEntity.bpnl
 
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,
@@ -365,14 +365,14 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpn
-        val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].address.bpn
-        val bpnA3 = givenStructure[1].addresses[0].address.bpn
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
+        val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].address.bpna
+        val bpnA3 = givenStructure[1].addresses[0].address.bpna
 
         val expected = listOf(
-            ResponseValues.addressPartner1.copy(bpn = bpnA2),
-            ResponseValues.addressPartner2.copy(bpn = bpnA3),
-            ResponseValues.addressPartner3.copy(bpn = bpnA1)
+            ResponseValues.addressPartner1.copy(bpna = bpnA2),
+            ResponseValues.addressPartner2.copy(bpna = bpnA3),
+            ResponseValues.addressPartner3.copy(bpna = bpnA1)
         )
 
         val toUpdate = listOf(
@@ -408,10 +408,10 @@ class AddressControllerIT @Autowired constructor(
             )
         )
 
-        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpn
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
 
         val expected = listOf(
-            ResponseValues.addressPartner2.copy(bpn = bpnA1)
+            ResponseValues.addressPartner2.copy(bpna = bpnA1)
         )
 
         val firstInvalidBpn = "BPNLXXXXXXXX"
@@ -432,7 +432,7 @@ class AddressControllerIT @Autowired constructor(
     }
 
     private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateResponse>, expected: Collection<AddressPartnerCreateResponse>) {
-        actuals.forEach { assertThat(it.address.bpn).matches(testHelpers.bpnAPattern) }
+        actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields("address.bpn", "address.bpnLegalEntity", "address.bpnSite")
@@ -440,7 +440,7 @@ class AddressControllerIT @Autowired constructor(
     }
 
     private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressResponse>, expected: Collection<LogisticAddressResponse>) {
-        actuals.forEach { assertThat(it.bpn).matches(testHelpers.bpnAPattern) }
+        actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields("bpn", "bpnLegalEntity", "bpnSite")

@@ -26,7 +26,7 @@ import java.time.Instant
 @Schema(name = "SiteResponse", description = "Site of a legal entity")
 data class SiteResponse(
     @get:Schema(description = "Business Partner Number, main identifier value for sites")
-    val bpn: String,
+    val bpns: String,
 
     @get:Schema(description = "Site name")
     val name: String,

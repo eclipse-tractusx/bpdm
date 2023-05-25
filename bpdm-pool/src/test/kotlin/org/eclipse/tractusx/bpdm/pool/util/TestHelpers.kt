@@ -58,7 +58,6 @@ class TestHelpers(
     val em: EntityManager = entityManagerFactory.createEntityManager()
 
 
-
     fun truncateDbTables() {
         em.transaction.begin()
 
@@ -96,7 +95,7 @@ class TestHelpers(
         val assignedSiteRequests =
             partnerStructures.flatMap {
                 it.siteStructures.map { site ->
-                    site.site.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpn)
+                    site.site.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
                 }
             }
         val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)
@@ -105,14 +104,14 @@ class TestHelpers(
         val assignedSitelessAddresses =
             partnerStructures.flatMap {
                 it.addresses.map { address ->
-                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpn)
+                    address.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
                 }
             }
         val assignedSiteAddresses =
             partnerStructures
                 .flatMap { it.siteStructures }
                 .flatMap {
-                    it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.site.bpn) }
+                    it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.site.bpns) }
                 }
 
         val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
@@ -132,7 +131,8 @@ class TestHelpers(
             )
         }
     }
-    fun `get address by bpn-a, not found`(bpn:String ){
+
+    fun `get address by bpn-a, not found`(bpn: String) {
         try {
             val result = poolClient.addresses().getAddress(bpn)
             assertThrows<WebClientResponseException> { result }
@@ -141,7 +141,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by identifiers, bpn request limit exceeded`( identifiersSearchRequest: IdentifiersSearchRequest){
+    fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchRequest) {
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
 
@@ -151,7 +151,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by nonexistent identifier type`( identifiersSearchRequest: IdentifiersSearchRequest){
+    fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchRequest) {
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
             assertThrows<WebClientResponseException> { result }
@@ -160,18 +160,18 @@ class TestHelpers(
         }
     }
 
-    fun `set business partner currentness using nonexistent bpn`(bpn:String ){
+    fun `set business partner currentness using nonexistent bpn`(bpn: String) {
         try {
-            val result =  poolClient.legalEntities().setLegalEntityCurrentness(bpn)
+            val result = poolClient.legalEntities().setLegalEntityCurrentness(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
     }
 
-    fun `get site by bpn-s, not found`(bpn:String ){
+    fun `get site by bpn-s, not found`(bpn: String) {
         try {
-            val result =   poolClient.sites().getSite(bpn)
+            val result = poolClient.sites().getSite(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)

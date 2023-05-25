@@ -126,7 +126,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     fun `find by BPN`() {
         val expected = convertCreateResponse(givenPartner1)
 
-        val bpn = givenPartner1.legalEntity.bpn
+        val bpn = givenPartner1.legalEntity.bpnl
         val respone = webTestClient.invokeGetEndpoint<BusinessPartnerResponse>("${EndpointValues.CATENA_BUSINESS_PARTNER_LEGACY_PATH}/${bpn}")
 
         testHelpers.assertRecursively(respone).ignoringFieldsMatchingRegexes(".*uuid").isEqualTo(expected)

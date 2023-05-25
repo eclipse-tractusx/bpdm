@@ -50,7 +50,7 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
 
 fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
-        bpn = bpn,
+        bpnl = bpn,
         identifiers = identifiers.map { it.toDto() },
         legalName = legalName.toDto(),
         legalForm = legalForm?.toDto(),
@@ -111,7 +111,7 @@ fun AddressState.toDto(): AddressStateResponse {
 
 fun LogisticAddress.toDto(): LogisticAddressResponse {
     return LogisticAddressResponse(
-        bpn = bpn,
+        bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
         isLegalAddress = legalEntity?.legalAddress == this,
         bpnSite = site?.bpn,

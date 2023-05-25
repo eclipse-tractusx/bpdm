@@ -148,7 +148,7 @@ class BusinessPartnerBuildService(
         val addressResponses = createAddressesForSite(siteRequests, errors, metadataMap)
             .plus(createAddressesForLegalEntity(legalEntityRequests, errors, metadataMap))
 
-        changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.address.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.address.bpna, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
         return EntitiesWithErrors(addressResponses, errors)
     }

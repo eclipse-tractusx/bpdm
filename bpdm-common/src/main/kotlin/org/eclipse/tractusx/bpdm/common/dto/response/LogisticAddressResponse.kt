@@ -28,7 +28,7 @@ import java.time.Instant
 data class LogisticAddressResponse(
 
     @get:Schema(description = "Business Partner Number of this address")
-    val bpn: String,
+    val bpna: String,
 
     @get:Schema(
         description = "Name of the logistic address of the business partner. This is not according to official\n" +

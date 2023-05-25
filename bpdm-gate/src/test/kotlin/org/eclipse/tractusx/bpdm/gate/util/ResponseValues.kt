@@ -203,7 +203,7 @@ object ResponseValues {
     )
 
     val logisticAddress1 = LogisticAddressResponse(
-        bpn = CommonValues.bpnAddress1,
+        bpna = CommonValues.bpnAddress1,
         physicalPostalAddress = address1,
         bpnLegalEntity = CommonValues.bpn1,
         bpnSite = "BPNS0000000001XY",
@@ -212,7 +212,7 @@ object ResponseValues {
     )
 
     val logisticAddress2 = LogisticAddressResponse(
-        bpn = CommonValues.bpnAddress2,
+        bpna = CommonValues.bpnAddress2,
         physicalPostalAddress = address2,
         bpnLegalEntity = CommonValues.bpn2,
         bpnSite = "BPNS0000000002XY",
@@ -222,7 +222,7 @@ object ResponseValues {
 
 
     val legalEntityResponse1 = LegalEntityResponse(
-        bpn = CommonValues.bpn1,
+        bpnl = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
         legalName = name1,
         legalForm = legalForm1,
@@ -234,7 +234,7 @@ object ResponseValues {
     )
 
     val legalEntityResponse2 = LegalEntityResponse(
-        bpn = CommonValues.bpn2,
+        bpnl = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
         legalName = name3,
         legalForm = legalForm2,
@@ -293,7 +293,7 @@ object ResponseValues {
     )
 
     val siteResponse1 = SiteResponse(
-        bpn = CommonValues.bpnSite1,
+        bpns = CommonValues.bpnSite1,
         name = CommonValues.nameSite1,
         states = listOf(),
         bpnLegalEntity = CommonValues.bpn1,
@@ -301,7 +301,7 @@ object ResponseValues {
         updatedAt = CommonValues.now
     )
     val siteResponse2 = SiteResponse(
-        bpn = CommonValues.bpnSite2,
+        bpns = CommonValues.bpnSite2,
         name = CommonValues.nameSite2,
         states = listOf(),
         bpnLegalEntity = CommonValues.bpn2,

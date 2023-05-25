@@ -99,7 +99,7 @@ class AddressService(
 
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpn }
+        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpna }
 
         if (bpnSet.size > addressesByBpnMap.size) {
             logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
