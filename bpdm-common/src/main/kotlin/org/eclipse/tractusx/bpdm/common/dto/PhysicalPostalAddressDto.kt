@@ -29,10 +29,10 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class PhysicalPostalAddressDto(
 
     @field:JsonUnwrapped
-    val areaPart: AreaDistrictDto,
+    val baseAddress: BasePostalAddressDto,
 
     @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressDto,
+    val areaPart: AreaDistrictDto,
 
     @get:Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
     val companyPostCode: String? = null,
