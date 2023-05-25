@@ -34,9 +34,9 @@ jobs:
       dockerfilePath: ./bpdm-gate/Dockerfile
       push: ${{ github.event_name != 'pull_request' }}
 
-  build-docker-dummy-bridge:
+  build-docker-bridge-dummy:
     uses: ./.github/workflows/build-docker.yaml
     with:
-      imageName: dummy-bridge
+      imageName: bridge-dummy
       dockerfilePath: ./bpdm-bridge-dummy/Dockerfile
       push: ${{ github.event_name != 'pull_request' }}
