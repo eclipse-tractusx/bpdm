@@ -224,19 +224,21 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
     val basePostalAddressDto = BasePostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
-        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
-        administrativeAreaLevel2 = administrativeAreaLevel2,
-        administrativeAreaLevel3 = administrativeAreaLevel3,
         postCode = postCode,
         city = city,
+        street = street?.toStreetDto(),
+    )
+
+    val areaDistrictAlternativDto = AreaDistrictAlternativDto(
+        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         districtLevel1 = districtLevel1,
         districtLevel2 = districtLevel2,
-        street = street?.toStreetDto(),
     )
 
     return AlternativePostalAddressDto(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
+        areaPart = areaDistrictAlternativDto,
         baseAddress = basePostalAddressDto
     )
 
@@ -247,14 +249,17 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto {
     val basePostalAddressDto = BasePostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
+        postCode = postCode,
+        city = city,
+        street = street?.toStreetDto(),
+    )
+
+    val areaDistrictDto = AreaDistrictDto(
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
-        postCode = postCode,
-        city = city,
         districtLevel1 = districtLevel1,
         districtLevel2 = districtLevel2,
-        street = street?.toStreetDto(),
     )
 
     return PhysicalPostalAddressDto(
@@ -263,7 +268,8 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto {
         industrialZone = industrialZone,
         building = building,
         floor = floor,
-        door = door
+        door = door,
+        areaPart = areaDistrictDto
     )
 
 }
