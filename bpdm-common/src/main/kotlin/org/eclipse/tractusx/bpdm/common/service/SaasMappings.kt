@@ -254,9 +254,7 @@ object SaasMappings {
             deliveryServiceNumber = deliveryServiceNumber,
             deliveryServiceType = deliveryServiceType,
             areaPart = AreaDistrictAlternativDto(
-                administrativeAreaLevel1 = map.adminAreaLevel1(),
-                districtLevel1 = map.districtLevel1(),
-                districtLevel2 = map.districtLevel2(),
+                administrativeAreaLevel1 = map.adminAreaLevel1()
             ),
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),

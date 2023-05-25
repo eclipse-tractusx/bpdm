@@ -23,12 +23,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "LegalEntityIdentifier", description = "Identifier record for a legal entity")
 data class LegalEntityIdentifierDto(
-    @Schema(description = "Value of the identifier")
+    @get:Schema(description = "Value of the identifier")
     val value: String,
 
-    @Schema(description = "Technical key of the type to which this identifier belongs to")
+    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
     val type: String,
 
-    @Schema(description = "Body which issued the identifier")
+    @get:Schema(description = "Body which issued the identifier")
     val issuingBody: String?
 )

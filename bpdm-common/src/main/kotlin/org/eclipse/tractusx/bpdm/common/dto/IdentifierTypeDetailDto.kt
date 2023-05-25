@@ -24,9 +24,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "IdentifierTypeDetailDto", description = "Identifier type validity details")
 data class IdentifierTypeDetailDto(
-    @Schema(description = "Country in which this identifier is valid, null for universal identifiers")
+    @get:Schema(description = "Country in which this identifier is valid, null for universal identifiers")
     val country: CountryCode?,
 
-    @Schema(description = "True if identifier is mandatory in this country")
+    @get:Schema(description = "True if identifier is mandatory in this country")
     val mandatory: Boolean
 )

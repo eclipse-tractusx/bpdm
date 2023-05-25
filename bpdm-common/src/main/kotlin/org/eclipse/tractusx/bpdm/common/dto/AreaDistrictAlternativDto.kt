@@ -26,11 +26,4 @@ data class AreaDistrictAlternativDto(
 
     @get:Schema(description = "Identifying code of the Region within the country (e.g. Bayern)")
     val administrativeAreaLevel1: String? = null,
-    
-    @get:Schema(description = "Divides the city in several smaller areas")
-    val districtLevel1: String? = null,
-
-    @get:Schema(description = "Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict")
-    val districtLevel2: String? = null,
-
-    )
+)

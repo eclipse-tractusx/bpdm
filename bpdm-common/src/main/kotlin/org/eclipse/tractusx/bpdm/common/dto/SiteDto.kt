@@ -24,12 +24,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Site", description = "Site record")
 data class SiteDto(
-    @Schema(description = "Site name")
+    @get:Schema(description = "Site name")
     val name: String,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
     val states: Collection<SiteStateDto> = emptyList(),
 
-    @Schema(description = "Main address where this site resides")
+    @get:Schema(description = "Main address where this site resides")
     val mainAddress: LogisticAddressDto
 )

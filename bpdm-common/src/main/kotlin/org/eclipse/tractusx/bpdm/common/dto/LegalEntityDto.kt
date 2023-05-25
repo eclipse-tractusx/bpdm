@@ -27,10 +27,10 @@ data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
 
-    @Schema(description = "Legal name the partner goes by")
+    @get:Schema(description = "Legal name the partner goes by")
     val legalName: NameDto,
 
-    @Schema(description = "Technical key of the legal form")
+    @get:Schema(description = "Technical key of the legal form")
     val legalForm: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
@@ -39,7 +39,7 @@ data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
     val classifications: Collection<ClassificationDto> = emptyList(),
 
-    @Schema(description = "Address of the official seat of this legal entity")
+    @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: LogisticAddressDto,
 
-)
+    )

@@ -23,15 +23,15 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Street", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
 data class StreetDto(
-    @Schema(description = "Describes the official Name of the Street.")
+    @get:Schema(description = "Describes the official Name of the Street.")
     val name: String? = null,
 
-    @Schema(description = "Describes the House Number")
+    @get:Schema(description = "Describes the House Number")
     val houseNumber: String? = null,
 
-    @Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
+    @get:Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
     val milestone: String? = null,
 
-    @Schema(description = "Describes the direction")
-    val direction: String?  = null
+    @get:Schema(description = "Describes the direction")
+    val direction: String? = null
 )

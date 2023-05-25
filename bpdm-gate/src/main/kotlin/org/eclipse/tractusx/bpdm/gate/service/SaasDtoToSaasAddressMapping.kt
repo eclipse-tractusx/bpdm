@@ -89,17 +89,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         return listOfNotNull(
             LocalitySaas(
                 value = postalAdress.city, type = SaasLocalityType.CITY.toSaasTypeDto()
-            ),
-            alternateAddress?.areaPart?.districtLevel1?.let {
-                LocalitySaas(
-                    value = it, type = SaasLocalityType.DISTRICT.toSaasTypeDto()
-                )
-            },
-            alternateAddress?.areaPart?.districtLevel2?.let {
-                LocalitySaas(
-                    value = it, type = SaasLocalityType.QUARTER.toSaasTypeDto()
-                )
-            }
+            )
         )
     }
 

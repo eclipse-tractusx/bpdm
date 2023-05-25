@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "NameRegioncodeDto", description = "Region within a country")
 data class NameRegioncodeDto(
-    @Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
+    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
     val name: String,
 
-    @Schema(description = "Abbreviation or shorthand of the area")
+    @get:Schema(description = "Abbreviation or shorthand of the area")
     val regionCode: String,
 )
