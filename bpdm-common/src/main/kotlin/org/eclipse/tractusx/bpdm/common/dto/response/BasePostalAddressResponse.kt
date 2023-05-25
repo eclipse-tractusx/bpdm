@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
 @Schema(name = "PostalAddressResponse", description = "Address record of a business partner")
@@ -40,6 +39,4 @@ data class BasePostalAddressResponse(
     @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,
 
-    @get:Schema(description = "Street")
-    val street: StreetDto? = null,
-)
+    )

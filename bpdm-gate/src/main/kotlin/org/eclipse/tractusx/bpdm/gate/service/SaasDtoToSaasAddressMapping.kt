@@ -109,7 +109,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
 
     fun thoroughfares(physicalAddress: PhysicalPostalAddressDto?): Collection<ThoroughfareSaas> {
         return listOfNotNull(
-            postalAdress.street?.let {
+            physicalAddress?.street?.let {
                 ThoroughfareSaas(
                     type = SaasThoroughfareType.STREET.toSaasTypeDto(),
                     name = it.name,

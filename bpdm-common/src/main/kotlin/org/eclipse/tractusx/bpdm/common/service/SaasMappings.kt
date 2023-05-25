@@ -223,12 +223,12 @@ object SaasMappings {
                 administrativeAreaLevel3 = null,
                 district = map.district(),
             ),
+            street = toStreetDto(map),
             baseAddress = BasePostalAddressDto(
                 geographicCoordinates = map.geoCoordinates(),
                 city = city,
                 country = country,
                 postCode = map.postcode(),
-                street = toStreetDto(map),
             )
         )
     }
@@ -260,7 +260,6 @@ object SaasMappings {
                 city = city,
                 country = country,
                 postCode = map.postcode(),
-                street = toStreetDto(map),
             )
         )
     }

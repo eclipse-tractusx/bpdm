@@ -153,8 +153,8 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
             country = country.toDto(),
             postCode = postCode,
             city = city,
-            street = street?.toDto()
         ),
+        street = street?.toDto(),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
             administrativeAreaLevel2 = administrativeAreaLevel2,
@@ -176,7 +176,6 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
             country = country.toDto(),
             postCode = postCode,
             city = city,
-            street = street?.toDto()
         ),
         areaPart = AreaDistrictAlternativResponse(
             administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },

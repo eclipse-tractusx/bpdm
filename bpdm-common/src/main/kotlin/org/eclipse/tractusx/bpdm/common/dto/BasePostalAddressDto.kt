@@ -36,8 +36,5 @@ data class BasePostalAddressDto(
 
     @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
     val city: String,
-    
-    @get:Schema(description = "Address country")
-    val street: StreetDto? = null,
 
     )

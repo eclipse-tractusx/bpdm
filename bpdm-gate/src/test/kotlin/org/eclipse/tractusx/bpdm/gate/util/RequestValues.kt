@@ -127,12 +127,12 @@ object RequestValues {
             administrativeAreaLevel2 = CommonValues.county1,
             district = CommonValues.district1,
         ),
+        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate1,
             country = CommonValues.country1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
-            street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1)
         )
     )
 
@@ -146,12 +146,12 @@ object RequestValues {
             administrativeAreaLevel2 = CommonValues.county2,
             district = CommonValues.district2,
         ),
+        street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate2,
             country = CommonValues.country2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
         )
     )
 

@@ -31,6 +31,9 @@ data class PhysicalPostalAddressDto(
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressDto,
 
+    @get:Schema(description = "Address Street")
+    val street: StreetDto? = null,
+
     @field:JsonUnwrapped
     val areaPart: AreaDistrictDto,
 

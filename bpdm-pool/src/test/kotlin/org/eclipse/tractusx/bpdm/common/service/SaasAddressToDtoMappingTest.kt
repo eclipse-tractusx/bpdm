@@ -54,6 +54,7 @@ class SaasAddressToDtoMappingTest {
 
         val baseAddressDto = physicalAddressDto.baseAddress
         val areaDto = physicalAddressDto.areaPart
+        val streetDto = physicalAddressDto.street
 //TODO        Assertions.assertThat(baseAddressDto.administrativeAreaLevel1?.name).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
         Assertions.assertThat(areaDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
         Assertions.assertThat(areaDto.administrativeAreaLevel3).isEqualTo(null)
@@ -63,10 +64,10 @@ class SaasAddressToDtoMappingTest {
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.latitude).isEqualTo(addressSaas.geographicCoordinates?.latitude)
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.longitude).isEqualTo(addressSaas.geographicCoordinates?.longitude)
         Assertions.assertThat(baseAddressDto.postCode).isEqualTo(findValue(addressSaas.postCodes, SaasPostCodeType.REGULAR))
-        Assertions.assertThat(baseAddressDto.street?.name).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.name)
-        Assertions.assertThat(baseAddressDto.street?.houseNumber).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.number)
-        Assertions.assertThat(baseAddressDto.street?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
-        Assertions.assertThat(baseAddressDto.street?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
+        Assertions.assertThat(streetDto?.name).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.name)
+        Assertions.assertThat(streetDto?.houseNumber).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.number)
+        Assertions.assertThat(streetDto?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
+        Assertions.assertThat(streetDto?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
 
         Assertions.assertThat(physicalAddressDto.industrialZone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)?.name)
         Assertions.assertThat(physicalAddressDto.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
@@ -78,6 +79,7 @@ class SaasAddressToDtoMappingTest {
 
         val baseAddressDto = physicalAddressDto.baseAddress
         val areaDto = physicalAddressDto.areaPart
+        val streetDto = physicalAddressDto.street
         Assertions.assertThat(areaDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
         Assertions.assertThat(areaDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
         Assertions.assertThat(areaDto.administrativeAreaLevel3).isEqualTo(null)
@@ -87,10 +89,10 @@ class SaasAddressToDtoMappingTest {
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.latitude).isEqualTo(addressSaas.geographicCoordinates?.latitude)
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.longitude).isEqualTo(addressSaas.geographicCoordinates?.longitude)
         Assertions.assertThat(baseAddressDto.postCode).isEqualTo(findValue(addressSaas.postCodes, SaasPostCodeType.REGULAR))
-        Assertions.assertThat(baseAddressDto.street?.name).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.name)
-        Assertions.assertThat(baseAddressDto.street?.houseNumber).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.number)
-        Assertions.assertThat(baseAddressDto.street?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
-        Assertions.assertThat(baseAddressDto.street?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
+        Assertions.assertThat(streetDto?.name).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.name)
+        Assertions.assertThat(streetDto?.houseNumber).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.number)
+        Assertions.assertThat(streetDto?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
+        Assertions.assertThat(streetDto?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
 
         Assertions.assertThat(physicalAddressDto.industrialZone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)?.name)
         Assertions.assertThat(physicalAddressDto.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
