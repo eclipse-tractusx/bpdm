@@ -26,11 +26,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLogisticAddressResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -95,7 +95,7 @@ interface GateAddressApi {
     fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageLogisticAddressResponse<AddressGateInputResponse>
+    ): PageResponse<AddressGateInputResponse>
 
 
     @Operation(
@@ -110,7 +110,7 @@ interface GateAddressApi {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageLogisticAddressResponse<AddressGateInputResponse>
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse>
 
     @Operation(
         summary = "Get page of addresses",

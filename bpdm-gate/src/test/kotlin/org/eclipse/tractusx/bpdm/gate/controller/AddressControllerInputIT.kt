@@ -44,9 +44,9 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLogisticAddressResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
@@ -202,13 +202,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddresses(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
-            PageLogisticAddressResponse(
+            PageResponse(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
                 contentSize = contentSize,
-                content = expectedAddresses,
-                invalidEntries = 0
+                content = expectedAddresses
             )
         )
     }
@@ -252,13 +251,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagTest, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
-            PageLogisticAddressResponse(
+            PageResponse(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
                 contentSize = contentSize,
-                content = expectedAddresses,
-                invalidEntries = 0
+                content = expectedAddresses
             )
         )
     }
@@ -295,13 +293,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddresses(paginationValues)
 
         assertThat(pageResponse).isEqualTo(
-            PageLogisticAddressResponse(
+            PageResponse(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
                 contentSize = contentSize,
-                content = expectedAddresses,
-                invalidEntries = 0
+                content = expectedAddresses
             )
         )
 

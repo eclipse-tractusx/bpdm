@@ -21,13 +21,13 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLogisticAddressResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -54,25 +54,20 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageLogisticAddressResponse<AddressGateInputResponse> {
-
-        val findAllPageEntries = addressRepository.findAll(PageRequest.of(page, size))
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
         } else {
-            findAllPageEntries
+            addressRepository.findAll(PageRequest.of(page, size))
         }
 
-        val invalidValue = externalIds?.let { findAllPageEntries.totalElements - logisticAddressPage.totalElements } ?: 0
-
-        return PageLogisticAddressResponse(
+        return PageResponse(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
             contentSize = logisticAddressPage.content.size,
             content = toValidLogisticAddresses(logisticAddressPage),
-            invalidEntries = invalidValue.toInt()
         )
     }
 
