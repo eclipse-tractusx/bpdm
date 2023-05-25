@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -31,6 +32,9 @@ data class PhysicalPostalAddressResponse(
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressResponse,
 
+    @get:Schema(description = "Street")
+    val street: StreetDto? = null,
+    
     @field:JsonUnwrapped
     val areaPart: AreaDistrictResponse,
 

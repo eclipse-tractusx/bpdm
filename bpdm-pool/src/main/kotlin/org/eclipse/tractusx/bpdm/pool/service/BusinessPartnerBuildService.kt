@@ -435,7 +435,7 @@ class BusinessPartnerBuildService(
             postCode = baseAddress.postCode,
             city = baseAddress.city,
             districtLevel1 = area.district,
-            street = baseAddress.street?.let { createStreet(it) },
+            street = physicalAddress.street?.let { createStreet(it) },
             companyPostCode = physicalAddress.companyPostCode,
             industrialZone = physicalAddress.industrialZone,
             building = physicalAddress.building,
@@ -457,7 +457,6 @@ class BusinessPartnerBuildService(
             administrativeAreaLevel1 = null,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
-            street = baseAddress.street?.let { createStreet(it) },
             deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber
         )
