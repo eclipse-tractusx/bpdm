@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
@@ -67,37 +66,19 @@ class AddressService(
 
         val invalidValue = externalIds?.let { findAllPageEntries.totalElements - logisticAddressPage.totalElements } ?: 0
 
-        val logisticAddressGateInputResponse = toValidLogisticAddresses(logisticAddressPage)
-
         return PageLogisticAddressResponse(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
             contentSize = logisticAddressPage.content.size,
-            content = logisticAddressGateInputResponse,
+            content = toValidLogisticAddresses(logisticAddressPage),
             invalidEntries = invalidValue.toInt()
         )
     }
 
     private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputResponse> {
-
         return logisticAddressPage.content.map { logisticAddress ->
-            val addressDto = LogisticAddressDto(
-                name = logisticAddress.name,
-                states = mapToDtoStates(logisticAddress.states),
-                identifiers = mapToDtoIdentifiers(logisticAddress.identifiers),
-                physicalPostalAddress = logisticAddress.physicalPostalAddress.toPhysicalPostalAddress(),
-                alternativePostalAddress = logisticAddress.alternativePostalAddress?.toAlternativePostalAddressDto()
-            )
-
-            AddressGateInputResponse(
-                address = addressDto,
-                externalId = logisticAddress.externalId,
-                legalEntityExternalId = logisticAddress.legalEntity?.externalId,
-                siteExternalId = logisticAddress.site?.externalId,
-                bpn = logisticAddress.bpn,
-                processStartedAt = null //TODO Remove this?
-            )
+            logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
     }
 
@@ -105,20 +86,8 @@ class AddressService(
 
         val logisticAddress = addressRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Logistic Address", externalId)
 
-        return toValidSingleLogisticAddress(logisticAddress)
+        return logisticAddress.toAddressGateInputResponse(logisticAddress)
 
-    }
-
-    private fun toValidSingleLogisticAddress(logisticAddressRecord: LogisticAddress): AddressGateInputResponse {
-
-        return AddressGateInputResponse(
-            address = logisticAddressRecord.toLogisticAddressDto(),
-            externalId = logisticAddressRecord.externalId,
-            legalEntityExternalId = logisticAddressRecord.legalEntity?.externalId,
-            siteExternalId = logisticAddressRecord.site?.externalId,
-            bpn = logisticAddressRecord.bpn,
-            processStartedAt = null //TODO Remove this?
-        )
     }
 
     /**

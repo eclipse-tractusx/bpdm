@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
@@ -196,8 +197,22 @@ fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {
     return siteExternalId + "_legalAddress"
 }
 
-//New
+//Logistic Address mapping to AddressGateInputResponse
+fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddress): AddressGateInputResponse {
 
+    val addressGateInputResponse = AddressGateInputResponse(
+        address = logisticAddressPage.toLogisticAddressDto(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntity?.externalId,
+        siteExternalId = siteExternalId,
+        bpn = bpn,
+        processStartedAt = null //TODO Remove ?
+    )
+
+    return addressGateInputResponse
+}
+
+//Logistic Address mapping to LogisticAddressDto
 fun LogisticAddress.toLogisticAddressDto(): LogisticAddressDto {
 
     val logisticAddress = LogisticAddressDto(
