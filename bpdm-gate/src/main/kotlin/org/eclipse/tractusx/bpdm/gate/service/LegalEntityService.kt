@@ -22,12 +22,12 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageLegalEntityResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
@@ -68,7 +68,7 @@ class LegalEntityService(
         return toValidSingleLegalEntity(legalEntity)
     }
 
-    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageLegalEntityResponse<LegalEntityGateInputResponse> {
+    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<LegalEntityGateInputResponse> {
 
         val legalEntitiesPage = if (externalIds != null) {
             legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
@@ -77,7 +77,7 @@ class LegalEntityService(
         }
 
 
-        return PageLegalEntityResponse(
+        return PageResponse(
             page = page,
             totalElements = legalEntitiesPage.totalElements,
             totalPages = legalEntitiesPage.totalPages,
