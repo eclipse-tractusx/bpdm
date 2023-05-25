@@ -95,7 +95,7 @@ class TestHelpers(
         val assignedSiteRequests =
             partnerStructures.flatMap {
                 it.siteStructures.map { site ->
-                    site.site.copy(bpnParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
+                    site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
                 }
             }
         val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)

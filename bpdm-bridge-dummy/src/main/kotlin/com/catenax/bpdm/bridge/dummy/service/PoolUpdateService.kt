@@ -71,7 +71,7 @@ class PoolUpdateService(
                     SitePartnerCreateRequest(
                         site = entry.site,
                         index = entry.externalId,
-                        bpnParent = leParentBpn
+                        bpnlParent = leParentBpn
                     )
                 }
         }

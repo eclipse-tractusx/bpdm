@@ -170,9 +170,9 @@ class SiteControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2, ResponseValues.siteUpsert3)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
-            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
-            RequestValues.siteCreate3.copy(bpnParent = bpnL2)
+            RequestValues.siteCreate1.copy(bpnlParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnlParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnlParent = bpnL2)
         )
 
         val response = poolClient.sites().createSite(toCreate)
@@ -200,9 +200,9 @@ class SiteControllerIT @Autowired constructor(
         val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(bpnParent = bpnL1),
-            RequestValues.siteCreate2.copy(bpnParent = bpnL2),
-            RequestValues.siteCreate3.copy(bpnParent = "NONEXISTENT")
+            RequestValues.siteCreate1.copy(bpnlParent = bpnL1),
+            RequestValues.siteCreate2.copy(bpnlParent = bpnL2),
+            RequestValues.siteCreate3.copy(bpnlParent = "NONEXISTENT")
         )
         val response = poolClient.sites().createSite(toCreate)
 

@@ -95,19 +95,19 @@ interface PoolLegalEntityApi {
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
         description = "Confirms that the data of a business partner is still up to date " +
-                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\". Ignores case of bpn."
+                "by saving the current timestamp at the time this POST-request is made as this business partner's \"currentness\". Ignores case of bpnl."
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Business partner's \"currentness\" successfully updated"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpnl", content = [Content()])
         ]
     )
-    @PostMapping("/{bpn}/confirm-up-to-date")
-    @PostExchange("/{bpn}/confirm-up-to-date")
+    @PostMapping("/{bpnl}/confirm-up-to-date")
+    @PostExchange("/{bpnl}/confirm-up-to-date")
     fun setLegalEntityCurrentness(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String
+        @Parameter(description = "Bpnl value") @PathVariable bpnl: String
     )
 
     @Operation(
@@ -134,19 +134,19 @@ interface PoolLegalEntityApi {
 
     @Operation(
         summary = "Get site partners of a legal entity",
-        description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpn ignoring case."
+        description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpnl ignoring case."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The sites for the specified bpn"),
+            ApiResponse(responseCode = "200", description = "The sites for the specified bpnl"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No business partner found for specified bpnl", content = [Content()])
         ]
     )
-    @GetMapping("/{bpn}/sites")
-    @GetExchange("/{bpn}/sites")
+    @GetMapping("/{bpnl}/sites")
+    @GetExchange("/{bpnl}/sites")
     fun getSites(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @Parameter(description = "Bpnl value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<SiteResponse>
 
@@ -161,10 +161,10 @@ interface PoolLegalEntityApi {
             ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
         ]
     )
-    @GetMapping("/{bpn}/addresses")
-    @GetExchange("/{bpn}/addresses")
+    @GetMapping("/{bpnl}/addresses")
+    @GetExchange("/{bpnl}/addresses")
     fun getAddresses(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String,
+        @Parameter(description = "Bpn value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<LogisticAddressResponse>
 

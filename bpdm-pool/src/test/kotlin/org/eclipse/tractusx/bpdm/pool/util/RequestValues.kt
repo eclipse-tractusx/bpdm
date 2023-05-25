@@ -219,7 +219,7 @@ object RequestValues {
             mainAddress = logisticAddress1
         ),
         index = CommonValues.index1,
-        bpnParent = legalEntityUpdate1.bpnl
+        bpnlParent = legalEntityUpdate1.bpnl
     )
 
     val siteCreate2 = SitePartnerCreateRequest(
@@ -229,7 +229,7 @@ object RequestValues {
             mainAddress = logisticAddress2
         ),
         index = CommonValues.index2,
-        bpnParent = legalEntityUpdate2.bpnl
+        bpnlParent = legalEntityUpdate2.bpnl
     )
 
     val siteCreate3 = SitePartnerCreateRequest(
@@ -239,7 +239,7 @@ object RequestValues {
             mainAddress = logisticAddress3
         ),
         index = CommonValues.index3,
-        bpnParent = legalEntityUpdate3.bpnl
+        bpnlParent = legalEntityUpdate3.bpnl
     )
 
     val siteUpdate1 = SitePartnerUpdateRequest(

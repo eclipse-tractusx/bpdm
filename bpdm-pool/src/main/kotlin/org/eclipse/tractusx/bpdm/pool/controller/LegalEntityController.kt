@@ -72,8 +72,8 @@ class LegalEntityController(
     }
 
 
-    override fun setLegalEntityCurrentness(bpn: String) {
-        businessPartnerBuildService.setBusinessPartnerCurrentness(bpn.uppercase())
+    override fun setLegalEntityCurrentness(bpnl: String) {
+        businessPartnerBuildService.setBusinessPartnerCurrentness(bpnl.uppercase())
     }
 
     override fun searchSites(
@@ -86,18 +86,18 @@ class LegalEntityController(
     }
 
     override fun getSites(
-        bpn: String,
+        bpnl: String,
         paginationRequest: PaginationRequest
     ): PageResponse<SiteResponse> {
-        return siteService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
+        return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
 
     override fun getAddresses(
-        bpn: String,
+        bpnl: String,
         paginationRequest: PaginationRequest
     ): PageResponse<LogisticAddressResponse> {
-        return addressService.findByPartnerBpn(bpn.uppercase(), paginationRequest.page, paginationRequest.size)
+        return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
 
@@ -114,7 +114,8 @@ class LegalEntityController(
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
-    override fun updateBusinessPartners(businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+    override fun updateBusinessPartners(
+        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }

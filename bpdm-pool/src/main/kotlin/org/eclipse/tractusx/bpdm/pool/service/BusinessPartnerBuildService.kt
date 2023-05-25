@@ -95,12 +95,12 @@ class BusinessPartnerBuildService(
     fun createSites(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
-        val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnParent })
+        val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnlParent })
         val legalEntityMap = legalEntities.associateBy { it.bpn }
 
-        val (validRequests, invalidRequests) = requests.partition { legalEntityMap[it.bpnParent] != null }
+        val (validRequests, invalidRequests) = requests.partition { legalEntityMap[it.bpnlParent] != null }
         val errors = invalidRequests.map {
-            ErrorInfo(SiteCreateError.LegalEntityNotFound, "Site not created: parent legal entity ${it.bpnParent} not found", it.index)
+            ErrorInfo(SiteCreateError.LegalEntityNotFound, "Site not created: parent legal entity ${it.bpnlParent} not found", it.index)
         }
 
         val addressMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.site.mainAddress })
@@ -110,7 +110,7 @@ class BusinessPartnerBuildService(
 
         val siteWithIndexByBpnMap = validRequests
             .mapIndexed { i, request ->
-                val legalEntity = legalEntityMap[request.bpnParent]!!
+                val legalEntity = legalEntityMap[request.bpnlParent]!!
                 val site = createSite(request.site, bpnSs[i], legalEntity)
                 site.mainAddress = createLogisticAddress(request.site.mainAddress, bpnAs[i], site, addressMetadataMap)
                 Pair(site, request.index)

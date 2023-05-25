@@ -32,7 +32,7 @@ data class SitePartnerCreateRequest(
     val site: SiteDto,
 
     @Schema(description = "Business Partner Number of the legal entity this site belongs to")
-    val bpnParent: String,
+    val bpnlParent: String,
 
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?

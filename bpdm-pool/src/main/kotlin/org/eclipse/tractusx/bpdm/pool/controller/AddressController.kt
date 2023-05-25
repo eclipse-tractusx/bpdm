@@ -52,9 +52,9 @@ class AddressController(
     }
 
     override fun getAddress(
-        bpn: String
+        bpna: String
     ): LogisticAddressResponse {
-        return addressService.findByBpn(bpn.uppercase())
+        return addressService.findByBpn(bpna.uppercase())
     }
 
     override fun searchAddresses(
@@ -68,7 +68,7 @@ class AddressController(
 
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
-    ):  AddressPartnerCreateResponseWrapper {
+    ): AddressPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
