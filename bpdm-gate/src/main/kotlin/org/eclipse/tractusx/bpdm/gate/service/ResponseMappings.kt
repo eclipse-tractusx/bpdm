@@ -22,11 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
@@ -331,7 +327,9 @@ fun Name.toNameDto(): NameDto {
     return NameDto(value, shortName)
 }
 
+//LegalEntity mapping to LegalEntityGateInputResponse
 fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         externalId = legalEntity.externalId,
@@ -340,6 +338,7 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
     )
 }
 
+//Site mapping to SiteDto
 fun Site.toSiteDto(): SiteDto {
 
     return SiteDto(
@@ -351,4 +350,17 @@ fun Site.toSiteDto(): SiteDto {
 
 fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto> {
     return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
+}
+
+//LegalEntity mapping to LegalEntityGateInputResponse
+fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
+
+    return SiteGateInputResponse(
+        site = sitePage.toSiteDto(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntity.externalId,
+        bpn = bpn,
+        processStartedAt = null //TODO Remove this?
+    )
+
 }

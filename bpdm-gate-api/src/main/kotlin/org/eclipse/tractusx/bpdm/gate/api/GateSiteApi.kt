@@ -26,12 +26,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageSiteResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -92,7 +92,7 @@ interface GateSiteApi {
     fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageSiteResponse<SiteGateInputResponse>
+    ): PageResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",
@@ -106,7 +106,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageSiteResponse<SiteGateInputResponse>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",

@@ -33,8 +33,5 @@ data class PageLogisticAddressResponse<T>(
     val contentSize: Int,
     @Schema(description = "Collection of results in the page")
     val content: Collection<T>,
-    @Schema(description = "Number of entries in the page that have been omitted due to being invalid")
-    val invalidEntries: Int
-
 )
 

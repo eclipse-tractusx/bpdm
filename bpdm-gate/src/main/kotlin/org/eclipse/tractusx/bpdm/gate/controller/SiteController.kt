@@ -20,15 +20,16 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageSiteResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
 import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springframework.http.HttpStatus
@@ -43,9 +44,9 @@ class SiteController(
 ) : GateSiteApi {
 
     override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
-//        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
-//            return ResponseEntity(HttpStatus.BAD_REQUEST)
-//        }
+        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
         siteService.upsertSites(sites)
         return ResponseEntity(HttpStatus.OK)
     }
@@ -57,11 +58,11 @@ class SiteController(
     override fun getSitesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageSiteResponse<SiteGateInputResponse> {
+    ): PageResponse<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    override fun getSites(paginationRequest: PaginationRequest): PageSiteResponse<SiteGateInputResponse> {
+    override fun getSites(paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 
