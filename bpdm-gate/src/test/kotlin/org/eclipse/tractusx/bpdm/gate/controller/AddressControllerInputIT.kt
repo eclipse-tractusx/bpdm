@@ -49,11 +49,9 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
-import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
@@ -62,7 +60,6 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -74,9 +71,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class AddressControllerInputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
-    private val saasConfigProperties: SaasConfigProperties,
     val gateClient: GateClient,
-    private val gateAddressRepository: GateAddressRepository
+    private val gateAddressRepository: GateAddressRepository,
+    val testHelpers: DbTestHelpers,
 ) {
     companion object {
         @RegisterExtension
@@ -94,6 +91,7 @@ internal class AddressControllerInputIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         wireMockServer.resetAll()
+        testHelpers.truncateDbTables()
     }
 
     /**
@@ -103,11 +101,11 @@ internal class AddressControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get address by external id`() {
-        val externalIdToQuery = SaasValues.addressBusinessPartnerWithRelations1.externalId!!
-        val expectedAddress = ResponseValues.logisticAddressGateInputResponse1
+
+        val externalIdToQuery = CommonValues.externalIdAddress2
+        val expectedAddress = ResponseValues.logisticAddressGateInputResponse2
 
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
             RequestValues.addressGateInputRequest2
         )
 
@@ -131,42 +129,6 @@ internal class AddressControllerInputIT @Autowired constructor(
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
-    }
-
-    /**
-     * Given address business partner without address data in SaaS
-     * When query by its external ID
-     * Then server error is returned
-     */
-    @Test
-    fun `get address for which SaaS data is invalid, expect error`() {
-
-        val invalidPartner = SaasValues.addressBusinessPartnerWithRelations1.copy(addresses = emptyList())
-
-        wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                FetchResponse(
-                                    businessPartner = invalidPartner,
-                                    status = FetchResponse.Status.OK
-                                )
-                            )
-                        )
-                )
-        )
-
-        try {
-            gateClient.addresses().getAddressByExternalId(SaasValues.addressBusinessPartnerWithRelations1.externalId.toString())
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            Assertions.assertTrue(statusCodeValue in 500..599)
-        }
-
     }
 
     /**
@@ -214,15 +176,15 @@ internal class AddressControllerInputIT @Autowired constructor(
 
 
     /**
-     * Given addresses exists in SaaS
+     * Given addresses exists in the Persistence Database
      * When getting addresses page based on external id list
-     * Then addresses page mapped to the catena data model should be returned
+     * Then addresses should be returned
      */
     @Test
     fun `get addresses filter by external ids`() {
-        val addressesSaas = listOf(
-            SaasValues.addressBusinessPartnerWithRelations1,
-            SaasValues.addressBusinessPartnerWithRelations2
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
         )
 
         val expectedAddresses = listOf(
@@ -238,17 +200,12 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageValue = 0
         val contentSize = 2
 
-        val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
-        )
-
-        val listExternalIds = addressesSaas.mapNotNull { it.externalId }
+        val listExternalIds = addresses.map { it.externalId }
 
         gateClient.addresses().upsertAddresses(addresses)
 
-        val pagTest = PaginationRequest(page, size)
-        val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagTest, listExternalIds)
+        val pagination = PaginationRequest(page, size)
+        val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagination, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
             PageResponse(
@@ -259,67 +216,6 @@ internal class AddressControllerInputIT @Autowired constructor(
                 content = expectedAddresses
             )
         )
-    }
-
-    /**
-     * Given invalid addresses in SaaS
-     * When getting addresses page
-     * Then only valid addresses on page returned
-     */
-    @Test
-    fun `filter invalid addresses`() {
-
-        val expectedAddresses = listOf(
-            ResponseValues.logisticAddressGateInputResponse1,
-            ResponseValues.logisticAddressGateInputResponse2,
-        )
-
-        val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
-        )
-
-        val page = 0
-        val size = 10
-
-        val totalElements = 2L
-        val totalPages = 1
-        val pageValue = 0
-        val contentSize = 2
-
-        gateClient.addresses().upsertAddresses(addresses)
-
-        val paginationValues = PaginationRequest(page, size)
-        val pageResponse = gateClient.addresses().getAddresses(paginationValues)
-
-        assertThat(pageResponse).isEqualTo(
-            PageResponse(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedAddresses
-            )
-        )
-
-
-    }
-
-    /**
-     * When SaaS api responds with an error status code while getting addresses
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get addresses, SaaS error`() {
-
-        try {
-            gateClient.addresses().getAddresses(PaginationRequest(0, 10))
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            Assertions.assertTrue(statusCodeValue in 500..599)
-        }
-
     }
 
     /**
@@ -343,9 +239,9 @@ internal class AddressControllerInputIT @Autowired constructor(
     }
 
     /**
-     * Given legal entities and sites in SaaS
-     * When upserting addresses of legal entities and sites
-     * Then upsert addresses and relations in SaaS api should be called with the address data mapped to the SaaS data model
+     * Given legal entities and sites
+     * When upserting addresses of legal entities and sites or a new one
+     * Then upsert addresses should be persisted on the database
      */
     @Test
     fun `upsert addresses`() {
@@ -366,6 +262,25 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val addressExternal2 = gateAddressRepository.findByExternalId("address-external-2")
         assertNotEquals(addressExternal2, null)
+
+    }
+
+    /**
+     * When upserting addresses
+     * if both have both have the same externalId, "bad request" should show
+     */
+    @Test
+    fun `upsert addresses, same externalid`() {
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest1
+        )
+
+        try {
+            gateClient.addresses().upsertAddresses(addresses)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
 
     }
 

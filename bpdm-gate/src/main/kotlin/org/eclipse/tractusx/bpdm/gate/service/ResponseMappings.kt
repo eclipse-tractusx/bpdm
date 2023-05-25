@@ -204,7 +204,7 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
-        siteExternalId = siteExternalId,
+        siteExternalId = site?.externalId,
         bpn = bpn,
         processStartedAt = null //TODO Remove ?
     )
@@ -239,15 +239,12 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
     val basePostalAddressDto = BasePostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
-        postCode = postCode,
-        city = city,
-        street = street?.toStreetDto(),
+        postalCode = postCode,
+        city = city
     )
 
     val areaDistrictAlternativDto = AreaDistrictAlternativDto(
-        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
-        districtLevel1 = districtLevel1,
-        districtLevel2 = districtLevel2,
+        administrativeAreaLevel1 = null // TODO Add region mapping Logic
     )
 
     return AlternativePostalAddressDto(
@@ -264,24 +261,23 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto {
     val basePostalAddressDto = BasePostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
-        postCode = postCode,
-        city = city,
-        street = street?.toStreetDto(),
+        postalCode = postCode,
+        city = city
     )
 
     val areaDistrictDto = AreaDistrictDto(
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
-        districtLevel1 = districtLevel1,
-        districtLevel2 = districtLevel2,
+        district = districtLevel1
     )
 
     return PhysicalPostalAddressDto(
         baseAddress = basePostalAddressDto,
-        companyPostCode = companyPostCode,
+        companyPostalCode = companyPostCode,
         industrialZone = industrialZone,
         building = building,
+        street = street?.toStreetDto(),
         floor = floor,
         door = door,
         areaPart = areaDistrictDto

@@ -155,8 +155,7 @@ object RequestValues {
         )
     )
 
-
-    //Temporary Values for Logistic Addresses Tests
+    //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
         industrialZone = CommonValues.industrialZone1,
         building = CommonValues.building1,
@@ -165,15 +164,14 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = CommonValues.county1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
+            district = CommonValues.district1,
         ),
+        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate1,
             country = CommonValues.country1,
-            postCode = CommonValues.postCode1,
+            postalCode = CommonValues.postCode1,
             city = CommonValues.city1,
-            street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1)
         )
     )
 
@@ -185,15 +183,14 @@ object RequestValues {
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = CommonValues.county2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
+            district = CommonValues.district2,
         ),
+        street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate2,
             country = CommonValues.country2,
-            postCode = CommonValues.postCode2,
+            postalCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
         )
     )
 
@@ -205,12 +202,12 @@ object RequestValues {
         physicalPostalAddress = postalAddress2,
     )
 
-    //Temporary Values for Logistic Address Tests
-    val Logisticaddress1 = LogisticAddressDto(
+    //New Values for Logistic Address Tests
+    val logisticAddress1 = LogisticAddressDto(
         physicalPostalAddress = postalAddressLogisticAddress1,
     )
 
-    val Logisticaddress2 = LogisticAddressDto(
+    val logisticAddress2 = LogisticAddressDto(
         physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
@@ -277,6 +274,7 @@ object RequestValues {
         legalEntityExternalId = CommonValues.externalId1,
         bpn = CommonValues.bpnAddress1
     )
+
     val addressGateInputRequest2 = AddressGateInputRequest(
         address = address2,
         externalId = CommonValues.externalIdAddress2,
