@@ -178,7 +178,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate1,
             country = country1,
-            postCode = CommonValues.postCode1,
+            postalCode = CommonValues.postCode1,
             city = CommonValues.city1,
         )
     )
@@ -197,7 +197,7 @@ object ResponseValues {
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate2,
             country = country2,
-            postCode = CommonValues.postCode2,
+            postalCode = CommonValues.postCode2,
             city = CommonValues.city2,
         )
     )

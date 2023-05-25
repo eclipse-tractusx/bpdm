@@ -69,13 +69,13 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
 
     fun postcodes(physicalAddress: PhysicalPostalAddressDto?): Collection<PostCodeSaas> {
         return listOfNotNull(
-            postalAdress.postCode?.let {
+            postalAdress.postalCode?.let {
                 PostCodeSaas(
                     value = it,
                     type = SaasPostCodeType.REGULAR.toSaasTypeDto()
                 )
             },
-            physicalAddress?.companyPostCode?.let {
+            physicalAddress?.companyPostalCode?.let {
                 PostCodeSaas(
                     value = it,
                     type = SaasPostCodeType.LARGE_MAIL_USER.toSaasTypeDto()

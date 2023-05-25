@@ -131,7 +131,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest(
-            postCode = givenAddress1.physicalPostalAddress.baseAddress.postCode
+            postCode = givenAddress1.physicalPostalAddress.baseAddress.postalCode
         )
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
@@ -275,7 +275,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
         val addressSearchRequest = AddressPartnerSearchRequest()
         addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postalCode
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
@@ -295,7 +295,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postCode
+        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postalCode
         addressSearchRequest.administrativeArea = "someNonexistentValue"
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
@@ -335,7 +335,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest(
-            postCode = givenAddress3.physicalPostalAddress.baseAddress.postCode
+            postCode = givenAddress3.physicalPostalAddress.baseAddress.postalCode
         )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 

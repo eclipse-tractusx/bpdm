@@ -432,11 +432,11 @@ class BusinessPartnerBuildService(
             administrativeAreaLevel1 = null,
             administrativeAreaLevel2 = area.administrativeAreaLevel2,
             administrativeAreaLevel3 = area.administrativeAreaLevel3,
-            postCode = baseAddress.postCode,
+            postCode = baseAddress.postalCode,
             city = baseAddress.city,
             districtLevel1 = area.district,
             street = physicalAddress.street?.let { createStreet(it) },
-            companyPostCode = physicalAddress.companyPostCode,
+            companyPostCode = physicalAddress.companyPostalCode,
             industrialZone = physicalAddress.industrialZone,
             building = physicalAddress.building,
             floor = physicalAddress.floor,
@@ -455,7 +455,7 @@ class BusinessPartnerBuildService(
 //                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
 //            },
             administrativeAreaLevel1 = null,
-            postCode = baseAddress.postCode,
+            postCode = baseAddress.postalCode,
             city = baseAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber

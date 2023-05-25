@@ -131,7 +131,7 @@ object RequestValues {
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate1,
             country = CommonValues.country1,
-            postCode = CommonValues.postCode1,
+            postalCode = CommonValues.postCode1,
             city = CommonValues.city1,
         )
     )
@@ -150,7 +150,7 @@ object RequestValues {
         baseAddress = BasePostalAddressDto(
             geographicCoordinates = geoCoordinate2,
             country = CommonValues.country2,
-            postCode = CommonValues.postCode2,
+            postalCode = CommonValues.postCode2,
             city = CommonValues.city2,
         )
     )
