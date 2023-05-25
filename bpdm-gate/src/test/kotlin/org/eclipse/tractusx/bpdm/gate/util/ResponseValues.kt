@@ -335,6 +335,7 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress1,
         processStartedAt = SaasValues.modificationTime1,
     )
+
     val addressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.address2
             .copy(
