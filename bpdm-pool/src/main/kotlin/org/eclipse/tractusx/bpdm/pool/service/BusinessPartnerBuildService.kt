@@ -542,10 +542,6 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: AddressVersionDto): AddressVersion {
-        return AddressVersion(dto.characterSet, dto.language)
-    }
-
     private fun toEntity(dto: GeoCoordinateDto): GeographicCoordinate {
         return GeographicCoordinate(dto.latitude, dto.longitude, dto.altitude)
     }
