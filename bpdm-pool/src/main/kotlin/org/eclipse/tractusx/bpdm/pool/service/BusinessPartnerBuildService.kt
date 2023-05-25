@@ -163,7 +163,7 @@ class BusinessPartnerBuildService(
         val legalEntityMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
         val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity.legalAddress })
 
-        val bpnsToFetch = requests.map { it.bpn }
+        val bpnsToFetch = requests.map { it.bpnl }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
         businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntities)
 
@@ -172,7 +172,7 @@ class BusinessPartnerBuildService(
             ErrorInfo(LegalEntityUpdateError.LegalEntityNotFound, "Legal entity $it not updated: BPNL not found", it)
         }
 
-        val requestByBpnMap = requests.associateBy { it.bpn }
+        val requestByBpnMap = requests.associateBy { it.bpnl }
         legalEntities.forEach {
             val request = requestByBpnMap.get(it.bpn)!!
             updateLegalEntity(it, request.legalEntity, legalEntityMetadataMap)
@@ -193,7 +193,7 @@ class BusinessPartnerBuildService(
 
         val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.site.mainAddress })
 
-        val bpnsToFetch = requests.map { it.bpn }
+        val bpnsToFetch = requests.map { it.bpns }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
 
         val bpnsNotFetched = bpnsToFetch.minus(sites.map { it.bpn }.toSet())
@@ -204,7 +204,7 @@ class BusinessPartnerBuildService(
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
         changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.mainAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
-        val requestByBpnMap = requests.associateBy { it.bpn }
+        val requestByBpnMap = requests.associateBy { it.bpns }
         sites.forEach {
             val request = requestByBpnMap[it.bpn]!!
             updateSite(it, request.site)
@@ -218,14 +218,14 @@ class BusinessPartnerBuildService(
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }
 
-        val validAddresses = logisticAddressRepository.findDistinctByBpnIn(requests.map { it.bpn })
+        val validAddresses = logisticAddressRepository.findDistinctByBpnIn(requests.map { it.bpna })
         val validBpns = validAddresses.map { it.bpn }.toHashSet()
-        val (validRequests, invalidRequests) = requests.partition { validBpns.contains(it.bpn) }
+        val (validRequests, invalidRequests) = requests.partition { validBpns.contains(it.bpna) }
         val errors = invalidRequests.map {
-            ErrorInfo(AddressUpdateError.AddressNotFound, "Address ${it.bpn} not updated: BPNA not found", it.bpn)
+            ErrorInfo(AddressUpdateError.AddressNotFound, "Address ${it.bpna} not updated: BPNA not found", it.bpna)
         }
 
-        val requestByBpnMap = requests.associateBy { it.bpn }
+        val requestByBpnMap = requests.associateBy { it.bpna }
         val metadataMap = metadataMappingService.mapRequests(validRequests.map { it.address })
 
         validAddresses.forEach { updateLogisticAddress(it, requestByBpnMap[it.bpn]!!.address, metadataMap) }

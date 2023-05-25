@@ -167,7 +167,7 @@ class LegalEntityControllerIT @Autowired constructor(
         }
 
         val toUpdate = RequestValues.legalEntityUpdate3.copy(
-            bpn = givenBpnL
+            bpnl = givenBpnL
         )
         val response = poolClient.legalEntities().updateBusinessPartners(listOf(toUpdate))
 
@@ -190,8 +190,8 @@ class LegalEntityControllerIT @Autowired constructor(
         val bpnA = createdEntity.legalAddress.bpna
 
         val toUpdate = listOf(
-            RequestValues.legalEntityUpdate3.copy(bpn = "NONEXISTENT"),
-            RequestValues.legalEntityUpdate3.copy(bpn = bpnL)
+            RequestValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT"),
+            RequestValues.legalEntityUpdate3.copy(bpnl = bpnL)
         )
 
         val expected = with(ResponseValues.legalEntityUpsert3) {

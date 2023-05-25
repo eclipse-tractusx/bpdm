@@ -376,9 +376,9 @@ class AddressControllerIT @Autowired constructor(
         )
 
         val toUpdate = listOf(
-            RequestValues.addressPartnerUpdate1.copy(bpn = bpnA2),
-            RequestValues.addressPartnerUpdate2.copy(bpn = bpnA3),
-            RequestValues.addressPartnerUpdate3.copy(bpn = bpnA1)
+            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA2),
+            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA3),
+            RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1)
         )
 
         val response = poolClient.addresses().updateAddresses(toUpdate)
@@ -417,9 +417,9 @@ class AddressControllerIT @Autowired constructor(
         val firstInvalidBpn = "BPNLXXXXXXXX"
         val secondInvalidBpn = "BPNAXXXXXXXX"
         val toUpdate = listOf(
-            RequestValues.addressPartnerUpdate2.copy(bpn = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpn = firstInvalidBpn),
-            RequestValues.addressPartnerUpdate3.copy(bpn = secondInvalidBpn)
+            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA1),
+            RequestValues.addressPartnerUpdate2.copy(bpna = firstInvalidBpn),
+            RequestValues.addressPartnerUpdate3.copy(bpna = secondInvalidBpn)
         )
 
         val response = poolClient.addresses().updateAddresses(toUpdate)
@@ -435,7 +435,11 @@ class AddressControllerIT @Autowired constructor(
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
-            .ignoringFields("address.bpn", "address.bpnLegalEntity", "address.bpnSite")
+            .ignoringFields(
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpna.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnLegalEntity.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnSite.name
+            )
             .isEqualTo(expected)
     }
 
@@ -443,7 +447,11 @@ class AddressControllerIT @Autowired constructor(
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
-            .ignoringFields("bpn", "bpnLegalEntity", "bpnSite")
+            .ignoringFields(
+                LogisticAddressResponse::bpna.name,
+                LogisticAddressResponse::bpnLegalEntity.name,
+                LogisticAddressResponse::bpnSite.name
+            )
             .isEqualTo(expected)
     }
 

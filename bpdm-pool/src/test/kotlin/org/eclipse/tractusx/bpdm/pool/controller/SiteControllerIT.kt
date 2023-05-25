@@ -244,9 +244,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val toUpdate = listOf(
-            RequestValues.siteUpdate1.copy(bpn = bpnS3),
-            RequestValues.siteUpdate2.copy(bpn = bpnS1),
-            RequestValues.siteUpdate3.copy(bpn = bpnS2)
+            RequestValues.siteUpdate1.copy(bpns = bpnS3),
+            RequestValues.siteUpdate2.copy(bpns = bpnS1),
+            RequestValues.siteUpdate3.copy(bpns = bpnS2)
         )
 
         val response = poolClient.sites().updateSite(toUpdate)
@@ -280,9 +280,9 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val toUpdate = listOf(
-            RequestValues.siteUpdate1.copy(bpn = bpnS2),
-            RequestValues.siteUpdate2.copy(bpn = bpnS1),
-            RequestValues.siteUpdate3.copy(bpn = "NONEXISTENT"),
+            RequestValues.siteUpdate1.copy(bpns = bpnS2),
+            RequestValues.siteUpdate2.copy(bpns = bpnS1),
+            RequestValues.siteUpdate3.copy(bpns = "NONEXISTENT"),
         )
         val response = poolClient.sites().updateSite(toUpdate)
 
@@ -353,7 +353,12 @@ class SiteControllerIT @Autowired constructor(
         actuals.forEach { assertThat(it.site.bpns).matches(testHelpers.bpnSPattern) }
 
         testHelpers.assertRecursively(actuals)
-            .ignoringFields("site.bpn", "site.bpnLegalEntity", "mainAddress.bpn", "mainAddress.bpnSite")
+            .ignoringFields(
+                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpns.name,
+                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpnLegalEntity.name,
+                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
+                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpnSite.name
+            )
             .isEqualTo(expected)
     }
 

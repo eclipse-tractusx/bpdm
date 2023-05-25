@@ -198,17 +198,17 @@ object RequestValues {
     )
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
-        bpn = CommonValues.bpnL1,
+        bpnl = CommonValues.bpnL1,
         legalEntity = legalEntityCreate1.legalEntity
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
-        bpn = CommonValues.bpnL2,
+        bpnl = CommonValues.bpnL2,
         legalEntity = legalEntityCreate2.legalEntity
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
-        bpn = CommonValues.bpnL3,
+        bpnl = CommonValues.bpnL3,
         legalEntity = legalEntityCreate3.legalEntity
     )
 
@@ -219,7 +219,7 @@ object RequestValues {
             mainAddress = logisticAddress1
         ),
         index = CommonValues.index1,
-        bpnParent = legalEntityUpdate1.bpn
+        bpnParent = legalEntityUpdate1.bpnl
     )
 
     val siteCreate2 = SitePartnerCreateRequest(
@@ -229,7 +229,7 @@ object RequestValues {
             mainAddress = logisticAddress2
         ),
         index = CommonValues.index2,
-        bpnParent = legalEntityUpdate2.bpn
+        bpnParent = legalEntityUpdate2.bpnl
     )
 
     val siteCreate3 = SitePartnerCreateRequest(
@@ -239,54 +239,54 @@ object RequestValues {
             mainAddress = logisticAddress3
         ),
         index = CommonValues.index3,
-        bpnParent = legalEntityUpdate3.bpn
+        bpnParent = legalEntityUpdate3.bpnl
     )
 
     val siteUpdate1 = SitePartnerUpdateRequest(
-        bpn = CommonValues.bpnS1,
+        bpns = CommonValues.bpnS1,
         site = siteCreate1.site
     )
 
     val siteUpdate2 = SitePartnerUpdateRequest(
-        bpn = CommonValues.bpnS2,
+        bpns = CommonValues.bpnS2,
         site = siteCreate2.site
     )
 
     val siteUpdate3 = SitePartnerUpdateRequest(
-        bpn = CommonValues.bpnS3,
+        bpns = CommonValues.bpnS3,
         site = siteCreate3.site
     )
 
     val addressPartnerCreate1 = AddressPartnerCreateRequest(
         address = logisticAddress1,
-        bpnParent = legalEntityUpdate1.bpn,
+        bpnParent = legalEntityUpdate1.bpnl,
         index = CommonValues.index1
     )
 
     val addressPartnerCreate2 = AddressPartnerCreateRequest(
         address = logisticAddress2,
-        bpnParent = legalEntityUpdate2.bpn,
+        bpnParent = legalEntityUpdate2.bpnl,
         index = CommonValues.index2
     )
 
     val addressPartnerCreate3 = AddressPartnerCreateRequest(
         address = logisticAddress3,
-        bpnParent = legalEntityUpdate3.bpn,
+        bpnParent = legalEntityUpdate3.bpnl,
         index = CommonValues.index3
     )
 
     val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
-        bpn = CommonValues.bpnA1,
+        bpna = CommonValues.bpnA1,
         address = logisticAddress1
     )
 
     val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
-        bpn = CommonValues.bpnA2,
+        bpna = CommonValues.bpnA2,
         address = logisticAddress2
     )
 
     val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
-        bpn = CommonValues.bpnA3,
+        bpna = CommonValues.bpnA3,
         address = logisticAddress3
     )
 

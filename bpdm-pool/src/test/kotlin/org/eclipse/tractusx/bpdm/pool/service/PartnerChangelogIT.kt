@@ -95,7 +95,7 @@ class PartnerChangelogIT @Autowired constructor(
 
         // prepare modified partner to import
         val modifiedPartnersToImport = listOf(
-            RequestValues.legalEntityUpdate3.copy(bpn = bpnL1)
+            RequestValues.legalEntityUpdate3.copy(bpnl = bpnL1)
         )
 
         val timestampBetweenCreateAndUpdate = Instant.now()

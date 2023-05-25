@@ -53,7 +53,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
                 legalEntity = it.legalEntity,
-                bpn = it.bpn!!
+                bpnl = it.bpn!!
             )
         }
 
@@ -90,7 +90,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
                 site = it.site,
-                bpn = it.bpn!!
+                bpns = it.bpn!!
             )
         }
 
@@ -142,7 +142,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
                 address = it.address,
-                bpn = it.bpn!!
+                bpna = it.bpn!!
             )
         }
 
