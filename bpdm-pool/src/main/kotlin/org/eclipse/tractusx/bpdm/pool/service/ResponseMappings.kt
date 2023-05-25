@@ -52,7 +52,8 @@ fun LegalEntity.toDto(): LegalEntityResponse {
     return LegalEntityResponse(
         bpnl = bpn,
         identifiers = identifiers.map { it.toDto() },
-        legalName = legalName.toDto(),
+        legalName = legalName.value,
+        legalShortName = legalName.shortName,
         legalForm = legalForm?.toDto(),
         states = states.map { it.toDto() },
         classifications = classifications.map { it.toDto() },
@@ -87,10 +88,6 @@ fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
 fun IdentifierType.toDto(): IdentifierTypeDto {
     return IdentifierTypeDto(technicalKey, lsaType, name,
         details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
-}
-
-fun Name.toDto(): NameResponse {
-    return NameResponse(value, shortName)
 }
 
 fun LegalForm.toDto(): LegalFormResponse {

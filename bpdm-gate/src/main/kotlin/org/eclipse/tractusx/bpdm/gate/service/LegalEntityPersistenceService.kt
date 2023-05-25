@@ -23,10 +23,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.entity.AddressIdentifier
-import org.eclipse.tractusx.bpdm.gate.entity.AddressState
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.stereotype.Service
@@ -73,7 +70,7 @@ class LegalEntityPersistenceService(
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
         legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
-        legalEntity.legalName = legalEntityRequest.legalEntity.legalName.toName()
+        legalEntity.legalName = Name(value = legalEntityRequest.legalEntity.legalName, shortName = legalEntityRequest.legalEntity.legalShortName)
         legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })

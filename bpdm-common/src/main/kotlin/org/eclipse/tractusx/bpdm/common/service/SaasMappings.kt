@@ -70,7 +70,8 @@ object SaasMappings {
             ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toLegalEntityIdentifierDto(it) },
-            legalName = legalName,
+            legalName = legalName.value,
+            legalShortName = legalName.shortName,
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),

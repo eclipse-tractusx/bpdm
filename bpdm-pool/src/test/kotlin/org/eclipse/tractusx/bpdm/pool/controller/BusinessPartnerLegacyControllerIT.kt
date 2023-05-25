@@ -19,9 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.common.dto.NameDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
@@ -55,10 +53,7 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
         LegalEntityStructureRequest(legalEntity = with(RequestValues.legalEntityCreate1) {
             copy(
                 legalEntity = legalEntity.copy(
-                    legalName = NameDto(
-                        uniqueName,
-                        null
-                    )
+                    legalName = uniqueName
                 )
             )
         }),

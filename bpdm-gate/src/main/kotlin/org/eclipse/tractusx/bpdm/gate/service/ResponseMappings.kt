@@ -158,7 +158,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
-        legalName = legalEntity.legalName.toName()
+        legalName = Name(legalEntity.legalName, legalEntity.legalShortName)
     )
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
@@ -180,10 +180,6 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
 
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
-}
-
-fun NameDto.toName(): Name {
-    return Name(value, shortName)
 }
 
 private fun createCurrentnessTimestamp(): Instant {

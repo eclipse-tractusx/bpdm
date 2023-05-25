@@ -75,26 +75,6 @@ object ResponseValues {
 
     )
 
-    val name1 = NameResponse(
-        value = CommonValues.name1,
-        shortName = CommonValues.shortName1,
-    )
-
-    val name2 = NameResponse(
-        value = CommonValues.name2,
-        shortName = CommonValues.shortName2,
-    )
-
-    val name3 = NameResponse(
-        value = CommonValues.name3,
-        shortName = CommonValues.shortName3,
-    )
-
-    val name4 = NameResponse(
-        value = CommonValues.name4,
-        shortName = CommonValues.shortName4,
-    )
-
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
@@ -224,7 +204,8 @@ object ResponseValues {
     val legalEntityResponse1 = LegalEntityResponse(
         bpnl = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
-        legalName = name1,
+        legalName = CommonValues.name1,
+        legalShortName = CommonValues.shortName1,
         legalForm = legalForm1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
@@ -236,7 +217,8 @@ object ResponseValues {
     val legalEntityResponse2 = LegalEntityResponse(
         bpnl = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
-        legalName = name3,
+        legalName = CommonValues.name3,
+        legalShortName = CommonValues.shortName3,
         legalForm = legalForm2,
         states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),

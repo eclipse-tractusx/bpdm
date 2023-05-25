@@ -309,7 +309,10 @@ class BusinessPartnerBuildService(
         bpnL: String,
         metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
-        val legalName = toEntity(request.legalName)
+        val legalName = Name(
+            value = request.legalName,
+            shortName = request.legalShortName
+        )
         val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
 
         val partner = LegalEntity(
@@ -347,7 +350,11 @@ class BusinessPartnerBuildService(
 
         partner.currentness = createCurrentnessTimestamp()
 
-        partner.legalName = toEntity(request.legalName)
+        partner.legalName = Name(
+            value = request.legalName,
+            shortName = request.legalShortName
+        )
+
         partner.legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
 
         partner.identifiers.clear()
@@ -498,13 +505,6 @@ class BusinessPartnerBuildService(
             validTo = dto.validTo,
             type = dto.type,
             address = address
-        )
-    }
-
-    private fun toEntity(dto: NameDto): Name {
-        return Name(
-            value = dto.value,
-            shortName = dto.shortName
         )
     }
 

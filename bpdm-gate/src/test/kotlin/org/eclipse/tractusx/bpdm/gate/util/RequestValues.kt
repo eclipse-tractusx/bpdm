@@ -58,9 +58,6 @@ object RequestValues {
         )
 
     val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
-    val name2 = NameDto(value = CommonValues.name2, shortName = CommonValues.shortName2)
-    val name3 = NameDto(value = CommonValues.name3, shortName = CommonValues.shortName3)
-    val name4 = NameDto(value = CommonValues.name4, shortName = CommonValues.shortName4)
 
     val leBusinessStatus1 = LegalEntityStateDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
@@ -236,7 +233,8 @@ object RequestValues {
 
     val legalEntity1 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
-        legalName = name1,
+        legalName = CommonValues.name1,
+        legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
@@ -245,7 +243,8 @@ object RequestValues {
 
     val legalEntity2 = LegalEntityDto(
         identifiers = listOf(identifier3, identifier4),
-        legalName = name3,
+        legalName = CommonValues.name3,
+        legalShortName = CommonValues.shortName3,
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),

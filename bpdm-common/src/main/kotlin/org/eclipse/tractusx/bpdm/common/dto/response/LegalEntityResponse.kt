@@ -33,7 +33,10 @@ data class LegalEntityResponse(
     val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
 
     @get:Schema(description = "Legal name the partner goes by")
-    val legalName: NameResponse,
+    val legalName: String,
+
+    @get:Schema(description = "Abbreviated name or shorthand")
+    val legalShortName: String? = null,
 
     @get:Schema(description = "Legal form of the business partner")
     val legalForm: LegalFormResponse? = null,
