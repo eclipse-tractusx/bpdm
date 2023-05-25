@@ -50,7 +50,7 @@ object ResponseValues {
         LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
     private val identifier3 =
         LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
-    
+
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
@@ -244,7 +244,7 @@ object ResponseValues {
 
     val legalEntity1 = LegalEntityResponse(
         bpnl = CommonValues.bpnL1,
-        legalName = CommonValues.name1,
+        legalName = name1,
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
         states = listOf(leStatus1),
