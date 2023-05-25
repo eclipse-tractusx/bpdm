@@ -421,6 +421,7 @@ class BusinessPartnerBuildService(
 
     private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMappingDto): PhysicalPostalAddress {
         val baseAddress = physicalAddress.baseAddress
+        val area = physicalAddress.areaPart
         return PhysicalPostalAddress(
             geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
             country = baseAddress.country,
@@ -429,12 +430,12 @@ class BusinessPartnerBuildService(
 //                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
 //            },
             administrativeAreaLevel1 = null,
-            administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
-            administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
+            administrativeAreaLevel2 = area.administrativeAreaLevel2,
+            administrativeAreaLevel3 = area.administrativeAreaLevel3,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
-            districtLevel1 = baseAddress.districtLevel1,
-            districtLevel2 = baseAddress.districtLevel2,
+            districtLevel1 = area.districtLevel1,
+            districtLevel2 = area.districtLevel2,
             street = baseAddress.street?.let { createStreet(it) },
             companyPostCode = physicalAddress.companyPostCode,
             industrialZone = physicalAddress.industrialZone,
@@ -446,6 +447,7 @@ class BusinessPartnerBuildService(
 
     private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMappingDto): AlternativePostalAddress {
         val baseAddress = alternativeAddress.baseAddress
+        val area = alternativeAddress.areaPart
         return AlternativePostalAddress(
             geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
             country = baseAddress.country,
@@ -454,12 +456,10 @@ class BusinessPartnerBuildService(
 //                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
 //            },
             administrativeAreaLevel1 = null,
-            administrativeAreaLevel2 = baseAddress.administrativeAreaLevel2,
-            administrativeAreaLevel3 = baseAddress.administrativeAreaLevel3,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
-            districtLevel1 = baseAddress.districtLevel1,
-            districtLevel2 = baseAddress.districtLevel2,
+            districtLevel1 = area.districtLevel1,
+            districtLevel2 = area.districtLevel2,
             street = baseAddress.street?.let { createStreet(it) },
             deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber

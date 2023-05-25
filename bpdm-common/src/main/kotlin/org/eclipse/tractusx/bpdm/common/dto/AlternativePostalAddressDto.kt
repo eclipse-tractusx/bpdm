@@ -37,4 +37,7 @@ data class AlternativePostalAddressDto(
 
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressDto,
+
+    @field:JsonUnwrapped
+    val areaPart: AreaDistrictAlternativDto,
 )

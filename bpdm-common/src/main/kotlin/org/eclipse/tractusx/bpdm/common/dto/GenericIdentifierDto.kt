@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "GenericIdentifier", description = "Identifier record for a generic business partner")
 data class GenericIdentifierDto(
-    @Schema(description = "Value of the identifier")
+    @get:Schema(description = "Value of the identifier")
     val value: String,
 
-    @Schema(description = "Technical key of the type to which this identifier belongs to")
+    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
     val type: String
 )

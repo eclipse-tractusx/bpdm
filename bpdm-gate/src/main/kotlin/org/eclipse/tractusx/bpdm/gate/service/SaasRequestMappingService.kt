@@ -158,9 +158,9 @@ class SaasRequestMappingService(
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
             country = mapping.country(),
-            administrativeAreas = mapping.administrativeAreas(),
+            administrativeAreas = mapping.administrativeAreas(physicalAddress = address),
             postCodes = mapping.postcodes(physicalAddress = address),
-            localities = mapping.localities(),
+            localities = mapping.localities(physicalAddress = address),
             thoroughfares = mapping.thoroughfares(physicalAddress = address),
             premises = mapping.premises(physicalAddress = address),
             postalDeliveryPoints = emptyList(),
@@ -173,9 +173,9 @@ class SaasRequestMappingService(
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
             country = mapping.country(),
-            administrativeAreas = mapping.administrativeAreas(),
+            administrativeAreas = mapping.administrativeAreas(alternateAddress = address),
             postCodes = mapping.postcodes(physicalAddress = null),
-            localities = mapping.localities(),
+            localities = mapping.localities(alternateAddress = address),
             thoroughfares = mapping.thoroughfares(physicalAddress = null),
             premises = mapping.premises(physicalAddress = null),
             postalDeliveryPoints = mapping.postalDeliveryPoints(alternativeAddress = address),

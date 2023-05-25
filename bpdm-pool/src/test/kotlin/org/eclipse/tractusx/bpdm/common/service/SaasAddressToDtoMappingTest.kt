@@ -77,13 +77,14 @@ class SaasAddressToDtoMappingTest {
     private fun checkMappingDtoPhysicalAddress(physicalAddressDto: PhysicalPostalAddressDto, addressSaas: AddressSaas) {
 
         val baseAddressDto = physicalAddressDto.baseAddress
-        Assertions.assertThat(baseAddressDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
-        Assertions.assertThat(baseAddressDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
-        Assertions.assertThat(baseAddressDto.administrativeAreaLevel3).isEqualTo(null)
+        val areaDto = physicalAddressDto.areaPart
+        Assertions.assertThat(areaDto.administrativeAreaLevel1).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.REGION))
+        Assertions.assertThat(areaDto.administrativeAreaLevel2).isEqualTo(findValue(addressSaas.administrativeAreas, SaasAdministrativeAreaType.COUNTY))
+        Assertions.assertThat(areaDto.administrativeAreaLevel3).isEqualTo(null)
         Assertions.assertThat(baseAddressDto.city).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.CITY))
         Assertions.assertThat(baseAddressDto.country).isEqualTo(addressSaas.country?.shortName)
-        Assertions.assertThat(baseAddressDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))
-        Assertions.assertThat(baseAddressDto.districtLevel2).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.QUARTER))
+        Assertions.assertThat(areaDto.districtLevel1).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.DISTRICT))
+        Assertions.assertThat(areaDto.districtLevel2).isEqualTo(findValue(addressSaas.localities, SaasLocalityType.QUARTER))
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.latitude).isEqualTo(addressSaas.geographicCoordinates?.latitude)
         Assertions.assertThat(baseAddressDto.geographicCoordinates?.longitude).isEqualTo(addressSaas.geographicCoordinates?.longitude)
         Assertions.assertThat(baseAddressDto.postCode).isEqualTo(findValue(addressSaas.postCodes, SaasPostCodeType.REGULAR))

@@ -37,15 +37,15 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         return CountrySaas(shortName = postalAdress.country, value = postalAdress.country.getName())
     }
 
-    fun administrativeAreas(): Collection<AdministrativeAreaSaas> {
+    fun administrativeAreas(physicalAddress: PhysicalPostalAddressDto?): Collection<AdministrativeAreaSaas> {
         return listOfNotNull(
-            postalAdress.administrativeAreaLevel1?.let {
+            physicalAddress?.areaPart?.administrativeAreaLevel1?.let {
                 AdministrativeAreaSaas(
                     value = it,
                     type = SaasAdministrativeAreaType.REGION.toSaasTypeDto()
                 )
             },
-            postalAdress.administrativeAreaLevel2?.let {
+            physicalAddress?.areaPart?.administrativeAreaLevel2?.let {
                 AdministrativeAreaSaas(
                     value = it,
                     type = SaasAdministrativeAreaType.COUNTY.toSaasTypeDto()
@@ -54,6 +54,18 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
             // TODO Where can administrativeAreaLevel3 be stored in SaaS model? It's just ignored for now!
         )
     }
+
+    fun administrativeAreas(alternateAddress: AlternativePostalAddressDto?): Collection<AdministrativeAreaSaas> {
+        return listOfNotNull(
+            alternateAddress?.areaPart?.administrativeAreaLevel1?.let {
+                AdministrativeAreaSaas(
+                    value = it,
+                    type = SaasAdministrativeAreaType.REGION.toSaasTypeDto()
+                )
+            },
+        )
+    }
+
 
     fun postcodes(physicalAddress: PhysicalPostalAddressDto?): Collection<PostCodeSaas> {
         return listOfNotNull(
@@ -72,18 +84,37 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         )
     }
 
-    fun localities(): Collection<LocalitySaas> {
+    fun localities(alternateAddress: AlternativePostalAddressDto?): Collection<LocalitySaas> {
 
         return listOfNotNull(
             LocalitySaas(
                 value = postalAdress.city, type = SaasLocalityType.CITY.toSaasTypeDto()
             ),
-            postalAdress.districtLevel1?.let {
+            alternateAddress?.areaPart?.districtLevel1?.let {
                 LocalitySaas(
                     value = it, type = SaasLocalityType.DISTRICT.toSaasTypeDto()
                 )
             },
-            postalAdress.districtLevel2?.let {
+            alternateAddress?.areaPart?.districtLevel2?.let {
+                LocalitySaas(
+                    value = it, type = SaasLocalityType.QUARTER.toSaasTypeDto()
+                )
+            }
+        )
+    }
+
+    fun localities(physicalAddress: PhysicalPostalAddressDto?): Collection<LocalitySaas> {
+
+        return listOfNotNull(
+            LocalitySaas(
+                value = postalAdress.city, type = SaasLocalityType.CITY.toSaasTypeDto()
+            ),
+            physicalAddress?.areaPart?.districtLevel1?.let {
+                LocalitySaas(
+                    value = it, type = SaasLocalityType.DISTRICT.toSaasTypeDto()
+                )
+            },
+            physicalAddress?.areaPart?.districtLevel2?.let {
                 LocalitySaas(
                     value = it, type = SaasLocalityType.QUARTER.toSaasTypeDto()
                 )

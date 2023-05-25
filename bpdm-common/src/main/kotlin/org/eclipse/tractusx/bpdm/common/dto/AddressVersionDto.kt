@@ -25,8 +25,10 @@ import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 
 @Schema(name = "AddressVersion", description = "Localization record for an address")
 data class AddressVersionDto(
-    @Schema(description = "Character set in which the address is written", defaultValue = "UNDEFINED")
+
+    @get:Schema(description = "Character set in which the address is written", defaultValue = "UNDEFINED")
     val characterSet: CharacterSet = CharacterSet.UNDEFINED,
-    @Schema(description = "Language in which the address is written", defaultValue = "undefined")
+
+    @get:Schema(description = "Language in which the address is written", defaultValue = "undefined")
     val language: LanguageCode = LanguageCode.undefined
 )

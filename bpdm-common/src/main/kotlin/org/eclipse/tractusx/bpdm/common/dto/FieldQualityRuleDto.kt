@@ -25,15 +25,15 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(name = "FieldQualityRuleDto", description = "Rule for the quality level of an entity field ")
 data class FieldQualityRuleDto(
 
-    @Schema(description = "Path to the field")
+    @get:Schema(description = "Path to the field")
     val fieldPath: String,
 
-    @Schema(description = "Schema name of the entity the field belongs to")
+    @get:Schema(description = "Schema name of the entity the field belongs to")
     val schemaName: String?,
 
-    @Schema(description = "Country for wich the rule is valid")
+    @get:Schema(description = "Country for wich the rule is valid")
     val country: CountryCode,
 
-    @Schema(description = "Quality level of the field")
+    @get:Schema(description = "Quality level of the field")
     val qualityLevel: QualityLevel
 )
