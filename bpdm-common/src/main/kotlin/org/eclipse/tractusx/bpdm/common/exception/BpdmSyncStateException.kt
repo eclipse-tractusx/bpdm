@@ -17,12 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.exception
 
-enum class SyncStatus{
-    NOT_SYNCED,
-    RUNNING,
-    SUCCESS,
-    ERROR
-}
-
+class BpdmSyncStateException(
+    msg: String
+) : RuntimeException(msg)

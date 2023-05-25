@@ -21,7 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
+import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
+import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import java.time.Instant
 
@@ -30,24 +31,31 @@ import java.time.Instant
 class SyncRecord(
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, unique = true)
-    var type: SyncType,
+    override var type: SyncType,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    var status: SyncStatus,
+    override var status: SyncStatus,
+
     @Column(name = "from_time", nullable = false)
-    var fromTime: Instant,
+    override var fromTime: Instant,
+
     @Column(name = "progress", nullable = false)
-    var progress: Float = 0f,
+    override var progress: Float = 0f,
+
     @Column(name = "count", nullable = false)
-    var count: Int = 0,
+    override var count: Int = 0,
+
     @Column(name = "status_details")
-    var errorDetails: String? = null,
+    override var errorDetails: String? = null,
+
     @Column(name = "save_state")
-    var errorSave: String? = null,
+    override var errorSave: String? = null,
+
     @Column(name = "started_at")
-    var startedAt: Instant? = null,
+    override var startedAt: Instant? = null,
+
     @Column(name = "finished_at")
-    var finishedAt: Instant? = null,
-    ): BaseEntity()
+    override var finishedAt: Instant? = null
 
-
+) : BaseEntity(), BaseSyncRecord<SyncType>
