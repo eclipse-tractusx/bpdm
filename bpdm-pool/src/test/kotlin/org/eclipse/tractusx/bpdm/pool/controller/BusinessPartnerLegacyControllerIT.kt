@@ -52,7 +52,9 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
     val partnerStructures = listOf(
         LegalEntityStructureRequest(legalEntity = with(RequestValues.legalEntityCreate1) {
             copy(
-                legalName = uniqueName
+                legalEntity = legalEntity.copy(
+                    legalName = uniqueName
+                )
             )
         }),
         LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
