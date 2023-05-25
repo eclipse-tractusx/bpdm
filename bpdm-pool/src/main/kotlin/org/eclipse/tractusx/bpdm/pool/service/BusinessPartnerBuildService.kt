@@ -458,8 +458,6 @@ class BusinessPartnerBuildService(
             administrativeAreaLevel1 = null,
             postCode = baseAddress.postCode,
             city = baseAddress.city,
-            districtLevel1 = area.districtLevel1,
-            districtLevel2 = area.districtLevel2,
             street = baseAddress.street?.let { createStreet(it) },
             deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber

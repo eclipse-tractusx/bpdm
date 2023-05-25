@@ -25,8 +25,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "LogisticAddressDto", description = "Address record for a business partner")
 data class LogisticAddressDto(
-    @Schema(description = "Name of the logistic address of the business partner. This is not according to official\n" +
-            "registers but according to the name the uploading sharing member chooses.")
+    @get:Schema(
+        description = "Name of the logistic address of the business partner. This is not according to official\n" +
+                "registers but according to the name the uploading sharing member chooses."
+    )
     val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
@@ -35,9 +37,9 @@ data class LogisticAddressDto(
     @ArraySchema(arraySchema = Schema(description = "List of identifiers"))
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
 
-    @Schema(description = "Physical postal address")
+    @get:Schema(description = "Physical postal address")
     val physicalPostalAddress: PhysicalPostalAddressDto,
 
-    @Schema(description = "Alternative postal address")
+    @get:Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressDto? = null
 )

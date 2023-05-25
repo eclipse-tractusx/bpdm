@@ -23,15 +23,15 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "IdentifierTypeDto", description = "Identifier type definition for legal entity or address")
 data class IdentifierTypeDto(
-    @Schema(description = "Unique key (in combination with lsaType) to be used as reference")
+    @get:Schema(description = "Unique key (in combination with lsaType) to be used as reference")
     val technicalKey: String,
 
-    @Schema(description = "Specifies if this identifier type is valid for legal entities (L) or addresses (A)")
+    @get:Schema(description = "Specifies if this identifier type is valid for legal entities (L) or addresses (A)")
     val lsaType: IdentifierLsaType,
 
-    @Schema(description = "Full name")
+    @get:Schema(description = "Full name")
     val name: String,
 
-    @Schema(description = "Validity details")
+    @get:Schema(description = "Validity details")
     val details: Collection<IdentifierTypeDetailDto> = listOf()
 )

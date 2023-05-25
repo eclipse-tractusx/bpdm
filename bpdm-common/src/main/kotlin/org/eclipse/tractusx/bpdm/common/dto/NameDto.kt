@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "Name", description = "Name record for a business partner")
 data class NameDto(
-    @Schema(description = "Full name")
+    @get:Schema(description = "Full name")
     val value: String,
 
-    @Schema(description = "Abbreviated name or shorthand")
+    @get:Schema(description = "Abbreviated name or shorthand")
     val shortName: String?
 )

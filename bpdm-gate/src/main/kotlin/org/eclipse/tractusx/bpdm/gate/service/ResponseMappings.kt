@@ -65,8 +65,6 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
         administrativeAreaLevel1 = null, // TODO Add region mapping Logic
         postCode = baseAddress.postCode,
         city = baseAddress.city,
-        districtLevel1 = areaPart.districtLevel1,
-        districtLevel2 = areaPart.districtLevel2,
         street = baseAddress.street?.toStreetEntity(),
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber
