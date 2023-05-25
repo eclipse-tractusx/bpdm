@@ -40,22 +40,22 @@ object ResponseValues {
     val language2 = TypeKeyNameDto(CommonValues.language2, CommonValues.language2.getName())
     val language3 = TypeKeyNameDto(CommonValues.language3, CommonValues.language3.getName())
 
-    val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
-    val country2 = TypeKeyNameDto(CommonValues.country2, CommonValues.country2.getName())
-    val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
+    private val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
+    private val country2 = TypeKeyNameDto(CommonValues.country2, CommonValues.country2.getName())
+    private val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
 
-    val identifier1 =
-        LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1,  CommonValues.issuingBody1)
-    val identifier2 =
-        LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2,  CommonValues.issuingBody2)
-    val identifier3 =
+    private val identifier1 =
+        LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)
+    private val identifier2 =
+        LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
+    private val identifier3 =
         LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
 
-    val name1 = NameResponse(value = CommonValues.name1)
-    val name2 = NameResponse(value = CommonValues.name2)
-    val name3 = NameResponse(value = CommonValues.name3)
-    val name4 = NameResponse(value = CommonValues.name4)
-    val name5 = NameResponse(value = CommonValues.name5)
+    private val name1 = NameResponse(value = CommonValues.name1)
+    private val name2 = NameResponse(value = CommonValues.name2)
+    private val name3 = NameResponse(value = CommonValues.name3)
+    private val name4 = NameResponse(value = CommonValues.name4)
+    private val name5 = NameResponse(value = CommonValues.name5)
 
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
@@ -73,77 +73,80 @@ object ResponseValues {
         abbreviation = CommonValues.legalFormAbbreviation3,
     )
 
-    val statusType1 = TypeKeyNameDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName())
-    val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
-    val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
+    private val statusType1 = TypeKeyNameDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName())
+    private val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
+    private val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
 
-    val leStatus1 = LegalEntityStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
-    val leStatus2 = LegalEntityStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
-    val leStatus3 = LegalEntityStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
+    private val leStatus1 = LegalEntityStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
+    private val leStatus2 = LegalEntityStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
+    private val leStatus3 = LegalEntityStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, statusType3)
 
-    val siteStatus1 = SiteStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1.toDto())
-    val siteStatus2 = SiteStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2.toDto())
-    val siteStatus3 = SiteStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3.toDto())
+    private val siteStatus1 = SiteStateResponse(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, CommonValues.statusType1.toDto())
+    private val siteStatus2 = SiteStateResponse(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2.toDto())
+    private val siteStatus3 = SiteStateResponse(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3.toDto())
 
-    val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
+    private val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
 
-    val classification1 = ClassificationResponse(CommonValues.classification1, null, classificationType)
-    val classification2 = ClassificationResponse(CommonValues.classification2, null, classificationType)
-    val classification3 = ClassificationResponse(CommonValues.classification3, null, classificationType)
-    val classification4 = ClassificationResponse(CommonValues.classification4, null, classificationType)
-    val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
+    private val classification1 = ClassificationResponse(CommonValues.classification1, null, classificationType)
+    private val classification2 = ClassificationResponse(CommonValues.classification2, null, classificationType)
+    private val classification3 = ClassificationResponse(CommonValues.classification3, null, classificationType)
+    private val classification4 = ClassificationResponse(CommonValues.classification4, null, classificationType)
+    private val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
-    val address1 = PhysicalPostalAddressResponse(
+    private val address1 = PhysicalPostalAddressResponse(
         companyPostCode = CommonValues.postCode2,
         industrialZone = CommonValues.industrialZone1,
         building = CommonValues.building1,
         floor = CommonValues.floor1,
         door = CommonValues.door1,
+        areaPart = AreaDistrictResponse(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
+            administrativeAreaLevel2 = CommonValues.county1,
+            district = CommonValues.district1,
+        ),
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country1,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
-            administrativeAreaLevel2 = CommonValues.county1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
             street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
         )
     )
 
-    val address2 = PhysicalPostalAddressResponse(
+    private val address2 = PhysicalPostalAddressResponse(
         industrialZone = CommonValues.industrialZone2,
         building = CommonValues.building2,
         floor = CommonValues.floor2,
         door = CommonValues.door2,
+        areaPart = AreaDistrictResponse(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
+            administrativeAreaLevel2 = CommonValues.county2,
+            district = CommonValues.district2,
+        ),
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country2,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
-            administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
             street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
         )
     )
 
-    val address3 = PhysicalPostalAddressResponse(
+    private val address3 = PhysicalPostalAddressResponse(
         industrialZone = CommonValues.industrialZone3,
         building = CommonValues.building3,
         floor = CommonValues.floor3,
         door = CommonValues.door3,
+        areaPart = AreaDistrictResponse(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
+            administrativeAreaLevel2 = CommonValues.county3,
+            district = CommonValues.district3,
+        ),
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = null,
             country = country3,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
-            administrativeAreaLevel2 = CommonValues.county3,
             postCode = CommonValues.postCode3,
             city = CommonValues.city3,
-            districtLevel1 = CommonValues.districtLevel1_3,
-            districtLevel2 = CommonValues.districtLevel2_3,
             street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
         )
     )
@@ -304,7 +307,7 @@ object ResponseValues {
         legalEntity = LegalEntityResponse(
             bpn = CommonValues.bpnL2,
             legalName = name3,
-            identifiers = listOf( LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2,  CommonValues.issuingBody2)),
+            identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)),
             legalForm = legalForm2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
@@ -323,7 +326,7 @@ object ResponseValues {
         legalEntity = LegalEntityResponse(
             bpn = CommonValues.bpnL3,
             legalName = name5,
-            identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3,  CommonValues.issuingBody3 )),
+            identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)),
             legalForm = legalForm3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),

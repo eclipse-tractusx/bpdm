@@ -198,13 +198,9 @@ object CommonValues {
     const val city2 = "Atlanta"
 
 
-    const val districtLevel1_1 = "Vaihingen"
-    const val districtLevel1_2 = "TODO"
-    const val districtLevel1_3= "TODO"
-
-    const val districtLevel2_1 = "Vaihingen-Level2"
-    const val districtLevel2_2 = "TODO"
-    const val districtLevel2_3 = "TODO"
+    const val district1 = "Vaihingen"
+    const val district2 = "TODO"
+    const val district3 = "TODO"
 
     const val street1 = "Mercedesstraße"
     const val street2 = "TODO"

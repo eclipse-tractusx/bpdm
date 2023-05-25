@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "NameResponse", description = "Name record of a business partner")
-data class NameResponse (
-    @Schema(description = "Full name")
+data class NameResponse(
+    @get:Schema(description = "Full name")
     val value: String,
 
-    @Schema(description = "Abbreviated name or shorthand")
+    @get:Schema(description = "Abbreviated name or shorthand")
     val shortName: String? = null
 )

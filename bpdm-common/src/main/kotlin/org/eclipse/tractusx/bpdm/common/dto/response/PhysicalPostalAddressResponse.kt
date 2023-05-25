@@ -26,23 +26,26 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
-data class PhysicalPostalAddressResponse (
+data class PhysicalPostalAddressResponse(
 
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressResponse,
 
-    @Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
+    @field:JsonUnwrapped
+    val areaPart: AreaDistrictResponse,
+
+    @get:Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
     val companyPostCode: String? = null,
 
-    @Schema(description = "The practice of designating an area for industrial development")
+    @get:Schema(description = "The practice of designating an area for industrial development")
     val industrialZone: String? = null,
 
-    @Schema(description = "Describes a specific building within the address")
+    @get:Schema(description = "Describes a specific building within the address")
     val building: String? = null,
 
-    @Schema(description = "Describes the floor/level the delivery shall take place")
+    @get:Schema(description = "Describes the floor/level the delivery shall take place")
     val floor: String? = null,
 
-    @Schema(description = "Describes the door/room/suite on the respective floor the delivery shall take place")
+    @get:Schema(description = "Describes the door/room/suite on the respective floor the delivery shall take place")
     val door: String? = null,
 )

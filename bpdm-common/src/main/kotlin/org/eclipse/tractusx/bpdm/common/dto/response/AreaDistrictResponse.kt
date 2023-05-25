@@ -19,16 +19,21 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressBpnResponse", description = "Localized address record of a business partner")
-data class AddressBpnResponse(
-    @Schema(description = "Business Partner Number, main identifier value for addresses")
-    val bpn: String,
-    @field:JsonUnwrapped
-    val address: BasePostalAddressResponse
+@Schema(name = "AreaDistrictDto", description = "Record for administrativeAreaLevel and district part of an address")
+data class AreaDistrictResponse(
+
+    @get:Schema(description = "Region within the country")
+    val administrativeAreaLevel1: NameRegioncodeDto? = null,
+
+    @get:Schema(description = "Further possibility to describe the region/address(e.g. County/Landkreis)")
+    val administrativeAreaLevel2: String? = null,
+
+    @get:Schema(description = "Further possibility to describe the region/address(e.g. Township/Gemeinde)")
+    val administrativeAreaLevel3: String? = null,
+
+    @get:Schema(description = "Divides the city in several smaller areas")
+    val district: String? = null,
 )

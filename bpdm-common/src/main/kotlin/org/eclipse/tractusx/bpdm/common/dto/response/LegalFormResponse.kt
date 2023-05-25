@@ -23,12 +23,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(name = "LegalFormResponse", description = "Legal form a business partner can have")
 data class LegalFormResponse(
-    @Schema(description = "Unique key to be used for reference")
+    @get:Schema(description = "Unique key to be used for reference")
     val technicalKey: String,
 
-    @Schema(description = "Full name of the legal form")
+    @get:Schema(description = "Full name of the legal form")
     val name: String,
 
-    @Schema(description = "Abbreviation of the legal form name")
+    @get:Schema(description = "Abbreviation of the legal form name")
     val abbreviation: String? = null,
 )

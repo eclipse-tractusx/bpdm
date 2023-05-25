@@ -25,12 +25,12 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(name = "ClassificationResponse", description = "Classification record of a business partner")
 data class ClassificationResponse(
-    @Schema(description = "Name of the classification")
+    @get:Schema(description = "Name of the classification")
     val value: String? = null,
 
-    @Schema(description = "Identifying code of the classification, if applicable")
+    @get:Schema(description = "Identifying code of the classification, if applicable")
     val code: String? = null,
 
-    @Schema(description = "Type of specified classification")
+    @get:Schema(description = "Type of specified classification")
     val type: TypeKeyNameDto<ClassificationType>
 )

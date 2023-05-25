@@ -26,16 +26,16 @@ import java.time.Instant
 // TODO probably rename to LegalEntityDetailedDto
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
-    @Schema(description = "Business Partner Number of this legal entity")
+    @get:Schema(description = "Business Partner Number of this legal entity")
     val bpn: String,
 
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
 
-    @Schema(description = "Legal name the partner goes by")
+    @get:Schema(description = "Legal name the partner goes by")
     val legalName: NameResponse,
 
-    @Schema(description = "Legal form of the business partner")
+    @get:Schema(description = "Legal form of the business partner")
     val legalForm: LegalFormResponse? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
@@ -47,12 +47,12 @@ data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
 
-    @Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    @get:Schema(description = "The timestamp the business partner data was last indicated to be still current")
     val currentness: Instant,
 
-    @Schema(description = "The timestamp the business partner data was created")
+    @get:Schema(description = "The timestamp the business partner data was created")
     val createdAt: Instant,
 
-    @Schema(description = "The timestamp the business partner data was last updated")
+    @get:Schema(description = "The timestamp the business partner data was last updated")
     val updatedAt: Instant
 )

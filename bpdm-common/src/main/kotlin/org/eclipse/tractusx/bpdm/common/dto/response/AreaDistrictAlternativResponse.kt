@@ -20,21 +20,11 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
 
-@Schema(name = "SiteStateResponse", description = "Status record of a site")
-data class SiteStateResponse(
-    @get:Schema(description = "Description of the status")
-    val description: String?,
+@Schema(name = "AreaDistrictDto", description = "Record for administrativeAreaLevel and district part of an alternativ address")
+data class AreaDistrictAlternativResponse(
 
-    @get:Schema(description = "Since when the status is/was valid")
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = "Until the status was valid, if applicable")
-    val validTo: LocalDateTime?,
-
-    @get:Schema(description = "The type of this status")
-    val type: TypeKeyNameDto<BusinessStateType>
+    @get:Schema(description = "Region within the country")
+    val administrativeAreaLevel1: NameRegioncodeDto? = null,
 )

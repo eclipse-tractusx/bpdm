@@ -22,11 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
-import org.eclipse.tractusx.bpdm.common.dto.saas.ThoroughfareSaas
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.bpdm.common.model.SaasThoroughfareType
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
@@ -160,14 +158,10 @@ object CommonValues {
     val city2 = "Atlanta"
     val city3 = "Atlanta"
 
-    val districtLevel1_1 = "Sindelfingen-Ost"
-    val districtLevel1_2 = "District Level 1"
-    val districtLevel1_3 = "DL 1"
-
-    val districtLevel2_1 = "Sindelfingen-Ost-Level2"
-    val districtLevel2_2 = "District Level 2"
-    val districtLevel2_3 = "DL 2"
-
+    val district1 = "Sindelfingen-Ost"
+    val district2 = "District Level 1"
+    val district3 = "DL 1"
+    
     val street1 = "Bela-Barenyi-Straße"
     val street2 = ""
     val street3 = ""

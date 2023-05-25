@@ -26,15 +26,15 @@ import java.time.LocalDateTime
 
 @Schema(name = "AddressStateResponse", description = "Status record of a legal entity")
 data class AddressStateResponse(
-    @Schema(description = "Exact, official denotation of the status")
+    @get:Schema(description = "Exact, official denotation of the status")
     val officialDenotation: String?,
 
-    @Schema(description = "Since when the status is/was valid")
+    @get:Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
 
-    @Schema(description = "Until the status was valid, if applicable")
+    @get:Schema(description = "Until the status was valid, if applicable")
     val validTo: LocalDateTime?,
 
-    @Schema(description = "The type of this status")
+    @get:Schema(description = "The type of this status")
     val type: TypeKeyNameDto<BusinessStateType>
 )

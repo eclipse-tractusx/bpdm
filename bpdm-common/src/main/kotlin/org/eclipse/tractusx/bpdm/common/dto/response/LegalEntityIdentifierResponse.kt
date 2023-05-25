@@ -24,12 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
 @Schema(name = "LegalEntityIdentifierResponse", description = "Identifier record of a legal entity")
 data class LegalEntityIdentifierResponse(
-    @Schema(description = "Value of the identifier")
+    @get:Schema(description = "Value of the identifier")
     val value: String,
 
-    @Schema(description = "Type of the identifier")
+    @get:Schema(description = "Type of the identifier")
     val type: TypeKeyNameDto<String>,
 
-    @Schema(description = "Body which issued the identifier")
+    @get:Schema(description = "Body which issued the identifier")
     val issuingBody: String? = null
 )

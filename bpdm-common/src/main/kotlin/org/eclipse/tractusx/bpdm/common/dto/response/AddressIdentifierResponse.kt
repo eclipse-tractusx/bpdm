@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 
 @Schema(name = "IdentifierResponse", description = "Identifier record of a logistic address")
 data class AddressIdentifierResponse(
-    @Schema(description = "Value of the identifier")
+    @get:Schema(description = "Value of the identifier")
     val value: String,
 
-    @Schema(description = "Type of the identifier")
+    @get:Schema(description = "Type of the identifier")
     val type: TypeKeyNameDto<String>,
 )

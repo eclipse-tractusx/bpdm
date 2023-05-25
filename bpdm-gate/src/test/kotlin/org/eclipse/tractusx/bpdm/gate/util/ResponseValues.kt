@@ -169,15 +169,16 @@ object ResponseValues {
         building = CommonValues.building1,
         floor = CommonValues.floor1,
         door = CommonValues.door1,
+        areaPart = AreaDistrictResponse(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
+            administrativeAreaLevel2 = CommonValues.county1,
+            district = CommonValues.district1,
+        ),
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate1,
             country = country1,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
-            administrativeAreaLevel2 = CommonValues.county1,
             postCode = CommonValues.postCode1,
             city = CommonValues.city1,
-            districtLevel1 = CommonValues.districtLevel1_1,
-            districtLevel2 = CommonValues.districtLevel2_1,
             street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
         )
     )
@@ -187,15 +188,16 @@ object ResponseValues {
         building = CommonValues.building2,
         floor = CommonValues.floor2,
         door = CommonValues.door2,
+        areaPart = AreaDistrictResponse(
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
+            administrativeAreaLevel2 = CommonValues.county2,
+            district = CommonValues.district2,
+        ),
         baseAddress = BasePostalAddressResponse(
             geographicCoordinates = geoCoordinate2,
             country = country2,
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
-            administrativeAreaLevel2 = CommonValues.county2,
             postCode = CommonValues.postCode2,
             city = CommonValues.city2,
-            districtLevel1 = CommonValues.districtLevel1_2,
-            districtLevel2 = CommonValues.districtLevel2_2,
             street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
         )
     )
@@ -315,8 +317,10 @@ object ResponseValues {
 
     val addressGateInputResponse1 = AddressGateInputResponse(
         address = RequestValues.address1
-            .copy(name = CommonValues.name1,
-                identifiers = listOf(AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
+            .copy(
+                name = CommonValues.name1,
+                identifiers = listOf(
+                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
                     AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
                 )
             ),
@@ -328,11 +332,14 @@ object ResponseValues {
     val addressGateInputResponse2 = AddressGateInputResponse(
 
         address = RequestValues.address2
-            .copy(name = CommonValues.nameSite1,
-                identifiers = listOf(AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
+            .copy(
+                name = CommonValues.nameSite1,
+                identifiers = listOf(
+                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
                     AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
                 )
-            ),       externalId = CommonValues.externalIdAddress2,
+            ),
+        externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
         bpn = CommonValues.bpnAddress2,
         processStartedAt = SaasValues.modificationTime2,

@@ -284,19 +284,21 @@ object SaasValues {
     private val postCodeRegular2 = PostCodeSaas(CommonValues.postCode2, SaasPostCodeType.REGULAR)
 
     private val localityCity1 = LocalitySaas(CommonValues.city1, SaasLocalityType.CITY, language1)
-    private val localityDistrict1 = LocalitySaas(CommonValues.districtLevel1_1, SaasLocalityType.DISTRICT, language1)
-    private val localityQuarter1 = LocalitySaas(CommonValues.districtLevel2_1, SaasLocalityType.QUARTER, language1)
+    private val localityDistrict1 = LocalitySaas(CommonValues.district1, SaasLocalityType.DISTRICT, language1)
+    private val localityQuarter1 = LocalitySaas("Quarter1", SaasLocalityType.QUARTER, language1)
 
-    private val localityCity2 = LocalitySaas(CommonValues.city2,  SaasLocalityType.CITY, language2)
-    private val localityDistrict2 = LocalitySaas(CommonValues.districtLevel1_2, SaasLocalityType.DISTRICT, language2)
-    private val localityQuarter2 = LocalitySaas(CommonValues.districtLevel2_2, SaasLocalityType.QUARTER, language2)
+    private val localityCity2 = LocalitySaas(CommonValues.city2, SaasLocalityType.CITY, language2)
+    private val localityDistrict2 = LocalitySaas(CommonValues.district2, SaasLocalityType.DISTRICT, language2)
+    private val localityQuarter2 = LocalitySaas("Quarter2", SaasLocalityType.QUARTER, language2)
 
     private val thoroughfareZone1 = ThoroughfareSaas(name = CommonValues.industrialZone1, saasType = INDUSTRIAL_ZONE, language = language1)
-    private val thoroughfareStreet1 = ThoroughfareSaas(name = CommonValues.street1, direction = CommonValues.direction1
-        , number = CommonValues.houseNumber1, saasType = STREET, language = language1)
+    private val thoroughfareStreet1 = ThoroughfareSaas(
+        name = CommonValues.street1, direction = CommonValues.direction1, number = CommonValues.houseNumber1, saasType = STREET, language = language1
+    )
     private val thoroughfareZone2 = ThoroughfareSaas(name = CommonValues.industrialZone2, saasType = INDUSTRIAL_ZONE, language = language2)
-    private val thoroughfareStreet2 = ThoroughfareSaas(name = CommonValues.street2, direction = CommonValues.direction2
-        , number = CommonValues.houseNumber2, saasType = STREET, language = language2)
+    private val thoroughfareStreet2 = ThoroughfareSaas(
+        name = CommonValues.street2, direction = CommonValues.direction2, number = CommonValues.houseNumber2, saasType = STREET, language = language2
+    )
 
 
     private val premiseBuilding1 = PremiseSaas(CommonValues.building1, SaasPremiseType.BUILDING, language1)
@@ -380,8 +382,12 @@ object SaasValues {
     )
 
     val siteBusinessPartner1 = BusinessPartnerSaas(
-        status = BusinessPartnerStatusSaas(type = TypeKeyNameUrlSaas(CommonValues.businessStateType1.name),
-            validFrom = CommonValues.businessStatusValidFrom1, validUntil = CommonValues.businessStatusValidUntil1, officialDenotation =  CommonValues.businessStatusOfficialDenotation1),
+        status = BusinessPartnerStatusSaas(
+            type = TypeKeyNameUrlSaas(CommonValues.businessStateType1.name),
+            validFrom = CommonValues.businessStatusValidFrom1,
+            validUntil = CommonValues.businessStatusValidUntil1,
+            officialDenotation = CommonValues.businessStatusOfficialDenotation1
+        ),
         externalId = CommonValues.externalIdSite1,
         identifiers = listOf(identifierBpnSite1, identifier1, identifier2), // identifiers copied from legal entity
         names = listOf(nameSite1),
@@ -399,8 +405,12 @@ object SaasValues {
     )
 
     val siteBusinessPartner2 = BusinessPartnerSaas(
-        status = BusinessPartnerStatusSaas(type = TypeKeyNameUrlSaas(CommonValues.businessStateType2.name),
-            validFrom = CommonValues.businessStatusValidFrom2, validUntil = CommonValues.businessStatusValidUntil2, officialDenotation =  CommonValues.businessStatusOfficialDenotation2),
+        status = BusinessPartnerStatusSaas(
+            type = TypeKeyNameUrlSaas(CommonValues.businessStateType2.name),
+            validFrom = CommonValues.businessStatusValidFrom2,
+            validUntil = CommonValues.businessStatusValidUntil2,
+            officialDenotation = CommonValues.businessStatusOfficialDenotation2
+        ),
         externalId = CommonValues.externalIdSite2,
         identifiers = listOf(identifierBpnSite2, identifier3, identifier4), // identifiers copied from legal entity
         names = listOf(nameSite2),
@@ -470,7 +480,7 @@ object SaasValues {
         lastModifiedAt = modificationTime1,
         metadata = BusinessPartnerMetadataSaas(
             sharingStatus = SharingStatusSaas(SharingStatusType.SHARED_WITH_CONFIDENT_MATCH, "OK")
-       ),
+        ),
     )
 
     val addressBusinessPartnerRequest1 = addressBusinessPartner1.copy(
