@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 
@@ -328,9 +327,4 @@ object RequestValues {
         bpn = CommonValues.bpnAddress2
     )
 
-    val candidate1 = BusinessPartnerCandidateDto(
-        identifiers = listOf(genericIdentifier),
-        names = listOf(name1),
-        address = address1
-    )
 }
