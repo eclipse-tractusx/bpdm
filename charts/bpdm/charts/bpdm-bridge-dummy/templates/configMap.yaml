@@ -18,25 +18,25 @@
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
 
-apiVersion: v2
-type: application
-name: bpdm-pool
-appVersion: "4.0.0-alpha.4"
-version: 5.0.0-alpha.4
-description: A Helm chart for deploying the BPDM pool service
-home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
-sources:
-  - https://github.com/eclipse-tractusx/bpdm
-dependencies:
-  - name: opensearch
-    version: 2.4.0
-    repository: https://opensearch-project.github.io/helm-charts/
-    alias: opensearch
-    condition: opensearch.enabled
-  - name: postgresql
-    version: 11.9.1
-    repository: https://charts.bitnami.com/bitnami
-    alias: postgres
-    condition: postgres.enabled
-maintainers:
-  - name: Nico Koprowski
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{include "bpdm.fullname" .}}
+  labels:
+    {{- include "bpdm.labels" . | nindent 4 }}
+data:
+  deployment.yml: |-
+    # Place for putting standard deployment configuration
+    # which can be overwritten by external.yml
+    bpdm:
+      datasource:
+        host: {{ include "bpdm.postgresDependency" . }}
+      pool:
+        base-url: {{include "bpdm-bridge.poolServiceName" .}}
+      gate:
+        base-url: {{include "bpdm-bridge.gateServiceName" .}}
+  external.yml: |-
+    # External properties for overwriting application config
+    {{- if .Values.applicationConfig }}
+    {{- .Values.applicationConfig | toYaml | nindent 4 }}
+    {{- end }}

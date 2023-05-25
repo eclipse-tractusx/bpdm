@@ -56,5 +56,5 @@ jobs:
       # install the chart to the kind cluster and run helm test
       # define charts to test with the --charts parameter
       - name: Run chart-testing (install)
-        run: ct install --charts charts/bpdm,charts/bpdm/charts/bpdm-pool,charts/bpdm/charts/bpdm-gate --config charts/config/chart-testing-config.yaml
+        run: ct install --charts charts/bpdm,charts/bpdm/charts/bpdm-pool,charts/bpdm/charts/bpdm-gate,charts/bpdm/charts/bpdm-bridge-dummy --config charts/config/chart-testing-config.yaml
         if: ${{ env.CHART_CHANGED == 'true' }}

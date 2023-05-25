@@ -19,10 +19,10 @@
 ################################################################################
 
 apiVersion: v2
-name: bpdm umbrella-chart
+name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the gate and pool applications
-version: 0.2.0
+version: 3.0.0
 appVersion: 1.0.0
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
@@ -37,6 +37,10 @@ dependencies:
     version: 5.0.0-alpha.4
     alias: bpdm-pool
     condition: bpdm-pool.enabled
+  - name: bpdm-bridge-dummy
+    version: 1.0.0
+    alias: bpdm-bridge-dummy
+    condition: bpdm-bridge-dummy.enabled
   - name: opensearch
     version: 2.*.*
     repository: https://opensearch-project.github.io/helm-charts/
