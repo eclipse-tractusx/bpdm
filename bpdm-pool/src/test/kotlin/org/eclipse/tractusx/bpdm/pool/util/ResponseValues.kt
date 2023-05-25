@@ -244,7 +244,7 @@ object ResponseValues {
 
     val legalEntity1 = LegalEntityResponse(
         bpnl = CommonValues.bpnL1,
-        legalName = name1,
+        legalName = CommonValues.name1,
         identifiers = listOf(identifier1),
         legalForm = legalForm1,
         states = listOf(leStatus1),
