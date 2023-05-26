@@ -258,10 +258,25 @@ object ResponseValues {
         bpn = CommonValues.bpn2,
         processStartedAt = SaasValues.modificationTime2,
     )
+
     val legalEntityGateInputResponse3 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity3,
         externalId = CommonValues.externalId3,
         bpn = CommonValues.bpn3,
+        processStartedAt = null,
+    )
+
+    //Values without processStartedAt value
+    val newLegalEntityGateInputResponse1 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity1,
+        externalId = CommonValues.externalId1,
+        bpn = CommonValues.bpn1,
+        processStartedAt = null,
+    )
+    val newLegalEntityGateInputResponse2 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity2,
+        externalId = CommonValues.externalId2,
+        bpn = CommonValues.bpn2,
         processStartedAt = null,
     )
 
@@ -309,6 +324,24 @@ object ResponseValues {
         bpn = CommonValues.bpnSite2,
         processStartedAt = SaasValues.modificationTime2,
     )
+
+    //New Site Response values without processStartedAt value
+    val persistencesiteGateInputResponse1 = SiteGateInputResponse(
+        site = RequestValues.site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnSite1,
+        processStartedAt = null,
+    )
+
+    val persistenceSiteGateInputResponse2 = SiteGateInputResponse(
+        site = RequestValues.site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2,
+        bpn = CommonValues.bpnSite2,
+        processStartedAt = null,
+    )
+
 
     val siteGateOutput1 = SiteGateOutput(
         site = siteResponse1,

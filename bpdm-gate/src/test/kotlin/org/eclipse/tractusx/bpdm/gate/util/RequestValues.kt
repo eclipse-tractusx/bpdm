@@ -240,7 +240,7 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
-        legalAddress = address1
+        legalAddress = Logisticaddress1
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -249,7 +249,7 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),
-        legalAddress = address2
+        legalAddress = Logisticaddress2
     )
 
     val legalEntity3 = LegalEntityDto(
@@ -282,13 +282,13 @@ object RequestValues {
     val site1 = SiteDto(
         name = CommonValues.nameSite1,
         states = listOf(siteBusinessStatus1),
-        mainAddress = address1
+        mainAddress = Logisticaddress1
     )
 
     val site2 = SiteDto(
         name = CommonValues.nameSite2,
         states = listOf(siteBusinessStatus2),
-        mainAddress = address2
+        mainAddress = Logisticaddress2
     )
 
     val siteGateInputRequest1 = SiteGateInputRequest(
