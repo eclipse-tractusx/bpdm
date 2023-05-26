@@ -120,16 +120,22 @@ class InvalidIndexStartupIT @Autowired constructor(
         assertThat(getResponse.found()).isFalse
 
         //import a business partner to DB
-        testHelpers.importAndGetResponse(listOf(SaasValues.legalEntity1), webTestClient, wireMockServer)
-
+        testHelpers.createTestMetadata()
+        testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                )
+            )
+        )
         //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         val searchResult = poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest
-            , AddressPropertiesSearchRequest.EmptySearchRequest
-            , SitePropertiesSearchRequest.EmptySearchRequest
-            , PaginationRequest()
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest,
+            PaginationRequest()
         )
 
         assertThat(searchResult.content).isNotEmpty

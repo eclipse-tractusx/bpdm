@@ -77,13 +77,26 @@ class ValidIndexStartupIT @Autowired constructor(
     @DirtiesContext
     fun setupIndexForNextTest() {
         testHelpers.truncateDbTables()
+        testHelpers.createTestMetadata()
         //Clear and set up a fresh valid OpenSearch context
         // webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
         poolClient.opensearch().clear()
 
         //Import values to DB
-        val partnersToImport = listOf(SaasValues.legalEntity1, SaasValues.legalEntity2, SaasValues.legalEntity3)
-        testHelpers.importAndGetResponse(partnersToImport, webTestClient, wireMockServer)
+        testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate3,
+                )
+            )
+        )
+
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there

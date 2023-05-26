@@ -34,8 +34,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSea
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
-import org.eclipse.tractusx.bpdm.pool.component.saas.service.ImportStarterService
+
+
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,15 +59,18 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class OpenSearchControllerIT @Autowired constructor(
     private val webTestClient: WebTestClient,
-    private val importService: ImportStarterService,
     private val openSearchSyncService: OpenSearchSyncStarterService,
-    private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers,
     private val poolClient: PoolClientImpl
 ) {
 
     companion object {
+        // Configuration properties of Saas mock
+        private val exchangeApiUrl: String = "data-exchange/rest/v4"
+        private val storage: String = "storage_id"
+        val readBusinessPartnerUrl = "/${exchangeApiUrl}/storages/${storage}/businesspartners"
+
         @RegisterExtension
         var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
@@ -101,15 +104,28 @@ class OpenSearchControllerIT @Autowired constructor(
         )
 
         wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(saasAdapterConfigProperties.readBusinessPartnerUrl))
+            WireMock.get(WireMock.urlPathMatching(readBusinessPartnerUrl))
                 .willReturn(
                     WireMock.aResponse()
                         .withHeader("Content-Type", "application/json")
                         .withBody(objectMapper.writeValueAsString(importCollection))
                 )
         )
+        testHelpers.createTestMetadata()
+        testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate3,
+                )
+            )
+        )
 
-        importService.import()
     }
 
 
