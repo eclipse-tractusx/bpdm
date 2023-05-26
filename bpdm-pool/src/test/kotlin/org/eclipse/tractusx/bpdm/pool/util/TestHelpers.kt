@@ -19,28 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
-import org.eclipse.tractusx.bpdm.pool.component.saas.config.SaasAdapterConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.junit.Assert
 import org.junit.jupiter.api.assertThrows
@@ -58,8 +46,6 @@ private const val BPDM_DB_SCHEMA_NAME: String = "bpdm"
 @Component
 class TestHelpers(
     entityManagerFactory: EntityManagerFactory,
-    private val objectMapper: ObjectMapper,
-    private val saasAdapterConfigProperties: SaasAdapterConfigProperties,
     private val bpnConfigProperties: BpnConfigProperties,
     private val poolClient: PoolClientImpl
 ) {
@@ -237,34 +223,7 @@ class TestHelpers(
         return syncResponse
     }
 
-    fun importAndGetResponse(
-        partnersToImport: Collection<BusinessPartnerSaas>,
-        client: WebTestClient,
-        wireMockServer: WireMockExtension
-    ): PageResponse<LegalEntityMatchResponse> {
-        val importCollection = PagedResponseSaas(
-            partnersToImport.size,
-            null,
-            null,
-            partnersToImport.size,
-            partnersToImport
-        )
 
-        wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(saasAdapterConfigProperties.readBusinessPartnerUrl)).willReturn(
-                WireMock.aResponse()
-                    .withHeader("Content-Type", "application/json")
-                    .withBody(objectMapper.writeValueAsString(importCollection))
-            )
-        )
-
-        startSyncAndAwaitSuccess(client, EndpointValues.SAAS_SYNCH_PATH)
-
-        return poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest, AddressPropertiesSearchRequest.EmptySearchRequest,
-            SitePropertiesSearchRequest.EmptySearchRequest, PaginationRequest()
-        )
-    }
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
         return Assertions.assertThat(actual)
