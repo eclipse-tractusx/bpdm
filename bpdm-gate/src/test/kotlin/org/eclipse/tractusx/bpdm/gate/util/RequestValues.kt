@@ -269,14 +269,24 @@ object RequestValues {
     )
 
     val addressGateInputRequest1 = AddressGateInputRequest(
-        address = address1,
+        address = address1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
         bpn = CommonValues.bpnAddress1
     )
 
     val addressGateInputRequest2 = AddressGateInputRequest(
-        address = address2,
+        address = address2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
         bpn = CommonValues.bpnAddress2

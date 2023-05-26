@@ -355,7 +355,12 @@ object ResponseValues {
     )
 
     val logisticAddressGateInputResponse1 = AddressGateInputResponse(
-        address = RequestValues.logisticAddress1,
+        address = RequestValues.logisticAddress1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
         bpn = CommonValues.bpnAddress1,
@@ -363,7 +368,12 @@ object ResponseValues {
     )
 
     val logisticAddressGateInputResponse2 = AddressGateInputResponse(
-        address = RequestValues.logisticAddress2,
+        address = RequestValues.logisticAddress2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress2,
         bpn = CommonValues.bpnAddress2,
         siteExternalId = null,
