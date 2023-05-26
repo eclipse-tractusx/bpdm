@@ -29,7 +29,7 @@ sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: opensearch
-    version: 2.4.0
+    version: 2.2.0
     repository: https://opensearch-project.github.io/helm-charts/
     alias: opensearch
     condition: opensearch.enabled
