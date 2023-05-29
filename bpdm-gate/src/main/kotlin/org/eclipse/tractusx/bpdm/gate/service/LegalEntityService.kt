@@ -39,7 +39,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class LegalEntityService(
-    private val saasRequestMappingService: SaasRequestMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
@@ -72,7 +71,6 @@ class LegalEntityService(
         } else {
             legalEntityRepository.findAll(PageRequest.of(page, size))
         }
-
 
         return PageResponse(
             page = page,

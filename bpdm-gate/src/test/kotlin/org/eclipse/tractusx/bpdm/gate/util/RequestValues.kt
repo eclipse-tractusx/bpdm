@@ -123,7 +123,7 @@ object RequestValues {
         floor = CommonValues.floor1,
         door = CommonValues.door1,
         areaPart = AreaDistrictDto(
-            administrativeAreaLevel1 = null, //CommonValues.adminAreaLevel1RegionCode_1,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1, //null,
             administrativeAreaLevel2 = CommonValues.county1,
             district = CommonValues.district1,
         ),
@@ -219,6 +219,7 @@ object RequestValues {
     val address2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
     )
+
     val address3 = LogisticAddressDto(
         physicalPostalAddress = postalAddress3,
     )
@@ -250,6 +251,7 @@ object RequestValues {
         classifications = listOf(classification3, classification4),
         legalAddress = address2
     )
+
     val legalEntity3 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
         legalName = name1,
@@ -258,6 +260,7 @@ object RequestValues {
         classifications = listOf(classification1, classification2),
         legalAddress = address3
     )
+    
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         externalId = CommonValues.externalId1,
