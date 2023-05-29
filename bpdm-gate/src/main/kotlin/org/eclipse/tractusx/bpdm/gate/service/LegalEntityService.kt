@@ -52,9 +52,6 @@ class LegalEntityService(
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
-        saasClient.upsertLegalEntities(legalEntitiesSaas)
-
         // create changelog entry if all goes well from saasClient
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))

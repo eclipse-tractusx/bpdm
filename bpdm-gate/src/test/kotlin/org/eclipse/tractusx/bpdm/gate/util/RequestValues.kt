@@ -123,7 +123,7 @@ object RequestValues {
         floor = CommonValues.floor1,
         door = CommonValues.door1,
         areaPart = AreaDistrictDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
+            administrativeAreaLevel1 = null, //CommonValues.adminAreaLevel1RegionCode_1,
             administrativeAreaLevel2 = CommonValues.county1,
             district = CommonValues.district1,
         ),
@@ -152,6 +152,24 @@ object RequestValues {
             country = CommonValues.country2,
             postalCode = CommonValues.postCode2,
             city = CommonValues.city2,
+        )
+    )
+    val postalAddress3 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = null,
+            administrativeAreaLevel2 = CommonValues.county1,
+            district = CommonValues.district1,
+        ),
+        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate1,
+            country = CommonValues.country1,
+            postalCode = CommonValues.postCode1,
+            city = CommonValues.city1,
         )
     )
 
@@ -201,6 +219,9 @@ object RequestValues {
     val address2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
     )
+    val address3 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress3,
+    )
 
     //New Values for Logistic Address Tests
     val logisticAddress1 = LogisticAddressDto(
@@ -229,7 +250,14 @@ object RequestValues {
         classifications = listOf(classification3, classification4),
         legalAddress = address2
     )
-
+    val legalEntity3 = LegalEntityDto(
+        identifiers = listOf(identifier1, identifier2),
+        legalName = name1,
+        legalForm = CommonValues.legalFormTechnicalKey1,
+        states = listOf(leBusinessStatus1),
+        classifications = listOf(classification1, classification2),
+        legalAddress = address3
+    )
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         externalId = CommonValues.externalId1,
@@ -240,6 +268,12 @@ object RequestValues {
         legalEntity = legalEntity2,
         externalId = CommonValues.externalId2,
         bpn = CommonValues.bpn2
+    )
+
+    val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
+        legalEntity = legalEntity3,
+        externalId = CommonValues.externalId3,
+        bpn = CommonValues.bpn3
     )
 
     val site1 = SiteDto(

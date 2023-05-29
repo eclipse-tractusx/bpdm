@@ -258,19 +258,13 @@ object ResponseValues {
         bpn = CommonValues.bpn2,
         processStartedAt = SaasValues.modificationTime2,
     )
+    val legalEntityGateInputResponse3 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity3,
+        externalId = CommonValues.externalId3,
+        bpn = CommonValues.bpn3,
+        processStartedAt = null,
+    )
 
-    val newLegalEntityGateInputResponse1 = LegalEntityGateInputResponse(
-        legalEntity = RequestValues.legalEntity1,
-        externalId = CommonValues.externalId1,
-        bpn = CommonValues.bpn1,
-        processStartedAt = null,
-    )
-    val newLegalEntityGateInputResponse2 = LegalEntityGateInputResponse(
-        legalEntity = RequestValues.legalEntity2,
-        externalId = CommonValues.externalId2,
-        bpn = CommonValues.bpn2,
-        processStartedAt = null,
-    )
     val legalEntityGateOutput1 = LegalEntityGateOutput(
         legalEntity = legalEntityResponse1,
         legalAddress = logisticAddress1,
