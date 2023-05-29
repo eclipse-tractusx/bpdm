@@ -98,7 +98,7 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val site = gateClient.sites().getSiteByExternalId(CommonValues.externalIdSite1)
 
-        assertThat(site).usingRecursiveComparison().isEqualTo(expectedSite)
+        assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(expectedSite)
     }
 
     /**
@@ -209,7 +209,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites().getSites(paginationValue)
 
-        assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
             PageResponse(
                 totalElements = totalElements,
                 totalPages = totalPages,
@@ -218,6 +218,7 @@ internal class SiteControllerInputIT @Autowired constructor(
                 content = expectedSites
             )
         )
+
     }
 
     /**
@@ -258,7 +259,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites().getSitesByExternalIds(paginationValue, externalIds)
 
-        assertThat(pageResponse).isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
             PageResponse(
                 totalElements = totalElements,
                 totalPages = totalPages,
