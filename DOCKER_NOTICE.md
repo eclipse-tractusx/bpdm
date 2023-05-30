@@ -4,15 +4,15 @@ DockerHub: [https://hub.docker.com/r/tractusx/bpdm](https://hub.docker.com/r/tra
 
 Eclipse Tractus-X product(s) installed within the image:
 
-__ BPDM __
+**BPDM**
 
 Eclipse Tractus-X product(s) installed within the image:
 
-- GitHub: https://github.com/eclipse-tractusx/bpdm>
+- GitHub: https://github.com/eclipse-tractusx/bpdm 
 - Project home: https://projects.eclipse.org/projects/automotive.tractusx
-- Pool Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-pool/Dockerfile> 
-- Gate Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-gate/Dockerfile> 
-- Bridge Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-brige-dumy/Dockerfile> 
+- Pool Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-pool/Dockerfile
+- Gate Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-gate/Dockerfile 
+- Bridge Dockerfile: https://github.com/eclipse-tractusx/bpdm/blob/main/bpdm-brige-dumy/Dockerfile 
 - Project license: [Apache License, Version 2.0](https://github.com/eclipse-tractusx/bpdm/blob/main/LICENSE)
 
 
