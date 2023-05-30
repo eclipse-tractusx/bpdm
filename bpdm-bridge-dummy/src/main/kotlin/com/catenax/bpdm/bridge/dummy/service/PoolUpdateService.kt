@@ -74,7 +74,7 @@ class PoolUpdateService(
                 ?.let { leParentBpn ->
                     SitePartnerCreateRequest(
                         site = SiteDto(
-                            name = entry.site.nameParts.firstOrNull()?: "",
+                            name = entry.site.nameParts.firstOrNull() ?: "",
                             states = entry.site.states,
                             mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
                         ),
@@ -98,7 +98,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
                 site = SiteDto(
-                    name = it.site.nameParts.firstOrNull()?: "",
+                    name = it.site.nameParts.firstOrNull() ?: "",
                     states = it.site.states,
                     mainAddress = gateToPoolLogisticAddress(it.mainAddress),
                 ),
@@ -114,7 +114,9 @@ class PoolUpdateService(
         val leParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.legalEntityExternalId }
             .let { gateQueryService.getBpnByExternalId(BusinessPartnerType.LEGAL_ENTITY, it.toSet()) }
-        val leParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
+        val leParentsCreateRequests = entriesToCreate
+            .filter { !isLegalAddress(it) }
+            .mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     AddressPartnerCreateRequest(
@@ -128,7 +130,9 @@ class PoolUpdateService(
         val siteParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.siteExternalId }
             .let { gateQueryService.getBpnByExternalId(BusinessPartnerType.SITE, it.toSet()) }
-        val siteParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
+        val siteParentsCreateRequests = entriesToCreate
+            .filter { !isSiteMainAddress(it) }
+            .mapNotNull { entry ->
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
@@ -154,6 +158,19 @@ class PoolUpdateService(
         }
         return poolClient.addresses().createAddresses(createRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} new addresses, ${it.errorCount} were refused" } }
+    }
+
+    private fun isSiteMainAddress(it: GateAddressInfo): Boolean {
+
+        val mainAdressExternalId = it.siteExternalId?.let { it1 -> gateQueryService.gateClient.sites().getSiteByExternalId(it1).mainAddress.externalId }
+        return it.externalId == mainAdressExternalId
+    }
+
+    private fun isLegalAddress(it: GateAddressInfo): Boolean {
+
+        val legalAdressExternalId =
+            it.legalEntityExternalId?.let { it1 -> gateQueryService.gateClient.legalEntities().getLegalEntityByExternalId(it1).legalAddress.externalId }
+        return it.externalId == legalAdressExternalId
     }
 
     fun updateAddressesInPool(entriesToUpdate: Collection<GateAddressInfo>): AddressPartnerUpdateResponseWrapper {

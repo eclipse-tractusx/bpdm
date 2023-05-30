@@ -17,26 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.controller
+package com.catenax.bpdm.bridge.dummy.config
 
-import com.catenax.bpdm.bridge.dummy.service.SyncService
-import io.swagger.v3.oas.annotations.Operation
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import com.catenax.bpdm.bridge.dummy.client.BridgeClient
+import com.catenax.bpdm.bridge.dummy.client.BridgeClientImpl
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.client.WebClient
 
-@RestController
-class BridgeController(
-    val syncService: SyncService
-) : BridgeApi {
+@Configuration
+class BridgeClientTestConfig {
 
-    @Operation(
-        summary = "Start sync between Gate and Pool"
-    )
-    @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
-    override fun triggerSync() {
-        syncService.sync()
+    @Bean
+    fun bridgeClient(webServerAppCtxt: ServletWebServerApplicationContext): BridgeClient {
+        return BridgeClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
     }
 }
