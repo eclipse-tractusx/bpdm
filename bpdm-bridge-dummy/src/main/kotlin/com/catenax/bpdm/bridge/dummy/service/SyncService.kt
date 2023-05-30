@@ -19,15 +19,18 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
+import com.catenax.bpdm.bridge.dummy.entity.SyncType
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class SyncService(
     val gateQueryService: GateQueryService,
     val poolUpdateService: PoolUpdateService,
-    val gateUpdateService: GateUpdateService
+    val gateUpdateService: GateUpdateService,
+    val syncRecordService: SyncRecordService
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -36,19 +39,21 @@ class SyncService(
 
     fun sync() {
         logger.info("Bridge sync started...")
+        val syncRecord = syncRecordService.setSynchronizationStart(SyncType.GATE_TO_POOL)
         try {
-            syncInternal()
+            syncInternal(syncRecord.fromTime)
             logger.info("Bridge sync completed")
+            syncRecordService.setSynchronizationSuccess(SyncType.GATE_TO_POOL)
         } catch (e: Exception) {
             logger.error("Bridge sync failed with critical error:", e)
+            syncRecordService.setSynchronizationError(SyncType.GATE_TO_POOL, e.toString(), null)
             throw e
         }
     }
 
-    private fun syncInternal() {
+    private fun syncInternal(modifiedAfter: Instant) {
         // Check changelog entries from Gate (after last sync time)
-        val externalIdsByType = gateQueryService.getChangedExternalIdsByLsaType(null)
-        // TODO persist syncAfter=LocalDateTime.now()
+        val externalIdsByType = gateQueryService.getChangedExternalIdsByLsaType(modifiedAfter)
 
         externalIdsByType[LsaType.LegalEntity]?.let { syncLegalEntities(it) }
         externalIdsByType[LsaType.Site]?.let { syncSites(it) }

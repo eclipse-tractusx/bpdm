@@ -17,18 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package com.catenax.bpdm.bridge.dummy.repository
 
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import java.time.Instant
+import com.catenax.bpdm.bridge.dummy.entity.SyncRecord
+import com.catenax.bpdm.bridge.dummy.entity.SyncType
+import org.springframework.data.repository.CrudRepository
 
-data class SyncResponse(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
-)
+interface SyncRecordRepository : CrudRepository<SyncRecord, Long> {
+
+    fun findByType(type: SyncType): SyncRecord?
+}

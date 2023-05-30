@@ -17,13 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package com.catenax.bpdm.bridge.dummy.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.BaseSyncRecord
 import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
 import java.time.Instant
 
 @Entity

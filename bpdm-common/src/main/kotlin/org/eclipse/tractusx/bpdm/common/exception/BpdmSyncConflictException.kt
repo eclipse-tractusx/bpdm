@@ -17,8 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.exception
+package org.eclipse.tractusx.bpdm.common.exception
 
-class BpdmSyncStateException(
-    msg: String
-) : RuntimeException(msg)
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.CONFLICT)
+class BpdmSyncConflictException(
+    val type: Enum<*>
+) : RuntimeException("Synchronization of type $type already running")

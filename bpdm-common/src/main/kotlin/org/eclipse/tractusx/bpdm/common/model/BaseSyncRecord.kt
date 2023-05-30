@@ -17,13 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.exception
+package org.eclipse.tractusx.bpdm.common.model
 
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
+import java.time.Instant
 
-@ResponseStatus(HttpStatus.CONFLICT)
-class BpdmSyncConflictException(
-    val type: SyncType
-) : RuntimeException("Synchronization of type $type already running")
+interface BaseSyncRecord<SYNC_TYPE> {
+    var type: SYNC_TYPE
+
+    var status: SyncStatus
+
+    var fromTime: Instant
+
+    var progress: Float
+
+    var count: Int
+
+    var errorDetails: String?
+
+    var errorSave: String?
+
+    var startedAt: Instant?
+
+    var finishedAt: Instant?
+}

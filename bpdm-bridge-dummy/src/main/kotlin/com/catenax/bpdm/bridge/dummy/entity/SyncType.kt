@@ -17,18 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package com.catenax.bpdm.bridge.dummy.entity
 
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import java.time.Instant
-
-data class SyncResponse(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
-)
+enum class SyncType {
+    GATE_TO_POOL
+}

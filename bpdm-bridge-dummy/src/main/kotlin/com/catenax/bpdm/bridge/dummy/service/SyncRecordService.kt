@@ -17,14 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.service
+package com.catenax.bpdm.bridge.dummy.service
 
+import com.catenax.bpdm.bridge.dummy.entity.SyncRecord
+import com.catenax.bpdm.bridge.dummy.entity.SyncType
+import com.catenax.bpdm.bridge.dummy.repository.SyncRecordRepository
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import org.eclipse.tractusx.bpdm.pool.entity.SyncRecord
-import org.eclipse.tractusx.bpdm.pool.repository.SyncRecordRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 
