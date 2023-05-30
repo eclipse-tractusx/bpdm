@@ -32,9 +32,6 @@ data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
 
-    @get:Schema(description = "Legal name the partner goes by")
-    val legalName: String,
-
     @get:Schema(description = "Abbreviated name or shorthand")
     val legalShortName: String? = null,
 

@@ -311,7 +311,7 @@ class BusinessPartnerBuildService(
         metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
         val legalName = Name(
-            value = request.legalName,
+            value = legalNameValue,
             shortName = request.legalShortName
         )
         val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
@@ -353,7 +353,7 @@ class BusinessPartnerBuildService(
         partner.currentness = createCurrentnessTimestamp()
 
         partner.legalName = Name(
-            value = request.legalName,
+            value = legalName,
             shortName = request.legalShortName
         )
 

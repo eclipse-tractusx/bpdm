@@ -157,7 +157,6 @@ object RequestValues {
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name1,
             legalShortName = null,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
@@ -171,7 +170,6 @@ object RequestValues {
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name3,
             legalShortName = null,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
@@ -185,7 +183,6 @@ object RequestValues {
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name5,
             legalShortName = null,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
