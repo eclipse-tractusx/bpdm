@@ -66,20 +66,20 @@ interface PoolAddressApi {
     ): PageResponse<AddressMatchResponse>
 
     @Operation(
-        summary = "Get address partners by bpn",
+        summary = "Get address partners by bpna",
         description = "Get business partners of type address by bpn-a ignoring case."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Found address with specified bpn"),
+            ApiResponse(responseCode = "200", description = "Found address with specified bpna"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No address found under specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No address found under specified bpna", content = [Content()])
         ]
     )
-    @GetMapping("/{bpn}")
-    @GetExchange("/{bpn}")
+    @GetMapping("/{bpna}")
+    @GetExchange("/{bpna}")
     fun getAddress(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String
+        @Parameter(description = "Bpn value") @PathVariable bpna: String
     ): LogisticAddressResponse
 
     @Operation(

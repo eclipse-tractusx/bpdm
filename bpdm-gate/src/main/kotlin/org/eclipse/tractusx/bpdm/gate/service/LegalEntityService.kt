@@ -95,7 +95,7 @@ class LegalEntityService(
 
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.bpn }
+        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.bpnl }
         val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnSet).associateBy { it.bpnLegalEntity }
 
         if (bpnSet.size > legalEntitiesByBpnMap.size) {

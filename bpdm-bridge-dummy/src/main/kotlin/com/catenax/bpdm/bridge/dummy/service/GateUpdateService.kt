@@ -41,7 +41,7 @@ class GateUpdateService(
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, entity.legalEntity.bpn, true)
+            buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, entity.legalEntity.bpnl, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
@@ -57,7 +57,7 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (entity in responseWrapper.entities) {
-            val bpn = entity.legalEntity.bpn
+            val bpn = entity.legalEntity.bpnl
             val externalId = externalIdByBpn[bpn]
             buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, bpn, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
@@ -76,7 +76,7 @@ class GateUpdateService(
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.Site, externalId, entity.site.bpn, true)
+            buildSuccessSharingStateDto(LsaType.Site, externalId, entity.site.bpns, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
@@ -92,7 +92,7 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (entity in responseWrapper.entities) {
-            val bpn = entity.site.bpn
+            val bpn = entity.site.bpns
             val externalId = externalIdByBpn[bpn]
             buildSuccessSharingStateDto(LsaType.Site, externalId, bpn, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
@@ -111,7 +111,7 @@ class GateUpdateService(
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.Address, externalId, entity.address.bpn, true)
+            buildSuccessSharingStateDto(LsaType.Address, externalId, entity.address.bpna, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
@@ -127,7 +127,7 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (entity in responseWrapper.entities) {
-            val bpn = entity.bpn
+            val bpn = entity.bpna
             val externalId = externalIdByBpn[bpn]
             buildSuccessSharingStateDto(LsaType.Address, externalId, bpn, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }

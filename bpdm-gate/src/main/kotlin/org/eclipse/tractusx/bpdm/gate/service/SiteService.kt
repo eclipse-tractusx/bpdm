@@ -95,7 +95,7 @@ class SiteService(
         val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
 
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.bpn }
+        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.bpns }
         val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.bpnSite }
 
         if (bpnSet.size > sitesByBpnMap.size) {

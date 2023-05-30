@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(name = "AddressPartnerUpdateRequest", description = "Request for updating a business partner record of type address")
 data class AddressPartnerUpdateRequest(
     @Schema(description = "Business Partner Number of this address")
-    val bpn: String,
+    val bpna: String,
 
     @field:JsonUnwrapped
     val address: LogisticAddressDto

@@ -44,8 +44,10 @@ import org.springframework.test.web.reactive.server.returnResult
 import java.time.Instant
 import java.util.*
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
-    properties = ["bpdm.controller.search-request-limit=2"])
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class],
+    properties = ["bpdm.controller.search-request-limit=2"]
+)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class PartnerChangelogIT @Autowired constructor(
@@ -88,12 +90,12 @@ class PartnerChangelogIT @Autowired constructor(
                 LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3)
             )
         )
-        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpn
-        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpn
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
+        val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
         // prepare modified partner to import
         val modifiedPartnersToImport = listOf(
-            RequestValues.legalEntityUpdate3.copy(bpn = bpnL1)
+            RequestValues.legalEntityUpdate3.copy(bpnl = bpnL1)
         )
 
         val timestampBetweenCreateAndUpdate = Instant.now()
@@ -191,7 +193,7 @@ class PartnerChangelogIT @Autowired constructor(
         )
 
         val limit = controllerConfigProperties.searchRequestLimit
-        val bpnsOk = (0..limit-1).map { it -> "bpn${it}" }      // limit entries
+        val bpnsOk = (0..limit - 1).map { it -> "bpn${it}" }      // limit entries
         getChangelogResponse(null, bpnsOk)
             .expectStatus().isOk
 

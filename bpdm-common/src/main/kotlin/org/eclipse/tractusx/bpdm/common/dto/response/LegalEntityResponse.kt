@@ -27,7 +27,7 @@ import java.time.Instant
 @Schema(name = "LegalEntityResponse", description = "Legal entity record")
 data class LegalEntityResponse(
     @get:Schema(description = "Business Partner Number of this legal entity")
-    val bpn: String,
+    val bpnl: String,
 
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
