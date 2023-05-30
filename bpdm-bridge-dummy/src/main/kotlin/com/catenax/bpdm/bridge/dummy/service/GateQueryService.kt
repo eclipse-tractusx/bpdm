@@ -153,11 +153,11 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
             )
-            pageStartAfter = pageResponse.nextStartAfter
+            //pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
-            invalidEntries += pageResponse.invalidEntries
+            invalidEntries += 0 //pageResponse.invalidEntries //TODO Needs to be changed according to the removal of SaaS
         } while (pageStartAfter != null)
 
         logger.info { "Gate returned ${validContent.size} valid legal entities, $invalidEntries were invalid" }

@@ -22,64 +22,62 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
 class LegalEntityService(
-    private val saasRequestMappingService: SaasRequestMappingService,
-    private val inputSaasMappingService: InputSaasMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val changelogRepository: ChangelogRepository,
-    private val legalEntityPersistenceService: LegalEntityPersistenceService
+    private val legalEntityPersistenceService: LegalEntityPersistenceService,
+    private val legalEntityRepository: LegalEntityRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        val legalEntitiesSaas = legalEntities.map { saasRequestMappingService.toSaasModel(it) }
-        saasClient.upsertLegalEntities(legalEntitiesSaas)
-
         // create changelog entry if all goes well from saasClient
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities);
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return inputSaasMappingService.toInputLegalEntity(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Legal Entity", externalId)
-        }
+        val legalEntity = legalEntityRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("LegalEntity", externalId)
+        return toValidSingleLegalEntity(legalEntity)
     }
 
-    fun getLegalEntities(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<LegalEntityGateInputResponse> {
-        val partnerCollection = saasClient.getLegalEntities(limit, startAfter, externalIds)
+    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<LegalEntityGateInputResponse> {
 
-        val validEntries = toValidLegalEntities(partnerCollection.values)
+        val legalEntitiesPage = if (externalIds != null) {
+            legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        } else {
+            legalEntityRepository.findAll(PageRequest.of(page, size))
+        }
 
-        return PageStartAfterResponse(
-            total = partnerCollection.total,
-            nextStartAfter = partnerCollection.nextStartAfter,
-            content = validEntries,
-            invalidEntries = partnerCollection.values.size - validEntries.size
+        return PageResponse(
+            page = page,
+            totalElements = legalEntitiesPage.totalElements,
+            totalPages = legalEntitiesPage.totalPages,
+            contentSize = legalEntitiesPage.content.size,
+            content = toValidLegalEntities(legalEntitiesPage)
         )
     }
 
@@ -138,21 +136,19 @@ class LegalEntityService(
             externalId = externalId
         )
 
-    private fun toValidLegalEntities(partners: Collection<BusinessPartnerSaas>): Collection<LegalEntityGateInputResponse> {
-        return partners.mapNotNull {
-            val logMessageStart =
-                "SaaS business partner for legal entity with ID ${it.id ?: "Unknown"}"
-
-            try {
-                if (it.addresses.size > 1) {
-                    logger.warn { "$logMessageStart has multiple legal addresses." }
-                }
-
-                inputSaasMappingService.toInputLegalEntity(it)
-            } catch (e: BpdmMappingException) {
-                logger.warn { "$logMessageStart will be ignored: ${e.message}" }
-                null
-            }
+    private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputResponse> {
+        return legalEntityPage.content.map { legalEntity ->
+            legalEntity.LegalEntityGateInputResponse(legalEntity)
         }
     }
+
+}
+
+private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+
+    return LegalEntityGateInputResponse(
+        legalEntity = legalEntity.toLegalEntityDto(),
+        bpn = legalEntity.bpn,
+        externalId = legalEntity.externalId
+    )
 }

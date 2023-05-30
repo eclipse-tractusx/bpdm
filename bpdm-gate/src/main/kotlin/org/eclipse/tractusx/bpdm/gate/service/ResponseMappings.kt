@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -160,9 +161,9 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalName = legalEntity.legalName.toName()
     )
 
-    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
-    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 
@@ -177,6 +178,7 @@ fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity):
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
     return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
+
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
 }
@@ -295,5 +297,42 @@ private fun Street.toStreetDto(): StreetDto {
         houseNumber = houseNumber,
         milestone = milestone,
         direction = direction
+    )
+}
+
+fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
+    return LegalEntityDto(
+        legalName = legalName.toNameDto(),
+        legalForm = legalForm,
+        legalAddress = legalAddress.toLogisticAddressDto(),
+        states = mapToLegalEntityStateDto(states),
+        classifications = mapToLegalEntityClassificationsDto(classifications),
+        identifiers = mapToLegalEntityIdentifierDto(identifiers)
+    )
+
+}
+
+fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
+    return states.map { LegalEntityStateDto(it.officialDenotation, it.validFrom, it.validTo, it.type) }
+}
+
+fun mapToLegalEntityIdentifierDto(identifier: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
+    return identifier.map { LegalEntityIdentifierDto(it.value, it.type.toString(), it.issuingBody) }
+}
+
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
+    return classification.map { ClassificationDto(it.value, it.code, it.type) }
+}
+
+fun Name.toNameDto(): NameDto {
+    return NameDto(value, shortName)
+}
+
+fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+    return LegalEntityGateInputResponse(
+        legalEntity = legalEntity.toLegalEntityDto(),
+        externalId = legalEntity.externalId,
+        bpn = legalEntity.bpn,
+        processStartedAt = null
     )
 }

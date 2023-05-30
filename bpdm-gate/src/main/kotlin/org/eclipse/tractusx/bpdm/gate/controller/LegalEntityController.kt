@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -55,14 +56,14 @@ class LegalEntityController(
     }
 
     override fun getLegalEntitiesByExternalIds(
-        paginationRequest: PaginationStartAfterRequest,
+        paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageStartAfterResponse<LegalEntityGateInputResponse> {
-        return legalEntityService.getLegalEntities(limit = paginationRequest.limit, startAfter = paginationRequest.startAfter, externalIds = externalIds)
+    ): PageResponse<LegalEntityGateInputResponse> {
+        return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    override fun getLegalEntities(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<LegalEntityGateInputResponse> {
-        return legalEntityService.getLegalEntities(paginationRequest.limit, paginationRequest.startAfter)
+    override fun getLegalEntities(paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputResponse> {
+        return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
 
     override fun getLegalEntitiesOutput(

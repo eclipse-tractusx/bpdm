@@ -27,25 +27,24 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -58,6 +57,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class LegalEntityControllerInputIT @Autowired constructor(
+    val testHelpers: DbTestHelpers,
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
     val gateClient: GateClient,
@@ -76,9 +76,15 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         }
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        testHelpers.truncateDbTables()
+    }
+
+
     /**
      * When upserting legal entities
-     * Then SaaS upsert api should be called with the legal entity data mapped to the SaaS data model
+     * Then legal entity should be persisted on the database
      */
     @Test
     fun `upsert legal entities`() {
@@ -87,39 +93,19 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest2,
         )
 
-        val expectedLegalEntities = listOf(
-            SaasValues.legalEntityRequest1,
-            SaasValues.legalEntityRequest2,
-        )
-
-        wireMockServer.stubFor(
-            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertResponse(
-                                    emptyList(),
-                                    emptyList(),
-                                    2,
-                                    0
-                                )
-                            )
-                        )
-                )
-        )
-
         try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }
 
-        val body = wireMockServer.allServeEvents.single().request.bodyAsString
-        val upsertRequest = objectMapper.readValue(body, UpsertRequest::class.java)
-        // TODO: check the upsertRequest
-//        assertThat(upsertRequest.businessPartners).containsExactlyInAnyOrderElementsOf(expectedLegalEntities)
+        //Check if persisted Address data
+        val legalEntityExternal1 = legalEntityRepository.findByExternalId("external-1")
+        assertNotEquals(legalEntityExternal1, null)
+
+        val legalEntityExternal2 = legalEntityRepository.findByExternalId("external-2")
+        assertNotEquals(legalEntityExternal2, null)
+
     }
 
     /**
@@ -180,82 +166,33 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     }
 
     /**
-     * When SaaS api responds with an error status code while upserting legal entities
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `upsert legal entities, SaaS error`() {
-        val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
-        )
-
-        wireMockServer.stubFor(
-            put(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            assertTrue(statusCodeValue in 500..599)
-        }
-    }
-
-    /**
-     * Given legal entity exists in SaaS
+     * Given legal entity exists
      * When getting legal entity by external id
      * Then legal entity mapped to the catena data model should be returned
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse1
+        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse3
 
-        wireMockServer.stubFor(
-            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                FetchResponse(
-                                    businessPartner = SaasValues.legalEntityResponse1,
-                                    status = FetchResponse.Status.OK
-                                )
-                            )
-                        )
-                )
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest3
         )
 
-        val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
+        val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(CommonValues.externalId3)
 
-        assertThat(legalEntity).usingRecursiveComparison().isEqualTo(expectedLegalEntity)
+        assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
+
     }
 
     /**
-     * Given legal entity does not exist in SaaS
+     * Given legal entity does not exist
      * When getting legal entity by external id
      * Then "not found" response is sent
      */
     @Test
     fun `get legal entity by external id, not found`() {
-        wireMockServer.stubFor(
-            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                FetchResponse(
-                                    businessPartner = null,
-                                    status = FetchResponse.Status.NOT_FOUND
-                                )
-                            )
-                        )
-                )
-        )
 
         try {
             gateClient.legalEntities().getLegalEntityByExternalId("nonexistent-externalid123")
@@ -265,72 +202,17 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
     }
 
-    /**
-     * When SaaS api responds with an error status code while fetching legal entity by external id
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get legal entity by external id, SaaS error`() {
-        wireMockServer.stubFor(
-            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        try {
-            gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            assertTrue(statusCodeValue in 500..599)
-        }
-    }
 
     /**
-     * Given legal entity without legal address in SaaS
-     * When query by its external ID
-     * Then server error is returned
-     */
-    @Test
-    fun `get legal entity without legal address, expect error`() {
-
-        val invalidPartner = SaasValues.legalEntityResponse1.copy(addresses = emptyList())
-
-        wireMockServer.stubFor(
-            post(urlPathMatching(SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                FetchResponse(
-                                    businessPartner = invalidPartner,
-                                    status = FetchResponse.Status.OK
-                                )
-                            )
-                        )
-                )
-        )
-
-        try {
-            gateClient.legalEntities().getLegalEntityByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            assertTrue(statusCodeValue in 500..599)
-        }
-    }
-
-
-    /**
-     * Given legal entity exists in SaaS
+     * Given legal entity exists in the persistence database
      * When getting legal entities page
      * Then legal entities page mapped to the catena data model should be returned
      */
     @Test
     fun `get legal entities`() {
-        val legalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1,
-            SaasValues.legalEntityResponse2,
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
         )
 
         val expectedLegalEntities = listOf(
@@ -338,181 +220,74 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             ResponseValues.legalEntityGateInputResponse2,
         )
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
-        val invalidEntries = 0
+        val page = 0
+        val size = 10
 
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = legalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
+        val totalElements = 2L
+        val totalPages = 1
+        val contentSize = 2
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+
+        val paginationValue = PaginationRequest(page, size)
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
         val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
 
-        assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
-                invalidEntries = invalidEntries
-            )
+        val expectedPage = PageResponse(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedLegalEntities
+        )
+
+        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
+            expectedPage
         )
     }
 
 
     /**
-     * Given legal entity exists in SaaS
+     * Given legal entity exists in the peristence database
      * When getting legal entities page based on external id list
      * Then legal entities page mapped to the catena data model should be returned
      */
     @Test
     fun `get legal entity filter by external ids`() {
-        val legalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1,
-            SaasValues.legalEntityResponse2,
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
         )
 
         val expectedLegalEntities = listOf(
             ResponseValues.legalEntityGateInputResponse1,
             ResponseValues.legalEntityGateInputResponse2,
         )
+        val page = 0
+        val size = 10
+        val totalElements = 2L
+        val totalPages = 1
+        val contentSize = 2
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
-        val invalidEntries = 0
+        val paginationValue = PaginationRequest(page, size)
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
 
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = legalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
+        val listExternalIds = legalEntities.map { it.externalId }
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val listExternalIds = legalEntitiesSaas.mapNotNull { it.externalId }
         val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
 
-        assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
-                invalidEntries = invalidEntries
-            )
-        )
-    }
-
-    /**
-     * Given legal entity without legal address in SaaS
-     * When getting legal entities page
-     * Then only valid legal entities on page returned
-     */
-    @Test
-    fun `filter legal entities without legal address`() {
-        val legalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1,
-            SaasValues.legalEntityResponse2,
-            SaasValues.legalEntityResponse1.copy(addresses = emptyList())
+        val expectedPage = PageResponse(
+            totalElements,
+            totalPages,
+            page,
+            contentSize,
+            content = expectedLegalEntities
         )
 
-        val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateInputResponse1,
-            ResponseValues.legalEntityGateInputResponse2,
+        assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
+            expectedPage
         )
-
-        val limit = 3
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
-        val invalidEntries = 1
-
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = legalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
-
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
-
-        assertThat(pageResponse).isEqualTo(
-            PageStartAfterResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
-                invalidEntries = invalidEntries
-            )
-        )
-    }
-
-    /**
-     * When SaaS api responds with an error status code while getting legal entities
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get legal entities, SaaS error`() {
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        try {
-            val paginationValue = PaginationStartAfterRequest("")
-            gateClient.legalEntities().getLegalEntities(paginationValue)
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            assertTrue(statusCodeValue in 500..599)
-        }
-
-//        webTestClient.get().uri(GATE_API_INPUT_LEGAL_ENTITIES_PATH)
-//            .exchange()
-//            .expectStatus()
-//            .is5xxServerError
     }
 
     /**
@@ -523,7 +298,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     fun `get legal entities, pagination limit exceeded`() {
 
         try {
-            val paginationValue = PaginationStartAfterRequest("", 999999)
+            val paginationValue = PaginationRequest(0, 999999)
             gateClient.legalEntities().getLegalEntities(paginationValue)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
@@ -606,11 +381,6 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val legalEntities = listOf(
             RequestValues.legalEntityGateInputRequest1,
             RequestValues.legalEntityGateInputRequest2,
-        )
-
-        val expectedLegalEntities = listOf(
-            SaasValues.legalEntityRequest1,
-            SaasValues.legalEntityRequest2,
         )
 
         wireMockServer.stubFor(

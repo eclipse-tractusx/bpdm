@@ -258,6 +258,12 @@ object ResponseValues {
         bpn = CommonValues.bpn2,
         processStartedAt = SaasValues.modificationTime2,
     )
+    val legalEntityGateInputResponse3 = LegalEntityGateInputResponse(
+        legalEntity = RequestValues.legalEntity3,
+        externalId = CommonValues.externalId3,
+        bpn = CommonValues.bpn3,
+        processStartedAt = null,
+    )
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
         legalEntity = legalEntityResponse1,
@@ -329,7 +335,6 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress1,
         processStartedAt = SaasValues.modificationTime1,
     )
-
     val addressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.address2
             .copy(
