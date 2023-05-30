@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -50,7 +49,8 @@ import org.springframework.test.context.DynamicPropertySource
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class LegalEntityControllerOutputIT @Autowired constructor(
     private val objectMapper: ObjectMapper,
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    private val testHelpers: DbTestHelpers
 ) {
     companion object {
         @RegisterExtension
@@ -178,17 +178,17 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
         val paginationValue = PaginationStartAfterRequest(startAfter, limit)
         val pageResponse = gateClient.legalEntities().getLegalEntitiesOutput(paginationValue, emptyList())
-
-        assertThat(pageResponse).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
-                invalidEntries = expectedPending.size + expectedErrors.size,
-                pending = expectedPending,
-                errors = expectedErrors,
-            )
+        val expectedResponse = PageOutputResponse(
+            total = total,
+            nextStartAfter = nextStartAfter,
+            content = expectedLegalEntities,
+            invalidEntries = expectedPending.size + expectedErrors.size,
+            pending = expectedPending,
+            errors = expectedErrors,
         )
+
+
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedResponse)
     }
 
     /**
@@ -283,16 +283,14 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
         val paginationValue = PaginationStartAfterRequest(startAfter, limit)
         val pageResponse = gateClient.legalEntities().getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1, CommonValues.externalId2))
-
-        assertThat(pageResponse).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedLegalEntities,
-                invalidEntries = 0,
-                pending = listOf(),
-                errors = listOf(),
-            )
+        val expectedResponse = PageOutputResponse(
+            total = total,
+            nextStartAfter = nextStartAfter,
+            content = expectedLegalEntities,
+            invalidEntries = 0,
+            pending = listOf(),
+            errors = listOf(),
         )
+        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedResponse)
     }
 }

@@ -21,7 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.RecursiveComparisonAssert
 import org.springframework.stereotype.Component
+import java.time.Instant
 
 private const val BPDM_DB_SCHEMA_NAME: String = "bpdmgate"
 
@@ -50,5 +53,13 @@ class DbTestHelpers(entityManagerFactory: EntityManagerFactory) {
 
         em.transaction.commit()
     }
-    
+
+    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
+        return Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
+    }
+
 }
