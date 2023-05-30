@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -60,14 +61,14 @@ class AddressController(
     }
 
     override fun getAddressesByExternalIds(
-        paginationRequest: PaginationStartAfterRequest,
+        paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageStartAfterResponse<AddressGateInputResponse> {
-        return addressService.getAddresses(limit = paginationRequest.limit, startAfter = paginationRequest.startAfter, externalIds = externalIds)
+    ): PageResponse<AddressGateInputResponse> {
+        return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    override fun getAddresses(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<AddressGateInputResponse> {
-        return addressService.getAddresses(paginationRequest.limit, paginationRequest.startAfter)
+    override fun getAddresses(paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse> {
+        return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
 
     override fun getAddressesOutput(

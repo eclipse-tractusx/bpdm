@@ -155,12 +155,60 @@ object RequestValues {
         )
     )
 
+    //New Values for Logistic Addresses Tests
+    val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = null,
+            administrativeAreaLevel2 = CommonValues.county1,
+            district = CommonValues.district1,
+        ),
+        street = StreetDto(name = CommonValues.street1, houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate1,
+            country = CommonValues.country1,
+            postalCode = CommonValues.postCode1,
+            city = CommonValues.city1,
+        )
+    )
+
+    val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
+        areaPart = AreaDistrictDto(
+            administrativeAreaLevel1 = null,
+            administrativeAreaLevel2 = CommonValues.county2,
+            district = CommonValues.district2,
+        ),
+        street = StreetDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
+        baseAddress = BasePostalAddressDto(
+            geographicCoordinates = geoCoordinate2,
+            country = CommonValues.country2,
+            postalCode = CommonValues.postCode2,
+            city = CommonValues.city2,
+        )
+    )
+
     val address1 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
     )
 
     val address2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
+    )
+
+    //New Values for Logistic Address Tests
+    val logisticAddress1 = LogisticAddressDto(
+        physicalPostalAddress = postalAddressLogisticAddress1,
+    )
+
+    val logisticAddress2 = LogisticAddressDto(
+        physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
 
@@ -221,13 +269,24 @@ object RequestValues {
     )
 
     val addressGateInputRequest1 = AddressGateInputRequest(
-        address = address1,
+        address = address1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
         bpn = CommonValues.bpnAddress1
     )
+
     val addressGateInputRequest2 = AddressGateInputRequest(
-        address = address2,
+        address = address2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
         bpn = CommonValues.bpnAddress2

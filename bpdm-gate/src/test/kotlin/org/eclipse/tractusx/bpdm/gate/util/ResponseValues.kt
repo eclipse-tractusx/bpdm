@@ -329,8 +329,8 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress1,
         processStartedAt = SaasValues.modificationTime1,
     )
-    val addressGateInputResponse2 = AddressGateInputResponse(
 
+    val addressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.address2
             .copy(
                 name = CommonValues.nameSite1,
@@ -352,5 +352,31 @@ object ResponseValues {
     val addressGateOutput2 = AddressGateOutput(
         address = logisticAddress2,
         externalId = CommonValues.externalIdAddress2,
+    )
+
+    val logisticAddressGateInputResponse1 = AddressGateInputResponse(
+        address = RequestValues.logisticAddress1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = null,
+        bpn = CommonValues.bpnAddress1,
+        processStartedAt = null,
+    )
+
+    val logisticAddressGateInputResponse2 = AddressGateInputResponse(
+        address = RequestValues.logisticAddress2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress2,
+        bpn = CommonValues.bpnAddress2,
+        siteExternalId = null,
+        processStartedAt = null,
     )
 }

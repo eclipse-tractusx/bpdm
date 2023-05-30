@@ -21,22 +21,22 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -49,71 +49,40 @@ class AddressService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val typeMatchingService: TypeMatchingService,
     private val changelogRepository: ChangelogRepository,
-    private val addressPersistenceService: AddressPersistenceService
+    private val addressPersistenceService: AddressPersistenceService,
+    private val addressRepository: GateAddressRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<AddressGateInputResponse> {
-        val addressesPage = saasClient.getAddresses(limit, startAfter, externalIds)
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
 
-        val addressGateInputResponse = toValidAddresses(addressesPage)
+        val logisticAddressPage = if (externalIds != null) {
+            addressRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        } else {
+            addressRepository.findAll(PageRequest.of(page, size))
+        }
 
-        return PageStartAfterResponse(
-            total = addressesPage.total,
-            nextStartAfter = addressesPage.nextStartAfter,
-            content = addressGateInputResponse,
-            invalidEntries = addressesPage.values.size - addressGateInputResponse.size
+        return PageResponse(
+            page = page,
+            totalElements = logisticAddressPage.totalElements,
+            totalPages = logisticAddressPage.totalPages,
+            contentSize = logisticAddressPage.content.size,
+            content = toValidLogisticAddresses(logisticAddressPage),
         )
     }
 
-    private fun toValidAddresses(addressesPage: PagedResponseSaas<BusinessPartnerSaas>): List<AddressGateInputResponse> {
-        val validEntries = addressesPage.values
-            .filter { validateAddressBusinessPartner(it) }
-
-        val addressesWithParent = validEntries.map {
-            Pair(it, inputSaasMappingService.toParentLegalEntityExternalId(it)!!)
-        }
-
-        val parents = if (addressesWithParent.isNotEmpty())
-            saasClient.getBusinessPartners(
-                externalIds = addressesWithParent.map { (_, parentId) -> parentId }
-            ).values
-        else
-            emptyList()
-
-        val (legalEntityParents, siteParents) = typeMatchingService.partitionIntoParentTypes(parents)
-        val legalEntityParentIds = legalEntityParents.mapNotNull { it.externalId }.toHashSet()
-        val siteParentIds = siteParents.mapNotNull { it.externalId }.toHashSet()
-
-        return addressesWithParent.mapNotNull { (address, parentId) ->
-            try {
-                when {
-                    legalEntityParentIds.contains(parentId) ->
-                        inputSaasMappingService.toInputAddress(address, parentId, null)
-
-                    siteParentIds.contains(parentId) ->
-                        inputSaasMappingService.toInputAddress(address, null, parentId)
-
-                    else -> {
-                        logger.warn { "Could not fetch parent for SaaS address record with ID ${address.id}" }
-                        null
-                    }
-                }
-
-            } catch (e: RuntimeException) {
-                logger.warn { "SaaS address record with ID ${address.id} will be ignored: ${e.message}" }
-                null
-            }
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputResponse> {
+        return logisticAddressPage.content.map { logisticAddress ->
+            logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
 
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return toValidAddressInput(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Address", externalId)
-        }
+        val logisticAddress = addressRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Logistic Address", externalId)
+
+        return logisticAddress.toAddressGateInputResponse(logisticAddress)
+
     }
 
     /**
@@ -175,17 +144,10 @@ class AddressService(
      */
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
 
-        val addressesSaas = toSaasModels(addresses)
-        saasClient.upsertAddresses(addressesSaas)
-
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
             changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
         }
-
-        deleteParentRelationsOfAddresses(addresses)
-
-        upsertParentRelations(addresses)
 
         addressPersistenceService.persistAddressBP(addresses)
     }
@@ -199,37 +161,6 @@ class AddressService(
 
         return addresses.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
     }
-
-    private fun upsertParentRelations(addresses: Collection<AddressGateInputRequest>) {
-        val legalEntityRelations = toLegalEntityParentRelations(addresses)
-        val siteRelations = toSiteParentRelations(addresses)
-        saasClient.upsertAddressRelations(legalEntityRelations, siteRelations)
-    }
-
-    private fun deleteParentRelationsOfAddresses(addresses: Collection<AddressGateInputRequest>) {
-        val addressesPage = saasClient.getAddresses(externalIds = addresses.map { it.externalId })
-        saasClient.deleteParentRelations(addressesPage.values)
-    }
-
-    private fun toSiteParentRelations(addresses: Collection<AddressGateInputRequest>) =
-        addresses.filter {
-            it.siteExternalId != null
-        }.map {
-            SaasClient.AddressSiteRelation(
-                addressExternalId = it.externalId,
-                siteExternalId = it.siteExternalId!!
-            )
-        }.toList()
-
-    private fun toLegalEntityParentRelations(addresses: Collection<AddressGateInputRequest>) =
-        addresses.filter {
-            it.legalEntityExternalId != null
-        }.map {
-            SaasClient.AddressLegalEntityRelation(
-                addressExternalId = it.externalId,
-                legalEntityExternalId = it.legalEntityExternalId!!
-            )
-        }.toList()
 
     private fun getParentSites(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
         val parentSiteExternalIds = addresses.mapNotNull { it.siteExternalId }.distinct().toList()
@@ -270,42 +201,4 @@ class AddressService(
         return addressSaas.copy(identifiers = addressSaas.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
-    private fun toValidAddressInput(partner: BusinessPartnerSaas): AddressGateInputResponse {
-        if (!validateAddressBusinessPartner(partner)) {
-            throw SaasInvalidRecordException(partner.id)
-        }
-
-        val parentId = inputSaasMappingService.toParentLegalEntityExternalId(partner)
-        val parentType = parentId?.let { saasClient.getBusinessPartner(it).businessPartner }?.let { typeMatchingService.determineType(it) }
-
-        return when (parentType) {
-            OptionalLsaType.LegalEntity -> inputSaasMappingService.toInputAddress(partner, parentId, null)
-            OptionalLsaType.Site -> inputSaasMappingService.toInputAddress(partner, null, parentId)
-            else -> throw SaasInvalidRecordException(parentId)
-        }
-    }
-
-    private fun validateAddressBusinessPartner(partner: BusinessPartnerSaas): Boolean {
-        val logMessageStart = "SaaS business partner for address with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
-
-        if (partner.addresses.size > 1) {
-            logger.warn { "$logMessageStart has multiple addresses" }
-        }
-        if (partner.addresses.isEmpty()) {
-            logger.warn { "$logMessageStart does not have an address" }
-            return false
-        }
-
-        val numParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner).size
-        if (numParents > 1) {
-            logger.warn { "$logMessageStart has multiple parents." }
-        }
-
-        if (numParents == 0) {
-            logger.warn { "$logMessageStart does not have a parent legal entity or site." }
-            return false
-        }
-
-        return true
-    }
 }

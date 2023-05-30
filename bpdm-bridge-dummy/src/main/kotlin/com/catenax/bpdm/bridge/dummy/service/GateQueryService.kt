@@ -199,11 +199,11 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.addresses().getAddressesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
             )
-            pageStartAfter = pageResponse.nextStartAfter
+            //pageStartAfter = pageResponse.nextStartAfter
             validContent.addAll(pageResponse.content)
-            invalidEntries += pageResponse.invalidEntries
+            invalidEntries += 0 //TODO Needs to be changed according to the removal of SaaS
         } while (pageStartAfter != null)
 
         logger.info { "Gate returned ${validContent.size} valid addresses, $invalidEntries were invalid" }

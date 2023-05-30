@@ -20,13 +20,17 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 
-interface GateAddressRepository : JpaRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long> {
+interface GateAddressRepository : PagingAndSortingRepository<LogisticAddress, Long>, CrudRepository<LogisticAddress, Long> {
 
     fun findByExternalIdIn(externalId: Collection<String>): Set<LogisticAddress>
 
     fun findByExternalId(externalId: String): LogisticAddress?
+
+    fun findByExternalIdIn(externalId: Collection<String>?, pageable: Pageable): Page<LogisticAddress>
 
 }
