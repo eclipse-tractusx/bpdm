@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
@@ -66,8 +66,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityResponse
-    private lateinit var givenPartner2: LegalEntityResponse
+    private lateinit var givenPartner1: PoolLegalEntityResponse
+    private lateinit var givenPartner2: PoolLegalEntityResponse
 
     @BeforeEach
     fun beforeEach() {
@@ -143,7 +143,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
             )
         )
 
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name,0,10)
+        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name, 0, 10)
 
         assertPageEquals(pageResponse, expected)
     }
@@ -155,15 +155,16 @@ class LegalEntityControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search business partner by site name, no result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name",0,10).content
+        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name", 0, 10).content
         assertThat(foundPartners).isEmpty()
     }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int , size: Int ): PageResponse<LegalEntityMatchResponse> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageResponse<LegalEntityMatchResponse> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
-        return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            AddressPropertiesSearchRequest.EmptySearchRequest,sitePropertiesSearchRequest, PaginationRequest(page, size)
+        return poolClient.legalEntities().getLegalEntities(
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            AddressPropertiesSearchRequest.EmptySearchRequest, sitePropertiesSearchRequest, PaginationRequest(page, size)
         )
 
 

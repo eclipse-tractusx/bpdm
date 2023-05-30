@@ -157,7 +157,6 @@ object RequestValues {
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name1,
             legalShortName = null,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
@@ -165,12 +164,12 @@ object RequestValues {
             classifications = listOf(classification1, classification2),
             legalAddress = logisticAddress1
         ),
+        legalName = CommonValues.name1,
         index = CommonValues.index1
     )
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name3,
             legalShortName = null,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
@@ -178,12 +177,12 @@ object RequestValues {
             classifications = listOf(classification3, classification4),
             legalAddress = logisticAddress2
         ),
+        legalName = CommonValues.name3,
         index = CommonValues.index2
     )
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = CommonValues.name5,
             legalShortName = null,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
@@ -191,21 +190,25 @@ object RequestValues {
             classifications = listOf(classification5),
             legalAddress = logisticAddress3
         ),
+        legalName = CommonValues.name5,
         index = CommonValues.index3
     )
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL1,
+        legalName = legalEntityCreate1.legalName,
         legalEntity = legalEntityCreate1.legalEntity
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL2,
+        legalName = legalEntityCreate2.legalName,
         legalEntity = legalEntityCreate2.legalEntity
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL3,
+        legalName = legalEntityCreate3.legalName,
         legalEntity = legalEntityCreate3.legalEntity
     )
 

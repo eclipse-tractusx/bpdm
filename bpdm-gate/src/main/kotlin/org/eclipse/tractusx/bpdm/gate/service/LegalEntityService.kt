@@ -22,6 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
+import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
+import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
@@ -129,9 +133,21 @@ class LegalEntityService(
         )
     }
 
-    fun toLegalEntityOutput(externalId: String, legalEntity: LegalEntityResponse, legalAddress: LogisticAddressResponse): LegalEntityGateOutput =
+    fun toLegalEntityOutput(externalId: String, legalEntityPool: PoolLegalEntityResponse, legalAddress: LogisticAddressResponse): LegalEntityGateOutput =
         LegalEntityGateOutput(
-            legalEntity = legalEntity,
+            legalEntity = LegalEntityResponse(
+                bpnl = legalEntityPool.bpnl,
+                identifiers = legalEntityPool.identifiers,
+                legalShortName = legalEntityPool.legalShortName,
+                legalForm = legalEntityPool.legalForm,
+                states = legalEntityPool.states,
+                classifications = legalEntityPool.classifications,
+                relations = legalEntityPool.relations,
+                currentness = legalEntityPool.currentness,
+                createdAt = legalEntityPool.createdAt,
+                updatedAt = legalEntityPool.updatedAt,
+            ),
+            legalNameParts = arrayOf(legalEntityPool.legalName),
             legalAddress = legalAddress,
             externalId = externalId
         )

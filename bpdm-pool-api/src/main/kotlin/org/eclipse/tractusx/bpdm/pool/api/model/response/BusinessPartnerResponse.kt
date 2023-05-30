@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
@@ -33,7 +33,7 @@ data class BusinessPartnerResponse(
     val uuid: String,
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityResponse,
+    val legalEntity: PoolLegalEntityResponse,
 
     val addresses: Collection<LogisticAddressResponse>,
 

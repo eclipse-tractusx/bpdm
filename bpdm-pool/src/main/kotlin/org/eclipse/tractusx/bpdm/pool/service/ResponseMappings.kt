@@ -48,8 +48,8 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
     )
 }
 
-fun LegalEntity.toDto(): LegalEntityResponse {
-    return LegalEntityResponse(
+fun LegalEntity.toDto(): PoolLegalEntityResponse {
+    return PoolLegalEntityResponse(
         bpnl = bpn,
         identifiers = identifiers.map { it.toDto() },
         legalName = legalName.value,

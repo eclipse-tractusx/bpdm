@@ -154,7 +154,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
-        legalName = Name(legalEntity.legalName, legalEntity.legalShortName)
+        legalName = Name(legalNameParts[0], legalEntity.legalShortName)
     )
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })

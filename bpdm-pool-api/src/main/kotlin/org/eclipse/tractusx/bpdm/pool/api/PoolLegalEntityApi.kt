@@ -90,7 +90,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): LegalEntityResponse
+    ): PoolLegalEntityResponse
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -130,7 +130,7 @@ interface PoolLegalEntityApi {
     @PostExchange("/search")
     fun searchSites(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityResponse>>
+    ): ResponseEntity<Collection<PoolLegalEntityResponse>>
 
     @Operation(
         summary = "Get site partners of a legal entity",

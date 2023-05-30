@@ -105,8 +105,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityResponse1,
-            ResponseValues.legalEntityResponse2
+            ResponseValues.legalEntityResponsePool1,
+            ResponseValues.legalEntityResponsePool2
         )
         val legalAddressesPool = listOf(
             ResponseValues.logisticAddress1,
@@ -209,8 +209,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val legalEntitiesPool = listOf(
-            ResponseValues.legalEntityResponse1,
-            ResponseValues.legalEntityResponse2
+            ResponseValues.legalEntityResponsePool1,
+            ResponseValues.legalEntityResponsePool2
         )
         val legalAddressesPool = listOf(
             ResponseValues.logisticAddress1,

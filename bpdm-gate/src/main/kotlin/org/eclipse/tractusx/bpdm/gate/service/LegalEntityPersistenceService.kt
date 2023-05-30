@@ -70,7 +70,7 @@ class LegalEntityPersistenceService(
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
         legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
-        legalEntity.legalName = Name(value = legalEntityRequest.legalEntity.legalName, shortName = legalEntityRequest.legalEntity.legalShortName)
+        legalEntity.legalName = Name(value = legalEntityRequest.legalNameParts[0], shortName = legalEntityRequest.legalEntity.legalShortName)
         legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
