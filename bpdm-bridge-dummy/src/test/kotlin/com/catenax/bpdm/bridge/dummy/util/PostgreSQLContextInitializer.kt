@@ -22,6 +22,7 @@ package com.catenax.bpdm.bridge.dummy.util
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
+import org.testcontainers.containers.Network
 import org.testcontainers.containers.PostgreSQLContainer
 
 /**
@@ -29,15 +30,23 @@ import org.testcontainers.containers.PostgreSQLContainer
  */
 class PostgreSQLContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     companion object {
+
         val postgreSQLContainer = PostgreSQLContainer("postgres:13.2")
+            .withAccessToHost(true)
+            .withNetwork(Network.SHARED)
+
+
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
+        val postgresAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
+        postgreSQLContainer.withNetworkAliases(postgresAlias)
+
         postgreSQLContainer.start()
         TestPropertyValues.of(
             "spring.datasource.url=${postgreSQLContainer.jdbcUrl}",
             "spring.datasource.username=${postgreSQLContainer.username}",
-            "spring.datasource.password=${postgreSQLContainer.password}"
+            "spring.datasource.password=${postgreSQLContainer.password}",
         ).applyTo(applicationContext.environment)
     }
 }
