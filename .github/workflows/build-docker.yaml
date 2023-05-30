@@ -1,3 +1,22 @@
+################################################################################
+# Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+#
+# See the NOTICE file(s) distributed with this work for additional
+# information regarding copyright ownership.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+################################################################################
+
 name: Build - Docker image (SemVer)
 
 on:
@@ -18,15 +37,15 @@ on:
 
 
 env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}/${{ inputs.imageName }}
+  IMAGE_NAMESPACE: "tractusx"
+  IMAGE_NAME: ${{ inputs.imageName }}
+
 jobs:
-  build-docker:
+  docker:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,7 +56,9 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          # Automatically prepare image tags; See action docs for more examples.
+          # semver patter will generate tags like these for example :1 :1.2 :1.2.3
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -45,19 +66,33 @@ jobs:
             type=semver,pattern={{major}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
+      - name: DockerHub login
+        if:  inputs.push
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          # Use existing DockerHub credentials present as secrets
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: .
+          # Build image for verification purposes on every trigger event. Only push if event is not a PR
           push: ${{ inputs.push }}
-          file: ${{ inputs.dockerfilePath }}
+          file: ${{ inputs.dockerfilePath }}/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # https://github.com/peter-evans/dockerhub-description
+      # Important step to push image description to DockerHub
+      - name: Update Docker Hub description
+        if: inputs.push
+        uses: peter-evans/dockerhub-description@v3
+        with:
+        # readme-filepath defaults to toplevel README.md, Only necessary if you have a dedicated file with your 'Notice for docker images'
+        # readme-filepath: path/to/dedicated/notice-for-docker-image.md
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          repository: ${{ env.IMAGE_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          readme-filepath: ${{ inputs.dockerfilePath }}/DOCKER_NOTICE.md
