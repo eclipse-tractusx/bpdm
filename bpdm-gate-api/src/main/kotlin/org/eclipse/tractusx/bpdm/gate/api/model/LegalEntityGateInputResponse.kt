@@ -29,6 +29,9 @@ import java.time.LocalDateTime
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityGateInputResponse", description = "Legal entity with external id")
 data class LegalEntityGateInputResponse(
+
+    val legalNameParts: Array<String> = emptyArray(),
+
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
