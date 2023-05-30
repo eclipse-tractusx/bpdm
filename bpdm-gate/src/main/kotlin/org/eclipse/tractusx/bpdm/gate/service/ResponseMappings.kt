@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
@@ -28,9 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.Site
-import org.eclipse.tractusx.bpdm.gate.entity.SiteState
 
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
@@ -153,16 +149,16 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalEntityExternalId = externalId
     )
 
-    val legalEntity= LegalEntity(
+    val legalEntity = LegalEntity(
         bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
         legalName = Name(legalEntity.legalName, legalEntity.legalShortName)
     )
-    legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
-    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
+    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
 
@@ -297,8 +293,9 @@ private fun Street.toStreetDto(): StreetDto {
 
 fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
     return LegalEntityDto(
-        legalName = legalName.toNameDto(),
+        legalName = legalName.value,
         legalForm = legalForm,
+        legalShortName = legalName.shortName,
         legalAddress = legalAddress.toLogisticAddressDto(),
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
