@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.CrudRepository
 
@@ -28,5 +30,7 @@ interface SiteRepository : JpaRepository<Site, Long>, CrudRepository<Site, Long>
     fun findByExternalIdIn(externalId: Collection<String>): Set<Site>
 
     fun findByExternalId(externalId: String): Site?
+
+    fun findByExternalIdIn(externalId: Collection<String>?, pageable: Pageable): Page<Site>
 
 }

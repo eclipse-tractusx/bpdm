@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.entity.SiteState
 
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
@@ -153,14 +153,13 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         legalEntityExternalId = externalId
     )
 
-    val legalEntity = LegalEntity(
+    val legalEntity= LegalEntity(
         bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
         legalName = legalEntity.legalName.toName()
     )
-
     legalEntity.identifiers.addAll( this.legalEntity.identifiers.map {toEntityIdentifier(it,legalEntity)})
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it,legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it,legalEntity) })
@@ -328,11 +327,40 @@ fun Name.toNameDto(): NameDto {
     return NameDto(value, shortName)
 }
 
+//LegalEntity mapping to LegalEntityGateInputResponse
 fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         externalId = legalEntity.externalId,
         bpn = legalEntity.bpn,
         processStartedAt = null
     )
+}
+
+//Site mapping to SiteDto
+fun Site.toSiteDto(): SiteDto {
+
+    return SiteDto(
+        name = name,
+        states = mapToDtoSitesStates(states),
+        mainAddress = mainAddress.toLogisticAddressDto()
+    )
+}
+
+fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto> {
+    return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
+}
+
+//LegalEntity mapping to LegalEntityGateInputResponse
+fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
+
+    return SiteGateInputResponse(
+        site = sitePage.toSiteDto(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntity.externalId,
+        bpn = bpn,
+        processStartedAt = null //TODO Remove this?
+    )
+
 }

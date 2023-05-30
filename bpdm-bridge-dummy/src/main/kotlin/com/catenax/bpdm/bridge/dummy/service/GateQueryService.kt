@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.springframework.stereotype.Service
@@ -176,11 +175,11 @@ class GateQueryService(
         do {
             val pageResponse = gateClient.sites().getSitesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationStartAfterRequest(pageStartAfter, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
             )
-            pageStartAfter = pageResponse.nextStartAfter
-            validContent.addAll(pageResponse.content)
-            invalidEntries += pageResponse.invalidEntries
+            //pageStartAfter = pageResponse.nextStartAfter
+            validContent.addAll(pageResponse.content) //TODO Needs to be changed according to the removal of SaaS
+            invalidEntries += 0//pageResponse.invalidEntries
         } while (pageStartAfter != null)
 
         logger.info { "Gate returned ${validContent.size} valid sites, $invalidEntries were invalid" }

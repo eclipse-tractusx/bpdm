@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -55,14 +56,14 @@ class SiteController(
     }
 
     override fun getSitesByExternalIds(
-        paginationRequest: PaginationStartAfterRequest,
+        paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageStartAfterResponse<SiteGateInputResponse> {
-        return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter, externalIds)
+    ): PageResponse<SiteGateInputResponse> {
+        return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    override fun getSites(paginationRequest: PaginationStartAfterRequest): PageStartAfterResponse<SiteGateInputResponse> {
-        return siteService.getSites(paginationRequest.limit, paginationRequest.startAfter)
+    override fun getSites(paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse> {
+        return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 
     override fun getSitesOutput(paginationRequest: PaginationStartAfterRequest, externalIds: Collection<String>?): PageOutputResponse<SiteGateOutput> {

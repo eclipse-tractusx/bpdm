@@ -21,56 +21,65 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageStartAfterResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.exception.SaasInvalidRecordException
+import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
 class SiteService(
     private val saasRequestMappingService: SaasRequestMappingService,
-    private val inputSaasMappingService: InputSaasMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
-    private val sitePersistenceService: SitePersistenceService
+    private val sitePersistenceService: SitePersistenceService,
+    private val siteRepository: SiteRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(limit: Int, startAfter: String?, externalIds: Collection<String>? = null): PageStartAfterResponse<SiteGateInputResponse> {
-        val sitesPage = saasClient.getSites(limit, startAfter, externalIds)
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputResponse> {
 
-        val validEntries = toValidSites(sitesPage.values)
+        val sitesPage = if (externalIds != null) {
+            siteRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+        } else {
+            siteRepository.findAll(PageRequest.of(page, size))
+        }
 
-        return PageStartAfterResponse(
-            total = sitesPage.total,
-            nextStartAfter = sitesPage.nextStartAfter,
-            content = validEntries,
-            invalidEntries = sitesPage.values.size - validEntries.size
+        return PageResponse(
+            page = page,
+            totalElements = sitesPage.totalElements,
+            totalPages = sitesPage.totalPages,
+            contentSize = sitesPage.content.size,
+            content = toValidSite(sitesPage)
         )
     }
 
-    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
-        val fetchResponse = saasClient.getBusinessPartner(externalId)
-
-        when (fetchResponse.status) {
-            FetchResponse.Status.OK -> return toValidSiteInput(fetchResponse.businessPartner!!)
-            FetchResponse.Status.NOT_FOUND -> throw BpdmNotFoundException("Site", externalId)
+    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputResponse> {
+        return sitePage.content.map { site ->
+            site.toSiteGateInputResponse(site)
         }
+    }
+
+    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
+        val siteRecord = siteRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Site", externalId)
+
+        return siteRecord.toSiteGateInputResponse(siteRecord)
     }
 
     /**
@@ -137,19 +146,12 @@ class SiteService(
      */
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        val sitesSaas = toSaasModels(sites)
-        saasClient.upsertSites(sitesSaas)
-
         // create changelog entry if all goes well from saasClient
         sites.forEach { site ->
             changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
         }
 
         sitePersistenceService.persistSitesBP(sites)
-
-        deleteParentRelationsOfSites(sites)
-
-        upsertParentRelations(sites)
     }
 
     /**
@@ -158,84 +160,6 @@ class SiteService(
     fun toSaasModels(sites: Collection<SiteGateInputRequest>): Collection<BusinessPartnerSaas> {
         val parentLegalEntitiesByExternalId = getParentLegalEntities(sites)
         return sites.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId]) }
-    }
-
-    private fun upsertParentRelations(sites: Collection<SiteGateInputRequest>) {
-        val relations = sites.map {
-            SaasClient.SiteLegalEntityRelation(
-                siteExternalId = it.externalId,
-                legalEntityExternalId = it.legalEntityExternalId
-            )
-        }.toList()
-        saasClient.upsertSiteRelations(relations)
-    }
-
-    private fun deleteParentRelationsOfSites(sites: Collection<SiteGateInputRequest>) {
-        val sitesPage = saasClient.getSites(externalIds = sites.map { it.externalId })
-        saasClient.deleteParentRelations(sitesPage.values)
-    }
-
-    private fun toValidSites(partners: Collection<BusinessPartnerSaas>): Collection<SiteGateInputResponse> {
-        return partners.mapNotNull {
-            try {
-                toValidSiteInput(it)
-
-            } catch (e: RuntimeException) {
-                logger.warn { "${getLogDescription(it)} will be ignored: ${e.message}" }
-                null
-            }
-        }
-    }
-
-    private fun toValidSiteInput(partner: BusinessPartnerSaas): SiteGateInputResponse {
-        if (!validateSiteBusinessPartner(partner)) {
-            throw SaasInvalidRecordException(partner.id)
-        }
-        return inputSaasMappingService.toInputSite(partner)
-    }
-
-    private fun validateSiteBusinessPartner(partner: BusinessPartnerSaas): Boolean {
-        val logMessageStart = getLogDescription(partner)
-        return validateAddresses(partner, logMessageStart)
-                && validateLegalEntityParents(partner, logMessageStart)
-                && validateNames(partner, logMessageStart)
-    }
-
-    private fun getLogDescription(partner: BusinessPartnerSaas) =
-        "SaaS business partner for site with ${if (partner.id != null) "ID " + partner.id else "external id " + partner.externalId}"
-
-    private fun validateNames(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
-        if (partner.names.size > 1) {
-            logger.warn { "$logMessageStart has multiple names." }
-        }
-        if (partner.names.isEmpty()) {
-            logger.warn { "$logMessageStart does not have a name." }
-            return false
-        }
-        return true
-    }
-
-    private fun validateAddresses(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
-        if (partner.addresses.size > 1) {
-            logger.warn { "$logMessageStart has multiple main addresses" }
-        }
-        if (partner.addresses.isEmpty()) {
-            logger.warn { "$logMessageStart does not have a main address" }
-            return false
-        }
-        return true
-    }
-
-    private fun validateLegalEntityParents(partner: BusinessPartnerSaas, logMessageStart: String): Boolean {
-        val numLegalEntityParents = inputSaasMappingService.toParentLegalEntityExternalIds(partner).size
-        if (numLegalEntityParents > 1) {
-            logger.warn { "$logMessageStart has multiple parent legal entities." }
-        }
-        if (numLegalEntityParents == 0) {
-            logger.warn { "$logMessageStart does not have a parent legal entity." }
-            return false
-        }
-        return true
     }
 
     private fun getParentLegalEntities(sites: Collection<SiteGateInputRequest>): Map<String, BusinessPartnerSaas> {
