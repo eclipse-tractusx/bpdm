@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
@@ -48,7 +47,7 @@ class BusinessPartnerFetchService(
 ) {
 
     /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityResponse]
+     * Fetch a business partner by [bpn] and return as [PoolLegalEntityResponse]
      */
     fun findLegalEntityIgnoreCase(bpn: String): PoolLegalEntityResponse {
         return findLegalEntityOrThrow(bpn).toDto()
@@ -60,7 +59,7 @@ class BusinessPartnerFetchService(
 
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityResponse]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [PoolLegalEntityResponse]
      */
     @Transactional
     fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): PoolLegalEntityResponse {
