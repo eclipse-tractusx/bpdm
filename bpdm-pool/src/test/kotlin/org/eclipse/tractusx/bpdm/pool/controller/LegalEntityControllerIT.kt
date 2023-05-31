@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -152,17 +153,17 @@ class LegalEntityControllerIT @Autowired constructor(
         val createResponse = poolClient.legalEntities().createBusinessPartners(given)
             .entities.single()
         val givenBpnL = createResponse.legalEntity.bpnl
-        val givenBpnA = createResponse.legalAddress.bpna
+        val givenBpnA = createResponse.legalEntity.legalAddress.bpna
 
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
                 legalEntity = legalEntity.copy(
-                    bpnl = givenBpnL
+                    bpnl = givenBpnL,
+                    legalAddress = legalEntity.legalAddress.copy(
+                        bpna = givenBpnA,
+                        bpnLegalEntity = givenBpnL
+                    )
                 ),
-                legalAddress = legalAddress.copy(
-                    bpna = givenBpnA,
-                    bpnLegalEntity = givenBpnL
-                )
             )
         }
 
@@ -187,7 +188,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val createResponse = poolClient.legalEntities().createBusinessPartners(given)
         val createdEntity = createResponse.entities.toList()[1]
         val bpnL = createdEntity.legalEntity.bpnl
-        val bpnA = createdEntity.legalAddress.bpna
+        val bpnA = createdEntity.legalEntity.legalAddress.bpna
 
         val toUpdate = listOf(
             RequestValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT"),
@@ -197,13 +198,14 @@ class LegalEntityControllerIT @Autowired constructor(
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
                 legalEntity = legalEntity.copy(
-                    bpnl = bpnL
+                    bpnl = bpnL,
+                    legalAddress = legalEntity.legalAddress.copy(
+                        bpna = bpnA,
+                        bpnLegalEntity = bpnL
+                    )
                 ),
-                legalAddress = legalAddress.copy(
-                    bpna = bpnA,
-                    bpnLegalEntity = bpnL
+                
                 )
-            )
         }
 
         val response = poolClient.legalEntities().updateBusinessPartners(toUpdate)
@@ -231,7 +233,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalAddress) }
+            .map { toLegalAddressResponse(it.legalEntity.legalAddress) }
 
         val bpnsToSearch = givenLegalEntities.map { it.legalEntity.bpnl }
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
@@ -259,7 +261,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalAddress) }
+            .map { toLegalAddressResponse(it.legalEntity.legalAddress) }
             .take(2)
 
         val bpnsToSearch = expected.map { it.bpnLegalEntity }.plus("NONEXISTENT")
@@ -292,7 +294,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpnl }
-        val response = poolClient.legalEntities().searchSites(bpnsToSearch).body
+        val response = poolClient.legalEntities().searchSites(bpnsToSearch).body?.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -320,7 +322,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .first() // search for first
 
         val identifierToFind = expected.identifiers.first()
-        val response = poolClient.legalEntities().getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey)
+        val response = poolClient.legalEntities().getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -350,7 +352,7 @@ class LegalEntityControllerIT @Autowired constructor(
         var identifierToFind = expected.identifiers.first()
         identifierToFind = identifierToFind.copy(value = changeCase(identifierToFind.value))
 
-        val response = poolClient.legalEntities().getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey)
+        val response = poolClient.legalEntities().getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -379,7 +381,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val bpnToFind = expected.bpnl
 
-        val response = poolClient.legalEntities().getLegalEntity(bpnToFind)
+        val response = poolClient.legalEntities().getLegalEntity(bpnToFind).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -407,7 +409,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .first() // search for first
 
         val bpnToFind = changeCase(expected.bpnl)
-        val response = poolClient.legalEntities().getLegalEntity(bpnToFind)
+        val response = poolClient.legalEntities().getLegalEntity(bpnToFind).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -436,7 +438,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpnl }.plus("NONEXISTENT") // also search for nonexistent BPN
-        val response = poolClient.legalEntities().searchSites(bpnsToSearch).body
+        val response = poolClient.legalEntities().searchSites(bpnsToSearch).body?.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -464,7 +466,7 @@ class LegalEntityControllerIT @Autowired constructor(
         poolClient.legalEntities().setLegalEntityCurrentness(bpnL)
 
 
-        val updatedCurrentness = poolClient.legalEntities().getLegalEntity(bpnL).currentness
+        val updatedCurrentness = poolClient.legalEntities().getLegalEntity(bpnL).legalEntity.currentness
         assertThat(updatedCurrentness).isBetween(instantBeforeCurrentnessUpdate, Instant.now())
     }
 
@@ -488,7 +490,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFieldsMatchingRegexes(".*${PoolLegalEntityResponse::bpnl.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityResponse::bpnl.name}")
             .isEqualTo(expected)
     }
 
@@ -509,7 +511,7 @@ class LegalEntityControllerIT @Autowired constructor(
         .exchange().expectStatus().isOk
         .returnResult<PoolLegalEntityResponse>()
         .responseBody
-        .blockFirst()!!.currentness
+        .blockFirst()!!.legalEntity.currentness
 
     private fun changeCase(value: String): String {
         return if (value.uppercase() != value)

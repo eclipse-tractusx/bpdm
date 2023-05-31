@@ -243,94 +243,178 @@ object ResponseValues {
 
 
     val legalEntity1 = PoolLegalEntityResponse(
-        bpnl = CommonValues.bpnL1,
         legalName = CommonValues.name1,
-        identifiers = listOf(identifier1),
-        legalForm = legalForm1,
-        states = listOf(leStatus1),
-        classifications = listOf(classification1, classification2),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
-        createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        LegalEntityResponse(
+            bpnl = CommonValues.bpnL1,
+            identifiers = listOf(identifier1),
+            legalForm = legalForm1,
+            states = listOf(leStatus1),
+            classifications = listOf(classification1, classification2),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
+            legalAddress = LogisticAddressResponse(
+                bpna = CommonValues.bpnA1,
+                physicalPostalAddress = PhysicalPostalAddressResponse(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null,
+                    areaPart = AreaDistrictResponse(
+                        administrativeAreaLevel1 = null,
+                        administrativeAreaLevel2 = null,
+                        district = null,
+                    ),
+                    street = null,
+                    baseAddress = BasePostalAddressResponse(
+                        geographicCoordinates = null,
+                        country = country1,
+                        postalCode = null,
+                        city = CommonValues.locality1,
+                    )
+                ),
+                bpnLegalEntity = null,
+                bpnSite = null,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now()
+            )
+        )
     )
 
     val legalEntity2 = PoolLegalEntityResponse(
-        bpnl = CommonValues.bpnL2,
         legalName = CommonValues.name3,
-        identifiers = listOf(identifier2),
-        legalForm = legalForm2,
-        states = listOf(leStatus2),
-        classifications = listOf(classification3, classification4),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
-        createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        LegalEntityResponse(
+            bpnl = CommonValues.bpnL2,
+            identifiers = listOf(identifier2),
+            legalForm = legalForm2,
+            states = listOf(leStatus2),
+            classifications = listOf(classification3, classification4),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
+            legalAddress = LogisticAddressResponse(
+                bpna = CommonValues.bpnA1,
+                physicalPostalAddress = PhysicalPostalAddressResponse(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null,
+                    areaPart = AreaDistrictResponse(
+                        administrativeAreaLevel1 = null,
+                        administrativeAreaLevel2 = null,
+                        district = null,
+                    ),
+                    street = null,
+                    baseAddress = BasePostalAddressResponse(
+                        geographicCoordinates = null,
+                        country = country2,
+                        postalCode = null,
+                        city = CommonValues.locality3,
+                    )
+                ),
+                bpnLegalEntity = null,
+                bpnSite = null,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now()
+            )
+        )
     )
 
     val legalEntity3 = PoolLegalEntityResponse(
-        bpnl = CommonValues.bpnL3,
         legalName = CommonValues.name5,
-        identifiers = listOf(identifier3),
-        legalForm = legalForm3,
-        states = listOf(leStatus3),
-        classifications = listOf(classification5),
-        currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
-        createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        LegalEntityResponse(
+            bpnl = CommonValues.bpnL3,
+            identifiers = listOf(identifier3),
+            legalForm = legalForm3,
+            states = listOf(leStatus3),
+            classifications = listOf(classification5),
+            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
+            legalAddress = LogisticAddressResponse(
+                bpna = CommonValues.bpnA1,
+                physicalPostalAddress = PhysicalPostalAddressResponse(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null,
+                    areaPart = AreaDistrictResponse(
+                        administrativeAreaLevel1 = null,
+                        administrativeAreaLevel2 = null,
+                        district = null,
+                    ),
+                    street = null,
+                    baseAddress = BasePostalAddressResponse(
+                        geographicCoordinates = null,
+                        country = country3,
+                        postalCode = null,
+                        city = CommonValues.locality5,
+                    )
+                ),
+                bpnLegalEntity = null,
+                bpnSite = null,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now()
+            )
+        )
     )
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
-        legalEntity = PoolLegalEntityResponse(
+        legalName = CommonValues.name1,
+        legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpnL1,
-            legalName = CommonValues.name1,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)),
             legalForm = legalForm1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
-            updatedAt = CommonValues.now
-        ),
-        legalAddress = addressPartner1.copy(
-            bpnLegalEntity = legalEntity1.bpnl,
-            isLegalAddress = true
+            updatedAt = CommonValues.now,
+            legalAddress = addressPartner1.copy(
+                bpnLegalEntity = legalEntity1.legalEntity.bpnl,
+                isLegalAddress = true
+            ),
         ),
         index = CommonValues.index1
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
-        legalEntity = PoolLegalEntityResponse(
+        legalName = CommonValues.name3,
+        legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpnL2,
-            legalName = CommonValues.name3,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)),
             legalForm = legalForm2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
-            updatedAt = CommonValues.now
-        ),
-        legalAddress = addressPartner2.copy(
-            bpnLegalEntity = legalEntity2.bpnl,
-            isLegalAddress = true
+            updatedAt = CommonValues.now,
+            legalAddress = addressPartner2.copy(
+                bpnLegalEntity = legalEntity2.legalEntity.bpnl,
+                isLegalAddress = true
+            ),
         ),
         index = CommonValues.index2
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
-        legalEntity = PoolLegalEntityResponse(
+        legalName = CommonValues.name5,
+        legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpnL3,
-            legalName = CommonValues.name5,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)),
             legalForm = legalForm3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
-            updatedAt = CommonValues.now
-        ),
-        legalAddress = addressPartner3.copy(
-            bpnLegalEntity = legalEntity3.bpnl,
-            isLegalAddress = true
+            updatedAt = CommonValues.now,
+            legalAddress = addressPartner3.copy(
+                bpnLegalEntity = legalEntity3.legalEntity.bpnl,
+                isLegalAddress = true
+            )
         ),
         index = CommonValues.index3
     )

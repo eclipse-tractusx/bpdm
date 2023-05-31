@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityUpdateRequest", description = "Request for updating a business partner record of type legal entity")
+@Schema(name = "LegalEntityPartnerUpdateRequest", description = "Request for updating a business partner record of type legal entity")
 data class LegalEntityPartnerUpdateRequest(
     @Schema(description = "Business Partner Number")
     val bpnl: String,
