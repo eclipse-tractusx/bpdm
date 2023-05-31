@@ -33,7 +33,7 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 }
 
 fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
-    return LegalEntityMatchResponse(score, this.toDto())
+    return LegalEntityMatchResponse(score = score, legalEntity = this.toDto(), legalName = this.legalName.value)
 }
 
 fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchResponse {
@@ -43,16 +43,34 @@ fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchRes
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
         legalEntity = toDto(),
-        legalAddress = legalAddress.toDto(),
-        index = entryId
+        index = entryId,
+        legalName = legalName.value,
     )
 }
 
-fun LegalEntity.toDto(): PoolLegalEntityResponse {
+fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityResponse {
     return PoolLegalEntityResponse(
+        legalName = legalName.value,
+        LegalEntityResponse(
+            bpnl = bpn,
+            identifiers = identifiers.map { it.toDto() },
+            legalShortName = legalName.shortName,
+            legalForm = legalForm?.toDto(),
+            states = states.map { it.toDto() },
+            classifications = classifications.map { it.toDto() },
+            relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
+            currentness = currentness,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            legalAddress = legalAddress.toDto()
+        )
+    )
+}
+
+fun LegalEntity.toDto(): LegalEntityResponse {
+    return LegalEntityResponse(
         bpnl = bpn,
         identifiers = identifiers.map { it.toDto() },
-        legalName = legalName.value,
         legalShortName = legalName.shortName,
         legalForm = legalForm?.toDto(),
         states = states.map { it.toDto() },
@@ -60,7 +78,8 @@ fun LegalEntity.toDto(): PoolLegalEntityResponse {
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        legalAddress = legalAddress.toDto()
     )
 }
 
@@ -70,6 +89,7 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
         legalEntity = toDto(),
         addresses = listOf(legalAddress.toDto()),
         sites = emptyList(),
+        legalName = legalName.value,
     )
 }
 

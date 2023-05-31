@@ -19,21 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateResponse", description = "Created business partner of type legal entity")
 data class LegalEntityPartnerCreateResponse(
-    @field:JsonUnwrapped
-    val legalEntity: PoolLegalEntityResponse,
 
-    @Schema(description = "Address of the official seat of this of the legal entity")
-    val legalAddress: LogisticAddressResponse,
+    @get:Schema(description = "Legal name the partner goes by")
+    val legalName: String,
+
+    @Schema(description = "Legal Entity")
+    val legalEntity: LegalEntityResponse,
 
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
     val index: String?
