@@ -145,21 +145,19 @@ class GateQueryService(
             return emptyList()
         }
 
-        var pageStartAfter: String? = null
+        var page = 0
         val validContent = mutableListOf<LegalEntityGateInputResponse>()
-        var invalidEntries = 0
 
         do {
             val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
-            //pageStartAfter = pageResponse.nextStartAfter
+            page++
             validContent.addAll(pageResponse.content)
-            invalidEntries += 0 //pageResponse.invalidEntries //TODO Needs to be changed according to the removal of SaaS
-        } while (pageStartAfter != null)
+        } while (pageResponse.content.isNotEmpty())
 
-        logger.info { "Gate returned ${validContent.size} valid legal entities, $invalidEntries were invalid" }
+        logger.info { "Gate returned ${validContent.size} valid legal entities" }
         return validContent
     }
 
@@ -168,21 +166,19 @@ class GateQueryService(
             return emptyList()
         }
 
-        var pageStartAfter: String? = null
+        var page = 0
         val validContent = mutableListOf<SiteGateInputResponse>()
-        var invalidEntries = 0
 
         do {
             val pageResponse = gateClient.sites().getSitesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
-            //pageStartAfter = pageResponse.nextStartAfter
-            validContent.addAll(pageResponse.content) //TODO Needs to be changed according to the removal of SaaS
-            invalidEntries += 0//pageResponse.invalidEntries
-        } while (pageStartAfter != null)
+            page++
+            validContent.addAll(pageResponse.content)
+        } while (pageResponse.content.isNotEmpty())
 
-        logger.info { "Gate returned ${validContent.size} valid sites, $invalidEntries were invalid" }
+        logger.info { "Gate returned ${validContent.size} valid sites" }
         return validContent
     }
 
@@ -191,21 +187,19 @@ class GateQueryService(
             return emptyList()
         }
 
-        var pageStartAfter: String? = null
+        var page = 0
         val validContent = mutableListOf<AddressGateInputResponse>()
-        var invalidEntries = 0
 
         do {
             val pageResponse = gateClient.addresses().getAddressesByExternalIds(
                 externalIds = externalIds,
-                paginationRequest = PaginationRequest(0, bridgeConfigProperties.queryPageSize)
+                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
-            //pageStartAfter = pageResponse.nextStartAfter
+            page++
             validContent.addAll(pageResponse.content)
-            invalidEntries += 0 //TODO Needs to be changed according to the removal of SaaS
-        } while (pageStartAfter != null)
+        } while (pageResponse.content.isNotEmpty())
 
-        logger.info { "Gate returned ${validContent.size} valid addresses, $invalidEntries were invalid" }
+        logger.info { "Gate returned ${validContent.size} valid addresses" }
         return validContent
     }
 
