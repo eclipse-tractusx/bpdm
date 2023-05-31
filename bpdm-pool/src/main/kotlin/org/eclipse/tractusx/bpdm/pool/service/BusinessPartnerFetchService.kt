@@ -52,7 +52,7 @@ class BusinessPartnerFetchService(
      * Fetch a business partner by [bpn] and return as [PoolLegalEntityResponse]
      */
     fun findLegalEntityIgnoreCase(bpn: String): PoolLegalEntityResponse {
-        return findLegalEntityOrThrow(bpn).toDto()
+        return findLegalEntityOrThrow(bpn).toPoolLegalEntity()
     }
 
     fun findBusinessPartnerIgnoreCase(bpn: String): BusinessPartnerResponse {
@@ -65,7 +65,7 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): PoolLegalEntityResponse {
-        return findLegalEntityOrThrow(identifierType, identifierValue).toDto()
+        return findLegalEntityOrThrow(identifierType, identifierValue).toPoolLegalEntity()
     }
 
 
@@ -87,7 +87,7 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun fetchDtosByBpns(bpns: Collection<String>): Collection<PoolLegalEntityResponse> {
-        return fetchByBpns(bpns).map { it.toDto() }
+        return fetchByBpns(bpns).map { it.toPoolLegalEntity() }
     }
 
     /**
