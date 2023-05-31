@@ -15,6 +15,7 @@ on:
     branches:
       - main
       - rc/**
+      - feat/dockerhub_images_release
   pull_request:
     branches:
       - main
