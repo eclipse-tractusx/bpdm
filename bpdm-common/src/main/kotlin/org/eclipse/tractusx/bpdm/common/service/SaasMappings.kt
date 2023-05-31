@@ -70,7 +70,8 @@ object SaasMappings {
             ?: throw BpdmMappingException(this::class, LegalEntityDto::class, "No legal name", externalId ?: "Unknown")
         return LegalEntityDto(
             identifiers = identifiers.filter { it.type?.technicalKey != BPN_TECHNICAL_KEY }.map { toLegalEntityIdentifierDto(it) },
-            legalName = legalName,
+            legalName = legalName.value,
+            legalShortName = legalName.shortName,
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),
@@ -100,11 +101,11 @@ object SaasMappings {
             )
     }
 
-    private fun BusinessPartnerSaas.toNameDto(): NameDto? {
+    private fun BusinessPartnerSaas.toNameDto(): SassNameDto? {
         if (names.size > 1) {
             logger.warn { "Business Partner with ID $externalId has more than one name" }
         }
-        return names.map { toDto(it) }
+        return names.map { SassNameDto(it) }
             .firstOrNull()
     }
 
@@ -120,13 +121,6 @@ object SaasMappings {
         return AddressIdentifierDto(
             value = identifier.value ?: throw BpdmNullMappingException(IdentifierSaas::class, AddressIdentifierDto::class, IdentifierSaas::value),
             type = toReference(identifier.type)
-        )
-    }
-
-    fun toDto(name: NameSaas): NameDto {
-        return NameDto(
-            name.value,
-            name.shortName
         )
     }
 
@@ -297,6 +291,14 @@ object SaasMappings {
                 externalId = relation.endNode
             )
         )
+    }
+
+    private data class SassNameDto(
+        val value: String,
+        val shortName: String?
+    ) {
+        constructor(nameSass: NameSaas) :
+                this(value = nameSass.value, shortName = nameSass.shortName)
     }
 
 }

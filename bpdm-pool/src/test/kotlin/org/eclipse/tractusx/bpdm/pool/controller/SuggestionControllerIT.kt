@@ -69,7 +69,7 @@ class SuggestionControllerIT @Autowired constructor(
             .build()
 
         private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.legalEntity
-        private val expectedLegalEntityName = expectedLegalEntity.legalName.value
+        private val expectedLegalEntityName = expectedLegalEntity.legalName
         private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
@@ -94,7 +94,7 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(
                     expectedLegalEntity.legalForm!!.name,
                     EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH,
-                    expectedLegalEntity.legalName.value
+                    expectedLegalEntity.legalName
                 ),
                 Arguments.of(
                     expectedLegalEntity.states.first().officialDenotation,
@@ -147,7 +147,7 @@ class SuggestionControllerIT @Autowired constructor(
         @JvmStatic
         fun argumentsSuggestPropertyValuesNonLatin(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(nonlatinLegalEntity.legalName.value, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
+                Arguments.of(nonlatinLegalEntity.legalName, EndpointValues.CATENA_SUGGESTION_LE_NAME_PATH),
                 Arguments.of(nonlatinLegalEntity.legalForm!!.name, EndpointValues.CATENA_SUGGESTION_LE_LEGAL_FORM_PATH),
                 Arguments.of(nonlatinSite.site.name, EndpointValues.CATENA_SUGGESTION_SITE_NAME_PATH),
                 Arguments.of(

@@ -126,13 +126,6 @@ class SaasRequestMappingService(
 
     private fun toLegalFormSaas(technicalKey: String?) = if (technicalKey != null) LegalFormSaas(technicalKey = technicalKey) else null
 
-    private fun NameDto.toSaasModel(): NameSaas {
-        return NameSaas(
-            value = value,
-            shortName = shortName
-        )
-    }
-
     private fun LegalEntityIdentifierDto.toSaasModel(): IdentifierSaas {
         return IdentifierSaas(
             type = TypeKeyNameUrlSaas(type),
@@ -183,9 +176,6 @@ class SaasRequestMappingService(
             types = listOf(SaasAddressType.LEGAL_ALTERNATIVE.toSaasTypeDto())
         )
     }
-
-    private fun toNamesSaas(nameDto: NameDto): List<NameSaas> =
-        listOf(nameDto.toSaasModel())
 
     private fun toNamesSaas(name: String?): List<NameSaas> =
         name?.let { listOf(NameSaas(value = it)) } ?: emptyList()

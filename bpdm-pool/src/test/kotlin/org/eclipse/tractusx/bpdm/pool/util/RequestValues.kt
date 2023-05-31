@@ -25,12 +25,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
 
-    val name1 = NameDto(value = CommonValues.name1, shortName = null)
-    val name2 = NameDto(value = CommonValues.name2, shortName = null)
-    val name3 = NameDto(value = CommonValues.name3, shortName = null)
-    val name4 = NameDto(value = CommonValues.name4, shortName = null)
-    val name5 = NameDto(value = CommonValues.name5, shortName = null)
-
     val identifierType1 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
     val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
     val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
@@ -163,7 +157,8 @@ object RequestValues {
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = name1,
+            legalName = CommonValues.name1,
+            legalShortName = null,
             identifiers = listOf(identifier1),
             legalForm = CommonValues.legalFormTechnicalKey1,
             states = listOf(leStatus1),
@@ -175,7 +170,8 @@ object RequestValues {
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = name3,
+            legalName = CommonValues.name3,
+            legalShortName = null,
             identifiers = listOf(identifier2),
             legalForm = CommonValues.legalFormTechnicalKey2,
             states = listOf(leStatus2),
@@ -187,7 +183,8 @@ object RequestValues {
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
-            legalName = name5,
+            legalName = CommonValues.name5,
+            legalShortName = null,
             identifiers = listOf(identifier3),
             legalForm = CommonValues.legalFormTechnicalKey3,
             states = listOf(leStatus3),

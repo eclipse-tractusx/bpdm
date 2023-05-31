@@ -28,7 +28,10 @@ data class LegalEntityDto(
     val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
 
     @get:Schema(description = "Legal name the partner goes by")
-    val legalName: NameDto,
+    val legalName: String,
+
+    @get:Schema(description = "Abbreviated name or shorthand")
+    val legalShortName: String?,
 
     @get:Schema(description = "Technical key of the legal form")
     val legalForm: String? = null,

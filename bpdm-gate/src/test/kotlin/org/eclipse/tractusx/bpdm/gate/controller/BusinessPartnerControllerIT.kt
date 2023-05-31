@@ -45,6 +45,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerCandidateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.OptionalLsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.TypeMatchResponse
 import org.eclipse.tractusx.bpdm.gate.config.TypeMatchConfigProperties
@@ -88,6 +89,12 @@ class BusinessPartnerControllerIT @Autowired constructor(
         }
     }
 
+    val candidate1 = BusinessPartnerCandidateDto(
+        identifiers = listOf(RequestValues.genericIdentifier),
+        names = listOf(RequestValues.name1),
+        address = RequestValues.address1
+    )
+
     /**
      * Given business partner candidate whose properties are matching existing legal entity
      * When invoking type match for candidate
@@ -96,7 +103,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `match legal entity type`() {
         //make sure candidate is valid by providing identifier and name
-        val givenCandidate = with(RequestValues.candidate1) {
+        val givenCandidate = with(candidate1) {
             copy(
                 identifiers = listOf(RequestValues.genericIdentifier),
                 names = listOf(RequestValues.name1)
@@ -121,7 +128,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `match no type`() {
         //make sure candidate is valid by providing identifier and name
-        val givenCandidate = with(RequestValues.candidate1) {
+        val givenCandidate = with(candidate1) {
             copy(
                 identifiers = listOf(RequestValues.genericIdentifier),
                 names = listOf(RequestValues.name1)
@@ -146,7 +153,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `accept candidate without name`() {
         //create candidate without name
-        val givenCandidate = with(RequestValues.candidate1) {
+        val givenCandidate = with(candidate1) {
             copy(
                 identifiers = listOf(RequestValues.genericIdentifier),
                 names = emptyList()
@@ -171,7 +178,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `accept candidate without identifier`() {
         //create candidate without identifier
-        val givenCandidate = with(RequestValues.candidate1) {
+        val givenCandidate = with(candidate1) {
             copy(
                 identifiers = emptyList(),
                 names = listOf(RequestValues.name1)
@@ -196,7 +203,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `refuse candidate without name and identifier`() {
         //create candidate without identifier
-        val givenCandidate = with(RequestValues.candidate1) {
+        val givenCandidate = with(candidate1) {
             copy(
                 identifiers = emptyList(),
                 names = emptyList()

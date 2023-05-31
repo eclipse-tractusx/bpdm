@@ -210,10 +210,11 @@ class OpenSearchControllerIT @Autowired constructor(
 
     private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
 
-        return poolClient.legalEntities().getLegalEntities(LegalEntityPropertiesSearchRequest(name,null,null,null)
-        , AddressPropertiesSearchRequest.EmptySearchRequest
-        , SitePropertiesSearchRequest.EmptySearchRequest
-        , PaginationRequest()
+        return poolClient.legalEntities().getLegalEntities(
+            LegalEntityPropertiesSearchRequest(name, null, null, null),
+            AddressPropertiesSearchRequest.EmptySearchRequest,
+            SitePropertiesSearchRequest.EmptySearchRequest,
+            PaginationRequest()
         )
     }
 
@@ -222,7 +223,7 @@ class OpenSearchControllerIT @Autowired constructor(
             val pageResult = searchBusinessPartnerByName(name)
 
             assertThat(pageResult.content).isNotEmpty
-            assertThat(pageResult.content.first()).matches { it.legalEntity.legalName.value == name }
+            assertThat(pageResult.content.first()).matches { it.legalEntity.legalName == name }
         }
     }
 
