@@ -70,13 +70,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
         {{- if and $pool (not (empty (index $pool "base-url"))) -}}
             {{- index $pool "base-url" -}}
         {{- else -}}
-            {{- printf "%s-bpdm-pool" .Release.Name -}}
+            {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s-bpdm-pool" .Release.Name -}}
+        {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
     {{- end -}}
 {{- else -}}
-    {{- printf "%s-bpdm-pool" .Release.Name -}}
+    {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
 {{- end -}}
 {{- end }}
 
@@ -89,13 +89,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
         {{- if and $gate (not (empty (index $gate "base-url"))) -}}
             {{- index $gate "base-url" -}}
         {{- else -}}
-            {{- printf "%s-bpdm-gate" .Release.Name -}}
+            {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s-bpdm-gate" .Release.Name -}}
+        {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
     {{- end -}}
 {{- else -}}
-    {{- printf "%s-bpdm-gate" .Release.Name -}}
+    {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
 {{- end -}}
 {{- end }}
 

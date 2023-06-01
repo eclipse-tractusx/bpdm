@@ -70,13 +70,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
         {{- if and $pool (not (empty (index $pool "base-url"))) -}}
             {{- index $pool "base-url" -}}
         {{- else -}}
-            {{- printf "%s-bpdm-pool" .Release.Name -}}
+            {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
         {{- end -}}
     {{- else -}}
-        {{- printf "%s-bpdm-pool" .Release.Name -}}
+        {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
     {{- end -}}
 {{- else -}}
-    {{- printf "%s-bpdm-pool" .Release.Name -}}
+    {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
 {{- end -}}
 {{- end }}
 

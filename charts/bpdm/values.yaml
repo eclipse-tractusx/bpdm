@@ -8,9 +8,11 @@ bpdm-gate:
     tag: ""
   # ... more configuration for bpdm-gate if need...
   applicationConfig:
-    bpdm:
-      pool:
-        base-url: ""
+# Use this configuration to specify custom base-urls for the bpdm pool and gate.
+# Only needed if the automatic default deploy is not used.
+#    bpdm:
+#      pool:
+#        base-url: ""
   postgres:
     enabled: false
 
@@ -38,11 +40,13 @@ bpdm-bridge-dummy:
     pullPolicy: Always
     tag: ""
   applicationConfig:
-    bpdm:
-      pool:
-        base-url: ""
-      gate:
-        base-url: ""
+# Use this configuration to specify custom base-urls for the bpdm pool and gate.
+# Only needed if the automatic default deploy is not used.
+#    bpdm:
+#      pool:
+#        base-url: ""
+#      gate:
+#        base-url: ""
   postgres:
     enabled: false
 
@@ -65,16 +69,11 @@ opensearch:
       memory: 2Gi
   config:
     opensearch.yml: |
-      # Bind to all interfaces because we don't know what
-      # IP address Docker will assign to us.
       network.host: 0.0.0.0
-      # Disable security
       plugins.security.disabled: true
   securityConfig:
     enabled: false
   extraInitContainers:
-    # Image that performs the sysctl operation to modify Kernel settings
-    # needed sometimes to avoid boot errors
     - name: sysctl
       image: docker.io/bitnami/bitnami-shell:10-debian-10-r199
       imagePullPolicy: "IfNotPresent"
