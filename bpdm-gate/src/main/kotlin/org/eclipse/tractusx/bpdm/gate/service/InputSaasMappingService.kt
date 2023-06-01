@@ -40,6 +40,8 @@ class InputSaasMappingService(
     fun toInputLegalEntity(businessPartner: BusinessPartnerSaas): LegalEntityGateInputResponse {
         return LegalEntityGateInputResponse(
             legalEntity = businessPartner.toLegalEntityDto(),
+            // TODO Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
+            legalAddress = SaasMappings.convertSaasAdressesToLogisticAddressDto(businessPartner.addresses, businessPartner.id),
             externalId = businessPartner.externalId!!,
             bpn = businessPartner.identifiers.find { it.type?.technicalKey == SaasMappings.BPN_TECHNICAL_KEY }?.value,
             processStartedAt = businessPartner.lastModifiedAt,

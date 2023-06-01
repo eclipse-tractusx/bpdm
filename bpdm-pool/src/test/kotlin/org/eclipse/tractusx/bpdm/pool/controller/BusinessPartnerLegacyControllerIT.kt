@@ -153,7 +153,8 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
             uuid = "",
             legalName = toConvert.legalName,
             legalEntity = toConvert.legalEntity,
-            addresses = listOf(toConvert.legalEntity.legalAddress),
+            legalAddress = toConvert.legalAddress,
+            addresses = listOf(toConvert.legalAddress),
             sites = emptyList()
         )
     }

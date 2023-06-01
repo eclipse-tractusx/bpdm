@@ -49,7 +49,7 @@ class SaasRequestMappingService(
             legalForm = toLegalFormSaas(legalEntity.legalForm),
             profile = toPartnerProfileSaas(legalEntity.classifications),
             // TODO Known issue: name, state, BPN-A and identifiers of the legal address are not transferred to SaaS yet!!
-            addresses = toAddressesSaasModel(legalEntity.legalAddress)
+            addresses = toAddressesSaasModel(request.legalAddress)
         )
     }
 

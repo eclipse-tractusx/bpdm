@@ -74,8 +74,6 @@ object SaasMappings {
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),
-            // TODO Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
-            legalAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 

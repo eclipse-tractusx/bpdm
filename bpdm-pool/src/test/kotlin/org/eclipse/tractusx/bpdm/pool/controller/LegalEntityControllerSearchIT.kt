@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -70,6 +71,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     private lateinit var givenPartner2: LegalEntityResponse
     private lateinit var legalName1: String
     private lateinit var legalName2: String
+    private lateinit var legalAddress1: LogisticAddressResponse
+    private lateinit var legalAddress2: LogisticAddressResponse
 
     @BeforeEach
     fun beforeEach() {
@@ -82,7 +85,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
         legalName1 = givenStructure[0].legalEntity.legalName
         legalName2 = givenStructure[1].legalEntity.legalName
-
+        legalAddress1 = givenStructure[0].legalEntity.legalAddress
+        legalAddress2 = givenStructure[1].legalEntity.legalAddress
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
 
@@ -97,8 +101,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageResponse(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1),
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1),
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
             )
         )
 
@@ -117,12 +121,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageResponse(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageResponse(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
             )
         )
 
@@ -143,7 +147,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expected = PageResponse(
             1, 1, 0, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2)
+                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
             )
         )
 

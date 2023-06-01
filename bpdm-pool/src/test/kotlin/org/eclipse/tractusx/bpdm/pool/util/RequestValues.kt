@@ -162,8 +162,8 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
-            legalAddress = logisticAddress1
         ),
+        legalAddress = logisticAddress1,
         legalName = CommonValues.name1,
         index = CommonValues.index1
     )
@@ -175,8 +175,8 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
-            legalAddress = logisticAddress2
         ),
+        legalAddress = logisticAddress2,
         legalName = CommonValues.name3,
         index = CommonValues.index2
     )
@@ -188,8 +188,8 @@ object RequestValues {
             legalForm = CommonValues.legalFormTechnicalKey3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),
-            legalAddress = logisticAddress3
         ),
+        legalAddress = logisticAddress3,
         legalName = CommonValues.name5,
         index = CommonValues.index3
     )
@@ -197,19 +197,22 @@ object RequestValues {
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL1,
         legalName = legalEntityCreate1.legalName,
-        legalEntity = legalEntityCreate1.legalEntity
+        legalEntity = legalEntityCreate1.legalEntity,
+        legalAddress = legalEntityCreate1.legalAddress,
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL2,
         legalName = legalEntityCreate2.legalName,
-        legalEntity = legalEntityCreate2.legalEntity
+        legalEntity = legalEntityCreate2.legalEntity,
+        legalAddress = legalEntityCreate2.legalAddress,
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL3,
         legalName = legalEntityCreate3.legalName,
-        legalEntity = legalEntityCreate3.legalEntity
+        legalEntity = legalEntityCreate3.legalEntity,
+        legalAddress = legalEntityCreate3.legalAddress,
     )
 
     val siteCreate1 = SitePartnerCreateRequest(

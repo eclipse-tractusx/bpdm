@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import java.time.LocalDateTime
 
@@ -34,6 +35,9 @@ data class LegalEntityGateInputResponse(
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
+
+    @get:Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: LogisticAddressDto,
 
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,

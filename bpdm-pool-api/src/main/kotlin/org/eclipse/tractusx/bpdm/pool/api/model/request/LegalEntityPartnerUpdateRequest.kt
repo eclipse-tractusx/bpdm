@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 
@@ -36,5 +37,9 @@ data class LegalEntityPartnerUpdateRequest(
     val legalName: String,
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto
-)
+    val legalEntity: LegalEntityDto,
+
+    @get:Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: LogisticAddressDto,
+
+    )
