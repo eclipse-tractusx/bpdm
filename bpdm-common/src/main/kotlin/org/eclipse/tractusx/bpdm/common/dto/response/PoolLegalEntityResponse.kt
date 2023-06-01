@@ -19,14 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "PoolLegalEntityResponse", description = "Legal entity record")
 data class PoolLegalEntityResponse(
 
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
 
-    @Schema(description = "Legal Entity")
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
 )
