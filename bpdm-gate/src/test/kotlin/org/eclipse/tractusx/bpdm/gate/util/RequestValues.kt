@@ -236,7 +236,6 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
-        legalAddress = address1
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -245,7 +244,6 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
         classifications = listOf(classification3, classification4),
-        legalAddress = address2
     )
 
     val legalEntity3 = LegalEntityDto(
@@ -254,11 +252,11 @@ object RequestValues {
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
         classifications = listOf(classification1, classification2),
-        legalAddress = address3
     )
 
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
+        legalAddress = address1,
         legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1
@@ -266,6 +264,7 @@ object RequestValues {
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
+        legalAddress = address2,
         legalNameParts = arrayOf(CommonValues.name3),
         externalId = CommonValues.externalId2,
         bpn = CommonValues.bpn2
@@ -273,6 +272,7 @@ object RequestValues {
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
+        legalAddress = address3,
         legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
         bpn = CommonValues.bpn3

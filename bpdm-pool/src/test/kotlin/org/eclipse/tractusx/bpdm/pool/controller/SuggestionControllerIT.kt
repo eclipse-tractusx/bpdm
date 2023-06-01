@@ -70,11 +70,11 @@ class SuggestionControllerIT @Autowired constructor(
 
         private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.legalEntity
         private val expectedLegalEntityName = ResponseValues.legalEntityUpsert1.legalName
-        private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalEntity.legalAddress
+        private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
         private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.legalEntity
-        private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalEntity.legalAddress
+        private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
         private val nonlatinSite = ResponseValues.siteUpsert3
 
         @JvmStatic

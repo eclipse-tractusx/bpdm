@@ -144,7 +144,7 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
 fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
 
     val addressInputRequest = AddressGateInputRequest(
-        address = legalEntity.legalAddress,
+        address = legalAddress,
         externalId = getMainAddressForLegalEntityExternalId(externalId),
         legalEntityExternalId = externalId
     )
@@ -295,7 +295,6 @@ fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
     return LegalEntityDto(
         legalForm = legalForm,
         legalShortName = legalName.shortName,
-        legalAddress = legalAddress.toLogisticAddressDto(),
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
         identifiers = mapToLegalEntityIdentifierDto(identifiers)
@@ -324,6 +323,7 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
 
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
+        legalAddress = legalAddress.toLogisticAddressDto(),
         externalId = legalEntity.externalId,
         bpn = legalEntity.bpn,
         processStartedAt = null
