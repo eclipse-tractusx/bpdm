@@ -19,9 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityMatchResponse", description = "Match with score for a business partner record of type legal entity")
 data class LegalEntityMatchResponse(
     @Schema(description = "Relative quality score of the match. The higher the better")
@@ -30,6 +34,6 @@ data class LegalEntityMatchResponse(
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
 
-    @Schema(description = "Legal Entity")
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse
 )

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
@@ -31,7 +32,7 @@ data class LegalEntityPartnerCreateResponse(
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
 
-    @Schema(description = "Legal Entity")
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
 
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
