@@ -16,12 +16,13 @@ on:
         type: boolean
         description: Whether to also push created image or just build it
 
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}/${{ inputs.imageName }}
-  DOCKER_IMAGE_NAMESPACE: "tractusx"
+  DOCKER_HUB_REGISTRY_NAMESPACE: tractusx
   DOCKER_IMAGE_NAME: ${{ inputs.imageName }}
 
 jobs:
@@ -29,14 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       # Create SemVer or ref tags dependent of trigger event
       - name: Docker meta
-        id: meta1
+        id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
@@ -56,63 +56,42 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v3
+      - name: Build and push to GHCR Registry ${{ env.REGISTRY }}/${{env.IMAGE_NAME }}
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: ${{ inputs.push }}
           file: ${{ inputs.dockerfilePath }}
-          tags: ${{ steps.meta1.outputs.tags }}
-          labels: ${{ steps.meta1.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      # Create SemVer or ref tags dependent of trigger event
-      - name: Docker meta hub
-        id: meta2
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.DOCKER_IMAGE_NAMESPACE }}/${{ env.DOCKER_IMAGE_NAME }}
-          # Automatically prepare image tags; See action docs for more examples.
-          # semver patter will generate tags like these for example :1 :1.2 :1.2.3
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: DockerHub login
+      - name: Login to Docker Hub
         env:
           DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
-        if: env.DOCKER_HUB_USER == ''
+        if: env.DOCKER_HUB_USER != ''
         uses: docker/login-action@v2
         with:
-          # Use existing DockerHub credentials present as secrets
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push for Docker Hub ${{ env.DOCKER_HUB_REGISTRY_NAMESPACE }}/${{ env.DOCKER_IMAGE_NAME }}
         env:
           DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
-        if: env.DOCKER_HUB_USER == ''
-        uses: docker/build-push-action@v3
+        if: env.DOCKER_HUB_USER != ''
+        uses: docker/build-push-action@v4
         with:
           context: .
-          # Build image for verification purposes on every trigger event. Only push if event is not a PR
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta2.outputs.tags }}
-          labels: ${{ steps.meta2.outputs.labels }}
+          push: ${{ inputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      # https://github.com/peter-evans/dockerhub-description
-      # Important step to push image description to DockerHub
       - name: Update Docker Hub description
         env:
           DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
-        if: env.DOCKER_HUB_USER == ''
+        if: env.DOCKER_HUB_USER != ''
         uses: peter-evans/dockerhub-description@v3
         with:
-        # readme-filepath defaults to toplevel README.md, Only necessary if you have a dedicated file with your 'Notice for docker images'
-        # readme-filepath: path/to/dedicated/notice-for-docker-image.md
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          repository: ${{ env.DOCKER_IMAGE_NAMESPACE }}/${{ env.DOCKER_IMAGE_NAME }}
+          repository: ${{ env.DOCKER_HUB_REGISTRY_NAMESPACE }}/${{ env.DOCKER_IMAGE_NAME }}
+          readme-filepath: DOCKER_NOTICE.md
