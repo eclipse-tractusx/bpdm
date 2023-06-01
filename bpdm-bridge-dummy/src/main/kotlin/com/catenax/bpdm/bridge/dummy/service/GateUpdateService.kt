@@ -41,7 +41,7 @@ class GateUpdateService(
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, entity.poolLegalEntity.bpnl, true)
+            buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, entity.legalEntity.bpnl, true)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
         }
         for (errorInfo in responseWrapper.errors) {
@@ -57,7 +57,7 @@ class GateUpdateService(
         externalIdByBpn: Map<String, String>
     ) {
         for (entity in responseWrapper.entities) {
-            val bpn = entity.poolLegalEntity.bpnl
+            val bpn = entity.legalEntity.bpnl
             val externalId = externalIdByBpn[bpn]
             buildSuccessSharingStateDto(LsaType.LegalEntity, externalId, bpn, false)
                 ?.let { gateClient.sharingState().upsertSharingState(it) }
