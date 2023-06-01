@@ -200,11 +200,35 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-
-    val legalEntityResponse1 = LegalEntityResponse(
+    val legalEntityResponsePool1 = PoolLegalEntityResponse(
         bpnl = CommonValues.bpn1,
         identifiers = listOf(identifier1, identifier2),
+        legalShortName = CommonValues.shortName1,
         legalName = CommonValues.name1,
+        legalForm = legalForm1,
+        states = listOf(leBusinessStatus1),
+        classifications = listOf(classification1, classification2),
+        currentness = CommonValues.now,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
+    )
+
+    val legalEntityResponsePool2 = PoolLegalEntityResponse(
+        bpnl = CommonValues.bpn2,
+        identifiers = listOf(identifier3, identifier4),
+        legalShortName = CommonValues.shortName3,
+        legalName = CommonValues.name3,
+        legalForm = legalForm2,
+        states = listOf(leBusinessStatus2),
+        classifications = listOf(classification3, classification4),
+        currentness = CommonValues.now,
+        createdAt = CommonValues.now,
+        updatedAt = CommonValues.now
+    )
+
+    val legalEntityResponseGate1 = LegalEntityResponse(
+        bpnl = CommonValues.bpn1,
+        identifiers = listOf(identifier1, identifier2),
         legalShortName = CommonValues.shortName1,
         legalForm = legalForm1,
         states = listOf(leBusinessStatus1),
@@ -214,10 +238,9 @@ object ResponseValues {
         updatedAt = CommonValues.now
     )
 
-    val legalEntityResponse2 = LegalEntityResponse(
+    val legalEntityResponseGate2 = LegalEntityResponse(
         bpnl = CommonValues.bpn2,
         identifiers = listOf(identifier3, identifier4),
-        legalName = CommonValues.name3,
         legalShortName = CommonValues.shortName3,
         legalForm = legalForm2,
         states = listOf(leBusinessStatus2),
@@ -263,13 +286,15 @@ object ResponseValues {
     )
 
     val legalEntityGateOutput1 = LegalEntityGateOutput(
-        legalEntity = legalEntityResponse1,
+        legalEntity = legalEntityResponseGate1,
+        legalNameParts = arrayOf(CommonValues.name1),
         legalAddress = logisticAddress1,
         externalId = CommonValues.externalId1
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
-        legalEntity = legalEntityResponse2,
+        legalEntity = legalEntityResponseGate2,
+        legalNameParts = arrayOf(CommonValues.name3),
         legalAddress = logisticAddress2,
         externalId = CommonValues.externalId2
     )

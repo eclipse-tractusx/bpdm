@@ -28,9 +28,13 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityPartnerCreateRequest", description = "Request for creating new business partner record of type legal entity")
 data class LegalEntityPartnerCreateRequest(
+
+    @get:Schema(description = "Legal name the partner goes by")
+    val legalName: String,
+
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
     @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
     val index: String?
- )
+)

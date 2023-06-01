@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -65,7 +65,7 @@ class LegalEntityController(
         )
     }
 
-    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityResponse {
+    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -78,7 +78,7 @@ class LegalEntityController(
 
     override fun searchSites(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<LegalEntityResponse>> {
+    ): ResponseEntity<Collection<PoolLegalEntityResponse>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }

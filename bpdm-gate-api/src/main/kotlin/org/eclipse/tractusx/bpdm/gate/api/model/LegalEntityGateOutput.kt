@@ -30,6 +30,9 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityGateOutput", description = "Legal entity with references")
 data class LegalEntityGateOutput(
+
+    val legalNameParts: Array<String> = emptyArray(),
+
     @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
 

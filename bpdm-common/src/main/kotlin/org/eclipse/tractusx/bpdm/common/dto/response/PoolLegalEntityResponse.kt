@@ -23,14 +23,16 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
-
-@Schema(name = "LegalEntityResponse", description = "Legal entity record")
-data class LegalEntityResponse(
+@Schema(name = "PoolLegalEntityResponse", description = "Legal entity record")
+data class PoolLegalEntityResponse(
     @get:Schema(description = "Business Partner Number of this legal entity")
     val bpnl: String,
 
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
     val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
+
+    @get:Schema(description = "Legal name the partner goes by")
+    val legalName: String,
 
     @get:Schema(description = "Abbreviated name or shorthand")
     val legalShortName: String? = null,

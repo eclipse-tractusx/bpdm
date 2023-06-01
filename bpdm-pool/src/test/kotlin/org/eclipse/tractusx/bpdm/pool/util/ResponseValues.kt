@@ -50,7 +50,7 @@ object ResponseValues {
         LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
     private val identifier3 =
         LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)
-    
+
     val legalForm1 = LegalFormResponse(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
@@ -242,7 +242,7 @@ object ResponseValues {
     )
 
 
-    val legalEntity1 = LegalEntityResponse(
+    val legalEntity1 = PoolLegalEntityResponse(
         bpnl = CommonValues.bpnL1,
         legalName = CommonValues.name1,
         identifiers = listOf(identifier1),
@@ -254,7 +254,7 @@ object ResponseValues {
         updatedAt = CommonValues.now
     )
 
-    val legalEntity2 = LegalEntityResponse(
+    val legalEntity2 = PoolLegalEntityResponse(
         bpnl = CommonValues.bpnL2,
         legalName = CommonValues.name3,
         identifiers = listOf(identifier2),
@@ -266,7 +266,7 @@ object ResponseValues {
         updatedAt = CommonValues.now
     )
 
-    val legalEntity3 = LegalEntityResponse(
+    val legalEntity3 = PoolLegalEntityResponse(
         bpnl = CommonValues.bpnL3,
         legalName = CommonValues.name5,
         identifiers = listOf(identifier3),
@@ -279,7 +279,7 @@ object ResponseValues {
     )
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
-        legalEntity = LegalEntityResponse(
+        legalEntity = PoolLegalEntityResponse(
             bpnl = CommonValues.bpnL1,
             legalName = CommonValues.name1,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)),
@@ -298,7 +298,7 @@ object ResponseValues {
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
-        legalEntity = LegalEntityResponse(
+        legalEntity = PoolLegalEntityResponse(
             bpnl = CommonValues.bpnL2,
             legalName = CommonValues.name3,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)),
@@ -317,7 +317,7 @@ object ResponseValues {
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
-        legalEntity = LegalEntityResponse(
+        legalEntity = PoolLegalEntityResponse(
             bpnl = CommonValues.bpnL3,
             legalName = CommonValues.name5,
             identifiers = listOf(LegalEntityIdentifierResponse(CommonValues.identifierValue3, RequestValues.identifierType3, CommonValues.issuingBody3)),

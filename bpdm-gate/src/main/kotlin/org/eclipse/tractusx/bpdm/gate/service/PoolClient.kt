@@ -35,7 +35,7 @@ class PoolClient(
     private val webClient: WebClient,
     private val objectMapper: ObjectMapper
 ) {
-    fun searchLegalEntities(bpnLs: Collection<String>): Collection<LegalEntityResponse> {
+    fun searchLegalEntities(bpnLs: Collection<String>): Collection<PoolLegalEntityResponse> {
         if (bpnLs.isEmpty()) return emptyList()
 
         val legalEntities = try {
@@ -44,7 +44,7 @@ class PoolClient(
                 .uri("/legal-entities/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnLs))
                 .retrieve()
-                .bodyToMono<Collection<LegalEntityResponse>>()
+                .bodyToMono<Collection<PoolLegalEntityResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search legal entities failed.", e)

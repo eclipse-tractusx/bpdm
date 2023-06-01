@@ -73,7 +73,7 @@ class BusinessPartnerBuildService(
 
         val legalEntityWithIndexByBpnMap = validRequests
             .mapIndexed { i, request ->
-                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[i], legalEntityMetadataMap)
+                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[i], request.legalName, legalEntityMetadataMap)
                 legalEntity.legalAddress = createLogisticAddress(request.legalEntity.legalAddress, bpnAs[i], legalEntity, addressMetadataMap)
                 Pair(legalEntity, request.index)
             }
@@ -175,7 +175,7 @@ class BusinessPartnerBuildService(
         val requestByBpnMap = requests.associateBy { it.bpnl }
         legalEntities.forEach {
             val request = requestByBpnMap.get(it.bpn)!!
-            updateLegalEntity(it, request.legalEntity, legalEntityMetadataMap)
+            updateLegalEntity(it, request.legalEntity, request.legalName, legalEntityMetadataMap)
             updateLogisticAddress(it.legalAddress, request.legalEntity.legalAddress, addressMetadataMap)
         }
 
@@ -307,10 +307,11 @@ class BusinessPartnerBuildService(
     private fun createLegalEntity(
         request: LegalEntityDto,
         bpnL: String,
+        legalNameValue: String,
         metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
         val legalName = Name(
-            value = request.legalName,
+            value = legalNameValue,
             shortName = request.legalShortName
         )
         val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
@@ -322,7 +323,7 @@ class BusinessPartnerBuildService(
             currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
         )
 
-        return updateLegalEntity(partner, request, metadataMap)
+        return updateLegalEntity(partner, request, legalNameValue, metadataMap)
     }
 
     private fun createSite(
@@ -345,13 +346,14 @@ class BusinessPartnerBuildService(
     private fun updateLegalEntity(
         partner: LegalEntity,
         request: LegalEntityDto,
+        legalName: String,
         metadataMap: LegalEntityMetadataMappingDto
     ): LegalEntity {
 
         partner.currentness = createCurrentnessTimestamp()
 
         partner.legalName = Name(
-            value = request.legalName,
+            value = legalName,
             shortName = request.legalShortName
         )
 

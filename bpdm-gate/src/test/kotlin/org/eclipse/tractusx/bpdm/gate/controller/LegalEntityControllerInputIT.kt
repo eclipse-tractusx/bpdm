@@ -240,10 +240,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
+        // TODO check administrativeAreaLevel1
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
-            expectedPage
-        )
+                expectedPage
+            )
     }
 
 
@@ -286,8 +287,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
-            expectedPage
-        )
+                expectedPage
+            )
     }
 
     /**

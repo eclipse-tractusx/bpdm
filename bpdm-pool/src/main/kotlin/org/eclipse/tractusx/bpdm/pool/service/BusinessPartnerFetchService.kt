@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
@@ -47,9 +47,9 @@ class BusinessPartnerFetchService(
 ) {
 
     /**
-     * Fetch a business partner by [bpn] and return as [LegalEntityResponse]
+     * Fetch a business partner by [bpn] and return as [PoolLegalEntityResponse]
      */
-    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityResponse {
+    fun findLegalEntityIgnoreCase(bpn: String): PoolLegalEntityResponse {
         return findLegalEntityOrThrow(bpn).toDto()
     }
 
@@ -59,10 +59,10 @@ class BusinessPartnerFetchService(
 
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityResponse]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [PoolLegalEntityResponse]
      */
     @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityResponse {
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): PoolLegalEntityResponse {
         return findLegalEntityOrThrow(identifierType, identifierValue).toDto()
     }
 
@@ -84,7 +84,7 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns] and map to dtos
      */
     @Transactional
-    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityResponse> {
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<PoolLegalEntityResponse> {
         return fetchByBpns(bpns).map { it.toDto() }
     }
 

@@ -43,7 +43,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
             identifiers = toLegalEntityIdentifiersSaas(legalEntity.identifiers, request.bpn),
-            names = toNamesSaas(legalEntity.legalName),
+            names = toNamesSaas(request.legalNameParts[0]),
             // TODO Only the first state is passed to SaaS, any others are ignored
             status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
             legalForm = toLegalFormSaas(legalEntity.legalForm),
