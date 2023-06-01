@@ -69,7 +69,7 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
 
 }
 
-fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddress {
+fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddress {
 
     return PhysicalPostalAddress(
         geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
@@ -81,11 +81,11 @@ fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddr
         city = baseAddress.city,
         districtLevel1 = areaPart.district,
         street = street?.toStreetEntity(),
-        companyPostCode = companyPostalCode,
-        industrialZone = industrialZone,
-        building = building,
-        floor = floor,
-        door = door
+        companyPostCode = basePhysicalAddress.companyPostalCode,
+        industrialZone = basePhysicalAddress.industrialZone,
+        building = basePhysicalAddress.building,
+        floor = basePhysicalAddress.floor,
+        door = basePhysicalAddress.door
     )
 
 }
@@ -94,7 +94,7 @@ fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
     return GeographicCoordinate(longitude, latitude, altitude)
 }
 
-private fun StreetDto.toStreetEntity(): Street {
+private fun StreetGateDto.toStreetEntity(): Street {
     return Street(
         name = name,
         houseNumber = houseNumber,
@@ -206,9 +206,9 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
 }
 
 //Logistic Address mapping to LogisticAddressDto
-fun LogisticAddress.toLogisticAddressDto(): LogisticAddressDto {
+fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
 
-    val logisticAddress = LogisticAddressDto(
+    val logisticAddress = LogisticAddressGateDto(
         name = name,
         states = mapToDtoStates(states),
         identifiers = mapToDtoIdentifiers(identifiers),
@@ -249,7 +249,7 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
 
 }
 
-fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto {
+fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDto {
 
     val basePostalAddressDto = BasePostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
@@ -265,14 +265,16 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto {
         district = districtLevel1
     )
 
-    return PhysicalPostalAddressDto(
+    return PhysicalPostalAddressGateDto(
         baseAddress = basePostalAddressDto,
-        companyPostalCode = companyPostCode,
-        industrialZone = industrialZone,
-        building = building,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            companyPostalCode = companyPostCode,
+            industrialZone = industrialZone,
+            building = building,
+            floor = floor,
+            door = door,
+        ),
         street = street?.toStreetDto(),
-        floor = floor,
-        door = door,
         areaPart = areaDistrictDto
     )
 
@@ -282,8 +284,8 @@ fun GeographicCoordinate.toGeographicCoordinateDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-private fun Street.toStreetDto(): StreetDto {
-    return StreetDto(
+private fun Street.toStreetDto(): StreetGateDto {
+    return StreetGateDto(
         name = name,
         houseNumber = houseNumber,
         milestone = milestone,
@@ -314,10 +316,6 @@ fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification
     return classification.map { ClassificationDto(it.value, it.code, it.type) }
 }
 
-fun Name.toNameDto(): NameDto {
-    return NameDto(value, shortName)
-}
-
 //LegalEntity mapping to LegalEntityGateInputResponse
 fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
 
@@ -331,9 +329,9 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
 }
 
 //Site mapping to SiteDto
-fun Site.toSiteDto(): SiteDto {
+fun Site.toSiteDto(): SiteGateDto {
 
-    return SiteDto(
+    return SiteGateDto(
         name = name,
         states = mapToDtoSitesStates(states),
         mainAddress = mainAddress.toLogisticAddressDto()

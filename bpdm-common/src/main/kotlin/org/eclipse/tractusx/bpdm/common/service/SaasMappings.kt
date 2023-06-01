@@ -203,11 +203,13 @@ object SaasMappings {
         }
 
         return PhysicalPostalAddressDto(
-            companyPostalCode = map.companyPostCode(),
-            industrialZone = map.industrialZone(),
-            building = map.building(),
-            floor = map.floor(),
-            door = map.door(),
+            basePhysicalAddress = BasePhysicalAddressDto(
+                companyPostalCode = map.companyPostCode(),
+                industrialZone = map.industrialZone(),
+                building = map.building(),
+                floor = map.floor(),
+                door = map.door(),
+            ),
             areaPart = AreaDistrictDto(
                 administrativeAreaLevel1 = map.adminAreaLevel1(),
                 administrativeAreaLevel2 = map.adminAreaLevel2(),

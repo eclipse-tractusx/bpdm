@@ -20,13 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toLogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings.toSiteDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.springframework.stereotype.Service
@@ -37,37 +30,6 @@ class InputSaasMappingService(
     private val bpnConfigProperties: BpnConfigProperties
 ) {
 
-    fun toInputLegalEntity(businessPartner: BusinessPartnerSaas): LegalEntityGateInputResponse {
-        return LegalEntityGateInputResponse(
-            legalEntity = businessPartner.toLegalEntityDto(),
-            // TODO Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
-            legalAddress = SaasMappings.convertSaasAdressesToLogisticAddressDto(businessPartner.addresses, businessPartner.id),
-            externalId = businessPartner.externalId!!,
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == SaasMappings.BPN_TECHNICAL_KEY }?.value,
-            processStartedAt = businessPartner.lastModifiedAt,
-        )
-    }
-
-    fun toInputAddress(businessPartner: BusinessPartnerSaas, legalEntityExternalId: String?, siteExternalId: String?): AddressGateInputResponse {
-        return AddressGateInputResponse(
-            address = businessPartner.toLogisticAddressDto(),
-            externalId = businessPartner.externalId!!,
-            legalEntityExternalId = legalEntityExternalId,
-            siteExternalId = siteExternalId,
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
-            processStartedAt = businessPartner.lastModifiedAt,
-        )
-    }
-
-    fun toInputSite(businessPartner: BusinessPartnerSaas): SiteGateInputResponse {
-        return SiteGateInputResponse(
-            site = businessPartner.toSiteDto(),
-            externalId = businessPartner.externalId!!,
-            legalEntityExternalId = toParentLegalEntityExternalId(businessPartner)!!,
-            bpn = businessPartner.identifiers.find { it.type?.technicalKey == bpnConfigProperties.id }?.value,
-            processStartedAt = businessPartner.lastModifiedAt,
-        )
-    }
 
     fun toParentLegalEntityExternalId(businessPartner: BusinessPartnerSaas): String? {
         return toParentLegalEntityExternalIds(businessPartner).firstOrNull()
