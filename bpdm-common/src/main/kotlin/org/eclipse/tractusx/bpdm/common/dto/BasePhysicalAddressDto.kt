@@ -17,28 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
-data class LegalEntityGateInputRequest(
+@Schema(name = "BasePhysicalAddressDto", description = "Address record for the basical physical address fields")
+data class BasePhysicalAddressDto(
 
-    val legalNameParts: Array<String> = emptyArray(),
+    @get:Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
+    val companyPostalCode: String? = null,
 
-    @Schema(description = "legal Enity")
-    val legalEntity: LegalEntityDto,
+    @get:Schema(description = "The practice of designating an area for industrial development")
+    val industrialZone: String? = null,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressGateDto,
+    @get:Schema(description = "Describes a specific building within the address")
+    val building: String? = null,
 
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
-    val externalId: String,
+    @get:Schema(description = "Describes the floor/level the delivery shall take place")
+    val floor: String? = null,
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
+    @get:Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
+    val door: String? = null,
 )

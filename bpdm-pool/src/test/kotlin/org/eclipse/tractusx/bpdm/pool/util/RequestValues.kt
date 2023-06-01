@@ -85,11 +85,13 @@ object RequestValues {
     val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
 
     val postalAddress1 = PhysicalPostalAddressDto(
-        companyPostalCode = CommonValues.postCode2,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            companyPostalCode = CommonValues.postCode2,
+            industrialZone = CommonValues.industrialZone1,
+            building = CommonValues.building1,
+            floor = CommonValues.floor1,
+            door = CommonValues.door1,
+        ),
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
             administrativeAreaLevel2 = CommonValues.county1,
@@ -105,10 +107,12 @@ object RequestValues {
     )
 
     val postalAddress2 = PhysicalPostalAddressDto(
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone2,
+            building = CommonValues.building2,
+            floor = CommonValues.floor2,
+            door = CommonValues.door2
+        ),
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
             administrativeAreaLevel2 = CommonValues.county2,
@@ -124,10 +128,12 @@ object RequestValues {
     )
 
     val postalAddress3 = PhysicalPostalAddressDto(
-        industrialZone = CommonValues.industrialZone3,
-        building = CommonValues.building3,
-        floor = CommonValues.floor3,
-        door = CommonValues.door3,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone3,
+            building = CommonValues.building3,
+            floor = CommonValues.floor3,
+            door = CommonValues.door3
+        ),
         areaPart = AreaDistrictDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_3,
             administrativeAreaLevel2 = CommonValues.county3,

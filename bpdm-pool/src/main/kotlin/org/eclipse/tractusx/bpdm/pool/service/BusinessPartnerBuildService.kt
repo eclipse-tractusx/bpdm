@@ -445,11 +445,11 @@ class BusinessPartnerBuildService(
             city = baseAddress.city,
             districtLevel1 = area.district,
             street = physicalAddress.street?.let { createStreet(it) },
-            companyPostCode = physicalAddress.companyPostalCode,
-            industrialZone = physicalAddress.industrialZone,
-            building = physicalAddress.building,
-            floor = physicalAddress.floor,
-            door = physicalAddress.door
+            companyPostCode = physicalAddress.basePhysicalAddress.companyPostalCode,
+            industrialZone = physicalAddress.basePhysicalAddress.industrialZone,
+            building = physicalAddress.basePhysicalAddress.building,
+            floor = physicalAddress.basePhysicalAddress.floor,
+            door = physicalAddress.basePhysicalAddress.door
         )
     }
 

@@ -23,9 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.model.SaasAddressType
 import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.springframework.stereotype.Service
@@ -141,13 +139,13 @@ class SaasRequestMappingService(
         )
     }
 
-    private fun toAddressesSaasModel(address: LogisticAddressDto): Collection<AddressSaas> {
+    private fun toAddressesSaasModel(address: LogisticAddressGateDto): Collection<AddressSaas> {
         val physicalAddress = address.physicalPostalAddress.let { toPhysicalAddressSaasModel(it) }
         val alternativeAddress = address.alternativePostalAddress?.let { toAlternativeAddressSaasModel(it) }
         return listOfNotNull(physicalAddress, alternativeAddress)
     }
 
-    private fun toPhysicalAddressSaasModel(address: PhysicalPostalAddressDto): AddressSaas {
+    private fun toPhysicalAddressSaasModel(address: PhysicalPostalAddressGateDto): AddressSaas {
         val mapping = SaasDtoToSaasAddressMapping(address.baseAddress)
         return AddressSaas(
             country = mapping.country(),

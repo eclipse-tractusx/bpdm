@@ -36,10 +36,15 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(streetDto?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
         assertThat(streetDto?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
 
-        assertThat(addressDto.physicalPostalAddress.industrialZone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)?.name)
-        assertThat(addressDto.physicalPostalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
-        assertThat(addressDto.physicalPostalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
-        assertThat(addressDto.physicalPostalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.industrialZone).isEqualTo(
+            findObject(
+                addressSaas.thoroughfares,
+                SaasThoroughfareType.INDUSTRIAL_ZONE
+            )?.name
+        )
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
     }
 
     @Test
@@ -81,10 +86,15 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(streetDto?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
         assertThat(streetDto?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
 
-        assertThat(addressDto.physicalPostalAddress.industrialZone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)?.name)
-        assertThat(addressDto.physicalPostalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
-        assertThat(addressDto.physicalPostalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
-        assertThat(addressDto.physicalPostalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.industrialZone).isEqualTo(
+            findObject(
+                addressSaas.thoroughfares,
+                SaasThoroughfareType.INDUSTRIAL_ZONE
+            )?.name
+        )
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
     }
 
     @Test
@@ -110,10 +120,15 @@ class SaasDtoToSaasAddressMappingTest {
         assertThat(streetDto?.direction).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.direction)
         assertThat(streetDto?.milestone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.STREET)?.shortName)
 
-        assertThat(addressDto.physicalPostalAddress.industrialZone).isEqualTo(findObject(addressSaas.thoroughfares, SaasThoroughfareType.INDUSTRIAL_ZONE)?.name)
-        assertThat(addressDto.physicalPostalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
-        assertThat(addressDto.physicalPostalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
-        assertThat(addressDto.physicalPostalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.industrialZone).isEqualTo(
+            findObject(
+                addressSaas.thoroughfares,
+                SaasThoroughfareType.INDUSTRIAL_ZONE
+            )?.name
+        )
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.building).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.BUILDING))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.floor).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.LEVEL))
+        assertThat(addressDto.physicalPostalAddress.basePhysicalAddress.door).isEqualTo(findValue(addressSaas.premises, SaasPremiseType.ROOM))
     }
 
     private fun <T : TypeValueSaas> findValue(values: Collection<T>, enumType: SaasType): String? {
