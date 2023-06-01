@@ -40,4 +40,7 @@ data class AlternativePostalAddressResponse(
 
     @get:Schema(description = "The type of this specified delivery")
     val type: DeliveryServiceType = DeliveryServiceType.PO_BOX,
+
+    @get:Schema(description = "Delivery Service Qualifier")
+    val deliveryServiceQualifier: String = "",
 )
