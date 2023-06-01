@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
     val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
-
+    
     @get:Schema(description = "Abbreviated name or shorthand")
     val legalShortName: String?,
 

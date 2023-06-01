@@ -100,7 +100,7 @@ object SaasMappings {
             )
     }
 
-    fun BusinessPartnerSaas.toNameDto(): SassNameDto? {
+    private fun BusinessPartnerSaas.toNameDto(): SassNameDto? {
         if (names.size > 1) {
             logger.warn { "Business Partner with ID $externalId has more than one name" }
         }
@@ -292,7 +292,7 @@ object SaasMappings {
         )
     }
 
-    data class SassNameDto(
+    private data class SassNameDto(
         val value: String,
         val shortName: String?
     ) {

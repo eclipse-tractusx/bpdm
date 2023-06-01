@@ -41,7 +41,8 @@ class PoolUpdateService(
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
                 legalEntity = it.legalEntity,
-                index = it.externalId
+                index = it.externalId,
+                legalName = it.legalNameParts[0]
             )
         }
 
@@ -53,7 +54,8 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
                 legalEntity = it.legalEntity,
-                bpnl = it.bpn!!
+                bpnl = it.bpn!!,
+                legalName = it.legalNameParts[0]
             )
         }
 

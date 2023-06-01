@@ -250,7 +250,6 @@ object RequestValues {
 
     val legalEntity3 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
-        legalName = CommonValues.name1,
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -274,6 +273,7 @@ object RequestValues {
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
+        legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
         bpn = CommonValues.bpn3
     )

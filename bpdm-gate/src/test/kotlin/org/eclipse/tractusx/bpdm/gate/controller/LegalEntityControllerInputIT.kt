@@ -61,8 +61,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
     val gateClient: GateClient,
-    private val legalEntityRepository: LegalEntityRepository,
-    private val testHelpers: DbTestHelpers
+    private val legalEntityRepository: LegalEntityRepository
 ) {
     companion object {
         @RegisterExtension
@@ -241,12 +240,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             content = expectedLegalEntities
         )
 
+        // TODO check administrativeAreaLevel1
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
-            expectedPage
-        )
-
-        testHelpers.assertRecursively(pageResponse).isEqualTo(expectedResponse)
+                expectedPage
+            )
     }
 
 
@@ -289,8 +287,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
-            expectedPage
-        )
+                expectedPage
+            )
     }
 
     /**

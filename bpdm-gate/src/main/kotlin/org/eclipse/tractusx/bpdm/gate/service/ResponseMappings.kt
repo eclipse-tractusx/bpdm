@@ -293,7 +293,6 @@ private fun Street.toStreetDto(): StreetDto {
 
 fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
     return LegalEntityDto(
-        legalName = legalName.value,
         legalForm = legalForm,
         legalShortName = legalName.shortName,
         legalAddress = legalAddress.toLogisticAddressDto(),
