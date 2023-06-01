@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -28,7 +29,7 @@ import org.springframework.data.domain.Page
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
+fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?, datatype: OutputInputEnum): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         externalId = externalId,
@@ -37,7 +38,8 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
-        site = site
+        site = site,
+        dataType = datatype
     )
 
     logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
@@ -122,7 +124,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
-    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site)
+    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site, OutputInputEnum.Input)
 
     return site
 }
@@ -157,7 +159,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
-    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null)
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, OutputInputEnum.Input)
 
     return legalEntity
 
@@ -347,4 +349,18 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
         processStartedAt = null //TODO Remove this?
     )
 
+}
+
+//Logistic Address mapping to AddressGateInputResponse
+fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputResponse {
+
+    val addressGateOutputResponse = AddressGateOutputResponse(
+        address = logisticAddressPage.toLogisticAddressDto(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntity?.externalId,
+        siteExternalId = site?.externalId,
+        bpn = bpn,
+    )
+
+    return addressGateOutputResponse
 }
