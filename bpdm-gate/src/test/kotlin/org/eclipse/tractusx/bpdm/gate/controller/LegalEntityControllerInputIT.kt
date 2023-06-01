@@ -61,7 +61,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     private val webTestClient: WebTestClient,
     private val objectMapper: ObjectMapper,
     val gateClient: GateClient,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
 ) {
     companion object {
         @RegisterExtension
