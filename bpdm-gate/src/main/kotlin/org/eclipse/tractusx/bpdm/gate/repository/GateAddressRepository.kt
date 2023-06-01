@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -31,6 +32,9 @@ interface GateAddressRepository : PagingAndSortingRepository<LogisticAddress, Lo
 
     fun findByExternalId(externalId: String): LogisticAddress?
 
-    fun findByExternalIdIn(externalId: Collection<String>?, pageable: Pageable): Page<LogisticAddress>
+    fun findByExternalIdAndDataType(externalId: String, dataType: OutputInputEnum): LogisticAddress
 
+    fun findByExternalIdInAndDataType(externalId: Collection<String>?, dataType: OutputInputEnum, pageable: Pageable): Page<LogisticAddress>
+
+    fun findByDataType(dataType: OutputInputEnum, pageable: Pageable): Page<LogisticAddress>
 }

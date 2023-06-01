@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 
 @Entity
 @Table(
@@ -50,6 +51,10 @@ class LogisticAddress(
 
     @Column(name = "name")
     var name: String? = null,
+
+    @Column(name = "data_type")
+    @Enumerated(EnumType.STRING)
+    var dataType: OutputInputEnum,
 
     @Embedded
     var physicalPostalAddress: PhysicalPostalAddress,

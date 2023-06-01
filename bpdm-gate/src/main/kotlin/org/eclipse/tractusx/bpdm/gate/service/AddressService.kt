@@ -23,12 +23,13 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -55,9 +56,9 @@ class AddressService(
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
 
         val logisticAddressPage = if (externalIds != null) {
-            addressRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+            addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
         } else {
-            addressRepository.findAll(PageRequest.of(page, size))
+            addressRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
         return PageResponse(
@@ -77,7 +78,8 @@ class AddressService(
 
     fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
 
-        val logisticAddress = addressRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Logistic Address", externalId)
+        val logisticAddress =
+            addressRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
 
         return logisticAddress.toAddressGateInputResponse(logisticAddress)
 
@@ -87,43 +89,62 @@ class AddressService(
      * Get addresses by first fetching addresses from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the addresses from the bpdm pool.
      */
-    fun getAddressesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageOutputResponse<AddressGateOutput> {
-        val partnerResponse = saasClient.getAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
-        val partners = partnerResponse.values
+    fun getAddressesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
 
-        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
-        val augmentedPartnerResponse = saasClient.getAugmentedAddresses(externalIds = partnersWithExternalId.map { it.externalId })
-        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
+        val logisticAddressPage = addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
 
-        //Search entries in the pool with BPNs found in the local mirror
-        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpna }
-
-        if (bpnSet.size > addressesByBpnMap.size) {
-            logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
-        }
-
-        val partnersWithPoolBpn = partnersWithLocalBpn.filter { addressesByBpnMap[it.bpn] != null }
-        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
-
-        //Evaluate the sharing status of the legal entities
-        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
-
-        val validAddresses = sharingStatus.validExternalIds.map { externalId ->
-            val bpn = bpnByExternalIdMap[externalId]!!
-            val address = addressesByBpnMap[bpn]!!
-            toAddressOutput(externalId, address)
-        }
-
-        return PageOutputResponse(
-            total = partnerResponse.total,
-            nextStartAfter = partnerResponse.nextStartAfter,
-            content = validAddresses,
-            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
-            pending = sharingStatus.pendingExternalIds,
-            errors = sharingStatus.errors,
+        return PageResponse(
+            page = page,
+            totalElements = logisticAddressPage.totalElements,
+            totalPages = logisticAddressPage.totalPages,
+            contentSize = logisticAddressPage.content.size,
+            content = toValidOutputLogisticAddresses(logisticAddressPage),
         )
+
     }
+
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputResponse> {
+        return logisticAddressPage.content.map { logisticAddress ->
+            logisticAddress.toAddressGateOutputResponse(logisticAddress)
+        }
+    }
+
+//        val partnerResponse = saasClient.getAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
+//        val partners = partnerResponse.values
+//
+//        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
+//        val augmentedPartnerResponse = saasClient.getAugmentedAddresses(externalIds = partnersWithExternalId.map { it.externalId })
+//        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
+//
+//        //Search entries in the pool with BPNs found in the local mirror
+//        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
+//        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpna }
+//
+//        if (bpnSet.size > addressesByBpnMap.size) {
+//            logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
+//        }
+//
+//        val partnersWithPoolBpn = partnersWithLocalBpn.filter { addressesByBpnMap[it.bpn] != null }
+//        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
+//
+//        //Evaluate the sharing status of the legal entities
+//        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
+//
+//        val validAddresses = sharingStatus.validExternalIds.map { externalId ->
+//            val bpn = bpnByExternalIdMap[externalId]!!
+//            val address = addressesByBpnMap[bpn]!!
+//            toAddressOutput(externalId, address)
+//        }
+//
+//        return PageOutputResponse(
+//            total = partnerResponse.total,
+//            nextStartAfter = partnerResponse.nextStartAfter,
+//            content = validAddresses,
+//            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
+//            pending = sharingStatus.pendingExternalIds,
+//            errors = sharingStatus.errors,
+//        )
+//    }
 
     fun toAddressOutput(externalId: String, address: LogisticAddressGateResponse): AddressGateOutput {
         return AddressGateOutput(
@@ -148,6 +169,15 @@ class AddressService(
         }
 
         addressPersistenceService.persistAddressBP(addresses)
+    }
+
+    fun upsertOutputAddresses(addresses: Collection<AddressGateInputRequest>) {
+
+//        addresses.forEach { address ->
+//            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
+//        }
+
+        addressPersistenceService.persistOutputAddress(addresses)
     }
 
     /**
