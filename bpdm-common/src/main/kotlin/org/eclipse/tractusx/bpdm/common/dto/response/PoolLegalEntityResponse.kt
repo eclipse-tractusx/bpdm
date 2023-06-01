@@ -33,4 +33,7 @@ data class PoolLegalEntityResponse(
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,
+
+    @get:Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: LogisticAddressResponse,
 )

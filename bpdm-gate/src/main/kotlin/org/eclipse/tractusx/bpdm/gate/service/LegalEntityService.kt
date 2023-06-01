@@ -143,8 +143,8 @@ class LegalEntityService(
                 currentness = legalEntityPool.legalEntity.currentness,
                 createdAt = legalEntityPool.legalEntity.createdAt,
                 updatedAt = legalEntityPool.legalEntity.updatedAt,
-                legalAddress = legalEntityPool.legalEntity.legalAddress,
             ),
+            legalAddress = legalEntityPool.legalAddress,
             legalNameParts = arrayOf(legalEntityPool.legalName),
             externalId = externalId
         )

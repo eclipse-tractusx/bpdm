@@ -202,7 +202,8 @@ object ResponseValues {
 
     val legalEntityResponsePool1 = PoolLegalEntityResponse(
         legalName = CommonValues.name1,
-        LegalEntityResponse(
+        legalAddress = logisticAddress1,
+        legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn1,
             identifiers = listOf(identifier1, identifier2),
             legalShortName = CommonValues.shortName1,
@@ -212,14 +213,14 @@ object ResponseValues {
             currentness = CommonValues.now,
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = logisticAddress1
         )
 
     )
 
     val legalEntityResponsePool2 = PoolLegalEntityResponse(
         legalName = CommonValues.name3,
-        LegalEntityResponse(
+        legalAddress = logisticAddress2,
+        legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn2,
             identifiers = listOf(identifier3, identifier4),
             legalShortName = CommonValues.shortName3,
@@ -229,7 +230,6 @@ object ResponseValues {
             currentness = CommonValues.now,
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = logisticAddress2
         )
     )
 
@@ -243,7 +243,6 @@ object ResponseValues {
         currentness = CommonValues.now,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now,
-        legalAddress = logisticAddress1,
     )
 
     val legalEntityResponseGate2 = LegalEntityResponse(
@@ -256,7 +255,6 @@ object ResponseValues {
         currentness = CommonValues.now,
         createdAt = CommonValues.now,
         updatedAt = CommonValues.now,
-        legalAddress = logisticAddress2,
     )
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
@@ -285,7 +283,7 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity1,
         externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1,
-        processStartedAt = null,
+        processStartedAt = null
     )
     val newLegalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity2,
@@ -297,13 +295,15 @@ object ResponseValues {
     val legalEntityGateOutput1 = LegalEntityGateOutput(
         legalEntity = legalEntityResponseGate1,
         legalNameParts = arrayOf(CommonValues.name1),
-        externalId = CommonValues.externalId1
+        externalId = CommonValues.externalId1,
+        legalAddress = logisticAddress1,
     )
 
     val legalEntityGateOutput2 = LegalEntityGateOutput(
         legalEntity = legalEntityResponseGate2,
         legalNameParts = arrayOf(CommonValues.name3),
-        externalId = CommonValues.externalId2
+        externalId = CommonValues.externalId2,
+        legalAddress = logisticAddress2,
     )
 
     val siteResponse1 = SiteResponse(
