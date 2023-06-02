@@ -124,4 +124,18 @@ interface GateSiteApi {
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<SiteGateOutput>
 
+    @Operation(
+        summary = "Create or update sites.",
+        description = "Create or update sites. " //TODO Need better description
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Sites were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed site request", content = [Content()]),
+        ]
+    )
+    @PutMapping("/output/sites")
+    @PutExchange("/output/sites")
+    fun upsertSitesOutput(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit>
+
 }

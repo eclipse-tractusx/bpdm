@@ -67,4 +67,12 @@ class SiteController(
         return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 
+    override fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
+        if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        siteService.upsertSitesOutput(sites)
+        return ResponseEntity(HttpStatus.OK)
+    }
+
 }

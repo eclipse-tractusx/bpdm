@@ -168,16 +168,13 @@ class AddressService(
             changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
         }
 
-        addressPersistenceService.persistAddressBP(addresses)
+        addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
     }
 
     fun upsertOutputAddresses(addresses: Collection<AddressGateInputRequest>) {
 
-//        addresses.forEach { address ->
-//            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
-//        }
+        addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Output)
 
-        addressPersistenceService.persistOutputAddress(addresses)
     }
 
     /**

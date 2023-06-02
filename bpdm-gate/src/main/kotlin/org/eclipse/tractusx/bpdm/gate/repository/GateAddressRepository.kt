@@ -32,7 +32,7 @@ interface GateAddressRepository : PagingAndSortingRepository<LogisticAddress, Lo
 
     fun findByExternalId(externalId: String): LogisticAddress?
 
-    fun findByExternalIdAndDataType(externalId: String, dataType: OutputInputEnum): LogisticAddress
+    fun findByExternalIdAndDataType(externalId: String, dataType: OutputInputEnum): LogisticAddress?
 
     fun findByExternalIdInAndDataType(externalId: Collection<String>?, dataType: OutputInputEnum, pageable: Pageable): Page<LogisticAddress>
 

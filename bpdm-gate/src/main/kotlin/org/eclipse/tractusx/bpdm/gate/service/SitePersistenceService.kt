@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -37,7 +38,7 @@ class SitePersistenceService(
 ) {
 
     @Transactional
-    fun persistSitesBP(sites: Collection<SiteGateInputRequest>) {
+    fun persistSitesBP(sites: Collection<SiteGateInputRequest>, datatype: OutputInputEnum) {
 
         //Finds Site in DB
         val externalIdColl: MutableCollection<String> = mutableListOf()
@@ -51,12 +52,12 @@ class SitePersistenceService(
                     legalEntityRepository.findByExternalId(site.legalEntityExternalId) ?: throw BpdmNotFoundException("Business Partner", it)
                 }
 
-            val fullSite = site.toSiteGate(legalEntityRecord)
+            val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
+            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }?.let { existingSite ->
 
                 val logisticAddressRecord =
-                    addressRepository.findByExternalId(getMainAddressForSiteExternalId(site.externalId)) ?: throw BpdmNotFoundException(
+                    addressRepository.findByExternalIdAndDataType(getMainAddressForSiteExternalId(site.externalId), datatype) ?: throw BpdmNotFoundException(
                         "Business Partner",
                         "Error"
                     )

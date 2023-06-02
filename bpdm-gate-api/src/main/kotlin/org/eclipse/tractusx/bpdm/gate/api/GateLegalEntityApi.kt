@@ -124,4 +124,18 @@ interface GateLegalEntityApi {
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<LegalEntityGateOutput>
 
+    @Operation(
+        summary = "Create or update legal entities output.",
+        description = "Create or update legal entities. " //TODO need better description
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Legal entities were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
+        ]
+    )
+    @PutMapping("/output/legal-entities")
+    @PutExchange("/output/legal-entities")
+    fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit>
+
 }
