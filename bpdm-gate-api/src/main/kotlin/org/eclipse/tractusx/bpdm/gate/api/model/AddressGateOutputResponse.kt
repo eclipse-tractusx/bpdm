@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 )
 data class AddressGateOutputResponse(
     @field:JsonUnwrapped
-    val address: LogisticAddressDto,
+    val address: LogisticAddressGateDto,
 
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,

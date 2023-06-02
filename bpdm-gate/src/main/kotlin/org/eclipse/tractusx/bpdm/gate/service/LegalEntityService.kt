@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
@@ -52,25 +53,30 @@ class LegalEntityService(
 
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        // create changelog entry if all goes well from saasClient
         legalEntities.forEach { legalEntity ->
             changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
         }
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities)
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
+    }
+
+    fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateInputRequest>) {
+
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Output)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
 
-        val legalEntity = legalEntityRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("LegalEntity", externalId)
+        val legalEntity =
+            legalEntityRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("LegalEntity", externalId)
         return toValidSingleLegalEntity(legalEntity)
     }
 
     fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<LegalEntityGateInputResponse> {
 
         val legalEntitiesPage = if (externalIds != null) {
-            legalEntityRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+            legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
         } else {
-            legalEntityRepository.findAll(PageRequest.of(page, size))
+            legalEntityRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
         return PageResponse(

@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 
 @Entity
 @Table(name = "sites")
@@ -33,6 +34,10 @@ class Site(
 
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
+
+    @Column(name = "data_type")
+    @Enumerated(EnumType.STRING)
+    var dataType: OutputInputEnum,
 
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)

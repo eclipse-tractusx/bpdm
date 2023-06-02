@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
@@ -56,9 +57,9 @@ class SiteService(
     fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputResponse> {
 
         val sitesPage = if (externalIds != null) {
-            siteRepository.findByExternalIdIn(externalIds, PageRequest.of(page, size))
+            siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
         } else {
-            siteRepository.findAll(PageRequest.of(page, size))
+            siteRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
         return PageResponse(
@@ -77,7 +78,7 @@ class SiteService(
     }
 
     fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
-        val siteRecord = siteRepository.findByExternalId(externalId) ?: throw BpdmNotFoundException("Site", externalId)
+        val siteRecord = siteRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Site", externalId)
 
         return siteRecord.toSiteGateInputResponse(siteRecord)
     }
@@ -146,12 +147,16 @@ class SiteService(
      */
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        // create changelog entry if all goes well from saasClient
         sites.forEach { site ->
             changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
         }
 
-        sitePersistenceService.persistSitesBP(sites)
+        sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Input)
+    }
+
+    fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>) {
+
+        sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Output)
     }
 
     /**

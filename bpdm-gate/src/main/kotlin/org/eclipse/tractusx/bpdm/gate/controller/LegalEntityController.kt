@@ -70,4 +70,12 @@ class LegalEntityController(
         return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
     }
 
+    override fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {
+        if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        legalEntityService.upsertLegalEntitiesOutput(legalEntities)
+        return ResponseEntity(HttpStatus.OK)
+    }
+
 }

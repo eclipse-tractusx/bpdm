@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import java.time.Instant
 
 @Entity
@@ -42,7 +43,11 @@ class LegalEntity(
     var legalForm: String?,
 
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant
+    var currentness: Instant,
+
+    @Column(name = "data_type")
+    @Enumerated(EnumType.STRING)
+    var dataType: OutputInputEnum
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)

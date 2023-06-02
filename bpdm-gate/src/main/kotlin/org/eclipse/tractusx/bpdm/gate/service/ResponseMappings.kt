@@ -109,7 +109,7 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 }
 
 // Site Mappers
-fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
+fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputInputEnum): Site {
 
     val addressInputRequest = AddressGateInputRequest(
         address = site.mainAddress,
@@ -121,10 +121,11 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
         name = site.name,
         externalId = externalId,
         legalEntity = legalEntity,
+        dataType = datatype
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
-    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site, OutputInputEnum.Input)
+    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site, datatype)
 
     return site
 }
@@ -141,7 +142,7 @@ fun ChangelogEntry.toGateDto(): ChangelogResponse {
     )
 }
 
-fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
+fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalEntity {
 
     val addressInputRequest = AddressGateInputRequest(
         address = legalAddress,
@@ -153,13 +154,15 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
-        legalName = Name(legalNameParts[0], legalEntity.legalShortName)
+        legalName = Name(legalNameParts[0], legalEntity.legalShortName),
+        dataType = datatype
     )
+
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
-    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, OutputInputEnum.Input)
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
     return legalEntity
 

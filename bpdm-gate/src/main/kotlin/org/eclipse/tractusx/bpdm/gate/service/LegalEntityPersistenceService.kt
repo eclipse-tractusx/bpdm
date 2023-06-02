@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -36,18 +37,19 @@ class LegalEntityPersistenceService(
 ) {
 
     @Transactional
-    fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>) {
+    fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>, datatype: OutputInputEnum) {
 
         //finds Legal Entity by External ID
         val legalEntityRecord = gateLegalEntityRepository.findDistinctByExternalIdIn(legalEntities.map { it.externalId })
 
         //Business Partner persist
         legalEntities.forEach { legalEntity ->
-            val fullLegalEntity = legalEntity.toLegalEntity()
-            legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
+            val fullLegalEntity = legalEntity.toLegalEntity(datatype)
+            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }?.let { existingLegalEntity ->
 
-                val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
-                    ?: throw BpdmNotFoundException("Business Partner", "Error")
+                val logisticAddressRecord =
+                    gateAddressRepository.findByExternalIdAndDataType(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId), datatype)
+                        ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
 
