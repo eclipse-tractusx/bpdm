@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
@@ -88,11 +89,13 @@ object ResponseValues {
     private val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
     private val address1 = PhysicalPostalAddressResponse(
-        companyPostalCode = CommonValues.postCode2,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            companyPostalCode = CommonValues.postCode2,
+            industrialZone = CommonValues.industrialZone1,
+            building = CommonValues.building1,
+            floor = CommonValues.floor1,
+            door = CommonValues.door1
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
@@ -108,10 +111,12 @@ object ResponseValues {
     )
 
     private val address2 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone2,
+            building = CommonValues.building2,
+            floor = CommonValues.floor2,
+            door = CommonValues.door2
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
@@ -127,10 +132,12 @@ object ResponseValues {
     )
 
     private val address3 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone3,
-        building = CommonValues.building3,
-        floor = CommonValues.floor3,
-        door = CommonValues.door3,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone3,
+            building = CommonValues.building3,
+            floor = CommonValues.floor3,
+            door = CommonValues.door3
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
             administrativeAreaLevel2 = CommonValues.county3,
@@ -257,11 +264,13 @@ object ResponseValues {
         legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressResponse(
-                companyPostalCode = null,
-                industrialZone = null,
-                building = null,
-                floor = null,
-                door = null,
+                basePhysicalAddress = BasePhysicalAddressDto(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null
+                ),
                 areaPart = AreaDistrictResponse(
                     administrativeAreaLevel1 = null,
                     administrativeAreaLevel2 = null,
@@ -297,11 +306,13 @@ object ResponseValues {
         legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressResponse(
-                companyPostalCode = null,
-                industrialZone = null,
-                building = null,
-                floor = null,
-                door = null,
+                basePhysicalAddress = BasePhysicalAddressDto(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null
+                ),
                 areaPart = AreaDistrictResponse(
                     administrativeAreaLevel1 = null,
                     administrativeAreaLevel2 = null,
@@ -337,11 +348,13 @@ object ResponseValues {
         legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressResponse(
-                companyPostalCode = null,
-                industrialZone = null,
-                building = null,
-                floor = null,
-                door = null,
+                basePhysicalAddress = BasePhysicalAddressDto(
+                    companyPostalCode = null,
+                    industrialZone = null,
+                    building = null,
+                    floor = null,
+                    door = null
+                ),
                 areaPart = AreaDistrictResponse(
                     administrativeAreaLevel1 = null,
                     administrativeAreaLevel2 = null,

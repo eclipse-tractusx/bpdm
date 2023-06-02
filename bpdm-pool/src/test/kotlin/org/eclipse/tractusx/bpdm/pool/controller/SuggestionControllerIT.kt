@@ -132,7 +132,7 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.physicalPostalAddress.building,
+                    expectedLegalAddress.physicalPostalAddress.basePhysicalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
@@ -157,7 +157,7 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.postalCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.street!!.name, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.basePhysicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
                 // TODO check alternativePostalAddress
                 // Arguments.of(nonlatinLegalAddress.alternativePostalAddress!!.deliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )

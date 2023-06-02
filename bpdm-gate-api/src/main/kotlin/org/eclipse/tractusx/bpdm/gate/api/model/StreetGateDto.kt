@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "Street", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
+@Schema(name = "StreetGate", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
 data class StreetGateDto(
 
 

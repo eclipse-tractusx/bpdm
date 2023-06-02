@@ -21,13 +21,13 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -130,7 +130,7 @@ class LegalEntityService(
         )
     }
 
-    fun toLegalEntityOutput(externalId: String, legalEntityPool: PoolLegalEntityResponse, legalAddress: LogisticAddressResponse): LegalEntityGateOutput =
+    fun toLegalEntityOutput(externalId: String, legalEntityPool: PoolLegalEntityResponse, legalAddress: LogisticAddressGateResponse): LegalEntityGateOutput =
         LegalEntityGateOutput(
             legalEntity = LegalEntityResponse(
                 bpnl = legalEntityPool.legalEntity.bpnl,
@@ -144,7 +144,7 @@ class LegalEntityService(
                 createdAt = legalEntityPool.legalEntity.createdAt,
                 updatedAt = legalEntityPool.legalEntity.updatedAt,
             ),
-            legalAddress = legalEntityPool.legalAddress,
+            legalAddress = legalAddress,
             legalNameParts = arrayOf(legalEntityPool.legalName),
             externalId = externalId
         )

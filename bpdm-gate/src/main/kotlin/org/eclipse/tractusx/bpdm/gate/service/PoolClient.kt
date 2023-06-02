@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import org.eclipse.tractusx.bpdm.gate.exception.PoolRequestException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
@@ -52,7 +53,7 @@ class PoolClient(
         return legalEntities
     }
 
-    fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LogisticAddressResponse> {
+    fun searchLegalAddresses(bpnLs: Collection<String>): Collection<LogisticAddressGateResponse> {
         if (bpnLs.isEmpty()) return emptyList()
 
         val legalAddresses = try {
@@ -61,7 +62,7 @@ class PoolClient(
                 .uri("/legal-entities/legal-addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnLs))
                 .retrieve()
-                .bodyToMono<Collection<LogisticAddressResponse>>()
+                .bodyToMono<Collection<LogisticAddressGateResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search legal addresses failed.", e)
@@ -86,7 +87,7 @@ class PoolClient(
         return sites.content
     }
 
-    fun searchMainAddresses(bpnSs: Collection<String>): Collection<LogisticAddressResponse> {
+    fun searchMainAddresses(bpnSs: Collection<String>): Collection<LogisticAddressGateResponse> {
         if (bpnSs.isEmpty()) return emptyList()
 
         val mainAddresses = try {
@@ -95,7 +96,7 @@ class PoolClient(
                 .uri("/sites/main-addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(bpnSs))
                 .retrieve()
-                .bodyToMono<Collection<LogisticAddressResponse>>()
+                .bodyToMono<Collection<LogisticAddressGateResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to main addresses of sites failed.", e)
@@ -103,7 +104,7 @@ class PoolClient(
         return mainAddresses
     }
 
-    fun searchAddresses(bpnAs: Collection<String>): Collection<LogisticAddressResponse> {
+    fun searchAddresses(bpnAs: Collection<String>): Collection<LogisticAddressGateResponse> {
         if (bpnAs.isEmpty()) return emptyList()
 
         val addresses = try {
@@ -112,7 +113,7 @@ class PoolClient(
                 .uri("/addresses/search")
                 .bodyValue(objectMapper.writeValueAsString(AddressPartnerBpnSearchRequest(addresses = bpnAs)))
                 .retrieve()
-                .bodyToMono<PageResponse<LogisticAddressResponse>>()
+                .bodyToMono<PageResponse<LogisticAddressGateResponse>>()
                 .block()!!
         } catch (e: Exception) {
             throw PoolRequestException("Request to search addresses failed.", e)
