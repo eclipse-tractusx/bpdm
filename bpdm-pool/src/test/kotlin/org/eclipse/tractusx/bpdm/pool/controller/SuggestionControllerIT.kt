@@ -70,11 +70,11 @@ class SuggestionControllerIT @Autowired constructor(
 
         private val expectedLegalEntity = ResponseValues.legalEntityUpsert1.legalEntity
         private val expectedLegalEntityName = ResponseValues.legalEntityUpsert1.legalName
-        private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalEntity.legalAddress
+        private val expectedLegalAddress = ResponseValues.legalEntityUpsert1.legalAddress
         private val expectedSite = ResponseValues.siteUpsert2
 
         private val nonlatinLegalEntity = ResponseValues.legalEntityUpsert3.legalEntity
-        private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalEntity.legalAddress
+        private val nonlatinLegalAddress = ResponseValues.legalEntityUpsert3.legalAddress
         private val nonlatinSite = ResponseValues.siteUpsert3
 
         @JvmStatic
@@ -132,7 +132,7 @@ class SuggestionControllerIT @Autowired constructor(
                     expectedLegalEntityName
                 ),
                 Arguments.of(
-                    expectedLegalAddress.physicalPostalAddress.building,
+                    expectedLegalAddress.physicalPostalAddress.basePhysicalAddress.building,
                     EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH,
                     expectedLegalEntityName
                 ),
@@ -157,7 +157,7 @@ class SuggestionControllerIT @Autowired constructor(
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.postalCode, EndpointValues.CATENA_SUGGESTION_ADDRESS_POST_CODE_PATH),
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.baseAddress.city, EndpointValues.CATENA_SUGGESTION_ADDRESS_LOCALITY_PATH),
                 Arguments.of(nonlatinLegalAddress.physicalPostalAddress.street!!.name, EndpointValues.CATENA_SUGGESTION_ADDRESS_THOROUGHFARE_PATH),
-                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
+                Arguments.of(nonlatinLegalAddress.physicalPostalAddress.basePhysicalAddress.building, EndpointValues.CATENA_SUGGESTION_ADDRESS_PREMISE_PATH),
                 // TODO check alternativePostalAddress
                 // Arguments.of(nonlatinLegalAddress.alternativePostalAddress!!.deliveryServiceNumber, EndpointValues.CATENA_SUGGESTION_ADDRESS_POSTAL_DELIVERY_POINT_PATH)
             )

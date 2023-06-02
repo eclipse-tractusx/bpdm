@@ -17,13 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.dto
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 
-data class GateSiteInfo(
-    val site: SiteGateDto,
-    val externalId: String,
-    val legalEntityExternalId: String,
-    val bpn: String?
+@Schema(name = "Site", description = "Site record")
+data class SiteGateDto(
+    @get:Schema(description = "Site name")
+    val name: String,
+
+    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    val states: Collection<SiteStateDto> = emptyList(),
+
+    @get:Schema(description = "Main address where this site resides")
+    val mainAddress: LogisticAddressGateDto
 )

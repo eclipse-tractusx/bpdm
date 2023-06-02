@@ -153,16 +153,16 @@ class LegalEntityControllerIT @Autowired constructor(
         val createResponse = poolClient.legalEntities().createBusinessPartners(given)
             .entities.single()
         val givenBpnL = createResponse.legalEntity.bpnl
-        val givenBpnA = createResponse.legalEntity.legalAddress.bpna
+        val givenBpnA = createResponse.legalAddress.bpna
 
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
+                legalAddress = legalAddress.copy(
+                    bpna = givenBpnA,
+                    bpnLegalEntity = givenBpnL
+                ),
                 legalEntity = legalEntity.copy(
                     bpnl = givenBpnL,
-                    legalAddress = legalEntity.legalAddress.copy(
-                        bpna = givenBpnA,
-                        bpnLegalEntity = givenBpnL
-                    )
                 ),
             )
         }
@@ -188,7 +188,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val createResponse = poolClient.legalEntities().createBusinessPartners(given)
         val createdEntity = createResponse.entities.toList()[1]
         val bpnL = createdEntity.legalEntity.bpnl
-        val bpnA = createdEntity.legalEntity.legalAddress.bpna
+        val bpnA = createdEntity.legalAddress.bpna
 
         val toUpdate = listOf(
             RequestValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT"),
@@ -197,14 +197,14 @@ class LegalEntityControllerIT @Autowired constructor(
 
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
+                legalAddress = legalAddress.copy(
+                    bpna = bpnA,
+                    bpnLegalEntity = bpnL
+                ),
                 legalEntity = legalEntity.copy(
                     bpnl = bpnL,
-                    legalAddress = legalEntity.legalAddress.copy(
-                        bpna = bpnA,
-                        bpnLegalEntity = bpnL
-                    )
                 ),
-                
+
                 )
         }
 
@@ -233,7 +233,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalEntity.legalAddress) }
+            .map { toLegalAddressResponse(it.legalAddress) }
 
         val bpnsToSearch = givenLegalEntities.map { it.legalEntity.bpnl }
         val response = poolClient.legalEntities().searchLegalAddresses(bpnsToSearch)
@@ -261,7 +261,7 @@ class LegalEntityControllerIT @Autowired constructor(
         val givenLegalEntities = testHelpers.createBusinessPartnerStructure(givenStructures).map { it.legalEntity }
 
         val expected = givenLegalEntities
-            .map { toLegalAddressResponse(it.legalEntity.legalAddress) }
+            .map { toLegalAddressResponse(it.legalAddress) }
             .take(2)
 
         val bpnsToSearch = expected.map { it.bpnLegalEntity }.plus("NONEXISTENT")

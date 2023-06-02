@@ -19,26 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.AreaDistrictDto
+import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.BasePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
-data class LegalEntityGateInputRequest(
+@Schema(name = "PhysicalPostalAddressGateDto", description = "Physical Postal Address Part")
+data class PhysicalPostalAddressGateDto(
 
-    val legalNameParts: Array<String> = emptyArray(),
+    @field:JsonUnwrapped
+    val baseAddress: BasePostalAddressDto,
 
-    @Schema(description = "legal Enity")
-    val legalEntity: LegalEntityDto,
+    @get:Schema(description = "Address Street")
+    val street: StreetGateDto? = null,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressGateDto,
+    @field:JsonUnwrapped
+    val areaPart: AreaDistrictDto,
 
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
-    val externalId: String,
-
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
+    @field:JsonUnwrapped
+    val basePhysicalAddress: BasePhysicalAddressDto
 )

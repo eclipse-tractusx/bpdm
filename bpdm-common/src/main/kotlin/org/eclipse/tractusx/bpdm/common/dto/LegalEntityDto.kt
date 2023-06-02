@@ -39,7 +39,5 @@ data class LegalEntityDto(
     @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
     val classifications: Collection<ClassificationDto> = emptyList(),
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressDto,
 
     )

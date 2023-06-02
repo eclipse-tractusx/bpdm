@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
@@ -28,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
@@ -129,7 +129,7 @@ class SiteService(
         )
     }
 
-    fun toSiteOutput(externalId: String, site: SiteResponse, mainAddress: LogisticAddressResponse) =
+    fun toSiteOutput(externalId: String, site: SiteResponse, mainAddress: LogisticAddressGateResponse) =
         SiteGateOutput(
             site = site,
             mainAddress = mainAddress,

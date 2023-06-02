@@ -33,7 +33,12 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
 }
 
 fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
-    return LegalEntityMatchResponse(score = score, legalEntity = this.toDto(), legalName = this.legalName.value)
+    return LegalEntityMatchResponse(
+        score = score,
+        legalEntity = this.toDto(),
+        legalName = this.legalName.value,
+        legalAddress = legalAddress.toDto(),
+    )
 }
 
 fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchResponse {
@@ -43,6 +48,7 @@ fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchRes
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
         legalEntity = toDto(),
+        legalAddress = legalAddress.toDto(),
         index = entryId,
         legalName = legalName.value,
     )
@@ -51,7 +57,8 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
 fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityResponse {
     return PoolLegalEntityResponse(
         legalName = legalName.value,
-        LegalEntityResponse(
+        legalAddress = legalAddress.toDto(),
+        legalEntity = LegalEntityResponse(
             bpnl = bpn,
             identifiers = identifiers.map { it.toDto() },
             legalShortName = legalName.shortName,
@@ -62,7 +69,6 @@ fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityResponse {
             currentness = currentness,
             createdAt = createdAt,
             updatedAt = updatedAt,
-            legalAddress = legalAddress.toDto()
         )
     )
 }
@@ -79,7 +85,6 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         currentness = currentness,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        legalAddress = legalAddress.toDto()
     )
 }
 
@@ -88,6 +93,7 @@ fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
         uuid = "",
         legalEntity = toDto(),
         addresses = listOf(legalAddress.toDto()),
+        legalAddress = legalAddress.toDto(),
         sites = emptyList(),
         legalName = legalName.value,
     )
@@ -178,11 +184,13 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
             administrativeAreaLevel3 = administrativeAreaLevel3,
             district = districtLevel1,
         ),
-        companyPostalCode = companyPostCode,
-        industrialZone = industrialZone,
-        building = building,
-        floor = floor,
-        door = door
+        basePhysicalAddress = BasePhysicalAddressDto(
+            companyPostalCode = companyPostCode,
+            industrialZone = industrialZone,
+            building = building,
+            floor = floor,
+            door = door
+        )
     )
 }
 

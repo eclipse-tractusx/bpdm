@@ -23,6 +23,12 @@ import com.catenax.bpdm.bridge.dummy.dto.GateAddressInfo
 import com.catenax.bpdm.bridge.dummy.dto.GateLegalEntityInfo
 import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.dto.StreetDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
@@ -37,10 +43,38 @@ class PoolUpdateService(
 
     private val logger = KotlinLogging.logger { }
 
+    fun gateToPoolPhysicalAddress(gateDto: PhysicalPostalAddressGateDto): PhysicalPostalAddressDto {
+
+        return PhysicalPostalAddressDto(
+            baseAddress = gateDto.baseAddress,
+            areaPart = gateDto.areaPart,
+            basePhysicalAddress = gateDto.basePhysicalAddress,
+            street = StreetDto(
+                name = gateDto.street?.name,
+                houseNumber = gateDto.street?.houseNumber,
+                milestone = gateDto.street?.milestone,
+                direction = gateDto.street?.direction,
+            ),
+        )
+    }
+
+    fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressDto {
+
+        return LogisticAddressDto(
+            name = gateDto.name,
+            states = gateDto.states,
+            identifiers = gateDto.identifiers,
+            physicalPostalAddress = gateToPoolPhysicalAddress(gateDto.physicalPostalAddress),
+            alternativePostalAddress = gateDto.alternativePostalAddress
+        )
+    }
+
+
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
                 legalEntity = it.legalEntity,
+                legalAddress = gateToPoolLogisticAddress(it.legalAddress),
                 index = it.externalId,
                 legalName = it.legalNameParts[0]
             )
@@ -54,6 +88,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
                 legalEntity = it.legalEntity,
+                legalAddress = gateToPoolLogisticAddress(it.legalAddress),
                 bpnl = it.bpn!!,
                 legalName = it.legalNameParts[0]
             )
@@ -71,7 +106,11 @@ class PoolUpdateService(
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     SitePartnerCreateRequest(
-                        site = entry.site,
+                        site = SiteDto(
+                            name = entry.site.name,
+                            states = entry.site.states,
+                            mainAddress = gateToPoolLogisticAddress(entry.site.mainAddress),
+                        ),
                         index = entry.externalId,
                         bpnlParent = leParentBpn
                     )
@@ -91,7 +130,11 @@ class PoolUpdateService(
     fun updateSitesInPool(entriesToUpdate: Collection<GateSiteInfo>): SitePartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
-                site = it.site,
+                site = SiteDto(
+                    name = it.site.name,
+                    states = it.site.states,
+                    mainAddress = gateToPoolLogisticAddress(it.site.mainAddress),
+                ),
                 bpns = it.bpn!!
             )
         }
@@ -108,7 +151,7 @@ class PoolUpdateService(
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
                     AddressPartnerCreateRequest(
-                        address = entry.address,
+                        address = gateToPoolLogisticAddress(entry.address),
                         index = entry.externalId,
                         bpnParent = leParentBpn
                     )
@@ -122,7 +165,13 @@ class PoolUpdateService(
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
-                        address = entry.address,
+                        address = LogisticAddressDto(
+                            name = entry.address.name,
+                            states = entry.address.states,
+                            identifiers = entry.address.identifiers,
+                            physicalPostalAddress = gateToPoolPhysicalAddress(entry.address.physicalPostalAddress),
+                            alternativePostalAddress = entry.address.alternativePostalAddress
+                        ),
                         index = entry.externalId,
                         bpnParent = siteParentBpn
                     )
@@ -143,7 +192,13 @@ class PoolUpdateService(
     fun updateAddressesInPool(entriesToUpdate: Collection<GateAddressInfo>): AddressPartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
-                address = it.address,
+                address = LogisticAddressDto(
+                    name = it.address.name,
+                    states = it.address.states,
+                    identifiers = it.address.identifiers,
+                    physicalPostalAddress = gateToPoolPhysicalAddress(it.address.physicalPostalAddress),
+                    alternativePostalAddress = it.address.alternativePostalAddress
+                ),
                 bpna = it.bpn!!
             )
         }

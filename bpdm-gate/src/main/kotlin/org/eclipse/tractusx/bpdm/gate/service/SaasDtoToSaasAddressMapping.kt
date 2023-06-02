@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.BasePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 
 class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto) {
 
@@ -37,7 +37,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         return CountrySaas(shortName = postalAdress.country, value = postalAdress.country.getName())
     }
 
-    fun administrativeAreas(physicalAddress: PhysicalPostalAddressDto?): Collection<AdministrativeAreaSaas> {
+    fun administrativeAreas(physicalAddress: PhysicalPostalAddressGateDto?): Collection<AdministrativeAreaSaas> {
         return listOfNotNull(
             physicalAddress?.areaPart?.administrativeAreaLevel1?.let {
                 AdministrativeAreaSaas(
@@ -67,7 +67,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
     }
 
 
-    fun postcodes(physicalAddress: PhysicalPostalAddressDto?): Collection<PostCodeSaas> {
+    fun postcodes(physicalAddress: PhysicalPostalAddressGateDto?): Collection<PostCodeSaas> {
         return listOfNotNull(
             postalAdress.postalCode?.let {
                 PostCodeSaas(
@@ -75,7 +75,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
                     type = SaasPostCodeType.REGULAR.toSaasTypeDto()
                 )
             },
-            physicalAddress?.companyPostalCode?.let {
+            physicalAddress?.basePhysicalAddress?.companyPostalCode?.let {
                 PostCodeSaas(
                     value = it,
                     type = SaasPostCodeType.LARGE_MAIL_USER.toSaasTypeDto()
@@ -93,7 +93,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         )
     }
 
-    fun localities(physicalAddress: PhysicalPostalAddressDto?): Collection<LocalitySaas> {
+    fun localities(physicalAddress: PhysicalPostalAddressGateDto?): Collection<LocalitySaas> {
 
         return listOfNotNull(
             LocalitySaas(
@@ -107,7 +107,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         )
     }
 
-    fun thoroughfares(physicalAddress: PhysicalPostalAddressDto?): Collection<ThoroughfareSaas> {
+    fun thoroughfares(physicalAddress: PhysicalPostalAddressGateDto?): Collection<ThoroughfareSaas> {
         return listOfNotNull(
             physicalAddress?.street?.let {
                 ThoroughfareSaas(
@@ -118,7 +118,7 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
                     direction = it.direction
                 )
             },
-            physicalAddress?.industrialZone?.let {
+            physicalAddress?.basePhysicalAddress?.industrialZone?.let {
                 ThoroughfareSaas(
                     type = SaasThoroughfareType.INDUSTRIAL_ZONE.toSaasTypeDto(),
                     name = it
@@ -127,21 +127,21 @@ class SaasDtoToSaasAddressMapping(private val postalAdress: BasePostalAddressDto
         )
     }
 
-    fun premises(physicalAddress: PhysicalPostalAddressDto?): Collection<PremiseSaas> {
+    fun premises(physicalAddress: PhysicalPostalAddressGateDto?): Collection<PremiseSaas> {
         return listOfNotNull(
-            physicalAddress?.building?.let {
+            physicalAddress?.basePhysicalAddress?.building?.let {
                 PremiseSaas(
                     value = it,
                     type = SaasPremiseType.BUILDING.toSaasTypeDto()
                 )
             },
-            physicalAddress?.floor?.let {
+            physicalAddress?.basePhysicalAddress?.floor?.let {
                 PremiseSaas(
                     value = it,
                     type = SaasPremiseType.LEVEL.toSaasTypeDto()
                 )
             },
-            physicalAddress?.door?.let {
+            physicalAddress?.basePhysicalAddress?.door?.let {
                 PremiseSaas(
                     value = it,
                     type = SaasPremiseType.ROOM.toSaasTypeDto()

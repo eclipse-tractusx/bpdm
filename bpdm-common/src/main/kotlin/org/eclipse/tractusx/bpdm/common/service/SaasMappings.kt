@@ -74,8 +74,6 @@ object SaasMappings {
             legalForm = toOptionalReference(legalForm),
             states = toLegalEntityStatesDtos(status),
             classifications = toDto(profile),
-            // TODO Known issue: For now the legal address is not a separate business partner in SaaS, therefore its properties name, states, identifiers are missing!
-            legalAddress = convertSaasAdressesToLogisticAddressDto(addresses, id)
         )
     }
 
@@ -205,11 +203,13 @@ object SaasMappings {
         }
 
         return PhysicalPostalAddressDto(
-            companyPostalCode = map.companyPostCode(),
-            industrialZone = map.industrialZone(),
-            building = map.building(),
-            floor = map.floor(),
-            door = map.door(),
+            basePhysicalAddress = BasePhysicalAddressDto(
+                companyPostalCode = map.companyPostCode(),
+                industrialZone = map.industrialZone(),
+                building = map.building(),
+                floor = map.floor(),
+                door = map.door(),
+            ),
             areaPart = AreaDistrictDto(
                 administrativeAreaLevel1 = map.adminAreaLevel1(),
                 administrativeAreaLevel2 = map.adminAreaLevel2(),

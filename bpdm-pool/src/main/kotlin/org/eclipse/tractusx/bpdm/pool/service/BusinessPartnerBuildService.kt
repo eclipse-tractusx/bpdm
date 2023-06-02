@@ -66,7 +66,7 @@ class BusinessPartnerBuildService(
         val validRequests = filterLegalEntityDuplicatesByIdentifier(requests, errors)
 
         val legalEntityMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalEntity })
-        val addressMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalEntity.legalAddress })
+        val addressMetadataMap = metadataMappingService.mapRequests(validRequests.map { it.legalAddress })
 
         val bpnLs = bpnIssuingService.issueLegalEntityBpns(validRequests.size)
         val bpnAs = bpnIssuingService.issueAddressBpns(validRequests.size)
@@ -74,7 +74,7 @@ class BusinessPartnerBuildService(
         val legalEntityWithIndexByBpnMap = validRequests
             .mapIndexed { i, request ->
                 val legalEntity = createLegalEntity(request.legalEntity, bpnLs[i], request.legalName, legalEntityMetadataMap)
-                legalEntity.legalAddress = createLogisticAddress(request.legalEntity.legalAddress, bpnAs[i], legalEntity, addressMetadataMap)
+                legalEntity.legalAddress = createLogisticAddress(request.legalAddress, bpnAs[i], legalEntity, addressMetadataMap)
                 Pair(legalEntity, request.index)
             }
             .associateBy { (legalEntity, _) -> legalEntity.bpn }
@@ -161,7 +161,7 @@ class BusinessPartnerBuildService(
         logger.info { "Update ${requests.size} legal entities" }
 
         val legalEntityMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
-        val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity.legalAddress })
+        val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalAddress })
 
         val bpnsToFetch = requests.map { it.bpnl }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
@@ -176,7 +176,7 @@ class BusinessPartnerBuildService(
         legalEntities.forEach {
             val request = requestByBpnMap.get(it.bpn)!!
             updateLegalEntity(it, request.legalEntity, request.legalName, legalEntityMetadataMap)
-            updateLogisticAddress(it.legalAddress, request.legalEntity.legalAddress, addressMetadataMap)
+            updateLogisticAddress(it.legalAddress, request.legalAddress, addressMetadataMap)
         }
 
         changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
@@ -445,11 +445,11 @@ class BusinessPartnerBuildService(
             city = baseAddress.city,
             districtLevel1 = area.district,
             street = physicalAddress.street?.let { createStreet(it) },
-            companyPostCode = physicalAddress.companyPostalCode,
-            industrialZone = physicalAddress.industrialZone,
-            building = physicalAddress.building,
-            floor = physicalAddress.floor,
-            door = physicalAddress.door
+            companyPostCode = physicalAddress.basePhysicalAddress.companyPostalCode,
+            industrialZone = physicalAddress.basePhysicalAddress.industrialZone,
+            building = physicalAddress.basePhysicalAddress.building,
+            floor = physicalAddress.basePhysicalAddress.floor,
+            door = physicalAddress.basePhysicalAddress.door
         )
     }
 

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
+import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
@@ -88,11 +89,13 @@ object ResponseValues {
     private val classification5 = ClassificationResponse(CommonValues.classification5, null, classificationType)
 
     private val address1 = PhysicalPostalAddressResponse(
-        companyPostalCode = CommonValues.postCode2,
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            companyPostalCode = CommonValues.postCode2,
+            industrialZone = CommonValues.industrialZone1,
+            building = CommonValues.building1,
+            floor = CommonValues.floor1,
+            door = CommonValues.door1
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
@@ -108,10 +111,12 @@ object ResponseValues {
     )
 
     private val address2 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone2,
+            building = CommonValues.building2,
+            floor = CommonValues.floor2,
+            door = CommonValues.door2
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
@@ -127,10 +132,12 @@ object ResponseValues {
     )
 
     private val address3 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone3,
-        building = CommonValues.building3,
-        floor = CommonValues.floor3,
-        door = CommonValues.door3,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone3,
+            building = CommonValues.building3,
+            floor = CommonValues.floor3,
+            door = CommonValues.door3
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
             administrativeAreaLevel2 = CommonValues.county3,
@@ -253,32 +260,34 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = LogisticAddressResponse(
-                bpna = CommonValues.bpnA1,
-                physicalPostalAddress = PhysicalPostalAddressResponse(
+        ),
+        legalAddress = LogisticAddressResponse(
+            bpna = CommonValues.bpnA1,
+            physicalPostalAddress = PhysicalPostalAddressResponse(
+                basePhysicalAddress = BasePhysicalAddressDto(
                     companyPostalCode = null,
                     industrialZone = null,
                     building = null,
                     floor = null,
-                    door = null,
-                    areaPart = AreaDistrictResponse(
-                        administrativeAreaLevel1 = null,
-                        administrativeAreaLevel2 = null,
-                        district = null,
-                    ),
-                    street = null,
-                    baseAddress = BasePostalAddressResponse(
-                        geographicCoordinates = null,
-                        country = country1,
-                        postalCode = null,
-                        city = CommonValues.locality1,
-                    )
+                    door = null
                 ),
-                bpnLegalEntity = null,
-                bpnSite = null,
-                createdAt = Instant.now(),
-                updatedAt = Instant.now()
-            )
+                areaPart = AreaDistrictResponse(
+                    administrativeAreaLevel1 = null,
+                    administrativeAreaLevel2 = null,
+                    district = null,
+                ),
+                street = null,
+                baseAddress = BasePostalAddressResponse(
+                    geographicCoordinates = null,
+                    country = country1,
+                    postalCode = null,
+                    city = CommonValues.locality1,
+                )
+            ),
+            bpnLegalEntity = null,
+            bpnSite = null,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
         )
     )
 
@@ -293,32 +302,34 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = LogisticAddressResponse(
-                bpna = CommonValues.bpnA1,
-                physicalPostalAddress = PhysicalPostalAddressResponse(
+        ),
+        legalAddress = LogisticAddressResponse(
+            bpna = CommonValues.bpnA1,
+            physicalPostalAddress = PhysicalPostalAddressResponse(
+                basePhysicalAddress = BasePhysicalAddressDto(
                     companyPostalCode = null,
                     industrialZone = null,
                     building = null,
                     floor = null,
-                    door = null,
-                    areaPart = AreaDistrictResponse(
-                        administrativeAreaLevel1 = null,
-                        administrativeAreaLevel2 = null,
-                        district = null,
-                    ),
-                    street = null,
-                    baseAddress = BasePostalAddressResponse(
-                        geographicCoordinates = null,
-                        country = country2,
-                        postalCode = null,
-                        city = CommonValues.locality3,
-                    )
+                    door = null
                 ),
-                bpnLegalEntity = null,
-                bpnSite = null,
-                createdAt = Instant.now(),
-                updatedAt = Instant.now()
-            )
+                areaPart = AreaDistrictResponse(
+                    administrativeAreaLevel1 = null,
+                    administrativeAreaLevel2 = null,
+                    district = null,
+                ),
+                street = null,
+                baseAddress = BasePostalAddressResponse(
+                    geographicCoordinates = null,
+                    country = country2,
+                    postalCode = null,
+                    city = CommonValues.locality3,
+                )
+            ),
+            bpnLegalEntity = null,
+            bpnSite = null,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
         )
     )
 
@@ -333,32 +344,34 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = LogisticAddressResponse(
-                bpna = CommonValues.bpnA1,
-                physicalPostalAddress = PhysicalPostalAddressResponse(
+        ),
+        legalAddress = LogisticAddressResponse(
+            bpna = CommonValues.bpnA1,
+            physicalPostalAddress = PhysicalPostalAddressResponse(
+                basePhysicalAddress = BasePhysicalAddressDto(
                     companyPostalCode = null,
                     industrialZone = null,
                     building = null,
                     floor = null,
-                    door = null,
-                    areaPart = AreaDistrictResponse(
-                        administrativeAreaLevel1 = null,
-                        administrativeAreaLevel2 = null,
-                        district = null,
-                    ),
-                    street = null,
-                    baseAddress = BasePostalAddressResponse(
-                        geographicCoordinates = null,
-                        country = country3,
-                        postalCode = null,
-                        city = CommonValues.locality5,
-                    )
+                    door = null
                 ),
-                bpnLegalEntity = null,
-                bpnSite = null,
-                createdAt = Instant.now(),
-                updatedAt = Instant.now()
-            )
+                areaPart = AreaDistrictResponse(
+                    administrativeAreaLevel1 = null,
+                    administrativeAreaLevel2 = null,
+                    district = null,
+                ),
+                street = null,
+                baseAddress = BasePostalAddressResponse(
+                    geographicCoordinates = null,
+                    country = country3,
+                    postalCode = null,
+                    city = CommonValues.locality5,
+                )
+            ),
+            bpnLegalEntity = null,
+            bpnSite = null,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
         )
     )
 
@@ -373,10 +386,11 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = addressPartner1.copy(
-                bpnLegalEntity = legalEntity1.legalEntity.bpnl,
-                isLegalAddress = true
+
             ),
+        legalAddress = addressPartner1.copy(
+            bpnLegalEntity = legalEntity1.legalEntity.bpnl,
+            isLegalAddress = true
         ),
         index = CommonValues.index1
     )
@@ -392,10 +406,10 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = addressPartner2.copy(
-                bpnLegalEntity = legalEntity2.legalEntity.bpnl,
-                isLegalAddress = true
-            ),
+        ),
+        legalAddress = addressPartner2.copy(
+            bpnLegalEntity = legalEntity2.legalEntity.bpnl,
+            isLegalAddress = true
         ),
         index = CommonValues.index2
     )
@@ -411,10 +425,10 @@ object ResponseValues {
             currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
-            legalAddress = addressPartner3.copy(
-                bpnLegalEntity = legalEntity3.legalEntity.bpnl,
-                isLegalAddress = true
-            )
+        ),
+        legalAddress = addressPartner3.copy(
+            bpnLegalEntity = legalEntity3.legalEntity.bpnl,
+            isLegalAddress = true
         ),
         index = CommonValues.index3
     )
