@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
@@ -32,7 +32,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 )
 data class AddressGateOutput(
     @field:JsonUnwrapped
-    val address: LogisticAddressResponse,
+    val address: LogisticAddressGateResponse,
 
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String

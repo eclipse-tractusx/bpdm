@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import java.time.Instant
 
 object ResponseValues {
@@ -145,10 +147,12 @@ object ResponseValues {
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
     val address1 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone1,
-        building = CommonValues.building1,
-        floor = CommonValues.floor1,
-        door = CommonValues.door1,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone1,
+            building = CommonValues.building1,
+            floor = CommonValues.floor1,
+            door = CommonValues.door1
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
@@ -164,10 +168,12 @@ object ResponseValues {
     )
 
     val address2 = PhysicalPostalAddressResponse(
-        industrialZone = CommonValues.industrialZone2,
-        building = CommonValues.building2,
-        floor = CommonValues.floor2,
-        door = CommonValues.door2,
+        basePhysicalAddress = BasePhysicalAddressDto(
+            industrialZone = CommonValues.industrialZone2,
+            building = CommonValues.building2,
+            floor = CommonValues.floor2,
+            door = CommonValues.door2
+        ),
         areaPart = AreaDistrictResponse(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
@@ -182,7 +188,7 @@ object ResponseValues {
         )
     )
 
-    val logisticAddress1 = LogisticAddressResponse(
+    val logisticAddress1 = LogisticAddressGateResponse(
         bpna = CommonValues.bpnAddress1,
         physicalPostalAddress = address1,
         bpnLegalEntity = CommonValues.bpn1,
@@ -191,7 +197,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val logisticAddress2 = LogisticAddressResponse(
+    val logisticAddress2 = LogisticAddressGateResponse(
         bpna = CommonValues.bpnAddress2,
         physicalPostalAddress = address2,
         bpnLegalEntity = CommonValues.bpn2,
@@ -202,7 +208,14 @@ object ResponseValues {
 
     val legalEntityResponsePool1 = PoolLegalEntityResponse(
         legalName = CommonValues.name1,
-        legalAddress = logisticAddress1,
+        legalAddress = LogisticAddressResponse(
+            bpna = CommonValues.bpnAddress1,
+            physicalPostalAddress = address1,
+            bpnLegalEntity = CommonValues.bpn1,
+            bpnSite = "BPNS0000000001XY",
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        ),
         legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn1,
             identifiers = listOf(identifier1, identifier2),
@@ -219,7 +232,14 @@ object ResponseValues {
 
     val legalEntityResponsePool2 = PoolLegalEntityResponse(
         legalName = CommonValues.name3,
-        legalAddress = logisticAddress2,
+        legalAddress = LogisticAddressResponse(
+            bpna = CommonValues.bpnAddress2,
+            physicalPostalAddress = address2,
+            bpnLegalEntity = CommonValues.bpn2,
+            bpnSite = "BPNS0000000002XY",
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        ),
         legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn2,
             identifiers = listOf(identifier3, identifier4),

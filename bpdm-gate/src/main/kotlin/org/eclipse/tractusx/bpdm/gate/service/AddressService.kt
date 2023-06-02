@@ -20,13 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
@@ -127,7 +127,7 @@ class AddressService(
         )
     }
 
-    fun toAddressOutput(externalId: String, address: LogisticAddressResponse): AddressGateOutput {
+    fun toAddressOutput(externalId: String, address: LogisticAddressGateResponse): AddressGateOutput {
         return AddressGateOutput(
             address = address,
             externalId = externalId

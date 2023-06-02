@@ -17,28 +17,29 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AreaDistrictDto
 import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.BasePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.response.AreaDistrictResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.BasePostalAddressResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "PhysicalPostalAddressGateDto", description = "Physical Postal Address Part")
-data class PhysicalPostalAddressGateDto(
+@Schema(name = "PhysicalPostalGateAddress", description = "Physical Postal Address Part")
+data class PhysicalPostalAddressGateResponse(
 
     @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressDto,
+    val baseAddress: BasePostalAddressResponse,
 
-    @get:Schema(description = "Address Street")
+    @get:Schema(description = "Street")
     val street: StreetGateDto? = null,
 
     @field:JsonUnwrapped
-    val areaPart: AreaDistrictDto,
+    val areaPart: AreaDistrictResponse,
 
     @field:JsonUnwrapped
     val basePhysicalAddress: BasePhysicalAddressDto

@@ -204,7 +204,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
         val addressSearchRequest = AddressPartnerSearchRequest(
-            premise = givenAddress1.physicalPostalAddress.building
+            premise = givenAddress1.physicalPostalAddress.basePhysicalAddress.building
         )
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 

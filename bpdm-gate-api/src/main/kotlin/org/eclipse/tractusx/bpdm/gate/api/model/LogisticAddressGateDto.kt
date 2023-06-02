@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressStateDto
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
 
 
-@Schema(name = "LogisticAddressDto", description = "Address record for a business partner")
+@Schema(name = "LogisticAddressGateDto", description = "Address record for a business partner")
 data class LogisticAddressGateDto(
     @get:Schema(
         description = "Name of the logistic address of the business partner. This is not according to official\n" +
