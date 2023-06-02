@@ -150,10 +150,11 @@ class BusinessPartnerLegacyControllerIT @Autowired constructor(
 
     private fun convertCreateResponse(toConvert: LegalEntityPartnerCreateResponse): BusinessPartnerResponse {
         return BusinessPartnerResponse(
-            "",
-            toConvert.legalEntity,
-            listOf(toConvert.legalAddress),
-            emptyList()
+            uuid = "",
+            legalName = toConvert.legalName,
+            legalEntity = toConvert.legalEntity,
+            addresses = listOf(toConvert.legalEntity.legalAddress),
+            sites = emptyList()
         )
     }
 }

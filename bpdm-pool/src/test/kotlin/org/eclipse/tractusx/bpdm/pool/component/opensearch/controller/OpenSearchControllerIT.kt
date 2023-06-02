@@ -223,7 +223,7 @@ class OpenSearchControllerIT @Autowired constructor(
             val pageResult = searchBusinessPartnerByName(name)
 
             assertThat(pageResult.content).isNotEmpty
-            assertThat(pageResult.content.first()).matches { it.legalEntity.legalName == name }
+            assertThat(pageResult.content.first()).matches { it.legalName == name }
         }
     }
 

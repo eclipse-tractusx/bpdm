@@ -47,6 +47,9 @@ data class LegalEntityResponse(
     @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
     val relations: Collection<RelationResponse> = emptyList(),
 
+    @get:Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: LogisticAddressResponse,
+
     @get:Schema(description = "The timestamp the business partner data was last indicated to be still current")
     val currentness: Instant,
 
@@ -54,5 +57,6 @@ data class LegalEntityResponse(
     val createdAt: Instant,
 
     @get:Schema(description = "The timestamp the business partner data was last updated")
-    val updatedAt: Instant
-)
+    val updatedAt: Instant,
+
+    )

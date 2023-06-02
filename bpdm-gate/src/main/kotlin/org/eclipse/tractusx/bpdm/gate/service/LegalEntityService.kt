@@ -22,11 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.FetchResponse
-import org.eclipse.tractusx.bpdm.common.exception.BpdmMappingException
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
@@ -99,7 +96,7 @@ class LegalEntityService(
 
         //Search entries in the pool with BPNs found in the local mirror
         val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.bpnl }
+        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.legalEntity.bpnl }
         val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnSet).associateBy { it.bpnLegalEntity }
 
         if (bpnSet.size > legalEntitiesByBpnMap.size) {
@@ -136,19 +133,19 @@ class LegalEntityService(
     fun toLegalEntityOutput(externalId: String, legalEntityPool: PoolLegalEntityResponse, legalAddress: LogisticAddressResponse): LegalEntityGateOutput =
         LegalEntityGateOutput(
             legalEntity = LegalEntityResponse(
-                bpnl = legalEntityPool.bpnl,
-                identifiers = legalEntityPool.identifiers,
-                legalShortName = legalEntityPool.legalShortName,
-                legalForm = legalEntityPool.legalForm,
-                states = legalEntityPool.states,
-                classifications = legalEntityPool.classifications,
-                relations = legalEntityPool.relations,
-                currentness = legalEntityPool.currentness,
-                createdAt = legalEntityPool.createdAt,
-                updatedAt = legalEntityPool.updatedAt,
+                bpnl = legalEntityPool.legalEntity.bpnl,
+                identifiers = legalEntityPool.legalEntity.identifiers,
+                legalShortName = legalEntityPool.legalEntity.legalShortName,
+                legalForm = legalEntityPool.legalEntity.legalForm,
+                states = legalEntityPool.legalEntity.states,
+                classifications = legalEntityPool.legalEntity.classifications,
+                relations = legalEntityPool.legalEntity.relations,
+                currentness = legalEntityPool.legalEntity.currentness,
+                createdAt = legalEntityPool.legalEntity.createdAt,
+                updatedAt = legalEntityPool.legalEntity.updatedAt,
+                legalAddress = legalEntityPool.legalEntity.legalAddress,
             ),
             legalNameParts = arrayOf(legalEntityPool.legalName),
-            legalAddress = legalAddress,
             externalId = externalId
         )
 

@@ -19,42 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "PoolLegalEntityResponse", description = "Legal entity record")
 data class PoolLegalEntityResponse(
-    @get:Schema(description = "Business Partner Number of this legal entity")
-    val bpnl: String,
-
-    @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
-    val identifiers: Collection<LegalEntityIdentifierResponse> = emptyList(),
 
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
 
-    @get:Schema(description = "Abbreviated name or shorthand")
-    val legalShortName: String? = null,
-
-    @get:Schema(description = "Legal form of the business partner")
-    val legalForm: LegalFormResponse? = null,
-
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<LegalEntityStateResponse> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Classifications"))
-    val classifications: Collection<ClassificationResponse> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
-    val relations: Collection<RelationResponse> = emptyList(),
-
-    @get:Schema(description = "The timestamp the business partner data was last indicated to be still current")
-    val currentness: Instant,
-
-    @get:Schema(description = "The timestamp the business partner data was created")
-    val createdAt: Instant,
-
-    @get:Schema(description = "The timestamp the business partner data was last updated")
-    val updatedAt: Instant
+    @field:JsonUnwrapped
+    val legalEntity: LegalEntityResponse,
 )
