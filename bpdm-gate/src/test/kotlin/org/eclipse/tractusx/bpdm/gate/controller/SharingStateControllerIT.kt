@@ -54,36 +54,36 @@ class SharingStateControllerIT @Autowired constructor(
     @Test
     fun `insert and get sharing states `() {
 
-        val stateAddress = insertSharingStateSuccess(LsaType.Address, externalId = "exIdAddress")
-        val stateSite = insertSharingStateSuccess(LsaType.Site, externalId = "exIdSite")
-        val stateLegalEntity1 = insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity1")
-        val stateLegalEntity2 = insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdEntity2")
-        insertSharingStateSuccess(LsaType.Address, externalId = "exIdMultiple")
-        insertSharingStateSuccess(LsaType.Site, externalId = "exIdMultiple")
-        insertSharingStateSuccess(LsaType.LegalEntity, externalId = "exIdMultiple")
+        val stateAddress = insertSharingStateSuccess(LsaType.ADDRESS, externalId = "exIdAddress")
+        val stateSite = insertSharingStateSuccess(LsaType.SITE, externalId = "exIdSite")
+        val stateLegalEntity1 = insertSharingStateSuccess(LsaType.LEGAL_ENTITY, externalId = "exIdEntity1")
+        val stateLegalEntity2 = insertSharingStateSuccess(LsaType.LEGAL_ENTITY, externalId = "exIdEntity2")
+        insertSharingStateSuccess(LsaType.ADDRESS, externalId = "exIdMultiple")
+        insertSharingStateSuccess(LsaType.SITE, externalId = "exIdMultiple")
+        insertSharingStateSuccess(LsaType.LEGAL_ENTITY, externalId = "exIdMultiple")
 
-        val searchAddressById = readSharingStates(LsaType.Address, "exIdAddress")
+        val searchAddressById = readSharingStates(LsaType.ADDRESS, "exIdAddress")
         assertThat(searchAddressById).hasSize(1)
         assertThat(searchAddressById.first()).isEqualTo(stateAddress)
 
-        val searchSitesById = readSharingStates(LsaType.Site, "exIdSite")
+        val searchSitesById = readSharingStates(LsaType.SITE, "exIdSite")
         assertThat(searchSitesById).hasSize(1)
         assertThat(searchSitesById.first()).isEqualTo(stateSite)
 
-        val searchAddressWrongId = readSharingStates(LsaType.Address, "exIdEntity")
+        val searchAddressWrongId = readSharingStates(LsaType.ADDRESS, "exIdEntity")
         assertThat(searchAddressWrongId).hasSize(0)
 
-        val searchEntityMultiple = readSharingStates(LsaType.LegalEntity, "exIdEntity1", "exIdEntity2")
+        val searchEntityMultiple = readSharingStates(LsaType.LEGAL_ENTITY, "exIdEntity1", "exIdEntity2")
         assertThat(searchEntityMultiple).hasSize(2)
 
-        val searchEntitySingle = readSharingStates(LsaType.LegalEntity, "exIdEntity2")
+        val searchEntitySingle = readSharingStates(LsaType.LEGAL_ENTITY, "exIdEntity2")
         assertThat(searchEntitySingle).hasSize(1)
         assertThat(searchEntitySingle.first()).isEqualTo(stateLegalEntity2)
 
         val searchAll = readSharingStates(null)
         assertThat(searchAll).hasSize(7)
 
-        val searchEntityAllLegalEntities = readSharingStates(LsaType.LegalEntity)
+        val searchEntityAllLegalEntities = readSharingStates(LsaType.LEGAL_ENTITY)
         assertThat(searchEntityAllLegalEntities).hasSize(3)
         assertThat(searchEntityAllLegalEntities).extracting(SharingStateDto::externalId.name)
             .contains(stateLegalEntity1.externalId, stateLegalEntity2.externalId, "exIdMultiple")
@@ -98,11 +98,11 @@ class SharingStateControllerIT @Autowired constructor(
     @Test
     fun `insert and get sharing states with error code`() {
 
-        val stateAddress1 = insertSharingStateError(LsaType.Address, externalId = "exIdAddress1", errorCode = SharingTimeout)
-        insertSharingStateError(LsaType.Address, externalId = "exIdAddress2", errorCode = SharingProcessError)
-        insertSharingStateError(LsaType.Address, externalId = "exIdAddress3", errorCode = BpnNotInPool)
+        val stateAddress1 = insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress1", errorCode = SharingTimeout)
+        insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress2", errorCode = SharingProcessError)
+        insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress3", errorCode = BpnNotInPool)
 
-        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        val searchAddress = readSharingStates(LsaType.ADDRESS, "exIdAddress1")
         assertThat(searchAddress).hasSize(1)
         assertThat(searchAddress.first()).isEqualTo(stateAddress1)
     }
@@ -110,11 +110,11 @@ class SharingStateControllerIT @Autowired constructor(
     @Test
     fun `insert and update states`() {
 
-        val stateAddress1 = insertSharingStateError(LsaType.Address, externalId = "exIdAddress1", errorCode = SharingTimeout)
-        insertSharingStateError(LsaType.Address, externalId = "exIdAddress2", errorCode = SharingProcessError)
-        insertSharingStateError(LsaType.Address, externalId = "exIdAddress3", errorCode = BpnNotInPool)
+        val stateAddress1 = insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress1", errorCode = SharingTimeout)
+        insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress2", errorCode = SharingProcessError)
+        insertSharingStateError(LsaType.ADDRESS, externalId = "exIdAddress3", errorCode = BpnNotInPool)
 
-        val searchAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        val searchAddress = readSharingStates(LsaType.ADDRESS, "exIdAddress1")
         assertThat(searchAddress).hasSize(1)
         assertThat(searchAddress.first()).isEqualTo(stateAddress1)
 
@@ -128,7 +128,7 @@ class SharingStateControllerIT @Autowired constructor(
 
         gateClient.sharingState().upsertSharingState(updatedAddress1)
 
-        val readUpdatedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        val readUpdatedAddress = readSharingStates(LsaType.ADDRESS, "exIdAddress1")
         assertThat(readUpdatedAddress).hasSize(1)
         assertThat(readUpdatedAddress.first()).isEqualTo(updatedAddress1)
     }
@@ -138,11 +138,11 @@ class SharingStateControllerIT @Autowired constructor(
 
         val startTime = LocalDateTime.now().withNano(0)
         val stateAddress1 = insertSharingStateSuccess(
-            lsaType = LsaType.Address, externalId = "exIdAddress1",
+            lsaType = LsaType.ADDRESS, externalId = "exIdAddress1",
             sharingProcessStarted = startTime
         )
 
-        val readInsertedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        val readInsertedAddress = readSharingStates(LsaType.ADDRESS, "exIdAddress1")
         assertThat(readInsertedAddress.first().sharingProcessStarted).isEqualTo(startTime)
 
         val updatedWithEmpyStarted = stateAddress1.copy(
@@ -152,7 +152,7 @@ class SharingStateControllerIT @Autowired constructor(
         )
         gateClient.sharingState().upsertSharingState(updatedWithEmpyStarted)
 
-        val readUpdatedAddress = readSharingStates(LsaType.Address, "exIdAddress1")
+        val readUpdatedAddress = readSharingStates(LsaType.ADDRESS, "exIdAddress1")
         assertThat(readUpdatedAddress.first().sharingStateType).isEqualTo(SharingStateType.Error)
         assertThat(readUpdatedAddress.first().sharingProcessStarted).isEqualTo(startTime).describedAs("Update with null - sharingProcessStarted not changed ")
         assertThat(readUpdatedAddress.first().sharingErrorMessage).isEqualTo("Changed")

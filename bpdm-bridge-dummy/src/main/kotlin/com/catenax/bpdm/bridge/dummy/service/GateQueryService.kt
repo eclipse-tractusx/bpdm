@@ -26,6 +26,11 @@ import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.springframework.stereotype.Service
@@ -45,9 +50,8 @@ class GateQueryService(
         val content = mutableListOf<ChangelogResponse>()
 
         do {
-            val pageResponse = gateClient.changelog().getChangelogEntriesLsaType(
-                lsaType = null,
-                fromTime = modifiedAfter,
+            val pageResponse = gateClient.changelog().getChangelogEntries(
+                searchRequest = ChangeLogSearchRequest(fromTime = modifiedAfter),
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
             page++
@@ -61,16 +65,16 @@ class GateQueryService(
             .also {
                 logger.info {
                     "Changed entries in Gate since last sync: " +
-                            "${it[LsaType.LegalEntity]?.size ?: 0} legal entities, " +
-                            "${it[LsaType.Site]?.size ?: 0} sites, " +
-                            "${it[LsaType.Address]?.size ?: 0} addresses"
+                            "${it[LsaType.LEGAL_ENTITY]?.size ?: 0} legal entities, " +
+                            "${it[LsaType.SITE]?.size ?: 0} sites, " +
+                            "${it[LsaType.ADDRESS]?.size ?: 0} addresses"
                 }
             }
     }
 
     fun getLegalEntityInfos(externalIds: Set<String>): Collection<GateLegalEntityInfo> {
         val entries = getLegalEntitiesInput(externalIds)
-        val bpnByExternalId = getBpnByExternalId(LsaType.LegalEntity, externalIds)
+        val bpnByExternalId = getBpnByExternalId(LsaType.LEGAL_ENTITY, externalIds)
 
         return entries.map {
             GateLegalEntityInfo(
@@ -84,7 +88,7 @@ class GateQueryService(
 
     fun getSiteInfos(externalIds: Set<String>): Collection<GateSiteInfo> {
         val entries = getSitesInput(externalIds)
-        val bpnByExternalId = getBpnByExternalId(LsaType.Site, externalIds)
+        val bpnByExternalId = getBpnByExternalId(LsaType.SITE, externalIds)
 
         return entries.map {
             GateSiteInfo(
@@ -98,7 +102,7 @@ class GateQueryService(
 
     fun getAddressInfos(externalIds: Set<String>): Collection<GateAddressInfo> {
         val entries = getAddressesInput(externalIds)
-        val bpnByExternalId = getBpnByExternalId(LsaType.Address, externalIds)
+        val bpnByExternalId = getBpnByExternalId(LsaType.ADDRESS, externalIds)
 
         return entries.map {
             GateAddressInfo(
