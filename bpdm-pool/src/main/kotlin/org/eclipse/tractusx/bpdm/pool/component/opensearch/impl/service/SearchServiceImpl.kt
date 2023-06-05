@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
@@ -55,7 +54,6 @@ class SearchServiceImpl(
     val logisticAddressRepository: LogisticAddressRepository,
     val addressService: AddressService,
     val businessPartnerFetchService: BusinessPartnerFetchService,
-    val objectMapper: ObjectMapper,
     val openSearchConfigProperties: OpenSearchConfigProperties
 ) : SearchService {
 
