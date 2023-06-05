@@ -27,15 +27,12 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.service.toBusinessPartnerMatchDto
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
@@ -90,19 +87,4 @@ class SearchServiceMock(
         return resultPage.toDto(resultPage.content.map { it.toBusinessPartnerMatchDto(1f) })
     }
 
-    /**
-     * Ignores [field], [text] as well as [filters] and returns empty page of suggestions
-     */
-    override fun getSuggestion(
-        field: SuggestionType,
-        text: String?,
-        filters: BusinessPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageResponse<SuggestionResponse> {
-        val emptyPage = Page.empty<SuggestionResponse>(PageRequest.of(paginationRequest.page, paginationRequest.size))
-
-        logger.info { "Mock search: Returning no suggestions" }
-
-        return emptyPage.toDto(emptyPage.content)
-    }
 }

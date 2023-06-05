@@ -26,8 +26,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
@@ -54,16 +52,5 @@ interface SearchService {
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerMatchResponse>
-
-
-    /**
-     * In business partners matching the [filters], find [field] values matching [text].
-     */
-    fun getSuggestion(
-        field: SuggestionType,
-        text: String?,
-        filters: BusinessPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageResponse<SuggestionResponse>
 
 }

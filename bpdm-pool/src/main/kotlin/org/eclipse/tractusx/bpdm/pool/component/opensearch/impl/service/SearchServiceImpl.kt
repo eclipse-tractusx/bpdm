@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
@@ -29,13 +27,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SuggestionResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.SuggestionType
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.TextDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
@@ -59,9 +53,7 @@ class SearchServiceImpl(
     val legalEntityRepository: LegalEntityRepository,
     val logisticAddressRepository: LogisticAddressRepository,
     val addressService: AddressService,
-    val textDocSearchRepository: TextDocSearchRepository,
     val businessPartnerFetchService: BusinessPartnerFetchService,
-    val objectMapper: ObjectMapper,
     val openSearchConfigProperties: OpenSearchConfigProperties
 ) : SearchService {
 
@@ -115,45 +107,6 @@ class SearchServiceImpl(
             PageResponse(totalElements, totalPages, page, contentSize,
                 content.map { (score, legalEntity) -> legalEntity.toBusinessPartnerMatchDto(score) })
         }
-    }
-
-    /**
-     * Query OpenSearch for [field] values by [text] and [filters]
-     *
-     * The found values and their hit scores are converted to [SuggestionResponse] and returned as a paginated result.
-     */
-    override fun getSuggestion(
-        field: SuggestionType,
-        text: String?,
-        filters: BusinessPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageResponse<SuggestionResponse> {
-
-        logger.debug { "Search index for suggestion type $field" }
-
-        val hits = textDocSearchRepository.findByFieldAndTextAndFilters(
-            field,
-            text,
-            filters,
-            PageRequest.of(paginationRequest.page, paginationRequest.size)
-        )
-
-        logger.debug { "Returning ${hits.hits.size} suggestions for $field. (${hits.totalHits} found in total)" }
-
-        return PageResponse(
-            hits.totalHits!!.value,
-            ceil(hits.totalHits!!.value.toDouble() / paginationRequest.size).toInt(),
-            paginationRequest.page,
-            hits.hits.size,
-            hits.map { hit ->
-                SuggestionResponse(extractTextDocText(hit.sourceAsString), hit.score)
-            }.toList()
-        )
-    }
-
-    private fun extractTextDocText(textDocJson: String): String {
-        val textDoc: TextDoc = objectMapper.readValue(textDocJson)
-        return textDoc.text
     }
 
     private fun searchAndPreparePage(
@@ -252,7 +205,7 @@ class SearchServiceImpl(
 
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
-       return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
+        return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
     }
 
 }
