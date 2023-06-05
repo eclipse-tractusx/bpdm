@@ -21,16 +21,13 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.Site
@@ -87,55 +84,25 @@ class SiteService(
      * Get sites by first fetching sites from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the sites from the bpdm pool.
      */
-    fun getSitesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageOutputResponse<SiteGateOutput> {
-        val partnerResponse = saasClient.getSites(limit = limit, startAfter = startAfter, externalIds = externalIds)
-        val partners = partnerResponse.values
+    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputResponse> {
 
-        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
-        val augmentedPartnerResponse = saasClient.getAugmentedSites(externalIds = partnersWithExternalId.map { it.externalId })
-        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
+        val sitePage = siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
 
-        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val sitesByBpnMap = poolClient.searchSites(bpnSet).associateBy { it.bpns }
-        val mainAddressesByBpnMap = poolClient.searchMainAddresses(bpnSet).associateBy { it.bpnSite }
-
-        if (bpnSet.size > sitesByBpnMap.size) {
-            logger.warn { "Requested ${bpnSet.size} sites from pool, but only ${sitesByBpnMap.size} were found." }
-        }
-        if (bpnSet.size > mainAddressesByBpnMap.size) {
-            logger.warn { "Requested ${bpnSet.size} main addresses of sites from pool, but only ${mainAddressesByBpnMap.size} were found." }
-        }
-
-        //Filter only sites which can be found with their main address  in the Pool under the given local BPN
-        val partnersWithPoolBpn = partnersWithLocalBpn.filter { sitesByBpnMap[it.bpn] != null && mainAddressesByBpnMap[it.bpn] != null }
-        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
-
-        //Evaluate the sharing status of the legal entities
-        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
-
-        val validSites = sharingStatus.validExternalIds.map { externalId ->
-            val bpn = bpnByExternalIdMap[externalId]!!
-            val site = sitesByBpnMap[bpn]!!
-            val mainAddress = mainAddressesByBpnMap[bpn]!!
-            toSiteOutput(externalId, site, mainAddress)
-        }
-
-        return PageOutputResponse(
-            total = partnerResponse.total,
-            nextStartAfter = partnerResponse.nextStartAfter,
-            content = validSites,
-            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
-            pending = sharingStatus.pendingExternalIds,
-            errors = sharingStatus.errors,
+        return PageResponse(
+            page = page,
+            totalElements = sitePage.totalElements,
+            totalPages = sitePage.totalPages,
+            contentSize = sitePage.content.size,
+            content = toValidOutputSites(sitePage),
         )
+
     }
 
-    fun toSiteOutput(externalId: String, site: SiteResponse, mainAddress: LogisticAddressGateResponse) =
-        SiteGateOutput(
-            site = site,
-            mainAddress = mainAddress,
-            externalId = externalId
-        )
+    private fun toValidOutputSites(sitePage: Page<Site>): List<SiteGateOutputResponse> {
+        return sitePage.content.map { sites ->
+            sites.toSiteGateOutputResponse(sites)
+        }
+    }
 
     /**
      * Upsert sites by:

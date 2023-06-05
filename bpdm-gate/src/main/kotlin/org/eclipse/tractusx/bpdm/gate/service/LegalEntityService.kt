@@ -20,17 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -92,68 +88,25 @@ class LegalEntityService(
      * Get legal entities by first fetching legal entities from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
      * which is then used to fetch the data for the legal entities from the bpdm pool.
      */
-    fun getLegalEntitiesOutput(externalIds: Collection<String>?, limit: Int, startAfter: String?): PageOutputResponse<LegalEntityGateOutput> {
-        val partnerResponse = saasClient.getLegalEntities(limit = limit, startAfter = startAfter, externalIds = externalIds)
-        val partners = partnerResponse.values
+    fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<LegalEntityGateOutputResponse> {
 
-        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
-        val augmentedPartnerResponse = saasClient.getAugmentedLegalEntities(externalIds = partnersWithExternalId.map { it.externalId })
-        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
+        val legalEntityPage = legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
 
-        //Search entries in the pool with BPNs found in the local mirror
-        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-        val legalEntitiesByBpnMap = poolClient.searchLegalEntities(bpnSet).associateBy { it.legalEntity.bpnl }
-        val legalAddressesByBpnMap = poolClient.searchLegalAddresses(bpnSet).associateBy { it.bpnLegalEntity }
-
-        if (bpnSet.size > legalEntitiesByBpnMap.size) {
-            logger.warn { "Requested ${bpnSet.size} legal entities from pool, but only ${legalEntitiesByBpnMap.size} were found." }
-        }
-        if (bpnSet.size > legalAddressesByBpnMap.size) {
-            logger.warn { "Requested ${bpnSet.size} legal addresses from pool, but only ${legalAddressesByBpnMap.size} were found." }
-        }
-
-        //Filter only legal entities which can be found with their legal address  in the Pool under the given local BPN
-        val partnersWithPoolBpn = partnersWithLocalBpn.filter { legalEntitiesByBpnMap[it.bpn] != null && legalAddressesByBpnMap[it.bpn] != null }
-        val bpnByExternalIdMap = partnersWithPoolBpn.associate { Pair(it.externalId, it.bpn) }
-
-        //Evaluate the sharing status of the legal entities
-        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
-
-        val validLegalEntities = sharingStatus.validExternalIds.map { externalId ->
-            val bpn = bpnByExternalIdMap[externalId]!!
-            val legalEntity = legalEntitiesByBpnMap[bpn]!!
-            val legalAddress = legalAddressesByBpnMap[bpn]!!
-            toLegalEntityOutput(externalId, legalEntity, legalAddress)
-        }
-
-        return PageOutputResponse(
-            total = partnerResponse.total,
-            nextStartAfter = partnerResponse.nextStartAfter,
-            content = validLegalEntities,
-            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
-            pending = sharingStatus.pendingExternalIds,
-            errors = sharingStatus.errors,
+        return PageResponse(
+            page = page,
+            totalElements = legalEntityPage.totalElements,
+            totalPages = legalEntityPage.totalPages,
+            contentSize = legalEntityPage.content.size,
+            content = toValidOutputLegalEntities(legalEntityPage),
         )
+
     }
 
-    fun toLegalEntityOutput(externalId: String, legalEntityPool: PoolLegalEntityResponse, legalAddress: LogisticAddressGateResponse): LegalEntityGateOutput =
-        LegalEntityGateOutput(
-            legalEntity = LegalEntityResponse(
-                bpnl = legalEntityPool.legalEntity.bpnl,
-                identifiers = legalEntityPool.legalEntity.identifiers,
-                legalShortName = legalEntityPool.legalEntity.legalShortName,
-                legalForm = legalEntityPool.legalEntity.legalForm,
-                states = legalEntityPool.legalEntity.states,
-                classifications = legalEntityPool.legalEntity.classifications,
-                relations = legalEntityPool.legalEntity.relations,
-                currentness = legalEntityPool.legalEntity.currentness,
-                createdAt = legalEntityPool.legalEntity.createdAt,
-                updatedAt = legalEntityPool.legalEntity.updatedAt,
-            ),
-            legalAddress = legalAddress,
-            legalNameParts = arrayOf(legalEntityPool.legalName),
-            externalId = externalId
-        )
+    private fun toValidOutputLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateOutputResponse> {
+        return legalEntityPage.content.map { legalEntity ->
+            legalEntity.toLegalEntityGateOutputResponse(legalEntity)
+        }
+    }
 
     private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputResponse> {
         return legalEntityPage.content.map { legalEntity ->

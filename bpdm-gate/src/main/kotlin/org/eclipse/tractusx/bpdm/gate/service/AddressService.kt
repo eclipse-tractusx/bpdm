@@ -109,50 +109,6 @@ class AddressService(
         }
     }
 
-//        val partnerResponse = saasClient.getAddresses(limit = limit, startAfter = startAfter, externalIds = externalIds)
-//        val partners = partnerResponse.values
-//
-//        val partnersWithExternalId = outputSaasMappingService.mapWithExternalId(partners)
-//        val augmentedPartnerResponse = saasClient.getAugmentedAddresses(externalIds = partnersWithExternalId.map { it.externalId })
-//        val partnersWithLocalBpn = outputSaasMappingService.mapWithLocalBpn(partnersWithExternalId, augmentedPartnerResponse.values)
-//
-//        //Search entries in the pool with BPNs found in the local mirror
-//        val bpnSet = partnersWithLocalBpn.map { it.bpn }.toSet()
-//        val addressesByBpnMap = poolClient.searchAddresses(bpnSet).associateBy { it.bpna }
-//
-//        if (bpnSet.size > addressesByBpnMap.size) {
-//            logger.warn { "Requested ${bpnSet.size} addresses from pool, but only ${addressesByBpnMap.size} were found." }
-//        }
-//
-//        val partnersWithPoolBpn = partnersWithLocalBpn.filter { addressesByBpnMap[it.bpn] != null }
-//        val bpnByExternalIdMap = partnersWithPoolBpn.map { Pair(it.partner.externalId!!, it.bpn) }.toMap()
-//
-//        //Evaluate the sharing status of the legal entities
-//        val sharingStatus = outputSaasMappingService.evaluateSharingStatus(partners, partnersWithLocalBpn, partnersWithPoolBpn)
-//
-//        val validAddresses = sharingStatus.validExternalIds.map { externalId ->
-//            val bpn = bpnByExternalIdMap[externalId]!!
-//            val address = addressesByBpnMap[bpn]!!
-//            toAddressOutput(externalId, address)
-//        }
-//
-//        return PageOutputResponse(
-//            total = partnerResponse.total,
-//            nextStartAfter = partnerResponse.nextStartAfter,
-//            content = validAddresses,
-//            invalidEntries = partners.size - sharingStatus.validExternalIds.size, // difference between all entries from SaaS and valid content
-//            pending = sharingStatus.pendingExternalIds,
-//            errors = sharingStatus.errors,
-//        )
-//    }
-
-    fun toAddressOutput(externalId: String, address: LogisticAddressGateResponse): AddressGateOutput {
-        return AddressGateOutput(
-            address = address,
-            externalId = externalId
-        )
-    }
-
     /**
      * Upsert addresses by:
      *

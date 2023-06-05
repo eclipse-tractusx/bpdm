@@ -29,9 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -120,9 +118,9 @@ interface GateSiteApi {
     @PostMapping("/output/sites/search")
     @PostExchange("/output/sites/search")
     fun getSitesOutput(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageOutputResponse<SiteGateOutput>
+    ): PageResponse<SiteGateOutputResponse>
 
     @Operation(
         summary = "Create or update sites.",
