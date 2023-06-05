@@ -51,7 +51,7 @@ class LegalEntityService(
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         legalEntities.forEach { legalEntity ->
-            changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LegalEntity))
+            changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LEGAL_ENTITY))
         }
         legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
     }

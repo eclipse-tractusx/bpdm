@@ -20,15 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
 @Validated
@@ -36,17 +34,10 @@ class ChangelogController(
     private val changelogService: ChangelogService
 ) : GateChangelogApi {
 
-    override fun getChangelogEntriesExternalId(
-        paginationRequest: PaginationRequest, fromTime: Instant?, externalIds: Set<String>
+    override fun getChangelogEntries(
+        paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
-        return changelogService.getChangeLogByExternalId(externalIds, fromTime, paginationRequest.page, paginationRequest.size)
+        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime, paginationRequest.page, paginationRequest.size)
     }
-
-    override fun getChangelogEntriesLsaType(
-        paginationRequest: PaginationRequest, fromTime: Instant?, lsaType: LsaType?
-    ): PageResponse<ChangelogResponse> {
-        return changelogService.getChangeLogByLsaType(lsaType, fromTime, paginationRequest.page, paginationRequest.size)
-    }
-
 
 }

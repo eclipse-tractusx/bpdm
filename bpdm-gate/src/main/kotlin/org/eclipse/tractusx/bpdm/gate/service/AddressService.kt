@@ -117,7 +117,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.Address))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS))
         }
 
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)

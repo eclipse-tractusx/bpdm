@@ -55,9 +55,9 @@ class SyncService(
         // Check changelog entries from Gate (after last sync time)
         val externalIdsByType = gateQueryService.getChangedExternalIdsByLsaType(modifiedAfter)
 
-        externalIdsByType[LsaType.LegalEntity]?.let { syncLegalEntities(it) }
-        externalIdsByType[LsaType.Site]?.let { syncSites(it) }
-        externalIdsByType[LsaType.Address]?.let { syncAddresses(it) }
+        externalIdsByType[LsaType.LEGAL_ENTITY]?.let { syncLegalEntities(it) }
+        externalIdsByType[LsaType.SITE]?.let { syncSites(it) }
+        externalIdsByType[LsaType.ADDRESS]?.let { syncAddresses(it) }
     }
 
     private fun syncLegalEntities(externalIdsRequested: Set<String>) {

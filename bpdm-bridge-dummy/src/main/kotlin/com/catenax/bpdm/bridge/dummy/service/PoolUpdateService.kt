@@ -101,7 +101,7 @@ class PoolUpdateService(
     fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>): SitePartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
             .map { it.legalEntityExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.LegalEntity, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(LsaType.LEGAL_ENTITY, it.toSet()) }
         val createRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
@@ -146,7 +146,7 @@ class PoolUpdateService(
     fun createAddressesInPool(entriesToCreate: Collection<GateAddressInfo>): AddressPartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.legalEntityExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.LegalEntity, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(LsaType.LEGAL_ENTITY, it.toSet()) }
         val leParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
@@ -160,7 +160,7 @@ class PoolUpdateService(
 
         val siteParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.siteExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.Site, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(LsaType.SITE, it.toSet()) }
         val siteParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
