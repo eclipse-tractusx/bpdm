@@ -7,7 +7,8 @@ This file contains information on how to configure and run the BPDM applications
 BPDM Pool is a SpringBoot Kotlin software project managed by Maven.
 
 The project can be run with the following command: `mvn clean spring-boot:run`
-The command should be run from the root poom file
+In order to run the project you need to build the project from the parent pom file and depending on wich module we want to run we need to specify the module as
+a target.
 
 ### Prerequisites
 
@@ -33,11 +34,10 @@ Here you can find core application configuration such as Swagger documentation, 
 Furthermore, here you can find the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL) and Opensearch.
 
 You can also run the project with Spring profiles to enable additional components on top of the default configuration.
-Currently, the BPDM Pool offers the profiles `auth`.
+Currently, the BPDM Pool offers the profile `auth`.
 In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
 
 For example, the command `mvn clean spring-boot:run -Dspring.profiles.active=auth` starts the application with additional `auth` configuration enabled.
-You can also run several profiles at once, of course: `mvn clean spring-boot:run -Dspring.profiles.active=auth`.
 
 The following sections detail the configuration properties for each profile.
 
