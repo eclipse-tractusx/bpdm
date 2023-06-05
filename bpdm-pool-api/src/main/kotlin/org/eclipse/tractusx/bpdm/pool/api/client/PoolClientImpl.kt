@@ -44,7 +44,6 @@ class PoolClientImpl(
     private val poolClientLegalEntity by lazy { httpServiceProxyFactory.createClient(PoolLegalEntityApi::class.java) }
     private val poolClientMetadata by lazy { httpServiceProxyFactory.createClient(PoolMetadataApi::class.java) }
     private val poolClientSite by lazy { httpServiceProxyFactory.createClient(PoolSiteApi::class.java) }
-    private val poolClientSuggestion by lazy { httpServiceProxyFactory.createClient(PoolSuggestionApi::class.java) }
     private val poolClientOpenSearch by lazy { httpServiceProxyFactory.createClient(PoolOpenSearchApi::class.java) }
     private val poolClientSaas by lazy { httpServiceProxyFactory.createClient(PoolSaasApi::class.java) }
 
@@ -59,8 +58,6 @@ class PoolClientImpl(
     override fun metadata() = poolClientMetadata
 
     override fun sites() = poolClientSite
-
-    override fun suggestions() = poolClientSuggestion
 
     override fun opensearch() = poolClientOpenSearch
 

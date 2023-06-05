@@ -35,8 +35,6 @@ interface PoolApiClient {
 
     fun sites(): PoolSiteApi
 
-    fun suggestions(): PoolSuggestionApi
-
     fun opensearch(): PoolOpenSearchApi
 
     fun saas(): PoolSaasApi
