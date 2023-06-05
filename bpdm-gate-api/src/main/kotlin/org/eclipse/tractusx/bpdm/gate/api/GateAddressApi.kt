@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -128,21 +127,5 @@ interface GateAddressApi {
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<AddressGateOutput>
-
-    @Operation(
-        summary = "Validate an address partner",
-        description = "Determines errors in an address partner record which keep it from entering the sharing process"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
-            ApiResponse(responseCode = "400", description = "On malformed address requests", content = [Content()]),
-        ]
-    )
-    @PostMapping("/input/addresses/validation")
-    @PostExchange("/input/addresses/validation")
-    fun validateSite(
-        @RequestBody addressInput: AddressGateInputRequest
-    ): ValidationResponse
 
 }

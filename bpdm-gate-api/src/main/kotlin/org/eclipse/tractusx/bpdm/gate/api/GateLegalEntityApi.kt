@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -124,21 +123,5 @@ interface GateLegalEntityApi {
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<LegalEntityGateOutput>
-
-    @Operation(
-        summary = "Validate a legal entity",
-        description = "Determines errors in a legal entity record which keep it from entering the sharing process"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
-            ApiResponse(responseCode = "400", description = "On malformed legal entity requests", content = [Content()]),
-        ]
-    )
-    @PostMapping("/input/legal-entities/validation")
-    @PostExchange("/input/legal-entities/validation")
-    fun validateLegalEntity(
-        @RequestBody legalEntityInput: LegalEntityGateInputRequest
-    ): ValidationResponse
 
 }
