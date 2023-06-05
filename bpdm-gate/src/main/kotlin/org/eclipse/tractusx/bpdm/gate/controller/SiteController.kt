@@ -24,9 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
@@ -63,8 +61,8 @@ class SiteController(
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    override fun getSitesOutput(paginationRequest: PaginationStartAfterRequest, externalIds: Collection<String>?): PageOutputResponse<SiteGateOutput> {
-        return siteService.getSitesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
+    override fun getSitesOutput(paginationRequest: PaginationRequest, externalIds: Collection<String>?): PageResponse<SiteGateOutputResponse> {
+        return siteService.getSitesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
     override fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {

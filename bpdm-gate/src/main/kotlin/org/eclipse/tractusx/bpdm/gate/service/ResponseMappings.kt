@@ -342,7 +342,7 @@ fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto>
     return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-//LegalEntity mapping to LegalEntityGateInputResponse
+//Site mapping to SiteGateInputResponse
 fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
 
     return SiteGateInputResponse(
@@ -354,7 +354,7 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
 
 }
 
-//Logistic Address mapping to AddressGateInputResponse
+//Logistic Address mapping to AddressGateOutputResponse
 fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputResponse {
 
     val addressGateOutputResponse = AddressGateOutputResponse(
@@ -367,3 +367,29 @@ fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAdd
 
     return addressGateOutputResponse
 }
+
+//Site mapping to SiteGateOutputResponse
+fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputResponse {
+
+    return SiteGateOutputResponse(
+        site = sitePage.toSiteDto(),
+        externalId = externalId,
+        legalEntityExternalId = legalEntity.externalId,
+        bpn = bpn,
+        processStartedAt = null //TODO Remove this?
+    )
+
+}
+
+//LegalEntity mapping to LegalEntityGateOutputResponse
+fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): LegalEntityGateOutputResponse {
+
+    return LegalEntityGateOutputResponse(
+        legalEntity = legalEntity.toLegalEntityDto(),
+        externalId = legalEntity.externalId,
+        bpn = legalEntity.bpn,
+        processStartedAt = null //TODO Remove this?
+    )
+}
+
+

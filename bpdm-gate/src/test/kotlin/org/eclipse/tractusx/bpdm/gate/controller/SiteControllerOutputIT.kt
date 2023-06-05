@@ -24,12 +24,12 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.util.*
@@ -182,7 +182,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(0, 10)
         val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, emptyList())
 
         assertThat(pageResponseValue).isEqualTo(
@@ -295,7 +295,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
                 )
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(0, 10)
         val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))
 
         assertThat(pageResponseValue).isEqualTo(

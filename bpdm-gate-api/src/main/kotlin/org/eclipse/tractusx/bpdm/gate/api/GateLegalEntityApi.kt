@@ -29,9 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -120,9 +118,9 @@ interface GateLegalEntityApi {
     @PostMapping("/output/legal-entities/search")
     @PostExchange("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageOutputResponse<LegalEntityGateOutput>
+    ): PageResponse<LegalEntityGateOutputResponse>
 
     @Operation(
         summary = "Create or update legal entities output.",
