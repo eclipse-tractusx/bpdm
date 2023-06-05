@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -42,12 +42,10 @@ import org.springframework.stereotype.Service
 @Service
 class AddressService(
     private val saasRequestMappingService: SaasRequestMappingService,
-    private val inputSaasMappingService: InputSaasMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
     private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
-    private val typeMatchingService: TypeMatchingService,
     private val changelogRepository: ChangelogRepository,
     private val addressPersistenceService: AddressPersistenceService,
     private val addressRepository: GateAddressRepository

@@ -25,8 +25,6 @@ interface GateClient {
 
     fun addresses(): GateAddressApi
 
-    fun businessPartners(): GateBusinessPartnerApi
-
     fun legalEntities(): GateLegalEntityApi
 
     fun sites(): GateSiteApi
