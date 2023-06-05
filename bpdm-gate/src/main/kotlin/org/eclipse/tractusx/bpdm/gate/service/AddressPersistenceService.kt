@@ -29,7 +29,9 @@ import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AddressPersistenceService(
@@ -48,8 +50,8 @@ class AddressPersistenceService(
 
         addresses.forEach { address ->
 
-            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalId(it) }
-            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalId(it) }
+            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
 
             val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord, dataType)
 
@@ -57,7 +59,11 @@ class AddressPersistenceService(
                 updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
                 gateAddressRepository.save(existingAddress)
             } ?: run {
-                gateAddressRepository.save(fullAddress)
+                if (fullAddress.dataType == OutputInputEnum.Output && addressRecord.find { it.externalId == fullAddress.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Logistic Address doesn't exist")
+                } else {
+                    gateAddressRepository.save(fullAddress)
+                }
             }
         }
     }

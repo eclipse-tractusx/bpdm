@@ -27,8 +27,10 @@ import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class SitePersistenceService(
@@ -49,7 +51,10 @@ class SitePersistenceService(
 
             val legalEntityRecord =
                 site.legalEntityExternalId.let {
-                    legalEntityRepository.findByExternalId(site.legalEntityExternalId) ?: throw BpdmNotFoundException("Business Partner", it)
+                    legalEntityRepository.findByExternalIdAndDataType(site.legalEntityExternalId, datatype) ?: throw BpdmNotFoundException(
+                        "Business Partner",
+                        it
+                    )
                 }
 
             val fullSite = site.toSiteGate(legalEntityRecord, datatype)
@@ -68,7 +73,11 @@ class SitePersistenceService(
 
                 siteRepository.save(existingSite)
             } ?: run {
-                siteRepository.save(fullSite)
+                if (fullSite.dataType == OutputInputEnum.Output && siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
+                } else {
+                    siteRepository.save(fullSite)
+                }
             }
         }
     }

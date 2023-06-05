@@ -27,8 +27,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class LegalEntityPersistenceService(
@@ -52,15 +54,16 @@ class LegalEntityPersistenceService(
                         ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
-
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
+
                 gateLegalEntityRepository.save(existingLegalEntity)
-
             } ?: run {
-
-                gateLegalEntityRepository.save(fullLegalEntity)
+                if (fullLegalEntity.dataType == OutputInputEnum.Output && legalEntityRecord.find { it.externalId == fullLegalEntity.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Legal Entity doesn't exist")
+                } else {
+                    gateLegalEntityRepository.save(fullLegalEntity)
+                }
             }
-
         }
     }
 
