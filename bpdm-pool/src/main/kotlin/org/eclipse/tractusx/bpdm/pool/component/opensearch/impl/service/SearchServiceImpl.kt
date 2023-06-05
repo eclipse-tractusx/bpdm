@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
@@ -30,7 +29,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.TextDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
@@ -111,12 +109,6 @@ class SearchServiceImpl(
             PageResponse(totalElements, totalPages, page, contentSize,
                 content.map { (score, legalEntity) -> legalEntity.toBusinessPartnerMatchDto(score) })
         }
-    }
-
-
-    private fun extractTextDocText(textDocJson: String): String {
-        val textDoc: TextDoc = objectMapper.readValue(textDocJson)
-        return textDoc.text
     }
 
     private fun searchAndPreparePage(
