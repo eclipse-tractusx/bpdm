@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.eclipse.tractusx.bpdm.common.service.ValidationMapper
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -49,8 +48,4 @@ class SaasConfig(
             .defaultHeader("x-api-key", saasProperties.apiKey)
             .build()
     }
-
-    @Bean
-    fun validationMapper() =
-        ValidationMapper()
 }

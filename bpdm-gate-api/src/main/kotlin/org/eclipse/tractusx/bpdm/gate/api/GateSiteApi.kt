@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -124,21 +123,5 @@ interface GateSiteApi {
         @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
     ): PageOutputResponse<SiteGateOutput>
-
-    @Operation(
-        summary = "Validate a site",
-        description = "Determines errors in a site record which keep it from entering the sharing process"
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "A validation response with possible errors"),
-            ApiResponse(responseCode = "400", description = "On malformed site requests", content = [Content()]),
-        ]
-    )
-    @PostMapping("/input/sites/validation")
-    @PostExchange("/input/sites/validation")
-    fun validateSite(
-        @RequestBody siteInput: SiteGateInputRequest
-    ): ValidationResponse
 
 }

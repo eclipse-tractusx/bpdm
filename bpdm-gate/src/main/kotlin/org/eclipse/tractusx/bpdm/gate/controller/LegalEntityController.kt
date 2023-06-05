@@ -27,11 +27,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
-import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -39,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class LegalEntityController(
     val legalEntityService: LegalEntityService,
-    val apiConfigProperties: ApiConfigProperties,
-    val validationService: ValidationService
+    val apiConfigProperties: ApiConfigProperties
 ) : GateLegalEntityApi {
 
     override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {
@@ -71,10 +68,6 @@ class LegalEntityController(
         externalIds: Collection<String>?
     ): PageOutputResponse<LegalEntityGateOutput> {
         return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
-    }
-
-    override fun validateLegalEntity(legalEntityInput: LegalEntityGateInputRequest): ValidationResponse {
-        return validationService.validate(legalEntityInput)
     }
 
 }

@@ -27,11 +27,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
-import org.eclipse.tractusx.bpdm.gate.service.ValidationService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -39,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AddressController(
     private val addressService: AddressService,
-    private val apiConfigProperties: ApiConfigProperties,
-    private val validationService: ValidationService
+    private val apiConfigProperties: ApiConfigProperties
 ) : GateAddressApi {
 
     override fun upsertAddresses(addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
@@ -76,10 +73,6 @@ class AddressController(
         externalIds: Collection<String>?
     ): PageOutputResponse<AddressGateOutput> {
         return addressService.getAddressesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
-    }
-
-    override fun validateSite(addressInput: AddressGateInputRequest): ValidationResponse {
-        return validationService.validate(addressInput)
     }
 
 }

@@ -38,7 +38,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -47,11 +46,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
@@ -70,7 +66,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class AddressControllerInputIT @Autowired constructor(
-    private val objectMapper: ObjectMapper,
     val gateClient: GateClient,
     private val gateAddressRepository: GateAddressRepository,
     val testHelpers: DbTestHelpers,
@@ -360,94 +355,5 @@ internal class AddressControllerInputIT @Autowired constructor(
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
-    }
-
-    /**
-     * Given valid address partner
-     * When validate that address partner
-     * Then response is OK and no errors
-     */
-    @Test
-    fun `validate a valid address partner`() {
-        val address = RequestValues.addressGateInputRequest2
-
-        val mockParent = SaasValues.siteBusinessPartner1
-        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockParentResponse))
-                )
-        )
-
-        val mockDefects = listOf(
-            DataDefectSaas(ViolationLevel.INFO, "Info"),
-            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
-        )
-        val mockResponse = ValidationResponseSaas(mockDefects)
-        wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockResponse))
-                )
-        )
-
-        val actualResponse = gateClient.addresses().validateSite(address)
-
-        val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
-
-        assertThat(actualResponse).isEqualTo(expectedResponse)
-    }
-
-    /**
-     * Given invalid address partner
-     * When validate that address partner
-     * Then response is ERROR and contain error description
-     */
-    @Test
-    fun `validate an invalid site`() {
-        val address = RequestValues.addressGateInputRequest2
-
-
-        val mockParent = SaasValues.siteBusinessPartner1
-        val mockParentResponse = PagedResponseSaas(1, null, null, 1, listOf(mockParent))
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockParentResponse))
-                )
-        )
-
-
-        val mockErrorMessage = "Validation error"
-        val mockDefects = listOf(
-            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectSaas(ViolationLevel.INFO, "Info"),
-            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
-        )
-
-        val mockResponse = ValidationResponseSaas(mockDefects)
-        wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockResponse))
-                )
-        )
-
-        val actualResponse = gateClient.addresses().validateSite(address)
-
-        val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
-
-        assertThat(actualResponse).isEqualTo(expectedResponse)
     }
 }
