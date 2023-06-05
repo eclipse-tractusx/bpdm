@@ -21,7 +21,7 @@ package com.catenax.bpdm.bridge.dummy.service
 
 import com.catenax.bpdm.bridge.dummy.entity.SyncType
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.springframework.stereotype.Service
 import java.time.Instant
 

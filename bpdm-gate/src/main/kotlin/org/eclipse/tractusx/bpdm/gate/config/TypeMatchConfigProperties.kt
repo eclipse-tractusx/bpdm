@@ -19,10 +19,3 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-
-
-@ConfigurationProperties(prefix = "bpdm.type-matching")
-data class TypeMatchConfigProperties(
-    val legalEntityThreshold: Float = 0.8f
-)

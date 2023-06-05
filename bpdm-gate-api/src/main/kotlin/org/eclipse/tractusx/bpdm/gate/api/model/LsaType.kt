@@ -17,19 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
-
-data class TypeMatchResponse(
-    val score: Float,
-    val type: OptionalLsaType
-)
-
-enum class OptionalLsaType {
-    LegalEntity,
-    Site,
-    Address,
-    None
-}
+package org.eclipse.tractusx.bpdm.gate.api.model
 
 enum class LsaType {
     LegalEntity,
