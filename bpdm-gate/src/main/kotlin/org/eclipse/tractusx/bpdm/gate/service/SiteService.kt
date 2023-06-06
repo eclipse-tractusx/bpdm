@@ -41,9 +41,7 @@ import org.springframework.stereotype.Service
 @Service
 class SiteService(
     private val saasRequestMappingService: SaasRequestMappingService,
-    private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
-    private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
     private val sitePersistenceService: SitePersistenceService,
@@ -81,12 +79,15 @@ class SiteService(
     }
 
     /**
-     * Get sites by first fetching sites from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
-     * which is then used to fetch the data for the sites from the bpdm pool.
+     * Get output sites by first fetching sites from the database
      */
     fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputResponse> {
 
-        val sitePage = siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        val sitePage = if (externalIds != null && externalIds.isNotEmpty()) {
+            siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        } else {
+            siteRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+        }
 
         return PageResponse(
             page = page,
@@ -105,13 +106,8 @@ class SiteService(
     }
 
     /**
-     * Upsert sites by:
-     *
-     * - Retrieving parent legal entities to check whether they exist and since their identifiers are copied to site
-     * - Upserting the sites
-     * - Retrieving the old relations of the sites and deleting them
-     * - Upserting the new relations
-     */
+     * Upsert sites input to the database
+     **/
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
         sites.forEach { site ->
@@ -121,6 +117,9 @@ class SiteService(
         sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Input)
     }
 
+    /**
+     * Upsert sites output to the database
+     **/
     fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>) {
 
         sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Output)

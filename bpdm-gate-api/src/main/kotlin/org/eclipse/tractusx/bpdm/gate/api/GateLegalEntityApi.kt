@@ -123,8 +123,11 @@ interface GateLegalEntityApi {
     ): PageResponse<LegalEntityGateOutputResponse>
 
     @Operation(
-        summary = "Create or update legal entities output.",
-        description = "Create or update legal entities. " //TODO need better description
+        summary = "Create or update output legal entities.",
+        description = "Create or update legal entities (Output). " +
+                "Updates instead of creating a new legal entity if an already existing external id is used. " +
+                "The same external id may not occur more than once in a single request. " +
+                "For a single request, the maximum number of legal entities in the request is limited to \${bpdm.api.upsert-limit} entries."
     )
     @ApiResponses(
         value = [

@@ -26,9 +26,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -45,7 +43,6 @@ class AddressService(
     private val saasRequestMappingService: SaasRequestMappingService,
     private val outputSaasMappingService: OutputSaasMappingService,
     private val saasClient: SaasClient,
-    private val poolClient: PoolClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
     private val addressPersistenceService: AddressPersistenceService,
@@ -86,12 +83,15 @@ class AddressService(
     }
 
     /**
-     * Get addresses by first fetching addresses from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
-     * which is then used to fetch the data for the addresses from the bpdm pool.
+     * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
 
-        val logisticAddressPage = addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
+            addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        } else {
+            addressRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+        }
 
         return PageResponse(
             page = page,
@@ -110,13 +110,8 @@ class AddressService(
     }
 
     /**
-     * Upsert addresses by:
-     *
-     * - Retrieving parent legal entities and sites to check whether they exist and since their identifiers are copied to site
-     * - Upserting the addresses
-     * - Retrieving the old relations of the addresses and deleting them
-     * - Upserting the new relations
-     */
+     * Upsert addresses input to the database
+     **/
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
 
         // create changelog entry if all goes well from saasClient
@@ -127,6 +122,9 @@ class AddressService(
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
     }
 
+    /**
+     * Upsert addresses output to the database
+     **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateInputRequest>) {
 
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Output)

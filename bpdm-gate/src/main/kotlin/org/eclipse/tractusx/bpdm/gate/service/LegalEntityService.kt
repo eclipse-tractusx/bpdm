@@ -37,9 +37,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class LegalEntityService(
-    private val outputSaasMappingService: OutputSaasMappingService,
-    private val saasClient: SaasClient,
-    private val poolClient: PoolClient,
     private val changelogRepository: ChangelogRepository,
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
     private val legalEntityRepository: LegalEntityRepository
@@ -47,6 +44,9 @@ class LegalEntityService(
 
     private val logger = KotlinLogging.logger { }
 
+    /**
+     * Upsert legal entities input to the database
+     **/
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         legalEntities.forEach { legalEntity ->
@@ -55,6 +55,9 @@ class LegalEntityService(
         legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
     }
 
+    /**
+     * Upsert legal entities output to the database
+     **/
     fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Output)
@@ -85,12 +88,15 @@ class LegalEntityService(
     }
 
     /**
-     * Get legal entities by first fetching legal entities from "augmented business partners" in SaaS. Augmented business partners from SaaS should contain a BPN,
-     * which is then used to fetch the data for the legal entities from the bpdm pool.
+     * Get output legal entities by first fetching legal entities from the database
      */
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<LegalEntityGateOutputResponse> {
 
-        val legalEntityPage = legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        val legalEntityPage = if (externalIds != null && externalIds.isNotEmpty()) {
+            legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+        } else {
+            legalEntityRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+        }
 
         return PageResponse(
             page = page,
