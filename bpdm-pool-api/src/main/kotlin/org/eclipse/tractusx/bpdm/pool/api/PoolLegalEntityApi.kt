@@ -60,8 +60,6 @@ interface PoolLegalEntityApi {
     @GetExchange
     fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        @ParameterObject addressSearchRequest: AddressPropertiesSearchRequest,
-        @ParameterObject siteSearchRequest: SitePropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse>
 

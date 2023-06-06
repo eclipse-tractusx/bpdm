@@ -27,11 +27,6 @@ const val MAPPINGS_FILE_PATH_ADDRESSES = "opensearch/index-mappings-addresses.js
 data class AddressPartnerDoc(
     @JsonIgnore // ignore since this is the id and does not need to be in the document source
     val bpn: String,
-    val administrativeAreas: Collection<String>,
-    val postCodes: Collection<String>,
-    val localities: Collection<String>,
-    val thoroughfares: Collection<String>,
-    val premises: Collection<String>,
-    val postalDeliveryPoints: Collection<String>,
-    val countryCode: String
+    val name: Collection<String>
 )
+

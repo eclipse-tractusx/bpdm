@@ -19,31 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
 // TODO rename to LogisticAddressSearchRequest / adjust
 @Schema(name = "AddressPartnerSearchRequest", description = "Contains keywords used for searching in address properties")
 data class AddressPartnerSearchRequest constructor(
-    @field:Parameter(description = "Filter business partners by administrative area name")
-    var administrativeArea: String? = null,
-    @field:Parameter(description = "Filter business partners by postcode or postcodes")
-    var postCode: String? = null,
-    @field:Parameter(description = "Filter business partners by locality full denotation")
-    var locality: String? = null,
-    @field:Parameter(description = "Filter business partners by thoroughfare full denotation")
-    var thoroughfare: String? = null,
-    @field:Parameter(description = "Filter business partners by premise full denotation")
-    var premise: String? = null,
-    @field:Parameter(description = "Filter business partners by postal delivery point full denotation")
-    var postalDeliveryPoint: String? = null,
-    @field:Parameter(description = "Filter business partners by ISO 3166-1 alpha-2 country code")
-    var countryCode: CountryCode? = null
+    @field:Parameter(description = "Filter business partners by name")
+    var name: String? = null
 ) {
     companion object {
         val EmptySearchRequest = AddressPartnerSearchRequest()
     }
-
-
 }
+
+

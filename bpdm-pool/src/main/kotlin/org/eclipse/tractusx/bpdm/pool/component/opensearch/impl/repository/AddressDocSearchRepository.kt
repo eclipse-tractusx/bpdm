@@ -91,9 +91,7 @@ class AddressDocSearchRepository(
             .map { (fieldName, queryText) -> bpdmQueryBuilder.buildInnerShouldQuery(fieldName, queryText) }
             .forEach { mustQuery.add(it) }
 
-        if (partnerSearchRequest.countryCode != null) {
-            boolQuery.filter(QueryBuilders.termQuery(AddressPartnerSearchRequest::countryCode.name, partnerSearchRequest.countryCode!!.name))
-        }
+
 
         val searchRequest = SearchRequest()
         val searchSourceBuilder = SearchSourceBuilder()
