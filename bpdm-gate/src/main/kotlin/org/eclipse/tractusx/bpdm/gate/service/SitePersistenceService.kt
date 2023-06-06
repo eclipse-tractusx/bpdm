@@ -74,7 +74,6 @@ class SitePersistenceService(
 
     private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
 
-        site.bpn = updatedSite.bpn
         site.name = updatedSite.site.name
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
@@ -85,7 +84,6 @@ class SitePersistenceService(
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
 
         address.name = changeAddress.name
-        address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
         address.siteExternalId = changeAddress.siteExternalId

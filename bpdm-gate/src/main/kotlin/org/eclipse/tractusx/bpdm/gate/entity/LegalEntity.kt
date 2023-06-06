@@ -30,7 +30,7 @@ import java.time.Instant
 )
 class LegalEntity(
     @Column(name = "bpn")
-    var bpn: String?,
+    var bpn: String? = null,
 
     @Column(name = "externalId", nullable = false, unique = true)
     var externalId: String,

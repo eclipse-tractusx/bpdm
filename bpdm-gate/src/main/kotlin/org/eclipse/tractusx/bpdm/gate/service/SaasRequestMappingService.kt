@@ -40,7 +40,7 @@ class SaasRequestMappingService(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.LEGAL_ENTITY.name)),
-            identifiers = toLegalEntityIdentifiersSaas(legalEntity.identifiers, request.bpn),
+            identifiers = toLegalEntityIdentifiersSaas(legalEntity.identifiers, ""),
             names = toNamesSaas(request.legalNameParts[0]),
             // TODO Only the first state is passed to SaaS, any others are ignored
             status = legalEntity.states.map { it.toSaasModel() }.firstOrNull(),
@@ -57,7 +57,7 @@ class SaasRequestMappingService(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
-            identifiers = toIdentifiersSaas(request.bpn),
+            identifiers = toIdentifiersSaas(""),
             names = toNamesSaas(site.name),
             status = site.states.map { it.toSaasModel() }.firstOrNull(),
             // TODO Known issue: Name, state, BPN-A and identifiers of the main address are not transferred to SaaS yet!!
@@ -72,7 +72,7 @@ class SaasRequestMappingService(
             externalId = request.externalId,
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
-            identifiers = toAddressIdentifiersSaas(address.identifiers, request.bpn),
+            identifiers = toAddressIdentifiersSaas(address.identifiers, ""),
             names = toNamesSaas(address.name),
             status = address.states.map { it.toSaasModel() }.firstOrNull(),
             addresses = toAddressesSaasModel(address)

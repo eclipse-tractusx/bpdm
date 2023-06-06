@@ -38,6 +38,4 @@ data class SiteGateInputRequest(
     @Schema(description = "External id of the related legal entity")
     val legalEntityExternalId: String,
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
 )

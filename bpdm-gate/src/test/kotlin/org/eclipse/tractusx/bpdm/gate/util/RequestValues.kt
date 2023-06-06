@@ -267,7 +267,7 @@ object RequestValues {
         legalAddress = address1,
         legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
-        bpn = CommonValues.bpn1
+
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
@@ -275,16 +275,16 @@ object RequestValues {
         legalAddress = address2,
         legalNameParts = arrayOf(CommonValues.name3),
         externalId = CommonValues.externalId2,
-        bpn = CommonValues.bpn2
-    )
+
+        )
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
         legalAddress = address3,
         legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
-        bpn = CommonValues.bpn3
-    )
+
+        )
 
     val site1 = SiteGateDto(
         name = CommonValues.nameSite1,
@@ -302,15 +302,15 @@ object RequestValues {
         site = site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnSite1
-    )
+
+        )
 
     val siteGateInputRequest2 = SiteGateInputRequest(
         site = site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
-        bpn = CommonValues.bpnSite2
-    )
+
+        )
 
     val addressGateInputRequest1 = AddressGateInputRequest(
         address = address1.copy(
@@ -321,8 +321,8 @@ object RequestValues {
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnAddress1
-    )
+
+        )
 
     val addressGateInputRequest2 = AddressGateInputRequest(
         address = address2.copy(
@@ -333,7 +333,7 @@ object RequestValues {
         ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
-        bpn = CommonValues.bpnAddress2
-    )
+
+        )
 
 }

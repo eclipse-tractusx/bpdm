@@ -41,9 +41,6 @@ data class LegalEntityGateInputResponse(
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
-
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
 )
