@@ -6,9 +6,9 @@ This file contains information on how to configure and run the BPDM applications
 
 BPDM Pool is a SpringBoot Kotlin software project managed by Maven.
 
-The project can be run with the following command: `mvn clean spring-boot:run`
-In order to run the project you need to build the project from the parent pom file and depending on wich module we want to run we need to specify the module as
-a target.
+To run the project first you need to install it from the parent pom, go to the root folder and run `mvn clean install`
+
+Then depending on which module you want to start go to the module subfolder you like to run and use the following command: `mvn spring-boot:run`
 
 ### Prerequisites
 
