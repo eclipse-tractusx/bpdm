@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -31,12 +31,15 @@ import java.time.Instant
 interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry, Long>, JpaSpecificationExecutor<PartnerChangelogEntry> {
     object Specs {
         /**
-         * Restrict to entries with any one of the given BPNs; ignore if null
+         * Restrict to entries with any one of the given BPNs; ignore if empty
          */
-        fun byBpnsIn(bpns: Array<String>?) =
+        fun byBpnsIn(bpns: Set<String>?) =
             Specification<PartnerChangelogEntry> { root, _, _ ->
-                bpns?.let {
-                    root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
+                bpns?.let{
+                    if(bpns.isNotEmpty())
+                        root.get<String>(PartnerChangelogEntry::bpn.name).`in`(bpns.map { bpn -> bpn.uppercase() })
+                    else
+                        null
                 }
             }
 
@@ -49,9 +52,20 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
                     builder.greaterThanOrEqualTo(root.get(PartnerChangelogEntry::updatedAt.name), modifiedAfter)
                 }
             }
-    }
 
-    fun findAllByIdGreaterThan(id: Long, pageable: Pageable): Page<PartnerChangelogEntry>
+        /**
+         * Restrict to entries with any one of the given LSA types; ignore if empty
+         */
+        fun byLsaTypesIn(lsaTypes: Set<ChangelogSubject>?) =
+            Specification<PartnerChangelogEntry> { root, _, _ ->
+                lsaTypes?.let {
+                    if(lsaTypes.isNotEmpty())
+                        root.get<String>(PartnerChangelogEntry::changelogSubject.name).`in`(lsaTypes.map { type -> type })
+                    else
+                        null
+                }
+            }
+    }
 
     fun findByCreatedAtAfterAndChangelogSubjectIn(
         createdAt: Instant,

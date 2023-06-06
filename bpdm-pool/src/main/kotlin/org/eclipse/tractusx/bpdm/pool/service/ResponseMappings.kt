@@ -288,5 +288,5 @@ fun SyncRecord.toDto(): SyncResponse {
 }
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryResponse {
-    return ChangelogEntryResponse(bpn, changelogType, createdAt)
+    return ChangelogEntryResponse(bpn, changelogType, createdAt, changelogSubject)
 }

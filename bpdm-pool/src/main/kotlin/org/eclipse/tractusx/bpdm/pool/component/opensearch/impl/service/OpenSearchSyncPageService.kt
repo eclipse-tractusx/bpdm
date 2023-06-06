@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocRepository
-import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
