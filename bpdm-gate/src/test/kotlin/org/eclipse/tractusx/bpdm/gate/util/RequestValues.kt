@@ -268,7 +268,7 @@ object RequestValues {
         legalNameParts = arrayOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
 
-        )
+    )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
