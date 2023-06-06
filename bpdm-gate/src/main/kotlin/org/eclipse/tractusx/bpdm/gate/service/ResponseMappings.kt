@@ -118,7 +118,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
     val site = Site(
         name = site.name,
         externalId = externalId,
-        legalEntity = legalEntity
+        legalEntity = legalEntity,
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
