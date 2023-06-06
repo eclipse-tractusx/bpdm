@@ -21,12 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
-import org.eclipse.tractusx.bpdm.pool.entity.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
+import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byLsaTypesIn
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byUpdatedGreaterThan
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -49,12 +50,6 @@ class PartnerChangelogService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createChangelogEntry(changelogEntry: ChangelogEntryDto): PartnerChangelogEntry {
-        logger.debug { "Create new change log entry for BPN ${changelogEntry.bpn}" }
-        return createChangelogEntries(listOf(changelogEntry)).single()
-    }
-
-    @Transactional
     fun createChangelogEntries(changelogEntries: Collection<ChangelogEntryDto>): List<PartnerChangelogEntry> {
         logger.debug { "Create ${changelogEntries.size} new change log entries" }
         val entities = changelogEntries.map { it.toEntity() }
@@ -74,15 +69,8 @@ class PartnerChangelogService(
         )
     }
 
-    fun getChangelogEntriesStartingAfterId(startId: Long = -1, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
-        return partnerChangelogEntryRepository.findAllByIdGreaterThan(
-            startId,
-            PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::id.name).ascending())
-        )
-    }
-
-    fun getChangelogEntriesByBpn(bpns: Array<String>?, modifiedAfter: Instant?, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
-        val spec = Specification.allOf(byBpnsIn(bpns), byUpdatedGreaterThan(modifiedAfter))
+    fun getChangeLogEntries(bpns: Set<String>?, lsaTypes: Set<ChangelogSubject>?, fromTime: Instant?, pageIndex: Int, pageSize: Int): PageResponse<ChangelogEntryResponse> {
+        val spec = Specification.allOf(byBpnsIn(bpns), byLsaTypesIn(lsaTypes), byUpdatedGreaterThan(fromTime))
         val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)
         return page.toDto(page.content.map { it.toDto() })
