@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.controller
 
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -29,13 +30,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
-
-
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -211,9 +208,7 @@ class OpenSearchControllerIT @Autowired constructor(
     private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
 
         return poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest(name, null, null, null),
-            AddressPropertiesSearchRequest.EmptySearchRequest,
-            SitePropertiesSearchRequest.EmptySearchRequest,
+            LegalEntityPropertiesSearchRequest(name),
             PaginationRequest()
         )
     }

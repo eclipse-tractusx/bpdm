@@ -20,15 +20,11 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
 data class BusinessPartnerSearchRequest(
-    val partnerProperties: LegalEntityPropertiesSearchRequest,
-    val addressProperties: AddressPropertiesSearchRequest,
-    val siteProperties: SitePropertiesSearchRequest
+    val partnerProperties: LegalEntityPropertiesSearchRequest
 ) {
     companion object {
         val EmptySearchRequest = BusinessPartnerSearchRequest(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            AddressPropertiesSearchRequest.EmptySearchRequest,
-            SitePropertiesSearchRequest.EmptySearchRequest
+            LegalEntityPropertiesSearchRequest.EmptySearchRequest
         )
     }
 }

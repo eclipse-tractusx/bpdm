@@ -25,7 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
@@ -55,12 +58,10 @@ class LegalEntityController(
 
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
-        addressSearchRequest: AddressPropertiesSearchRequest,
-        siteSearchRequest: SitePropertiesSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LegalEntityMatchResponse> {
         return searchService.searchLegalEntities(
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
         )
     }

@@ -405,7 +405,8 @@ class BusinessPartnerBuildService(
             legalEntity = null,
             site = null,
             physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap),
-            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
+            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) },
+            name = dto.name
         )
 
         updateLogisticAddress(address, dto, metadataMap)

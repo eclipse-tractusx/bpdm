@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
-import org.eclipse.tractusx.bpdm.common.dto.saas.CountrySaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.GeoCoordinatesSaas
 
 interface AddressToSaasMapping {

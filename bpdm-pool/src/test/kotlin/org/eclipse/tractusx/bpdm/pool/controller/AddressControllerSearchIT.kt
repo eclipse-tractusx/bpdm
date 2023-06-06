@@ -28,7 +28,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -61,6 +60,7 @@ class AddressControllerSearchIT @Autowired constructor(
         addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate3)
     )
 
+
     val partnerStructure2 = LegalEntityStructureRequest(
         legalEntity = RequestValues.legalEntityCreate2,
         siteStructures = listOf(
@@ -71,9 +71,13 @@ class AddressControllerSearchIT @Autowired constructor(
         )
     )
 
+    val partnerStructure3 = LegalEntityStructureRequest(
+        legalEntity = RequestValues.legalEntityCreate1,
+        addresses = listOf(RequestValues.addressPartnerCreate4)
+    )
+
     private lateinit var givenAddress1: LogisticAddressResponse
-    private lateinit var givenAddress2: LogisticAddressResponse
-    private lateinit var givenAddress3: LogisticAddressResponse
+
 
 
     @BeforeEach
@@ -83,189 +87,22 @@ class AddressControllerSearchIT @Autowired constructor(
         poolClient.opensearch().clear()
         testHelpers.createTestMetadata()
 
-        val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure3))
         givenAddress1 = givenStructure[0].addresses[0].address                      // addressPartnerCreate1
-        givenAddress2 = givenStructure[1].siteStructures[0].addresses[0].address    // addressPartnerCreate2
-        givenAddress3 = givenStructure[0].addresses[1].address                      // addressPartnerCreate3
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
 
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by administrative area
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address via administrative area`() {
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            administrativeArea = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.areaPart.administrativeAreaLevel2
-        )
 
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
 
     /**
      * Given addresses in OpenSearch
-     * When searching an address by post code
+     * When searching an address by name of BPN search criteria
      * Then the matching address is returned
      */
     @Test
-    fun `search address via post code`() {
-        // regular, legal and site main address
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            postCode = givenAddress1.physicalPostalAddress.baseAddress.postalCode
-        )
-
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by locality
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address via locality`() {
-        // regular, legal and site main address
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            locality = givenAddress1.physicalPostalAddress.baseAddress.city
-        )
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by thoroughfare
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address via thoroughfare`() {
-        // regular, legal and site main address
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            thoroughfare = givenAddress1.physicalPostalAddress.street!!.name
-        )
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by premise
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address via premise`() {
-        // regular, legal and site main address
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            premise = givenAddress1.physicalPostalAddress.basePhysicalAddress.building
-        )
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by postal delivery point
-     * Then the matching address is returned
-     */
-    @Test
-    @Disabled("TODO create alternative address")
-    fun `search address via postal delivery point`() {
-        val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress1)
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by country code
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address via country code`() {
-        // regular, legal and site main address
-        val expected = PageResponse(
-            3, 1, 0, 3, listOf(
-                AddressMatchResponse(0f, givenAddress1),        // addressPartnerCreate1
-                AddressMatchResponse(0f, givenAddress1),        // legalEntityCreate1.legalAddress
-                AddressMatchResponse(0f, givenAddress1),        // siteCreate1.mainAddress
-            )
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            countryCode = givenAddress1.physicalPostalAddress.baseAddress.country.technicalKey
-        )
-
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address by multiple search criteria
-     * Then the matching address is returned
-     */
-    @Test
-    @Disabled("TODO create alternative address")
-    fun `search address via multiple criteria`() {
+    fun `search address via name`() {
         val expected = PageResponse(
             1, 1, 0, 1, listOf(
                 AddressMatchResponse(0f, givenAddress1)
@@ -274,73 +111,34 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postalDeliveryPoint = RequestValues.addressPartnerCreate1.address.alternativePostalAddress!!.deliveryServiceNumber
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postalCode
+        addressSearchRequest.name = RequestValues.addressPartnerCreate4.address.name
+
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
     }
 
-
     /**
      * Given addresses in OpenSearch
-     * When searching an address by multiple search criteria, one of which does not match any of the existing addresses
-     * Then there should be no result
+     * When searching an address by name of BPN that not exists in search criteria
+     * Then the matching address is not found
      */
     @Test
-    fun `search address via multiple criteria, no match found`() {
+    fun `search address via name not found`() {
         val expected = PageResponse(
             0, 0, 0, 0, emptyList<AddressMatchResponse>()
         )
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.postCode = RequestValues.addressPartnerCreate1.address.physicalPostalAddress.baseAddress.postalCode
-        addressSearchRequest.administrativeArea = "someNonexistentValue"
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
+        addressSearchRequest.name = "NONEXISTENT"
 
-
-        assertPageEquals(pageResponse, expected)
-    }
-
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address via search terms that don't match any of the existing addresses
-     * Then there should be no result
-     */
-    @Test
-    fun `search address, no match found`() {
-        val expected = PageResponse(
-            0, 0, 0, 0, emptyList<AddressMatchResponse>()
-        )
-
-        val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.administrativeArea = "someNonexistentValue"
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
     }
 
-    /**
-     * Given addresses in OpenSearch
-     * When searching an address that belongs to a site
-     * Then the matching address is returned
-     */
-    @Test
-    fun `search address of site`() {
-        val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                AddressMatchResponse(0f, givenAddress3)
-            )
-        )
 
-        val addressSearchRequest = AddressPartnerSearchRequest(
-            postCode = givenAddress3.physicalPostalAddress.baseAddress.postalCode
-        )
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
-
-        assertPageEquals(pageResponse, expected)
-    }
 
     private fun assertPageEquals(actual: PageResponse<AddressMatchResponse>, expected: PageResponse<AddressMatchResponse>) {
         testHelpers.assertRecursively(actual)

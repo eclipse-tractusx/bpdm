@@ -19,14 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
@@ -137,42 +135,42 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         assertPageEquals(secondPage, expectedSecondPage)
     }
 
-    /**
-     * Given partners in OpenSearch
-     * When searching by site name
-     * Then business partner is found
-     */
-    @Test
-    fun `search business partner by site name, result found`() {
-
-        val expected = PageResponse(
-            1, 1, 0, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
-            )
-        )
-
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name, 0, 10)
-
-        assertPageEquals(pageResponse, expected)
-    }
+//    /**
+//     * Given partners in OpenSearch
+//     * When searching by site name
+//     * Then business partner is found
+//     */
+//    @Test
+//    fun `search business partner by site name, result found`() {
+//
+//        val expected = PageResponse(
+//            1, 1, 0, 1, listOf(
+//                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
+//            )
+//        )
+//
+//        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name, 0, 10)
+//
+//        assertPageEquals(pageResponse, expected)
+//    }
 
     /**
      * Given partners in OpenSearch
      * When searching by nonexistent site name
      * Then no business partner is found
      */
-    @Test
-    fun `search business partner by site name, no result found`() {
-        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name", 0, 10).content
-        assertThat(foundPartners).isEmpty()
-    }
+//    @Test
+//    fun `search business partner by site name, no result found`() {
+//        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name", 0, 10).content
+//        assertThat(foundPartners).isEmpty()
+//    }
 
     private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageResponse<LegalEntityMatchResponse> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
         return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-            AddressPropertiesSearchRequest.EmptySearchRequest, sitePropertiesSearchRequest, PaginationRequest(page, size)
+             PaginationRequest(page, size)
         )
 
 

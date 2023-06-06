@@ -159,6 +159,9 @@ object RequestValues {
     val logisticAddress3 = LogisticAddressDto(
         physicalPostalAddress = postalAddress3,
     )
+    val logisticAddress4 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress1, name = CommonValues.name1
+    )
 
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
@@ -280,6 +283,12 @@ object RequestValues {
 
     val addressPartnerCreate3 = AddressPartnerCreateRequest(
         address = logisticAddress3,
+        bpnParent = legalEntityUpdate3.bpnl,
+        index = CommonValues.index3
+    )
+
+    val addressPartnerCreate4 = AddressPartnerCreateRequest(
+        address = logisticAddress4,
         bpnParent = legalEntityUpdate3.bpnl,
         index = CommonValues.index3
     )
