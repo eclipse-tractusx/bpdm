@@ -88,7 +88,7 @@ class BusinessPartnerBuildService(
 
         val validEntities = legalEntities.map { it.toUpsertDto(legalEntityWithIndexByBpnMap[it.bpn]!!.second) }
 
-        return EntitiesWithErrors(validEntities, errors)
+        return LegalEntityPartnerCreateResponseWrapper(validEntities, errors)
     }
 
     @Transactional
@@ -125,7 +125,7 @@ class BusinessPartnerBuildService(
 
         val validEntities = sites.map { it.toUpsertDto(siteWithIndexByBpnMap[it.bpn]!!.second) }
 
-        return EntitiesWithErrors(validEntities, errors)
+        return SitePartnerCreateResponseWrapper(validEntities, errors)
     }
 
     @Transactional
@@ -150,7 +150,7 @@ class BusinessPartnerBuildService(
 
         changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.address.bpna, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
-        return EntitiesWithErrors(addressResponses, errors)
+        return AddressPartnerCreateResponseWrapper(addressResponses, errors)
     }
 
     /**
@@ -184,7 +184,7 @@ class BusinessPartnerBuildService(
 
         val validEntities = legalEntityRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
 
-        return EntitiesWithErrors(validEntities, errors)
+        return LegalEntityPartnerUpdateResponseWrapper(validEntities, errors)
     }
 
     @Transactional
@@ -212,7 +212,7 @@ class BusinessPartnerBuildService(
         }
         val validEntities = siteRepository.saveAll(sites).map { it.toUpsertDto(null) }
 
-        return EntitiesWithErrors(validEntities, errors)
+        return SitePartnerUpdateResponseWrapper(validEntities, errors)
     }
 
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
@@ -233,7 +233,7 @@ class BusinessPartnerBuildService(
         changelogService.createChangelogEntries(validAddresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         val addressResponses = logisticAddressRepository.saveAll(validAddresses).map { it.toDto() }
-        return EntitiesWithErrors(addressResponses, errors)
+        return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
     }
 
     @Transactional
