@@ -39,6 +39,4 @@ data class LegalEntityGateInputRequest(
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String?,
 )

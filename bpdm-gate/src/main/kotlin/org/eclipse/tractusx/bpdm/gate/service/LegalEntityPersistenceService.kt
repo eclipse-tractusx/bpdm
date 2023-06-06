@@ -67,7 +67,6 @@ class LegalEntityPersistenceService(
         legalEntityRequest: LegalEntityGateInputRequest,
         logisticAddressRecord: LogisticAddress
     ): LegalEntity {
-        legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
         legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
         legalEntity.legalName = Name(value = legalEntityRequest.legalNameParts[0], shortName = legalEntityRequest.legalEntity.legalShortName)
@@ -82,7 +81,6 @@ class LegalEntityPersistenceService(
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
 
         address.name = changeAddress.name
-        address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
         address.siteExternalId = changeAddress.siteExternalId

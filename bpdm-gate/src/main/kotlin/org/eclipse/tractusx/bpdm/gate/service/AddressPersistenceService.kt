@@ -67,7 +67,6 @@ class AddressPersistenceService(
     private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
 
         address.name = changeAddress.address.name
-        address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
         address.site = siteRecord

@@ -29,9 +29,6 @@ import java.time.Instant
     indexes = [Index(columnList = "legal_form_id")]
 )
 class LegalEntity(
-    @Column(name = "bpn")
-    var bpn: String?,
-
     @Column(name = "externalId", nullable = false, unique = true)
     var externalId: String,
 

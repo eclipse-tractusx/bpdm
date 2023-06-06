@@ -25,9 +25,6 @@ import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 @Entity
 @Table(name = "sites")
 class Site(
-    @Column(name = "bpn")
-    var bpn: String?,
-
     @Column(name = "name", nullable = false)
     var name: String,
 
