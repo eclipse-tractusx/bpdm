@@ -28,12 +28,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -79,7 +79,7 @@ interface PoolSiteApi {
     @GetExchange("/{bpn}")
     fun getSite(
         @Parameter(description = "Bpn value") @PathVariable bpn: String
-    ): SiteResponse
+    ): SitePoolResponse
 
     @Operation(
         summary = "Search site partners by BPNs and/or parent BPNs",
@@ -96,7 +96,7 @@ interface PoolSiteApi {
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse>
+    ): PageResponse<SitePoolResponse>
 
     @Operation(
         summary = "Create new site business partners",

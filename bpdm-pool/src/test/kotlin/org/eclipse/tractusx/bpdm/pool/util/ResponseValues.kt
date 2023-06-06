@@ -200,7 +200,7 @@ object ResponseValues {
         states = listOf(siteStatus1),
         bpnLegalEntity = CommonValues.bpnL1,
         createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        updatedAt = CommonValues.now,
     )
 
     val site2 = SiteResponse(
@@ -209,7 +209,7 @@ object ResponseValues {
         states = listOf(siteStatus2),
         bpnLegalEntity = CommonValues.bpnL2,
         createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        updatedAt = CommonValues.now,
     )
 
     val site3 = SiteResponse(
@@ -218,7 +218,7 @@ object ResponseValues {
         states = listOf(siteStatus3),
         bpnLegalEntity = CommonValues.bpnL3,
         createdAt = CommonValues.now,
-        updatedAt = CommonValues.now
+        updatedAt = CommonValues.now,
     )
 
     val siteUpsert1 = SitePartnerCreateResponse(
