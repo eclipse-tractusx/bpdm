@@ -20,7 +20,9 @@
 package com.catenax.bpdm.bridge.dummy
 
 import com.catenax.bpdm.bridge.dummy.client.BridgeClient
+import com.catenax.bpdm.bridge.dummy.testdata.CommonValues
 import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues
+import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues.addressGateInputRequest1
 import com.catenax.bpdm.bridge.dummy.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
@@ -28,22 +30,23 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest as GateChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest as PoolChangelogSearchRequest
 
 private val DEFAULT_PAGINATION_REQUEST = PaginationRequest(0, 100)
 
@@ -67,7 +70,7 @@ class BridgeSyncIT @Autowired constructor(
     fun `just use API clients`() {
         assertGateChangelogHasCount(0)
         val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
-            paginationRequest = DEFAULT_PAGINATION_REQUEST, changelogSearchRequest = PoolChangelogSearchRequest(timestampAfter = null, bpns = null)
+            paginationRequest = DEFAULT_PAGINATION_REQUEST, changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
         )
         assertThat(poolChangelogResponses.contentSize).isZero()
         bridgeClient.bridge().triggerSync()
@@ -83,7 +86,7 @@ class BridgeSyncIT @Autowired constructor(
         gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
 
         assertGateChangelogHasCount(3 + 3)  // 3 LEs + 3 addresses
-        assertSharingStatesSuccessful(0)
+        assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
@@ -92,7 +95,8 @@ class BridgeSyncIT @Autowired constructor(
         assertPoolChangelogHasCount(3 + 3)
 
         // 3 legal entities
-        val sharingStatesOkay = assertSharingStatesSuccessful(3)
+        val sharingStatesOkay = readSuccessfulSharingStatesWithBpn()
+        assertThat(sharingStatesOkay.size).isEqualTo(3)
         val bpnByExternalId = buildBpnByExternalIdMap(sharingStatesOkay)
 
         val gateLegalEntityRequestByBpn = gateLegalEntityRequests.associateBy { bpnByExternalId[it.externalId]!! }
@@ -131,7 +135,7 @@ class BridgeSyncIT @Autowired constructor(
         gateClient.sites().upsertSites(gateSiteRequests)
 
         assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
-        assertSharingStatesSuccessful(0)
+        assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
@@ -140,7 +144,8 @@ class BridgeSyncIT @Autowired constructor(
         assertPoolChangelogHasCount(3 + 3 + 2 + 2)
 
         // 3 LEs + 2 sites
-        val sharingStatesOkay = assertSharingStatesSuccessful(3 + 2)
+        val sharingStatesOkay = readSuccessfulSharingStatesWithBpn()
+        assertThat(sharingStatesOkay.size).isEqualTo(3 + 2)
         val bpnByExternalId = buildBpnByExternalIdMap(sharingStatesOkay)
 
         val gateSiteRequestsByBpn = gateSiteRequests.associateBy { bpnByExternalId[it.externalId]!! }
@@ -175,13 +180,13 @@ class BridgeSyncIT @Autowired constructor(
         gateClient.sites().upsertSites(gateSiteRequests)
 
         val gateAddressRequests = listOf(
-            GateRequestValues.addressGateInputRequest1,
+            addressGateInputRequest1,
             GateRequestValues.addressGateInputRequest2
         )
         gateClient.addresses().upsertAddresses(gateAddressRequests)
 
         assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + 1 site + 2 addresses
-        assertSharingStatesSuccessful(0)
+        assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
@@ -190,7 +195,8 @@ class BridgeSyncIT @Autowired constructor(
         assertPoolChangelogHasCount(1 + 1 + 1 + 1 + 2)
 
         // 1 LE + 1 site + 2 addresses
-        val sharingStatesOkay = assertSharingStatesSuccessful(1 + 1 + 2)
+        val sharingStatesOkay = readSuccessfulSharingStatesWithBpn()
+        assertThat(sharingStatesOkay.size).isEqualTo(1 + 1 + 2)
         val bpnByExternalId = buildBpnByExternalIdMap(sharingStatesOkay)
 
         val gateAddressRequestsByBpn = gateAddressRequests.associateBy { bpnByExternalId[it.externalId]!! }
@@ -212,6 +218,198 @@ class BridgeSyncIT @Autowired constructor(
         }
     }
 
+    @Test
+    fun `sync updated legal entities`() {
+        val gateLegalEntityRequests = listOf(
+            GateRequestValues.legalEntityGateInputRequest1,
+            GateRequestValues.legalEntityGateInputRequest2,
+            GateRequestValues.legalEntityGateInputRequest3
+        )
+        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        assertGateChangelogHasCount(3 + 3)
+        // Action: Sync from Gate to Pool and BPN back to Gate
+        bridgeClient.bridge().triggerSync()
+        assertPoolChangelogHasCount(3 + 3)
+
+        val legalEntitiesFromPool = allLegalEntitiesFromPool()
+        assertThat(legalEntitiesFromPool.size).isEqualTo(3)
+
+        val bpnByExternalId = buildBpnByExternalIdMap(readSuccessfulSharingStatesWithBpn())
+        val gateLegalEntityRequestByBpn = gateLegalEntityRequests.associateBy { bpnByExternalId[it.externalId]!! }
+        legalEntitiesFromPool.forEach { poolLe ->
+            assertEqualLegalEntity(gateLegalEntityRequestByBpn[poolLe.legalEntity.bpnl]!!, poolLe)
+        }
+
+        // update legal entity and le address and trigger sync
+        val leRquestUpdate = GateRequestValues.legalEntityGateInputRequest1.copy(
+            legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
+            legalAddress = GateRequestValues.address1.copy(
+                physicalPostalAddress = GateRequestValues.postalAddress1.copy(
+                    street = StreetGateDto(name = "Changed Street Entiy", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                ),
+            ),
+        )
+        gateClient.legalEntities().upsertLegalEntities(listOf(leRquestUpdate))
+        assertGateChangelogHasCount(4 + 4) // 3 insert + 1 update
+        bridgeClient.bridge().triggerSync()
+        assertPoolChangelogHasCount(4 + 4)
+
+        val entitiesFromPoolAFterUpdate = allLegalEntitiesFromPool()
+        assertThat(legalEntitiesFromPool.size).isEqualTo(3)
+        val gateLegalEntityUpdateRequestsByBpn = listOf(
+            leRquestUpdate,
+            GateRequestValues.legalEntityGateInputRequest2,
+            GateRequestValues.legalEntityGateInputRequest3
+        ).associateBy { bpnByExternalId[it.externalId]!! }
+
+        entitiesFromPoolAFterUpdate.forEach { poolLe ->
+            assertEqualLegalEntity(gateLegalEntityUpdateRequestsByBpn[poolLe.legalEntity.bpnl]!!, poolLe)
+        }
+    }
+
+    @Test
+    fun `sync update sites`() {
+        // site needs parent legal entity!
+        val gateLegalEntityRequests = listOf(
+            GateRequestValues.legalEntityGateInputRequest1,
+            GateRequestValues.legalEntityGateInputRequest2,
+            GateRequestValues.legalEntityGateInputRequest3
+        )
+        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+
+        val gateSiteRequests = listOf(
+            GateRequestValues.siteGateInputRequest1,
+            GateRequestValues.siteGateInputRequest2
+        )
+        gateClient.sites().upsertSites(gateSiteRequests)
+
+        assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
+        assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
+
+        // Action: Sync from Gate to Pool and BPN back to Gate
+        bridgeClient.bridge().triggerSync()
+
+        // 3 legal entities + 3 legal addresses & 2 sites + 2 main addresses
+        assertPoolChangelogHasCount(3 + 3 + 2 + 2)
+
+        // 3 LEs + 2 sites
+        val sharingStatesOkay = readSuccessfulSharingStatesWithBpn()
+        assertThat(sharingStatesOkay.size).isEqualTo(3 + 2)
+        val bpnByExternalId = buildBpnByExternalIdMap(sharingStatesOkay)
+        val gateSiteRequestsByBpn = gateSiteRequests.associateBy { bpnByExternalId[it.externalId]!! }
+
+        val poolSiteResponses = poolClient.sites().searchSites(
+            siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
+            paginationRequest = DEFAULT_PAGINATION_REQUEST
+        )
+        assertThat(poolSiteResponses.contentSize).isEqualTo(2)
+        poolSiteResponses.content.forEach { poolSite ->
+            assertEqualSite(gateSiteRequestsByBpn[poolSite.site.bpns]!!, poolSite)
+        }
+
+        // update site and main address and trigger sync
+        val siteRquestUpdate = GateRequestValues.siteGateInputRequest1.copy(
+            site = GateRequestValues.site1.copy(nameParts = listOf("ChangedNamePart1")),
+            mainAddress = GateRequestValues.address1.copy(
+                physicalPostalAddress = GateRequestValues.postalAddress1.copy(
+                    street = StreetGateDto(name = "Changed Street Site", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                ),
+            )
+        )
+        gateClient.sites().upsertSites(listOf(siteRquestUpdate))
+        bridgeClient.bridge().triggerSync()
+        val poolSiteUpdateResponses = poolClient.sites().searchSites(
+            siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
+            paginationRequest = DEFAULT_PAGINATION_REQUEST
+        )
+
+        val gateSiteUpdateRequestsByBpn = listOf(
+            siteRquestUpdate,
+            GateRequestValues.siteGateInputRequest2
+        ).associateBy { bpnByExternalId[it.externalId]!! }
+
+        poolSiteUpdateResponses.content.forEach { poolSite ->
+            assertEqualSite(gateSiteUpdateRequestsByBpn[poolSite.site.bpns]!!, poolSite)
+        }
+
+    }
+
+    @Test
+    fun `sync update addresses`() {
+        // insert le, sites and addresses
+        val gateLegalEntityRequests = listOf(
+            GateRequestValues.legalEntityGateInputRequest1,
+        )
+        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        val gateSiteRequests = listOf(
+            GateRequestValues.siteGateInputRequest1,
+        )
+        gateClient.sites().upsertSites(gateSiteRequests)
+
+        val gateAddressRequests = listOf(
+            addressGateInputRequest1,
+            GateRequestValues.addressGateInputRequest2
+        )
+        gateClient.addresses().upsertAddresses(gateAddressRequests)
+
+        assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + le address + 1 site + main address + 2 addresses
+        assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
+
+        // Action: Sync from Gate to Pool and BPN back to Gate
+        bridgeClient.bridge().triggerSync()
+
+        // 1 legal entity + 1 le address & 1 site + 1 main address & 2 addresses
+        assertPoolChangelogHasCount(1 + 1 + 1 + 1 + 2)
+
+        val bpnByExternalId = buildBpnByExternalIdMap(readSuccessfulSharingStatesWithBpn())
+        val gateAddressRequestsByBpn = gateAddressRequests.associateBy { bpnByExternalId[it.externalId]!! }
+
+        val poolAddressResponses = poolClient.addresses().searchAddresses(
+            addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
+            paginationRequest = DEFAULT_PAGINATION_REQUEST
+        ).content
+        assertThat(poolAddressResponses.size).isEqualTo(2)
+
+        poolAddressResponses.forEach { poolVersion ->
+            assertEqualAddress(gateAddressRequestsByBpn[poolVersion.bpna]!!, poolVersion)
+        }
+
+        // update address nad trigger sync
+        val addressRequestUpdate = addressGateInputRequest1.copy(
+            address = GateRequestValues.address1.copy(
+                nameParts = listOf("Changed Address Name"),
+                physicalPostalAddress = GateRequestValues.postalAddress1
+                    .copy(street = StreetGateDto(name = "UpdateSteet", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1))
+            ),
+
+            )
+        gateClient.addresses().upsertAddresses(listOf(addressRequestUpdate))
+        bridgeClient.bridge().triggerSync()
+        val poolAddressUpdateResponses = poolClient.addresses().searchAddresses(
+            addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
+            paginationRequest = DEFAULT_PAGINATION_REQUEST
+        ).content
+
+        val gateAddressUpdateRequestsByBpn = listOf(
+            addressRequestUpdate,
+            GateRequestValues.addressGateInputRequest2
+        ).associateBy { bpnByExternalId[it.externalId]!! }
+
+        poolAddressUpdateResponses.forEach { poolVersion ->
+            assertEqualAddress(gateAddressUpdateRequestsByBpn[poolVersion.bpna]!!, poolVersion)
+        }
+
+    }
+
+    private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchVerboseDto> {
+        val poolLegalEntityResponses = poolClient.legalEntities().getLegalEntities(
+            bpSearchRequest = LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            paginationRequest = DEFAULT_PAGINATION_REQUEST
+        )
+        return poolLegalEntityResponses.content
+
+    }
+
     private fun buildBpnByExternalIdMap(sharingStatesOkay: List<SharingStateDto>) =
         sharingStatesOkay
             .associateBy { it.externalId }
@@ -220,7 +418,7 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertGateChangelogHasCount(changelogCount: Int) {
         val gateChangelogResponses = gateClient.changelog().getInputChangelog(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
-            searchRequest = GateChangelogSearchRequest(timestampAfter = null, businessPartnerTypes = emptySet())
+            searchRequest = org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest(timestampAfter = null, businessPartnerTypes = emptySet())
         )
         assertThat(gateChangelogResponses.contentSize).isEqualTo(changelogCount)
     }
@@ -228,14 +426,14 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertPoolChangelogHasCount(changelogCount: Int) {
         val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
-            changelogSearchRequest = PoolChangelogSearchRequest(timestampAfter = null, bpns = null)
+            changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
 
         )
         assertThat(poolChangelogResponses.contentSize).isEqualTo(changelogCount)
 
     }
 
-    private fun assertSharingStatesSuccessful(successfulStatesCount: Int): List<SharingStateDto> {
+    private fun readSuccessfulSharingStatesWithBpn(): List<SharingStateDto> {
         val sharingStates = gateClient.sharingState().getSharingStates(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
             businessPartnerType = null,
@@ -243,7 +441,6 @@ class BridgeSyncIT @Autowired constructor(
         )
         val sharingStatesOkay = sharingStates.content
             .filter { it.sharingStateType == SharingStateType.Success && it.bpn != null }
-        assertThat(sharingStatesOkay.size).isEqualTo(successfulStatesCount)
         return sharingStatesOkay
     }
 
@@ -260,6 +457,7 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SitePoolVerboseDto) {
         assertThat(poolVersion.site.name).isEqualTo(gateVersion.site.nameParts.first())
         assertThat(poolVersion.site.states.map { it.description }).isEqualTo(gateVersion.site.states.map { it.description })
+        assertThat(poolVersion.mainAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.mainAddress.physicalPostalAddress.street?.name)
     }
 
     private fun assertEqualAddress(gateVersion: AddressGateInputRequest, poolVersion: LogisticAddressVerboseDto) {
