@@ -77,7 +77,7 @@ class BpdmOpenSearchQueryBuilder {
      * Fields with no query text are omitted.
      */
     fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
-        return toFieldTextPairs(searchRequest.partnerProperties) + toFieldTextPairs(searchRequest.addressProperties) + toFieldTextPairs(searchRequest.siteProperties)
+        return toFieldTextPairs(searchRequest.partnerProperties)
     }
 
     /**
@@ -87,9 +87,6 @@ class BpdmOpenSearchQueryBuilder {
     fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchRequest): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
             Pair(LegalEntityDoc::legalName.name, bpSearch.legalName),
-            Pair(LegalEntityDoc::legalForm.name, bpSearch.legalForm),
-            Pair(LegalEntityDoc::classifications.name, bpSearch.classification),
-            Pair(LegalEntityDoc::status.name, bpSearch.status)
         )
 
         return bpParamPairs
@@ -140,26 +137,23 @@ class BpdmOpenSearchQueryBuilder {
      */
     fun toFieldTextPairs(addressSearch: AddressPartnerSearchRequest): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
-            Pair(AddressPartnerDoc::localities.name, addressSearch.locality),
-            Pair(AddressPartnerDoc::administrativeAreas.name, addressSearch.administrativeArea),
-            Pair(AddressPartnerDoc::postCodes.name, addressSearch.postCode),
-            Pair(AddressPartnerDoc::premises.name, addressSearch.premise),
-            Pair(AddressPartnerDoc::postalDeliveryPoints.name, addressSearch.postalDeliveryPoint),
-            Pair(AddressPartnerDoc::thoroughfares.name, addressSearch.thoroughfare)
+            Pair(AddressPartnerDoc::name.name, addressSearch.name)
+
         )
 
-        return addressParamPairs.filter { (_, query) -> query != null }
+        return addressParamPairs
+            .filter { (_, query) -> query != null }
             .map { (fieldName, query) -> Pair(fieldName, query!!) }
     }
+
+
 
     /**
      * Returns a lowercase representation of [searchRequest]
      */
     fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
         return BusinessPartnerSearchRequest(
-            toLowerCaseSearchRequest(searchRequest.partnerProperties),
-            toLowerCaseSearchRequest(searchRequest.addressProperties),
-            toLowerCaseSearchRequest(searchRequest.siteProperties)
+            toLowerCaseSearchRequest(searchRequest.partnerProperties)
         )
     }
 
@@ -168,10 +162,7 @@ class BpdmOpenSearchQueryBuilder {
      */
     fun toLowerCaseSearchRequest(searchRequest: LegalEntityPropertiesSearchRequest): LegalEntityPropertiesSearchRequest {
         return LegalEntityPropertiesSearchRequest(
-            searchRequest.legalName?.lowercase(),
-            searchRequest.legalForm?.lowercase(),
-            searchRequest.status?.lowercase(),
-            searchRequest.classification?.lowercase()
+            searchRequest.legalName?.lowercase()
         )
     }
 
@@ -203,13 +194,7 @@ class BpdmOpenSearchQueryBuilder {
      */
     fun toLowerCaseSearchRequest(searchRequest: AddressPartnerSearchRequest): AddressPartnerSearchRequest {
         return AddressPartnerSearchRequest(
-            searchRequest.administrativeArea?.lowercase(),
-            searchRequest.postCode?.lowercase(),
-            searchRequest.locality?.lowercase(),
-            searchRequest.thoroughfare?.lowercase(),
-            searchRequest.premise?.lowercase(),
-            searchRequest.postalDeliveryPoint?.lowercase(),
-            searchRequest.countryCode
+            searchRequest.name?.lowercase()
         )
     }
 }

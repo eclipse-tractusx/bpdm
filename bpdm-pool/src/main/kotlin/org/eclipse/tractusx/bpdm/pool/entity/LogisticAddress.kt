@@ -43,7 +43,7 @@ class LogisticAddress(
     var site: Site?,
 
     @Column(name = "name")
-    var name: String? = null,
+    var name: String?,
 
     @Embedded
     var physicalPostalAddress: PhysicalPostalAddress,

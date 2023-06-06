@@ -71,7 +71,7 @@ class BusinessPartnerLegacyController(
         @ParameterObject paginationRequest: PaginationRequest
     ): PageResponse<BusinessPartnerMatchResponse> {
         return searchService.searchBusinessPartners(
-            BusinessPartnerSearchRequest(bpSearchRequest, addressSearchRequest, siteSearchRequest),
+            BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
         )
     }

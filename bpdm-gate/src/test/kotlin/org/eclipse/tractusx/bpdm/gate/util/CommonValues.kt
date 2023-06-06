@@ -66,6 +66,8 @@ object CommonValues {
     const val bpnAddress2 = "BPNA0000000002XY"
     const val bpnAddress3 = "BPNA0000000003X9"
 
+    const val bpnAddress1Name = "BPNAME0000000001XY"
+
     val language1 = LanguageCode.de
     val language2 = LanguageCode.en
 

@@ -55,8 +55,8 @@ class DocumentMappingService {
     fun toDocument(logisticAddress: LogisticAddress): Collection<AddressPartnerDoc> {
 
         val addresses: MutableList<AddressPartnerDoc> = mutableListOf()
-
-        addresses.add(toAddressPartnerDoc((PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress)), logisticAddress.bpn))
+        val list = listOfNotNull(logisticAddress.name)
+        addresses.add(toAddressPartnerDoc(list,(PhysicalPostalAddressToSaasMapping(logisticAddress.physicalPostalAddress)), logisticAddress.bpn))
         // TODO OpenSearch indexing doesn't work as expected when creating two AddressPartnerDocs with the same BPN (which is the ID), only last is indexed!
         //  For now don't index alternativePostalAddress, since this would override (more important) physicalPostalAddress!
 //        if (logisticAddress.alternativePostalAddress != null) {
@@ -81,18 +81,13 @@ class DocumentMappingService {
         return addresses
     }
 
-    fun toAddressPartnerDoc(address: AddressToSaasMapping, bpn: String): AddressPartnerDoc {
+    fun toAddressPartnerDoc(name: List<String>, address: AddressToSaasMapping, bpn: String): AddressPartnerDoc {
         return AddressPartnerDoc(
             bpn = bpn,
-            administrativeAreas = address.administrativeAreas().map { it },
-            postCodes = address.postcodes().map { it },
-            localities = address.localities().map { it },
-            thoroughfares = address.thoroughfares().map { it },
-            premises = address.premises().map { it },
-            postalDeliveryPoints = address.postalDeliveryPoints().map { it },
-            countryCode = address.country()
+            name = name
         )
     }
+
 
     fun toAddressDoc(address: AddressToSaasMapping): AddressDoc {
         return AddressDoc(
