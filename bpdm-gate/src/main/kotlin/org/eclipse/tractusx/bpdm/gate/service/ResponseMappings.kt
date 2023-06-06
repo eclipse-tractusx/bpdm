@@ -31,7 +31,6 @@ import java.time.temporal.ChronoUnit
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
-        bpn = bpn,
         externalId = externalId,
         siteExternalId = siteExternalId.toString(),
         name = address.name,
@@ -117,7 +116,6 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity): Site {
     )
 
     val site = Site(
-        bpn = bpn,
         name = site.name,
         externalId = externalId,
         legalEntity = legalEntity
@@ -150,7 +148,6 @@ fun LegalEntityGateInputRequest.toLegalEntity(): LegalEntity {
     )
 
     val legalEntity = LegalEntity(
-        bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
@@ -198,7 +195,6 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
         siteExternalId = site?.externalId,
-        bpn = bpn,
         processStartedAt = null //TODO Remove ?
     )
 
@@ -323,7 +319,6 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toLogisticAddressDto(),
         externalId = legalEntity.externalId,
-        bpn = legalEntity.bpn,
         processStartedAt = null
     )
 }
@@ -349,7 +344,6 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
-        bpn = bpn,
         processStartedAt = null //TODO Remove this?
     )
 

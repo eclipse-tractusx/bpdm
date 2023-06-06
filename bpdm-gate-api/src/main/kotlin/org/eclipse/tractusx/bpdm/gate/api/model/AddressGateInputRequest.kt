@@ -42,6 +42,4 @@ data class AddressGateInputRequest(
     @Schema(description = "External id of the related site")
     val siteExternalId: String? = null,
 
-    @Schema(description = "Business Partner Number")
-    val bpn: String? = null
 )

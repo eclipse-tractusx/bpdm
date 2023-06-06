@@ -281,7 +281,6 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity1,
         legalAddress = RequestValues.address1,
         externalId = CommonValues.externalId1,
-        bpn = CommonValues.bpn1,
         processStartedAt = SaasValues.modificationTime1,
     )
 
@@ -289,7 +288,6 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity2,
         legalAddress = RequestValues.address2,
         externalId = CommonValues.externalId2,
-        bpn = CommonValues.bpn2,
         processStartedAt = SaasValues.modificationTime2,
     )
 
@@ -297,7 +295,6 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity3,
         legalAddress = RequestValues.address3,
         externalId = CommonValues.externalId3,
-        bpn = CommonValues.bpn3,
         processStartedAt = null,
     )
 
@@ -306,14 +303,12 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity1,
         legalAddress = RequestValues.address1,
         externalId = CommonValues.externalId1,
-        bpn = CommonValues.bpn1,
         processStartedAt = null
     )
     val newLegalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity2,
         legalAddress = RequestValues.address2,
         externalId = CommonValues.externalId2,
-        bpn = CommonValues.bpn2,
         processStartedAt = null,
     )
 
@@ -352,7 +347,6 @@ object ResponseValues {
         site = RequestValues.site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnSite1,
         processStartedAt = SaasValues.modificationTime1,
     )
 
@@ -360,7 +354,6 @@ object ResponseValues {
         site = RequestValues.site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
-        bpn = CommonValues.bpnSite2,
         processStartedAt = SaasValues.modificationTime2,
     )
 
@@ -369,7 +362,6 @@ object ResponseValues {
         site = RequestValues.site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnSite1,
         processStartedAt = null,
     )
 
@@ -377,7 +369,6 @@ object ResponseValues {
         site = RequestValues.site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
-        bpn = CommonValues.bpnSite2,
         processStartedAt = null,
     )
 
@@ -404,7 +395,6 @@ object ResponseValues {
             ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnAddress1,
         processStartedAt = SaasValues.modificationTime1,
     )
 
@@ -419,7 +409,6 @@ object ResponseValues {
             ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
-        bpn = CommonValues.bpnAddress2,
         processStartedAt = SaasValues.modificationTime2,
     )
 
@@ -441,7 +430,6 @@ object ResponseValues {
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
-        bpn = CommonValues.bpnAddress1,
         processStartedAt = null,
     )
 
@@ -453,7 +441,6 @@ object ResponseValues {
             )
         ),
         externalId = CommonValues.externalIdAddress2,
-        bpn = CommonValues.bpnAddress2,
         siteExternalId = null,
         processStartedAt = null,
     )
