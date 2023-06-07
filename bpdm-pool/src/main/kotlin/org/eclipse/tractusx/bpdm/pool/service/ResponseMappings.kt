@@ -41,10 +41,6 @@ fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
     )
 }
 
-fun LegalEntity.toBusinessPartnerMatchDto(score: Float): BusinessPartnerMatchResponse {
-    return BusinessPartnerMatchResponse(score, this.toBusinessPartnerDto())
-}
-
 fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
     return LegalEntityPartnerCreateResponse(
         legalEntity = toDto(),
@@ -85,17 +81,6 @@ fun LegalEntity.toDto(): LegalEntityResponse {
         currentness = currentness,
         createdAt = createdAt,
         updatedAt = updatedAt,
-    )
-}
-
-fun LegalEntity.toBusinessPartnerDto(): BusinessPartnerResponse {
-    return BusinessPartnerResponse(
-        uuid = "",
-        legalEntity = toDto(),
-        addresses = listOf(legalAddress.toDto()),
-        legalAddress = legalAddress.toDto(),
-        sites = emptyList(),
-        legalName = legalName.value,
     )
 }
 
