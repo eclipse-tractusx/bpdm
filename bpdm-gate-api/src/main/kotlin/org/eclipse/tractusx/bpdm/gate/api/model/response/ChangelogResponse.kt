@@ -21,6 +21,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import java.time.Instant
 
 @Schema(name = "ChangelogResponse", description = "Changelog entry for a business partner")

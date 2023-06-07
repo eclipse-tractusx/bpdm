@@ -19,21 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.GenericIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.NameDto
-
-data class BusinessPartnerCandidateDto(
-    @ArraySchema(arraySchema = Schema(description = "Identifiers of this partner candidate", required = false))
-    val identifiers: Collection<GenericIdentifierDto> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Names the partner goes by"), minItems = 1)
-    val names: Collection<NameDto>,
-
-    @Schema(description = "Technical key of the legal form")
-    val legalForm: String? = null,
-
-    @Schema(description = "Address of this partner")
-    val address: LogisticAddressGateDto
-)
+enum class OptionalLsaType {
+    LegalEntity,
+    Site,
+    Address,
+    None
+}
