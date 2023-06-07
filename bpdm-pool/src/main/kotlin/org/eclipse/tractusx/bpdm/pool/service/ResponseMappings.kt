@@ -245,7 +245,22 @@ fun Site.toDto(): SiteResponse {
         states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+    )
+}
+
+fun Site.toPoolDto(): SitePoolResponse {
+    return SitePoolResponse(
+
+        site = SiteResponse(
+            bpn,
+            name,
+            states = states.map { it.toDto() },
+            bpnLegalEntity = legalEntity.bpn,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+        ),
+        mainAddress = mainAddress.toDto()
     )
 }
 

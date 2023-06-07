@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -49,14 +49,14 @@ class SiteController(
 
     override fun getSite(
         bpn: String
-    ): SiteResponse {
+    ): SitePoolResponse {
         return siteService.findByBpn(bpn.uppercase())
     }
 
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse> {
+    ): PageResponse<SitePoolResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
