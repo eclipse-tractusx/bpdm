@@ -22,9 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import java.time.LocalDateTime
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
@@ -41,8 +39,5 @@ data class SiteGateOutputResponse(
     val legalEntityExternalId: String,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String?,
-
-    @Schema(description = "Time the sharing process was started according to SaaS")
-    val processStartedAt: LocalDateTime? = null,
+    val bpn: String?
 )

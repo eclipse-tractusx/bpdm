@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -120,9 +121,9 @@ class SiteService(
     /**
      * Upsert sites output to the database
      **/
-    fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>) {
+    fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>) {
 
-        sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Output)
+        sitePersistenceService.persistSitesOutputBP(sites, OutputInputEnum.Output)
     }
 
     /**

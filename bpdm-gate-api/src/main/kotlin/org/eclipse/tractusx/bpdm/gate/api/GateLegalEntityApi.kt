@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -137,6 +138,6 @@ interface GateLegalEntityApi {
     )
     @PutMapping("/output/legal-entities")
     @PutExchange("/output/legal-entities")
-    fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit>
+    fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit>
 
 }

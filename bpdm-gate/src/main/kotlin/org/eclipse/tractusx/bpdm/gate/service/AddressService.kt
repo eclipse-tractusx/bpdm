@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
@@ -125,9 +126,9 @@ class AddressService(
     /**
      * Upsert addresses output to the database
      **/
-    fun upsertOutputAddresses(addresses: Collection<AddressGateInputRequest>) {
+    fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
 
-        addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Output)
+        addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
 
     }
 
