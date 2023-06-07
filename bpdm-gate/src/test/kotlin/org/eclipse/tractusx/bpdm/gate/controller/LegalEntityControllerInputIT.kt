@@ -180,7 +180,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(CommonValues.externalId3)
 
         assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
+            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
 
     }
 
@@ -240,7 +240,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         // TODO check administrativeAreaLevel1
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
+            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
                 expectedPage
             )
     }
@@ -284,7 +284,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*").isEqualTo(
+            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
                 expectedPage
             )
     }
