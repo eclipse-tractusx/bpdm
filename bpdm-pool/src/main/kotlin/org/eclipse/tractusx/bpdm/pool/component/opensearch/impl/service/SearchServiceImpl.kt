@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
@@ -92,20 +91,6 @@ class SearchServiceImpl(
         return with(addressPage) {
             PageResponse(totalElements, totalPages, page, contentSize,
                 content.map { (score, address) -> address.toMatchDto(score) })
-        }
-    }
-
-    override fun searchBusinessPartners(
-        searchRequest: BusinessPartnerSearchRequest,
-        paginationRequest: PaginationRequest
-    ): PageResponse<BusinessPartnerMatchResponse> {
-
-        val legalEntityPage = searchAndPreparePage(searchRequest, paginationRequest)
-        businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
-
-        return with(legalEntityPage) {
-            PageResponse(totalElements, totalPages, page, contentSize,
-                content.map { (score, legalEntity) -> legalEntity.toBusinessPartnerMatchDto(score) })
         }
     }
 
