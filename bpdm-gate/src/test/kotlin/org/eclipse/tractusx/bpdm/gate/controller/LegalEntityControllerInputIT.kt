@@ -32,8 +32,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ValidationStatus
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
@@ -304,72 +302,6 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
-
-    }
-
-    /**
-     * Given valid legal entity
-     * When validate that legal entity
-     * Then response is OK and no errors
-     */
-    @Test
-    fun `validate a valid legal entity`() {
-        val legalEntity = RequestValues.legalEntityGateInputRequest1
-
-        val mockDefects = listOf(
-            DataDefectSaas(ViolationLevel.INFO, "Info"),
-            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
-        )
-        val mockResponse = ValidationResponseSaas(mockDefects)
-        wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockResponse))
-                )
-        )
-
-        val actualResponse = gateClient.legalEntities().validateLegalEntity(legalEntity)
-
-        val expectedResponse = ValidationResponse(ValidationStatus.OK, emptyList())
-
-        assertThat(actualResponse).isEqualTo(expectedResponse)
-    }
-
-    /**
-     * Given invalid legal entity
-     * When validate that legal entity
-     * Then response is ERROR and contain error description
-     */
-    @Test
-    fun `validate an invalid legal entity`() {
-        val legalEntity = RequestValues.legalEntityGateInputRequest1
-
-        val mockErrorMessage = "Validation error"
-        val mockDefects = listOf(
-            DataDefectSaas(ViolationLevel.ERROR, mockErrorMessage),
-            DataDefectSaas(ViolationLevel.INFO, "Info"),
-            DataDefectSaas(ViolationLevel.NO_DEFECT, "No Defect"),
-            DataDefectSaas(ViolationLevel.WARNING, "Warning"),
-        )
-
-        val mockResponse = ValidationResponseSaas(mockDefects)
-        wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(mockResponse))
-                )
-        )
-
-        val actualResponse = gateClient.legalEntities().validateLegalEntity(legalEntity)
-
-        val expectedResponse = ValidationResponse(ValidationStatus.ERROR, listOf(mockErrorMessage))
-
-        assertThat(actualResponse).isEqualTo(expectedResponse)
 
     }
 

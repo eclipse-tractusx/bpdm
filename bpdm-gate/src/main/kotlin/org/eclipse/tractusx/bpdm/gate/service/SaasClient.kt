@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
-import org.eclipse.tractusx.bpdm.common.service.SaasMappings
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.exception.SaasRequestException
 import org.springframework.beans.factory.annotation.Qualifier
@@ -31,16 +30,10 @@ import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.Instant
 
 private const val BUSINESS_PARTNER_PATH = "/businesspartners"
-private const val FETCH_BUSINESS_PARTNER_PATH = "$BUSINESS_PARTNER_PATH/fetch"
-
-private const val RELATIONS_PATH = "/relations"
-private const val DELETE_RELATIONS_PATH = "$RELATIONS_PATH/delete"
 
 const val PARENT_RELATION_TYPE_KEY = "PARENT"
 
 private const val LOOKUP_PATH = "/businesspartners/lookup"
-
-private const val VALIDATE_BUSINESS_PARTNER_PATH = "/businesspartners/validate"
 
 @Service
 class SaasClient(
@@ -87,83 +80,6 @@ class SaasClient(
             throw SaasRequestException("Read augmented business partners request failed.", e)
         }
         return partnerCollection
-    }
-
-    fun deleteParentRelations(businessPartners: Collection<BusinessPartnerSaas>) {
-        val relationsToDelete = businessPartners
-            .flatMap { businessPartner ->
-                businessPartner.relations
-                    .filter { it.type?.technicalKey == PARENT_RELATION_TYPE_KEY }
-                    .filter { it.endNode == businessPartner.externalId }
-            }
-            .map { SaasMappings.toRelationToDelete(it) }
-        if (relationsToDelete.isNotEmpty()) {
-            deleteRelations(relationsToDelete)
-        }
-    }
-
-    fun deleteRelations(relations: Collection<DeleteRelationsRequestSaas.RelationToDeleteSaas>) {
-        try {
-            webClient
-                .post()
-                .uri(saasConfigProperties.dataExchangeApiUrl + DELETE_RELATIONS_PATH)
-                .bodyValue(objectMapper.writeValueAsString(DeleteRelationsRequestSaas(relations)))
-                .retrieve()
-                .bodyToMono<DeleteRelationsResponseSaas>()
-                .block()!!
-        } catch (e: Exception) {
-            throw SaasRequestException("Delete relations request failed.", e)
-        }
-    }
-
-    fun upsertLegalEntities(legalEntities: List<BusinessPartnerSaas>) {
-        return upsertBusinessPartners(legalEntities)
-    }
-
-    fun upsertSites(sites: Collection<BusinessPartnerSaas>) {
-        return upsertBusinessPartners(sites)
-    }
-
-    fun upsertAddresses(addresses: Collection<BusinessPartnerSaas>) {
-        return upsertBusinessPartners(addresses)
-    }
-
-    private fun upsertBusinessPartners(businessPartners: Collection<BusinessPartnerSaas>) {
-        val upsertRequest =
-            UpsertRequest(
-                saasConfigProperties.datasource,
-                businessPartners,
-                listOf(UpsertRequest.SaasFeatures.UPSERT_BY_EXTERNAL_ID, UpsertRequest.SaasFeatures.API_ERROR_ON_FAILURES)
-            )
-
-        try {
-            webClient
-                .put()
-                .uri(saasConfigProperties.dataExchangeApiUrl + BUSINESS_PARTNER_PATH)
-                .bodyValue(objectMapper.writeValueAsString(upsertRequest))
-                .retrieve()
-                .bodyToMono<UpsertResponse>()
-                .block()!!
-        } catch (e: Exception) {
-            throw SaasRequestException("Upsert business partners request failed.", e)
-        }
-    }
-
-    fun getBusinessPartner(externalId: String): FetchResponse {
-        val fetchRequest = FetchRequest(saasConfigProperties.datasource, externalId, featuresOn = listOf(FetchRequest.SaasFeatures.FETCH_RELATIONS))
-
-        val fetchResponse = try {
-            webClient
-                .post()
-                .uri(saasConfigProperties.dataExchangeApiUrl + FETCH_BUSINESS_PARTNER_PATH)
-                .bodyValue(objectMapper.writeValueAsString(fetchRequest))
-                .retrieve()
-                .bodyToMono<FetchResponse>()
-                .block()!!
-        } catch (e: Exception) {
-            throw SaasRequestException("Fetch business partners request failed.", e)
-        }
-        return fetchResponse
     }
 
     fun getLegalEntities(limit: Int? = null, startAfter: String? = null, externalIds: Collection<String>? = null) =
@@ -219,87 +135,4 @@ class SaasClient(
         }
         return partnerCollection
     }
-
-    fun upsertSiteRelations(relations: Collection<SiteLegalEntityRelation>) {
-        val relationsSaas = relations.map {
-            RelationSaas(
-                startNode = it.legalEntityExternalId,
-                startNodeDataSource = saasConfigProperties.datasource,
-                endNode = it.siteExternalId,
-                endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
-            )
-        }.toList()
-        upsertBusinessPartnerRelations(relationsSaas)
-    }
-
-    fun upsertAddressRelations(legalEntityRelations: Collection<AddressLegalEntityRelation>, siteRelations: Collection<AddressSiteRelation>) {
-        val legalEntityRelationsSaas = legalEntityRelations.map {
-            RelationSaas(
-                startNode = it.legalEntityExternalId,
-                startNodeDataSource = saasConfigProperties.datasource,
-                endNode = it.addressExternalId,
-                endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
-            )
-        }.toList()
-        val siteRelationsSaas = siteRelations.map {
-            RelationSaas(
-                startNode = it.siteExternalId,
-                startNodeDataSource = saasConfigProperties.datasource,
-                endNode = it.addressExternalId,
-                endNodeDataSource = saasConfigProperties.datasource,
-                type = TypeKeyNameSaas(technicalKey = PARENT_RELATION_TYPE_KEY)
-            )
-        }.toList()
-        upsertBusinessPartnerRelations(legalEntityRelationsSaas.plus(siteRelationsSaas))
-    }
-
-    fun validateBusinessPartner(validationRequest: ValidationRequestSaas): ValidationResponseSaas {
-        return try {
-            webClient
-                .post()
-                .uri(saasConfigProperties.dataValidationApiUrl + VALIDATE_BUSINESS_PARTNER_PATH)
-                .bodyValue(objectMapper.writeValueAsString(validationRequest))
-                .retrieve()
-                .bodyToMono<ValidationResponseSaas>()
-                .block()!!
-        } catch (e: Exception) {
-            throw SaasRequestException("Validate business partner request failed.", e)
-        }
-    }
-
-    private fun upsertBusinessPartnerRelations(relations: Collection<RelationSaas>) {
-        val upsertRelationsRequest = UpsertRelationsRequestSaas(relations)
-        val upsertResponse = try {
-            webClient
-                .put()
-                .uri(saasConfigProperties.dataExchangeApiUrl + RELATIONS_PATH)
-                .bodyValue(objectMapper.writeValueAsString(upsertRelationsRequest))
-                .retrieve()
-                .bodyToMono<UpsertRelationsResponseSaas>()
-                .block()!!
-        } catch (e: Exception) {
-            throw SaasRequestException("Upsert business partner relations request failed.", e)
-        }
-
-        if (upsertResponse.failures.isNotEmpty() || upsertResponse.numberOfFailed > 0) {
-            throw SaasRequestException("Upsert business partner relations request failed for some relations.")
-        }
-    }
-
-    data class SiteLegalEntityRelation(
-        val siteExternalId: String,
-        val legalEntityExternalId: String
-    )
-
-    data class AddressLegalEntityRelation(
-        val addressExternalId: String,
-        val legalEntityExternalId: String
-    )
-
-    data class AddressSiteRelation(
-        val addressExternalId: String,
-        val siteExternalId: String
-    )
 }
