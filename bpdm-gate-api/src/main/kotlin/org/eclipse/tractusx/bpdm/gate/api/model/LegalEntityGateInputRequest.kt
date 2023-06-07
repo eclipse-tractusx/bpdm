@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.enumeration.Role
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
@@ -38,5 +39,8 @@ data class LegalEntityGateInputRequest(
 
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
+
+    @Schema(description = "Roles of the BPN")
+    val roles: List<Role> = emptyList()
 
 )

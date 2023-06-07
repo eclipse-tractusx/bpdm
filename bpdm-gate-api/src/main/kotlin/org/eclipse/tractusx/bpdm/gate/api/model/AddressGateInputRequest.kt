@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.enumeration.Role
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
@@ -41,5 +42,8 @@ data class AddressGateInputRequest(
 
     @Schema(description = "External id of the related site")
     val siteExternalId: String? = null,
+
+    @Schema(description = "Roles of the BPN")
+    val roles: List<Role> = emptyList()
 
 )

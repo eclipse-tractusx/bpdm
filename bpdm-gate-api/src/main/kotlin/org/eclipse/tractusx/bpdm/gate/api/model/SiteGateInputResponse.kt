@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.enumeration.Role
 import java.time.LocalDateTime
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -41,5 +42,8 @@ data class SiteGateInputResponse(
 
     @Schema(description = "Time the sharing process was started according to SaaS")
     val processStartedAt: LocalDateTime? = null,
+
+    @Schema(description = "Roles of the BPN")
+    val roles: List<Role> = emptyList()
 )
 
