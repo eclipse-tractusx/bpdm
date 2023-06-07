@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -137,6 +138,6 @@ interface GateSiteApi {
     )
     @PutMapping("/output/sites")
     @PutExchange("/output/sites")
-    fun upsertSitesOutput(@RequestBody sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit>
+    fun upsertSitesOutput(@RequestBody sites: Collection<SiteGateOutputRequest>): ResponseEntity<Unit>
 
 }

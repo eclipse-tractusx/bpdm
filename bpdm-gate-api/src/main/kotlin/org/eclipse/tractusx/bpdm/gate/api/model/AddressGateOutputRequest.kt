@@ -26,10 +26,10 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
-    name = "AddressGateInputResponse", description = "Address with legal entity or site references. " +
+    name = "AddressGateOutputRequest", description = "Address with legal entity or site references. " +
             "Only one of either legal entity or site external id can be set for an address."
 )
-data class AddressGateOutputResponse(
+data class AddressGateOutputRequest(
     @field:JsonUnwrapped
     val address: LogisticAddressGateDto,
 
@@ -43,6 +43,5 @@ data class AddressGateOutputResponse(
     val siteExternalId: String? = null,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String? = null,
-
-    )
+    val bpn: String? = null
+)

@@ -104,9 +104,14 @@ internal class AddressControllerOutputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
         try {
             gateClient.addresses().upsertAddresses(addresses)
-            gateClient.addresses().putAddressesOutput(addresses)
+            gateClient.addresses().putAddressesOutput(addressesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -127,8 +132,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert output addresses, no input persisted`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
         )
 
         try {
@@ -151,6 +156,11 @@ internal class AddressControllerOutputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
         val expectedAddresses = listOf(
             ResponseValues.logisticAddressGateInputResponse1,
             ResponseValues.logisticAddressGateInputResponse2,
@@ -165,7 +175,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val contentSize = 2
 
         gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().putAddressesOutput(addresses)
+        gateClient.addresses().putAddressesOutput(addressesOutput)
 
 
         val paginationValue = PaginationRequest(page, size)
@@ -194,6 +204,11 @@ internal class AddressControllerOutputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
         val expectedAddresses = listOf(
             ResponseValues.logisticAddressGateInputResponse1,
             ResponseValues.logisticAddressGateInputResponse2,
@@ -208,7 +223,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val contentSize = 2
 
         gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().putAddressesOutput(addresses)
+        gateClient.addresses().putAddressesOutput(addressesOutput)
 
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))

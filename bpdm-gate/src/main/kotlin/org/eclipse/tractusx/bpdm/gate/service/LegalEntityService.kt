@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -58,9 +59,9 @@ class LegalEntityService(
     /**
      * Upsert legal entities output to the database
      **/
-    fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateInputRequest>) {
+    fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>) {
 
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Output)
+        legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, OutputInputEnum.Output)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {

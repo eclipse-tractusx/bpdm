@@ -48,6 +48,26 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
     return logisticAddress
 }
 
+fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site: Site?, datatype: OutputInputEnum): LogisticAddress {
+
+    val logisticAddress = LogisticAddress(
+        bpn = bpn,
+        externalId = externalId,
+        siteExternalId = siteExternalId.toString(),
+        name = address.name,
+        physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
+        alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
+        legalEntity = legalEntity,
+        site = site,
+        dataType = datatype
+    )
+
+    logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
+    logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
+
+    return logisticAddress
+}
+
 fun toEntityAddress(dto: AddressStateDto, address: LogisticAddress): AddressState {
     return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
 }
@@ -130,6 +150,28 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     return site
 }
 
+fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputInputEnum): Site {
+
+    val addressInputRequest = AddressGateInputRequest(
+        address = site.mainAddress,
+        externalId = getMainAddressForSiteExternalId(externalId),
+        legalEntityExternalId = externalId
+    )
+
+    val site = Site(
+        bpn = bpn,
+        name = site.name,
+        externalId = externalId,
+        legalEntity = legalEntity,
+        dataType = datatype
+    )
+
+    site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
+    site.mainAddress = addressInputRequest.toAddressGate(legalEntity, site, datatype)
+
+    return site
+}
+
 fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
     return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
 }
@@ -151,6 +193,33 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     )
 
     val legalEntity = LegalEntity(
+        externalId = externalId,
+        currentness = createCurrentnessTimestamp(),
+        legalForm = legalEntity.legalForm,
+        legalName = Name(legalNameParts[0], legalEntity.legalShortName),
+        dataType = datatype
+    )
+
+    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
+    legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+
+    legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
+
+    return legalEntity
+
+}
+
+fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): LegalEntity {
+
+    val addressInputRequest = AddressGateInputRequest(
+        address = legalAddress,
+        externalId = getMainAddressForLegalEntityExternalId(externalId),
+        legalEntityExternalId = externalId
+    )
+
+    val legalEntity = LegalEntity(
+        bpn = bpn,
         externalId = externalId,
         currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
@@ -375,10 +444,8 @@ fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputResponse {
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
-        bpn = bpn,
-        processStartedAt = null //TODO Remove this?
+        bpn = bpn
     )
-
 }
 
 //LegalEntity mapping to LegalEntityGateOutputResponse
@@ -387,8 +454,7 @@ fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): Legal
     return LegalEntityGateOutputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         externalId = legalEntity.externalId,
-        bpn = legalEntity.bpn,
-        processStartedAt = null //TODO Remove this?
+        bpn = legalEntity.bpn
     )
 }
 

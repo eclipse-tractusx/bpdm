@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -142,6 +143,6 @@ interface GateAddressApi {
     )
     @PutMapping("/output/addresses")
     @PutExchange("/output/addresses")
-    fun putAddressesOutput(@RequestBody addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit>
+    fun putAddressesOutput(@RequestBody addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit>
 
 }

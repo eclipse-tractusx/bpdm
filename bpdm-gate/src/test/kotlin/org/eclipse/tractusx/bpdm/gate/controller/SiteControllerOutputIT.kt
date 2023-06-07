@@ -85,16 +85,26 @@ internal class SiteControllerOutputIT @Autowired constructor(
             RequestValues.siteGateInputRequest2
         )
 
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
+        )
+
         val legalEntities = listOf(
             RequestValues.legalEntityGateInputRequest1,
             RequestValues.legalEntityGateInputRequest2
         )
 
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
         try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntities)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
             gateClient.sites().upsertSites(sites)
-            gateClient.sites().upsertSitesOutput(sites)
+            gateClient.sites().upsertSitesOutput(sitesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -114,9 +124,10 @@ internal class SiteControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `upsert sites output, no input persisted`() {
-        val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
         )
 
         val legalEntities = listOf(
@@ -124,10 +135,15 @@ internal class SiteControllerOutputIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest2
         )
 
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
         try {
             gateClient.legalEntities().upsertLegalEntities(legalEntities)
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntities)
-            gateClient.sites().upsertSitesOutput(sites)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+            gateClient.sites().upsertSitesOutput(sitesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -154,20 +170,30 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val pageValue = 0
         val contentSize = 2
 
-        val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
-        )
-
         val sites = listOf(
             RequestValues.siteGateInputRequest1,
             RequestValues.siteGateInputRequest2
         )
 
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
+        )
+
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
+
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
         gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntities)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
         gateClient.sites().upsertSites(sites)
-        gateClient.sites().upsertSitesOutput(sites)
+        gateClient.sites().upsertSitesOutput(sitesOutput)
 
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites().getSitesOutput(paginationValue, emptyList())
@@ -203,20 +229,30 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val pageValue = 0
         val contentSize = 2
 
-        val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
-        )
-
         val sites = listOf(
             RequestValues.siteGateInputRequest1,
             RequestValues.siteGateInputRequest2
         )
 
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
+        )
+
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
+
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
         gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntities)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
         gateClient.sites().upsertSites(sites)
-        gateClient.sites().upsertSitesOutput(sites)
+        gateClient.sites().upsertSitesOutput(sitesOutput)
 
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites().getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))

@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -73,7 +74,7 @@ class AddressController(
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    override fun putAddressesOutput(addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
+    override fun putAddressesOutput(addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }

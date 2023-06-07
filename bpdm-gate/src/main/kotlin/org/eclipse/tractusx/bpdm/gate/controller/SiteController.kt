@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -65,7 +66,7 @@ class SiteController(
         return siteService.getSitesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    override fun upsertSitesOutput(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
+    override fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>): ResponseEntity<Unit> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
