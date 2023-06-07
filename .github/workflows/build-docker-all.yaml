@@ -23,6 +23,7 @@ on:
 jobs:
   build-docker-pool:
     uses: ./.github/workflows/build-docker.yaml
+    secrets: inherit
     with:
       imageName: pool
       dockerfilePath: ./bpdm-pool/Dockerfile
@@ -30,6 +31,7 @@ jobs:
 
   build-docker-gate:
     uses: ./.github/workflows/build-docker.yaml
+    secrets: inherit
     with:
       imageName: gate
       dockerfilePath: ./bpdm-gate/Dockerfile
@@ -37,6 +39,7 @@ jobs:
 
   build-docker-bridge-dummy:
     uses: ./.github/workflows/build-docker.yaml
+    secrets: inherit
     with:
       imageName: bridge-dummy
       dockerfilePath: ./bpdm-bridge-dummy/Dockerfile
