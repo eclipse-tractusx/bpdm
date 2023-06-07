@@ -162,8 +162,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.logisticAddressGateInputResponse1,
-            ResponseValues.logisticAddressGateInputResponse2,
+            ResponseValues.logisticAddressGateOutputResponse1,
+            ResponseValues.logisticAddressGateOutputResponse2,
         )
 
         val page = 0
@@ -210,8 +210,8 @@ internal class AddressControllerOutputIT @Autowired constructor(
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.logisticAddressGateInputResponse1,
-            ResponseValues.logisticAddressGateInputResponse2,
+            ResponseValues.logisticAddressGateOutputResponse1,
+            ResponseValues.logisticAddressGateOutputResponse2,
         )
 
         val page = 0

@@ -145,8 +145,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateInputResponse1,
-            ResponseValues.legalEntityGateInputResponse2,
+            ResponseValues.legalEntityGateOutputResponse1,
+            ResponseValues.legalEntityGateOutputResponse2,
         )
 
         val page = 0
@@ -194,8 +194,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateInputResponse1,
-            ResponseValues.legalEntityGateInputResponse2,
+            ResponseValues.legalEntityGateOutputResponse1,
+            ResponseValues.legalEntityGateOutputResponse2,
         )
 
         val page = 0

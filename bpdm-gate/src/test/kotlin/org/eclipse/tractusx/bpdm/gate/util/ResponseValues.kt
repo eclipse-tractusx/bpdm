@@ -298,6 +298,19 @@ object ResponseValues {
         processStartedAt = null,
     )
 
+    //Gate Output Legal Entities Response
+    val legalEntityGateOutputResponse1 = LegalEntityGateOutputResponse(
+        legalEntity = RequestValues.legalEntity1,
+        externalId = CommonValues.externalId1,
+        bpn = CommonValues.bpn1,
+    )
+
+    val legalEntityGateOutputResponse2 = LegalEntityGateOutputResponse(
+        legalEntity = RequestValues.legalEntity2,
+        externalId = CommonValues.externalId2,
+        bpn = CommonValues.bpn2,
+    )
+
     //Values without processStartedAt value
     val newLegalEntityGateInputResponse1 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity1,
@@ -372,6 +385,19 @@ object ResponseValues {
         processStartedAt = null,
     )
 
+    val persistencesiteGateOutputResponse1 = SiteGateOutputResponse(
+        site = RequestValues.site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnSite1,
+    )
+
+    val persistencesiteGateOutputResponse2 = SiteGateOutputResponse(
+        site = RequestValues.site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2,
+        bpn = CommonValues.bpnSite2,
+    )
 
     val siteGateOutput1 = SiteGateOutput(
         site = siteResponse1,
@@ -443,5 +469,30 @@ object ResponseValues {
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = null,
         processStartedAt = null,
+    )
+
+    //Output Response Values
+    val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
+        address = RequestValues.logisticAddress1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = null,
+        bpn = CommonValues.bpnAddress1
+    )
+
+    val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
+        address = RequestValues.logisticAddress2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress2,
+        siteExternalId = null,
+        bpn = CommonValues.bpnAddress2
     )
 }

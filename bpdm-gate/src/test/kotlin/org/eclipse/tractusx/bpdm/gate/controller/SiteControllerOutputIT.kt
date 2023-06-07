@@ -158,8 +158,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateInputResponse1,
-            ResponseValues.persistenceSiteGateInputResponse2
+            ResponseValues.persistencesiteGateOutputResponse1,
+            ResponseValues.persistencesiteGateOutputResponse2
         )
 
         val page = 0
@@ -217,8 +217,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites, filter by external ids`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateInputResponse1,
-            ResponseValues.persistenceSiteGateInputResponse2
+            ResponseValues.persistencesiteGateOutputResponse1,
+            ResponseValues.persistencesiteGateOutputResponse2
         )
 
         val page = 0
