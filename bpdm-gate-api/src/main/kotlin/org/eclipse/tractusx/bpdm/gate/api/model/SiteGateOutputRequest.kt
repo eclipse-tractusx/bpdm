@@ -32,6 +32,9 @@ data class SiteGateOutputRequest(
     @field:JsonUnwrapped
     val site: SiteGateDto,
 
+    @get:Schema(description = "Main address where this site resides")
+    val mainAddress: AddressGateOutputChildRequest,
+
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
 

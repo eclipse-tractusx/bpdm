@@ -26,12 +26,8 @@ import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -95,7 +91,8 @@ class GateQueryService(
                 site = it.site,
                 externalId = it.externalId,
                 legalEntityExternalId = it.legalEntityExternalId,
-                bpn = bpnByExternalId[it.externalId]
+                bpn = bpnByExternalId[it.externalId],
+                mainAddress = it.mainAddress.address
             )
         }
     }

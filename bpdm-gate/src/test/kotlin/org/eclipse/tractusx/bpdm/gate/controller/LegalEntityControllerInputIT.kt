@@ -170,14 +170,14 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse3
+        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse1
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest3
+            RequestValues.legalEntityGateInputRequest1
         )
 
         gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(CommonValues.externalId3)
+        val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(CommonValues.externalId1)
 
         assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)

@@ -20,12 +20,12 @@
 package com.catenax.bpdm.bridge.dummy.dto
 
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 
 data class GateLegalEntityInfo(
     val legalNameParts: Array<String> = emptyArray(),
     val legalEntity: LegalEntityDto,
-    val legalAddress: LogisticAddressGateDto,
+    val legalAddress: AddressGateInputResponse,
     val externalId: String,
     val bpn: String?
 )
