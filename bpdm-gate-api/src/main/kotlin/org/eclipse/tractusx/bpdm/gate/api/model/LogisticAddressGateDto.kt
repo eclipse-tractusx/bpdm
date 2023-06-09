@@ -44,5 +44,7 @@ data class LogisticAddressGateDto(
     val physicalPostalAddress: PhysicalPostalAddressGateDto,
 
     @get:Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressDto? = null
+    val alternativePostalAddress: AlternativePostalAddressDto? = null,
+
+    val roles: Collection<BusinessPartnerRole> = emptyList()
 )
