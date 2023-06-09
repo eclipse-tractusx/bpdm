@@ -20,15 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.api
 
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotEmpty
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -36,16 +33,15 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
-import java.time.Instant
 
-@RequestMapping("/api/catena/business-partners/changelog", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/business-partners/changelog")
+@RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
+@HttpExchange("/api/catena")
 interface GateChangelogApi {
 
 
     @Operation(
-        summary = "Get business partner changelog entries by list external id, from timestamp",
-        description = "Get business partner changelog entries by list external id, from timestamp"
+        summary = "Get business partner changelog entries for changes to the business partner input data",
+        description = "Get business partner changelog entries for changes to the business partner input data. Filter by list external id, from timestamp and/or lsa type"
     )
     @ApiResponses(
         value = [
@@ -53,17 +49,17 @@ interface GateChangelogApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/search")
-    @PostExchange("/search")
-    fun getChangelogEntriesExternalId(
+    @PostMapping("/input/changelog/search")
+    @PostExchange("/input/changelog/search")
+    fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
-        @RequestBody(required = true) @NotEmpty(message = "Input externalIds list cannot be empty.") externalIds: Set<String>
+        @RequestBody searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse>
 
+
     @Operation(
-        summary = "Get business partner changelog entries by timestamp or LSA type",
-        description = "Get business partner changelog entries by from timestamp or LSA type"
+        summary = "Get business partner changelog entries for changes to the business partner output data",
+        description = "Get business partner changelog entries for changes to the business partner output data. Filter by list external id, from timestamp and/or lsa type"
     )
     @ApiResponses(
         value = [
@@ -71,12 +67,10 @@ interface GateChangelogApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/filter")
-    @PostExchange("/filter")
-    fun getChangelogEntriesLsaType(
+    @PostMapping("/output/changelog/search")
+    @PostExchange("/output/changelog/search")
+    fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @Parameter(description = "From Time", example = "2023-03-20T10:23:28.194Z") @RequestParam(required = false) fromTime: Instant?,
-        @Parameter(description = "LSA Type") @RequestParam(required = false) lsaType: LsaType?
-    ): PageResponse<ChangelogResponse>
-
+        @RequestBody searchRequest: ChangeLogSearchRequest
+    ): PageChangeLogResponse<ChangelogResponse>
 }

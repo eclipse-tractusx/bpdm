@@ -33,15 +33,16 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
     object Specs {
 
         /**
-         * Restrict to entries with any one of the given ExternalIds; ignore if null
+         * Restrict to entries with any one of the given ExternalIds; ignore if empty
          */
-        fun byExternalIdsIn(externalIds: Collection<String>) =
+        fun byExternalIdsIn(externalIds: Collection<String>?) =
             Specification<ChangelogEntry> { root, _, _ ->
-
-                externalIds.let {
-                    root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds.map { externalId -> externalId })
+                externalIds?.let {
+                    if(externalIds.isNotEmpty())
+                        root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds.map { externalId -> externalId })
+                    else
+                        null
                 }
-
             }
 
         /**
@@ -55,12 +56,15 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
             }
 
         /**
-         * Restrict to entries for the LsaType; ignore if null
+         * Restrict to entries for the LsaType; ignore if empty
          */
-        fun byLsaType(lsaType: LsaType?) =
+        fun byLsaTypes(lsaTypes: Set<LsaType>?) =
             Specification<ChangelogEntry> { root, _, builder ->
-                lsaType?.let {
-                    builder.equal(root.get<LsaType>(ChangelogEntry::businessPartnerType.name), lsaType)
+                lsaTypes?.let {
+                    if(lsaTypes.isNotEmpty())
+                        root.get<String>(ChangelogEntry::businessPartnerType.name).`in`(lsaTypes.map { lsaType -> lsaType })
+                    else
+                        null
                 }
             }
     }

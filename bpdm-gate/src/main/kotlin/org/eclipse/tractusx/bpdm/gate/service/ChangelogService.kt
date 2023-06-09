@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
@@ -28,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaType
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaTypes
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -37,19 +36,21 @@ import java.time.Instant
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogByExternalId(externalIds: Set<String>, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
+    fun getChangeLogEntries(externalIds: Set<String>?, lsaTypes: Set<LsaType>?, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
 
-        val spec = Specification.allOf(byExternalIdsIn(externalIds = externalIds), byCreatedAtGreaterThan(createdAt = createdAt))
+        val nonNullExternalIds = externalIds ?: emptySet()
+
+        val spec = Specification.allOf(byExternalIdsIn(externalIds = nonNullExternalIds), byCreatedAtGreaterThan(createdAt = createdAt), byLsaTypes(lsaTypes))
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
-        val setDistinctList = changelogRepository.findExternalIdsInListDistinct(externalIds)
+        val setDistinctList = changelogRepository.findExternalIdsInListDistinct(nonNullExternalIds)
 
 
         val pageDto = pageResponse.map {
             it.toGateDto()
         }
 
-        val errorList = (externalIds - setDistinctList).map {
+        val errorList = (nonNullExternalIds - setDistinctList).map {
             ErrorInfo(
                 ChangeLogOutputError.ExternalIdNotFound,
                 "$it not found",
@@ -65,25 +66,6 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             content = pageDto.content,
             invalidEntries = errorList.size,
             errors = errorList
-        )
-    }
-
-    fun getChangeLogByLsaType(lsaType: LsaType?, createdAt: Instant?, page: Int, pageSize: Int): PageResponse<ChangelogResponse> {
-
-        val spec = Specification.allOf(byCreatedAtGreaterThan(createdAt = createdAt), byLsaType(lsaType))
-        val pageable = PageRequest.of(page, pageSize)
-        val pageResponse = changelogRepository.findAll(spec, pageable)
-
-        val pageDto = pageResponse.map {
-            it.toGateDto()
-        }
-
-        return PageResponse(
-            page = page,
-            totalElements = pageDto.totalElements,
-            totalPages = pageDto.totalPages,
-            contentSize = pageDto.content.size,
-            content = pageDto.content,
         )
     }
 

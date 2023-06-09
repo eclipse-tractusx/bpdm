@@ -44,8 +44,8 @@ object CommonValues {
     const val externalId4 = "external-4"
     const val externalId5 = "external-5"
 
-    val lsaTypeParam = LsaType.Address
-    val lsaTypeParamNotFound = LsaType.Site
+    val lsaTypeParam = LsaType.ADDRESS
+    val lsaTypeParamNotFound = LsaType.SITE
     val lsaNone = OptionalLsaType.None
 
     const val externalIdSite1 = "site-external-1"

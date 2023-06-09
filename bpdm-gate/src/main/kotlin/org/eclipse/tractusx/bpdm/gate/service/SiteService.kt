@@ -112,7 +112,7 @@ class SiteService(
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
         sites.forEach { site ->
-            changelogRepository.save(ChangelogEntry(site.externalId, LsaType.Site))
+            changelogRepository.save(ChangelogEntry(site.externalId, LsaType.SITE))
         }
 
         sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Input)

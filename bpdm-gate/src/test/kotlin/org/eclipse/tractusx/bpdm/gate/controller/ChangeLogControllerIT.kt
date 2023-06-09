@@ -48,6 +48,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
@@ -107,7 +108,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, setOf(CommonValues.externalIdAddress1))
+        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1))
+
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
             .ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
@@ -123,7 +126,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id not found`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), null, setOf("NONEXIST"))
+        val searchRequest = ChangeLogSearchRequest(externalIds = setOf("NONEXIST"))
+
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -156,7 +161,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id and timeStamp`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesExternalId(PaginationRequest(), instant, setOf(CommonValues.externalIdAddress1))
+        val searchRequest = ChangeLogSearchRequest(externalIds =  setOf(CommonValues.externalIdAddress1), fromTime = instant)
+
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
@@ -171,7 +178,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by lsaType`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesLsaType(PaginationRequest(), null, lsaTypeParam)
+        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParam))
+
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
@@ -185,7 +194,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
     @Test
     fun `get changeLog by lsaType not found`() {
-        val searchResult = gateClient.changelog().getChangelogEntriesLsaType(PaginationRequest(), null, lsaTypeParamNotFound)
+        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParamNotFound))
+
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
             .isEqualTo(emptyList<ChangelogEntry>())
@@ -198,8 +209,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
      */
     @Test
     fun `get changeLog by lsaType and timeStamp`() {
+        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParam), fromTime = instant)
 
-        val searchResult = gateClient.changelog().getChangelogEntriesLsaType(PaginationRequest(), instant, lsaTypeParam)
+        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
@@ -213,7 +225,9 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchResult = gateClient.changelog().getChangelogEntriesLsaType(paginationRequest = PaginationRequest(), fromTime = instant, lsaType = null)
+        val searchRequest = ChangeLogSearchRequest(lsaTypes =  emptySet(), fromTime = instant)
+
+        val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
@@ -271,23 +285,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
                         )
                 )
         )
-        val stubMappingUpsertAddresses = wireMockServer.stubFor(
-            put(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertResponse(
-                                    emptyList(),
-                                    emptyList(),
-                                    2,
-                                    0
-                                )
-                            )
-                        )
-                )
-        )
+
         // mock "get addresses with relations"
         // this simulates the case that the address already had some relations
         wireMockServer.stubFor(
@@ -307,36 +305,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
                                         SaasValues.addressBusinessPartnerWithRelations1,
                                         SaasValues.addressBusinessPartnerWithRelations2
                                     )
-                                )
-                            )
-                        )
-                )
-        )
-        val stubMappingDeleteRelations = wireMockServer.stubFor(
-            post(urlPathMatching(EndpointValues.SAAS_MOCK_DELETE_RELATIONS_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                DeleteRelationsResponseSaas(2)
-                            )
-                        )
-                )
-        )
-        val stubMappingUpsertRelations = wireMockServer.stubFor(
-            put(urlPathMatching(EndpointValues.SAAS_MOCK_RELATIONS_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                UpsertRelationsResponseSaas(
-                                    failures = emptyList(),
-                                    numberOfFailed = 0,
-                                    numberOfInserts = 2,
-                                    numberOfProvidedRelations = 2,
-                                    numberOfUpdates = 0
                                 )
                             )
                         )
