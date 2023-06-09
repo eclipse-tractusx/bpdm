@@ -58,7 +58,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.ORGANIZATIONAL_UNIT.name)),
             identifiers = toIdentifiersSaas(""),
-            names = toNamesSaas(site.name),
+            names = toNamesSaas(site.nameParts.firstOrNull()),
             status = site.states.map { it.toSaasModel() }.firstOrNull(),
             // TODO Known issue: Name, state, BPN-A and identifiers of the main address are not transferred to SaaS yet!!
             addresses = toAddressesSaasModel(site.mainAddress)

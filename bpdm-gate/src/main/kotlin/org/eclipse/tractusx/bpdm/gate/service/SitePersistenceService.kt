@@ -77,7 +77,7 @@ class SitePersistenceService(
 
     private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
 
-        site.name = updatedSite.site.name
+        site.name = updatedSite.site.nameParts.firstOrNull() ?: ""
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
@@ -138,7 +138,7 @@ class SitePersistenceService(
     private fun updateSiteOutput(site: Site, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntity) {
 
         site.bpn = updatedSite.bpn
-        site.name = updatedSite.site.name
+        site.name = updatedSite.site.nameParts.firstOrNull() ?: ""
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
