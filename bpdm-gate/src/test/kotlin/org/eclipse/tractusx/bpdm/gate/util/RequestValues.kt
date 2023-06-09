@@ -329,7 +329,7 @@ object RequestValues {
 
     val addressGateInputRequest1 = AddressGateInputRequest(
         address = address1.copy(
-            name = CommonValues.name1,
+            nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -341,7 +341,7 @@ object RequestValues {
 
     val addressGateInputRequest2 = AddressGateInputRequest(
         address = address2.copy(
-            name = CommonValues.name2,
+            nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -354,7 +354,7 @@ object RequestValues {
     //Output Endpoint Values
     val addressGateOutputRequest1 = AddressGateOutputRequest(
         address = address1.copy(
-            name = CommonValues.name1,
+            nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -366,7 +366,7 @@ object RequestValues {
 
     val addressGateOutputRequest2 = AddressGateOutputRequest(
         address = address2.copy(
-            name = CommonValues.name2,
+            nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
