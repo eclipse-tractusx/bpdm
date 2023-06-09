@@ -394,6 +394,7 @@ fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalE
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
         externalId = legalEntity.externalId,
+        legalNameParts = arrayOf(legalEntity.legalName.value)
     )
 }
 
@@ -453,6 +454,7 @@ fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): Legal
 
     return LegalEntityGateOutputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
+        legalNameParts = listOf(legalName.value),
         externalId = legalEntity.externalId,
         bpn = legalEntity.bpn!!,
         legalAddress = legalAddress.toAddressGateOutputResponse(legalAddress)

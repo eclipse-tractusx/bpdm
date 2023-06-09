@@ -76,7 +76,7 @@ class PoolUpdateService(
                 legalEntity = it.legalEntity,
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 index = it.externalId,
-                legalName = it.legalNameParts[0]
+                legalName = it.legalNameParts.firstOrNull() ?: ""
             )
         }
 
@@ -90,7 +90,7 @@ class PoolUpdateService(
                 legalEntity = it.legalEntity,
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 bpnl = it.bpn!!,
-                legalName = it.legalNameParts[0]
+                legalName = it.legalNameParts.firstOrNull() ?: ""
             )
         }
 
