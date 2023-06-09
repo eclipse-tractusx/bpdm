@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import java.time.Instant
 
 @Schema(name = "ChangelogEntryResponse", description = "Changelog entry for a business partner")
@@ -29,5 +30,7 @@ data class ChangelogEntryResponse(
     @Schema(description = "The type of the change")
     val changelogType: org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType,
     @Schema(description = "The timestamp of the change")
-    val timestamp: Instant
+    val timestamp: Instant,
+    @Schema(description = "The type of the business partner this change refers to")
+    val lsaType: ChangelogSubject
 )

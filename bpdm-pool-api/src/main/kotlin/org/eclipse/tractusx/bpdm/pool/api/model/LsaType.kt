@@ -17,25 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
-
-import org.eclipse.tractusx.bpdm.pool.api.*
-
-interface PoolApiClient {
-
-    fun addresses(): PoolAddressApi
-
-    fun bpns(): PoolBpnApi
-
-    fun changelogs(): PoolChangelogApi
-
-    fun legalEntities(): PoolLegalEntityApi
-
-    fun metadata(): PoolMetadataApi
-
-    fun sites(): PoolSiteApi
-
-    fun opensearch(): PoolOpenSearchApi
-
-    fun saas(): PoolSaasApi
+package org.eclipse.tractusx.bpdm.pool.api.model
+enum class ChangelogSubject {
+    LEGAL_ENTITY,
+    ADDRESS,
+    SITE
 }

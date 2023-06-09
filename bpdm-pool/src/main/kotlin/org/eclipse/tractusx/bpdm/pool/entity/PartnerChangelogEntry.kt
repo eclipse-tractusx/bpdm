@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
 @Entity
@@ -38,8 +39,3 @@ class PartnerChangelogEntry(
 
 
 
-enum class ChangelogSubject {
-    LEGAL_ENTITY,
-    ADDRESS,
-    SITE
-}

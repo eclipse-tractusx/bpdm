@@ -17,25 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.client
+package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import org.eclipse.tractusx.bpdm.pool.api.*
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import java.time.Instant
 
-interface PoolApiClient {
 
-    fun addresses(): PoolAddressApi
-
-    fun bpns(): PoolBpnApi
-
-    fun changelogs(): PoolChangelogApi
-
-    fun legalEntities(): PoolLegalEntityApi
-
-    fun metadata(): PoolMetadataApi
-
-    fun sites(): PoolSiteApi
-
-    fun opensearch(): PoolOpenSearchApi
-
-    fun saas(): PoolSaasApi
-}
+@Schema(name = "ChangeLogSearchRequest", description = "Request for searching and filtering the business partner changelog")
+data class ChangelogSearchRequest(
+    @Schema(description = "Changelog entries should be created after this time", example = "2023-03-20T10:23:28.194Z")
+    val fromTime: Instant? = null,
+    @Schema(description = "Only show changelog entries for business partners with the given BPNs. Empty means no restriction.")
+    val bpns: Set<String>? = null,
+    @Schema(description = "Only show changelog entries for business partners with the given LSA types. Empty means no restriction.")
+    val lsaTypes: Set<ChangelogSubject>? = null
+)

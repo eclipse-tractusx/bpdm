@@ -21,30 +21,35 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.pool.api.PoolBusinessPartnerApi
+import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
-import org.springdoc.core.annotations.ParameterObject
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
-@RequestMapping("/api/catena/business-partners")
-class BusinessPartnerController(
+class ChangelogController(
     private val partnerChangelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
-): PoolBusinessPartnerApi {
+): PoolChangelogApi {
     override fun getChangelogEntries(
-       bpn: Array<String>?,
-       modifiedAfter: Instant?,
-       @ParameterObject paginationRequest: PaginationRequest
+       changelogSearchRequest: ChangelogSearchRequest,
+       paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
-        if (bpn != null && bpn.size > controllerConfigProperties.searchRequestLimit) {
-            throw BpdmRequestSizeException(bpn.size, controllerConfigProperties.searchRequestLimit)
+
+        changelogSearchRequest.bpns?.let { bpns ->
+            if (bpns.size > controllerConfigProperties.searchRequestLimit) {
+                throw BpdmRequestSizeException(bpns.size, controllerConfigProperties.searchRequestLimit)
+            }
         }
-        return  partnerChangelogService.getChangelogEntriesByBpn(bpn, modifiedAfter, paginationRequest.page, paginationRequest.size)
+
+        return  partnerChangelogService.getChangeLogEntries(
+            changelogSearchRequest.bpns,
+            changelogSearchRequest.lsaTypes,
+            changelogSearchRequest.fromTime,
+            paginationRequest.page,
+            paginationRequest.size)
     }
 }

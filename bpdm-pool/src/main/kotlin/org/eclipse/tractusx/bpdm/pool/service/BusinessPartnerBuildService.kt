@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
