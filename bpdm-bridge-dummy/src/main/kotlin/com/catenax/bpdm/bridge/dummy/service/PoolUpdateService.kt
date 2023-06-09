@@ -74,7 +74,7 @@ class PoolUpdateService(
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
                 legalEntity = it.legalEntity,
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress),
+                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 index = it.externalId,
                 legalName = it.legalNameParts[0]
             )
@@ -88,7 +88,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
                 legalEntity = it.legalEntity,
-                legalAddress = gateToPoolLogisticAddress(it.legalAddress),
+                legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 bpnl = it.bpn!!,
                 legalName = it.legalNameParts[0]
             )
@@ -109,7 +109,7 @@ class PoolUpdateService(
                         site = SiteDto(
                             name = entry.site.nameParts.firstOrNull()?: "",
                             states = entry.site.states,
-                            mainAddress = gateToPoolLogisticAddress(entry.site.mainAddress),
+                            mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
                         ),
                         index = entry.externalId,
                         bpnlParent = leParentBpn
@@ -133,7 +133,7 @@ class PoolUpdateService(
                 site = SiteDto(
                     name = it.site.nameParts.firstOrNull()?: "",
                     states = it.site.states,
-                    mainAddress = gateToPoolLogisticAddress(it.site.mainAddress),
+                    mainAddress = gateToPoolLogisticAddress(it.mainAddress),
                 ),
                 bpns = it.bpn!!
             )

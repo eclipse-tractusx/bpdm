@@ -61,7 +61,7 @@ class SaasRequestMappingService(
             names = toNamesSaas(site.nameParts.firstOrNull()),
             status = site.states.map { it.toSaasModel() }.firstOrNull(),
             // TODO Known issue: Name, state, BPN-A and identifiers of the main address are not transferred to SaaS yet!!
-            addresses = toAddressesSaasModel(site.mainAddress)
+            addresses = toAddressesSaasModel(request.mainAddress)
         )
         // Parent relation is updated later in SiteService.upsertParentRelations()
     }

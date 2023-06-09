@@ -29,8 +29,5 @@ data class SiteGateDto(
     val nameParts: Collection<String> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<SiteStateDto> = emptyList(),
-
-    @get:Schema(description = "Main address where this site resides")
-    val mainAddress: LogisticAddressGateDto
+    val states: Collection<SiteStateDto> = emptyList()
 )

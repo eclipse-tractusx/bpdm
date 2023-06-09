@@ -23,11 +23,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -117,7 +113,7 @@ class LegalEntityService(
 
     private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputResponse> {
         return legalEntityPage.content.map { legalEntity ->
-            legalEntity.LegalEntityGateInputResponse(legalEntity)
+            legalEntity.toLegalEntityGateInputResponse(legalEntity)
         }
     }
 
@@ -127,7 +123,7 @@ private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateI
 
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
-        legalAddress = legalEntity.legalAddress.toLogisticAddressDto(),
+        legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
         externalId = legalEntity.externalId
     )
 }
