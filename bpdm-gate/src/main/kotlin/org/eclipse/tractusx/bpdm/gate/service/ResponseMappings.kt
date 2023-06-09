@@ -269,7 +269,6 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
         siteExternalId = site?.externalId,
-        processStartedAt = null //TODO Remove ?
     )
 
     return addressGateInputResponse
@@ -393,7 +392,6 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toLogisticAddressDto(),
         externalId = legalEntity.externalId,
-        processStartedAt = null
     )
 }
 
@@ -418,7 +416,6 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
-        processStartedAt = null //TODO Remove this?
     )
 
 }

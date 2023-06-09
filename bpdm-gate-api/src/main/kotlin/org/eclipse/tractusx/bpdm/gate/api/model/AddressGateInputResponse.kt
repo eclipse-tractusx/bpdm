@@ -44,6 +44,4 @@ data class AddressGateInputResponse(
     @Schema(description = "External id of the related site")
     val siteExternalId: String? = null,
 
-    @Schema(description = "Time the sharing process was started according to SaaS")
-    val processStartedAt: LocalDateTime? = null,
-)
+    )
