@@ -43,5 +43,5 @@ data class AddressGateOutputRequest(
     val siteExternalId: String? = null,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String? = null
+    val bpn: String
 )

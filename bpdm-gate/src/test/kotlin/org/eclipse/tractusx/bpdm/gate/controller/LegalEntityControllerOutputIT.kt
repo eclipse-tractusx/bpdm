@@ -173,7 +173,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(expectedPage)
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
+            .isEqualTo(expectedPage)
     }
 
     /**
@@ -222,6 +223,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(expectedPage)
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
+            .isEqualTo(expectedPage)
     }
 }

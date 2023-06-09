@@ -38,6 +38,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
@@ -50,6 +51,7 @@ data class LegalEntityGateOutputRequest(
     val legalNameParts: Array<String> = emptyArray(),
 
     @Schema(description = "legal Enity")
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")
@@ -59,5 +61,5 @@ data class LegalEntityGateOutputRequest(
     val externalId: String,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String?,
+    val bpn: String
 )
