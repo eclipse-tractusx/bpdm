@@ -406,7 +406,7 @@ object ResponseValues {
     val addressGateInputResponse1 = AddressGateInputResponse(
         address = RequestValues.address1
             .copy(
-                name = CommonValues.name1,
+                nameParts = listOf(CommonValues.name1),
                 identifiers = listOf(
                     AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
                     AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
@@ -419,7 +419,7 @@ object ResponseValues {
     val addressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.address2
             .copy(
-                name = CommonValues.nameSite1,
+                nameParts = listOf(CommonValues.nameSite1),
                 identifiers = listOf(
                     AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
                     AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
@@ -440,7 +440,7 @@ object ResponseValues {
 
     val logisticAddressGateInputResponse1 = AddressGateInputResponse(
         address = RequestValues.logisticAddress1.copy(
-            name = CommonValues.name1,
+            nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -451,7 +451,7 @@ object ResponseValues {
 
     val logisticAddressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.logisticAddress2.copy(
-            name = CommonValues.name2,
+            nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -463,7 +463,7 @@ object ResponseValues {
     //Output Response Values
     val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
         address = RequestValues.logisticAddress1.copy(
-            name = CommonValues.name1,
+            nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )
@@ -475,7 +475,7 @@ object ResponseValues {
 
     val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
         address = RequestValues.logisticAddress2.copy(
-            name = CommonValues.name2,
+            nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
                 AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
             )

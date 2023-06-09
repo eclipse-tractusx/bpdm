@@ -32,7 +32,7 @@ data class LogisticAddressGateDto(
         description = "Name of the logistic address of the business partner. This is not according to official\n" +
                 "registers but according to the name the uploading sharing member chooses."
     )
-    val name: String? = null,
+    val nameParts: Collection<String> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
     val states: Collection<AddressStateDto> = emptyList(),

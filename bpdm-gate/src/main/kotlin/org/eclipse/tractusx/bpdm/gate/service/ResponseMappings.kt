@@ -34,7 +34,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
     val logisticAddress = LogisticAddress(
         externalId = externalId,
         siteExternalId = siteExternalId.toString(),
-        name = address.name,
+        name = address.nameParts.firstOrNull(),
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
@@ -54,7 +54,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
         bpn = bpn,
         externalId = externalId,
         siteExternalId = siteExternalId.toString(),
-        name = address.name,
+        name = address.nameParts.firstOrNull(),
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
@@ -278,7 +278,7 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
 fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
 
     val logisticAddress = LogisticAddressGateDto(
-        name = name,
+        nameParts = name?.let { listOf(name!!) }?: emptyList(),
         states = mapToDtoStates(states),
         identifiers = mapToDtoIdentifiers(identifiers),
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
