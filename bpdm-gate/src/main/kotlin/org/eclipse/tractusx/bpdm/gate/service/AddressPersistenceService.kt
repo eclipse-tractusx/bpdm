@@ -20,15 +20,19 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AddressPersistenceService(
@@ -38,7 +42,7 @@ class AddressPersistenceService(
 ) {
 
     @Transactional
-    fun persistAddressBP(addresses: Collection<AddressGateInputRequest>) {
+    fun persistAddressBP(addresses: Collection<AddressGateInputRequest>, dataType: OutputInputEnum) {
 
         val externalIdColl: MutableCollection<String> = mutableListOf()
         addresses.forEach { externalIdColl.add(it.externalId) }
@@ -46,16 +50,13 @@ class AddressPersistenceService(
         val addressRecord = gateAddressRepository.findByExternalIdIn(externalIdColl)
 
         addresses.forEach { address ->
-            val legalEntityRecord =
-                address.legalEntityExternalId?.let { legalEntityRepository.findByExternalId(it) }
-            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalId(it) }
 
-//            if(legalEntityRecord == null && siteRecord == null) {
-//                throw BpdmNotFoundException("Business Partner", "Error")
-//            }
+            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
 
-            val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord)
-            addressRecord.find { it.externalId == address.externalId }?.let { existingAddress ->
+            val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord, dataType)
+
+            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }?.let { existingAddress ->
                 updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
                 gateAddressRepository.save(existingAddress)
             } ?: run {
@@ -67,6 +68,49 @@ class AddressPersistenceService(
     private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
 
         address.name = changeAddress.address.name
+        address.externalId = changeAddress.externalId
+        address.legalEntity = legalEntityRecord
+        address.site = siteRecord
+        address.siteExternalId = changeAddress.siteExternalId.toString()
+        address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
+        address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
+
+        address.identifiers.replace(changeAddress.address.identifiers.map { toEntityIdentifier(it, address) })
+        address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
+
+    }
+
+    @Transactional
+    fun persistOutputAddressBP(addresses: Collection<AddressGateOutputRequest>, dataType: OutputInputEnum) {
+        val externalIdColl: MutableCollection<String> = mutableListOf()
+        addresses.forEach { externalIdColl.add(it.externalId) }
+
+        val addressRecord = gateAddressRepository.findByExternalIdIn(externalIdColl)
+
+        addresses.forEach { address ->
+
+            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
+
+            val fullAddress = address.toAddressGateOutput(legalEntityRecord, siteRecord, dataType)
+
+            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }?.let { existingAddress ->
+                updateAddressOutput(existingAddress, address, legalEntityRecord, siteRecord)
+                gateAddressRepository.save(existingAddress)
+            } ?: run {
+                if (addressRecord.find { it.externalId == fullAddress.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Logistic Address doesn't exist")
+                } else {
+                    gateAddressRepository.save(fullAddress)
+                }
+            }
+        }
+    }
+
+    private fun updateAddressOutput(address: LogisticAddress, changeAddress: AddressGateOutputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
+
+        address.name = changeAddress.address.name
+        address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
         address.site = siteRecord

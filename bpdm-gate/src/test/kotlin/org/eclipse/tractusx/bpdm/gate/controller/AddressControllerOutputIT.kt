@@ -38,37 +38,36 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_ADDRESSES_SEARCH_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class AddressControllerOutputIT @Autowired constructor(
-    private val objectMapper: ObjectMapper,
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    private val gateAddressRepository: GateAddressRepository,
+    val testHelpers: DbTestHelpers
 ) {
     companion object {
         @RegisterExtension
@@ -89,211 +88,153 @@ internal class AddressControllerOutputIT @Autowired constructor(
         }
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        testHelpers.truncateDbTables()
+    }
+
     /**
-     * Given addresses exists in SaaS and bpdm pool
+     * If there is an Input Address persisted,
+     * upsert the Output with same external id
+     */
+    @Test
+    fun `upsert output addresses`() {
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
+        try {
+            gateClient.addresses().upsertAddresses(addresses)
+            gateClient.addresses().putAddressesOutput(addressesOutput)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.OK, e.statusCode)
+        }
+
+        //Check if persisted Address data
+        val addressExternal1 = gateAddressRepository.findByExternalIdAndDataType("address-external-1", OutputInputEnum.Output)
+        Assertions.assertNotEquals(addressExternal1, null)
+
+        val addressExternal2 = gateAddressRepository.findByExternalIdAndDataType("address-external-2", OutputInputEnum.Output)
+        Assertions.assertNotEquals(addressExternal2, null)
+
+    }
+
+    /**
+     * If there isn't an Input Address persisted,
+     * when upserting an output address, it should show an 400
+     */
+    @Test
+    fun `upsert output addresses, no input persisted`() {
+        val addresses = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
+        try {
+            gateClient.addresses().putAddressesOutput(addresses)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+
+    }
+
+    /**
+     * Given output addresses exists in the database
      * When getting addresses page via output route
      * Then addresses page should be returned
      */
     @Test
-    fun `get addresses`() {
+    fun `get output addresses`() {
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
         val expectedAddresses = listOf(
-            ResponseValues.addressGateOutput1,
-            ResponseValues.addressGateOutput2
-        )
-        val expectedErrors = listOf(
-            ErrorInfo(BusinessPartnerSharingError.BpnNotInPool, "BPNA0000000003X9 not found in pool", SaasValues.addressNotInPoolResponse.externalId),
-            ErrorInfo(
-                BusinessPartnerSharingError.SharingProcessError,
-                "SaaS sharing process error: Error message",
-                SaasValues.addressSharingErrorResponse.externalId
-            ),
-        )
-        val expectedPending = listOf(SaasValues.addressPendingResponse.externalId!!)
-
-        val addressesSaas = listOf(
-            SaasValues.addressBusinessPartner1,
-            SaasValues.addressBusinessPartner2,
-            SaasValues.addressNotInPoolResponse,
-            SaasValues.addressSharingErrorResponse,
-            SaasValues.addressPendingResponse,
+            ResponseValues.logisticAddressGateOutputResponse1,
+            ResponseValues.logisticAddressGateOutputResponse2,
         )
 
-        val addressesPool = listOf(
-            ResponseValues.logisticAddress1,
-            ResponseValues.logisticAddress2
-        )
+        val page = 0
+        val size = 10
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = addressesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
-                                )
-                            )
-                        )
-                )
-        )
+        gateClient.addresses().upsertAddresses(addresses)
+        gateClient.addresses().putAddressesOutput(addressesOutput)
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = addressesSaas
-                                )
-                            )
-                        )
-                )
-        )
 
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PageResponse(
-                                    totalElements = addressesPool.size.toLong(),
-                                    totalPages = 1,
-                                    page = 0,
-                                    contentSize = addressesPool.size,
-                                    content = addressesPool
-                                )
-                            )
-                        )
-                )
-        )
-
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, emptyList())
 
-        assertThat(pageResponse).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedAddresses,
-                invalidEntries = expectedPending.size + expectedErrors.size,
-                pending = expectedPending,
-                errors = expectedErrors,
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
+            PageResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedAddresses
             )
         )
     }
 
     /**
-     * Given addresses exists in SaaS and bpdm pool
+     * Given addresses exists in the database
      * When getting addresses page via output route filtering by external ids
      * Then addresses page should be returned
      */
     @Test
     fun `get addresses, filter by external ids`() {
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
+            RequestValues.addressGateInputRequest2
+        )
+
+        val addressesOutput = listOf(
+            RequestValues.addressGateOutputRequest1,
+            RequestValues.addressGateOutputRequest2
+        )
+
         val expectedAddresses = listOf(
-            ResponseValues.addressGateOutput1,
-            ResponseValues.addressGateOutput2
+            ResponseValues.logisticAddressGateOutputResponse1,
+            ResponseValues.logisticAddressGateOutputResponse2,
         )
 
-        val addressesSaas = listOf(
-            SaasValues.addressBusinessPartner1,
-            SaasValues.addressBusinessPartner2
-        )
+        val page = 0
+        val size = 10
 
-        val addressesPool = listOf(
-            ResponseValues.logisticAddress1,
-            ResponseValues.logisticAddress2
-        )
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
+        gateClient.addresses().upsertAddresses(addresses)
+        gateClient.addresses().putAddressesOutput(addressesOutput)
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2).joinToString(",")))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = addressesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
-                                )
-                            )
-                        )
-                )
-        )
-
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = addressesSaas
-                                )
-                            )
-                        )
-                )
-        )
-
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PageResponse(
-                                    totalElements = addressesPool.size.toLong(),
-                                    totalPages = 1,
-                                    page = 0,
-                                    contentSize = addressesPool.size,
-                                    content = addressesPool
-                                )
-                            )
-                        )
-                )
-        )
-
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
+        val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
 
-        assertThat(pageResponse).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedAddresses,
-                invalidEntries = 0,
-                pending = listOf(),
-                errors = listOf(),
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
+            PageResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedAddresses
             )
         )
     }

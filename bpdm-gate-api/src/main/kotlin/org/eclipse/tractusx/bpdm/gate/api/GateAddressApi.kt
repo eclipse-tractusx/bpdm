@@ -29,9 +29,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -112,8 +111,8 @@ interface GateAddressApi {
     fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse>
 
     @Operation(
-        summary = "Get page of addresses",
-        description = "Get page of addresses. Can optionally be filtered by external ids."
+        summary = "Get page of addresses (Output)",
+        description = "Get page of addresses (Output). Can optionally be filtered by external ids."
     )
     @ApiResponses(
         value = [
@@ -124,8 +123,26 @@ interface GateAddressApi {
     @PostMapping("/output/addresses/search")
     @PostExchange("/output/addresses/search")
     fun getAddressesOutput(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageOutputResponse<AddressGateOutput>
+    ): PageResponse<AddressGateOutputResponse>
+
+    @Operation(
+        summary = "Create or update output addresses.",
+        description = "Create or update addresses (Output). " +
+                "Updates instead of creating a new address if an already existing external id is used. " +
+                "The same external id may not occur more than once in a single request. " +
+                "For a single request, the maximum number of addresses in the request is limited to \${bpdm.api.upsert-limit} entries."
+
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Addresses were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed address request", content = [Content()]),
+        ]
+    )
+    @PutMapping("/output/addresses")
+    @PutExchange("/output/addresses")
+    fun putAddressesOutput(@RequestBody addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit>
 
 }

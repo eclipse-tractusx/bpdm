@@ -24,9 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -64,10 +63,18 @@ class LegalEntityController(
     }
 
     override fun getLegalEntitiesOutput(
-        paginationRequest: PaginationStartAfterRequest,
+        paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageOutputResponse<LegalEntityGateOutput> {
-        return legalEntityService.getLegalEntitiesOutput(externalIds, paginationRequest.limit, paginationRequest.startAfter)
+    ): PageResponse<LegalEntityGateOutputResponse> {
+        return legalEntityService.getLegalEntitiesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
+    }
+
+    override fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit> {
+        if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+        }
+        legalEntityService.upsertLegalEntitiesOutput(legalEntities)
+        return ResponseEntity(HttpStatus.OK)
     }
 
 }

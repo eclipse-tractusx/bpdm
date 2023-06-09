@@ -29,9 +29,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutput
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -120,8 +119,25 @@ interface GateLegalEntityApi {
     @PostMapping("/output/legal-entities/search")
     @PostExchange("/output/legal-entities/search")
     fun getLegalEntitiesOutput(
-        @ParameterObject @Valid paginationRequest: PaginationStartAfterRequest,
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageOutputResponse<LegalEntityGateOutput>
+    ): PageResponse<LegalEntityGateOutputResponse>
+
+    @Operation(
+        summary = "Create or update output legal entities.",
+        description = "Create or update legal entities (Output). " +
+                "Updates instead of creating a new legal entity if an already existing external id is used. " +
+                "The same external id may not occur more than once in a single request. " +
+                "For a single request, the maximum number of legal entities in the request is limited to \${bpdm.api.upsert-limit} entries."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Legal entities were successfully updated or created"),
+            ApiResponse(responseCode = "400", description = "On malformed legal entity request", content = [Content()]),
+        ]
+    )
+    @PutMapping("/output/legal-entities")
+    @PutExchange("/output/legal-entities")
+    fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit>
 
 }

@@ -22,23 +22,26 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
-data class LegalEntityGateInputRequest(
-
-    val legalNameParts: Array<String> = emptyArray(),
-
-    @Schema(description = "legal Entity")
+@Schema(
+    name = "AddressGateOutputRequest", description = "Address with legal entity or site references. " +
+            "Only one of either legal entity or site external id can be set for an address."
+)
+data class AddressGateOutputRequest(
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    val address: LogisticAddressGateDto,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressGateDto,
-
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
+    @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,
 
+    @Schema(description = "External id of the related legal entity")
+    val legalEntityExternalId: String? = null,
+
+    @Schema(description = "External id of the related site")
+    val siteExternalId: String? = null,
+
+    @Schema(description = "Business Partner Number")
+    val bpn: String
 )

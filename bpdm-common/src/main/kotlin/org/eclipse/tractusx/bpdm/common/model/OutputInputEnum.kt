@@ -17,25 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.repository
+package org.eclipse.tractusx.bpdm.common.model
 
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.entity.Site
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.CrudRepository
-
-interface SiteRepository : JpaRepository<Site, Long>, CrudRepository<Site, Long> {
-
-    fun findByExternalIdIn(externalId: Collection<String>): Set<Site>
-
-    fun findByExternalId(externalId: String): Site?
-
-    fun findByExternalIdAndDataType(externalId: String, dataType: OutputInputEnum): Site?
-
-    fun findByExternalIdInAndDataType(externalId: Collection<String>?, dataType: OutputInputEnum, pageable: Pageable): Page<Site>
-
-    fun findByDataType(dataType: OutputInputEnum, pageable: Pageable): Page<Site>
-
+enum class OutputInputEnum {
+    Input,
+    Output
 }

@@ -312,6 +312,21 @@ object RequestValues {
 
         )
 
+    //Output values for sites
+    val siteGateOutputRequest1 = SiteGateOutputRequest(
+        site = site1,
+        externalId = CommonValues.externalIdSite1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnSite1
+    )
+
+    val siteGateOutputRequest2 = SiteGateOutputRequest(
+        site = site2,
+        externalId = CommonValues.externalIdSite2,
+        legalEntityExternalId = CommonValues.externalId2,
+        bpn = CommonValues.bpnSite2
+    )
+
     val addressGateInputRequest1 = AddressGateInputRequest(
         address = address1.copy(
             name = CommonValues.name1,
@@ -336,4 +351,45 @@ object RequestValues {
 
         )
 
+    //Output Endpoint Values
+    val addressGateOutputRequest1 = AddressGateOutputRequest(
+        address = address1.copy(
+            name = CommonValues.name1,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress1,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpn = CommonValues.bpnAddress1
+    )
+
+    val addressGateOutputRequest2 = AddressGateOutputRequest(
+        address = address2.copy(
+            name = CommonValues.name2,
+            identifiers = listOf(
+                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+            )
+        ),
+        externalId = CommonValues.externalIdAddress2,
+        siteExternalId = CommonValues.externalIdSite1,
+        bpn = CommonValues.bpnAddress2
+    )
+
+    //Output Values
+    val legalEntityGateOutputRequest1 = LegalEntityGateOutputRequest(
+        legalEntity = legalEntity1,
+        legalAddress = address1,
+        legalNameParts = arrayOf(CommonValues.name1),
+        externalId = CommonValues.externalId1,
+        bpn = CommonValues.bpn1
+    )
+
+    val legalEntityGateOutputRequest2 = LegalEntityGateOutputRequest(
+        legalEntity = legalEntity2,
+        legalAddress = address2,
+        legalNameParts = arrayOf(CommonValues.name3),
+        externalId = CommonValues.externalId2,
+        bpn = CommonValues.bpn2
+    )
 }

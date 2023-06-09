@@ -19,39 +19,36 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.AugmentedBusinessPartnerResponseSaas
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.request.PaginationStartAfterRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageOutputResponse
+import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.POOL_API_MOCK_SITES_SEARCH_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class SiteControllerOutputIT @Autowired constructor(
-    private val objectMapper: ObjectMapper,
-    val gateClient: GateClient
+    val gateClient: GateClient,
+    private val gateSiteRepository: SiteRepository,
+    val testHelpers: DbTestHelpers
 ) {
     companion object {
         @RegisterExtension
@@ -72,240 +69,201 @@ internal class SiteControllerOutputIT @Autowired constructor(
         }
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        testHelpers.truncateDbTables()
+    }
+
     /**
-     * Given sites exists in SaaS and bpdm pool
+     * If there is an Input Sites persisted,
+     * upsert the Output with same external id
+     */
+    @Test
+    fun `upsert sites output`() {
+        val sites = listOf(
+            RequestValues.siteGateInputRequest1,
+            RequestValues.siteGateInputRequest2
+        )
+
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
+        )
+
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
+
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
+        try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+            gateClient.sites().upsertSites(sites)
+            gateClient.sites().upsertSitesOutput(sitesOutput)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.OK, e.statusCode)
+        }
+
+        //Check if persisted site data
+        val siteExternal1 = gateSiteRepository.findByExternalIdAndDataType("site-external-1", OutputInputEnum.Output)
+        Assertions.assertNotEquals(siteExternal1, null)
+
+        val siteExternal2 = gateSiteRepository.findByExternalIdAndDataType("site-external-2", OutputInputEnum.Output)
+        Assertions.assertNotEquals(siteExternal2, null)
+
+    }
+
+    /**
+     * If there isn't an Input Sites persisted,
+     * when upserting an output Sites, it should show an 400
+     */
+    @Test
+    fun `upsert sites output, no input persisted`() {
+
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
+        )
+
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
+        )
+
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
+
+        try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+            gateClient.sites().upsertSitesOutput(sitesOutput)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+
+    }
+
+    /**
+     * Given sites exists in the database
      * When getting sites page via output route
      * Then sites page should be returned
      */
     @Test
     fun `get sites`() {
         val expectedSites = listOf(
-            ResponseValues.siteGateOutput1,
-            ResponseValues.siteGateOutput2
-        )
-        val expectedErrors = listOf(
-            ErrorInfo(BusinessPartnerSharingError.BpnNotInPool, "BPNS0000000003X9 not found in pool", SaasValues.siteNotInPoolResponse.externalId),
-            ErrorInfo(
-                BusinessPartnerSharingError.SharingProcessError,
-                "SaaS sharing process error: Error message",
-                SaasValues.siteSharingErrorResponse.externalId
-            ),
-        )
-        val expectedPending = listOf(SaasValues.sitePendingResponse.externalId!!)
-
-        val sitesSaas = listOf(
-            SaasValues.siteBusinessPartner1,
-            SaasValues.siteBusinessPartner2,
-            SaasValues.siteNotInPoolResponse,
-            SaasValues.siteSharingErrorResponse,
-            SaasValues.sitePendingResponse,
+            ResponseValues.persistencesiteGateOutputResponse1,
+            ResponseValues.persistencesiteGateOutputResponse2
         )
 
-        val sitesPool = listOf(
-            ResponseValues.siteResponse1,
-            ResponseValues.siteResponse2
-        )
-        val mainAddressesPool = listOf(
-            ResponseValues.logisticAddress1,
-            ResponseValues.logisticAddress2
-        )
+        val page = 0
+        val size = 10
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = sitesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
-                                )
-                            )
-                        )
-                )
+        val sites = listOf(
+            RequestValues.siteGateInputRequest1,
+            RequestValues.siteGateInputRequest2
         )
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = sitesSaas
-                                )
-                            )
-                        )
-                )
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
         )
 
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_SITES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PageResponse(
-                                    totalElements = sitesPool.size.toLong(),
-                                    totalPages = 1,
-                                    page = 0,
-                                    contentSize = sitesPool.size,
-                                    content = sitesPool
-                                )
-
-                            )
-                        )
-                )
-        )
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(mainAddressesPool)
-                        )
-                )
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
         )
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, emptyList())
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
+        )
 
-        assertThat(pageResponseValue).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedSites,
-                invalidEntries = expectedPending.size + expectedErrors.size,
-                pending = expectedPending,
-                errors = expectedErrors,
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+        gateClient.sites().upsertSites(sites)
+        gateClient.sites().upsertSitesOutput(sitesOutput)
+
+        val paginationValue = PaginationRequest(page, size)
+        val pageResponse = gateClient.sites().getSitesOutput(paginationValue, emptyList())
+
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
+            PageResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedSites
             )
         )
     }
 
     /**
-     * Given sites exists in SaaS and bpdm pool
+     * Given sites exists in the database
      * When getting sites page via output route filtering by external ids
      * Then sites page should be returned
      */
     @Test
     fun `get sites, filter by external ids`() {
         val expectedSites = listOf(
-            ResponseValues.siteGateOutput1,
-            ResponseValues.siteGateOutput2
+            ResponseValues.persistencesiteGateOutputResponse1,
+            ResponseValues.persistencesiteGateOutputResponse2
         )
 
-        val sitesSaas = listOf(
-            SaasValues.siteBusinessPartner1,
-            SaasValues.siteBusinessPartner2
+        val page = 0
+        val size = 10
+
+        val totalElements = 2L
+        val totalPages = 1
+        val pageValue = 0
+        val contentSize = 2
+
+        val sites = listOf(
+            RequestValues.siteGateInputRequest1,
+            RequestValues.siteGateInputRequest2
         )
 
-        val sitesPool = listOf(
-            ResponseValues.siteResponse1,
-            ResponseValues.siteResponse2
-        )
-        val mainAddressesPool = listOf(
-            ResponseValues.logisticAddress1,
-            ResponseValues.logisticAddress2
+        val sitesOutput = listOf(
+            RequestValues.siteGateOutputRequest1,
+            RequestValues.siteGateOutputRequest2
         )
 
-        val limit = 2
-        val startAfter = "Aaa111"
-        val nextStartAfter = "Aaa222"
-        val total = 10
-
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalIds", equalTo(listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2).joinToString(",")))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = sitesSaas.map { AugmentedBusinessPartnerResponseSaas(it) }
-                                )
-                            )
-                        )
-                )
+        val legalEntities = listOf(
+            RequestValues.legalEntityGateInputRequest1,
+            RequestValues.legalEntityGateInputRequest2
         )
 
-        wireMockServerSaas.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = limit,
-                                    startAfter = startAfter,
-                                    nextStartAfter = nextStartAfter,
-                                    total = total,
-                                    values = sitesSaas
-                                )
-                            )
-                        )
-                )
+        val legalEntitiesOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1,
+            RequestValues.legalEntityGateOutputRequest2,
         )
 
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_SITES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PageResponse(
-                                    totalElements = sitesPool.size.toLong(),
-                                    totalPages = 1,
-                                    page = 0,
-                                    contentSize = sitesPool.size,
-                                    content = sitesPool
-                                )
-                            )
-                        )
-                )
-        )
-        wireMockServerBpdmPool.stubFor(
-            post(urlPathMatching(POOL_API_MOCK_SITES_MAIN_ADDRESSES_SEARCH_PATH))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(mainAddressesPool)
-                        )
-                )
-        )
+        gateClient.legalEntities().upsertLegalEntities(legalEntities)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+        gateClient.sites().upsertSites(sites)
+        gateClient.sites().upsertSitesOutput(sitesOutput)
 
-        val paginationValue = PaginationStartAfterRequest(startAfter, limit)
-        val pageResponseValue = gateClient.sites().getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))
+        val paginationValue = PaginationRequest(page, size)
+        val pageResponse = gateClient.sites().getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))
 
-        assertThat(pageResponseValue).isEqualTo(
-            PageOutputResponse(
-                total = total,
-                nextStartAfter = nextStartAfter,
-                content = expectedSites,
-                invalidEntries = 0,
-                pending = listOf(),
-                errors = listOf(),
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
+            PageResponse(
+                totalElements = totalElements,
+                totalPages = totalPages,
+                page = pageValue,
+                contentSize = contentSize,
+                content = expectedSites
             )
         )
     }

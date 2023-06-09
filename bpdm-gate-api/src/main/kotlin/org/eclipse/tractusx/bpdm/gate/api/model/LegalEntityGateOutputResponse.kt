@@ -26,12 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputRequest", description = "Legal entity with external id")
-data class LegalEntityGateInputRequest(
-
-    val legalNameParts: Array<String> = emptyArray(),
-
-    @Schema(description = "legal Entity")
+@Schema(name = "LegalEntityGateOutputResponse", description = "Legal entity with external id")
+data class LegalEntityGateOutputResponse(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
@@ -40,5 +36,8 @@ data class LegalEntityGateInputRequest(
 
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
+
+    @Schema(description = "Business Partner Number")
+    val bpn: String
 
 )

@@ -21,13 +21,17 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class LegalEntityPersistenceService(
@@ -36,29 +40,27 @@ class LegalEntityPersistenceService(
 ) {
 
     @Transactional
-    fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>) {
+    fun persistLegalEntitiesBP(legalEntities: Collection<LegalEntityGateInputRequest>, datatype: OutputInputEnum) {
 
         //finds Legal Entity by External ID
         val legalEntityRecord = gateLegalEntityRepository.findDistinctByExternalIdIn(legalEntities.map { it.externalId })
 
         //Business Partner persist
         legalEntities.forEach { legalEntity ->
-            val fullLegalEntity = legalEntity.toLegalEntity()
-            legalEntityRecord.find { it.externalId == legalEntity.externalId }?.let { existingLegalEntity ->
+            val fullLegalEntity = legalEntity.toLegalEntity(datatype)
+            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }?.let { existingLegalEntity ->
 
-                val logisticAddressRecord = gateAddressRepository.findByExternalId(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId))
-                    ?: throw BpdmNotFoundException("Business Partner", "Error")
+                val logisticAddressRecord =
+                    gateAddressRepository.findByExternalIdAndDataType(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId), datatype)
+                        ?: throw BpdmNotFoundException("Business Partner", "Error")
 
                 updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
-
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
+
                 gateLegalEntityRepository.save(existingLegalEntity)
-
             } ?: run {
-
                 gateLegalEntityRepository.save(fullLegalEntity)
             }
-
         }
     }
 
@@ -98,6 +100,51 @@ class LegalEntityPersistenceService(
 
     fun toEntityIdentifier(dto: AddressIdentifier, address: LogisticAddress): AddressIdentifier {
         return AddressIdentifier(dto.value, dto.type, address)
+    }
+
+    @Transactional
+    fun persistLegalEntitiesOutputBP(legalEntities: Collection<LegalEntityGateOutputRequest>, datatype: OutputInputEnum) {
+        //finds Legal Entity by External ID
+        val legalEntityRecord = gateLegalEntityRepository.findDistinctByExternalIdIn(legalEntities.map { it.externalId })
+
+        //Business Partner persist
+        legalEntities.forEach { legalEntity ->
+            val fullLegalEntity = legalEntity.toLegalEntity(datatype)
+            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }?.let { existingLegalEntity ->
+
+                val logisticAddressRecord =
+                    gateAddressRepository.findByExternalIdAndDataType(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId), datatype)
+                        ?: throw BpdmNotFoundException("Business Partner", "Error")
+
+                updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
+                updateLegalEntityOutput(existingLegalEntity, legalEntity, logisticAddressRecord)
+
+                gateLegalEntityRepository.save(existingLegalEntity)
+            } ?: run {
+                if (legalEntityRecord.find { it.externalId == fullLegalEntity.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Legal Entity doesn't exist")
+                } else {
+                    gateLegalEntityRepository.save(fullLegalEntity)
+                }
+            }
+        }
+    }
+
+    private fun updateLegalEntityOutput(
+        legalEntity: LegalEntity,
+        legalEntityRequest: LegalEntityGateOutputRequest,
+        logisticAddressRecord: LogisticAddress
+    ): LegalEntity {
+        legalEntity.bpn = legalEntityRequest.bpn
+        legalEntity.externalId = legalEntityRequest.externalId
+        legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
+        legalEntity.legalName = Name(value = legalEntityRequest.legalNameParts[0], shortName = legalEntityRequest.legalEntity.legalShortName)
+        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
+        legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.legalAddress = logisticAddressRecord
+        legalEntity.legalAddress.legalEntity = legalEntity
+        return legalEntity
     }
 
 }

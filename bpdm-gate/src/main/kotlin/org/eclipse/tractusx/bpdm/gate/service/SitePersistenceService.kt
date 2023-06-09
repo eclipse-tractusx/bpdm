@@ -20,14 +20,18 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class SitePersistenceService(
@@ -37,39 +41,38 @@ class SitePersistenceService(
 ) {
 
     @Transactional
-    fun persistSitesBP(sites: Collection<SiteGateInputRequest>) {
+    fun persistSitesBP(sites: Collection<SiteGateInputRequest>, datatype: OutputInputEnum) {
 
         //Finds Site in DB
-        val externalIdColl: MutableCollection<String> = mutableListOf()
-        sites.forEach { externalIdColl.add(it.externalId) }
-        val siteRecord = siteRepository.findByExternalIdIn(externalIdColl)
+        val siteRecord = siteRepository.findByExternalIdIn(sites.map { it.externalId })
 
         sites.forEach { site ->
 
-            val legalEntityRecord =
-                site.legalEntityExternalId.let {
-                    legalEntityRepository.findByExternalId(site.legalEntityExternalId) ?: throw BpdmNotFoundException("Business Partner", it)
-                }
+            val legalEntityRecord = getLegalEntityRecord(site.legalEntityExternalId, datatype)
 
-            val fullSite = site.toSiteGate(legalEntityRecord)
+            val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId }?.let { existingSite ->
+            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }?.let { existingSite ->
 
-                val logisticAddressRecord =
-                    addressRepository.findByExternalId(getMainAddressForSiteExternalId(site.externalId)) ?: throw BpdmNotFoundException(
-                        "Business Partner",
-                        "Error"
-                    )
+                val logisticAddressRecord = getAddressRecord(getMainAddressForSiteExternalId(site.externalId), datatype)
 
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
-
                 updateSite(existingSite, site, legalEntityRecord)
-
                 siteRepository.save(existingSite)
             } ?: run {
                 siteRepository.save(fullSite)
             }
         }
+    }
+
+    private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {
+        return addressRepository.findByExternalIdAndDataType(externalId, datatype)
+            ?: throw BpdmNotFoundException("Business Partner", "Error")
+    }
+
+    private fun getLegalEntityRecord(externalId: String, datatype: OutputInputEnum): LegalEntity {
+        return legalEntityRepository.findByExternalIdAndDataType(externalId, datatype)
+            ?: throw BpdmNotFoundException("Business Partner", externalId)
     }
 
     private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
@@ -103,4 +106,42 @@ class SitePersistenceService(
         return AddressIdentifier(dto.value, dto.type, address)
     }
 
+    @Transactional
+    fun persistSitesOutputBP(sites: Collection<SiteGateOutputRequest>, datatype: OutputInputEnum) {
+
+        //Finds Site in DB
+        val siteRecord = siteRepository.findByExternalIdIn(sites.map { it.externalId })
+
+        sites.forEach { site ->
+
+            val legalEntityRecord = getLegalEntityRecord(site.legalEntityExternalId, datatype)
+
+            val fullSite = site.toSiteGate(legalEntityRecord, datatype)
+
+            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }?.let { existingSite ->
+
+                val logisticAddressRecord = getAddressRecord(getMainAddressForSiteExternalId(site.externalId), datatype)
+
+                updateAddress(logisticAddressRecord, fullSite.mainAddress)
+                updateSiteOutput(existingSite, site, legalEntityRecord)
+                siteRepository.save(existingSite)
+            } ?: run {
+                if (siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
+                } else {
+                    siteRepository.save(fullSite)
+                }
+            }
+        }
+    }
+
+    private fun updateSiteOutput(site: Site, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntity) {
+
+        site.bpn = updatedSite.bpn
+        site.name = updatedSite.site.name
+        site.externalId = updatedSite.externalId
+        site.legalEntity = legalEntityRecord
+        site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
+
+    }
 }
