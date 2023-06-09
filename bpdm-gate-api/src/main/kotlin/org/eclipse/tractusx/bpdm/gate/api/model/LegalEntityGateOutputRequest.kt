@@ -55,7 +55,7 @@ data class LegalEntityGateOutputRequest(
     val legalEntity: LegalEntityDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressGateDto,
+    val legalAddress: AddressGateOutputChildRequest,
 
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,

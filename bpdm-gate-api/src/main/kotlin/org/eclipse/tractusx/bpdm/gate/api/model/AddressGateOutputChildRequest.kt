@@ -22,24 +22,17 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateInputResponse", description = "Legal entity with external id")
-data class LegalEntityGateInputResponse(
-
-    val legalNameParts: Array<String> = emptyArray(),
-
+@Schema(
+    name = "AddressGateOutputChildRequest",
+    description = "DTO for setting the output address data with BPN."
+)
+data class AddressGateOutputChildRequest(
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    val address: LogisticAddressGateDto,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: AddressGateInputResponse,
-
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
-    val externalId: String,
-
-    )
-
-
+    @Schema(description = "Business Partner Number")
+    val bpn: String
+)
