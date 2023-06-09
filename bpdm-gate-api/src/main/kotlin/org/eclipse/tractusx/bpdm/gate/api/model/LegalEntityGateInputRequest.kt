@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
@@ -30,7 +31,8 @@ data class LegalEntityGateInputRequest(
 
     val legalNameParts: Array<String> = emptyArray(),
 
-    @Schema(description = "legal Enity")
+    @Schema(description = "legal Entity")
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")

@@ -303,12 +303,14 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity1,
         externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1,
+        legalAddress = RequestValues.address1
     )
 
     val legalEntityGateOutputResponse2 = LegalEntityGateOutputResponse(
         legalEntity = RequestValues.legalEntity2,
         externalId = CommonValues.externalId2,
         bpn = CommonValues.bpn2,
+        legalAddress = RequestValues.address2
     )
 
     //Values without processStartedAt value
