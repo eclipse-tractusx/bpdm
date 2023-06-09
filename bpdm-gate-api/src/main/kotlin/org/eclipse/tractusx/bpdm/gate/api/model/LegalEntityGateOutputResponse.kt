@@ -31,6 +31,8 @@ data class LegalEntityGateOutputResponse(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
+    val legalNameParts: Collection<String>,
+
     @Schema(description = "Which roles this business partner takes in relation to the sharing member")
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
