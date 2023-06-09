@@ -73,7 +73,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
             identifiers = toAddressIdentifiersSaas(address.identifiers, ""),
-            names = toNamesSaas(address.name),
+            names = toNamesSaas(address.nameParts.firstOrNull()?: ""),
             status = address.states.map { it.toSaasModel() }.firstOrNull(),
             addresses = toAddressesSaasModel(address)
         )

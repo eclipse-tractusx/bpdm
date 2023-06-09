@@ -61,7 +61,7 @@ class PoolUpdateService(
     fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressDto {
 
         return LogisticAddressDto(
-            name = gateDto.name,
+            name = gateDto.nameParts.firstOrNull(),
             states = gateDto.states,
             identifiers = gateDto.identifiers,
             physicalPostalAddress = gateToPoolPhysicalAddress(gateDto.physicalPostalAddress),
@@ -166,7 +166,7 @@ class PoolUpdateService(
                 ?.let { siteParentBpn ->
                     AddressPartnerCreateRequest(
                         address = LogisticAddressDto(
-                            name = entry.address.name,
+                            name = entry.address.nameParts.firstOrNull(),
                             states = entry.address.states,
                             identifiers = entry.address.identifiers,
                             physicalPostalAddress = gateToPoolPhysicalAddress(entry.address.physicalPostalAddress),
@@ -193,7 +193,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             AddressPartnerUpdateRequest(
                 address = LogisticAddressDto(
-                    name = it.address.name,
+                    name = it.address.nameParts.firstOrNull(),
                     states = it.address.states,
                     identifiers = it.address.identifiers,
                     physicalPostalAddress = gateToPoolPhysicalAddress(it.address.physicalPostalAddress),
