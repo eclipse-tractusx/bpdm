@@ -34,14 +34,14 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-@RequestMapping("/api/catena/input/business-partners/changelog", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/catena/input/business-partners/changelog")
+@RequestMapping("/api/catena", produces = [MediaType.APPLICATION_JSON_VALUE])
+@HttpExchange("/api/catena")
 interface GateChangelogApi {
 
 
     @Operation(
-        summary = "Get business partner changelog entries by list external id, from timestamp and/or lsa type",
-        description = "Get business partner changelog entries by list external id, from timestamp and/or lsa type"
+        summary = "Get business partner changelog entries for changes to the business partner input data",
+        description = "Get business partner changelog entries for changes to the business partner input data. Filter by list external id, from timestamp and/or lsa type"
     )
     @ApiResponses(
         value = [
@@ -49,11 +49,28 @@ interface GateChangelogApi {
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
-    @PostMapping("/search")
-    @PostExchange("/search")
-    fun getChangelogEntries(
+    @PostMapping("/input/changelog/search")
+    @PostExchange("/input/changelog/search")
+    fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse>
 
+
+    @Operation(
+        summary = "Get business partner changelog entries for changes to the business partner output data",
+        description = "Get business partner changelog entries for changes to the business partner output data. Filter by list external id, from timestamp and/or lsa type"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The changelog entries for the specified parameters"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/output/changelog/search")
+    @PostExchange("/output/changelog/search")
+    fun getOutputChangelog(
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
+        @RequestBody searchRequest: ChangeLogSearchRequest
+    ): PageChangeLogResponse<ChangelogResponse>
 }

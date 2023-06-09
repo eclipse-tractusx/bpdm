@@ -50,7 +50,7 @@ class GateQueryService(
         val content = mutableListOf<ChangelogResponse>()
 
         do {
-            val pageResponse = gateClient.changelog().getChangelogEntries(
+            val pageResponse = gateClient.changelog().getInputChangelog(
                 searchRequest = ChangeLogSearchRequest(fromTime = modifiedAfter),
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
