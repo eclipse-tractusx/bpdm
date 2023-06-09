@@ -21,15 +21,15 @@
 apiVersion: v2
 type: application
 name: bpdm-gate
-appVersion: "4.0.0-alpha.4"
-version: 4.0.0-alpha.5
+appVersion: "4.0.0-alpha.5"
+version: 4.0.0-alpha.6
 description: A Helm chart for deploying the BPDM gate service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 dependencies:
   - name: postgresql
-    version: 11.9.1
+    version: 11.9.13
     repository: https://charts.bitnami.com/bitnami
     alias: postgres
     condition: postgres.enabled
