@@ -34,10 +34,16 @@ class ChangelogController(
     private val changelogService: ChangelogService
 ) : GateChangelogApi {
 
-    override fun getChangelogEntries(
+    override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
         return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime, paginationRequest.page, paginationRequest.size)
+    }
+
+    override fun getOutputChangelog(paginationRequest: PaginationRequest,
+                                    searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
+        throw NotImplementedError()
+        TODO("Not yet implemented")
     }
 
 }
