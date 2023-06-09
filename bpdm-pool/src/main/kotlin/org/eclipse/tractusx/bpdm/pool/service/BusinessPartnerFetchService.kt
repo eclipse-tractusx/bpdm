@@ -23,7 +23,6 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BusinessPartnerResponse
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
@@ -53,10 +52,6 @@ class BusinessPartnerFetchService(
         return findLegalEntityOrThrow(bpn).toPoolLegalEntity()
     }
 
-    fun findBusinessPartnerIgnoreCase(bpn: String): BusinessPartnerResponse {
-        return findLegalEntityOrThrow(bpn).toBusinessPartnerDto()
-    }
-
 
     /**
      * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [PoolLegalEntityResponse]
@@ -64,12 +59,6 @@ class BusinessPartnerFetchService(
     @Transactional
     fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): PoolLegalEntityResponse {
         return findLegalEntityOrThrow(identifierType, identifierValue).toPoolLegalEntity()
-    }
-
-
-    @Transactional
-    fun findBusinessPartnerIgnoreCase(identifierType: String, identifierValue: String): BusinessPartnerResponse {
-        return findLegalEntityOrThrow(identifierType, identifierValue).toBusinessPartnerDto()
     }
 
     /**
