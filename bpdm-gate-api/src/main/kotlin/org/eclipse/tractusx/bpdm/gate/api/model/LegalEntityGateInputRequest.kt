@@ -35,6 +35,9 @@ data class LegalEntityGateInputRequest(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
+    @Schema(description = "Which roles this business partner takes in relation to the sharing member")
+    val roles: Collection<BusinessPartnerRole> = emptyList(),
+
     @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: LogisticAddressGateDto,
 
