@@ -22,23 +22,23 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the gate and pool applications
-version: 3.0.2-alpha.1
-appVersion: "4.0.0-alpha.5"
+version: 3.0.2-alpha.2
+appVersion: "4.0.0-alpha.6"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 
 dependencies:
   - name: bpdm-gate
-    version: 4.0.0-alpha.6
+    version: 4.0.0-alpha.7
     alias: bpdm-gate
     condition: bpdm-gate.enabled
   - name: bpdm-pool
-    version: 5.0.0-alpha.5
+    version: 5.0.0-alpha.6
     alias: bpdm-pool
     condition: bpdm-pool.enabled
   - name: bpdm-bridge-dummy
-    version: 1.0.1-alpha.1
+    version: 1.0.1-alpha.2
     alias: bpdm-bridge-dummy
     condition: bpdm-bridge-dummy.enabled
   - name: opensearch
