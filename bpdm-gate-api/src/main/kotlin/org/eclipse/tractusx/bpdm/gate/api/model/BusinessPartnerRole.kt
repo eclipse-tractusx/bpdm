@@ -19,18 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
-
-@Schema(name = "Site", description = "Site record")
-data class SiteGateDto(
-    @get:Schema(description = "Parts that make up the name of that site")
-    val nameParts: Collection<String> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
-    val states: Collection<SiteStateDto> = emptyList(),
-
-    @Schema(description = "Which roles this business partner takes in relation to the sharing member")
-    val roles: Collection<BusinessPartnerRole> = emptyList(),
-)
+enum class BusinessPartnerRole {
+    SUPPLIER,
+    CUSTOMER
+}
