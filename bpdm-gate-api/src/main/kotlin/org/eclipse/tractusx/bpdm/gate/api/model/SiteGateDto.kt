@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 
 @Schema(name = "Site", description = "Site record")
 data class SiteGateDto(
-    @get:Schema(description = "Site name")
-    val name: String,
+    @get:Schema(description = "Parts that make up the name of that site")
+    val nameParts: Collection<String> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "Business status"))
     val states: Collection<SiteStateDto> = emptyList(),

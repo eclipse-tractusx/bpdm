@@ -287,13 +287,13 @@ object RequestValues {
         )
 
     val site1 = SiteGateDto(
-        name = CommonValues.nameSite1,
+        nameParts = listOf(CommonValues.nameSite1),
         states = listOf(siteBusinessStatus1),
         mainAddress = address1
     )
 
     val site2 = SiteGateDto(
-        name = CommonValues.nameSite2,
+        nameParts = listOf(CommonValues.nameSite2),
         states = listOf(siteBusinessStatus2),
         mainAddress = address2
     )

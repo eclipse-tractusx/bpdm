@@ -138,7 +138,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     )
 
     val site = Site(
-        name = site.name,
+        name = site.nameParts.firstOrNull()?: "",
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -160,7 +160,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     val site = Site(
         bpn = bpn,
-        name = site.name,
+        name = site.nameParts.firstOrNull()?: "",
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -399,7 +399,7 @@ fun LegalEntity.LegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEnt
 fun Site.toSiteDto(): SiteGateDto {
 
     return SiteGateDto(
-        name = name,
+        nameParts = if(name.isEmpty()) emptyList() else listOf(name),
         states = mapToDtoSitesStates(states),
         mainAddress = mainAddress.toLogisticAddressDto()
     )

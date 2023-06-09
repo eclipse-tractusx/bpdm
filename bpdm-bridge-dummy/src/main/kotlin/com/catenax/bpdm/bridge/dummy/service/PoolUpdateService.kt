@@ -107,7 +107,7 @@ class PoolUpdateService(
                 ?.let { leParentBpn ->
                     SitePartnerCreateRequest(
                         site = SiteDto(
-                            name = entry.site.name,
+                            name = entry.site.nameParts.firstOrNull()?: "",
                             states = entry.site.states,
                             mainAddress = gateToPoolLogisticAddress(entry.site.mainAddress),
                         ),
@@ -131,7 +131,7 @@ class PoolUpdateService(
         val updateRequests = entriesToUpdate.map {
             SitePartnerUpdateRequest(
                 site = SiteDto(
-                    name = it.site.name,
+                    name = it.site.nameParts.firstOrNull()?: "",
                     states = it.site.states,
                     mainAddress = gateToPoolLogisticAddress(it.site.mainAddress),
                 ),
