@@ -22,9 +22,11 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
@@ -37,7 +39,8 @@ import org.springframework.web.server.ResponseStatusException
 class SitePersistenceService(
     private val siteRepository: SiteRepository,
     private val legalEntityRepository: LegalEntityRepository,
-    private val addressRepository: GateAddressRepository
+    private val addressRepository: GateAddressRepository,
+    private val changelogRepository: ChangelogRepository
 ) {
 
     @Transactional
@@ -59,10 +62,18 @@ class SitePersistenceService(
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
                 updateSite(existingSite, site, legalEntityRecord)
                 siteRepository.save(existingSite)
+                saveChangelog(site)
             } ?: run {
                 siteRepository.save(fullSite)
+                saveChangelog(site)
             }
         }
+    }
+
+    //Creates Changelog For both Site and Logistic Address when they are created or updated
+    private fun saveChangelog(site: SiteGateInputRequest) {
+        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(site.externalId), LsaType.ADDRESS))
+        changelogRepository.save(ChangelogEntry(site.externalId, LsaType.SITE))
     }
 
     private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {

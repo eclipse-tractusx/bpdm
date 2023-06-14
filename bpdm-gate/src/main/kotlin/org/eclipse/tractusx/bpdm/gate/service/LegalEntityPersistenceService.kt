@@ -25,7 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.*
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.http.HttpStatus
@@ -36,7 +38,8 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class LegalEntityPersistenceService(
     private val gateLegalEntityRepository: LegalEntityRepository,
-    private val gateAddressRepository: GateAddressRepository
+    private val gateAddressRepository: GateAddressRepository,
+    private val changelogRepository: ChangelogRepository
 ) {
 
     @Transactional
@@ -58,10 +61,18 @@ class LegalEntityPersistenceService(
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
 
                 gateLegalEntityRepository.save(existingLegalEntity)
+                saveChangelog(legalEntity)
             } ?: run {
                 gateLegalEntityRepository.save(fullLegalEntity)
+                saveChangelog(legalEntity)
             }
         }
+    }
+
+    //Creates Changelog For both Legal Entity and Logistic Address when they are created or updated
+    private fun saveChangelog(legalEntity: LegalEntityGateInputRequest) {
+        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(legalEntity.externalId), LsaType.ADDRESS))
+        changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LEGAL_ENTITY))
     }
 
     private fun updateLegalEntity(
