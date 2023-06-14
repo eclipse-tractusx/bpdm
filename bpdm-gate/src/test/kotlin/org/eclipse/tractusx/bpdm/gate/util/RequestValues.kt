@@ -265,7 +265,7 @@ object RequestValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         legalAddress = address1,
-        legalNameParts = arrayOf(CommonValues.name1),
+        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
 
     )
@@ -273,7 +273,7 @@ object RequestValues {
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
         legalAddress = address2,
-        legalNameParts = arrayOf(CommonValues.name2),
+        legalNameParts = listOf(CommonValues.name2),
         externalId = CommonValues.externalId2,
 
         )
@@ -281,7 +281,7 @@ object RequestValues {
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
         legalAddress = address3,
-        legalNameParts = arrayOf(CommonValues.name1),
+        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
 
         )
@@ -380,7 +380,7 @@ object RequestValues {
     val legalEntityGateOutputRequest1 = LegalEntityGateOutputRequest(
         legalEntity = legalEntity1,
         legalAddress = AddressGateOutputChildRequest(address1, CommonValues.bpnAddress1),
-        legalNameParts = arrayOf(CommonValues.name1),
+        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1
     )
@@ -388,7 +388,7 @@ object RequestValues {
     val legalEntityGateOutputRequest2 = LegalEntityGateOutputRequest(
         legalEntity = legalEntity2,
         legalAddress = AddressGateOutputChildRequest(address2, CommonValues.bpnAddress2),
-        legalNameParts = arrayOf(CommonValues.name2),
+        legalNameParts = listOf(CommonValues.name2),
         externalId = CommonValues.externalId2,
         bpn = CommonValues.bpn2
     )

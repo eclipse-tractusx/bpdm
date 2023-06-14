@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResp
 @Schema(name = "LegalEntityGateOutput", description = "Legal entity with references")
 data class LegalEntityGateOutput(
 
-    val legalNameParts: Array<String> = emptyArray(),
+    val legalNameParts: List<String> = emptyList(),
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityResponse,

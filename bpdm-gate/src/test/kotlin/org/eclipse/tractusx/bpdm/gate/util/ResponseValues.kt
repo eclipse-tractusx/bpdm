@@ -352,7 +352,7 @@ object ResponseValues {
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity1,
-        legalNameParts = arrayOf(CommonValues.name1),
+        legalNameParts = listOf(CommonValues.name1),
         legalAddress = AddressGateInputResponse (
             address = RequestValues.logisticAddress1,
             externalId = "${CommonValues.externalId1}_legalAddress",
@@ -364,7 +364,7 @@ object ResponseValues {
 
     val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity2,
-        legalNameParts = arrayOf(CommonValues.name2),
+        legalNameParts = listOf(CommonValues.name2),
         legalAddress = AddressGateInputResponse (
             address = RequestValues.logisticAddress2,
             externalId = "${CommonValues.externalId2}_legalAddress",
