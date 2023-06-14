@@ -23,10 +23,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -34,7 +35,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class LegalEntityService(
-    private val changelogRepository: ChangelogRepository,
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
     private val legalEntityRepository: LegalEntityRepository
 ) {
@@ -46,9 +46,6 @@ class LegalEntityService(
      **/
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        legalEntities.forEach { legalEntity ->
-            changelogRepository.save(ChangelogEntry(legalEntity.externalId, LsaType.LEGAL_ENTITY))
-        }
         legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
     }
 
