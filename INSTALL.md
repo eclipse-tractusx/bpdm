@@ -14,11 +14,16 @@ Then depending on which module you want to start go to the module subfolder you 
 
 * Maven
 * JDK17
-* PostgreSQL 14.2
-* OpenSearch 2.1.0
+* Docker and Docker Compose
 * Keycloak 17.0.0 (with enabled `auth` profile)
 
-When running, the project requires a Postgresql database and an Opensearch instance to be available to connect to.
+When running, the project requires a PostgreSQL database and an OpenSearch instance to be available to connect to. You can set up these dependencies manually, or you can use the provided `docker-compose` file which will start the necessary dependencies for you.
+
+To use Docker Compose, navigate to the project directory and run the following command:
+```bash
+docker-compose up
+```
+
 Per default configuration the application expects postgres to run on `localhost` on port `5432`.
 Opensearch needs to run on `localhost` on port `9200` on default.
 
