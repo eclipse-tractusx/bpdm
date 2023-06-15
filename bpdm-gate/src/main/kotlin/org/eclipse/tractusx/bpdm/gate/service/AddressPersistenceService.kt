@@ -71,7 +71,6 @@ class AddressPersistenceService(
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
         address.site = siteRecord
-        address.siteExternalId = changeAddress.siteExternalId.toString()
         address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
@@ -114,7 +113,6 @@ class AddressPersistenceService(
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
         address.site = siteRecord
-        address.siteExternalId = changeAddress.siteExternalId.toString()
         address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
