@@ -26,14 +26,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?, datatype: OutputInputEnum): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         externalId = externalId,
-        siteExternalId = siteExternalId.toString(),
         name = address.nameParts.firstOrNull(),
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
@@ -53,7 +50,6 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
     val logisticAddress = LogisticAddress(
         bpn = bpn,
         externalId = externalId,
-        siteExternalId = siteExternalId.toString(),
         name = address.nameParts.firstOrNull(),
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
@@ -195,7 +191,6 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
 
     val legalEntity = LegalEntity(
         externalId = externalId,
-        currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
         legalName = Name(legalNameParts[0], legalEntity.legalShortName),
         dataType = datatype
@@ -223,7 +218,6 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
     val legalEntity = LegalEntity(
         bpn = bpn,
         externalId = externalId,
-        currentness = createCurrentnessTimestamp(),
         legalForm = legalEntity.legalForm,
         legalName = Name(legalNameParts[0], legalEntity.legalShortName),
         dataType = datatype
@@ -249,10 +243,6 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
 
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
-}
-
-private fun createCurrentnessTimestamp(): Instant {
-    return Instant.now().truncatedTo(ChronoUnit.MICROS)
 }
 
 fun getMainAddressForSiteExternalId(siteExternalId: String): String {

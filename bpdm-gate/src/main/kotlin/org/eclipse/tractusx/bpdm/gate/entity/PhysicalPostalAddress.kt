@@ -54,12 +54,6 @@ class PhysicalPostalAddress(
     val administrativeAreaLevel3: String? = null,
 
     /**
-     * Further possibility to describe the region/address(e.g. Sub-Province for China
-     */
-    @Column(name = "phy_admin_area_l4")
-    val administrativeAreaLevel4: String? = null,
-
-    /**
      * A postal code, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "phy_postcode")
@@ -76,12 +70,6 @@ class PhysicalPostalAddress(
      */
     @Column(name = "phy_district_l1")
     val districtLevel1: String? = null,
-
-    /**
-     * Divides the DistrictLevel1 in several smaller areas. Synonym: Subdistrict
-     */
-    @Column(name = "phy_district_l2")
-    val districtLevel2: String? = null,
 
     @Embedded
     @AttributeOverride(name = "name", column = Column(name = "phy_street_name"))

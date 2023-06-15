@@ -100,7 +100,6 @@ class SitePersistenceService(
         address.name = changeAddress.name
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
-        address.siteExternalId = changeAddress.siteExternalId
         address.physicalPostalAddress = changeAddress.physicalPostalAddress
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
 

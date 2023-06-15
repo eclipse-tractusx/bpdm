@@ -38,9 +38,6 @@ class LogisticAddress(
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
 
-    @Column(name = "site_external_id", nullable = true)
-    var siteExternalId: String,
-
     @ManyToOne
     @JoinColumn(name = "legal_entity_id")
     var legalEntity: LegalEntity?,
