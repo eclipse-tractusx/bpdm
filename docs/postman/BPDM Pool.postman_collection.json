@@ -1,23 +1,51 @@
 {
   "info": {
-    "_postman_id": "719b2373-ba52-4e10-b0a6-f5dc1dca9ce5",
-    "name": "BPDM Pool Copy",
-    "description": "API Documentation can be found at: https://{{Pool-Host}}/",
+    "_postman_id": "7c864024-7b7c-4bb6-aab8-0be237fbb80f",
+    "name": "BPDM Pool",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "1816771"
+    "_exporter_id": "26818013"
   },
   "item": [
     {
-      "name": "Legal Entity Controller",
+      "name": "Metadata Controller",
       "item": [
         {
-          "name": "Create Legal Entities",
+          "name": "Legal Forms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/legal-forms?page=0&size=10",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "legal-forms"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Legal Form",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n    {\n        \"identifiers\": [\n            {\n                \"value\": \"123456789\",\n                \"type\": \"CUSTOM_ID_TYPE\",\n                \"issuingBody\": \"CUSTOM_ISSUE_BODY\",\n                \"status\": \"CUSTOM_ID_STATUS\"\n            }\n        ],\n        \"names\": [\n            {\n                \"value\": \"Name of Company\",\n                \"shortName\": \"NoC\",\n                \"type\": \"ACRONYM\",\n                \"language\": \"en\"\n            }\n        ],\n        \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n        \"status\": {\n            \"officialDenotation\": \"Active\",\n            \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n            \"type\": \"ACTIVE\"\n        },\n        \"profileClassifications\": [\n            {\n                \"value\": \"Farming of cattle, dairy farming\",\n                \"code\": \"01.21\",\n                \"type\": \"NACE\"\n            }\n        ],\n        \"bankAccounts\": [\n            {\n                \"currency\": \"EUR\",\n                \"internationalBankAccountIdentifier\": \"11223445569\",\n                \"internationalBankIdentifier\": \"TEST1234\",\n                \"nationalBankAccountIdentifier\": \"004566676\",\n                \"nationalBankIdentifier\": \"TEST223\"\n            }\n        ],\n        \"legalAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"70546\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Stuttgart\",\n                    \"shortName\": \"S\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Stuttgarter Strasse 1\",\n                    \"name\": \"Stuttgarter Strasse\",\n                    \"shortName\": \"Stuttgarter Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Building A\",\n                    \"shortName\": \"A\",\n                    \"number\": \"A\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"postalDeliveryPoints\": [\n                {\n                    \"value\": \"On-site Mailbox\",\n                    \"type\": \"MAILBOX\"\n                }\n            ],\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"types\": [\n                \"HEADQUARTER\",\n                \"REGISTERED\"\n            ]\n        },\n        \"index\": \"0\"\n    },\n    {\n        \"identifiers\": [\n            {\n                \"value\": \"987654321\",\n                \"type\": \"CUSTOM_ID_TYPE\",\n                \"issuingBody\": \"CUSTOM_ISSUE_BODY\",\n                \"status\": \"CUSTOM_ID_STATUS\"\n            }\n        ],\n        \"names\": [\n            {\n                \"value\": \"Other Test Company\",\n                \"shortName\": \"OTC\",\n                \"type\": \"REGISTERED\",\n                \"language\": \"en\"\n            }\n        ],\n        \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n        \"status\": {\n            \"officialDenotation\": \"Dissolved\",\n            \"validFrom\": \"2021-03-14T05:54:48.942Z\",\n            \"type\": \"DISSOLVED\"\n        },\n        \"profileClassifications\": [\n            {\n                \"value\": \"Warehousing and Storage\",\n                \"code\": \"49\",\n                \"type\": \"NAICS\"\n            }\n        ],\n        \"bankAccounts\": [\n            {\n                \"currency\": \"EUR\",\n                \"internationalBankAccountIdentifier\": \"7654432212\",\n                \"internationalBankIdentifier\": \"TEST1234\",\n                \"nationalBankAccountIdentifier\": \"999847444\",\n                \"nationalBankIdentifier\": \"TEST223\"\n            }\n        ],\n        \"legalAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Bavaria\",\n                    \"shortName\": \"B\",\n                    \"fipsCode\": \"GM02\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"80331\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Munich\",\n                    \"shortName\": \"M\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Muenchener Strasse 1\",\n                    \"name\": \"Muenchener Strasse\",\n                    \"shortName\": \"Munchener Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Block 1\",\n                    \"shortName\": \"B1\",\n                    \"number\": \"1\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"postalDeliveryPoints\": [\n                {\n                    \"value\": \"On-site Mailbox\",\n                    \"type\": \"MAILBOX\"\n                }\n            ],\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"types\": [\n                \"HEADQUARTER\",\n                \"REGISTERED\"\n            ]\n        },\n        \"index\": \"1\"\n    }\n]",
+              "raw": "{\n  \"technicalKey\": \"CUSTOM_LEGAL_FORM_test1\",\n  \"name\": \"Custom Legal Form for Testing 1\",\n  \"abbreviation\": null\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -25,67 +53,46 @@
               }
             },
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-entities",
+              "raw": "{{Pool-Host}}/api/catena/legal-forms",
               "host": [
                 "{{Pool-Host}}"
               ],
               "path": [
                 "api",
                 "catena",
-                "legal-entities"
+                "legal-forms"
               ]
             }
           },
           "response": []
         },
         {
-          "name": "Update Legal Entities",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "[\n    {\n        \"identifiers\": [\n            {\n                \"value\": \"123456789\",\n                \"type\": \"CUSTOM_ID_TYPE\",\n                \"issuingBody\": \"CUSTOM_ISSUE_BODY\",\n                \"status\": \"CUSTOM_ID_STATUS\"\n            }\n        ],\n        \"names\": [\n            {\n                \"value\": \"Name of Company\",\n                \"shortName\": \"NoC\",\n                \"type\": \"ACRONYM\",\n                \"language\": \"en\"\n            }\n        ],\n        \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n        \"status\": {\n            \"officialDenotation\": \"Active\",\n            \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n            \"type\": \"ACTIVE\"\n        },\n        \"profileClassifications\": [\n            {\n                \"value\": \"Farming of cattle, dairy farming\",\n                \"code\": \"01.21\",\n                \"type\": \"NACE\"\n            }\n        ],\n        \"bankAccounts\": [\n            {\n                \"currency\": \"EUR\",\n                \"internationalBankAccountIdentifier\": \"11223445569\",\n                \"internationalBankIdentifier\": \"TEST1234\",\n                \"nationalBankAccountIdentifier\": \"004566676\",\n                \"nationalBankIdentifier\": \"TEST223\"\n            }\n        ],\n        \"legalAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"70546\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Stuttgart\",\n                    \"shortName\": \"S\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Stuttgarter Strasse 1\",\n                    \"name\": \"Stuttgarter Strasse\",\n                    \"shortName\": \"Stuttgarter Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Building A\",\n                    \"shortName\": \"A\",\n                    \"number\": \"A\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"postalDeliveryPoints\": [\n                {\n                    \"value\": \"On-site Mailbox\",\n                    \"type\": \"MAILBOX\"\n                }\n            ],\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"types\": [\n                \"HEADQUARTER\",\n                \"REGISTERED\"\n            ]\n        },\n        \"bpn\": \"BPNL000000000001\"\n    },\n    {\n        \"identifiers\": [\n            {\n                \"value\": \"987654321\",\n                \"type\": \"CUSTOM_ID_TYPE\",\n                \"issuingBody\": \"CUSTOM_ISSUE_BODY\",\n                \"status\": \"CUSTOM_ID_STATUS\"\n            }\n        ],\n        \"names\": [\n            {\n                \"value\": \"Other Test Company\",\n                \"shortName\": \"OTC\",\n                \"type\": \"REGISTERED\",\n                \"language\": \"en\"\n            }\n        ],\n        \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n        \"status\": {\n            \"officialDenotation\": \"Dissolved\",\n            \"validFrom\": \"2021-03-14T05:54:48.942Z\",\n            \"type\": \"DISSOLVED\"\n        },\n        \"profileClassifications\": [\n            {\n                \"value\": \"Warehousing and Storage\",\n                \"code\": \"49\",\n                \"type\": \"NAICS\"\n            }\n        ],\n        \"bankAccounts\": [\n            {\n                \"currency\": \"EUR\",\n                \"internationalBankAccountIdentifier\": \"7654432212\",\n                \"internationalBankIdentifier\": \"TEST1234\",\n                \"nationalBankAccountIdentifier\": \"999847444\",\n                \"nationalBankIdentifier\": \"TEST223\"\n            }\n        ],\n        \"legalAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Bavaria\",\n                    \"shortName\": \"B\",\n                    \"fipsCode\": \"GM02\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"80331\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Munich\",\n                    \"shortName\": \"M\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Muenchener Strasse 1\",\n                    \"name\": \"Muenchener Strasse\",\n                    \"shortName\": \"Munchener Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Block 1\",\n                    \"shortName\": \"B1\",\n                    \"number\": \"1\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"postalDeliveryPoints\": [\n                {\n                    \"value\": \"On-site Mailbox\",\n                    \"type\": \"MAILBOX\"\n                }\n            ],\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"types\": [\n                \"HEADQUARTER\",\n                \"REGISTERED\"\n            ]\n        },\n        \"bpn\": \"BPNL0000000001YN\"\n    }\n]",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-entities",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "legal-entities"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Legal Entity",
+          "name": "Identifier Types",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-entities/ID-VALUE?idType=EU_VAT_ID_DE",
+              "raw": "{{Pool-Host}}/api/catena/identifier-types?page=0&size=100&lsaType=ADDRESS",
               "host": [
                 "{{Pool-Host}}"
               ],
               "path": [
                 "api",
                 "catena",
-                "legal-entities",
-                "ID-VALUE"
+                "identifier-types"
               ],
               "query": [
                 {
-                  "key": "idType",
-                  "value": "EU_VAT_ID_DE"
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "100"
+                },
+                {
+                  "key": "lsaType",
+                  "value": "ADDRESS"
                 }
               ]
             }
@@ -93,7 +100,66 @@
           "response": []
         },
         {
-          "name": "Search Legal Entities",
+          "name": "Create Identifier Type",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"technicalKey\": \"CUSTOM_ID_ADD_TYPE\",\n  \"lsaType\": \"ADDRESS\",\n  \"name\": \"Custom Identifier Type of Address for Testing\",\n  \"details\": [\n    {\n      \"country\": \"DE\",\n      \"mandatory\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/identifier-types",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "identifier-types"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Feild Quality Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/field-quality-rules/?country=DE",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "field-quality-rules",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "DE"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Legal Entity Controller",
+      "item": [
+        {
+          "name": "Legal Entities",
           "request": {
             "method": "GET",
             "header": [],
@@ -109,7 +175,7 @@
               ],
               "query": [
                 {
-                  "key": "name",
+                  "key": "legalName",
                   "value": "company",
                   "disabled": true
                 },
@@ -177,13 +243,90 @@
           "response": []
         },
         {
-          "name": "Filter Legal Entities",
+          "name": "Update Legal Entity",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"bpnl\": \"BPNL000000000001\",\n    \"legalName\": \"Name of Company\",\n    \"identifiers\": [\n      {\n        \"value\": \"123456789\",\n        \"type\": \"CUSTOM_ID_TYPE\",\n        \"issuingBody\": \"CUSTOM_ISSUE_BODY\"\n      }\n    ],\n    \"legalShortName\": \"NoC\",\n    \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n    \"states\": [\n      {\n        \"officialDenotation\": \"Active\",\n        \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n        \"validTo\": \"2023-06-05T07:31:01.213Z\",\n        \"type\": \"ACTIVE\"\n      }\n    ],\n    \"classifications\": [\n      {\n        \"value\": \"Farming of cattle, dairy farming\",\n        \"code\": \"01.21\",\n        \"type\": \"NACE\"\n      }\n    ],\n    \"legalAddress\": {\n      \"name\": \"WESTERN_LATIN_STANDARD\",\n      \"states\": [\n        {\n          \"description\": \"WESTERN_LATIN_STANDARD\",\n          \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n          \"validTo\": \"2023-06-05T07:31:01.213Z\",\n          \"type\": \"ACTIVE\"\n        }\n      ],\n      \"identifiers\": [\n        {\n          \"value\": \"12345678910\",\n          \"type\": \"CUSTOM_ID_ADD_TYPE\"\n        }\n      ],\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"70546\",\n        \"city\": \"Stuttgart\",\n        \"street\": {\n          \"name\": \"Stuttgarter Strasse\",\n          \"houseNumber\": \"1\",\n          \"milestone\": \"Stuttgarter Strasse 1\",\n          \"direction\": \"Stuttgarter Str.\"\n        },\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg\",\n        \"administrativeAreaLevel2\": \"test1\",\n        \"administrativeAreaLevel3\": \"test2\",\n        \"district\": \"Stuttgart\",\n        \"companyPostalCode\": \"GM01\",\n        \"industrialZone\": \"HEADQUARTER\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"test\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart 1\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg 1\",\n        \"deliveryServiceNumber\": \"1234\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test\"\n      }\n    }\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/legal-entities",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "legal-entities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Legal Entities",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n  \"BPNL000000000001\"\n]",
+              "raw": "[\n  {\n    \"legalName\": \"Name of Company\",\n    \"identifiers\": [\n      {\n        \"value\": \"123456789\",\n        \"type\": \"CUSTOM_ID_TYPE\",\n        \"issuingBody\": \"CUSTOM_ISSUE_BODY\"\n      }\n    ],\n    \"legalShortName\": \"NoC\",\n    \"legalForm\": \"CUSTOM_LEGAL_FORM\",\n    \"states\": [\n      {\n        \"officialDenotation\": \"Active\",\n        \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n        \"validTo\": \"2023-06-05T07:31:01.213Z\",\n        \"type\": \"ACTIVE\"\n      }\n    ],\n    \"classifications\": [\n      {\n        \"value\": \"Farming of cattle, dairy farming\",\n        \"code\": \"01.21\",\n        \"type\": \"NACE\"\n      }\n    ],\n    \"legalAddress\": {\n      \"name\": \"WESTERN_LATIN_STANDARD\",\n      \"states\": [\n        {\n          \"description\": \"WESTERN_LATIN_STANDARD\",\n          \"validFrom\": \"2020-12-16T05:54:48.942Z\",\n          \"validTo\": \"2023-06-05T07:31:01.213Z\",\n          \"type\": \"ACTIVE\"\n        }\n      ],\n      \"identifiers\": [\n        {\n          \"value\": \"12345678910\",\n          \"type\": \"CUSTOM_ID_ADD_TYPE\"\n        }\n      ],\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"70546\",\n        \"city\": \"Stuttgart\",\n        \"street\": {\n          \"name\": \"Stuttgarter Strasse\",\n          \"houseNumber\": \"1\",\n          \"milestone\": \"Stuttgarter Strasse 1\",\n          \"direction\": \"Stuttgarter Str.\"\n        },\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg\",\n        \"administrativeAreaLevel2\": \"test1\",\n        \"administrativeAreaLevel3\": \"test2\",\n        \"district\": \"Stuttgart\",\n        \"companyPostalCode\": \"GM01\",\n        \"industrialZone\": \"HEADQUARTER\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"test\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart 1\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg 1\",\n        \"deliveryServiceNumber\": \"1234\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test\"\n      }\n    },\n    \"index\": \"0\"\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/legal-entities",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "legal-entities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm up to date",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/legal-entities/BPNL000000000001/confirm-up-to-date",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "legal-entities",
+                "BPNL000000000001",
+                "confirm-up-to-date"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Legal Entities",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    \"BPNL000000000001\"\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -206,13 +349,13 @@
           "response": []
         },
         {
-          "name": "Filter Legal Addresses",
+          "name": "Search Legal Addresses",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n  \"BPNL000000000001\"\n]",
+              "raw": "[\n    \"BPNL000000000001\"\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -230,6 +373,32 @@
                 "legal-entities",
                 "legal-addresses",
                 "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Legal Entity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/legal-entities/123456789?idType=CUSTOM_ID_TYPE",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "legal-entities",
+                "123456789"
+              ],
+              "query": [
+                {
+                  "key": "idType",
+                  "value": "CUSTOM_ID_TYPE"
+                }
               ]
             }
           },
@@ -272,7 +441,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-entities/BPNL0000000001YN/addresses?page=0&size=10",
+              "raw": "{{Pool-Host}}/api/catena/legal-entities/BPNL000000000001/addresses?page=0&size=10",
               "host": [
                 "{{Pool-Host}}"
               ],
@@ -280,7 +449,7 @@
                 "api",
                 "catena",
                 "legal-entities",
-                "BPNL0000000001YN",
+                "BPNL000000000001",
                 "addresses"
               ],
               "query": [
@@ -309,7 +478,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n    {\n        \"name\": \"Factory UT\",\n        \"mainAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"70327\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Stuttgart\",\n                    \"shortName\": \"S\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Untertuerckheim Strasse 1\",\n                    \"name\": \"Untertuerckheim Strasse\",\n                    \"shortName\": \"Untertuerckheim Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Gate 1\",\n                    \"shortName\": \"G1\",\n                    \"number\": \"1\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"types\": [\n                \"UNSPECIFIC\"\n            ]\n        },\n        \"legalEntity\": \"BPNL000000000001\",\n        \"index\": \"0\"\n    },\n    {\n        \"name\": \"Factory Sindelfingen\",\n        \"mainAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"71034\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Sindelfinden\",\n                    \"shortName\": \"BB\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Sindelfinger Strasse 1\",\n                    \"name\": \"Sindelfinger Strasse\",\n                    \"shortName\": \"Sindelfinger Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Building 8\",\n                    \"shortName\": \"G8\",\n                    \"number\": \"8\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"types\": [\n                \"UNSPECIFIC\"\n            ]\n        },\n        \"legalEntity\": \"BPNL000000000001\",\n        \"index\": \"1\"\n    }\n]",
+              "raw": "[\n  {\n    \"name\": \"Factory UT\",\n    \"states\": [\n      {\n        \"description\": \"Baden-Wuerttemberg\",\n        \"validFrom\": \"2023-06-06T08:18:05.777Z\",\n        \"validTo\": \"2024-06-06T08:18:05.777Z\",\n        \"type\": \"ACTIVE\"\n      }\n    ],\n    \"mainAddress\": {\n      \"name\": \"WESTERN_LATIN_STANDARD\",\n      \"states\": [\n        {\n          \"description\": \"Baden-Wuerttemberg\",\n          \"validFrom\": \"2023-06-06T08:18:05.777Z\",\n          \"validTo\": \"2024-06-06T08:18:05.777Z\",\n          \"type\": \"ACTIVE\"\n        }\n      ],\n      \"identifiers\": [\n        {\n          \"value\": \"123456789\",\n          \"type\": \"CUSTOM_SITE_ID\"\n        }\n      ],\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"70327\",\n        \"city\": \"Stuttgart\",\n        \"street\": {\n          \"name\": \"Untertuerckheim Strasse 1\",\n          \"houseNumber\": \"1234\",\n          \"milestone\": \"Untertuerckheim Strasse 1\",\n          \"direction\": \"Untertuerckheim Strasse 1\"\n        },\n        \"administrativeAreaLevel1\": \"Baden-Wuerttember\",\n        \"district\": \"Stuttgart\",\n        \"companyPostalCode\": \"71034\",\n        \"industrialZone\": \"Sindelfinden\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"1\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart\",\n        \"administrativeAreaLevel1\": \"Stuttgart\",\n        \"deliveryServiceNumber\": \"Untertuerckheim Strasse 1\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test qualifier\"\n      }\n    },\n    \"bpnlParent\": \"BPNL000000000001\",\n    \"index\": \"1\"\n  }\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -337,7 +506,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n    {\n        \"name\": \"Factory UT\",\n        \"mainAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"70327\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Stuttgart\",\n                    \"shortName\": \"S\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Untertuerckheim Strasse 1\",\n                    \"name\": \"Untertuerckheim Strasse\",\n                    \"shortName\": \"Untertuerckheim Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Gate 1\",\n                    \"shortName\": \"G1\",\n                    \"number\": \"1\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"types\": [\n                \"UNSPECIFIC\"\n            ]\n        },\n        \"bpn\": \"BPNS000000000001\"\n    },\n    {\n        \"name\": \"Factory Sindelfingen\",\n        \"mainAddress\": {\n            \"version\": {\n                \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n                \"language\": \"en\"\n            },\n            \"country\": \"DE\",\n            \"administrativeAreas\": [\n                {\n                    \"value\": \"Baden-Wuerttemberg\",\n                    \"shortName\": \"BW\",\n                    \"fipsCode\": \"GM01\",\n                    \"type\": \"REGION\"\n                }\n            ],\n            \"postCodes\": [\n                {\n                    \"value\": \"71034\",\n                    \"type\": \"REGULAR\"\n                }\n            ],\n            \"localities\": [\n                {\n                    \"value\": \"Sindelfinden\",\n                    \"shortName\": \"BB\",\n                    \"type\": \"CITY\"\n                }\n            ],\n            \"thoroughfares\": [\n                {\n                    \"value\": \"Sindelfinger Strasse 1\",\n                    \"name\": \"Sindelfinger Strasse\",\n                    \"shortName\": \"Sindelfinger Str.\",\n                    \"number\": \"1\",\n                    \"type\": \"STREET\"\n                }\n            ],\n            \"premises\": [\n                {\n                    \"value\": \"Building 8\",\n                    \"shortName\": \"G8\",\n                    \"number\": \"8\",\n                    \"type\": \"BUILDING\"\n                }\n            ],\n            \"types\": [\n                \"UNSPECIFIC\"\n            ]\n        },\n        \"bpn\": \"BPNS0000000001YN\"\n    }\n]",
+              "raw": "[\n  {\n    \"bpns\": \"BPNS000000000001\",\n    \"name\": \"Factory UT\",\n    \"states\": [\n      {\n        \"description\": \"Baden-Wuerttemberg\",\n        \"validFrom\": \"2023-06-06T08:18:05.777Z\",\n        \"validTo\": \"2024-06-06T08:18:05.777Z\",\n        \"type\": \"ACTIVE\"\n      }\n    ],\n    \"mainAddress\": {\n      \"name\": \"WESTERN_LATIN_STANDARD\",\n      \"states\": [\n        {\n          \"description\": \"Baden-Wuerttemberg\",\n          \"validFrom\": \"2023-06-06T08:18:05.777Z\",\n          \"validTo\": \"2024-06-06T08:18:05.777Z\",\n          \"type\": \"ACTIVE\"\n        }\n      ],\n      \"identifiers\": [\n        {\n          \"value\": \"123456789\",\n          \"type\": \"CUSTOM_SITE_ID\"\n        }\n      ],\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"70327\",\n        \"city\": \"Stuttgart\",\n        \"street\": {\n          \"name\": \"Untertuerckheim Strasse 1\",\n          \"houseNumber\": \"1234\",\n          \"milestone\": \"Untertuerckheim Strasse 1\",\n          \"direction\": \"Untertuerckheim Strasse 1\"\n        },\n        \"administrativeAreaLevel1\": \"Baden-Wuerttember\",\n        \"district\": \"Stuttgart\",\n        \"companyPostalCode\": \"71034\",\n        \"industrialZone\": \"Sindelfinden\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"1\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart\",\n        \"administrativeAreaLevel1\": \"Stuttgart\",\n        \"deliveryServiceNumber\": \"Untertuerckheim Strasse 1\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test qualifier\"\n      }\n    }\n  }\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -359,33 +528,13 @@
           "response": []
         },
         {
-          "name": "Site",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/sites/BPNS000000000001",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "sites",
-                "BPNS000000000001"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Filter Sites",
+          "name": "Search Sites",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"sites\": [\n    \"BPNS000000000001\"\n  ]\n}",
+              "raw": "{\n    \"legalEntities\": [\n        \"BPNL000000000001\"\n    ],\n    \"sites\": [\n        \"BPNS000000000001\"\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -418,7 +567,7 @@
           "response": []
         },
         {
-          "name": "Filter Main Addresses",
+          "name": "Search Main Addresses",
           "request": {
             "method": "POST",
             "header": [],
@@ -446,6 +595,26 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Site",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/sites/BPNS000000000001",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "sites",
+                "BPNS000000000001"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -459,7 +628,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n    {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"en\"\n        },\n        \"country\": \"DE\",\n        \"administrativeAreas\": [\n            {\n                \"value\": \"Baden-Wuerttemberg\",\n                \"shortName\": \"BW\",\n                \"fipsCode\": \"GM01\",\n                \"type\": \"REGION\"\n            }\n        ],\n        \"postCodes\": [\n            {\n                \"value\": \"70327\",\n                \"type\": \"REGULAR\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Stuttgart\",\n                \"shortName\": \"S\",\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Tor Strasse 1\",\n                \"name\": \"Tor Strasse\",\n                \"shortName\": \"Tor Str.\",\n                \"number\": \"1\",\n                \"type\": \"STREET\"\n            }\n        ],\n        \"premises\": [\n            {\n                \"value\": \"Gate 1\",\n                \"shortName\": \"1\",\n                \"number\": \"1\",\n                \"type\": \"BUILDING\"\n            }\n        ],\n        \"types\": [\n            \"UNSPECIFIC\"\n        ],\n        \"parent\": \"BPNS000000000001\",\n        \"index\": \"0\"\n    },\n    {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"en\"\n        },\n        \"country\": \"DE\",\n        \"administrativeAreas\": [\n            {\n                \"value\": \"Baden-Wuerttemberg\",\n                \"shortName\": \"BW\",\n                \"fipsCode\": \"GM01\",\n                \"type\": \"REGION\"\n            }\n        ],\n        \"postCodes\": [\n            {\n                \"value\": \"80331\",\n                \"type\": \"REGULAR\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Bavaria\",\n                \"shortName\": \"B\",\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Standort Strasse 10\",\n                \"name\": \"Standort Strasse\",\n                \"shortName\": \"Standort Str.\",\n                \"number\": \"10\",\n                \"type\": \"STREET\"\n            }\n        ],\n        \"types\": [\n            \"UNSPECIFIC\"\n        ],\n        \"parent\": \"BPNL0000000001YN\",\n        \"index\": \"1\"\n    }\n]",
+              "raw": "[\n    {\n        \"name\": \"WESTERN_LATIN_STANDARD\",\n        \"states\": [\n            {\n                \"description\": \"WESTERN_LATIN_STANDARD\",\n                \"validFrom\": \"2023-06-06T10:02:00.355Z\",\n                \"validTo\": \"2024-06-06T10:02:00.355Z\",\n                \"type\": \"ACTIVE\"\n            }\n        ],\n        \"identifiers\": [\n            {\n                \"value\": \"12345678910\",\n                \"type\": \"CUSTOM_ID_ADD_TYPE\"\n            }\n        ],\n        \"physicalPostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"70546\",\n            \"city\": \"Stuttgart\",\n            \"street\": {\n                \"name\": \"Stuttgarter Strasse\",\n                \"houseNumber\": \"1\",\n                \"milestone\": \"Stuttgarter Strasse 1\",\n                \"direction\": \"Stuttgarter Str.\"\n            },\n            \"administrativeAreaLevel1\": \"Baden-Wuerttemberg\",\n            \"district\": \"Stuttgart\",\n            \"companyPostalCode\": \"GM01\",\n            \"industrialZone\": \"HEADQUARTER\",\n            \"building\": \"Building A\",\n            \"floor\": \"A\",\n            \"door\": null\n        },\n        \"alternativePostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"1234\",\n            \"city\": \"Stuttgart\",\n            \"administrativeAreaLevel1\": \"Baden-Wuerttemberg test1\",\n            \"deliveryServiceNumber\": \"test\",\n            \"deliveryServiceType\": \"PO_BOX\",\n            \"deliveryServiceQualifier\": \"test1\"\n        },\n        \"bpnParent\": \"BPNL000000000001\",\n        \"index\": \"0\"\n    }\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -509,32 +678,12 @@
           "response": []
         },
         {
-          "name": "Address Partner",
+          "name": "Address Partners",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/addresses/BPNA000000000001",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "addresses",
-                "BPNA000000000001"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Search Address Partners",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/addresses?administrativeArea=baden&countryCode=DE&page=0&size=10",
+              "raw": "{{Pool-Host}}/api/catena/addresses?page=0&size=10",
               "host": [
                 "{{Pool-Host}}"
               ],
@@ -546,7 +695,8 @@
               "query": [
                 {
                   "key": "administrativeArea",
-                  "value": "baden"
+                  "value": null,
+                  "disabled": true
                 },
                 {
                   "key": "postCode",
@@ -575,7 +725,8 @@
                 },
                 {
                   "key": "countryCode",
-                  "value": "DE"
+                  "value": null,
+                  "disabled": true
                 },
                 {
                   "key": "page",
@@ -591,13 +742,13 @@
           "response": []
         },
         {
-          "name": "Filter Address Partners",
+          "name": "Search Address Partners",
           "request": {
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"addresses\": [\n    \"BPNA000000000001\"\n  ]\n}",
+              "raw": "{\n    \"legalEntities\": [\n        \"BPNL000000000001\"\n    ],\n    \"sites\": [\n        \"BPNS000000000001\"\n    ],\n    \"addresses\": [\n        \"BPNA000000000001\"\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -628,6 +779,26 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Address Partner",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/addresses/BPNA000000000001",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "addresses",
+                "BPNA000000000001"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -635,9 +806,9 @@
       "name": "Opensearch Controller",
       "item": [
         {
-          "name": "Update Opensearch Index",
+          "name": "Check Opensearch Last Update Status",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "url": {
               "raw": "{{Pool-Host}}/api/opensearch/business-partner",
@@ -654,9 +825,9 @@
           "response": []
         },
         {
-          "name": "Check Opensearch Last Update Status",
+          "name": "Update Opensearch Index",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [],
             "url": {
               "raw": "{{Pool-Host}}/api/opensearch/business-partner",
@@ -694,419 +865,6 @@
       ]
     },
     {
-      "name": "Metadata Controller",
-      "item": [
-        {
-          "name": "Create Identifier Type",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"technicalKey\": \"CUSTOM_ID_TYPE\",\n  \"name\": \"Custom Identifier Type for Testing\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-types",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "identifier-types"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Identifier Types",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-types?page=0&size=10",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "identifier-types"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Identifier Type Rules",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-types/for-country?country=DE",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "identifier-types",
-                "for-country"
-              ],
-              "query": [
-                {
-                  "key": "country",
-                  "value": "DE"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Create Issuing Body",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"technicalKey\": \"CUSTOM_ISSUE_BODY\",\n  \"name\": \"Custom Issuing Body for Testing\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/issuing-bodies",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "issuing-bodies"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Issuing Bodies",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/issuing-bodies?page=0&size=10",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "issuing-bodies"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Create Identifier Status",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"technicalKey\": \"CUSTOM_ID_STATUS\",\n  \"name\": \"Custom Identifier Status for Testing\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-status",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "identifier-status"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Identifier Stati",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-status?page=0&size=10",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "identifier-status"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Create Legal Form",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"technicalKey\": \"CUSTOM_LEGAL_FORM\",\n  \"name\": \"Custom Legal Form for Testing\",\n  \"mainAbbreviation\": \"CLF_0001\",\n  \"language\": \"en\",\n  \"category\": [\n    {\n      \"name\": \"holding company\"\n    }\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-forms",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "legal-forms"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Legal Forms",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/legal-forms?page=0&size=10",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "legal-forms"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "SaaS Controller",
-      "item": [
-        {
-          "name": "Sharing Process Import Status",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "https://{{Pool-Host}}/api/cdq/business-partner/sync",
-              "protocol": "https",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "cdq",
-                "business-partner",
-                "sync"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Start Sharing Process Data Import",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "https://{{Pool-Host}}/api/cdq/business-partner/sync",
-              "protocol": "https",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "cdq",
-                "business-partner",
-                "sync"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Import Mapping Filter",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"importIdentifiers\": [\n    \"string\"\n  ]\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "https://{{Pool-Host}}/api/saas/identifier-mappings/filter",
-              "protocol": "https",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "saas",
-                "identifier-mappings",
-                "filter"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Identifier Mappings",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "https://{{Pool-Host}}/api/saas/identifier-mappings?page=0&size=10",
-              "protocol": "https",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "saas",
-                "identifier-mappings"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Business Partner Controller",
-      "item": [
-        {
-          "name": "Business Partner Changelog",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{Pool-Host}}/api/catena/business-partners/changelog?page=0&size=10&modifiedAfter=2023-03-21T09:00:25.298594Z&bpn=BPNL0000000001YN&bpn=BPNL000000000001",
-              "host": [
-                "{{Pool-Host}}"
-              ],
-              "path": [
-                "api",
-                "catena",
-                "business-partners",
-                "changelog"
-              ],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                },
-                {
-                  "key": "modifiedAfter",
-                  "value": "2023-03-21T09:00:25.298594Z"
-                },
-                {
-                  "key": "bpn",
-                  "value": "BPNL0000000001YN"
-                },
-                {
-                  "key": "bpn",
-                  "value": "BPNL000000000001"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
       "name": "BPN Controller",
       "item": [
         {
@@ -1116,7 +874,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idType\": \"EU_VAT_ID_DE\",\n  \"idValues\": [\n    \"VAT_ID_VALUE\"\n  ]\n}",
+              "raw": "{\n    \"lsaType\": \"LEGAL_ENTITY\",\n    \"idType\": \"CUSTOM_ID_TYPE\",\n    \"idValues\": [\n        \"123456789\"\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1139,14 +897,59 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Changelog Controller",
+      "item": [
+        {
+          "name": "Business Partner Changelog",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromTime\": \"2023-03-21T09:00:25.298594Z\",\n  \"bpns\": [\n    \"BPNL000000000001\"\n  ],\n  \"lsaTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Pool-Host}}/api/catena/business-partners/changelog/search?page=0&size=10",
+              "host": [
+                "{{Pool-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "business-partners",
+                "changelog",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "auth": {
     "type": "oauth2",
     "oauth2": [
       {
-        "key": "accessTokenUrl",
-        "value": "{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+        "key": "client_authentication",
+        "value": "body",
         "type": "string"
       },
       {
@@ -1160,18 +963,33 @@
         "type": "string"
       },
       {
+        "key": "accessTokenUrl",
+        "value": "https://{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+        "type": "string"
+      },
+      {
         "key": "tokenName",
         "value": "BPDM Pool Token {{Environment}}",
         "type": "string"
       },
       {
-        "key": "challengeAlgorithm",
-        "value": "S256",
-        "type": "string"
+        "key": "refreshRequestParams",
+        "value": [],
+        "type": "any"
       },
       {
-        "key": "redirect_uri",
-        "value": "https://catenax-dev003-app-onboarding.azurewebsites.net",
+        "key": "tokenRequestParams",
+        "value": [],
+        "type": "any"
+      },
+      {
+        "key": "authRequestParams",
+        "value": [],
+        "type": "any"
+      },
+      {
+        "key": "challengeAlgorithm",
+        "value": "S256",
         "type": "string"
       },
       {
@@ -1180,18 +998,8 @@
         "type": "string"
       },
       {
-        "key": "authUrl",
-        "value": "https://catenaxdev003akssrv.germanywestcentral.cloudapp.azure.com/iamcentralidp/auth/realms/CX-Central/protocol/openid-connect/auth",
-        "type": "string"
-      },
-      {
         "key": "addTokenTo",
         "value": "header",
-        "type": "string"
-      },
-      {
-        "key": "client_authentication",
-        "value": "body",
         "type": "string"
       }
     ]
