@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
@@ -28,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaTypes
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byOutputInputEnum
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -36,11 +38,12 @@ import java.time.Instant
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogEntries(externalIds: Set<String>?, lsaTypes: Set<LsaType>?, createdAt: Instant?, page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
+    fun getChangeLogEntries(externalIds: Set<String>?, lsaTypes: Set<LsaType>?, createdAt: Instant?, outputInputEnum: OutputInputEnum?,page: Int, pageSize: Int): PageChangeLogResponse<ChangelogResponse> {
 
         val nonNullExternalIds = externalIds ?: emptySet()
 
-        val spec = Specification.allOf(byExternalIdsIn(externalIds = nonNullExternalIds), byCreatedAtGreaterThan(createdAt = createdAt), byLsaTypes(lsaTypes))
+        val spec = Specification.allOf(byExternalIdsIn(externalIds = nonNullExternalIds), byCreatedAtGreaterThan(createdAt = createdAt), byLsaTypes(lsaTypes), byOutputInputEnum(outputInputEnum))
+
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
         val setDistinctList = changelogRepository.findExternalIdsInListDistinct(nonNullExternalIds)

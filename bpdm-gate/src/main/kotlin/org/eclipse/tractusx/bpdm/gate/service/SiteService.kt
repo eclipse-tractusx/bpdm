@@ -24,10 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
@@ -80,7 +77,7 @@ class SiteService(
      */
     fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputResponse> {
 
-        val sitePage = if (externalIds != null && externalIds.isNotEmpty()) {
+        val sitePage = if (!externalIds.isNullOrEmpty()) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
         } else {
             siteRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))

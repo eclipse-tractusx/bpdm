@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.springframework.data.jpa.domain.Specification
@@ -65,6 +66,13 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
                         root.get<String>(ChangelogEntry::businessPartnerType.name).`in`(lsaTypes.map { lsaType -> lsaType })
                     else
                         null
+                }
+            }
+
+        fun byOutputInputEnum(outputInputEnum: OutputInputEnum?) =
+            Specification<ChangelogEntry> { root, _, builder ->
+                outputInputEnum?.let {
+                    builder.equal(root.get<OutputInputEnum>(ChangelogEntry::dataType.name), outputInputEnum)
                 }
             }
     }

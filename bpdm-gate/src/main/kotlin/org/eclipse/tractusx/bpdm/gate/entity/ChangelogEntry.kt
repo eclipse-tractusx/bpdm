@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 
 
@@ -32,7 +33,12 @@ class ChangelogEntry(
     val externalId: String,
     @Enumerated(EnumType.STRING)
     @Column(name = "business_partner_type", nullable = false, updatable = false)
-    val businessPartnerType: LsaType
+    val businessPartnerType: LsaType,
+    @Column(name = "data_type")
+    @Enumerated(EnumType.STRING)
+    var dataType: OutputInputEnum
+
+
 
 ) : BaseEntity()
 
