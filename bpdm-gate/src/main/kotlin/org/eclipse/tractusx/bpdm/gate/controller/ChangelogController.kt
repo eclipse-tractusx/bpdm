@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
@@ -37,13 +38,13 @@ class ChangelogController(
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
-        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime, paginationRequest.page, paginationRequest.size)
+        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Input, paginationRequest.page, paginationRequest.size)
     }
 
     override fun getOutputChangelog(paginationRequest: PaginationRequest,
                                     searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
-        throw NotImplementedError()
-        TODO("Not yet implemented")
+
+        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Output, paginationRequest.page, paginationRequest.size)
     }
 
 }
