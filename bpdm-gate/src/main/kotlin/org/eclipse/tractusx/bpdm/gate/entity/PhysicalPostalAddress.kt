@@ -37,9 +37,8 @@ class PhysicalPostalAddress(
     /**
      * Region within the country
      */
-    @ManyToOne
-    @JoinColumn(name = "phy_admin_area_l1_region")
-    val administrativeAreaLevel1: Region?,
+    @Column(name = "phy_admin_area_l1_region")
+    val administrativeAreaLevel1: String? = null,
 
     /**
      * Further possibility to describe the region/address(e.g. County)
