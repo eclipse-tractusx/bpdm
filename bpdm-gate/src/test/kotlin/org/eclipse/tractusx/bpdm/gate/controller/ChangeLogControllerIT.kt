@@ -51,7 +51,6 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParam
@@ -73,7 +72,6 @@ import java.time.Instant
 internal class ChangeLogControllerIT @Autowired constructor(
     val gateClient: GateClient,
     private val objectMapper: ObjectMapper,
-    val saasConfigProperties: SaasConfigProperties,
     private val testHelpers: DbTestHelpers,
 ) {
     companion object {
@@ -96,7 +94,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
         wireMockServer.resetAll()
-        mockSaas()
         createChangeLogs()
     }
 
@@ -233,84 +230,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
     }
 
-    fun mockSaas() {
-        val addresses = listOf(
-            RequestValues.addressGateInputRequest1
-        )
 
-        val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1
-        )
-
-        val parentSitesSaas = listOf(
-            SaasValues.siteBusinessPartner1
-        )
-
-
-        // mock "get parent legal entities"
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentLegalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
-        // mock "get parent sites"
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentSitesSaas
-                                )
-                            )
-                        )
-                )
-        )
-
-        // mock "get addresses with relations"
-        // this simulates the case that the address already had some relations
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 2,
-                                    values = listOf(
-                                        SaasValues.addressBusinessPartnerWithRelations1,
-                                        SaasValues.addressBusinessPartnerWithRelations2
-                                    )
-                                )
-                            )
-                        )
-                )
-        )
-    }
 
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
