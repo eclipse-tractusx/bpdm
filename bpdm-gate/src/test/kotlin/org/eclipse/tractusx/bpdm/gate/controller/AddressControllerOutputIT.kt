@@ -70,12 +70,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
     val testHelpers: DbTestHelpers
 ) {
     companion object {
-        @RegisterExtension
-        private val wireMockServerSaas: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-        @RegisterExtension
+           @RegisterExtension
         private val wireMockServerBpdmPool: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
@@ -83,7 +78,6 @@ internal class AddressControllerOutputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServerSaas.baseUrl() }
             registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }

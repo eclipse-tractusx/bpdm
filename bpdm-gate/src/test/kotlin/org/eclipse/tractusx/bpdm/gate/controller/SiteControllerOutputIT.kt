@@ -52,11 +52,6 @@ internal class SiteControllerOutputIT @Autowired constructor(
 ) {
     companion object {
         @RegisterExtension
-        private val wireMockServerSaas: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-        @RegisterExtension
         private val wireMockServerBpdmPool: WireMockExtension = WireMockExtension.newInstance()
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
@@ -64,7 +59,6 @@ internal class SiteControllerOutputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServerSaas.baseUrl() }
             registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }

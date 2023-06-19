@@ -282,8 +282,8 @@ object ResponseValues {
             .copy(
                 nameParts = listOf(CommonValues.name1),
                 identifiers = listOf(
-                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
-                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
+                    AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!),
+                    AddressIdentifierDto(identifier2.value!!, identifier2.type?.technicalKey!!)
                 )
             ),
         externalId = CommonValues.externalIdAddress1,
@@ -295,8 +295,8 @@ object ResponseValues {
             .copy(
                 nameParts = listOf(CommonValues.nameSite1),
                 identifiers = listOf(
-                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
-                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
+                    AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!),
+                    AddressIdentifierDto(identifier2.value!!, identifier2.type?.technicalKey!!)
                 )
             ),
         externalId = CommonValues.externalIdAddress2,
@@ -307,7 +307,7 @@ object ResponseValues {
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!)
             )
         ),
         externalId = CommonValues.externalIdAddress1,
@@ -318,7 +318,7 @@ object ResponseValues {
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!)
             )
         ),
         externalId = CommonValues.externalIdAddress2,
@@ -330,7 +330,7 @@ object ResponseValues {
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!)
             )
         ),
         externalId = CommonValues.externalIdAddress1,
@@ -342,7 +342,7 @@ object ResponseValues {
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type?.technicalKey!!)
             )
         ),
         externalId = CommonValues.externalIdAddress2,

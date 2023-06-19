@@ -21,17 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 object EndpointValues {
 
-    const val SAAS_MOCK_DATA_EXCHANGE_API_PATH = "/test-saas-data-exchange-api/test-saas-storage"
-    const val SAAS_MOCK_BUSINESS_PARTNER_PATH = "$SAAS_MOCK_DATA_EXCHANGE_API_PATH/businesspartners"
-    const val SAAS_MOCK_RELATIONS_PATH = "$SAAS_MOCK_DATA_EXCHANGE_API_PATH/relations"
-    const val SAAS_MOCK_DELETE_RELATIONS_PATH = "$SAAS_MOCK_RELATIONS_PATH/delete"
-
-    const val SAAS_MOCK_DATA_CLINIC_API_PATH = "/test-saas-data-clinic-api/test-saas-storage"
-    const val SAAS_MOCK_AUGMENTED_BUSINESS_PARTNER_PATH = "$SAAS_MOCK_DATA_CLINIC_API_PATH/augmentedbusinesspartners"
-
-    const val SAAS_MOCK_DATA_VALIDATION_API_PATH = "/test-saas-data-validation-api"
-    const val SAAS_MOCK_DATA_VALIDATION_BUSINESSPARTNER_PATH = "$SAAS_MOCK_DATA_VALIDATION_API_PATH/businesspartners/validate"
-
     const val GATE_API_PATH = "/api/catena"
     const val GATE_API_INPUT_PATH = "${GATE_API_PATH}/input"
     const val GATE_API_INPUT_LEGAL_ENTITIES_PATH = "${GATE_API_INPUT_PATH}/legal-entities"

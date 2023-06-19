@@ -25,25 +25,19 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,11 +54,7 @@ internal class SiteControllerInputIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        @JvmStatic
-        @DynamicPropertySource
-        fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
-        }
+
     }
 
     @BeforeEach
@@ -113,61 +103,6 @@ internal class SiteControllerInputIT @Autowired constructor(
 
     }
 
-//    /**
-//     * When SaaS api responds with an error status code while fetching site by external id
-//     * Then an internal server error response should be sent
-//     */
-//    @Test
-//    fun `DEPRECATED get site by external id, SaaS error`() {
-//        wireMockServer.stubFor(
-//            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-//                .willReturn(badRequest())
-//        )
-//
-//        try {
-//            gateClient.sites().getSiteByExternalId(SaasValues.legalEntityRequest1.externalId.toString())
-//        } catch (e: WebClientResponseException) {
-//            val statusCode: HttpStatusCode = e.statusCode
-//            val statusCodeValue: Int = statusCode.value()
-//            assertTrue(statusCodeValue in 500..599)
-//        }
-//    }
-
-//    /**
-//     * Given site without main address in SaaS
-//     * When query by its external ID
-//     * Then server error is returned
-//     */
-//    @Test
-//    fun `DEPRECATED get site without main address, expect error`() {
-//
-//        val invalidPartner = SaasValues.siteBusinessPartnerWithRelations1.copy(addresses = emptyList())
-//
-//        wireMockServer.stubFor(
-//            post(urlPathMatching(EndpointValues.SAAS_MOCK_FETCH_BUSINESS_PARTNER_PATH))
-//                .willReturn(
-//                    aResponse()
-//                        .withHeader("Content-Type", "application/json")
-//                        .withBody(
-//                            objectMapper.writeValueAsString(
-//                                FetchResponse(
-//                                    businessPartner = invalidPartner,
-//                                    status = FetchResponse.Status.OK
-//                                )
-//                            )
-//                        )
-//                )
-//        )
-//
-//        try {
-//            gateClient.sites().getSiteByExternalId(SaasValues.siteBusinessPartnerWithRelations1.externalId.toString())
-//        } catch (e: WebClientResponseException) {
-//            val statusCode: HttpStatusCode = e.statusCode
-//            val statusCodeValue: Int = statusCode.value()
-//            assertTrue(statusCodeValue in 500..599)
-//        }
-//
-//    }
 
     /**
      * Given sites exists in SaaS
@@ -266,28 +201,6 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
     }
 
-    /**
-     * When SaaS api responds with an error status code while getting sites
-     * Then an internal server error response should be sent
-     */
-    @Test
-    fun `get sites, SaaS error`() {
-        wireMockServer.stubFor(
-            get(urlPathMatching(SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .willReturn(badRequest())
-        )
-
-        val paginationValue = PaginationRequest(0, 10)
-
-        try {
-            gateClient.sites().getSites(paginationValue)
-        } catch (e: WebClientResponseException) {
-            val statusCode: HttpStatusCode = e.statusCode
-            val statusCodeValue: Int = statusCode.value()
-            assertTrue(statusCodeValue in 500..599)
-        }
-
-    }
 
     /**
      * When requesting too many sites

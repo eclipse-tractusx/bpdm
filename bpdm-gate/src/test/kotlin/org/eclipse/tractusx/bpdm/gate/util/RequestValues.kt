@@ -331,7 +331,7 @@ object RequestValues {
         address = address1.copy(
             nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type!!)
             )
         ),
         externalId = CommonValues.externalIdAddress1,
@@ -343,7 +343,7 @@ object RequestValues {
         address = address2.copy(
             nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type!!)
             )
         ),
         externalId = CommonValues.externalIdAddress2,
@@ -356,7 +356,7 @@ object RequestValues {
         address = address1.copy(
             nameParts = listOf(CommonValues.name1),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type!!)
             )
         ),
         externalId = CommonValues.externalIdAddress1,
@@ -368,7 +368,7 @@ object RequestValues {
         address = address2.copy(
             nameParts = listOf(CommonValues.name2),
             identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
+                AddressIdentifierDto(identifier1.value!!, identifier1.type!!)
             )
         ),
         externalId = CommonValues.externalIdAddress2,
