@@ -24,11 +24,13 @@ import org.eclipse.tractusx.bpdm.common.config.CustomJwtAuthenticationConverter
 import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 class BpdmSecurityConfigurerAdapterImpl(
     val securityConfigProperties: SecurityConfigProperties
 ) : BpdmSecurityConfigurerAdapter {
