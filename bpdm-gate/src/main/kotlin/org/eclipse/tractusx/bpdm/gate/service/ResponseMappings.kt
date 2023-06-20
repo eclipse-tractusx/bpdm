@@ -39,7 +39,6 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
         dataType = datatype
     )
 
-    logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
 
     return logisticAddress
@@ -58,7 +57,6 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
         dataType = datatype
     )
 
-    logisticAddress.identifiers.addAll(this.address.identifiers.map { toEntityIdentifier(it, logisticAddress) }.toSet())
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
 
     return logisticAddress
@@ -66,10 +64,6 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
 
 fun toEntityAddress(dto: AddressStateDto, address: LogisticAddress): AddressState {
     return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
-}
-
-fun toEntityIdentifier(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
-    return AddressIdentifier(dto.value, dto.type, address)
 }
 
 fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativePostalAddress {
@@ -196,7 +190,6 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
         dataType = datatype
     )
 
-    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
@@ -223,7 +216,6 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
         dataType = datatype
     )
 
-    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
 
@@ -231,10 +223,6 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     return legalEntity
 
-}
-
-fun toEntityIdentifier(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
-    return LegalEntityIdentifier(dto.value, dto.type, dto.issuingBody, legalEntity)
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
@@ -272,7 +260,6 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
     val logisticAddress = LogisticAddressGateDto(
         nameParts = name?.let { listOf(name!!) }?: emptyList(),
         states = mapToDtoStates(states),
-        identifiers = mapToDtoIdentifiers(identifiers),
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
         alternativePostalAddress = alternativePostalAddress?.toAlternativePostalAddressDto(),
     )
@@ -282,10 +269,6 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
 
 fun mapToDtoStates(states: MutableSet<AddressState>): Collection<AddressStateDto> {
     return states.map { AddressStateDto(it.description, it.validFrom, it.validTo, it.type) }
-}
-
-fun mapToDtoIdentifiers(identifier: MutableSet<AddressIdentifier>): Collection<AddressIdentifierDto> {
-    return identifier.map { AddressIdentifierDto(it.value, it.type) }
 }
 
 fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalAddressDto {
@@ -360,17 +343,12 @@ fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
         legalShortName = legalName.shortName,
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
-        identifiers = mapToLegalEntityIdentifierDto(identifiers)
     )
 
 }
 
 fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
     return states.map { LegalEntityStateDto(it.officialDenotation, it.validFrom, it.validTo, it.type) }
-}
-
-fun mapToLegalEntityIdentifierDto(identifier: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
-    return identifier.map { LegalEntityIdentifierDto(it.value, it.type.toString(), it.issuingBody) }
 }
 
 fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
