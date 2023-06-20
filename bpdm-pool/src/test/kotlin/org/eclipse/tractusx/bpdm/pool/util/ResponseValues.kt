@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateRes
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
@@ -35,7 +36,7 @@ import java.time.ZoneOffset
  * Numbered values should match with @see SaasValues numbered values for easier testing
  */
 object ResponseValues {
-
+    val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
     val language0 = TypeKeyNameDto(CommonValues.language0, CommonValues.language0.getName())
     val language1 = TypeKeyNameDto(CommonValues.language1, CommonValues.language1.getName())
     val language2 = TypeKeyNameDto(CommonValues.language2, CommonValues.language2.getName())
@@ -257,7 +258,7 @@ object ResponseValues {
             legalForm = legalForm1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
@@ -299,7 +300,7 @@ object ResponseValues {
             legalForm = legalForm2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
@@ -341,7 +342,7 @@ object ResponseValues {
             legalForm = legalForm3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
@@ -383,7 +384,7 @@ object ResponseValues {
             legalForm = legalForm1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
 
@@ -403,7 +404,7 @@ object ResponseValues {
             legalForm = legalForm2,
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
@@ -422,7 +423,7 @@ object ResponseValues {
             legalForm = legalForm3,
             states = listOf(leStatus3),
             classifications = listOf(classification5),
-            currentness = SaasValues.createdTime1.toInstant(ZoneOffset.UTC),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),

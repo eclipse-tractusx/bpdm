@@ -37,8 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(
@@ -59,11 +57,6 @@ class ValidIndexStartupIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        @JvmStatic
-        @DynamicPropertySource
-        fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
-        }
     }
 
     /**
