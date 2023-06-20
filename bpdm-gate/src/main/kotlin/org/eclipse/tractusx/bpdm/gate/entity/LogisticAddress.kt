@@ -60,8 +60,6 @@ class LogisticAddress(
     var alternativePostalAddress: AlternativePostalAddress?
 
 ) : BaseEntity() {
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val identifiers: MutableSet<AddressIdentifier> = mutableSetOf()
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<AddressState> = mutableSetOf()

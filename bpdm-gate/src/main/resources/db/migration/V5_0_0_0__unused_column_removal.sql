@@ -22,3 +22,8 @@ ALTER COLUMN phy_admin_area_l1_region TYPE VARCHAR(255);
 
 -- Removal of Regions Table
 DROP TABLE IF EXISTS regions;
+
+-- Removal of Identifiers TYPE
+DROP TABLE IF EXISTS legal_entity_identifiers CASCADE;
+
+DROP TABLE IF EXISTS address_identifiers CASCADE;

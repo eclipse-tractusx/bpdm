@@ -239,7 +239,6 @@ object RequestValues {
 
 
     val legalEntity1 = LegalEntityDto(
-        identifiers = listOf(identifier1, identifier2),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -247,7 +246,6 @@ object RequestValues {
     )
 
     val legalEntity2 = LegalEntityDto(
-        identifiers = listOf(identifier3, identifier4),
         legalShortName = CommonValues.shortName3,
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
@@ -255,7 +253,6 @@ object RequestValues {
     )
 
     val legalEntity3 = LegalEntityDto(
-        identifiers = listOf(identifier1, identifier2),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
