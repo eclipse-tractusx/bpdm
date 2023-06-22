@@ -21,8 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 
@@ -35,7 +35,7 @@ interface SearchService {
      * Find legal entities by matching their field values to [searchRequest] field query texts
      */
     fun searchLegalEntities(
-        searchRequest: BusinessPartnerSearchRequest,
+        searchRequest: BusinessPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityMatchVerboseDto>
 
@@ -43,7 +43,7 @@ interface SearchService {
      * Find addresses by matching their field values to [searchRequest] field query texts
      */
     fun searchAddresses(
-        searchRequest: AddressPartnerSearchRequest,
+        searchRequest: AddressPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<AddressMatchVerboseDto>
 

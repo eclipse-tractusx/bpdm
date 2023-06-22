@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.mock.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -50,7 +50,7 @@ class SearchServiceMock(
      * adding a default relevancy score to each entry
      */
     override fun searchLegalEntities(
-        searchRequest: BusinessPartnerSearchRequest,
+        searchRequest: BusinessPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityMatchVerboseDto> {
         val resultPage =
@@ -65,7 +65,7 @@ class SearchServiceMock(
      * Ignores [searchRequest] and returns an unfiltered result of addresses in the database,
      * adding a default relevancy score to each entry
      */
-    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
+    override fun searchAddresses(searchRequest: AddressPartnerSearchDto, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
         val resultPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         logger.info { "Mock search: Returning ${resultPage.size} addresses from database" }

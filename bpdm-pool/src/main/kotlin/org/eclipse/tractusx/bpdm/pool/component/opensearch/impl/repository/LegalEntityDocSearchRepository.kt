@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LegalEntityDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
@@ -79,7 +79,7 @@ class LegalEntityDocSearchRepository(
      *      }
      *  }
      */
-    fun findBySearchRequest(partnerSearchRequest: BusinessPartnerSearchRequest, pageable: Pageable): SearchHits {
+    fun findBySearchRequest(partnerSearchRequest: BusinessPartnerSearchDto, pageable: Pageable): SearchHits {
         val lowerCaseSearchRequest = bpdmQueryBuilder.toLowerCaseSearchRequest(partnerSearchRequest)
 
         val boolQuery = QueryBuilders.boolQuery()

@@ -22,24 +22,16 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityPartnerUpdateRequest", description = "Request for updating a business partner record of type legal entity")
-data class LegalEntityPartnerUpdateRequest(
-    @Schema(description = "Business Partner Number")
-    val bpnl: String,
+@Schema(name = "SitePartnerUpdateDto", description = "Request for updating a business partner record of type site")
+data class SitePartnerUpdateDto(
 
-    @get:Schema(description = "Legal name the partner goes by")
-    val legalName: String,
+    @Schema(description = "Business Partner Number of this site")
+    val bpns: String,
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
-
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressDto,
-
-    )
+    val site: SiteDto
+)

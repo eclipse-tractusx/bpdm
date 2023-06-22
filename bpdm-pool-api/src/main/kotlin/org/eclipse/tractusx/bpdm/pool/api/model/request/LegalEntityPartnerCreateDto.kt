@@ -19,17 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import io.swagger.v3.oas.annotations.Parameter
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "LegalEntityPartnerCreateDto", description = "Request for creating new business partner record of type legal entity")
+data class LegalEntityPartnerCreateDto(
 
-@Schema(name = "LegalEntityPropertiesSearchRequest", description = "Contains keywords used for searching in legal entity properties")
-data class LegalEntityPropertiesSearchRequest constructor(
-    @field:Parameter(description = "Filter legal entities by name")
-    val legalName: String?
-) {
-    companion object {
-        val EmptySearchRequest = LegalEntityPropertiesSearchRequest(null)
-    }
-}
+    @get:Schema(description = "Legal name the partner goes by")
+    val legalName: String,
 
+    @field:JsonUnwrapped
+    val legalEntity: LegalEntityDto,
+
+    @get:Schema(description = "Address of the official seat of this legal entity")
+    val legalAddress: LogisticAddressDto,
+
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
+    val index: String?
+)

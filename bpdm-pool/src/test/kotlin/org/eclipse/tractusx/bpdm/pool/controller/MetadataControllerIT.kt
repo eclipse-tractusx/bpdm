@@ -30,7 +30,6 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
@@ -99,8 +98,12 @@ class MetadataControllerIT @Autowired constructor(
         private fun postIdentifierTypeWithoutExpectation(client: WebTestClient, type: IdentifierTypeDto) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
-            postMetadata<LegalFormRequest, LegalFormDto>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
+        private fun postLegalForm(client: WebTestClient, type: LegalFormDto) =
+            postMetadata<LegalFormDto, LegalFormDto>(
+                client,
+                type,
+                EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH
+            )
 
         private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageDto<LegalFormDto> =
 //            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
@@ -110,7 +113,7 @@ class MetadataControllerIT @Autowired constructor(
                 Pair(PaginationRequest::size.name, size.toString())
             )
 
-        private fun postLegalFormWithoutExpectation(client: WebTestClient, type: LegalFormRequest) =
+        private fun postLegalFormWithoutExpectation(client: WebTestClient, type: LegalFormDto) =
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
 
 

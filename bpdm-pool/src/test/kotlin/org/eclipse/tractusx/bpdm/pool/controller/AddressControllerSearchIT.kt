@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -108,7 +108,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
+        val addressSearchRequest = AddressPartnerSearchDto()
         addressSearchRequest.name = RequestValues.addressPartnerCreate4.address.name
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
@@ -128,7 +128,7 @@ class AddressControllerSearchIT @Autowired constructor(
         )
 
 
-        val addressSearchRequest = AddressPartnerSearchRequest()
+        val addressSearchRequest = AddressPartnerSearchDto()
         addressSearchRequest.name = "NONEXISTENT"
 
         val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())

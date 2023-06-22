@@ -22,23 +22,15 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
+@Schema(name = "AddressPartnerSearchDto", description = "Contains keywords used for searching in address properties")
+data class AddressPartnerSearchDto constructor(
 
-@Schema(name = "AddressPropertiesSearchRequest", description = "Contains keywords used for searching in business partner properties")
-data class AddressPropertiesSearchRequest constructor(
-    @field:Parameter(description = "Filter business partners by administrative area name")
-    var administrativeArea: String? = null,
-    @field:Parameter(description = "Filter business partners by postcode or postcodes")
-    var postCode: String? = null,
-    @field:Parameter(description = "Filter business partners by locality full denotation")
-    var locality: String? = null,
-    @field:Parameter(description = "Filter business partners by thoroughfare full denotation")
-    var thoroughfare: String? = null,
-    @field:Parameter(description = "Filter business partners by premise full denotation")
-    var premise: String? = null,
-    @field:Parameter(description = "Filter business partners by postal delivery point full denotation")
-    var postalDeliveryPoint: String? = null
+    @field:Parameter(description = "Filter business partners by name")
+    var name: String? = null
 ) {
     companion object {
-        val EmptySearchRequest = AddressPropertiesSearchRequest()
+        val EmptySearchRequest = AddressPartnerSearchDto()
     }
 }
+
+

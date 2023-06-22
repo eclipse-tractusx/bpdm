@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -70,7 +70,7 @@ class SearchServiceImpl(
      *
      */
     override fun searchLegalEntities(
-        searchRequest: BusinessPartnerSearchRequest,
+        searchRequest: BusinessPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityMatchVerboseDto> {
 
@@ -86,7 +86,7 @@ class SearchServiceImpl(
     /**
      * @see SearchServiceImpl.searchLegalEntities
      */
-    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
+    override fun searchAddresses(searchRequest: AddressPartnerSearchDto, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
         val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
 
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
@@ -98,10 +98,10 @@ class SearchServiceImpl(
     }
 
     private fun searchAndPreparePage(
-        searchRequest: BusinessPartnerSearchRequest,
+        searchRequest: BusinessPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<Pair<Float, LegalEntity>> {
-        return if (searchRequest == BusinessPartnerSearchRequest.EmptySearchRequest) {
+        return if (searchRequest == BusinessPartnerSearchDto.EmptySearchRequest) {
             paginateLegalEntities(paginationRequest)
         } else {
             searchIndex(searchRequest, paginationRequest)
@@ -109,11 +109,11 @@ class SearchServiceImpl(
     }
 
     private fun searchAndPreparePage(
-        searchRequest: AddressPartnerSearchRequest,
+        searchRequest: AddressPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<Pair<Float, LogisticAddress>> {
 
-        return if (searchRequest == AddressPartnerSearchRequest.EmptySearchRequest) {
+        return if (searchRequest == AddressPartnerSearchDto.EmptySearchRequest) {
             paginateAddressPartner(paginationRequest)
         } else {
             searchIndex(searchRequest, paginationRequest)
@@ -135,7 +135,7 @@ class SearchServiceImpl(
     }
 
     private fun searchIndex(
-        searchRequest: BusinessPartnerSearchRequest,
+        searchRequest: BusinessPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<Pair<Float, LegalEntity>> {
         logger.debug { "Search index for legal entities" }
@@ -166,7 +166,7 @@ class SearchServiceImpl(
     }
 
     private fun searchIndex(
-        searchRequest: AddressPartnerSearchRequest,
+        searchRequest: AddressPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<Pair<Float, LogisticAddress>> {
         logger.debug { "Search index for addresses" }

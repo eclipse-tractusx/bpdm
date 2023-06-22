@@ -25,7 +25,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -99,7 +99,7 @@ class ValidIndexStartupIT @Autowired constructor(
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
         val searchResult = poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            LegalEntityPropertiesSearchDto.EmptySearchRequest,
             PaginationRequest()
         )
         Assertions.assertThat(searchResult.content).isNotEmpty
@@ -116,7 +116,7 @@ class ValidIndexStartupIT @Autowired constructor(
     fun acceptValidIndexOnStartup() {
 
         val searchResult = poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            LegalEntityPropertiesSearchDto.EmptySearchRequest,
             PaginationRequest()
         )
         Assertions.assertThat(searchResult.content).isNotEmpty

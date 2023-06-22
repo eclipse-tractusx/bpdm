@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.util.BpdmOpenSearchQueryBuilder
@@ -81,7 +81,7 @@ class AddressDocSearchRepository(
      *      }
      *  }
      */
-    fun findBySearchRequest(partnerSearchRequest: AddressPartnerSearchRequest, pageable: Pageable): SearchHits {
+    fun findBySearchRequest(partnerSearchRequest: AddressPartnerSearchDto, pageable: Pageable): SearchHits {
         val lowerCaseSearchRequest = bpdmQueryBuilder.toLowerCaseSearchRequest(partnerSearchRequest)
 
         val boolQuery = QueryBuilders.boolQuery()
@@ -90,7 +90,6 @@ class AddressDocSearchRepository(
         bpdmQueryBuilder.toFieldTextPairs(lowerCaseSearchRequest)
             .map { (fieldName, queryText) -> bpdmQueryBuilder.buildInnerShouldQuery(fieldName, queryText) }
             .forEach { mustQuery.add(it) }
-
 
 
         val searchRequest = SearchRequest()
@@ -103,7 +102,7 @@ class AddressDocSearchRepository(
         searchRequest.source(searchSourceBuilder)
 
         logger.info { searchRequest }
-        logger.info { restHighLevelClient.lowLevelClient.nodes.get(0).host.toHostString()}
+        logger.info { restHighLevelClient.lowLevelClient.nodes.get(0).host.toHostString() }
         val searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT)
 
         logger.info { searchResponse }

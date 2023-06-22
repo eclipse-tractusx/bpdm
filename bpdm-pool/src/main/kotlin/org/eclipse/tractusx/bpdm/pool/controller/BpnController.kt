@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.pool.api.PoolBpnApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
@@ -35,7 +35,7 @@ class BpnController(
     val controllerConfigProperties: ControllerConfigProperties
 ) : PoolBpnApi {
 
-    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchRequest): ResponseEntity<Set<BpnIdentifierMappingDto>> {
+    override fun findBpnsByIdentifiers(@RequestBody request: IdentifiersSearchDto): ResponseEntity<Set<BpnIdentifierMappingDto>> {
         if (request.idValues.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }

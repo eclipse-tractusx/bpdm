@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.springdoc.core.annotations.ParameterObject
@@ -88,7 +88,7 @@ interface PoolSaasApi {
     )
     @PostMapping("/identifier-mappings/filter")
     @PostExchange("/identifier-mappings/filter")
-    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingDto
+    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterDto): ImportIdMappingDto
 
     @Operation(
         summary = "Paginate Identifier Mappings by CX-Pool Identifiers",

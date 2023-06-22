@@ -60,7 +60,7 @@ class BusinessPartnerBuildService(
      * Create new business partner records from [requests]
      */
     @Transactional
-    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
+    fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateDto>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }
 
         val errors = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
@@ -93,7 +93,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createSites(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
+    fun createSites(requests: Collection<SitePartnerCreateDto>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnlParent })
@@ -130,10 +130,10 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
+    fun createAddresses(requests: Collection<AddressPartnerCreateDto>): AddressPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new addresses" }
-        fun isLegalEntityRequest(request: AddressPartnerCreateRequest) = request.bpnParent.startsWith(bpnIssuingService.bpnlPrefix)
-        fun isSiteRequest(request: AddressPartnerCreateRequest) = request.bpnParent.startsWith(bpnIssuingService.bpnsPrefix)
+        fun isLegalEntityRequest(request: AddressPartnerCreateDto) = request.bpnParent.startsWith(bpnIssuingService.bpnlPrefix)
+        fun isSiteRequest(request: AddressPartnerCreateDto) = request.bpnParent.startsWith(bpnIssuingService.bpnsPrefix)
 
         val (legalEntityRequests, otherAddresses) = requests.partition { isLegalEntityRequest(it) }
         val (siteRequests, invalidAddresses) = otherAddresses.partition { isSiteRequest(it) }
@@ -158,7 +158,7 @@ class BusinessPartnerBuildService(
      * Update existing records with [requests]
      */
     @Transactional
-    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
+    fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateDto>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }
 
         val legalEntityMetadataMap = metadataMappingService.mapRequests(requests.map { it.legalEntity })
@@ -189,7 +189,7 @@ class BusinessPartnerBuildService(
     }
 
     @Transactional
-    fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
+    fun updateSites(requests: Collection<SitePartnerUpdateDto>): SitePartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} sites" }
 
         val addressMetadataMap = metadataMappingService.mapRequests(requests.map { it.site.mainAddress })
@@ -216,7 +216,7 @@ class BusinessPartnerBuildService(
         return SitePartnerUpdateResponseWrapper(validEntities, errors)
     }
 
-    fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
+    fun updateAddresses(requests: Collection<AddressPartnerUpdateDto>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }
 
         val validAddresses = logisticAddressRepository.findDistinctByBpnIn(requests.map { it.bpna })
@@ -246,12 +246,12 @@ class BusinessPartnerBuildService(
     }
 
     private fun createAddressesForLegalEntity(
-        requests: Collection<AddressPartnerCreateRequest>,
+        requests: Collection<AddressPartnerCreateDto>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
     ): Collection<AddressPartnerCreateVerboseDto> {
 
-        fun findValidLegalEnities(requests: Collection<AddressPartnerCreateRequest>): Map<String, LegalEntity> {
+        fun findValidLegalEnities(requests: Collection<AddressPartnerCreateDto>): Map<String, LegalEntity> {
             val bpnLsToFetch = requests.map { it.bpnParent }
             val legalEntities = businessPartnerFetchService.fetchByBpns(bpnLsToFetch)
             val bpnl2LegalEntityMap = legalEntities.associateBy { it.bpn }
@@ -278,7 +278,7 @@ class BusinessPartnerBuildService(
     }
 
     private fun createAddressesForSite(
-        requests: Collection<AddressPartnerCreateRequest>,
+        requests: Collection<AddressPartnerCreateDto>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
     ): List<AddressPartnerCreateVerboseDto> {
@@ -551,8 +551,8 @@ class BusinessPartnerBuildService(
     }
 
     private fun filterLegalEntityDuplicatesByIdentifier(
-        requests: Collection<LegalEntityPartnerCreateRequest>, errors: MutableList<ErrorInfo<LegalEntityCreateError>>
-    ): Collection<LegalEntityPartnerCreateRequest> {
+        requests: Collection<LegalEntityPartnerCreateDto>, errors: MutableList<ErrorInfo<LegalEntityCreateError>>
+    ): Collection<LegalEntityPartnerCreateDto> {
 
         val idValues = requests.flatMap { it.legalEntity.identifiers }.map { it.value }
         val idsInDb = legalEntityIdentifierRepository.findByValueIn(idValues).map { Pair(it.value, it.type.technicalKey) }.toHashSet()

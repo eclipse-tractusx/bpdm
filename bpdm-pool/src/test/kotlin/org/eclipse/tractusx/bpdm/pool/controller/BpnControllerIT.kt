@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchDto
 import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.RequestValues
@@ -72,16 +72,20 @@ class BpnControllerIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         // ensure LE1 and 2 have same identifierType
-        val legalEntityCreate1 = with(RequestValues.legalEntityCreate1) { copy(
-            legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
+        val legalEntityCreate1 = with(RequestValues.legalEntityCreate1) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
+                )
             )
-        ) }
-        val legalEntityCreate2 = with(RequestValues.legalEntityCreate2) { copy(
-            legalEntity = legalEntity.copy(
-                identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
+        }
+        val legalEntityCreate2 = with(RequestValues.legalEntityCreate2) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
+                )
             )
-        ) }
+        }
         val legalEntityCreate3 = RequestValues.legalEntityCreate3
 
         testHelpers.truncateDbTables()
@@ -103,7 +107,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, all found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2))
+            IdentifiersSearchDto(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2))
 
         val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
 
@@ -118,7 +122,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, only some found`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
+            IdentifiersSearchDto(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
 
         val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
 
@@ -133,7 +137,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by identifiers, bpn request limit exceeded`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2, identifierValue3))
+            IdentifiersSearchDto(IdentifierLsaType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2, identifierValue3))
 
         testHelpers.`find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest)
     }
@@ -146,7 +150,7 @@ class BpnControllerIT @Autowired constructor(
     @Test
     fun `find bpns by nonexistent identifier type`() {
         val identifiersSearchRequest =
-            IdentifiersSearchRequest(IdentifierLsaType.LEGAL_ENTITY, "NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
+            IdentifiersSearchDto(IdentifierLsaType.LEGAL_ENTITY, "NONEXISTENT_IDENTIFIER_TYPE", listOf(identifierValue1))
 
         testHelpers.`find bpns by nonexistent identifier type`(identifiersSearchRequest)
     }

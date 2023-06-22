@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -102,7 +102,7 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(),
+            ChangelogSearchDto(),
             PaginationRequest()
         )
 
@@ -163,7 +163,7 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(),
+            ChangelogSearchDto(),
             PaginationRequest()
         )
 
@@ -222,7 +222,7 @@ class ChangelogControllerIT @Autowired constructor(
 
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(),
+            ChangelogSearchDto(),
             PaginationRequest()
         )
 
@@ -267,12 +267,12 @@ class ChangelogControllerIT @Autowired constructor(
 
 
         val actualFirstPage = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
+            ChangelogSearchDto(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
             PaginationRequest(page = 0, size = 2)
         )
 
         val actualSecondPage = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
+            ChangelogSearchDto(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
             PaginationRequest(page = 1, size = 2)
         )
 
@@ -326,15 +326,15 @@ class ChangelogControllerIT @Autowired constructor(
 
 
         val actualLegalEntityPage = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
+            ChangelogSearchDto(lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
             PaginationRequest()
         )
         val actualSitePage = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(lsaTypes = setOf(ChangelogSubject.SITE)),
+            ChangelogSearchDto(lsaTypes = setOf(ChangelogSubject.SITE)),
             PaginationRequest()
         )
         val actualAddressPage = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(lsaTypes = setOf(ChangelogSubject.ADDRESS)),
+            ChangelogSearchDto(lsaTypes = setOf(ChangelogSubject.ADDRESS)),
             PaginationRequest()
         )
 
@@ -375,7 +375,7 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(bpns = setOf(bpnL1, bpnL2)),
+            ChangelogSearchDto(bpns = setOf(bpnL1, bpnL2)),
             PaginationRequest()
         )
 
@@ -420,7 +420,7 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
-            ChangelogSearchRequest(fromTime = timeAfterFirstInsert, lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
+            ChangelogSearchDto(fromTime = timeAfterFirstInsert, lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
             PaginationRequest()
         )
 

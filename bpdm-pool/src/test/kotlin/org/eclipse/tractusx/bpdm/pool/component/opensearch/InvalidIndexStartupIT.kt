@@ -25,7 +25,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
@@ -130,7 +130,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         val searchResult = poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            LegalEntityPropertiesSearchDto.EmptySearchRequest,
             PaginationRequest()
         )
 

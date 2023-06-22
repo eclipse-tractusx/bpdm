@@ -19,16 +19,19 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@Schema(name = "LegalFormRequest", description = "New legal form record to be referenced by business partners")
-data class LegalFormRequest(
-    @Schema(description = "Unique key to be used for reference")
-    val technicalKey: String,
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "AddressPartnerUpdateDto", description = "Request for updating a business partner record of type address")
+data class AddressPartnerUpdateDto(
+    
+    @Schema(description = "Business Partner Number of this address")
+    val bpna: String,
 
-    @Schema(description = "Full name of the legal form")
-    val name: String,
-
-    @Schema(description = "Abbreviation of the legal form name")
-    val abbreviation: String?,
+    @field:JsonUnwrapped
+    val address: LogisticAddressDto
 )

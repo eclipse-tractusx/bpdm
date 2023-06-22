@@ -76,7 +76,7 @@ class BpdmOpenSearchQueryBuilder {
      * Converts a [searchRequest] into pairs of [LegalEntityDoc] field name to query text for that field.
      * Fields with no query text are omitted.
      */
-    fun toFieldTextPairs(searchRequest: BusinessPartnerSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(searchRequest: BusinessPartnerSearchDto): Collection<Pair<String, String>> {
         return toFieldTextPairs(searchRequest.partnerProperties)
     }
 
@@ -84,7 +84,7 @@ class BpdmOpenSearchQueryBuilder {
      * Converts a [bpSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
-    fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(bpSearch: LegalEntityPropertiesSearchDto): Collection<Pair<String, String>> {
         val bpParamPairs = mutableListOf(
             Pair(LegalEntityDoc::legalName.name, bpSearch.legalName),
         )
@@ -98,7 +98,7 @@ class BpdmOpenSearchQueryBuilder {
      * Converts a [addressSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
-    fun toFieldTextPairs(addressSearch: AddressPropertiesSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(addressSearch: AddressPropertiesSearchDto): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
             Pair("${LegalEntityDoc::addresses.name}.${AddressDoc::localities.name}", addressSearch.locality),
             Pair(
@@ -122,7 +122,7 @@ class BpdmOpenSearchQueryBuilder {
      * Converts a [siteSearch] into pairs of [LegalEntityDoc] field name to query text for that field.
      * @see toFieldTextPairs
      */
-    fun toFieldTextPairs(siteSearch: SitePropertiesSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(siteSearch: SitePropertiesSearchDto): Collection<Pair<String, String>> {
         val siteParamPairs = listOf(
             Pair(LegalEntityDoc::sites.name, siteSearch.siteName)
         )
@@ -135,7 +135,7 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Converts a [addressSearch] into pairs of [AddressPartnerDoc] field name to query text for that field.
      */
-    fun toFieldTextPairs(addressSearch: AddressPartnerSearchRequest): Collection<Pair<String, String>> {
+    fun toFieldTextPairs(addressSearch: AddressPartnerSearchDto): Collection<Pair<String, String>> {
         val addressParamPairs = listOf(
             Pair(AddressPartnerDoc::name.name, addressSearch.name)
 
@@ -147,12 +147,11 @@ class BpdmOpenSearchQueryBuilder {
     }
 
 
-
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchRequest): BusinessPartnerSearchRequest {
-        return BusinessPartnerSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: BusinessPartnerSearchDto): BusinessPartnerSearchDto {
+        return BusinessPartnerSearchDto(
             toLowerCaseSearchRequest(searchRequest.partnerProperties)
         )
     }
@@ -160,8 +159,8 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: LegalEntityPropertiesSearchRequest): LegalEntityPropertiesSearchRequest {
-        return LegalEntityPropertiesSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: LegalEntityPropertiesSearchDto): LegalEntityPropertiesSearchDto {
+        return LegalEntityPropertiesSearchDto(
             searchRequest.legalName?.lowercase()
         )
     }
@@ -169,8 +168,8 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchRequest): AddressPropertiesSearchRequest {
-        return AddressPropertiesSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: AddressPropertiesSearchDto): AddressPropertiesSearchDto {
+        return AddressPropertiesSearchDto(
             searchRequest.administrativeArea?.lowercase(),
             searchRequest.postCode?.lowercase(),
             searchRequest.locality?.lowercase(),
@@ -183,8 +182,8 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: SitePropertiesSearchRequest): SitePropertiesSearchRequest {
-        return SitePropertiesSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: SitePropertiesSearchDto): SitePropertiesSearchDto {
+        return SitePropertiesSearchDto(
             searchRequest.siteName?.lowercase()
         )
     }
@@ -192,8 +191,8 @@ class BpdmOpenSearchQueryBuilder {
     /**
      * Returns a lowercase representation of [searchRequest]
      */
-    fun toLowerCaseSearchRequest(searchRequest: AddressPartnerSearchRequest): AddressPartnerSearchRequest {
-        return AddressPartnerSearchRequest(
+    fun toLowerCaseSearchRequest(searchRequest: AddressPartnerSearchDto): AddressPartnerSearchDto {
+        return AddressPartnerSearchDto(
             searchRequest.name?.lowercase()
         )
     }

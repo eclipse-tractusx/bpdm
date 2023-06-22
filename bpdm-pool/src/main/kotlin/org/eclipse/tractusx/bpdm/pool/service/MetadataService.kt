@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
@@ -80,7 +79,7 @@ class MetadataService(
     }
 
     @Transactional
-    fun createLegalForm(request: LegalFormRequest): LegalFormDto {
+    fun createLegalForm(request: LegalFormDto): LegalFormDto {
         if (legalFormRepository.findByTechnicalKey(request.technicalKey) != null)
             throw BpdmAlreadyExists(LegalForm::class.simpleName!!, request.technicalKey)
 

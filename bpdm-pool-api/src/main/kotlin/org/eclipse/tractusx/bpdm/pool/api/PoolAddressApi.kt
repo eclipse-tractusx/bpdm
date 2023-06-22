@@ -28,9 +28,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchReque
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -61,7 +61,7 @@ interface PoolAddressApi {
     @GetMapping
     @GetExchange
     fun getAddresses(
-        @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
+        @ParameterObject addressSearchRequest: AddressPartnerSearchDto,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<AddressMatchVerboseDto>
 
@@ -116,7 +116,7 @@ interface PoolAddressApi {
     @PostExchange
     fun createAddresses(
         @RequestBody
-        requests: Collection<AddressPartnerCreateRequest>
+        requests: Collection<AddressPartnerCreateDto>
     ): AddressPartnerCreateResponseWrapper
 
     @Operation(
@@ -134,7 +134,7 @@ interface PoolAddressApi {
     @PutExchange
     fun updateAddresses(
         @RequestBody
-        requests: Collection<AddressPartnerUpdateRequest>
+        requests: Collection<AddressPartnerUpdateDto>
     ): AddressPartnerUpdateResponseWrapper
 
 

@@ -26,9 +26,13 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
+
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityPartnerCreateRequest", description = "Request for creating new business partner record of type legal entity")
-data class LegalEntityPartnerCreateRequest(
+@Schema(name = "LegalEntityPartnerUpdateDto", description = "Request for updating a business partner record of type legal entity")
+data class LegalEntityPartnerUpdateDto(
+
+    @Schema(description = "Business Partner Number")
+    val bpnl: String,
 
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
@@ -39,6 +43,4 @@ data class LegalEntityPartnerCreateRequest(
     @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: LogisticAddressDto,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
-    val index: String?
-)
+    )

@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
@@ -57,11 +57,11 @@ class LegalEntityController(
 
 
     override fun getLegalEntities(
-        bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        bpSearchRequest: LegalEntityPropertiesSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<LegalEntityMatchVerboseDto> {
         return searchService.searchLegalEntities(
-            BusinessPartnerSearchRequest(bpSearchRequest),
+            BusinessPartnerSearchDto(bpSearchRequest),
             paginationRequest
         )
     }
@@ -110,13 +110,13 @@ class LegalEntityController(
 
 
     override fun createBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerCreateRequest>
+        businessPartners: Collection<LegalEntityPartnerCreateDto>
     ): LegalEntityPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
     override fun updateBusinessPartners(
-        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+        businessPartners: Collection<LegalEntityPartnerUpdateDto>
     ): LegalEntityPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }

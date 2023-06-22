@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
@@ -44,7 +44,7 @@ class AddressController(
 
 
     override fun getAddresses(
-        addressSearchRequest: AddressPartnerSearchRequest,
+        addressSearchRequest: AddressPartnerSearchDto,
         paginationRequest: PaginationRequest
     ): PageDto<AddressMatchVerboseDto> {
 
@@ -67,14 +67,14 @@ class AddressController(
 
 
     override fun createAddresses(
-        requests: Collection<AddressPartnerCreateRequest>
+        requests: Collection<AddressPartnerCreateDto>
     ): AddressPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
 
     override fun updateAddresses(
-        requests: Collection<AddressPartnerUpdateRequest>
+        requests: Collection<AddressPartnerUpdateDto>
     ): AddressPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateAddresses(requests)
     }

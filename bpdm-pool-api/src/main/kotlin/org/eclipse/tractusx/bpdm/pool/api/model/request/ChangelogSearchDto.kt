@@ -19,6 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-data class ImportIdFilterRequest(
-    val importIdentifiers: Collection<String> = emptyList()
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import java.time.Instant
+
+
+@Schema(name = "ChangelogSearchDto", description = "Request for searching and filtering the business partner changelog")
+data class ChangelogSearchDto(
+
+    @Schema(description = "Changelog entries should be created after this time", example = "2023-03-20T10:23:28.194Z")
+    val fromTime: Instant? = null,
+
+    @Schema(description = "Only show changelog entries for business partners with the given BPNs. Empty means no restriction.")
+    val bpns: Set<String>? = null,
+
+    @Schema(description = "Only show changelog entries for business partners with the given LSA types. Empty means no restriction.")
+    val lsaTypes: Set<ChangelogSubject>? = null
 )

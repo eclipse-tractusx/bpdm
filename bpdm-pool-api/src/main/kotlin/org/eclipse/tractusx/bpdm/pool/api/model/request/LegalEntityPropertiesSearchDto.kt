@@ -23,12 +23,15 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
 
-@Schema(name = "SitePropertiesSearchRequest", description = "Contains keywords used for searching in site properties")
-data class SitePropertiesSearchRequest constructor(
-    @field:Parameter(description = "Filter sites by name")
-    val siteName: String?
+@Schema(name = "LegalEntityPropertiesSearchDto", description = "Contains keywords used for searching in legal entity properties")
+data class LegalEntityPropertiesSearchDto constructor(
+
+    @field:Parameter(description = "Filter legal entities by name")
+    val legalName: String?
 ) {
+
     companion object {
-        val EmptySearchRequest = SitePropertiesSearchRequest(null)
+        val EmptySearchRequest = LegalEntityPropertiesSearchDto(null)
     }
 }
+

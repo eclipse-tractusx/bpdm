@@ -28,8 +28,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
@@ -114,7 +114,7 @@ interface PoolSiteApi {
     @PostExchange
     fun createSite(
         @RequestBody
-        requests: Collection<SitePartnerCreateRequest>
+        requests: Collection<SitePartnerCreateDto>
     ): SitePartnerCreateResponseWrapper
 
     @Operation(
@@ -132,6 +132,6 @@ interface PoolSiteApi {
     @PutExchange
     fun updateSite(
         @RequestBody
-        requests: Collection<SitePartnerUpdateRequest>
+        requests: Collection<SitePartnerUpdateDto>
     ): SitePartnerUpdateResponseWrapper
 }

@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
@@ -61,13 +61,13 @@ class SiteController(
     }
 
     override fun createSite(
-        requests: Collection<SitePartnerCreateRequest>
+        requests: Collection<SitePartnerCreateDto>
     ): SitePartnerCreateResponseWrapper {
         return businessPartnerBuildService.createSites(requests)
     }
 
     override fun updateSite(
-        requests: Collection<SitePartnerUpdateRequest>
+        requests: Collection<SitePartnerUpdateDto>
     ): SitePartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateSites(requests)
     }

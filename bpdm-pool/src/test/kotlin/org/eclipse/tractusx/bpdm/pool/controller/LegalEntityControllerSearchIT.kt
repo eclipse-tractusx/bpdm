@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -166,10 +166,10 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 //    }
 
     private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
-        val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
+        val sitePropertiesSearchRequest = SitePropertiesSearchDto(siteName)
 
         return poolClient.legalEntities().getLegalEntities(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest,
+            LegalEntityPropertiesSearchDto.EmptySearchRequest,
             PaginationRequest(page, size)
         )
 

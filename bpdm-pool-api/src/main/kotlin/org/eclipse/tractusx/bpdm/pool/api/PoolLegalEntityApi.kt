@@ -59,7 +59,7 @@ interface PoolLegalEntityApi {
     @GetMapping
     @GetExchange
     fun getLegalEntities(
-        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
+        @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchDto,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LegalEntityMatchVerboseDto>
 
@@ -199,7 +199,7 @@ interface PoolLegalEntityApi {
     @PostExchange
     fun createBusinessPartners(
         @RequestBody
-        businessPartners: Collection<LegalEntityPartnerCreateRequest>
+        businessPartners: Collection<LegalEntityPartnerCreateDto>
     ): LegalEntityPartnerCreateResponseWrapper
 
 
@@ -218,7 +218,7 @@ interface PoolLegalEntityApi {
     @PutExchange
     fun updateBusinessPartners(
         @RequestBody
-        businessPartners: Collection<LegalEntityPartnerUpdateRequest>
+        businessPartners: Collection<LegalEntityPartnerUpdateDto>
     ): LegalEntityPartnerUpdateResponseWrapper
 
 }

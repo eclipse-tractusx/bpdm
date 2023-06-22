@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
@@ -51,17 +52,17 @@ object RequestValues {
         issuingBody = CommonValues.issuingBody3,
     )
 
-    val legalForm1 = LegalFormRequest(
+    val legalForm1 = LegalFormDto(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
         abbreviation = CommonValues.legalFormAbbreviation1,
     )
-    val legalForm2 = LegalFormRequest(
+    val legalForm2 = LegalFormDto(
         technicalKey = CommonValues.legalFormTechnicalKey2,
         name = CommonValues.legalFormName2,
         abbreviation = CommonValues.legalFormAbbreviation2,
     )
-    val legalForm3 = LegalFormRequest(
+    val legalForm3 = LegalFormDto(
         technicalKey = CommonValues.legalFormTechnicalKey3,
         name = CommonValues.legalFormName3,
         abbreviation = CommonValues.legalFormAbbreviation3,
@@ -164,7 +165,7 @@ object RequestValues {
     )
 
 
-    val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate1 = LegalEntityPartnerCreateDto(
         legalEntity = LegalEntityDto(
             legalShortName = null,
             identifiers = listOf(identifier1),
@@ -177,7 +178,7 @@ object RequestValues {
         index = CommonValues.index1
     )
 
-    val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate2 = LegalEntityPartnerCreateDto(
         legalEntity = LegalEntityDto(
             legalShortName = null,
             identifiers = listOf(identifier2),
@@ -190,7 +191,7 @@ object RequestValues {
         index = CommonValues.index2
     )
 
-    val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
+    val legalEntityCreate3 = LegalEntityPartnerCreateDto(
         legalEntity = LegalEntityDto(
             legalShortName = null,
             identifiers = listOf(identifier3),
@@ -203,28 +204,28 @@ object RequestValues {
         index = CommonValues.index3
     )
 
-    val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate1 = LegalEntityPartnerUpdateDto(
         bpnl = CommonValues.bpnL1,
         legalName = legalEntityCreate1.legalName,
         legalEntity = legalEntityCreate1.legalEntity,
         legalAddress = legalEntityCreate1.legalAddress,
     )
 
-    val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate2 = LegalEntityPartnerUpdateDto(
         bpnl = CommonValues.bpnL2,
         legalName = legalEntityCreate2.legalName,
         legalEntity = legalEntityCreate2.legalEntity,
         legalAddress = legalEntityCreate2.legalAddress,
     )
 
-    val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
+    val legalEntityUpdate3 = LegalEntityPartnerUpdateDto(
         bpnl = CommonValues.bpnL3,
         legalName = legalEntityCreate3.legalName,
         legalEntity = legalEntityCreate3.legalEntity,
         legalAddress = legalEntityCreate3.legalAddress,
     )
 
-    val siteCreate1 = SitePartnerCreateRequest(
+    val siteCreate1 = SitePartnerCreateDto(
         site = SiteDto(
             name = CommonValues.siteName1,
             states = listOf(siteStatus1),
@@ -234,7 +235,7 @@ object RequestValues {
         bpnlParent = legalEntityUpdate1.bpnl
     )
 
-    val siteCreate2 = SitePartnerCreateRequest(
+    val siteCreate2 = SitePartnerCreateDto(
         site = SiteDto(
             name = CommonValues.siteName2,
             states = listOf(siteStatus2),
@@ -244,7 +245,7 @@ object RequestValues {
         bpnlParent = legalEntityUpdate2.bpnl
     )
 
-    val siteCreate3 = SitePartnerCreateRequest(
+    val siteCreate3 = SitePartnerCreateDto(
         site = SiteDto(
             name = CommonValues.siteName3,
             states = listOf(siteStatus3),
@@ -254,56 +255,56 @@ object RequestValues {
         bpnlParent = legalEntityUpdate3.bpnl
     )
 
-    val siteUpdate1 = SitePartnerUpdateRequest(
+    val siteUpdate1 = SitePartnerUpdateDto(
         bpns = CommonValues.bpnS1,
         site = siteCreate1.site
     )
 
-    val siteUpdate2 = SitePartnerUpdateRequest(
+    val siteUpdate2 = SitePartnerUpdateDto(
         bpns = CommonValues.bpnS2,
         site = siteCreate2.site
     )
 
-    val siteUpdate3 = SitePartnerUpdateRequest(
+    val siteUpdate3 = SitePartnerUpdateDto(
         bpns = CommonValues.bpnS3,
         site = siteCreate3.site
     )
 
-    val addressPartnerCreate1 = AddressPartnerCreateRequest(
+    val addressPartnerCreate1 = AddressPartnerCreateDto(
         address = logisticAddress1,
         bpnParent = legalEntityUpdate1.bpnl,
         index = CommonValues.index1
     )
 
-    val addressPartnerCreate2 = AddressPartnerCreateRequest(
+    val addressPartnerCreate2 = AddressPartnerCreateDto(
         address = logisticAddress2,
         bpnParent = legalEntityUpdate2.bpnl,
         index = CommonValues.index2
     )
 
-    val addressPartnerCreate3 = AddressPartnerCreateRequest(
+    val addressPartnerCreate3 = AddressPartnerCreateDto(
         address = logisticAddress3,
         bpnParent = legalEntityUpdate3.bpnl,
         index = CommonValues.index3
     )
 
-    val addressPartnerCreate4 = AddressPartnerCreateRequest(
+    val addressPartnerCreate4 = AddressPartnerCreateDto(
         address = logisticAddress4,
         bpnParent = legalEntityUpdate3.bpnl,
         index = CommonValues.index3
     )
 
-    val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate1 = AddressPartnerUpdateDto(
         bpna = CommonValues.bpnA1,
         address = logisticAddress1
     )
 
-    val addressPartnerUpdate2 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate2 = AddressPartnerUpdateDto(
         bpna = CommonValues.bpnA2,
         address = logisticAddress2
     )
 
-    val addressPartnerUpdate3 = AddressPartnerUpdateRequest(
+    val addressPartnerUpdate3 = AddressPartnerUpdateDto(
         bpna = CommonValues.bpnA3,
         address = logisticAddress3
     )

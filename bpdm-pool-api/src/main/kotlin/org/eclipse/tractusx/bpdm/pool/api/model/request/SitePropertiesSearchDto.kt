@@ -19,21 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SitePartnerCreateRequest", description = "Request for creating new business partner record of type site")
-data class SitePartnerCreateRequest(
-    @field:JsonUnwrapped
-    val site: SiteDto,
 
-    @Schema(description = "Business Partner Number of the legal entity this site belongs to")
-    val bpnlParent: String,
+@Schema(name = "SitePropertiesSearchDto", description = "Contains keywords used for searching in site properties")
+data class SitePropertiesSearchDto(
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
-    val index: String?
-)
+    @field:Parameter(description = "Filter sites by name")
+    val siteName: String?
+) {
+    companion object {
+        val EmptySearchRequest = SitePropertiesSearchDto(null)
+    }
+}

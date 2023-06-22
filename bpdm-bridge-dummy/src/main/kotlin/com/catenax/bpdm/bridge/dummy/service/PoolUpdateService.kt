@@ -72,7 +72,7 @@ class PoolUpdateService(
 
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
         val createRequests = entriesToCreate.map {
-            LegalEntityPartnerCreateRequest(
+            LegalEntityPartnerCreateDto(
                 legalEntity = it.legalEntity,
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 index = it.externalId,
@@ -86,7 +86,7 @@ class PoolUpdateService(
 
     fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>): LegalEntityPartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
-            LegalEntityPartnerUpdateRequest(
+            LegalEntityPartnerUpdateDto(
                 legalEntity = it.legalEntity,
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 bpnl = it.bpn!!,
@@ -105,9 +105,9 @@ class PoolUpdateService(
         val createRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
-                    SitePartnerCreateRequest(
+                    SitePartnerCreateDto(
                         site = SiteDto(
-                            name = entry.site.nameParts.firstOrNull()?: "",
+                            name = entry.site.nameParts.firstOrNull() ?: "",
                             states = entry.site.states,
                             mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
                         ),
@@ -129,9 +129,9 @@ class PoolUpdateService(
 
     fun updateSitesInPool(entriesToUpdate: Collection<GateSiteInfo>): SitePartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
-            SitePartnerUpdateRequest(
+            SitePartnerUpdateDto(
                 site = SiteDto(
-                    name = it.site.nameParts.firstOrNull()?: "",
+                    name = it.site.nameParts.firstOrNull() ?: "",
                     states = it.site.states,
                     mainAddress = gateToPoolLogisticAddress(it.mainAddress),
                 ),
@@ -150,7 +150,7 @@ class PoolUpdateService(
         val leParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
-                    AddressPartnerCreateRequest(
+                    AddressPartnerCreateDto(
                         address = gateToPoolLogisticAddress(entry.address),
                         index = entry.externalId,
                         bpnParent = leParentBpn
@@ -164,7 +164,7 @@ class PoolUpdateService(
         val siteParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->
-                    AddressPartnerCreateRequest(
+                    AddressPartnerCreateDto(
                         address = LogisticAddressDto(
                             name = entry.address.nameParts.firstOrNull(),
                             states = entry.address.states,
@@ -191,7 +191,7 @@ class PoolUpdateService(
 
     fun updateAddressesInPool(entriesToUpdate: Collection<GateAddressInfo>): AddressPartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
-            AddressPartnerUpdateRequest(
+            AddressPartnerUpdateDto(
                 address = LogisticAddressDto(
                     name = it.address.nameParts.firstOrNull(),
                     states = it.address.states,

@@ -19,12 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-data class BusinessPartnerSearchRequest(
-    val partnerProperties: LegalEntityPropertiesSearchRequest
-) {
-    companion object {
-        val EmptySearchRequest = BusinessPartnerSearchRequest(
-            LegalEntityPropertiesSearchRequest.EmptySearchRequest
-        )
-    }
-}
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "SitePartnerCreateDto", description = "Request for creating new business partner record of type site")
+data class SitePartnerCreateDto(
+
+    @field:JsonUnwrapped
+    val site: SiteDto,
+
+    @Schema(description = "Business Partner Number of the legal entity this site belongs to")
+    val bpnlParent: String,
+
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
+    val index: String?
+)

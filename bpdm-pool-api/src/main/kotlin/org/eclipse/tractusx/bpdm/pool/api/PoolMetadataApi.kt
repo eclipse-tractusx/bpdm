@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -103,7 +102,7 @@ interface PoolMetadataApi {
     )
     @PostMapping("/legal-forms")
     @PostExchange("/legal-forms")
-    fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
+    fun createLegalForm(@RequestBody type: LegalFormDto): LegalFormDto
 
     @Operation(
         summary = "Get page of legal forms",

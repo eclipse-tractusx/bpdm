@@ -25,7 +25,7 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.model.SyncStatus
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
@@ -141,7 +141,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchRequest) {
+    fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchDto) {
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
 
@@ -151,7 +151,7 @@ class TestHelpers(
         }
     }
 
-    fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchRequest) {
+    fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchDto) {
         try {
             val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
             assertThrows<WebClientResponseException> { result }

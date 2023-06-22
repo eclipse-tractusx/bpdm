@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -47,7 +46,7 @@ class MetadataController(
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), lsaType, country)
     }
 
-    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
+    override fun createLegalForm(type: LegalFormDto): LegalFormDto {
         return metadataService.createLegalForm(type)
     }
 
