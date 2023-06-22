@@ -27,6 +27,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.entity.AddressState
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
@@ -100,21 +104,15 @@ class SitePersistenceService(
         address.name = changeAddress.name
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
-        address.siteExternalId = changeAddress.siteExternalId
         address.physicalPostalAddress = changeAddress.physicalPostalAddress
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
 
-        address.identifiers.replace(changeAddress.identifiers.map { toEntityIdentifier(it, address) })
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
 
     }
 
     fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
         return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
-    }
-
-    fun toEntityIdentifier(dto: AddressIdentifier, address: LogisticAddress): AddressIdentifier {
-        return AddressIdentifier(dto.value, dto.type, address)
     }
 
     @Transactional

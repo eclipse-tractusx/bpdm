@@ -38,9 +38,6 @@ class LogisticAddress(
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
 
-    @Column(name = "site_external_id", nullable = true)
-    var siteExternalId: String,
-
     @ManyToOne
     @JoinColumn(name = "legal_entity_id")
     var legalEntity: LegalEntity?,
@@ -63,8 +60,6 @@ class LogisticAddress(
     var alternativePostalAddress: AlternativePostalAddress?
 
 ) : BaseEntity() {
-    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val identifiers: MutableSet<AddressIdentifier> = mutableSetOf()
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<AddressState> = mutableSetOf()

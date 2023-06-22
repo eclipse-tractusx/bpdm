@@ -38,9 +38,8 @@ class AlternativePostalAddress(
     /**
      * Region within the country
      */
-    @ManyToOne
-    @JoinColumn(name = "alt_admin_area_l1_region")
-    val administrativeAreaLevel1: Region?,
+    @Column(name = "alt_admin_area_l1_region")
+    val administrativeAreaLevel1: String? = null,
 
     /**
      * Further possibility to describe the region/address(e.g. County)
@@ -53,12 +52,6 @@ class AlternativePostalAddress(
      */
     @Column(name = "alt_admin_area_l3")
     val administrativeAreaLevel3: String? = null,
-
-    /**
-     * Further possibility to describe the region/address(e.g. Sub-Province for China
-     */
-    @Column(name = "alt_admin_area_l4")
-    val administrativeAreaLevel4: String? = null,
 
     /**
      * A postal code, also known as postcode, PIN or ZIP Code

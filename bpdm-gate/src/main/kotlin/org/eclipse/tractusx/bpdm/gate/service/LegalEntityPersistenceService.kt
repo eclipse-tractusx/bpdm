@@ -28,6 +28,10 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.entity.AddressState
+import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
+import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.entity.Name
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.http.HttpStatus
@@ -83,7 +87,6 @@ class LegalEntityPersistenceService(
         legalEntity.externalId = legalEntityRequest.externalId
         legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
         legalEntity.legalName = Name(value = legalEntityRequest.legalNameParts[0], shortName = legalEntityRequest.legalEntity.legalShortName)
-        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.legalAddress = logisticAddressRecord
@@ -96,21 +99,15 @@ class LegalEntityPersistenceService(
         address.name = changeAddress.name
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
-        address.siteExternalId = changeAddress.siteExternalId
         address.physicalPostalAddress = changeAddress.physicalPostalAddress
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
 
-        address.identifiers.replace(changeAddress.identifiers.map { toEntityIdentifier(it, address) })
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
 
     }
 
     fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
         return AddressState(dto.description, dto.validFrom, dto.validTo, dto.type, address)
-    }
-
-    fun toEntityIdentifier(dto: AddressIdentifier, address: LogisticAddress): AddressIdentifier {
-        return AddressIdentifier(dto.value, dto.type, address)
     }
 
     @Transactional
@@ -150,7 +147,6 @@ class LegalEntityPersistenceService(
         legalEntity.externalId = legalEntityRequest.externalId
         legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
         legalEntity.legalName = Name(value = legalEntityRequest.legalNameParts[0], shortName = legalEntityRequest.legalEntity.legalShortName)
-        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifier(it, legalEntity) })
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.legalAddress = logisticAddressRecord

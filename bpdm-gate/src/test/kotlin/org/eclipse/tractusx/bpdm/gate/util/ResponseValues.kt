@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
@@ -218,7 +217,6 @@ object ResponseValues {
         ),
         legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn1,
-            identifiers = listOf(identifier1, identifier2),
             legalShortName = CommonValues.shortName1,
             legalForm = legalForm1,
             states = listOf(leBusinessStatus1),
@@ -242,7 +240,6 @@ object ResponseValues {
         ),
         legalEntity = LegalEntityResponse(
             bpnl = CommonValues.bpn2,
-            identifiers = listOf(identifier3, identifier4),
             legalShortName = CommonValues.shortName3,
             legalForm = legalForm2,
             states = listOf(leBusinessStatus2),
@@ -255,7 +252,6 @@ object ResponseValues {
 
     val legalEntityResponseGate1 = LegalEntityResponse(
         bpnl = CommonValues.bpn1,
-        identifiers = listOf(identifier1, identifier2),
         legalShortName = CommonValues.shortName1,
         legalForm = legalForm1,
         states = listOf(leBusinessStatus1),
@@ -267,7 +263,6 @@ object ResponseValues {
 
     val legalEntityResponseGate2 = LegalEntityResponse(
         bpnl = CommonValues.bpn2,
-        identifiers = listOf(identifier3, identifier4),
         legalShortName = CommonValues.shortName3,
         legalForm = legalForm2,
         states = listOf(leBusinessStatus2),
@@ -281,10 +276,6 @@ object ResponseValues {
         address = RequestValues.address1
             .copy(
                 nameParts = listOf(CommonValues.name1),
-                identifiers = listOf(
-                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
-                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
-                )
             ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = CommonValues.externalId1,
@@ -294,10 +285,6 @@ object ResponseValues {
         address = RequestValues.address2
             .copy(
                 nameParts = listOf(CommonValues.nameSite1),
-                identifiers = listOf(
-                    AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!),
-                    AddressIdentifierDto(SaasValues.identifier2.value!!, SaasValues.identifier2.type?.technicalKey!!)
-                )
             ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = CommonValues.externalIdSite1,
@@ -306,9 +293,6 @@ object ResponseValues {
     val logisticAddressGateInputResponse1 = AddressGateInputResponse(
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
-            identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
-            )
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
@@ -317,9 +301,6 @@ object ResponseValues {
     val logisticAddressGateInputResponse2 = AddressGateInputResponse(
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
-            identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
-            )
         ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = null,
@@ -329,9 +310,6 @@ object ResponseValues {
     val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
-            identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
-            )
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
@@ -341,9 +319,6 @@ object ResponseValues {
     val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
-            identifiers = listOf(
-                AddressIdentifierDto(SaasValues.identifier1.value!!, SaasValues.identifier1.type?.technicalKey!!)
-            )
         ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = null,
