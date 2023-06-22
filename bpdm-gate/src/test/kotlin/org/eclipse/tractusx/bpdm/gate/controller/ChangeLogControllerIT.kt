@@ -45,13 +45,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParam
@@ -63,8 +61,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import java.time.Instant
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,7 +69,6 @@ import java.time.Instant
 internal class ChangeLogControllerIT @Autowired constructor(
     val gateClient: GateClient,
     private val objectMapper: ObjectMapper,
-    val saasConfigProperties: SaasConfigProperties,
     private val testHelpers: DbTestHelpers,
 ) {
     companion object {
@@ -82,11 +77,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
-        @JvmStatic
-        @DynamicPropertySource
-        fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
-        }
     }
 
 
@@ -96,7 +86,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
         wireMockServer.resetAll()
-        mockSaas()
         createChangeLogs()
     }
 
@@ -232,86 +221,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogResponse::modifiedAt.name}")
             .isEqualTo(listOf(ChangelogResponse(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
     }
-
-    fun mockSaas() {
-        val addresses = listOf(
-            RequestValues.addressGateInputRequest1
-        )
-
-        val parentLegalEntitiesSaas = listOf(
-            SaasValues.legalEntityResponse1
-        )
-
-        val parentSitesSaas = listOf(
-            SaasValues.siteBusinessPartner1
-        )
-
-
-        // mock "get parent legal entities"
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.legalEntityExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentLegalEntitiesSaas
-                                )
-                            )
-                        )
-                )
-        )
-        // mock "get parent sites"
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.mapNotNull { it.siteExternalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 1,
-                                    values = parentSitesSaas
-                                )
-                            )
-                        )
-                )
-        )
-
-        // mock "get addresses with relations"
-        // this simulates the case that the address already had some relations
-        wireMockServer.stubFor(
-            get(urlPathMatching(EndpointValues.SAAS_MOCK_BUSINESS_PARTNER_PATH))
-                .withQueryParam("externalId", equalTo(addresses.map { it.externalId }.joinToString(",")))
-                .withQueryParam("dataSource", equalTo(saasConfigProperties.datasource))
-                .withQueryParam("featuresOn", containing("FETCH_RELATIONS"))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(
-                            objectMapper.writeValueAsString(
-                                PagedResponseSaas(
-                                    limit = 50,
-                                    total = 2,
-                                    values = listOf(
-                                        SaasValues.addressBusinessPartnerWithRelations1,
-                                        SaasValues.addressBusinessPartnerWithRelations2
-                                    )
-                                )
-                            )
-                        )
-                )
-        )
-    }
-
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
         return assertThat(actual)

@@ -21,18 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.data.domain.Page
@@ -41,9 +35,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val saasRequestMappingService: SaasRequestMappingService,
-    private val outputSaasMappingService: OutputSaasMappingService,
-    private val saasClient: SaasClient,
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
     private val addressPersistenceService: AddressPersistenceService,
@@ -130,55 +121,6 @@ class AddressService(
 
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
 
-    }
-
-    /**
-     * Fetches parent information and converts the given [addresses] to their corresponding SaaS models
-     */
-    fun toSaasModels(addresses: Collection<AddressGateInputRequest>): Collection<BusinessPartnerSaas> {
-        val parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = getParentLegalEntities(addresses)
-        val parentSitesByExternalId: Map<String, BusinessPartnerSaas> = getParentSites(addresses)
-
-        return addresses.map { toSaasModel(it, parentLegalEntitiesByExternalId[it.legalEntityExternalId], parentSitesByExternalId[it.siteExternalId]) }
-    }
-
-    private fun getParentSites(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
-        val parentSiteExternalIds = addresses.mapNotNull { it.siteExternalId }.distinct().toList()
-        var parentSitesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
-        if (parentSiteExternalIds.isNotEmpty()) {
-            val parentSitesPage = saasClient.getSites(externalIds = parentSiteExternalIds)
-            if (parentSitesPage.limit < parentSiteExternalIds.size) {
-                // should not happen as long as configured upsert limit is lower than SaaS's limit
-                throw IllegalStateException("Could not fetch all parent sites in single request.")
-            }
-            parentSitesByExternalId = parentSitesPage.values.associateBy { it.externalId!! }
-        }
-        return parentSitesByExternalId
-    }
-
-    private fun getParentLegalEntities(addresses: Collection<AddressGateInputRequest>): Map<String, BusinessPartnerSaas> {
-        val parentLegalEntityExternalIds = addresses.mapNotNull { it.legalEntityExternalId }.distinct().toList()
-        var parentLegalEntitiesByExternalId: Map<String, BusinessPartnerSaas> = HashMap()
-        if (parentLegalEntityExternalIds.isNotEmpty()) {
-            val parentLegalEntitiesPage = saasClient.getLegalEntities(externalIds = parentLegalEntityExternalIds)
-            if (parentLegalEntitiesPage.limit < parentLegalEntityExternalIds.size) {
-                // should not happen as long as configured upsert limit is lower than SaaS's limit
-                throw IllegalStateException("Could not fetch all parent legal entities in single request.")
-            }
-            parentLegalEntitiesByExternalId = parentLegalEntitiesPage.values.associateBy { it.externalId!! }
-        }
-        return parentLegalEntitiesByExternalId
-    }
-
-    private fun toSaasModel(address: AddressGateInputRequest, parentLegalEntity: BusinessPartnerSaas?, parentSite: BusinessPartnerSaas?): BusinessPartnerSaas {
-        if (parentLegalEntity == null && parentSite == null) {
-            throw SaasNonexistentParentException(address.legalEntityExternalId ?: address.siteExternalId!!)
-        }
-        val addressSaas = saasRequestMappingService.toSaasModel(address)
-        val parentNames = (parentLegalEntity ?: parentSite!!).names
-        val parentIdentifiersWithoutBpn = (parentLegalEntity ?: parentSite!!).identifiers.filter { it.type?.technicalKey != bpnConfigProperties.id }
-        // TODO Is this still okay? Address has its own name and identifiers with different valid types from LEs!
-        return addressSaas.copy(identifiers = addressSaas.identifiers.plus(parentIdentifiersWithoutBpn), names = parentNames)
     }
 
 }

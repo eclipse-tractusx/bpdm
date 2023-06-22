@@ -51,10 +51,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     private val testHelpers: DbTestHelpers
 ) {
     companion object {
-        @RegisterExtension
-        private val wireMockServerSaas: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
 
         @RegisterExtension
         private val wireMockServerBpdmPool: WireMockExtension = WireMockExtension.newInstance()
@@ -64,7 +60,6 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServerSaas.baseUrl() }
             registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }
