@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
@@ -40,12 +39,11 @@ import org.springframework.web.bind.annotation.RestController
 class SiteController(
     val siteService: SiteService,
     val apiConfigProperties: ApiConfigProperties,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties,
-    val securityConfigProperties: SecurityConfigProperties
+    val gateSecurityConfigProperties: GateSecurityConfigProperties
 ) : GateSiteApi {
 
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
     override fun upsertSites(sites: Collection<SiteGateInputRequest>): ResponseEntity<Unit> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -54,12 +52,12 @@ class SiteController(
         return ResponseEntity(HttpStatus.OK)
     }
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         return siteService.getSiteByExternalId(externalId)
     }
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getSitesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
@@ -67,17 +65,17 @@ class SiteController(
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getSites(paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getSitesOutput(paginationRequest: PaginationRequest, externalIds: Collection<String>?): PageResponse<SiteGateOutputResponse> {
         return siteService.getSitesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("!@siteController.securityConfigProperties.enabled || hasAuthority(@siteController.gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
     override fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>): ResponseEntity<Unit> {
         if (sites.size > apiConfigProperties.upsertLimit || sites.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)

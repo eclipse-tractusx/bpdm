@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
@@ -40,12 +39,11 @@ import org.springframework.web.bind.annotation.RestController
 class AddressController(
     private val addressService: AddressService,
     private val apiConfigProperties: ApiConfigProperties,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties,
-    val securityConfigProperties: SecurityConfigProperties
+    val gateSecurityConfigProperties: GateSecurityConfigProperties
 ) : GateAddressApi {
 
 
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.getChangeCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
     override fun upsertAddresses(addresses: Collection<AddressGateInputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
@@ -61,13 +59,13 @@ class AddressController(
     }
 
 
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
         gateSecurityConfigProperties.getReadCompanyOutputDataAsRole()
         return addressService.getAddressByExternalId(externalId)
     }
 
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getAddressesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
@@ -75,11 +73,11 @@ class AddressController(
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getAddresses(paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
@@ -87,7 +85,7 @@ class AddressController(
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
-    @PreAuthorize("!@addressController.securityConfigProperties.enabled || hasAuthority(@addressController.gateSecurityConfigProperties.gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
     override fun putAddressesOutput(addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit> {
         if (addresses.size > apiConfigProperties.upsertLimit || addresses.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
