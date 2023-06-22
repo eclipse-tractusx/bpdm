@@ -25,5 +25,26 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.gate-security")
 data class GateSecurityConfigProperties(
     val oauth2ClientRegistration: String = "gate-client",
-    val poolSecurityEnabled: Boolean = false
-)
+    val poolSecurityEnabled: Boolean = false,
+    val readCompanyInputData: String = "read_company_input_data",
+    val changeCompanyInputData: String = "change_company_input_data",
+    val readCompanyOutputData: String = "read_company_output_data",
+    val changeCompanyOutputData: String = "change_company_output_data"
+){
+
+    fun getReadCompanyInputDataAsRole(): String {
+        return "ROLE_$readCompanyInputData"
+    }
+
+    fun getChangeCompanyInputDataAsRole(): String {
+        return "ROLE_$changeCompanyInputData"
+    }
+
+    fun getReadCompanyOutputDataAsRole(): String {
+        return "ROLE_$readCompanyOutputData"
+    }
+
+    fun getChangeCompanyOutputDataAsRole(): String {
+        return "ROLE_$changeCompanyOutputData"
+    }
+}

@@ -19,28 +19,35 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Validated
 class ChangelogController(
-    private val changelogService: ChangelogService
+    private val changelogService: ChangelogService,
+    val gateSecurityConfigProperties: GateSecurityConfigProperties,
+    val securityConfigProperties: SecurityConfigProperties
 ) : GateChangelogApi {
 
+    @PreAuthorize("!@changelogController.securityConfigProperties.enabled || hasAuthority(@changelogController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
         return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Input, paginationRequest.page, paginationRequest.size)
     }
 
+    @PreAuthorize("!@changelogController.securityConfigProperties.enabled || hasAuthority(@changelogController.gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getOutputChangelog(paginationRequest: PaginationRequest,
                                     searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
 
