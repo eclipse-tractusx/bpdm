@@ -124,6 +124,11 @@ class AddressService(
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
 
+        // create changelog entry if all goes well from saasClient
+        addresses.forEach { address ->
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS,OutputInputEnum.Output))
+        }
+
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
 
     }

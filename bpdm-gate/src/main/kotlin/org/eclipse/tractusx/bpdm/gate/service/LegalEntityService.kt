@@ -86,7 +86,7 @@ class LegalEntityService(
      */
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<LegalEntityGateOutputResponse> {
 
-        val legalEntityPage = if (externalIds != null && externalIds.isNotEmpty()) {
+        val legalEntityPage = if (!externalIds.isNullOrEmpty()) {
             legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
         } else {
             legalEntityRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
