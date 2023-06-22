@@ -21,13 +21,13 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -78,7 +78,8 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
 
-        poolClient.legalEntities().updateBusinessPartners(listOf(
+        poolClient.legalEntities().updateBusinessPartners(
+            listOf(
                 RequestValues.legalEntityUpdate1.copy(bpnl = bpnL1),
                 RequestValues.legalEntityUpdate2.copy(bpnl = bpnL2)
             )
@@ -88,17 +89,17 @@ class ChangelogControllerIT @Autowired constructor(
 
         //Log entry for the created legal entities and their legal addresses should be there
         val expectedChangelogEntries = listOf(
-            ChangelogEntryResponse(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnA1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnL1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnL2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnA1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
+            ChangelogEntryVerboseDto(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnA1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnL1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnL2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnA1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(),
@@ -125,7 +126,8 @@ class ChangelogControllerIT @Autowired constructor(
                     siteStructures = listOf(
                         SiteStructureRequest(site = RequestValues.siteCreate1),
                         SiteStructureRequest(site = RequestValues.siteCreate2),
-                        ))
+                    )
+                )
             )
         )
         val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
@@ -135,28 +137,30 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnMainAddress1 = createdStructures[0].siteStructures[0].site.mainAddress.bpna
         val bpnMainAddress2 = createdStructures[0].siteStructures[1].site.mainAddress.bpna
 
-        poolClient.sites().updateSite(listOf(
-            RequestValues.siteUpdate1.copy(bpns = bpnS1),
-            RequestValues.siteUpdate2.copy(bpns = bpnS2)
-        ))
+        poolClient.sites().updateSite(
+            listOf(
+                RequestValues.siteUpdate1.copy(bpns = bpnS1),
+                RequestValues.siteUpdate2.copy(bpns = bpnS2)
+            )
+        )
 
         val timeAfterUpdate = Instant.now()
 
         //Log entry for the created sites and their main address should be there
         val expectedChangelogEntries = listOf(
-            ChangelogEntryResponse(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnS1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
-            ChangelogEntryResponse(bpnS2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
-            ChangelogEntryResponse(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnMainAddress1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnMainAddress2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnS1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.SITE),
-            ChangelogEntryResponse(bpnS2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.SITE),
-            ChangelogEntryResponse(bpnMainAddress1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnMainAddress2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
+            ChangelogEntryVerboseDto(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnS1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
+            ChangelogEntryVerboseDto(bpnS2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
+            ChangelogEntryVerboseDto(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnMainAddress1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnMainAddress2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnS1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.SITE),
+            ChangelogEntryVerboseDto(bpnS2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.SITE),
+            ChangelogEntryVerboseDto(bpnMainAddress1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnMainAddress2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(),
@@ -192,27 +196,29 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].addresses[0].address.bpna
         val bpnA2 = createdStructures[0].siteStructures[0].addresses[0].address.bpna
 
-        poolClient.addresses().updateAddresses(listOf(
-            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
-        ))
+        poolClient.addresses().updateAddresses(
+            listOf(
+                RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
+                RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
+            )
+        )
 
         val timeAfterUpdate = Instant.now()
 
         //Log entry for the created addresses including legal and main address
         val expectedChangelogEntries = listOf(
-            ChangelogEntryResponse(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnS1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
-            ChangelogEntryResponse(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnMainAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnA2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
+            ChangelogEntryVerboseDto(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnS1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE),
+            ChangelogEntryVerboseDto(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnMainAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA1, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnA2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
 
-        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
@@ -248,16 +254,16 @@ class ChangelogControllerIT @Autowired constructor(
         val timeAfterUpdate = Instant.now()
 
         val expectedEntriesFirstPage = listOf(
-            ChangelogEntryResponse(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
+            ChangelogEntryVerboseDto(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
         val expectedEntriesSecondPage = listOf(
-            ChangelogEntryResponse(bpnL3, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
+            ChangelogEntryVerboseDto(bpnL3, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedFirstPage = PageResponse(3, 2, 0, expectedEntriesFirstPage.size, expectedEntriesFirstPage)
-        val expectedSecondPage = PageResponse(3, 2, 1, expectedEntriesSecondPage.size, expectedEntriesSecondPage)
+        val expectedFirstPage = PageDto(3, 2, 0, expectedEntriesFirstPage.size, expectedEntriesFirstPage)
+        val expectedSecondPage = PageDto(3, 2, 1, expectedEntriesSecondPage.size, expectedEntriesSecondPage)
 
 
         val actualFirstPage = poolClient.changelogs().getChangelogEntries(
@@ -301,21 +307,22 @@ class ChangelogControllerIT @Autowired constructor(
         val timeAfterUpdate = Instant.now()
 
         val expectedLegalEntityEntries = listOf(
-            ChangelogEntryResponse(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
+            ChangelogEntryVerboseDto(bpnL, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
         val expectedSiteEntries = listOf(
-            ChangelogEntryResponse(bpnS, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE)
+            ChangelogEntryVerboseDto(bpnS, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.SITE)
         )
 
         val expectedAddressEntries = listOf(
-            ChangelogEntryResponse(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
-            ChangelogEntryResponse(bpnMainAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
+            ChangelogEntryVerboseDto(bpnLegalAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS),
+            ChangelogEntryVerboseDto(bpnMainAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedLegalEntitiesPage = PageResponse(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
-        val expectedSitesPage = PageResponse(expectedSiteEntries.size.toLong(), 1, 0, expectedSiteEntries.size, expectedSiteEntries)
-        val expectedAddressesPage = PageResponse(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
+        val expectedLegalEntitiesPage =
+            PageDto(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
+        val expectedSitesPage = PageDto(expectedSiteEntries.size.toLong(), 1, 0, expectedSiteEntries.size, expectedSiteEntries)
+        val expectedAddressesPage = PageDto(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
 
 
         val actualLegalEntityPage = poolClient.changelogs().getChangelogEntries(
@@ -361,11 +368,11 @@ class ChangelogControllerIT @Autowired constructor(
 
         //Log entry for the created legal entities and their legal addresses should be there
         val expectedChangelogEntries = listOf(
-            ChangelogEntryResponse(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
+            ChangelogEntryVerboseDto(bpnL1, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(bpns = setOf(bpnL1, bpnL2)),
@@ -406,11 +413,11 @@ class ChangelogControllerIT @Autowired constructor(
 
         //Log entry for the created legal entities and their legal addresses should be there
         val expectedChangelogEntries = listOf(
-            ChangelogEntryResponse(bpnL1, ChangelogType.CREATE, timeAfterSecondInsert, ChangelogSubject.LEGAL_ENTITY),
-            ChangelogEntryResponse(bpnL2, ChangelogType.CREATE, timeAfterSecondInsert, ChangelogSubject.LEGAL_ENTITY)
+            ChangelogEntryVerboseDto(bpnL1, ChangelogType.CREATE, timeAfterSecondInsert, ChangelogSubject.LEGAL_ENTITY),
+            ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterSecondInsert, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(fromTime = timeAfterFirstInsert, lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
@@ -422,7 +429,7 @@ class ChangelogControllerIT @Autowired constructor(
 
 
     private fun checkTimestampAscending() =
-        { changelogEntries: Collection<ChangelogEntryResponse> ->
+        { changelogEntries: Collection<ChangelogEntryVerboseDto> ->
             var lastTimestamp = Instant.MIN
             for (changelogEntry in changelogEntries) {
                 Assertions.assertThat(changelogEntry.timestamp).isAfterOrEqualTo(lastTimestamp)
@@ -431,27 +438,28 @@ class ChangelogControllerIT @Autowired constructor(
         }
 
     private fun checkTimestampsInBetween(after: Instant, before: Instant) =
-        { changelogEntries: Collection<ChangelogEntryResponse> ->
+        { changelogEntries: Collection<ChangelogEntryVerboseDto> ->
             changelogEntries.forEach { entry ->
                 Assertions.assertThat(entry.timestamp).isBetween(after, before)
             }
         }
 
-    private fun checkEqual(expected: PageResponse<ChangelogEntryResponse>) =
-        {  actualResponse: PageResponse<ChangelogEntryResponse> ->
-                testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
-                Unit
+    private fun checkEqual(expected: PageDto<ChangelogEntryVerboseDto>) =
+        { actualResponse: PageDto<ChangelogEntryVerboseDto> ->
+            testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
+            Unit
         }
 
-    private fun validateChangelogResponse(actual: PageResponse<ChangelogEntryResponse>,
-                                          expected: PageResponse<ChangelogEntryResponse>,
-                                          timeBeforeInsert: Instant,
-                                          timeAfterInsert: Instant
-                                          ){
-        actual.also (checkEqual(expected))
+    private fun validateChangelogResponse(
+        actual: PageDto<ChangelogEntryVerboseDto>,
+        expected: PageDto<ChangelogEntryVerboseDto>,
+        timeBeforeInsert: Instant,
+        timeAfterInsert: Instant
+    ) {
+        actual.also(checkEqual(expected))
             .content
-            .also (checkTimestampAscending())
-            .also (checkTimestampsInBetween(timeBeforeInsert, timeAfterInsert) )
+            .also(checkTimestampAscending())
+            .also(checkTimestampsInBetween(timeBeforeInsert, timeAfterInsert))
     }
 
 

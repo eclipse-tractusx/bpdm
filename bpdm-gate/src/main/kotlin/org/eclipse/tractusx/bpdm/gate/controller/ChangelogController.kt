@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springframework.validation.annotation.Validated
@@ -36,12 +36,20 @@ class ChangelogController(
 
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
-    ): PageChangeLogResponse<ChangelogResponse> {
-        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime, paginationRequest.page, paginationRequest.size)
+    ): PageChangeLogResponse<ChangelogGateDto> {
+        return changelogService.getChangeLogEntries(
+            searchRequest.externalIds,
+            searchRequest.lsaTypes,
+            searchRequest.fromTime,
+            paginationRequest.page,
+            paginationRequest.size
+        )
     }
 
-    override fun getOutputChangelog(paginationRequest: PaginationRequest,
-                                    searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
+    override fun getOutputChangelog(
+        paginationRequest: PaginationRequest,
+        searchRequest: ChangeLogSearchRequest
+    ): PageChangeLogResponse<ChangelogGateDto> {
         throw NotImplementedError()
         TODO("Not yet implemented")
     }

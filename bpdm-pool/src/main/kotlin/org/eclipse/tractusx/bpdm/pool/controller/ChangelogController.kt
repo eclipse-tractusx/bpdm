@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolChangelogApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
@@ -33,11 +33,11 @@ import org.springframework.web.bind.annotation.RestController
 class ChangelogController(
     private val partnerChangelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
-): PoolChangelogApi {
+) : PoolChangelogApi {
     override fun getChangelogEntries(
-       changelogSearchRequest: ChangelogSearchRequest,
-       paginationRequest: PaginationRequest
-    ): PageResponse<ChangelogEntryResponse> {
+        changelogSearchRequest: ChangelogSearchRequest,
+        paginationRequest: PaginationRequest
+    ): PageDto<ChangelogEntryVerboseDto> {
 
         changelogSearchRequest.bpns?.let { bpns ->
             if (bpns.size > controllerConfigProperties.searchRequestLimit) {
@@ -45,11 +45,12 @@ class ChangelogController(
             }
         }
 
-        return  partnerChangelogService.getChangeLogEntries(
+        return partnerChangelogService.getChangeLogEntries(
             changelogSearchRequest.bpns,
             changelogSearchRequest.lsaTypes,
             changelogSearchRequest.fromTime,
             paginationRequest.page,
-            paginationRequest.size)
+            paginationRequest.size
+        )
     }
 }

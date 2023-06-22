@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -86,7 +86,7 @@ interface PoolMetadataApi {
         @Parameter lsaType: IdentifierLsaType,
         @Parameter country: CountryCode?
     ):
-            PageResponse<IdentifierTypeDto>
+            PageDto<IdentifierTypeDto>
 
 
     @Operation(
@@ -103,7 +103,7 @@ interface PoolMetadataApi {
     )
     @PostMapping("/legal-forms")
     @PostExchange("/legal-forms")
-    fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormResponse
+    fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
     @Operation(
         summary = "Get page of legal forms",
@@ -117,7 +117,7 @@ interface PoolMetadataApi {
     )
     @GetMapping("/legal-forms")
     @GetExchange("/legal-forms")
-    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageResponse<LegalFormResponse>
+    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
 
     @Operation(

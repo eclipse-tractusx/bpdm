@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -107,11 +107,11 @@ class SiteControllerIT @Autowired constructor(
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
 
-        val expectedSiteWithReference1 = SitePoolResponse(
+        val expectedSiteWithReference1 = SitePoolVerboseDto(
             site = ResponseValues.site1.copy(bpnLegalEntity = bpnL),
             mainAddress = ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1)
         )
-        val expectedSiteWithReference2 = SitePoolResponse(
+        val expectedSiteWithReference2 = SitePoolVerboseDto(
             site = ResponseValues.site2.copy(bpnLegalEntity = bpnL),
             mainAddress = ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2)
         )
@@ -119,7 +119,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
+                SitePoolVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
@@ -154,17 +154,17 @@ class SiteControllerIT @Autowired constructor(
         val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 =
-            SitePoolResponse(
+            SitePoolVerboseDto(
                 site = ResponseValues.site1.copy(bpnLegalEntity = bpnL1),
                 mainAddress = ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1)
             )
         val expectedSiteWithReference2 =
-            SitePoolResponse(
+            SitePoolVerboseDto(
                 site = ResponseValues.site2.copy(bpnLegalEntity = bpnL1),
                 mainAddress = ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2)
             )
         val expectedSiteWithReference3 =
-            SitePoolResponse(
+            SitePoolVerboseDto(
                 site = ResponseValues.site3.copy(bpnLegalEntity = bpnL2),
                 mainAddress = ResponseValues.addressPartner3.copy(isMainAddress = true, bpnSite = CommonValues.bpnS3)
             )
@@ -172,7 +172,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
+                SitePoolVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }
@@ -374,15 +374,15 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
-    private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateResponse>, expected: Collection<SitePartnerCreateResponse>) {
+    private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.site.bpns).matches(testHelpers.bpnSPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpns.name,
-                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpnLegalEntity.name,
-                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
-                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpnSite.name
+                SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpns.name,
+                SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
+                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }

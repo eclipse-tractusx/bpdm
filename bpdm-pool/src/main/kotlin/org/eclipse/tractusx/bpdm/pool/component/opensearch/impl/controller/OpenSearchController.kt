@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.controller
 
 
 import org.eclipse.tractusx.bpdm.pool.api.PoolOpenSearchApi
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.springframework.web.bind.annotation.RestController
 
@@ -31,11 +31,11 @@ class OpenSearchController(
 ) : PoolOpenSearchApi {
 
 
-    override fun export(): SyncResponse {
+    override fun export(): SyncDto {
         return openSearchSyncService.exportAsync()
     }
 
-    override fun getBusinessPartners(): SyncResponse {
+    override fun getBusinessPartners(): SyncDto {
         return openSearchSyncService.getExportStatus()
     }
 

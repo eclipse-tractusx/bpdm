@@ -20,17 +20,17 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -59,14 +59,14 @@ class LegalEntityController(
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LegalEntityMatchResponse> {
+    ): PageDto<LegalEntityMatchVerboseDto> {
         return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
         )
     }
 
-    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityResponse {
+    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityVerboseDto {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -79,7 +79,7 @@ class LegalEntityController(
 
     override fun searchSites(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<PoolLegalEntityResponse>> {
+    ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -89,7 +89,7 @@ class LegalEntityController(
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse> {
+    ): PageDto<SiteVerboseDto> {
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
@@ -97,14 +97,14 @@ class LegalEntityController(
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressResponse> {
+    ): PageDto<LogisticAddressVerboseDto> {
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
 
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressResponse> {
+    ): Collection<LegalAddressVerboseDto> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

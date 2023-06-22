@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -53,7 +53,7 @@ interface PoolOpenSearchApi {
     )
     @PostMapping("/business-partner")
     @PostExchange("/business-partner")
-    fun export(): SyncResponse
+    fun export(): SyncDto
 
     @Operation(
         summary = "Fetch information about the latest OpenSearch export",
@@ -67,7 +67,7 @@ interface PoolOpenSearchApi {
     )
     @GetMapping("/business-partner")
     @GetExchange("/business-partner")
-    fun getBusinessPartners(): SyncResponse
+    fun getBusinessPartners(): SyncDto
 
 
     @Operation(

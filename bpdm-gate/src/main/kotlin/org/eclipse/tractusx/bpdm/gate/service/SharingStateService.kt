@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
@@ -72,7 +72,7 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
         this.stateRepository.save(entity)
     }
 
-    fun findSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
+    fun findSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageDto<SharingStateDto> {
 
         val spec = Specification.allOf(byLsaType(lsaType), byExternalIdsIn(externalIds))
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)

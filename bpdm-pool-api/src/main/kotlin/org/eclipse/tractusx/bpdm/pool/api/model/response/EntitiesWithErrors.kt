@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 
 open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
 
@@ -40,54 +40,54 @@ open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class LegalEntityPartnerCreateResponseWrapper(
-    override val entities: Collection<LegalEntityPartnerCreateResponse>,
+    override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityCreateError>>
-) : EntitiesWithErrors<LegalEntityPartnerCreateResponse, LegalEntityCreateError>(entities, errors)
+) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityCreateError>(entities, errors)
 
 @Schema(
     name = "LegalEntityUpdateWrapper",
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class LegalEntityPartnerUpdateResponseWrapper(
-    override val entities: Collection<LegalEntityPartnerCreateResponse>,
+    override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityUpdateError>>
-) : EntitiesWithErrors<LegalEntityPartnerCreateResponse, LegalEntityUpdateError>(entities, errors)
+) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityUpdateError>(entities, errors)
 
 @Schema(
     name = "SiteCreateWrapper",
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class SitePartnerCreateResponseWrapper(
-    override val entities: Collection<SitePartnerCreateResponse>,
+    override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteCreateError>>
-) : EntitiesWithErrors<SitePartnerCreateResponse, SiteCreateError>(entities, errors)
+) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteCreateError>(entities, errors)
 
 @Schema(
     name = "SiteUpdateWrapper",
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class SitePartnerUpdateResponseWrapper(
-    override val entities: Collection<SitePartnerCreateResponse>,
+    override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteUpdateError>>
-) : EntitiesWithErrors<SitePartnerCreateResponse, SiteUpdateError>(entities, errors)
+) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteUpdateError>(entities, errors)
 
 @Schema(
     name = "AddressCreateWrapper",
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class AddressPartnerCreateResponseWrapper(
-    override val entities: Collection<AddressPartnerCreateResponse>,
+    override val entities: Collection<AddressPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressCreateError>>
-) : EntitiesWithErrors<AddressPartnerCreateResponse, AddressCreateError>(entities, errors)
+) : EntitiesWithErrors<AddressPartnerCreateVerboseDto, AddressCreateError>(entities, errors)
 
 @Schema(
     name = "AddressUpdateWrapper",
     description = "Holds information about successfully and failed entities after the creating/updating of several objects"
 )
 data class AddressPartnerUpdateResponseWrapper(
-    override val entities: Collection<LogisticAddressResponse>,
+    override val entities: Collection<LogisticAddressVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressUpdateError>>
-) : EntitiesWithErrors<LogisticAddressResponse, AddressUpdateError>(entities, errors)
+) : EntitiesWithErrors<LogisticAddressVerboseDto, AddressUpdateError>(entities, errors)
 
 
 

@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
@@ -43,15 +43,15 @@ class MetadataController(
         return metadataService.createIdentifierType(identifierType)
     }
 
-    override fun getIdentifierTypes(paginationRequest: PaginationRequest, lsaType: IdentifierLsaType, country: CountryCode?): PageResponse<IdentifierTypeDto> {
+    override fun getIdentifierTypes(paginationRequest: PaginationRequest, lsaType: IdentifierLsaType, country: CountryCode?): PageDto<IdentifierTypeDto> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), lsaType, country)
     }
 
-    override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {
+    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
         return metadataService.createLegalForm(type)
     }
 
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageDto<LegalFormDto> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 

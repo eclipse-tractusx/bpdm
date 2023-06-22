@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.AddressIdentifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.springframework.data.jpa.repository.Query
@@ -32,6 +32,6 @@ interface AddressIdentifierRepository : CrudRepository<AddressIdentifier, Long> 
     fun joinType(identifiers: Set<AddressIdentifier>): Set<AddressIdentifier>
 
     @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.address.bpn) FROM AddressIdentifier i WHERE i.type = :identifierType AND i.value in :values")
-    fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingResponse>
+    fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingDto>
 
 }

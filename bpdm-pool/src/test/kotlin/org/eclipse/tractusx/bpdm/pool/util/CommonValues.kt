@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeDto
+import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
@@ -144,11 +144,11 @@ object CommonValues {
 //    val adminAreaLevel1Region3 = NameRegioncodeDto(adminAreaLevel1RegionCode_3, "Georgia")
 
     val adminAreaLevel1RegionCode_1: String? = null
-    val adminAreaLevel1Region1: NameRegioncodeDto? = null
+    val adminAreaLevel1Region1: NameRegioncodeVerboseDto? = null
     val adminAreaLevel1RegionCode_2: String? = null
-    val adminAreaLevel1Region2: NameRegioncodeDto? = null
+    val adminAreaLevel1Region2: NameRegioncodeVerboseDto? = null
     val adminAreaLevel1RegionCode_3: String? = null
-    val adminAreaLevel1Region3: NameRegioncodeDto? = null
+    val adminAreaLevel1Region3: NameRegioncodeVerboseDto? = null
 
     val county1 = "Böblingen"
     val county2 = " Fulton County"
@@ -161,7 +161,7 @@ object CommonValues {
     val district1 = "Sindelfingen-Ost"
     val district2 = "District Level 1"
     val district3 = "DL 1"
-    
+
     val street1 = "Bela-Barenyi-Straße"
     val street2 = ""
     val street3 = ""

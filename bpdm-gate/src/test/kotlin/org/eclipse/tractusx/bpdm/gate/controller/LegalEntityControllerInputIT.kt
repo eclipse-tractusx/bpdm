@@ -28,10 +28,10 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.EndpointValues.GATE_API_INPUT_LEGAL_ENTITIES_PATH
@@ -230,7 +230,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         gateClient.legalEntities().upsertLegalEntities(legalEntities)
         val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
 
-        val expectedPage = PageResponse(
+        val expectedPage = PageDto(
             totalElements,
             totalPages,
             page,
@@ -275,7 +275,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
 
-        val expectedPage = PageResponse(
+        val expectedPage = PageDto(
             totalElements,
             totalPages,
             page,

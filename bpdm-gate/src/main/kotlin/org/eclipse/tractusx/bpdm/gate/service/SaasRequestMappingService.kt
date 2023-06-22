@@ -23,7 +23,11 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.common.model.SaasAddressType
 import org.eclipse.tractusx.bpdm.common.model.toSaasTypeDto
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.config.SaasConfigProperties
 import org.springframework.stereotype.Service
@@ -73,7 +77,7 @@ class SaasRequestMappingService(
             dataSource = saasConfigProperties.datasource,
             types = listOf(TypeKeyNameUrlSaas(BusinessPartnerTypeSaas.BP_ADDRESS.name)),
             identifiers = toAddressIdentifiersSaas(address.identifiers, ""),
-            names = toNamesSaas(address.nameParts.firstOrNull()?: ""),
+            names = toNamesSaas(address.nameParts.firstOrNull() ?: ""),
             status = address.states.map { it.toSaasModel() }.firstOrNull(),
             addresses = toAddressesSaasModel(address)
         )

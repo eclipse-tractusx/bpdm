@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -65,12 +65,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityResponse
-    private lateinit var givenPartner2: LegalEntityResponse
+    private lateinit var givenPartner1: LegalEntityVerboseDto
+    private lateinit var givenPartner2: LegalEntityVerboseDto
     private lateinit var legalName1: String
     private lateinit var legalName2: String
-    private lateinit var legalAddress1: LogisticAddressResponse
-    private lateinit var legalAddress2: LogisticAddressResponse
+    private lateinit var legalAddress1: LogisticAddressVerboseDto
+    private lateinit var legalAddress2: LogisticAddressVerboseDto
 
     @BeforeEach
     fun beforeEach() {
@@ -96,11 +96,11 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     @Test
     fun `search business partner with pagination, multiple items in page`() {
 
-        val expected = PageResponse(
+        val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1),
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1),
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
             )
         )
 
@@ -117,14 +117,14 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     @Test
     fun `search business partner with pagination, multiple pages`() {
 
-        val expectedFirstPage = PageResponse(
+        val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1)
             )
         )
-        val expectedSecondPage = PageResponse(
+        val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
             )
         )
 
@@ -165,20 +165,20 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 //        assertThat(foundPartners).isEmpty()
 //    }
 
-    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageResponse<LegalEntityMatchResponse> {
+    private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
         return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-             PaginationRequest(page, size)
+            PaginationRequest(page, size)
         )
 
 
     }
 
-    private fun assertPageEquals(actual: PageResponse<LegalEntityMatchResponse>, expected: PageResponse<LegalEntityMatchResponse>) {
+    private fun assertPageEquals(actual: PageDto<LegalEntityMatchVerboseDto>, expected: PageDto<LegalEntityMatchVerboseDto>) {
         testHelpers.assertRecursively(actual)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchResponse::score.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityMatchVerboseDto::score.name}")
             .isEqualTo(expected)
     }
 }
