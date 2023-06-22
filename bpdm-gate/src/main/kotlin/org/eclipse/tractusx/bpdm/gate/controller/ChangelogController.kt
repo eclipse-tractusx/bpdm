@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
-import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
@@ -36,18 +35,17 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 class ChangelogController(
     private val changelogService: ChangelogService,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties,
-    val securityConfigProperties: SecurityConfigProperties
+    val gateSecurityConfigProperties: GateSecurityConfigProperties
 ) : GateChangelogApi {
 
-    @PreAuthorize("!@changelogController.securityConfigProperties.enabled || hasAuthority(@changelogController.gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
         return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Input, paginationRequest.page, paginationRequest.size)
     }
 
-    @PreAuthorize("!@changelogController.securityConfigProperties.enabled || hasAuthority(@changelogController.gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getOutputChangelog(paginationRequest: PaginationRequest,
                                     searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
 

@@ -20,16 +20,18 @@
 package org.eclipse.tractusx.bpdm.gate.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
 
 
+@Configuration
 @ConfigurationProperties(prefix = "bpdm.gate-security")
 data class GateSecurityConfigProperties(
-    val oauth2ClientRegistration: String = "gate-client",
-    val poolSecurityEnabled: Boolean = false,
-    val readCompanyInputData: String = "read_company_input_data",
-    val changeCompanyInputData: String = "change_company_input_data",
-    val readCompanyOutputData: String = "read_company_output_data",
-    val changeCompanyOutputData: String = "change_company_output_data"
+    var oauth2ClientRegistration: String = "gate-client",
+    var poolSecurityEnabled: Boolean = false,
+    var readCompanyInputData: String = "read_company_input_data",
+    var changeCompanyInputData: String = "change_company_input_data",
+    var readCompanyOutputData: String = "read_company_output_data",
+    var changeCompanyOutputData: String = "change_company_output_data"
 ){
 
     fun getReadCompanyInputDataAsRole(): String {
