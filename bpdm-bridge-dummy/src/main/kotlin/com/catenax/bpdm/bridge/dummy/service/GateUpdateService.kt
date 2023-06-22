@@ -23,8 +23,8 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime

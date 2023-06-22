@@ -43,7 +43,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.*
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
@@ -159,7 +159,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddresses(paginationValue)
 
         assertThat(pageResponse).isEqualTo(
-            PageResponse(
+            PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
@@ -203,7 +203,7 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagination, listExternalIds)
 
         assertThat(pageResponse).isEqualTo(
-            PageResponse(
+            PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
@@ -307,10 +307,10 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }

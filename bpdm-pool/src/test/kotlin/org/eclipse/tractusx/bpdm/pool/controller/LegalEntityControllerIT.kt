@@ -22,14 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -482,7 +482,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
     }
 
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
@@ -490,18 +490,21 @@ class LegalEntityControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityResponse::bpnl.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
             .isEqualTo(expected)
     }
 
-    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
+    fun assertThatModifiedLegalEntitiesEqual(
+        actuals: Collection<LegalEntityPartnerCreateVerboseDto>,
+        expected: Collection<LegalEntityPartnerCreateVerboseDto>
+    ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFields(LegalEntityPartnerCreateResponse::index.name)
+            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
             .isEqualTo(expected)
     }
 
@@ -509,7 +512,7 @@ class LegalEntityControllerIT @Autowired constructor(
         .get()
         .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
         .exchange().expectStatus().isOk
-        .returnResult<PoolLegalEntityResponse>()
+        .returnResult<PoolLegalEntityVerboseDto>()
         .responseBody
         .blockFirst()!!.legalEntity.currentness
 
@@ -522,7 +525,7 @@ class LegalEntityControllerIT @Autowired constructor(
             throw IllegalArgumentException("Can't change case of string $value")
     }
 
-    private fun toLegalAddressResponse(it: LogisticAddressResponse) = LegalAddressResponse(
+    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressVerboseDto(
         physicalPostalAddress = it.physicalPostalAddress,
         alternativePostalAddress = it.alternativePostalAddress,
         bpnLegalEntity = it.bpnLegalEntity!!,

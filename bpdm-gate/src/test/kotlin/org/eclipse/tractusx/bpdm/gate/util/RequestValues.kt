@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 
 object RequestValues {
     val identifier1 =
@@ -265,7 +266,7 @@ object RequestValues {
         legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
 
-    )
+        )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
@@ -298,14 +299,14 @@ object RequestValues {
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
         mainAddress = address1
-        )
+    )
 
     val siteGateInputRequest2 = SiteGateInputRequest(
         site = site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
         mainAddress = address2
-        )
+    )
 
     //Output values for sites
     val siteGateOutputRequest1 = SiteGateOutputRequest(

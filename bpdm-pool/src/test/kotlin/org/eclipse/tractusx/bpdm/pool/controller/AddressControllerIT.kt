@@ -24,11 +24,11 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -431,26 +431,26 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.assertErrorResponse(response.errors.last(), AddressUpdateError.AddressNotFound, secondInvalidBpn)
     }
 
-    private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateResponse>, expected: Collection<AddressPartnerCreateResponse>) {
+    private fun assertCreatedAddressesAreEqual(actuals: Collection<AddressPartnerCreateVerboseDto>, expected: Collection<AddressPartnerCreateVerboseDto>) {
         actuals.forEach { assertThat(it.address.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpna.name,
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnLegalEntity.name,
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnSite.name
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpna.name,
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
+                AddressPartnerCreateVerboseDto::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }
 
-    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressResponse>, expected: Collection<LogisticAddressResponse>) {
+    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                LogisticAddressResponse::bpna.name,
-                LogisticAddressResponse::bpnLegalEntity.name,
-                LogisticAddressResponse::bpnSite.name
+                LogisticAddressVerboseDto::bpna.name,
+                LogisticAddressVerboseDto::bpnLegalEntity.name,
+                LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }

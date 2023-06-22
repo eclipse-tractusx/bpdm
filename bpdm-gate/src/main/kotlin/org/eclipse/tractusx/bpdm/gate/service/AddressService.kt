@@ -20,11 +20,15 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -47,7 +51,7 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -55,7 +59,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
@@ -64,13 +68,13 @@ class AddressService(
         )
     }
 
-    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputResponse> {
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputDto> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
     }
 
-    fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
+    fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
         val logisticAddress =
             addressRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
@@ -82,7 +86,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -90,7 +94,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
@@ -100,7 +104,7 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputResponse> {
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputDto> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateOutputResponse(logisticAddress)
         }

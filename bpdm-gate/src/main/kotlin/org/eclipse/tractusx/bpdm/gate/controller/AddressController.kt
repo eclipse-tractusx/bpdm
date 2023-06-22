@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -58,7 +58,7 @@ class AddressController(
 
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
+    override fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
         return addressService.getAddressByExternalId(externalId)
     }
@@ -67,19 +67,19 @@ class AddressController(
     override fun getAddressesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageResponse<AddressGateInputResponse> {
+    ): PageDto<AddressGateInputDto> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getAddresses(paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse> {
+    override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputDto> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageResponse<AddressGateOutputResponse> {
+    ): PageDto<AddressGateOutputDto> {
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 

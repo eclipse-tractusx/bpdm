@@ -20,12 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -49,7 +49,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
+    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
@@ -57,19 +57,19 @@ class LegalEntityController(
     override fun getLegalEntitiesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageResponse<LegalEntityGateInputResponse> {
+    ): PageDto<LegalEntityGateInputDto> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getLegalEntities(paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputResponse> {
+    override fun getLegalEntities(paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getLegalEntitiesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageResponse<LegalEntityGateOutputResponse> {
+    ): PageDto<LegalEntityGateOutputDto> {
         return legalEntityService.getLegalEntitiesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
