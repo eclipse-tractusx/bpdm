@@ -20,8 +20,9 @@
 package com.catenax.bpdm.bridge.dummy.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
 
-
+@Configuration
 @ConfigurationProperties(prefix = "bpdm.bridge")
 class BridgeAuthProperties {
     var syncAuthorities: List<String> = listOf()

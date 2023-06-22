@@ -38,7 +38,7 @@ class BridgeController(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeController.bridgeAuthProperties.syncAuthority)")
+    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
     fun triggerSync() {
         syncService.sync()
     }
