@@ -60,7 +60,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"lsaType\": \"LegalEntity\",\n    \"externalId\": \"string\",\n    \"sharingStateType\": \"Pending\",\n    \"sharingErrorCode\": \"SharingProcessError\",\n    \"sharingErrorMessage\": \"string\",\n    \"bpn\": \"string\",\n    \"sharingProcessStarted\": \"2023-06-05T06:56:40.785Z\"\n}",
+              "raw": "{\n    \"lsaType\": \"LEGAL_ENTITY\",\n    \"externalId\": \"string\",\n    \"sharingStateType\": \"Pending\",\n    \"sharingErrorCode\": \"SharingProcessError\",\n    \"sharingErrorMessage\": \"string\",\n    \"bpn\": \"string\",\n    \"sharingProcessStarted\": \"2023-06-05T06:56:40.785Z\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -722,7 +722,7 @@
     "oauth2": [
       {
         "key": "accessTokenUrl",
-        "value": "https://{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+        "value": "{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
         "type": "string"
       },
       {
