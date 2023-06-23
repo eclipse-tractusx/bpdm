@@ -42,5 +42,5 @@ data class AlternativePostalAddressDto(
     val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
 
     @get:Schema(description = "Delivery Service Qualifier")
-    val deliveryServiceQualifier: String = "",
+    val deliveryServiceQualifier: String?,
 )
