@@ -30,6 +30,11 @@
 		"type": "oauth2",
 		"oauth2": [
 			{
+				"key": "accessTokenUrl",
+				"value": "{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+				"type": "string"
+			},
+			{
 				"key": "client_authentication",
 				"value": "body",
 				"type": "string"
@@ -42,11 +47,6 @@
 			{
 				"key": "clientId",
 				"value": "{{Bridge-Client-ID}}",
-				"type": "string"
-			},
-			{
-				"key": "accessTokenUrl",
-				"value": "https://{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
 				"type": "string"
 			},
 			{

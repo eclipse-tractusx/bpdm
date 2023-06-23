@@ -128,7 +128,7 @@
           "response": []
         },
         {
-          "name": "Feild Quality Rules",
+          "name": "Field Quality Rules",
           "request": {
             "method": "GET",
             "header": [],
@@ -656,7 +656,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "[\n    {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"en\"\n        },\n        \"country\": \"DE\",\n        \"administrativeAreas\": [\n            {\n                \"value\": \"Baden-Wuerttemberg\",\n                \"shortName\": \"BW\",\n                \"fipsCode\": \"GM01\",\n                \"type\": \"REGION\"\n            }\n        ],\n        \"postCodes\": [\n            {\n                \"value\": \"70327\",\n                \"type\": \"REGULAR\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Stuttgart\",\n                \"shortName\": \"S\",\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Tor Strasse 1\",\n                \"name\": \"Tor Strasse\",\n                \"shortName\": \"Tor Str.\",\n                \"number\": \"1\",\n                \"type\": \"STREET\"\n            }\n        ],\n        \"premises\": [\n            {\n                \"value\": \"Gate 1\",\n                \"shortName\": \"1\",\n                \"number\": \"1\",\n                \"type\": \"BUILDING\"\n            }\n        ],\n        \"types\": [\n            \"UNSPECIFIC\"\n        ],\n        \"bpn\": \"BPNA000000000001\"\n    },\n    {\n        \"version\": {\n            \"characterSet\": \"WESTERN_LATIN_STANDARD\",\n            \"language\": \"en\"\n        },\n        \"country\": \"DE\",\n        \"administrativeAreas\": [\n            {\n                \"value\": \"Baden-Wuerttemberg\",\n                \"shortName\": \"BW\",\n                \"fipsCode\": \"GM01\",\n                \"type\": \"REGION\"\n            }\n        ],\n        \"postCodes\": [\n            {\n                \"value\": \"80331\",\n                \"type\": \"REGULAR\"\n            }\n        ],\n        \"localities\": [\n            {\n                \"value\": \"Bavaria\",\n                \"shortName\": \"B\",\n                \"type\": \"CITY\"\n            }\n        ],\n        \"thoroughfares\": [\n            {\n                \"value\": \"Standort Strasse 10\",\n                \"name\": \"Standort Strasse\",\n                \"shortName\": \"Standort Str.\",\n                \"number\": \"10\",\n                \"type\": \"STREET\"\n            }\n        ],\n        \"types\": [\n            \"UNSPECIFIC\"\n        ],\n        \"bpn\": \"BPNA0000000001YN\"\n    }\n]",
+              "raw": "[\n    {\n        \"bpna\": \"BPNA000000000001\",\n        \"name\": \"WESTERN_LATIN_STANDARD\",\n        \"states\": [\n            {\n                \"description\": \"WESTERN_LATIN_STANDARD\",\n                \"validFrom\": \"2020-12-16T05:54:48.942\",\n                \"validTo\": \"2023-06-05T07:31:01.213\",\n                \"type\": \"ACTIVE\"\n            }\n        ],\n        \"identifiers\": [\n            {\n                \"value\": \"12345678910\",\n                \"type\": \"CUSTOM_ID_ADD_TYPE\"\n            }\n        ],\n        \"physicalPostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"70546\",\n            \"city\": \"Stuttgart\",\n            \"street\": {\n                \"name\": \"Stuttgarter Strasse\",\n                \"houseNumber\": \"1\",\n                \"milestone\": \"Stuttgarter Strasse 1\",\n                \"direction\": \"Stuttgarter Str.\"\n            },\n            \"administrativeAreaLevel1\": null,\n            \"administrativeAreaLevel2\": \"test1\",\n            \"administrativeAreaLevel3\": \"test2\",\n            \"district\": \"Stuttgart\",\n            \"companyPostalCode\": \"GM01\",\n            \"industrialZone\": \"HEADQUARTER\",\n            \"building\": \"Building A\",\n            \"floor\": \"A\",\n            \"door\": \"test\"\n        },\n        \"alternativePostalAddress\": {\n            \"geographicCoordinates\": {\n                \"longitude\": 0,\n                \"latitude\": 0,\n                \"altitude\": 0\n            },\n            \"country\": \"DE\",\n            \"postalCode\": \"Stuttgart 1\",\n            \"city\": \"string\",\n            \"administrativeAreaLevel1\": \"test1\",\n            \"deliveryServiceNumber\": \"test2\",\n            \"deliveryServiceType\": \"PO_BOX\",\n            \"deliveryServiceQualifier\": \"test3\"\n        }\n    }\n]",
               "options": {
                 "raw": {
                   "language": "json"
@@ -683,7 +683,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/addresses?page=0&size=10",
+              "raw": "{{Pool-Host}}/api/catena/addresses",
               "host": [
                 "{{Pool-Host}}"
               ],
@@ -695,7 +695,7 @@
               "query": [
                 {
                   "key": "administrativeArea",
-                  "value": null,
+                  "value": "",
                   "disabled": true
                 },
                 {
@@ -725,16 +725,18 @@
                 },
                 {
                   "key": "countryCode",
-                  "value": null,
+                  "value": "",
                   "disabled": true
                 },
                 {
                   "key": "page",
-                  "value": "0"
+                  "value": "0",
+                  "disabled": true
                 },
                 {
                   "key": "size",
-                  "value": "10"
+                  "value": "10",
+                  "disabled": true
                 }
               ]
             }
@@ -948,6 +950,11 @@
     "type": "oauth2",
     "oauth2": [
       {
+        "key": "accessTokenUrl",
+        "value": "{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
+        "type": "string"
+      },
+      {
         "key": "client_authentication",
         "value": "body",
         "type": "string"
@@ -960,11 +967,6 @@
       {
         "key": "clientId",
         "value": "{{Pool-Client-ID}}",
-        "type": "string"
-      },
-      {
-        "key": "accessTokenUrl",
-        "value": "https://{{Keycloak-Host}}/auth/realms/CX-Central/protocol/openid-connect/token",
         "type": "string"
       },
       {
