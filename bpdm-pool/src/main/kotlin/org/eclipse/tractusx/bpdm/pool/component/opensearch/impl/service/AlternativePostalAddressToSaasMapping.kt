@@ -70,10 +70,6 @@ class AlternativePostalAddressToSaasMapping(private val postalAdress: Alternativ
 
         return listOfNotNull(
 
-            postalAdress.street?.name,
-            postalAdress.street?.houseNumber,
-            postalAdress.street?.milestone,
-            postalAdress.street?.direction,
         )
     }
 
