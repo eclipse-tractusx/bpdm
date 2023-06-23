@@ -25,23 +25,26 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class SharingStateController(
-    val sharingStateService: SharingStateService
+    val sharingStateService: SharingStateService,
+    val gateSecurityConfigProperties: GateSecurityConfigProperties
 ) : GateSharingStateApi {
 
     private val logger = KotlinLogging.logger { }
 
+    @PreAuthorize("hasAuthority(gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageResponse<SharingStateDto> {
-
         return sharingStateService.findSharingStates(paginationRequest, lsaType, externalIds)
     }
 
+    @PreAuthorize("hasAuthority(gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
     override fun upsertSharingState(request: SharingStateDto) {
-
         logger.info { "upsertSharingState() called with $request" }
         sharingStateService.upsertSharingState(request)
     }
