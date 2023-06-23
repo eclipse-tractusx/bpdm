@@ -191,7 +191,8 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
             administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
         ),
         type = deliveryServiceType,
-        deliveryServiceNumber = deliveryServiceNumber
+        deliveryServiceNumber = deliveryServiceNumber,
+        deliveryServiceQualifier = deliveryServiceQualifier
     )
 }
 

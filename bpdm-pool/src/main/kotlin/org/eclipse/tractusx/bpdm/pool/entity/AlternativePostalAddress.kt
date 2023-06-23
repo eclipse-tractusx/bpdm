@@ -54,15 +54,6 @@ class AlternativePostalAddress(
     @Column(name = "alt_city")
     val city: String,
 
-    @Embedded
-    @AttributeOverride(name = "name", column = Column(name = "alt_street_name"))
-    @AttributeOverride(name = "houseNumber", column = Column(name = "alt_street_number"))
-    @AttributeOverride(name = "milestone", column = Column(name = "alt_street_milestone"))
-    @AttributeOverride(name = "direction", column = Column(name = "alt_street_direction"))
-    val street: Street? = null,
-
-    // specific for AlternativePostalAddress
-
     /**
      * The type of this specified delivery
      */
@@ -75,4 +66,7 @@ class AlternativePostalAddress(
      */
     @Column(name = "alt_delivery_service_number")
     val deliveryServiceNumber: String = "",
+
+    @Column(name = "alt_delivery_service_qualifier")
+    val deliveryServiceQualifier: String = "",
 )

@@ -75,7 +75,8 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
         postCode = baseAddress.postalCode,
         city = baseAddress.city,
         deliveryServiceType = deliveryServiceType,
-        deliveryServiceNumber = deliveryServiceNumber
+        deliveryServiceNumber = deliveryServiceNumber,
+        deliveryServiceQualifier = deliveryServiceQualifier
     )
 
 }
@@ -287,6 +288,7 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
     return AlternativePostalAddressDto(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
+        deliveryServiceQualifier = deliveryServiceQualifier,
         areaPart = areaDistrictAlternativDto,
         baseAddress = basePostalAddressDto
     )
