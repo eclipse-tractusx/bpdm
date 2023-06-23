@@ -17,27 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.controller
+package com.catenax.bpdm.bridge.dummy.config
 
-import com.catenax.bpdm.bridge.dummy.service.SyncService
-import io.swagger.v3.oas.annotations.Operation
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
 
-@RestController
-@RequestMapping("/api/bridge")
-class BridgeController(
-    val syncService: SyncService
-) {
+@Configuration
+@ConfigurationProperties(prefix = "bpdm.bridge")
+class BridgeAuthProperties {
+    var syncAuthorities: List<String> = listOf()
 
-    @Operation(
-        summary = "Start sync between Gate and Pool"
-    )
-    @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
-    fun triggerSync() {
-        syncService.sync()
-    }
+    val syncAuthority: String
+        get() = syncAuthorities.joinToString(", ") { "ROLE_$it" }
 }
