@@ -19,7 +19,6 @@
 
 package com.catenax.bpdm.bridge.dummy.controller
 
-import com.catenax.bpdm.bridge.dummy.config.BridgeAuthProperties
 import com.catenax.bpdm.bridge.dummy.service.SyncService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,8 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/bridge")
 class BridgeController(
-    val syncService: SyncService,
-    val bridgeAuthProperties: BridgeAuthProperties
+    val syncService: SyncService
 ) {
 
     @Operation(
