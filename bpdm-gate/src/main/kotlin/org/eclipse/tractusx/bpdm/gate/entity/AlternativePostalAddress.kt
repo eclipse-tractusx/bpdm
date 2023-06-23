@@ -67,5 +67,5 @@ class AlternativePostalAddress(
     val deliveryServiceNumber: String = "",
 
     @Column(name = "alt_delivery_service_qualifier")
-    val deliveryServiceQualifier: String = "",
+    val deliveryServiceQualifier: String?,
 )
