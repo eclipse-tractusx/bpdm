@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
 import org.springframework.http.HttpStatus
@@ -38,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class LegalEntityController(
     val legalEntityService: LegalEntityService,
-    val apiConfigProperties: ApiConfigProperties,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties
+    val apiConfigProperties: ApiConfigProperties
 ) : GateLegalEntityApi {
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
     override fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit> {

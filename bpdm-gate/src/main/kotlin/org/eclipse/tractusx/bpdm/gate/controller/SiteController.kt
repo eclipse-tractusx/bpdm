@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
 import org.springframework.http.HttpStatus
@@ -38,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class SiteController(
     val siteService: SiteService,
-    val apiConfigProperties: ApiConfigProperties,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties
+    val apiConfigProperties: ApiConfigProperties
 ) : GateSiteApi {
 
 
