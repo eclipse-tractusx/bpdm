@@ -469,7 +469,8 @@ class BusinessPartnerBuildService(
             postCode = baseAddress.postalCode,
             city = baseAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
-            deliveryServiceNumber = alternativeAddress.deliveryServiceNumber
+            deliveryServiceNumber = alternativeAddress.deliveryServiceNumber,
+            deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier
         )
     }
 

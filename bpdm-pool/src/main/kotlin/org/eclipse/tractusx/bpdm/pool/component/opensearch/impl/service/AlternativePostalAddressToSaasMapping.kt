@@ -46,8 +46,7 @@ class AlternativePostalAddressToSaasMapping(private val postalAdress: Alternativ
 
             (postalAdress.administrativeAreaLevel1)?.let {
                 postalAdress.administrativeAreaLevel1.regionCode
-            },
-            postalAdress.administrativeAreaLevel2
+            }
         )
     }
 
@@ -63,9 +62,7 @@ class AlternativePostalAddressToSaasMapping(private val postalAdress: Alternativ
 
         return listOfNotNull(
 
-            postalAdress.city,
-            postalAdress.districtLevel1,
-            postalAdress.districtLevel2
+            postalAdress.city
         )
     }
 
@@ -73,10 +70,6 @@ class AlternativePostalAddressToSaasMapping(private val postalAdress: Alternativ
 
         return listOfNotNull(
 
-            postalAdress.street?.name,
-            postalAdress.street?.houseNumber,
-            postalAdress.street?.milestone,
-            postalAdress.street?.direction,
         )
     }
 

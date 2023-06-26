@@ -245,6 +245,7 @@ object SaasMappings {
         return AlternativePostalAddressDto(
             deliveryServiceNumber = deliveryServiceNumber,
             deliveryServiceType = deliveryServiceType,
+            deliveryServiceQualifier = null,
             areaPart = AreaDistrictAlternativDto(
                 administrativeAreaLevel1 = map.adminAreaLevel1()
             ),
