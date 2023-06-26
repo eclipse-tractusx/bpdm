@@ -36,12 +36,14 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdat
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
+import org.eclipse.tractusx.bpdm.pool.config.PoolSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -52,10 +54,11 @@ class LegalEntityController(
     val bpnConfigProperties: BpnConfigProperties,
     val controllerConfigProperties: ControllerConfigProperties,
     val siteService: SiteService,
-    val addressService: AddressService
+    val addressService: AddressService,
+    val poolSecurityConfigProperties: PoolSecurityConfigProperties
 ) : PoolLegalEntityApi {
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
@@ -66,17 +69,19 @@ class LegalEntityController(
         )
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityResponse {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun setLegalEntityCurrentness(bpnl: String) {
         businessPartnerBuildService.setBusinessPartnerCurrentness(bpnl.uppercase())
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchSites(
         bpnLs: Collection<String>
     ): ResponseEntity<Collection<PoolLegalEntityResponse>> {
@@ -86,6 +91,7 @@ class LegalEntityController(
         return ResponseEntity(businessPartnerFetchService.fetchDtosByBpns(bpnLs), HttpStatus.OK)
     }
 
+
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
@@ -93,7 +99,7 @@ class LegalEntityController(
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
@@ -101,24 +107,24 @@ class LegalEntityController(
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
     ): Collection<LegalAddressResponse> {
         return addressService.findLegalAddresses(bpnLs)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun createBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerCreateRequest>
     ): LegalEntityPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createLegalEntities(businessPartners)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun updateBusinessPartners(
         businessPartners: Collection<LegalEntityPartnerUpdateRequest>
     ): LegalEntityPartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateLegalEntities(businessPartners)
     }
-
 }

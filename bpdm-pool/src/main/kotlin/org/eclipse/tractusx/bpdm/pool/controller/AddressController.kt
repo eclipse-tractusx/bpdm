@@ -33,6 +33,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateRes
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -42,37 +43,37 @@ class AddressController(
     private val searchService: SearchService
 ) : PoolAddressApi {
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getAddresses(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse> {
-
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getAddress(
         bpna: String
     ): LogisticAddressResponse {
         return addressService.findByBpn(bpna.uppercase())
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<LogisticAddressResponse> {
-
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun createAddresses(
         requests: Collection<AddressPartnerCreateRequest>
     ): AddressPartnerCreateResponseWrapper {
         return businessPartnerBuildService.createAddresses(requests)
     }
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun updateAddresses(
         requests: Collection<AddressPartnerUpdateRequest>
     ): AddressPartnerUpdateResponseWrapper {

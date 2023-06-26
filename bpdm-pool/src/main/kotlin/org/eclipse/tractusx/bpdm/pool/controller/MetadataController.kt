@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -39,25 +40,28 @@ class MetadataController(
     val metadataService: MetadataService
 ) : PoolMetadataApi {
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
     override fun createIdentifierType(identifierType: IdentifierTypeDto): IdentifierTypeDto {
         return metadataService.createIdentifierType(identifierType)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
     override fun getIdentifierTypes(paginationRequest: PaginationRequest, lsaType: IdentifierLsaType, country: CountryCode?): PageResponse<IdentifierTypeDto> {
         return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), lsaType, country)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
     override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {
         return metadataService.createLegalForm(type)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
     override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
     override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>> {
-
         return ResponseEntity(metadataService.getFieldQualityRules(country), HttpStatus.OK)
     }
-
 }

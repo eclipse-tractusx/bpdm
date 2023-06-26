@@ -32,6 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -41,18 +42,21 @@ class SiteController(
     private val addressService: AddressService
 ) : PoolSiteApi {
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchMainAddresses(
         bpnS: Collection<String>
     ): Collection<MainAddressResponse> {
         return addressService.findMainAddresses(bpnS)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getSite(
         bpn: String
     ): SitePoolResponse {
         return siteService.findByBpn(bpn.uppercase())
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
@@ -60,12 +64,14 @@ class SiteController(
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun createSite(
         requests: Collection<SitePartnerCreateRequest>
     ): SitePartnerCreateResponseWrapper {
         return businessPartnerBuildService.createSites(requests)
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangePoolPartnerDataAsRole())")
     override fun updateSite(
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper {
