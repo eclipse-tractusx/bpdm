@@ -93,7 +93,7 @@ class DocumentMappingService {
 
     fun toAddressDoc(address: PhysicalPostalAddress): AddressDoc {
         return AddressDoc(
-            administrativeAreas = setOf(TextDoc(address.administrativeAreaLevel2.toString())),
+            administrativeAreas = setOf(TextDoc(address.administrativeAreaLevel1.toString())),
             postCodes = setOf(TextDoc(address.postCode.toString())),
             localities = setOf(TextDoc("")),
             thoroughfares = setOf(TextDoc("")),
