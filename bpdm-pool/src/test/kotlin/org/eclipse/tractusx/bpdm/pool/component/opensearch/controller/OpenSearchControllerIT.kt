@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.controller
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
@@ -39,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
 
@@ -69,14 +72,41 @@ class OpenSearchControllerIT @Autowired constructor(
             .options(WireMockConfiguration.wireMockConfig().dynamicPort())
             .build()
 
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
+        }
     }
 
+    // We import 3 legal entities which result in 6 OpenSearch records: 3 for the LEs itself and 3 for the corresponding legal addresses.
+    val partnerDocs = listOf(
+        RequestValues.legalEntityCreate1,
+        RequestValues.legalEntityCreate2,
+        RequestValues.legalEntityCreate3
+    )
 
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
+        val importCollection = PageResponse(
+            partnerDocs.size.toLong(),
+            1,
+            0,
+            partnerDocs.size,
+            partnerDocs
+        )
+
+        wireMockServer.stubFor(
+            WireMock.get(WireMock.urlPathMatching(readBusinessPartnerUrl))
+                .willReturn(
+                    WireMock.aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(objectMapper.writeValueAsString(importCollection))
+                )
+        )
         testHelpers.createTestMetadata()
         testHelpers.createBusinessPartnerStructure(
             listOf(
@@ -106,6 +136,7 @@ class OpenSearchControllerIT @Autowired constructor(
         var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(6)
+        assertSearchableByNames(partnerDocs.map { it.legalName })
 
         //export now to check behaviour
         exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
@@ -124,8 +155,30 @@ class OpenSearchControllerIT @Autowired constructor(
 
         // We have
         assertThat(exportResponse.count).isEqualTo(6)
+        assertSearchableByNames(partnerDocs.map { it.legalName })
     }
 
+    /**
+     * Given partners in OpenSearch
+     * When delete index
+     * Then partners can't be searched anymore
+     */
+    @Test
+    fun `empty index`() {
+        val names = partnerDocs.map { it.legalName }
+
+        // fill the opensearch index
+        val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
+
+        assertThat(exportResponse.count).isEqualTo(6)
+        assertSearchableByNames(names)
+
+        //clear the index
+        poolClient.opensearch().clear()
+
+        //check that the partners can really not be searched anymore
+        names.forEach { assertThat(searchBusinessPartnerByName(it)).matches { it.contentSize == 0 } }
+    }
 
     /**
      * Given partners in OpenSearch
@@ -147,6 +200,7 @@ class OpenSearchControllerIT @Autowired constructor(
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(6)
+        assertSearchableByNames(partnerDocs.map { it.legalName })
 
     }
 
