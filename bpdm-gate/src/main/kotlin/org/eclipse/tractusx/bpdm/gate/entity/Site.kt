@@ -29,15 +29,15 @@ class Site(
     @Column(name = "bpn")
     var bpn: String? = null,
 
-    @Column(name = "name", nullable = false)
-    var name: String,
-
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
 
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum,
+
+    @Column(name = "name_parts", nullable = true)
+    var nameParts: Collection<String> = emptyList(),
 
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)

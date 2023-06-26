@@ -1,0 +1,10 @@
+ALTER TABLE legal_entities
+ADD COLUMN name_parts VARCHAR(255) NULL;
+
+ALTER TABLE logistic_addresses
+DROP COLUMN IF EXISTS name,
+ADD COLUMN name_parts VARCHAR(255) NULL;
+
+ALTER TABLE sites
+DROP COLUMN IF EXISTS name,
+ADD COLUMN name_parts VARCHAR(255) NULL;

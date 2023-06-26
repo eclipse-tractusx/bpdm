@@ -35,7 +35,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
 
     val logisticAddress = LogisticAddress(
         externalId = externalId,
-        name = address.nameParts.firstOrNull(),
+        nameParts = address.nameParts,
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
@@ -53,7 +53,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
     val logisticAddress = LogisticAddress(
         bpn = bpn,
         externalId = externalId,
-        name = address.nameParts.firstOrNull(),
+        nameParts = address.nameParts,
         physicalPostalAddress = address.physicalPostalAddress.toPhysicalPostalAddressEntity(),
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
@@ -133,7 +133,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     )
 
     val site = Site(
-        name = site.nameParts.firstOrNull() ?: "",
+        nameParts = site.nameParts,
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -156,7 +156,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     val site = Site(
         bpn = bpn,
-        name = site.nameParts.firstOrNull() ?: "",
+        nameParts = site.nameParts,
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -263,7 +263,7 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
 fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
 
     val logisticAddress = LogisticAddressGateDto(
-        nameParts = name?.let { listOf(name!!) } ?: emptyList(),
+        nameParts = nameParts,
         states = mapToDtoStates(states),
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
         alternativePostalAddress = alternativePostalAddress?.toAlternativePostalAddressDto(),
@@ -376,7 +376,7 @@ fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalE
 fun Site.toSiteDto(): SiteGateDto {
 
     return SiteGateDto(
-        nameParts = if (name.isEmpty()) emptyList() else listOf(name),
+        nameParts = nameParts,
         states = mapToDtoSitesStates(states)
     )
 }

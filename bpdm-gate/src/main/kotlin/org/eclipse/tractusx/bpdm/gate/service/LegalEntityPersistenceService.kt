@@ -92,7 +92,7 @@ class LegalEntityPersistenceService(
 
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
 
-        address.name = changeAddress.name
+        address.nameParts = changeAddress.nameParts
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
         address.physicalPostalAddress = changeAddress.physicalPostalAddress

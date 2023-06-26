@@ -41,6 +41,9 @@ class LegalEntity(
     @Column(name = "legal_form_id", nullable = false)
     var legalForm: String?,
 
+    @Column(name = "name_parts", nullable = true)
+    val nameParts: List<String> = emptyList(),
+
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum
