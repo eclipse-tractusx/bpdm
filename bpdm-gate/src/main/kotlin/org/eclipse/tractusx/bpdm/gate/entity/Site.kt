@@ -36,9 +36,6 @@ class Site(
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum,
 
-    @Column(name = "name_parts", nullable = true)
-    var nameParts: Collection<String> = emptyList(),
-
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity,
@@ -54,4 +51,7 @@ class Site(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     lateinit var mainAddress: LogisticAddress
+
+    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val nameParts: MutableSet<NameParts> = mutableSetOf()
 }

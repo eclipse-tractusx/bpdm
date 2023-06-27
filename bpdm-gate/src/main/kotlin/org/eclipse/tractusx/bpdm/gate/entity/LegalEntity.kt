@@ -41,9 +41,6 @@ class LegalEntity(
     @Column(name = "legal_form_id", nullable = false)
     var legalForm: String?,
 
-    @Column(name = "name_parts", nullable = true)
-    val nameParts: List<String> = emptyList(),
-
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum
@@ -62,4 +59,8 @@ class LegalEntity(
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<LogisticAddress> = mutableSetOf()
+
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val nameParts: MutableSet<NameParts> = mutableSetOf()
+
 }

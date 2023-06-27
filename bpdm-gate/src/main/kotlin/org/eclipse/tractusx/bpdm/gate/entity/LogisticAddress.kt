@@ -46,9 +46,6 @@ class LogisticAddress(
     @JoinColumn(name = "site_id")
     var site: Site?,
 
-    @Column(name = "name_parts", nullable = true)
-    var nameParts: Collection<String> = emptyList(),
-
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum,
@@ -63,4 +60,7 @@ class LogisticAddress(
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val states: MutableSet<AddressState> = mutableSetOf()
+
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val nameParts: MutableSet<NameParts> = mutableSetOf()
 }
