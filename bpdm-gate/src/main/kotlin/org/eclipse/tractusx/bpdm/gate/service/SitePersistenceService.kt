@@ -104,7 +104,7 @@ class SitePersistenceService(
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
 
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
-        //address.nameParts.replace(changeAddress.nameParts)
+        address.nameParts.replace(changeAddress.nameParts.map { toNameParts(it.namePart, address, null, null) })
     }
 
     fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
