@@ -27,7 +27,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
 import org.springframework.http.HttpStatus
@@ -38,8 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AddressController(
     private val addressService: AddressService,
-    private val apiConfigProperties: ApiConfigProperties,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties
+    private val apiConfigProperties: ApiConfigProperties
 ) : GateAddressApi {
 
 
@@ -61,7 +59,7 @@ class AddressController(
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
-        gateSecurityConfigProperties.getReadCompanyOutputDataAsRole()
+
         return addressService.getAddressByExternalId(externalId)
     }
 

@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
-import org.eclipse.tractusx.bpdm.gate.config.GateSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -34,8 +33,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Validated
 class ChangelogController(
-    private val changelogService: ChangelogService,
-    val gateSecurityConfigProperties: GateSecurityConfigProperties
+    private val changelogService: ChangelogService
 ) : GateChangelogApi {
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
@@ -48,7 +46,6 @@ class ChangelogController(
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getOutputChangelog(paginationRequest: PaginationRequest,
                                     searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
-
         return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Output, paginationRequest.page, paginationRequest.size)
     }
 
