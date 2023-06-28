@@ -31,7 +31,7 @@ interface LegalEntityIdentifierRepository : CrudRepository<LegalEntityIdentifier
     @Query("SELECT DISTINCT i FROM LegalEntityIdentifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
     fun joinType(identifiers: Set<LegalEntityIdentifier>): Set<LegalEntityIdentifier>
 
-    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.legalEntity.bpn) FROM LegalEntityIdentifier i WHERE i.type = :identifierType AND i.value in :values")
+    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto(i.value,i.legalEntity.bpn) FROM LegalEntityIdentifier i WHERE i.type = :identifierType AND i.value in :values")
     fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingDto>
 
 }

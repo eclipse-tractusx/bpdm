@@ -31,7 +31,7 @@ interface AddressIdentifierRepository : CrudRepository<AddressIdentifier, Long> 
     @Query("SELECT DISTINCT i FROM AddressIdentifier i LEFT JOIN FETCH i.type WHERE i IN :identifiers")
     fun joinType(identifiers: Set<AddressIdentifier>): Set<AddressIdentifier>
 
-    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse(i.value,i.address.bpn) FROM AddressIdentifier i WHERE i.type = :identifierType AND i.value in :values")
+    @Query("SELECT new org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto(i.value,i.address.bpn) FROM AddressIdentifier i WHERE i.type = :identifierType AND i.value in :values")
     fun findBpnsByIdentifierTypeAndValues(identifierType: IdentifierType, values: Collection<String>): Set<BpnIdentifierMappingDto>
 
 }
