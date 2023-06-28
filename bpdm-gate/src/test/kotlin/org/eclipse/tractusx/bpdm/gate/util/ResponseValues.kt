@@ -23,25 +23,25 @@ import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import java.time.Instant
 
 object ResponseValues {
-    val language1 = TypeKeyNameVerboseDto(
+    val language1 = TypeKeyNameDto(
         technicalKey = CommonValues.language1,
         name = CommonValues.language1.getName()
     )
 
-    val language2 = TypeKeyNameVerboseDto(
+    val language2 = TypeKeyNameDto(
         technicalKey = CommonValues.language2,
         name = CommonValues.language2.getName()
     )
 
     val identifier1 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue1,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
             name = CommonValues.identifierTypeName1,
         ),
@@ -49,7 +49,7 @@ object ResponseValues {
     )
     val identifier2 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue2,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
             name = CommonValues.identifierTypeName2,
         ),
@@ -58,7 +58,7 @@ object ResponseValues {
     )
     val identifier3 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue3,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
             name = CommonValues.identifierTypeName3,
         ),
@@ -67,7 +67,7 @@ object ResponseValues {
     )
     val identifier4 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue4,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey4,
             name = CommonValues.identifierTypeName4,
         ),
@@ -91,7 +91,7 @@ object ResponseValues {
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.businessStateType1,
             name = CommonValues.businessStateType1.getTypeName(),
         )
@@ -101,7 +101,7 @@ object ResponseValues {
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
-        type = TypeKeyNameVerboseDto(
+        type = TypeKeyNameDto(
             technicalKey = CommonValues.businessStateType2,
             name = CommonValues.businessStateType2.getTypeName(),
         )
@@ -132,11 +132,11 @@ object ResponseValues {
     )
 
 
-    val country1 = TypeKeyNameVerboseDto(
+    val country1 = TypeKeyNameDto(
         technicalKey = CommonValues.country1,
         name = CommonValues.country1.getName()
     )
-    val country2 = TypeKeyNameVerboseDto(
+    val country2 = TypeKeyNameDto(
         technicalKey = CommonValues.country2,
         name = CommonValues.country2.getName()
     )

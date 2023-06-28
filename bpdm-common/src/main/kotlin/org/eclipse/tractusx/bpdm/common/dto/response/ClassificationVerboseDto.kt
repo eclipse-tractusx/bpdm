@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(name = "ClassificationVerboseDto", description = "Classification record of a business partner")
@@ -33,5 +33,5 @@ data class ClassificationVerboseDto(
     val code: String? = null,
 
     @get:Schema(description = "Type of specified classification")
-    val type: TypeKeyNameVerboseDto<ClassificationType>
+    val type: TypeKeyNameDto<ClassificationType>
 )
