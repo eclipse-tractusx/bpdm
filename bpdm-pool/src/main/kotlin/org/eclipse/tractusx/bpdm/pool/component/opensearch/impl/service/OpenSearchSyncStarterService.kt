@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.ADDRESS_PARTNER_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.LEGAL_ENTITIES_INDEX_NAME
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.MAPPINGS_FILE_PATH_ADDRESSES
@@ -59,21 +59,21 @@ class OpenSearchSyncStarterService(
      * Checks for changed records since the last export and exports those changes to OpenSearch
      */
     @Scheduled(cron = "\${bpdm.opensearch.export-scheduler-cron-expr:-}", zone = "UTC")
-    fun export(): SyncDto {
+    fun export(): SyncResponse {
         return startExport(true)
     }
 
     /**
      * Non-blocking asynchronous variant of [export]
      */
-    fun exportAsync(): SyncDto {
+    fun exportAsync(): SyncResponse {
         return startExport(false)
     }
 
     /**
-     * Fetch a [SyncDto] about the state of the latest export
+     * Fetch a [SyncResponse] about the state of the latest export
      */
-    fun getExportStatus(): SyncDto {
+    fun getExportStatus(): SyncResponse {
         return syncRecordService.getOrCreateRecord(SyncType.OPENSEARCH).toDto()
     }
 
@@ -150,7 +150,7 @@ class OpenSearchSyncStarterService(
     /**
      *  Start export either asynchronously or synchronously depending on whether [inSync]
      */
-    private fun startExport(inSync: Boolean): SyncDto {
+    private fun startExport(inSync: Boolean): SyncResponse {
         val record = syncRecordService.setSynchronizationStart(SyncType.OPENSEARCH)
         val response = record.toDto()
 

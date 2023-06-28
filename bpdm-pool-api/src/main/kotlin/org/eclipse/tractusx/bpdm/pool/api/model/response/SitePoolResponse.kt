@@ -19,11 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-data class ImportIdMappingDto(
-    val entries: Collection<ImportIdEntry>,
-    val notFound: Collection<String>
-) {
-    val size = entries.size
-}
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "SitePoolResponse", description = "Site with legal entity reference.")
+data class SitePoolResponse(
+
+    @field:JsonUnwrapped
+    val site: SiteVerboseDto,
+
+    @Schema(description = "Main address where this site resides")
+    val mainAddress: LogisticAddressVerboseDto,
+)

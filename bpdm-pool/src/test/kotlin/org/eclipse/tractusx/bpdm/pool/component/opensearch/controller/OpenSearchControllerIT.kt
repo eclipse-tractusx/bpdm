@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -205,7 +205,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
     }
 
-    private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchVerboseDto> {
+    private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchResponse> {
 
         return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest(name),

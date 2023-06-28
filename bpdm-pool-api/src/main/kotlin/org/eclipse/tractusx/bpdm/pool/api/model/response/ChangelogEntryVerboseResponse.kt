@@ -19,16 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import java.time.Instant
 
-data class SyncDto(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
+@Schema(name = "ChangelogEntryVerboseDto", description = "Changelog entry for a business partner")
+data class ChangelogEntryVerboseResponse(
+
+    @Schema(description = "Business Partner Number of the changelog entry")
+    val bpn: String,
+
+    @Schema(description = "The type of the change")
+    val changelogType: ChangelogType,
+
+    @Schema(description = "The timestamp of the change")
+    val timestamp: Instant,
+
+    @Schema(description = "The type of the business partner this change refers to")
+    val lsaType: ChangelogSubject
 )

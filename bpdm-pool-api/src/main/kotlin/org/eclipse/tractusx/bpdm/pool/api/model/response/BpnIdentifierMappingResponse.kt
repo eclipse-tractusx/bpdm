@@ -19,26 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityMatchVerboseDto", description = "Match with score for a business partner record of type legal entity")
-data class LegalEntityMatchVerboseDto(
+@Schema(name = "BpnIdentifierMappingResponse", description = "Mapping of Business Partner Number to identifier value")
+data class BpnIdentifierMappingResponse(
 
-    @Schema(description = "Relative quality score of the match. The higher the better")
-    val score: Float,
+    @Schema(description = "Value of the identifier")
+    val idValue: String,
 
-    @get:Schema(description = "Legal name the partner goes by")
-    val legalName: String,
-
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityVerboseDto,
-
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressVerboseDto,
+    @Schema(description = "Business Partner Number")
+    val bpn: String
 )

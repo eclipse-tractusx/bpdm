@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -60,7 +60,7 @@ interface PoolSaasApi {
     )
     @PostMapping("/business-partner/sync")
     @PostExchange("/business-partner/sync")
-    fun importBusinessPartners(): SyncDto
+    fun importBusinessPartners(): SyncResponse
 
     @Operation(
         summary = "Fetch information about the SaaS synchronization",
@@ -74,7 +74,7 @@ interface PoolSaasApi {
     )
     @GetMapping("/business-partner/sync")
     @GetExchange("/business-partner/sync")
-    fun getSyncStatus(): SyncDto
+    fun getSyncStatus(): SyncResponse
 
     @Operation(
         summary = "Filter Identifier Mappings by CX-Pool Identifiers",
@@ -88,7 +88,7 @@ interface PoolSaasApi {
     )
     @PostMapping("/identifier-mappings/filter")
     @PostExchange("/identifier-mappings/filter")
-    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingDto
+    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingResponse
 
     @Operation(
         summary = "Paginate Identifier Mappings by CX-Pool Identifiers",

@@ -27,9 +27,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -482,7 +482,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
     }
 
-    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateVerboseDto>, expected: Collection<LegalEntityPartnerCreateVerboseDto>) {
+    fun assertThatCreatedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
@@ -495,8 +495,8 @@ class LegalEntityControllerIT @Autowired constructor(
     }
 
     fun assertThatModifiedLegalEntitiesEqual(
-        actuals: Collection<LegalEntityPartnerCreateVerboseDto>,
-        expected: Collection<LegalEntityPartnerCreateVerboseDto>
+        actuals: Collection<LegalEntityPartnerCreateResponse>,
+        expected: Collection<LegalEntityPartnerCreateResponse>
     ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
@@ -504,7 +504,7 @@ class LegalEntityControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
+            .ignoringFields(LegalEntityPartnerCreateResponse::index.name)
             .isEqualTo(expected)
     }
 
@@ -525,7 +525,7 @@ class LegalEntityControllerIT @Autowired constructor(
             throw IllegalArgumentException("Can't change case of string $value")
     }
 
-    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressVerboseDto(
+    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressResponse(
         physicalPostalAddress = it.physicalPostalAddress,
         alternativePostalAddress = it.alternativePostalAddress,
         bpnLegalEntity = it.bpnLegalEntity!!,

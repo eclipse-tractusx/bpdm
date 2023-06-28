@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -45,14 +45,14 @@ class SiteController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchMainAddresses(
         bpnS: Collection<String>
-    ): Collection<MainAddressVerboseDto> {
+    ): Collection<MainAddressResponse> {
         return addressService.findMainAddresses(bpnS)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getSite(
         bpn: String
-    ): SitePoolVerboseDto {
+    ): SitePoolResponse {
         return siteService.findByBpn(bpn.uppercase())
     }
 
@@ -60,7 +60,7 @@ class SiteController(
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<SitePoolVerboseDto> {
+    ): PageResponse<SitePoolResponse> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 

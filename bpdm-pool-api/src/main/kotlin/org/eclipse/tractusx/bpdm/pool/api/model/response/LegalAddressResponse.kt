@@ -20,22 +20,25 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import java.time.Instant
 
-@Schema(name = "ChangelogEntryVerboseDto", description = "Changelog entry for a business partner")
-data class ChangelogEntryVerboseDto(
+@Schema(name = "LegalAddressResponse", description = "Legal address for legal entity")
+data class LegalAddressResponse(
 
-    @Schema(description = "Business Partner Number of the changelog entry")
-    val bpn: String,
+    @Schema(description = "Physical postal address")
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
-    @Schema(description = "The type of the change")
-    val changelogType: ChangelogType,
+    @Schema(description = "Alternative postal address")
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
-    @Schema(description = "The timestamp of the change")
-    val timestamp: Instant,
-    
-    @Schema(description = "The type of the business partner this change refers to")
-    val lsaType: ChangelogSubject
+    @Schema(description = "BPN of the related legal entity")
+    val bpnLegalEntity: String,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

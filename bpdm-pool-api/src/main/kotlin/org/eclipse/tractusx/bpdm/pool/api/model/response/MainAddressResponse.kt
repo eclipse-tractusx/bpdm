@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVer
 import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import java.time.Instant
 
-@Schema(name = "LegalAddressVerboseDto", description = "Legal address for legal entity")
-data class LegalAddressVerboseDto(
+@Schema(name = "MainAddressResponse", description = "Main address for site")
+data class MainAddressResponse(
 
     @Schema(description = "Physical postal address")
     val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
@@ -33,8 +33,8 @@ data class LegalAddressVerboseDto(
     @Schema(description = "Alternative postal address")
     val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
-    @Schema(description = "BPN of the related legal entity")
-    val bpnLegalEntity: String,
+    @Schema(description = "BPN of the related site")
+    val bpnSite: String,
 
     @Schema(description = "The timestamp the business partner data was created")
     val createdAt: Instant,

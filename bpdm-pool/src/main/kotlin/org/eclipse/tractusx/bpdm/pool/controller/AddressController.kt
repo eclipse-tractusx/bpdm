@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -47,6 +48,7 @@ class AddressController(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse> {
+
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }
 

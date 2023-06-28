@@ -74,7 +74,7 @@ class PartnerChangelogService(
         fromTime: Instant?,
         pageIndex: Int,
         pageSize: Int
-    ): PageResponse<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto> {
+    ): PageResponse<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseResponse> {
         val spec = Specification.allOf(byBpnsIn(bpns), byLsaTypesIn(lsaTypes), byUpdatedGreaterThan(fromTime))
         val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)

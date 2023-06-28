@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
@@ -81,7 +81,7 @@ class BusinessPartnerFetchService(
      * Find bpn to identifier value mappings by [idValues] of [identifierTypeKey]
      */
     @Transactional
-    fun findBpnsByIdentifiers(identifierTypeKey: String, lsaType: IdentifierLsaType, idValues: Collection<String>): Set<BpnIdentifierMappingDto> {
+    fun findBpnsByIdentifiers(identifierTypeKey: String, lsaType: IdentifierLsaType, idValues: Collection<String>): Set<BpnIdentifierMappingResponse> {
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, lsaType)
         return when (lsaType) {
             IdentifierLsaType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)

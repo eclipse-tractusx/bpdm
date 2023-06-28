@@ -19,19 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressPartnerCreateVerboseDto", description = "Created business partners of type address")
-data class AddressPartnerCreateVerboseDto(
-    
-    @field:JsonUnwrapped
-    val address: LogisticAddressVerboseDto,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
-    val index: String?
+@Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
+data class AddressMatchResponse(
+
+    @Schema(description = "Relative quality score of the match. The higher the better")
+    val score: Float,
+
+    @Schema(description = "Matched address business partner record")
+    val address: LogisticAddressVerboseDto
 )

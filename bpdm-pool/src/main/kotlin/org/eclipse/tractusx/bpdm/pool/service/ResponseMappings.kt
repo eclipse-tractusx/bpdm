@@ -32,8 +32,8 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
     return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
-    return LegalEntityMatchVerboseDto(
+fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
+    return LegalEntityMatchResponse(
         score = score,
         legalEntity = this.toDto(),
         legalName = this.legalName.value,
@@ -41,8 +41,8 @@ fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
     )
 }
 
-fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
-    return LegalEntityPartnerCreateVerboseDto(
+fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
+    return LegalEntityPartnerCreateResponse(
         legalEntity = toDto(),
         legalAddress = legalAddress.toDto(),
         index = entryId,
@@ -134,8 +134,8 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
     )
 }
 
-fun LogisticAddress.toLegalAddressResponse(): LegalAddressVerboseDto {
-    return LegalAddressVerboseDto(
+fun LogisticAddress.toLegalAddressResponse(): LegalAddressResponse {
+    return LegalAddressResponse(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnLegalEntity = legalEntity?.bpn!!,
@@ -144,8 +144,8 @@ fun LogisticAddress.toLegalAddressResponse(): LegalAddressVerboseDto {
     )
 }
 
-fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
-    return MainAddressVerboseDto(
+fun LogisticAddress.toMainAddressResponse(): MainAddressResponse {
+    return MainAddressResponse(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnSite = site?.bpn!!,
@@ -205,19 +205,19 @@ private fun Street.toDto(): StreetDto {
     )
 }
 
-fun LogisticAddress.toMatchDto(score: Float): AddressMatchVerboseDto {
-    return AddressMatchVerboseDto(score, this.toDto())
+fun LogisticAddress.toMatchDto(score: Float): AddressMatchResponse {
+    return AddressMatchResponse(score, this.toDto())
 }
 
-fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateVerboseDto {
-    return AddressPartnerCreateVerboseDto(
+fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
+    return AddressPartnerCreateResponse(
         address = toDto(),
         index = index
     )
 }
 
-fun Site.toUpsertDto(entryId: String?): SitePartnerCreateVerboseDto {
-    return SitePartnerCreateVerboseDto(
+fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
+    return SitePartnerCreateResponse(
         site = toDto(),
         mainAddress = mainAddress.toDto(),
         index = entryId
@@ -235,8 +235,8 @@ fun Site.toDto(): SiteVerboseDto {
     )
 }
 
-fun Site.toPoolDto(): SitePoolVerboseDto {
-    return SitePoolVerboseDto(
+fun Site.toPoolDto(): SitePoolResponse {
+    return SitePoolResponse(
 
         site = SiteVerboseDto(
             bpn,
@@ -269,10 +269,10 @@ fun Relation.toDto(): RelationVerboseDto {
     )
 }
 
-fun SyncRecord.toDto(): SyncDto {
-    return SyncDto(type, status, count, progress, errorDetails, startedAt, finishedAt)
+fun SyncRecord.toDto(): SyncResponse {
+    return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
 }
 
-fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
-    return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, changelogSubject)
+fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseResponse {
+    return ChangelogEntryVerboseResponse(bpn, changelogType, createdAt, changelogSubject)
 }

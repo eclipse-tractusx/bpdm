@@ -249,7 +249,7 @@ class BusinessPartnerBuildService(
         requests: Collection<AddressPartnerCreateRequest>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
-    ): Collection<AddressPartnerCreateVerboseDto> {
+    ): Collection<AddressPartnerCreateResponse> {
 
         fun findValidLegalEnities(requests: Collection<AddressPartnerCreateRequest>): Map<String, LegalEntity> {
             val bpnLsToFetch = requests.map { it.bpnParent }
@@ -281,7 +281,7 @@ class BusinessPartnerBuildService(
         requests: Collection<AddressPartnerCreateRequest>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
-    ): List<AddressPartnerCreateVerboseDto> {
+    ): List<AddressPartnerCreateResponse> {
 
         val bpnsToFetch = requests.map { it.bpnParent }
         val siteByBpnMap = siteRepository

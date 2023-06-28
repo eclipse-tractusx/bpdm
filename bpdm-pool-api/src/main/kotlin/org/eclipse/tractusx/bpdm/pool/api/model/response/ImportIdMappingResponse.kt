@@ -19,16 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 
-
-@Schema(name = "AddressMatchVerboseDto", description = "Match with score for a business partner record of type address")
-data class AddressMatchVerboseDto(
-    
-    @Schema(description = "Relative quality score of the match. The higher the better")
-    val score: Float,
-
-    @Schema(description = "Matched address business partner record")
-    val address: LogisticAddressVerboseDto
-)
+data class ImportIdMappingResponse(
+    val entries: Collection<ImportIdEntry>,
+    val notFound: Collection<String>
+) {
+    val size = entries.size
+}
