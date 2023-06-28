@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
@@ -90,7 +90,7 @@ interface GateLegalEntityApi {
     fun getLegalEntitiesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<LegalEntityGateInputDto>
+    ): PageResponse<LegalEntityGateInputDto>
 
     @Operation(
         summary = "Get page of legal entities",
@@ -104,7 +104,7 @@ interface GateLegalEntityApi {
     )
     @GetMapping("/input/legal-entities")
     @GetExchange("/input/legal-entities")
-    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto>
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputDto>
 
     @Operation(
         summary = "Get page of legal entities",
@@ -121,7 +121,7 @@ interface GateLegalEntityApi {
     fun getLegalEntitiesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageDto<LegalEntityGateOutputDto>
+    ): PageResponse<LegalEntityGateOutputDto>
 
     @Operation(
         summary = "Create or update output legal entities.",

@@ -23,7 +23,7 @@ import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
@@ -40,7 +40,7 @@ class AddressService(
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDto> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<LogisticAddressVerboseDto> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -59,7 +59,7 @@ class AddressService(
     fun findByPartnerAndSiteBpns(
         searchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 

@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
-    return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
+fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
+    return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
 fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {

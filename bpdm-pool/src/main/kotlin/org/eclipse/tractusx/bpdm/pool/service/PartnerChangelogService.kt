@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
@@ -74,7 +74,7 @@ class PartnerChangelogService(
         fromTime: Instant?,
         pageIndex: Int,
         pageSize: Int
-    ): PageDto<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto> {
+    ): PageResponse<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto> {
         val spec = Specification.allOf(byBpnsIn(bpns), byLsaTypesIn(lsaTypes), byUpdatedGreaterThan(fromTime))
         val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)

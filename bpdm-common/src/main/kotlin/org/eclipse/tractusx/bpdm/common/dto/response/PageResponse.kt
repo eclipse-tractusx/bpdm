@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Paginated collection of results")
-data class PageDto<T>(
+data class PageResponse<T>(
 
     @get:Schema(description = "Total number of all results in all pages")
     val totalElements: Long,

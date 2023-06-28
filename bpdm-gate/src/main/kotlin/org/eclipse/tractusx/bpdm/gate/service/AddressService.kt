@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
@@ -51,7 +51,7 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputDto> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -59,7 +59,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageDto(
+        return PageResponse(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
@@ -86,7 +86,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputDto> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -94,7 +94,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageDto(
+        return PageResponse(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
@@ -117,7 +117,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS,OutputInputEnum.Input))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS, OutputInputEnum.Input))
         }
 
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
@@ -130,7 +130,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS,OutputInputEnum.Output))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS, OutputInputEnum.Output))
         }
 
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)

@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
@@ -62,7 +62,7 @@ class LegalEntityController(
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageResponse<LegalEntityMatchVerboseDto> {
         return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
@@ -95,7 +95,7 @@ class LegalEntityController(
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<SiteVerboseDto> {
+    ): PageResponse<SiteVerboseDto> {
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 
@@ -103,7 +103,7 @@ class LegalEntityController(
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageDto<LogisticAddressVerboseDto> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 

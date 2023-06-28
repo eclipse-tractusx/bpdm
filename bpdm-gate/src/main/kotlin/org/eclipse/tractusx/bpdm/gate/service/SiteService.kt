@@ -20,11 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.saas.BusinessPartnerSaas
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
@@ -47,7 +46,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputDto> {
 
         val sitesPage = if (externalIds != null) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -55,7 +54,7 @@ class SiteService(
             siteRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageDto(
+        return PageResponse(
             page = page,
             totalElements = sitesPage.totalElements,
             totalPages = sitesPage.totalPages,
@@ -79,7 +78,7 @@ class SiteService(
     /**
      * Get output sites by first fetching sites from the database
      */
-    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<SiteGateOutputDto> {
+    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputDto> {
 
         val sitePage = if (!externalIds.isNullOrEmpty()) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -87,7 +86,7 @@ class SiteService(
             siteRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageDto(
+        return PageResponse(
             page = page,
             totalElements = sitePage.totalElements,
             totalPages = sitePage.totalPages,

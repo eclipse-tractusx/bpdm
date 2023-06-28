@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
@@ -65,20 +65,20 @@ class SearchServiceImpl(
      * Uses the [searchRequest] to perform an OpenSearch query for business partners.
      * The BPNs of found partners are used to query the whole business partner records from the database.
      * The records are supplied with relevancy scores of the search hits and returned as a paginated result.
-     * In case BPNs found by OpenSearch can not be found in the database, the [PageDto] properties are
+     * In case BPNs found by OpenSearch can not be found in the database, the [PageResponse] properties are
      * adapted accordingly from the OpenSearch page information
      *
      */
     override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<LegalEntityMatchVerboseDto> {
+    ): PageResponse<LegalEntityMatchVerboseDto> {
 
         val legalEntityPage = searchAndPreparePage(searchRequest, paginationRequest)
         businessPartnerFetchService.fetchLegalEntityDependencies(legalEntityPage.content.map { (_, legalEntity) -> legalEntity }.toSet())
 
         return with(legalEntityPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageResponse(totalElements, totalPages, page, contentSize,
                 content.map { (score, legalEntity) -> legalEntity.toMatchDto(score) })
         }
     }
@@ -86,13 +86,13 @@ class SearchServiceImpl(
     /**
      * @see SearchServiceImpl.searchLegalEntities
      */
-    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
+    override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageResponse<AddressMatchVerboseDto> {
         val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
 
         addressService.fetchLogisticAddressDependencies(addressPage.content.map { (_, address) -> address }.toSet())
 
         return with(addressPage) {
-            PageDto(totalElements, totalPages, page, contentSize,
+            PageResponse(totalElements, totalPages, page, contentSize,
                 content.map { (score, address) -> address.toMatchDto(score) })
         }
     }
@@ -100,7 +100,7 @@ class SearchServiceImpl(
     private fun searchAndPreparePage(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LegalEntity>> {
+    ): PageResponse<Pair<Float, LegalEntity>> {
         return if (searchRequest == BusinessPartnerSearchRequest.EmptySearchRequest) {
             paginateLegalEntities(paginationRequest)
         } else {
@@ -111,7 +111,7 @@ class SearchServiceImpl(
     private fun searchAndPreparePage(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LogisticAddress>> {
+    ): PageResponse<Pair<Float, LogisticAddress>> {
 
         return if (searchRequest == AddressPartnerSearchRequest.EmptySearchRequest) {
             paginateAddressPartner(paginationRequest)
@@ -120,14 +120,14 @@ class SearchServiceImpl(
         }
     }
 
-    private fun paginateLegalEntities(paginationRequest: PaginationRequest): PageDto<Pair<Float, LegalEntity>> {
+    private fun paginateLegalEntities(paginationRequest: PaginationRequest): PageResponse<Pair<Float, LegalEntity>> {
         logger.debug { "Paginate database for legal entities" }
         val legalEntityPage = legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         return legalEntityPage.toDto(legalEntityPage.content.map { Pair(0f, it) }) // assign 0 score as no search has been conducted
     }
 
-    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageDto<Pair<Float, LogisticAddress>> {
+    private fun paginateAddressPartner(paginationRequest: PaginationRequest): PageResponse<Pair<Float, LogisticAddress>> {
         logger.debug { "Paginate database for address partners" }
         val addressPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
@@ -137,7 +137,7 @@ class SearchServiceImpl(
     private fun searchIndex(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LegalEntity>> {
+    ): PageResponse<Pair<Float, LegalEntity>> {
         logger.debug { "Search index for legal entities" }
 
         if (paginationRequest.page > openSearchConfigProperties.maxPage)
@@ -162,13 +162,13 @@ class SearchServiceImpl(
 
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
-        return PageDto(totalHits, totalPages, paginationRequest.page, legalEntities.size, scoreLegalEntityPairs)
+        return PageResponse(totalHits, totalPages, paginationRequest.page, legalEntities.size, scoreLegalEntityPairs)
     }
 
     private fun searchIndex(
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<Pair<Float, LogisticAddress>> {
+    ): PageResponse<Pair<Float, LogisticAddress>> {
         logger.debug { "Search index for addresses" }
 
         if (paginationRequest.page > openSearchConfigProperties.maxPage)
@@ -193,7 +193,7 @@ class SearchServiceImpl(
 
         val totalHits = searchResult.totalHits!!.value - missingPartners.size
         val totalPages = ceil(totalHits.toDouble() / paginationRequest.size).toInt()
-        return PageDto(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
+        return PageResponse(totalHits, totalPages, paginationRequest.page, addresses.size, scoreAddressPairs)
     }
 
 }

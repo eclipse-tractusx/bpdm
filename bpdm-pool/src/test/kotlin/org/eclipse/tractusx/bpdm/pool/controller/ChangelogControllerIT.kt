@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
@@ -99,7 +99,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnA2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(),
@@ -160,7 +160,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnMainAddress2, ChangelogType.UPDATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(),
@@ -218,7 +218,7 @@ class ChangelogControllerIT @Autowired constructor(
         )
 
 
-        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
@@ -262,8 +262,8 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnL3, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedFirstPage = PageDto(3, 2, 0, expectedEntriesFirstPage.size, expectedEntriesFirstPage)
-        val expectedSecondPage = PageDto(3, 2, 1, expectedEntriesSecondPage.size, expectedEntriesSecondPage)
+        val expectedFirstPage = PageResponse(3, 2, 0, expectedEntriesFirstPage.size, expectedEntriesFirstPage)
+        val expectedSecondPage = PageResponse(3, 2, 1, expectedEntriesSecondPage.size, expectedEntriesSecondPage)
 
 
         val actualFirstPage = poolClient.changelogs().getChangelogEntries(
@@ -320,9 +320,9 @@ class ChangelogControllerIT @Autowired constructor(
         )
 
         val expectedLegalEntitiesPage =
-            PageDto(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
-        val expectedSitesPage = PageDto(expectedSiteEntries.size.toLong(), 1, 0, expectedSiteEntries.size, expectedSiteEntries)
-        val expectedAddressesPage = PageDto(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
+            PageResponse(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
+        val expectedSitesPage = PageResponse(expectedSiteEntries.size.toLong(), 1, 0, expectedSiteEntries.size, expectedSiteEntries)
+        val expectedAddressesPage = PageResponse(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
 
 
         val actualLegalEntityPage = poolClient.changelogs().getChangelogEntries(
@@ -372,7 +372,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(bpns = setOf(bpnL1, bpnL2)),
@@ -417,7 +417,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnL2, ChangelogType.CREATE, timeAfterSecondInsert, ChangelogSubject.LEGAL_ENTITY)
         )
 
-        val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
+        val expectedChangelog = PageResponse(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
         val actualChangelog = poolClient.changelogs().getChangelogEntries(
             ChangelogSearchRequest(fromTime = timeAfterFirstInsert, lsaTypes = setOf(ChangelogSubject.LEGAL_ENTITY)),
@@ -444,15 +444,15 @@ class ChangelogControllerIT @Autowired constructor(
             }
         }
 
-    private fun checkEqual(expected: PageDto<ChangelogEntryVerboseDto>) =
-        { actualResponse: PageDto<ChangelogEntryVerboseDto> ->
+    private fun checkEqual(expected: PageResponse<ChangelogEntryVerboseDto>) =
+        { actualResponse: PageResponse<ChangelogEntryVerboseDto> ->
             testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
             Unit
         }
 
     private fun validateChangelogResponse(
-        actual: PageDto<ChangelogEntryVerboseDto>,
-        expected: PageDto<ChangelogEntryVerboseDto>,
+        actual: PageResponse<ChangelogEntryVerboseDto>,
+        expected: PageResponse<ChangelogEntryVerboseDto>,
         timeBeforeInsert: Instant,
         timeAfterInsert: Instant
     ) {
