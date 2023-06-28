@@ -24,8 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
 
-@Schema(name = "LogisticAddressVerboseDto", description = "Logistic address ")
-data class LogisticAddressVerboseDto(
+@Schema(name = "LogisticAddressResponse", description = "Logistic address ")
+data class LogisticAddressResponse(
 
     @get:Schema(description = "Business Partner Number of this address")
     val bpna: String,

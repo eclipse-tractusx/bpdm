@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -76,7 +76,7 @@ class AddressControllerSearchIT @Autowired constructor(
         addresses = listOf(RequestValues.addressPartnerCreate4)
     )
 
-    private lateinit var givenAddress1: LogisticAddressVerboseDto
+    private lateinit var givenAddress1: LogisticAddressResponse
 
 
     @BeforeEach

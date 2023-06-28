@@ -23,7 +23,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -525,7 +525,7 @@ class LegalEntityControllerIT @Autowired constructor(
             throw IllegalArgumentException("Can't change case of string $value")
     }
 
-    private fun toLegalAddressResponse(it: LogisticAddressVerboseDto) = LegalAddressResponse(
+    private fun toLegalAddressResponse(it: LogisticAddressResponse) = LegalAddressResponse(
         physicalPostalAddress = it.physicalPostalAddress,
         alternativePostalAddress = it.alternativePostalAddress,
         bpnLegalEntity = it.bpnLegalEntity!!,

@@ -35,5 +35,5 @@ data class PoolLegalEntityVerboseDto(
     val legalEntity: LegalEntityVerboseDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressVerboseDto,
+    val legalAddress: LogisticAddressResponse,
 )

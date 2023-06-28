@@ -152,7 +152,7 @@ object ResponseValues {
         )
     )
 
-    val addressPartner1 = LogisticAddressVerboseDto(
+    val addressPartner1 = LogisticAddressResponse(
         bpna = CommonValues.bpnA1,
         physicalPostalAddress = address1,
         bpnLegalEntity = null,
@@ -161,7 +161,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val addressPartner2 = LogisticAddressVerboseDto(
+    val addressPartner2 = LogisticAddressResponse(
         bpna = CommonValues.bpnA2,
         physicalPostalAddress = address2,
         bpnLegalEntity = null,
@@ -170,7 +170,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val addressPartner3 = LogisticAddressVerboseDto(
+    val addressPartner3 = LogisticAddressResponse(
         bpna = CommonValues.bpnA3,
         physicalPostalAddress = address3,
         bpnLegalEntity = null,
@@ -261,7 +261,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressVerboseDto(
+        legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(
@@ -303,7 +303,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressVerboseDto(
+        legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(
@@ -345,7 +345,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressVerboseDto(
+        legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(

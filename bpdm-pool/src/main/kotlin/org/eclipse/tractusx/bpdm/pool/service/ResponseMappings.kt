@@ -117,8 +117,8 @@ fun AddressState.toDto(): AddressStateVerboseDto {
     return AddressStateVerboseDto(description, validFrom, validTo, type.toDto())
 }
 
-fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
-    return LogisticAddressVerboseDto(
+fun LogisticAddress.toDto(): LogisticAddressResponse {
+    return LogisticAddressResponse(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
         isLegalAddress = legalEntity?.legalAddress == this,
