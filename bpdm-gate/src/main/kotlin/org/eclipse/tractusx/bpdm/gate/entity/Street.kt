@@ -37,5 +37,18 @@ class Street(
     val milestone: String? = null,
 
     @Column
-    val direction: String? = null
-)
+    val direction: String? = null,
+
+    @Column
+    val namePrefix: String? = null,
+
+    @Column
+    val additionalNamePrefix: String? = null,
+
+    @Column
+    val nameSuffix: String? = null,
+
+    @Column
+    val additionalNameSuffix: String? = null,
+
+    )

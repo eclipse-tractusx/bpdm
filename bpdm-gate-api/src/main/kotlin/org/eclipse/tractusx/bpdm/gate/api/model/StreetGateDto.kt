@@ -35,7 +35,7 @@ data class StreetGateDto(
     val name: String? = null,
 
     @get:Schema(description = "Describes the name suffix of the Street.")
-    val NameSuffix: String? = null,
+    val nameSuffix: String? = null,
 
     @get:Schema(description = "Describes the additional name suffix of the Street.")
     val additionalNameSuffix: String? = null,

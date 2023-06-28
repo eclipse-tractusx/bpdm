@@ -183,7 +183,7 @@ object RequestValues {
             door = CommonValues.door1,
         ),
         areaPart = AreaDistrictDto(
-            administrativeAreaLevel1 = null,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_1,
             administrativeAreaLevel2 = CommonValues.county1,
             district = CommonValues.district1,
         ),
@@ -204,7 +204,7 @@ object RequestValues {
             door = CommonValues.door2,
         ),
         areaPart = AreaDistrictDto(
-            administrativeAreaLevel1 = null,
+            administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
             administrativeAreaLevel2 = CommonValues.county2,
             district = CommonValues.district2,
         ),

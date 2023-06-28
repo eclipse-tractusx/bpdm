@@ -22,10 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -79,7 +76,7 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativeP
     return AlternativePostalAddress(
         geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
         country = baseAddress.country,
-        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel1 = areaPart.administrativeAreaLevel1,
         postCode = baseAddress.postalCode,
         city = baseAddress.city,
         deliveryServiceType = deliveryServiceType,
@@ -94,7 +91,7 @@ fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity(): PhysicalPostal
     return PhysicalPostalAddress(
         geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
         country = baseAddress.country,
-        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel1 = areaPart.administrativeAreaLevel1,
         administrativeAreaLevel2 = areaPart.administrativeAreaLevel2,
         administrativeAreaLevel3 = areaPart.administrativeAreaLevel3,
         postCode = baseAddress.postalCode,
@@ -115,11 +112,16 @@ fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
 }
 
 private fun StreetGateDto.toStreetEntity(): Street {
+
     return Street(
         name = name,
         houseNumber = houseNumber,
         milestone = milestone,
-        direction = direction
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
     )
 }
 
@@ -203,6 +205,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
+    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
@@ -229,12 +232,17 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
 
     legalEntity.legalAddress = addressOutputRequest.toAddressGateOutput(legalEntity, null, datatype)
 
     return legalEntity
 
+}
+
+fun toLegalEntityRoles(role: BusinessPartnerRole, legalEntity: LegalEntity): LegalEntityRoles {
+    return LegalEntityRoles(legalEntity, role)
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
@@ -303,7 +311,7 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
     )
 
     val areaDistrictAlternativDto = AreaDistrictAlternativDto(
-        administrativeAreaLevel1 = null // TODO Add region mapping Logic
+        administrativeAreaLevel1 = administrativeAreaLevel1
     )
 
     return AlternativePostalAddressDto(
@@ -326,7 +334,7 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDt
     )
 
     val areaDistrictDto = AreaDistrictDto(
-        administrativeAreaLevel1 = null, // TODO Add region mapping Logic
+        administrativeAreaLevel1 = administrativeAreaLevel1,
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
         district = districtLevel1
@@ -352,11 +360,16 @@ fun GeographicCoordinate.toGeographicCoordinateDto(): GeoCoordinateDto {
 }
 
 private fun Street.toStreetDto(): StreetGateDto {
+
     return StreetGateDto(
         name = name,
         houseNumber = houseNumber,
         milestone = milestone,
-        direction = direction
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
     )
 }
 
@@ -385,6 +398,7 @@ fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalE
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
+        roles = roles.map { it.roleName },
         externalId = legalEntity.externalId,
         legalNameParts = getNamePartValuesToList(nameParts)
     )
