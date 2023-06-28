@@ -23,6 +23,7 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.controller
 import org.eclipse.tractusx.bpdm.pool.api.PoolOpenSearchApi
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -30,15 +31,17 @@ class OpenSearchController(
     val openSearchSyncService: OpenSearchSyncStarterService
 ) : PoolOpenSearchApi {
 
-
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getManageOpensearchAsRole())")
     override fun export(): SyncResponse {
         return openSearchSyncService.exportAsync()
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getManageOpensearchAsRole())")
     override fun getBusinessPartners(): SyncResponse {
         return openSearchSyncService.getExportStatus()
     }
 
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getManageOpensearchAsRole())")
     override fun clear() {
         openSearchSyncService.clearOpenSearch()
     }

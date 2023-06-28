@@ -27,6 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmRequestSizeException
 import org.eclipse.tractusx.bpdm.pool.service.PartnerChangelogService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -34,9 +35,11 @@ class ChangelogController(
     private val partnerChangelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
 ): PoolChangelogApi {
+
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getChangelogEntries(
-       changelogSearchRequest: ChangelogSearchRequest,
-       paginationRequest: PaginationRequest
+        changelogSearchRequest: ChangelogSearchRequest,
+        paginationRequest: PaginationRequest
     ): PageResponse<ChangelogEntryResponse> {
 
         changelogSearchRequest.bpns?.let { bpns ->
