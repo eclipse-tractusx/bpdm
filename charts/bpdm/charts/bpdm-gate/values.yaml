@@ -110,7 +110,7 @@ startupProbe:
     scheme: HTTP
   initialDelaySeconds: 10
   failureThreshold: 20
-  periodSeconds: 10
+  periodSeconds: 15
 
 
 # Used to overwrite the default property values of the application configuration
