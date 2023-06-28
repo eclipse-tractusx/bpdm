@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import java.time.Instant
 
 @Schema(name = "ChangelogEntryVerboseDto", description = "Changelog entry for a business partner")
-data class ChangelogEntryVerboseResponse(
+data class ChangelogEntryResponse(
 
     @Schema(description = "Business Partner Number of the changelog entry")
     val bpn: String,

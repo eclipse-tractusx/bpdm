@@ -70,7 +70,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
-    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityResponse {
+    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityVerboseDto {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)

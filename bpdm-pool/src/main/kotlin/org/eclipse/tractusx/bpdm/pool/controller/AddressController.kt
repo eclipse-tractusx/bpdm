@@ -63,7 +63,7 @@ class AddressController(
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressResponse> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 

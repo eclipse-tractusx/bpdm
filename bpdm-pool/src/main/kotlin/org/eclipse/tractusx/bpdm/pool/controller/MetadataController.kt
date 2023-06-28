@@ -51,12 +51,12 @@ class MetadataController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
-    override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {
+    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
         return metadataService.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormDto> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 
