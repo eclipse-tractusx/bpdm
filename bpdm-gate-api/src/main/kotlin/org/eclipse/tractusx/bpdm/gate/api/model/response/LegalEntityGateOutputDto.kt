@@ -27,9 +27,8 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateOutputDto", description = "Legal entity with external id")
-data class LegalEntityGateOutputDto(
-    
+@Schema(name = "LegalEntityGateOutputResponse", description = "Legal entity with external id")
+data class LegalEntityGateOutputResponse(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
@@ -39,7 +38,7 @@ data class LegalEntityGateOutputDto(
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
     @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: AddressGateOutputDto,
+    val legalAddress: AddressGateOutputResponse,
 
     @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,

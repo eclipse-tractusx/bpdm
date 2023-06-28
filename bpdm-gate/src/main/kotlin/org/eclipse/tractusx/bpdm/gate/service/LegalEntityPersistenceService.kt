@@ -23,11 +23,9 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
@@ -63,18 +61,18 @@ class LegalEntityPersistenceService(
                 updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
 
                 gateLegalEntityRepository.save(existingLegalEntity)
-                saveChangelog(legalEntity.externalId,datatype)
+                saveChangelog(legalEntity.externalId, datatype)
             } ?: run {
                 gateLegalEntityRepository.save(fullLegalEntity)
-                saveChangelog(legalEntity.externalId,datatype)
+                saveChangelog(legalEntity.externalId, datatype)
             }
         }
     }
 
     //Creates Changelog For both Legal Entity and Logistic Address when they are created or updated
-    private fun saveChangelog(externalId: String,outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(externalId), LsaType.ADDRESS,outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, LsaType.LEGAL_ENTITY,outputInputEnum))
+    private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
+        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(externalId), LsaType.ADDRESS, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, LsaType.LEGAL_ENTITY, outputInputEnum))
     }
 
     private fun updateLegalEntity(
@@ -126,13 +124,13 @@ class LegalEntityPersistenceService(
                 updateLegalEntityOutput(existingLegalEntity, legalEntity, logisticAddressRecord)
 
                 gateLegalEntityRepository.save(existingLegalEntity)
-                saveChangelog(legalEntity.externalId,datatype)
+                saveChangelog(legalEntity.externalId, datatype)
             } ?: run {
                 if (legalEntityRecord.find { it.externalId == fullLegalEntity.externalId && it.dataType == OutputInputEnum.Input } == null) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Legal Entity doesn't exist")
                 } else {
                     gateLegalEntityRepository.save(fullLegalEntity)
-                    saveChangelog(legalEntity.externalId,datatype)
+                    saveChangelog(legalEntity.externalId, datatype)
                 }
             }
         }

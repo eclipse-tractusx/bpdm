@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -73,7 +73,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites/{externalId}")
     @GetExchange("/input/sites/{externalId}")
-    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputDto
+    fun getSiteByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): SiteGateInputResponse
 
     @Operation(
         summary = "Get page of sites filtered by a collection of externalIds",
@@ -90,7 +90,7 @@ interface GateSiteApi {
     fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageResponse<SiteGateInputDto>
+    ): PageResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",
@@ -104,7 +104,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<SiteGateInputDto>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse>
 
     @Operation(
         summary = "Get page of sites",
@@ -121,7 +121,7 @@ interface GateSiteApi {
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageResponse<SiteGateOutputDto>
+    ): PageResponse<SiteGateOutputResponse>
 
     @Operation(
         summary = "Create or update output sites.",

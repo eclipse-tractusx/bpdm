@@ -172,8 +172,8 @@ fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
     return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
 }
 
-fun ChangelogEntry.toGateDto(): ChangelogGateDto {
-    return ChangelogGateDto(
+fun ChangelogEntry.toGateDto(): ChangelogResponse {
+    return ChangelogResponse(
         externalId = externalId,
         businessPartnerType = businessPartnerType,
         modifiedAt = createdAt
@@ -247,9 +247,9 @@ fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {
 }
 
 //Logistic Address mapping to AddressGateInputResponse
-fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddress): AddressGateInputDto {
+fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddress): AddressGateInputResponse {
 
-    val addressGateInputResponse = AddressGateInputDto(
+    val addressGateInputResponse = AddressGateInputResponse(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
@@ -362,9 +362,9 @@ fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse
-fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputDto {
+fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
 
-    return LegalEntityGateInputDto(
+    return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
         externalId = legalEntity.externalId,
@@ -386,9 +386,9 @@ fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto>
 }
 
 //Site mapping to SiteGateInputResponse
-fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputDto {
+fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
 
-    return SiteGateInputDto(
+    return SiteGateInputResponse(
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
@@ -398,9 +398,9 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputDto {
 }
 
 //Logistic Address mapping to AddressGateOutputResponse
-fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputDto {
+fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputResponse {
 
-    val addressGateOutputResponse = AddressGateOutputDto(
+    val addressGateOutputResponse = AddressGateOutputResponse(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,
@@ -412,9 +412,9 @@ fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAdd
 }
 
 //Site mapping to SiteGateOutputResponse
-fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputDto {
+fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputResponse {
 
-    return SiteGateOutputDto(
+    return SiteGateOutputResponse(
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
@@ -424,9 +424,9 @@ fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputDto {
 }
 
 //LegalEntity mapping to LegalEntityGateOutputResponse
-fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): LegalEntityGateOutputDto {
+fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): LegalEntityGateOutputResponse {
 
-    return LegalEntityGateOutputDto(
+    return LegalEntityGateOutputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         legalNameParts = listOf(legalName.value),
         externalId = legalEntity.externalId,

@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -51,7 +51,7 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputDto> {
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -68,13 +68,13 @@ class AddressService(
         )
     }
 
-    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputDto> {
+    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputResponse> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateInputResponse(logisticAddress)
         }
     }
 
-    fun getAddressByExternalId(externalId: String): AddressGateInputDto {
+    fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
 
         val logisticAddress =
             addressRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
@@ -86,7 +86,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputDto> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -104,7 +104,7 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputDto> {
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputResponse> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateOutputResponse(logisticAddress)
         }

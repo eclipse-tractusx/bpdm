@@ -17,15 +17,33 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.dto
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
-data class GateLegalEntityInfo(
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "LegalEntityGateInputResponse", description = "Legal entity with external id")
+data class LegalEntityGateInputResponse(
+
     val legalNameParts: List<String> = emptyList(),
+
+    @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
+
+    @Schema(description = "Which roles this business partner takes in relation to the sharing member")
+    val roles: Collection<BusinessPartnerRole> = emptyList(),
+
+    @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: AddressGateInputResponse,
+
+    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
     val externalId: String,
-    val bpn: String?
-)
+
+    )
+
+

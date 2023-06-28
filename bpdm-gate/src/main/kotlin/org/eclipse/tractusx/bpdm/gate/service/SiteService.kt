@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.exception.SaasNonexistentParentException
@@ -46,7 +46,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputDto> {
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputResponse> {
 
         val sitesPage = if (externalIds != null) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -63,13 +63,13 @@ class SiteService(
         )
     }
 
-    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputDto> {
+    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputResponse> {
         return sitePage.content.map { site ->
             site.toSiteGateInputResponse(site)
         }
     }
 
-    fun getSiteByExternalId(externalId: String): SiteGateInputDto {
+    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         val siteRecord = siteRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Site", externalId)
 
         return siteRecord.toSiteGateInputResponse(siteRecord)
@@ -78,7 +78,7 @@ class SiteService(
     /**
      * Get output sites by first fetching sites from the database
      */
-    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputDto> {
+    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputResponse> {
 
         val sitePage = if (!externalIds.isNullOrEmpty()) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -96,7 +96,7 @@ class SiteService(
 
     }
 
-    private fun toValidOutputSites(sitePage: Page<Site>): List<SiteGateOutputDto> {
+    private fun toValidOutputSites(sitePage: Page<Site>): List<SiteGateOutputResponse> {
         return sitePage.content.map { sites ->
             sites.toSiteGateOutputResponse(sites)
         }

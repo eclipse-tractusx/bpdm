@@ -29,7 +29,6 @@ import java.time.LocalDateTime
     name = "SharingState"
 )
 data class SharingStateDto(
-    
     @get:Schema(description = "LSA Type")
     val lsaType: LsaType,
 

@@ -27,15 +27,15 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(
-    name = "SiteGateOutputDto", description = "Site with legal entity reference"
+    name = "SiteGateOutputResponse", description = "Site with legal entity reference"
 )
-data class SiteGateOutputDto(
+data class SiteGateOutputResponse(
 
     @field:JsonUnwrapped
     val site: SiteGateDto,
 
     @get:Schema(description = "Main address where this site resides")
-    val mainAddress: AddressGateOutputDto,
+    val mainAddress: AddressGateOutputResponse,
 
     @Schema(description = "ID the record has in the external system where the record originates from")
     val externalId: String,

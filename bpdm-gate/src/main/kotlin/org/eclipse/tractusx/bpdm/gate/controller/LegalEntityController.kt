@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -49,7 +49,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
+    override fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputResponse {
         return legalEntityService.getLegalEntityByExternalId(externalId)
     }
 
@@ -57,12 +57,12 @@ class LegalEntityController(
     override fun getLegalEntitiesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageResponse<LegalEntityGateInputDto> {
+    ): PageResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getLegalEntities(paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputDto> {
+    override fun getLegalEntities(paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
 
@@ -70,7 +70,7 @@ class LegalEntityController(
     override fun getLegalEntitiesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageResponse<LegalEntityGateOutputDto> {
+    ): PageResponse<LegalEntityGateOutputResponse> {
         return legalEntityService.getLegalEntitiesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 

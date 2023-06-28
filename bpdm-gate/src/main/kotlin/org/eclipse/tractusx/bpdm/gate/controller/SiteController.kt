@@ -24,8 +24,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
@@ -51,7 +51,7 @@ class SiteController(
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getSiteByExternalId(externalId: String): SiteGateInputDto {
+    override fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
         return siteService.getSiteByExternalId(externalId)
     }
 
@@ -59,17 +59,17 @@ class SiteController(
     override fun getSitesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageResponse<SiteGateInputDto> {
+    ): PageResponse<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getSites(paginationRequest: PaginationRequest): PageResponse<SiteGateInputDto> {
+    override fun getSites(paginationRequest: PaginationRequest): PageResponse<SiteGateInputResponse> {
         return siteService.getSites(page = paginationRequest.page, size = paginationRequest.size)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
-    override fun getSitesOutput(paginationRequest: PaginationRequest, externalIds: Collection<String>?): PageResponse<SiteGateOutputDto> {
+    override fun getSitesOutput(paginationRequest: PaginationRequest, externalIds: Collection<String>?): PageResponse<SiteGateOutputResponse> {
         return siteService.getSitesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 

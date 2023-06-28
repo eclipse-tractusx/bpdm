@@ -28,8 +28,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerbos
 import java.time.Instant
 
 
-@Schema(name = "LogisticAddressGateVerboseDto", description = "Logistic address ")
-data class LogisticAddressGateVerboseDto(
+@Schema(name = "LogisticAddressGateResponse", description = "Logistic address ")
+data class LogisticAddressGateResponse(
 
     @get:Schema(description = "Business Partner Number of this address")
     val bpna: String,

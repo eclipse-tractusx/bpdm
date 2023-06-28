@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -38,11 +38,23 @@ import java.time.Instant
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
-    fun getChangeLogEntries(externalIds: Set<String>?, lsaTypes: Set<LsaType>?, createdAt: Instant?, outputInputEnum: OutputInputEnum?,page: Int, pageSize: Int): PageChangeLogResponse<ChangelogGateDto> {
+    fun getChangeLogEntries(
+        externalIds: Set<String>?,
+        lsaTypes: Set<LsaType>?,
+        createdAt: Instant?,
+        outputInputEnum: OutputInputEnum?,
+        page: Int,
+        pageSize: Int
+    ): PageChangeLogResponse<ChangelogResponse> {
 
         val nonNullExternalIds = externalIds ?: emptySet()
 
-        val spec = Specification.allOf(byExternalIdsIn(externalIds = nonNullExternalIds), byCreatedAtGreaterThan(createdAt = createdAt), byLsaTypes(lsaTypes), byOutputInputEnum(outputInputEnum))
+        val spec = Specification.allOf(
+            byExternalIdsIn(externalIds = nonNullExternalIds),
+            byCreatedAtGreaterThan(createdAt = createdAt),
+            byLsaTypes(lsaTypes),
+            byOutputInputEnum(outputInputEnum)
+        )
 
         val pageable = PageRequest.of(page, pageSize)
         val pageResponse = changelogRepository.findAll(spec, pageable)
