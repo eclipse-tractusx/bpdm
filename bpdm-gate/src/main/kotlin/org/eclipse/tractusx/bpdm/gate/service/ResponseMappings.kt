@@ -22,8 +22,12 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.request.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 
@@ -129,7 +133,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     )
 
     val site = Site(
-        name = site.nameParts.firstOrNull()?: "",
+        name = site.nameParts.firstOrNull() ?: "",
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -152,7 +156,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     val site = Site(
         bpn = bpn,
-        name = site.nameParts.firstOrNull()?: "",
+        name = site.nameParts.firstOrNull() ?: "",
         externalId = externalId,
         legalEntity = legalEntity,
         dataType = datatype
@@ -170,9 +174,9 @@ fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
 
 fun ChangelogEntry.toGateDto(): ChangelogResponse {
     return ChangelogResponse(
-        externalId,
-        businessPartnerType,
-        createdAt
+        externalId = externalId,
+        businessPartnerType = businessPartnerType,
+        modifiedAt = createdAt
     )
 }
 
@@ -259,7 +263,7 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
 fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
 
     val logisticAddress = LogisticAddressGateDto(
-        nameParts = name?.let { listOf(name!!) }?: emptyList(),
+        nameParts = name?.let { listOf(name!!) } ?: emptyList(),
         states = mapToDtoStates(states),
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
         alternativePostalAddress = alternativePostalAddress?.toAlternativePostalAddressDto(),
@@ -372,7 +376,7 @@ fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalE
 fun Site.toSiteDto(): SiteGateDto {
 
     return SiteGateDto(
-        nameParts = if(name.isEmpty()) emptyList() else listOf(name),
+        nameParts = if (name.isEmpty()) emptyList() else listOf(name),
         states = mapToDtoSitesStates(states)
     )
 }

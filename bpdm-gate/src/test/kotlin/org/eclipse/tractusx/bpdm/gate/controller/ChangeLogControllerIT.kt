@@ -150,7 +150,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id and timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(externalIds =  setOf(CommonValues.externalIdAddress1), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), fromTime = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -167,7 +167,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by lsaType`() {
 
-        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParam))
+        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParam))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -183,7 +183,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
     @Test
     fun `get changeLog by lsaType not found`() {
-        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParamNotFound))
+        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParamNotFound))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -198,7 +198,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
      */
     @Test
     fun `get changeLog by lsaType and timeStamp`() {
-        val searchRequest = ChangeLogSearchRequest(lsaTypes =  setOf(lsaTypeParam), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParam), fromTime = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -214,7 +214,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(lsaTypes =  emptySet(), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(lsaTypes = emptySet(), fromTime = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 

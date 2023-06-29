@@ -79,7 +79,6 @@ class AddressControllerSearchIT @Autowired constructor(
     private lateinit var givenAddress1: LogisticAddressResponse
 
 
-
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
@@ -93,7 +92,6 @@ class AddressControllerSearchIT @Autowired constructor(
 
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
-
 
 
     /**
@@ -137,7 +135,6 @@ class AddressControllerSearchIT @Autowired constructor(
 
         assertPageEquals(pageResponse, expected)
     }
-
 
 
     private fun assertPageEquals(actual: PageResponse<AddressMatchResponse>, expected: PageResponse<AddressMatchResponse>) {

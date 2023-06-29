@@ -25,8 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LogisticAddressGateResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import java.time.Instant
 
 object ResponseValues {
@@ -40,7 +39,7 @@ object ResponseValues {
         name = CommonValues.language2.getName()
     )
 
-    val identifier1 = LegalEntityIdentifierResponse(
+    val identifier1 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue1,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
@@ -48,7 +47,7 @@ object ResponseValues {
         ),
         issuingBody = CommonValues.identifierIssuingBody1
     )
-    val identifier2 = LegalEntityIdentifierResponse(
+    val identifier2 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue2,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
@@ -57,7 +56,7 @@ object ResponseValues {
         issuingBody = CommonValues.identifierIssuingBody2
 
     )
-    val identifier3 = LegalEntityIdentifierResponse(
+    val identifier3 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue3,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
@@ -66,7 +65,7 @@ object ResponseValues {
         issuingBody = CommonValues.identifierIssuingBody3
 
     )
-    val identifier4 = LegalEntityIdentifierResponse(
+    val identifier4 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue4,
         type = TypeKeyNameDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey4,
@@ -76,19 +75,19 @@ object ResponseValues {
 
     )
 
-    val legalForm1 = LegalFormResponse(
+    val legalForm1 = LegalFormDto(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
         abbreviation = CommonValues.legalFormAbbreviation1,
     )
 
-    val legalForm2 = LegalFormResponse(
+    val legalForm2 = LegalFormDto(
         technicalKey = CommonValues.legalFormTechnicalKey2,
         name = CommonValues.legalFormName2,
         abbreviation = CommonValues.legalFormAbbreviation2,
     )
 
-    val leBusinessStatus1 = LegalEntityStateResponse(
+    val leBusinessStatus1 = LegalEntityStateVerboseDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
@@ -98,7 +97,7 @@ object ResponseValues {
         )
     )
 
-    val leBusinessStatus2 = LegalEntityStateResponse(
+    val leBusinessStatus2 = LegalEntityStateVerboseDto(
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
@@ -108,25 +107,25 @@ object ResponseValues {
         )
     )
 
-    val classification1 = ClassificationResponse(
+    val classification1 = ClassificationVerboseDto(
         value = CommonValues.classificationValue1,
         code = CommonValues.classificationCode1,
         type = CommonValues.classificationType.toDto()
     )
 
-    val classification2 = ClassificationResponse(
+    val classification2 = ClassificationVerboseDto(
         value = CommonValues.classificationValue2,
         code = CommonValues.classificationCode2,
         type = CommonValues.classificationType.toDto()
     )
 
-    val classification3 = ClassificationResponse(
+    val classification3 = ClassificationVerboseDto(
         value = CommonValues.classificationValue3,
         code = CommonValues.classificationCode3,
         type = CommonValues.classificationType.toDto()
     )
 
-    val classification4 = ClassificationResponse(
+    val classification4 = ClassificationVerboseDto(
         value = CommonValues.classificationValue4,
         code = CommonValues.classificationCode4,
         type = CommonValues.classificationType.toDto()
@@ -145,20 +144,20 @@ object ResponseValues {
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
-    val address1 = PhysicalPostalAddressResponse(
+    val address1 = PhysicalPostalAddressVerboseDto(
         basePhysicalAddress = BasePhysicalAddressDto(
             industrialZone = CommonValues.industrialZone1,
             building = CommonValues.building1,
             floor = CommonValues.floor1,
             door = CommonValues.door1
         ),
-        areaPart = AreaDistrictResponse(
+        areaPart = AreaDistrictVerboseDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
             administrativeAreaLevel2 = CommonValues.county1,
             district = CommonValues.district1,
         ),
         street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
-        baseAddress = BasePostalAddressResponse(
+        baseAddress = BasePostalAddressVerboseDto(
             geographicCoordinates = geoCoordinate1,
             country = country1,
             postalCode = CommonValues.postCode1,
@@ -166,20 +165,20 @@ object ResponseValues {
         )
     )
 
-    val address2 = PhysicalPostalAddressResponse(
+    val address2 = PhysicalPostalAddressVerboseDto(
         basePhysicalAddress = BasePhysicalAddressDto(
             industrialZone = CommonValues.industrialZone2,
             building = CommonValues.building2,
             floor = CommonValues.floor2,
             door = CommonValues.door2
         ),
-        areaPart = AreaDistrictResponse(
+        areaPart = AreaDistrictVerboseDto(
             administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
             administrativeAreaLevel2 = CommonValues.county2,
             district = CommonValues.district2,
         ),
         street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
-        baseAddress = BasePostalAddressResponse(
+        baseAddress = BasePostalAddressVerboseDto(
             geographicCoordinates = geoCoordinate2,
             country = country2,
             postalCode = CommonValues.postCode2,
@@ -205,7 +204,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val legalEntityResponsePool1 = PoolLegalEntityResponse(
+    val legalEntityResponsePool1 = PoolLegalEntityVerboseDto(
         legalName = CommonValues.name1,
         legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnAddress1,
@@ -215,7 +214,7 @@ object ResponseValues {
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
-        legalEntity = LegalEntityResponse(
+        legalEntity = LegalEntityVerboseDto(
             bpnl = CommonValues.bpn1,
             legalShortName = CommonValues.shortName1,
             legalForm = legalForm1,
@@ -228,7 +227,7 @@ object ResponseValues {
 
     )
 
-    val legalEntityResponsePool2 = PoolLegalEntityResponse(
+    val legalEntityResponsePool2 = PoolLegalEntityVerboseDto(
         legalName = CommonValues.name3,
         legalAddress = LogisticAddressResponse(
             bpna = CommonValues.bpnAddress2,
@@ -238,7 +237,7 @@ object ResponseValues {
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
-        legalEntity = LegalEntityResponse(
+        legalEntity = LegalEntityVerboseDto(
             bpnl = CommonValues.bpn2,
             legalShortName = CommonValues.shortName3,
             legalForm = legalForm2,
@@ -250,7 +249,7 @@ object ResponseValues {
         )
     )
 
-    val legalEntityResponseGate1 = LegalEntityResponse(
+    val legalEntityResponseGate1 = LegalEntityVerboseDto(
         bpnl = CommonValues.bpn1,
         legalShortName = CommonValues.shortName1,
         legalForm = legalForm1,
@@ -261,7 +260,7 @@ object ResponseValues {
         updatedAt = CommonValues.now,
     )
 
-    val legalEntityResponseGate2 = LegalEntityResponse(
+    val legalEntityResponseGate2 = LegalEntityVerboseDto(
         bpnl = CommonValues.bpn2,
         legalShortName = CommonValues.shortName3,
         legalForm = legalForm2,
@@ -328,7 +327,7 @@ object ResponseValues {
     val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity1,
         legalNameParts = listOf(CommonValues.name1),
-        legalAddress = AddressGateInputResponse (
+        legalAddress = AddressGateInputResponse(
             address = RequestValues.logisticAddress1,
             externalId = "${CommonValues.externalId1}_legalAddress",
             legalEntityExternalId = CommonValues.externalId1,
@@ -340,7 +339,7 @@ object ResponseValues {
     val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
         legalEntity = RequestValues.legalEntity2,
         legalNameParts = listOf(CommonValues.name2),
-        legalAddress = AddressGateInputResponse (
+        legalAddress = AddressGateInputResponse(
             address = RequestValues.logisticAddress2,
             externalId = "${CommonValues.externalId2}_legalAddress",
             legalEntityExternalId = CommonValues.externalId2,

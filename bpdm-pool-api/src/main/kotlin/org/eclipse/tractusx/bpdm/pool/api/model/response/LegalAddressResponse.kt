@@ -20,17 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import java.time.Instant
 
 @Schema(name = "LegalAddressResponse", description = "Legal address for legal entity")
 data class LegalAddressResponse(
+
     @Schema(description = "Physical postal address")
-    val physicalPostalAddress: PhysicalPostalAddressResponse,
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
     @Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressResponse? = null,
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
     @Schema(description = "BPN of the related legal entity")
     val bpnLegalEntity: String,

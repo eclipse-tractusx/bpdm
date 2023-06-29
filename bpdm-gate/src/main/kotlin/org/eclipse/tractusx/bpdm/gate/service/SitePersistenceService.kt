@@ -23,8 +23,8 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
@@ -62,18 +62,18 @@ class SitePersistenceService(
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
                 updateSite(existingSite, site, legalEntityRecord)
                 siteRepository.save(existingSite)
-                saveChangelog(site.externalId,datatype)
+                saveChangelog(site.externalId, datatype)
             } ?: run {
                 siteRepository.save(fullSite)
-                saveChangelog(site.externalId,datatype)
+                saveChangelog(site.externalId, datatype)
             }
         }
     }
 
     //Creates Changelog For both Site and Logistic Address when they are created or updated
-    private fun saveChangelog(externalId: String,outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(externalId), LsaType.ADDRESS,outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, LsaType.SITE,outputInputEnum))
+    private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
+        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(externalId), LsaType.ADDRESS, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, LsaType.SITE, outputInputEnum))
     }
 
     private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {
@@ -130,13 +130,13 @@ class SitePersistenceService(
                 updateAddress(logisticAddressRecord, fullSite.mainAddress)
                 updateSiteOutput(existingSite, site, legalEntityRecord)
                 siteRepository.save(existingSite)
-                saveChangelog(site.externalId,datatype)
+                saveChangelog(site.externalId, datatype)
             } ?: run {
                 if (siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
                 } else {
                     siteRepository.save(fullSite)
-                    saveChangelog(site.externalId,datatype)
+                    saveChangelog(site.externalId, datatype)
                 }
             }
         }

@@ -50,11 +50,11 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse 
     )
 }
 
-fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityResponse {
-    return PoolLegalEntityResponse(
+fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityVerboseDto {
+    return PoolLegalEntityVerboseDto(
         legalName = legalName.value,
         legalAddress = legalAddress.toDto(),
-        legalEntity = LegalEntityResponse(
+        legalEntity = LegalEntityVerboseDto(
             bpnl = bpn,
             identifiers = identifiers.map { it.toDto() },
             legalShortName = legalName.shortName,
@@ -69,8 +69,8 @@ fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityResponse {
     )
 }
 
-fun LegalEntity.toDto(): LegalEntityResponse {
-    return LegalEntityResponse(
+fun LegalEntity.toDto(): LegalEntityVerboseDto {
+    return LegalEntityVerboseDto(
         bpnl = bpn,
         identifiers = identifiers.map { it.toDto() },
         legalShortName = legalName.shortName,
@@ -84,12 +84,12 @@ fun LegalEntity.toDto(): LegalEntityResponse {
     )
 }
 
-fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierResponse {
-    return LegalEntityIdentifierResponse(value, type.toTypeKeyNameDto(), issuingBody)
+fun LegalEntityIdentifier.toDto(): LegalEntityIdentifierVerboseDto {
+    return LegalEntityIdentifierVerboseDto(value, type.toTypeKeyNameDto(), issuingBody)
 }
 
-fun AddressIdentifier.toDto(): AddressIdentifierResponse {
-    return AddressIdentifierResponse(value, type.toTypeKeyNameDto())
+fun AddressIdentifier.toDto(): AddressIdentifierVerboseDto {
+    return AddressIdentifierVerboseDto(value, type.toTypeKeyNameDto())
 }
 
 fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
@@ -101,20 +101,20 @@ fun IdentifierType.toDto(): IdentifierTypeDto {
         details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 
-fun LegalForm.toDto(): LegalFormResponse {
-    return LegalFormResponse(technicalKey, name, abbreviation)
+fun LegalForm.toDto(): LegalFormDto {
+    return LegalFormDto(technicalKey, name, abbreviation)
 }
 
-fun LegalEntityState.toDto(): LegalEntityStateResponse {
-    return LegalEntityStateResponse(officialDenotation, validFrom, validTo, type.toDto())
+fun LegalEntityState.toDto(): LegalEntityStateVerboseDto {
+    return LegalEntityStateVerboseDto(officialDenotation, validFrom, validTo, type.toDto())
 }
 
-fun SiteState.toDto(): SiteStateResponse {
-    return SiteStateResponse(description, validFrom, validTo, type.toDto())
+fun SiteState.toDto(): SiteStateVerboseDto {
+    return SiteStateVerboseDto(description, validFrom, validTo, type.toDto())
 }
 
-fun AddressState.toDto(): AddressStateResponse {
-    return AddressStateResponse(description, validFrom, validTo, type.toDto())
+fun AddressState.toDto(): AddressStateVerboseDto {
+    return AddressStateVerboseDto(description, validFrom, validTo, type.toDto())
 }
 
 fun LogisticAddress.toDto(): LogisticAddressResponse {
@@ -154,17 +154,17 @@ fun LogisticAddress.toMainAddressResponse(): MainAddressResponse {
     )
 }
 
-fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
-    return PhysicalPostalAddressResponse(
-        baseAddress = BasePostalAddressResponse(
+fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
+    return PhysicalPostalAddressVerboseDto(
+        baseAddress = BasePostalAddressVerboseDto(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
             postalCode = postCode,
             city = city,
         ),
         street = street?.toDto(),
-        areaPart = AreaDistrictResponse(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+        areaPart = AreaDistrictVerboseDto(
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeVerboseDto(it.regionName, it.regionCode) },
             administrativeAreaLevel2 = administrativeAreaLevel2,
             administrativeAreaLevel3 = administrativeAreaLevel3,
             district = districtLevel1,
@@ -179,16 +179,16 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressResponse {
     )
 }
 
-fun AlternativePostalAddress.toDto(): AlternativePostalAddressResponse {
-    return AlternativePostalAddressResponse(
-        baseAddress = BasePostalAddressResponse(
+fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
+    return AlternativePostalAddressVerboseDto(
+        baseAddress = BasePostalAddressVerboseDto(
             geographicCoordinates = geographicCoordinates?.toDto(),
             country = country.toDto(),
             postalCode = postCode,
             city = city,
         ),
-        areaPart = AreaDistrictAlternativResponse(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeDto(it.regionName, it.regionCode) },
+        areaPart = AreaDistrictAlternativVerboseDto(
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeVerboseDto(it.regionName, it.regionCode) },
         ),
         type = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
@@ -224,8 +224,8 @@ fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
     )
 }
 
-fun Site.toDto(): SiteResponse {
-    return SiteResponse(
+fun Site.toDto(): SiteVerboseDto {
+    return SiteVerboseDto(
         bpn,
         name,
         states = states.map { it.toDto() },
@@ -238,7 +238,7 @@ fun Site.toDto(): SiteResponse {
 fun Site.toPoolDto(): SitePoolResponse {
     return SitePoolResponse(
 
-        site = SiteResponse(
+        site = SiteVerboseDto(
             bpn,
             name,
             states = states.map { it.toDto() },
@@ -255,12 +255,12 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-fun Classification.toDto(): ClassificationResponse {
-    return ClassificationResponse(value, code, type.toDto())
+fun Classification.toDto(): ClassificationVerboseDto {
+    return ClassificationVerboseDto(value, code, type.toDto())
 }
 
-fun Relation.toDto(): RelationResponse {
-    return RelationResponse(
+fun Relation.toDto(): RelationVerboseDto {
+    return RelationVerboseDto(
         type = type.toDto(),
         startBpn = startNode.bpn,
         endBpn = endNode.bpn,

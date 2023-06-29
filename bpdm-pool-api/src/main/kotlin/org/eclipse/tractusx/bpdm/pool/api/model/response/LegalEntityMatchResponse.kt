@@ -22,13 +22,14 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityMatchResponse", description = "Match with score for a business partner record of type legal entity")
 data class LegalEntityMatchResponse(
+
     @Schema(description = "Relative quality score of the match. The higher the better")
     val score: Float,
 
@@ -36,7 +37,7 @@ data class LegalEntityMatchResponse(
     val legalName: String,
 
     @field:JsonUnwrapped
-    val legalEntity: LegalEntityResponse,
+    val legalEntity: LegalEntityVerboseDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: LogisticAddressResponse,

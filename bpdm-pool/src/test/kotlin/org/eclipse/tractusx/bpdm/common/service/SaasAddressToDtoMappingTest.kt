@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.service
 
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.saas.AddressSaas
 import org.eclipse.tractusx.bpdm.common.dto.saas.TypeValueSaas
 import org.eclipse.tractusx.bpdm.common.model.*
@@ -50,7 +50,7 @@ class SaasAddressToDtoMappingTest {
 
     }
 
-    private fun checkMappingResponsePhysicalAddress(physicalAddressDto: PhysicalPostalAddressResponse, addressSaas: AddressSaas) {
+    private fun checkMappingResponsePhysicalAddress(physicalAddressDto: PhysicalPostalAddressVerboseDto, addressSaas: AddressSaas) {
 
         val baseAddressDto = physicalAddressDto.baseAddress
         val areaDto = physicalAddressDto.areaPart

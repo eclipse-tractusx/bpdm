@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
@@ -51,12 +51,12 @@ class MetadataController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
-    override fun createLegalForm(type: LegalFormRequest): LegalFormResponse {
+    override fun createLegalForm(type: LegalFormRequest): LegalFormDto {
         return metadataService.createLegalForm(type)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
-    override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormResponse> {
+    override fun getLegalForms(paginationRequest: PaginationRequest): PageResponse<LegalFormDto> {
         return metadataService.getLegalForms(PageRequest.of(paginationRequest.page, paginationRequest.size))
     }
 

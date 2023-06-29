@@ -23,7 +23,10 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository

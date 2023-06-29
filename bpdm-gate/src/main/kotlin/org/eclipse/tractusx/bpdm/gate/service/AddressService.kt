@@ -23,7 +23,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -108,7 +112,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS,OutputInputEnum.Input))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS, OutputInputEnum.Input))
         }
 
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
@@ -121,7 +125,7 @@ class AddressService(
 
         // create changelog entry if all goes well from saasClient
         addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS,OutputInputEnum.Output))
+            changelogRepository.save(ChangelogEntry(address.externalId, LsaType.ADDRESS, OutputInputEnum.Output))
         }
 
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)

@@ -23,14 +23,15 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
 data class SitePartnerCreateResponse(
+
     @field:JsonUnwrapped
-    val site: SiteResponse,
+    val site: SiteVerboseDto,
 
     @Schema(description = "Main address of this site")
     val mainAddress: LogisticAddressResponse,

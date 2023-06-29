@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController
 class ChangelogController(
     private val partnerChangelogService: PartnerChangelogService,
     private val controllerConfigProperties: ControllerConfigProperties
-): PoolChangelogApi {
+) : PoolChangelogApi {
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getChangelogEntries(
@@ -48,11 +48,12 @@ class ChangelogController(
             }
         }
 
-        return  partnerChangelogService.getChangeLogEntries(
+        return partnerChangelogService.getChangeLogEntries(
             changelogSearchRequest.bpns,
             changelogSearchRequest.lsaTypes,
             changelogSearchRequest.fromTime,
             paginationRequest.page,
-            paginationRequest.size)
+            paginationRequest.size
+        )
     }
 }

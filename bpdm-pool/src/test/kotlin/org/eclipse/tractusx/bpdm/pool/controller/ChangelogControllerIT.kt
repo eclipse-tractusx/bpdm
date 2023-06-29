@@ -78,7 +78,8 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
 
-        poolClient.legalEntities().updateBusinessPartners(listOf(
+        poolClient.legalEntities().updateBusinessPartners(
+            listOf(
                 RequestValues.legalEntityUpdate1.copy(bpnl = bpnL1),
                 RequestValues.legalEntityUpdate2.copy(bpnl = bpnL2)
             )
@@ -125,7 +126,8 @@ class ChangelogControllerIT @Autowired constructor(
                     siteStructures = listOf(
                         SiteStructureRequest(site = RequestValues.siteCreate1),
                         SiteStructureRequest(site = RequestValues.siteCreate2),
-                        ))
+                    )
+                )
             )
         )
         val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
@@ -135,10 +137,12 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnMainAddress1 = createdStructures[0].siteStructures[0].site.mainAddress.bpna
         val bpnMainAddress2 = createdStructures[0].siteStructures[1].site.mainAddress.bpna
 
-        poolClient.sites().updateSite(listOf(
-            RequestValues.siteUpdate1.copy(bpns = bpnS1),
-            RequestValues.siteUpdate2.copy(bpns = bpnS2)
-        ))
+        poolClient.sites().updateSite(
+            listOf(
+                RequestValues.siteUpdate1.copy(bpns = bpnS1),
+                RequestValues.siteUpdate2.copy(bpns = bpnS2)
+            )
+        )
 
         val timeAfterUpdate = Instant.now()
 
@@ -192,10 +196,12 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].addresses[0].address.bpna
         val bpnA2 = createdStructures[0].siteStructures[0].addresses[0].address.bpna
 
-        poolClient.addresses().updateAddresses(listOf(
-            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
-        ))
+        poolClient.addresses().updateAddresses(
+            listOf(
+                RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
+                RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
+            )
+        )
 
         val timeAfterUpdate = Instant.now()
 
@@ -313,7 +319,8 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryResponse(bpnMainAddress, ChangelogType.CREATE, timeAfterUpdate, ChangelogSubject.ADDRESS)
         )
 
-        val expectedLegalEntitiesPage = PageResponse(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
+        val expectedLegalEntitiesPage =
+            PageResponse(expectedLegalEntityEntries.size.toLong(), 1, 0, expectedLegalEntityEntries.size, expectedLegalEntityEntries)
         val expectedSitesPage = PageResponse(expectedSiteEntries.size.toLong(), 1, 0, expectedSiteEntries.size, expectedSiteEntries)
         val expectedAddressesPage = PageResponse(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
 
@@ -438,20 +445,21 @@ class ChangelogControllerIT @Autowired constructor(
         }
 
     private fun checkEqual(expected: PageResponse<ChangelogEntryResponse>) =
-        {  actualResponse: PageResponse<ChangelogEntryResponse> ->
-                testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
-                Unit
+        { actualResponse: PageResponse<ChangelogEntryResponse> ->
+            testHelpers.assertRecursively(actualResponse).isEqualTo(expected)
+            Unit
         }
 
-    private fun validateChangelogResponse(actual: PageResponse<ChangelogEntryResponse>,
-                                          expected: PageResponse<ChangelogEntryResponse>,
-                                          timeBeforeInsert: Instant,
-                                          timeAfterInsert: Instant
-                                          ){
-        actual.also (checkEqual(expected))
+    private fun validateChangelogResponse(
+        actual: PageResponse<ChangelogEntryResponse>,
+        expected: PageResponse<ChangelogEntryResponse>,
+        timeBeforeInsert: Instant,
+        timeAfterInsert: Instant
+    ) {
+        actual.also(checkEqual(expected))
             .content
-            .also (checkTimestampAscending())
-            .also (checkTimestampsInBetween(timeBeforeInsert, timeAfterInsert) )
+            .also(checkTimestampAscending())
+            .also(checkTimestampsInBetween(timeBeforeInsert, timeAfterInsert))
     }
 
 

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingResponse
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
+import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 

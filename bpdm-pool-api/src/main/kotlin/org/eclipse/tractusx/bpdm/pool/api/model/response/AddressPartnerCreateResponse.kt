@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "AddressPartnerCreateResponse", description = "Created business partners of type address")
 data class AddressPartnerCreateResponse(
+
     @field:JsonUnwrapped
     val address: LogisticAddressResponse,
 

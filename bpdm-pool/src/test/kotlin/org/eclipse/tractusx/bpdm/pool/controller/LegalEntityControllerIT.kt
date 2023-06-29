@@ -22,9 +22,9 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
@@ -490,11 +490,14 @@ class LegalEntityControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFieldsOfTypes(Instant::class.java)
-            .ignoringFieldsMatchingRegexes(".*${LegalEntityResponse::bpnl.name}")
+            .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
             .isEqualTo(expected)
     }
 
-    fun assertThatModifiedLegalEntitiesEqual(actuals: Collection<LegalEntityPartnerCreateResponse>, expected: Collection<LegalEntityPartnerCreateResponse>) {
+    fun assertThatModifiedLegalEntitiesEqual(
+        actuals: Collection<LegalEntityPartnerCreateResponse>,
+        expected: Collection<LegalEntityPartnerCreateResponse>
+    ) {
         val now = Instant.now()
         val justBeforeCreate = now.minusSeconds(2)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
@@ -509,7 +512,7 @@ class LegalEntityControllerIT @Autowired constructor(
         .get()
         .uri(EndpointValues.CATENA_LEGAL_ENTITY_PATH + "/${bpn}")
         .exchange().expectStatus().isOk
-        .returnResult<PoolLegalEntityResponse>()
+        .returnResult<PoolLegalEntityVerboseDto>()
         .responseBody
         .blockFirst()!!.legalEntity.currentness
 

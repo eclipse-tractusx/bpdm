@@ -40,13 +40,29 @@ class ChangelogController(
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
     ): PageChangeLogResponse<ChangelogResponse> {
-        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Input, paginationRequest.page, paginationRequest.size)
+        return changelogService.getChangeLogEntries(
+            searchRequest.externalIds,
+            searchRequest.lsaTypes,
+            searchRequest.fromTime,
+            OutputInputEnum.Input,
+            paginationRequest.page,
+            paginationRequest.size
+        )
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
-    override fun getOutputChangelog(paginationRequest: PaginationRequest,
-                                    searchRequest: ChangeLogSearchRequest): PageChangeLogResponse<ChangelogResponse> {
-        return changelogService.getChangeLogEntries(searchRequest.externalIds, searchRequest.lsaTypes, searchRequest.fromTime,OutputInputEnum.Output, paginationRequest.page, paginationRequest.size)
+    override fun getOutputChangelog(
+        paginationRequest: PaginationRequest,
+        searchRequest: ChangeLogSearchRequest
+    ): PageChangeLogResponse<ChangelogResponse> {
+        return changelogService.getChangeLogEntries(
+            searchRequest.externalIds,
+            searchRequest.lsaTypes,
+            searchRequest.fromTime,
+            OutputInputEnum.Output,
+            paginationRequest.page,
+            paginationRequest.size
+        )
     }
 
 }

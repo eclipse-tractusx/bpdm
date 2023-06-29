@@ -35,7 +35,10 @@ import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchUserException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.*
+import org.eclipse.tractusx.bpdm.pool.service.AddressService
+import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
+import org.eclipse.tractusx.bpdm.pool.service.toDto
+import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service

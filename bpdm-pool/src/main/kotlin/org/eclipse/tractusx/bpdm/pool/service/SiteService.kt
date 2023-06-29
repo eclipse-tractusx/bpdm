@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolResponse
 import org.eclipse.tractusx.bpdm.pool.entity.Site
@@ -37,7 +37,7 @@ class SiteService(
     private val legalEntityRepository: LegalEntityRepository,
     private val addressService: AddressService
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SiteResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SiteVerboseDto> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }

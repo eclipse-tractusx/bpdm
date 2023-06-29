@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -65,8 +65,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         )
     )
 
-    private lateinit var givenPartner1: LegalEntityResponse
-    private lateinit var givenPartner2: LegalEntityResponse
+    private lateinit var givenPartner1: LegalEntityVerboseDto
+    private lateinit var givenPartner2: LegalEntityVerboseDto
     private lateinit var legalName1: String
     private lateinit var legalName2: String
     private lateinit var legalAddress1: LogisticAddressResponse
@@ -170,7 +170,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
-             PaginationRequest(page, size)
+            PaginationRequest(page, size)
         )
 
 

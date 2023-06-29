@@ -48,6 +48,7 @@ class AddressController(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageResponse<AddressMatchResponse> {
+
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }
 

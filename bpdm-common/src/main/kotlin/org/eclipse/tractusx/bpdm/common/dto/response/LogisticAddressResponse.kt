@@ -37,16 +37,16 @@ data class LogisticAddressResponse(
     val name: String? = null,
 
     @ArraySchema(arraySchema = Schema(description = "Address status"))
-    val states: Collection<AddressStateResponse> = emptyList(),
+    val states: Collection<AddressStateVerboseDto> = emptyList(),
 
     @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
-    val identifiers: Collection<AddressIdentifierResponse> = emptyList(),
+    val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
 
     @get:Schema(description = "Physical postal address")
-    val physicalPostalAddress: PhysicalPostalAddressResponse,
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
     @get:Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressResponse? = null,
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
     @get:Schema(description = "BPN of the related legal entity, if available")
     val bpnLegalEntity: String?,

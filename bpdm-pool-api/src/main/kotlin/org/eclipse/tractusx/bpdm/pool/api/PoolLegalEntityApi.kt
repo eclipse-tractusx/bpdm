@@ -88,7 +88,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): PoolLegalEntityResponse
+    ): PoolLegalEntityVerboseDto
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -128,7 +128,7 @@ interface PoolLegalEntityApi {
     @PostExchange("/search")
     fun searchSites(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<PoolLegalEntityResponse>>
+    ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>>
 
     @Operation(
         summary = "Get site partners of a legal entity",
@@ -146,7 +146,7 @@ interface PoolLegalEntityApi {
     fun getSites(
         @Parameter(description = "Bpnl value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse>
+    ): PageResponse<SiteVerboseDto>
 
     @Operation(
         summary = "Get address partners of a legal entity",

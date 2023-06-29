@@ -22,8 +22,8 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityResponse
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
@@ -70,7 +70,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
-    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityResponse {
+    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityVerboseDto {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -84,7 +84,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchSites(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<PoolLegalEntityResponse>> {
+    ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -95,7 +95,7 @@ class LegalEntityController(
     override fun getSites(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<SiteResponse> {
+    ): PageResponse<SiteVerboseDto> {
         return siteService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 

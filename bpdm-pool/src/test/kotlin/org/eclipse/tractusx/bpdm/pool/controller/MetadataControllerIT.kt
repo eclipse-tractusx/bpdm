@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
@@ -100,9 +100,9 @@ class MetadataControllerIT @Autowired constructor(
             postMetadataWithoutExpectation(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
         private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
-            postMetadata<LegalFormRequest, LegalFormResponse>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
+            postMetadata<LegalFormRequest, LegalFormDto>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
 
-        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageResponse<LegalFormResponse> =
+        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageResponse<LegalFormDto> =
 //            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH,

@@ -24,10 +24,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import java.time.Instant
 
 data class ChangeLogSearchRequest(
+
     @field:Parameter(description = "From when to search changelog entries", example = "2023-03-20T10:23:28.194Z", required = false)
     val fromTime: Instant? = null,
+
     @field:Parameter(description = "External-IDs of business partners for which to search changelog entries. Ignored if empty", required = false)
     val externalIds: Set<String> = emptySet(),
+
     @field:Parameter(description = "Lsa-Types of business partners for which to search changelog entries. Ignored if empty", required = false)
     val lsaTypes: Set<LsaType> = emptySet()
-    )
+)

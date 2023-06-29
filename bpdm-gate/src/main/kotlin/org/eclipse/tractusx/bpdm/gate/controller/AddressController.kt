@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -75,6 +75,7 @@ class AddressController(
     override fun getAddresses(paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
+
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,

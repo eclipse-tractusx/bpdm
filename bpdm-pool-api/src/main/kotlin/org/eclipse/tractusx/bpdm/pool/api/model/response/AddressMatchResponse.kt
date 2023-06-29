@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
 
 @Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
 data class AddressMatchResponse(
+
     @Schema(description = "Relative quality score of the match. The higher the better")
     val score: Float,
 

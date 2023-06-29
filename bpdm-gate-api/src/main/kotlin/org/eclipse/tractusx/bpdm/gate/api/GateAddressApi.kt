@@ -27,10 +27,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

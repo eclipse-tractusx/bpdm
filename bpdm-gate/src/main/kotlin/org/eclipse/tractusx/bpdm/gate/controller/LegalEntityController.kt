@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateLegalEntityApi
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
@@ -65,6 +65,7 @@ class LegalEntityController(
     override fun getLegalEntities(paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputResponse> {
         return legalEntityService.getLegalEntities(page = paginationRequest.page, size = paginationRequest.size)
     }
+
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getLegalEntitiesOutput(
         paginationRequest: PaginationRequest,
@@ -72,6 +73,7 @@ class LegalEntityController(
     ): PageResponse<LegalEntityGateOutputResponse> {
         return legalEntityService.getLegalEntitiesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
+
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")
     override fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit> {
         if (legalEntities.size > apiConfigProperties.upsertLimit || legalEntities.map { it.externalId }.containsDuplicates()) {

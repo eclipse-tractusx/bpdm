@@ -379,8 +379,8 @@ class SiteControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpns.name,
-                SitePartnerCreateResponse::site.name + "." + SiteResponse::bpnLegalEntity.name,
+                SitePartnerCreateResponse::site.name + "." + SiteVerboseDto::bpns.name,
+                SitePartnerCreateResponse::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
                 SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
                 SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpnSite.name
             )

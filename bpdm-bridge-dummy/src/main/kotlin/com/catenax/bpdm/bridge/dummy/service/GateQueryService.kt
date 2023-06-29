@@ -26,9 +26,9 @@ import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.springframework.stereotype.Service
 import java.time.Instant
 

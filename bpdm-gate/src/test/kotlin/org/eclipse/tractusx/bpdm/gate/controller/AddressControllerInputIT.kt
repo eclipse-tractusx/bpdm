@@ -299,10 +299,10 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
-        try{
+        try {
             gateClient.addresses().upsertAddresses(addresses)
-        }catch (e: WebClientResponseException){
-            assertEquals(HttpStatus.BAD_REQUEST,e.statusCode)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
 
     }

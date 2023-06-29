@@ -22,10 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.GateSiteApi
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
