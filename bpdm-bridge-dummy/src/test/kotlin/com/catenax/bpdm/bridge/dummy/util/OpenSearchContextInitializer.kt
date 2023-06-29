@@ -20,14 +20,12 @@
 package com.catenax.bpdm.bridge.dummy.util
 
 
-import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import com.github.dockerjava.api.model.Ulimit
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
-import org.testcontainers.lifecycle.Startable
 
 /**
  * When used on a spring boot test, starts a singleton opensearch container that is shared between all integration tests.
@@ -53,8 +51,6 @@ class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableA
             .withCreateContainerCmdModifier { cmd ->
                 cmd.hostConfig!!.withUlimits(arrayOf(Ulimit("nofile", 65536L, 65536L), Ulimit("memlock", -1L, -1L)))
             }
-            .withNetwork(postgreSQLContainer.getNetwork())
-            .dependsOn(listOf<Startable>(postgreSQLContainer))
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
