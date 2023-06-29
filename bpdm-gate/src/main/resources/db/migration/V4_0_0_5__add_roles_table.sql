@@ -15,6 +15,7 @@ CREATE INDEX legal_entity_roles ON roles (legal_entity_id);
 ALTER TABLE IF EXISTS roles ADD CONSTRAINT uuid_roles_uk UNIQUE (uuid);
 
 ALTER TABLE IF EXISTS roles
+ADD CONSTRAINT fk_sites_roles FOREIGN KEY (site_id) REFERENCES sites,
 ADD CONSTRAINT fk_legal_entity_roles FOREIGN KEY (legal_entity_id) REFERENCES legal_entities;
 
 ALTER TABLE logistic_addresses
