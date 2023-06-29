@@ -196,7 +196,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     val legalEntity = LegalEntity(
         externalId = externalId,
         legalForm = legalEntity.legalForm,
-        legalName = Name("", legalEntity.legalShortName),
+        shortName = legalEntity.legalShortName,
         dataType = datatype
     )
 
@@ -223,7 +223,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
         bpn = bpn,
         externalId = externalId,
         legalForm = legalEntity.legalForm,
-        legalName = Name("", legalEntity.legalShortName),
+        shortName = legalEntity.legalShortName,
         dataType = datatype
     )
 
@@ -361,9 +361,10 @@ private fun Street.toStreetDto(): StreetGateDto {
 }
 
 fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
+
     return LegalEntityDto(
         legalForm = legalForm,
-        legalShortName = legalName.shortName,
+        legalShortName = shortName,
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
     )

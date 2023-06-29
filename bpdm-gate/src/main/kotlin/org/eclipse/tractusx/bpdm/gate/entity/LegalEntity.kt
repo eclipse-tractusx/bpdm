@@ -35,8 +35,8 @@ class LegalEntity(
     @Column(name = "externalId", nullable = false, unique = true)
     var externalId: String,
 
-    @Embedded
-    var legalName: Name,
+    @Column(name = "name_shortname")
+    var shortName: String?,
 
     @Column(name = "legal_form_id", nullable = false)
     var legalForm: String?,

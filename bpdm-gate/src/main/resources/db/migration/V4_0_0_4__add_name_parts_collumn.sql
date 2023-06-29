@@ -1,9 +1,3 @@
-ALTER TABLE logistic_addresses
-DROP COLUMN IF EXISTS name;
-
-ALTER TABLE sites
-DROP COLUMN IF EXISTS name;
-
 CREATE TABLE name_parts (
   id BIGINT NOT NULL,
   created_at TIMESTAMP WITH time zone NOT NULL,
@@ -29,3 +23,18 @@ ALTER TABLE IF EXISTS name_parts
 ADD CONSTRAINT fk_address_name_parts FOREIGN KEY (address_id) REFERENCES logistic_addresses,
 ADD CONSTRAINT fk_legal_entity_name_parts FOREIGN KEY (legal_entity_id) REFERENCES legal_entities,
 ADD CONSTRAINT fk_sites_name_parts FOREIGN KEY (site_id) REFERENCES sites;
+
+INSERT INTO name_parts (address_id, name_part)
+SELECT id, name FROM logistic_addresses WHERE name IS NOT NULL;
+
+INSERT INTO name_parts (site_id, name_part)
+SELECT id, name FROM sites WHERE name IS NOT NULL;
+
+ALTER TABLE logistic_addresses
+DROP COLUMN IF EXISTS name;
+
+ALTER TABLE sites
+DROP COLUMN IF EXISTS name;
+
+ALTER TABLE legal_entities
+DROP COLUMN IF EXISTS name_value;
