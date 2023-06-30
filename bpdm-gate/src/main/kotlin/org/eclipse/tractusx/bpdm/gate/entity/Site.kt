@@ -29,9 +29,6 @@ class Site(
     @Column(name = "bpn")
     var bpn: String? = null,
 
-    @Column(name = "name", nullable = false)
-    var name: String,
-
     @Column(name = "external_id", nullable = false, unique = true)
     var externalId: String,
 
@@ -54,4 +51,7 @@ class Site(
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     lateinit var mainAddress: LogisticAddress
+
+    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val nameParts: MutableSet<NameParts> = mutableSetOf()
 }

@@ -88,23 +88,23 @@ class SitePersistenceService(
 
     private fun updateSite(site: Site, updatedSite: SiteGateInputRequest, legalEntityRecord: LegalEntity) {
 
-        site.name = updatedSite.site.nameParts.firstOrNull() ?: ""
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
+
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
+        site.nameParts.replace(updatedSite.site.nameParts.map { toNameParts(it, null, site, null) })
 
     }
 
     private fun updateAddress(address: LogisticAddress, changeAddress: LogisticAddress) {
 
-        address.name = changeAddress.name
         address.externalId = changeAddress.externalId
         address.legalEntity = changeAddress.legalEntity
         address.physicalPostalAddress = changeAddress.physicalPostalAddress
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
 
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
-
+        address.nameParts.replace(changeAddress.nameParts.map { toNameParts(it.namePart, address, null, null) })
     }
 
     fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
@@ -145,10 +145,11 @@ class SitePersistenceService(
     private fun updateSiteOutput(site: Site, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntity) {
 
         site.bpn = updatedSite.bpn
-        site.name = updatedSite.site.nameParts.firstOrNull() ?: ""
         site.externalId = updatedSite.externalId
         site.legalEntity = legalEntityRecord
+
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
+        site.nameParts.replace(updatedSite.site.nameParts.map { toNameParts(it, null, site, null) })
 
     }
 }

@@ -67,7 +67,6 @@ class AddressPersistenceService(
 
     private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
 
-        address.name = changeAddress.address.nameParts.firstOrNull()
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
         address.site = siteRecord
@@ -75,6 +74,7 @@ class AddressPersistenceService(
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
+        address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
 
     }
 
@@ -107,7 +107,6 @@ class AddressPersistenceService(
 
     private fun updateAddressOutput(address: LogisticAddress, changeAddress: AddressGateOutputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
 
-        address.name = changeAddress.address.nameParts.firstOrNull()
         address.bpn = changeAddress.bpn
         address.externalId = changeAddress.externalId
         address.legalEntity = legalEntityRecord
@@ -116,6 +115,7 @@ class AddressPersistenceService(
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
 
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
+        address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
 
     }
 
