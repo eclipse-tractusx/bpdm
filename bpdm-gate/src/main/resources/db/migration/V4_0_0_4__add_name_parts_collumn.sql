@@ -24,11 +24,17 @@ ADD CONSTRAINT fk_address_name_parts FOREIGN KEY (address_id) REFERENCES logisti
 ADD CONSTRAINT fk_legal_entity_name_parts FOREIGN KEY (legal_entity_id) REFERENCES legal_entities,
 ADD CONSTRAINT fk_sites_name_parts FOREIGN KEY (site_id) REFERENCES sites;
 
-INSERT INTO name_parts (address_id, name_part)
-SELECT id, name FROM logistic_addresses WHERE name IS NOT NULL;
+INSERT INTO name_parts (id, address_id, name_part, created_at, updated_at, uuid)
+SELECT nextval('bpdm_sequence'), id, name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, uuid
+FROM logistic_addresses WHERE name IS NOT NULL;
 
-INSERT INTO name_parts (site_id, name_part)
-SELECT id, name FROM sites WHERE name IS NOT NULL;
+INSERT INTO name_parts (id, site_id, name_part, created_at, updated_at, uuid)
+SELECT nextval('bpdm_sequence'), id, name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, uuid
+FROM sites WHERE name IS NOT NULL;
+
+INSERT INTO name_parts (id, legal_entity_id, name_part, created_at, updated_at, uuid)
+SELECT nextval('bpdm_sequence'), id, name_shortname, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, uuid
+FROM legal_entities WHERE name_shortname IS NOT NULL;
 
 ALTER TABLE logistic_addresses
 DROP COLUMN IF EXISTS name;
