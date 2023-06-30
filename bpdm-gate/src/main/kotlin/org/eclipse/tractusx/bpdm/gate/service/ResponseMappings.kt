@@ -41,6 +41,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
+    logisticAddress.roles.addAll(this.address.roles.map { toLegalEntityRoles(it, null, null, logisticAddress) }.toSet())
 
     return logisticAddress
 }
@@ -59,6 +60,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
+    logisticAddress.roles.addAll(this.address.roles.map { toLegalEntityRoles(it, null, null, logisticAddress) }.toSet())
 
     return logisticAddress
 }
@@ -145,8 +147,8 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
-    site.roles.addAll(this.site.roles.map { toLegalEntityRoles(it, null, site) })
     site.nameParts.addAll(this.site.nameParts.map { toNameParts(it, null, site, null) }.toSet())
+    site.roles.addAll(this.site.roles.map { toLegalEntityRoles(it, null, site, null) })
 
     site.mainAddress = addressInputRequest.toAddressGate(null, site, datatype)
 
@@ -171,7 +173,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
     site.nameParts.addAll(this.site.nameParts.map { toNameParts(it, null, site, null) }.toSet())
-    legalEntity.roles.addAll(this.site.roles.map { toLegalEntityRoles(it, null, site) })
+    legalEntity.roles.addAll(this.site.roles.map { toLegalEntityRoles(it, null, site, null) })
 
     site.mainAddress = addressOutputRequest.toAddressGateOutput(null, site, datatype)
 
@@ -208,7 +210,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity, null) })
+    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity, null, null) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
@@ -235,7 +237,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity, null) })
+    legalEntity.roles.addAll(this.roles.map { toLegalEntityRoles(it, legalEntity, null, null) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
 
     legalEntity.legalAddress = addressOutputRequest.toAddressGateOutput(legalEntity, null, datatype)
@@ -244,8 +246,8 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
 }
 
-fun toLegalEntityRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?): LegalEntityRoles {
-    return LegalEntityRoles(legalEntity, site, role)
+fun toLegalEntityRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?, address: LogisticAddress?): LegalEntityRoles {
+    return LegalEntityRoles(legalEntity, address, site, role)
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
@@ -283,6 +285,7 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
     val logisticAddress = LogisticAddressGateDto(
         nameParts = getNamePartValues(nameParts),
         states = mapToDtoStates(states),
+        roles = roles.map { it.roleName },
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
         alternativePostalAddress = alternativePostalAddress?.toAlternativePostalAddressDto(),
     )

@@ -75,6 +75,7 @@ class AddressPersistenceService(
 
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
+        address.roles.replace(changeAddress.address.roles.map { toLegalEntityRoles(it, null, null, address) })
 
     }
 
@@ -116,6 +117,7 @@ class AddressPersistenceService(
 
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
+        address.roles.replace(changeAddress.address.roles.map { toLegalEntityRoles(it, null, null, address) })
 
     }
 

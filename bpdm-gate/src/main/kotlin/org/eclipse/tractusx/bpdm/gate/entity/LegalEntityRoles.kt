@@ -50,9 +50,9 @@ class LegalEntityRoles(
     @JoinColumn(name = "legal_entity_id", nullable = false)
     var legalEntity: LegalEntity?,
 
-//    @ManyToOne
-//    @JoinColumn(name = "address_id", nullable = true)
-//    var address: LogisticAddress?,
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = true)
+    var address: LogisticAddress?,
 
     @ManyToOne
     @JoinColumn(name = "site_id", nullable = true)
