@@ -27,7 +27,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
-import org.eclipse.tractusx.bpdm.common.dto.saas.PagedResponseSaas
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
@@ -82,9 +81,9 @@ class OpenSearchControllerIT @Autowired constructor(
 
     // We import 3 legal entities which result in 6 OpenSearch records: 3 for the LEs itself and 3 for the corresponding legal addresses.
     val partnerDocs = listOf(
-        SaasValues.legalEntity1,
-        SaasValues.legalEntity2,
-        SaasValues.legalEntity3
+        RequestValues.legalEntityCreate1,
+        RequestValues.legalEntityCreate2,
+        RequestValues.legalEntityCreate3
     )
 
     @BeforeEach
@@ -92,10 +91,10 @@ class OpenSearchControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
-        val importCollection = PagedResponseSaas(
-            partnerDocs.size,
-            null,
-            null,
+        val importCollection = PageResponse(
+            partnerDocs.size.toLong(),
+            1,
+            0,
             partnerDocs.size,
             partnerDocs
         )
@@ -137,7 +136,7 @@ class OpenSearchControllerIT @Autowired constructor(
         var exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(6)
-        assertSearchableByNames(partnerDocs.map { it.names.first().value })
+        assertSearchableByNames(partnerDocs.map { it.legalName })
 
         //export now to check behaviour
         exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
@@ -156,7 +155,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
         // We have
         assertThat(exportResponse.count).isEqualTo(6)
-        assertSearchableByNames(partnerDocs.map { it.names.first().value })
+        assertSearchableByNames(partnerDocs.map { it.legalName })
     }
 
     /**
@@ -166,7 +165,7 @@ class OpenSearchControllerIT @Autowired constructor(
      */
     @Test
     fun `empty index`() {
-        val names = partnerDocs.map { it.names.first().value }
+        val names = partnerDocs.map { it.legalName }
 
         // fill the opensearch index
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
@@ -201,7 +200,7 @@ class OpenSearchControllerIT @Autowired constructor(
         val exportResponse = testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
         assertThat(exportResponse.count).isEqualTo(6)
-        assertSearchableByNames(partnerDocs.map { it.names.first().value })
+        assertSearchableByNames(partnerDocs.map { it.legalName })
 
     }
 
