@@ -38,8 +38,8 @@ class LegalEntity(
     @Column(name = "name_shortname")
     var shortName: String?,
 
-    @Column(name = "legal_form_id", nullable = false)
-    var legalForm: String?,
+    @Column(name = "legal_form_id")
+    var legalForm: String? = null,
 
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
