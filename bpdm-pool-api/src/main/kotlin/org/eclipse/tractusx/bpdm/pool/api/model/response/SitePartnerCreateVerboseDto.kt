@@ -19,16 +19,23 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import java.time.Instant
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-data class SyncResponse(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "SitePartnerCreateVerboseDto", description = "Created business partner record of type site")
+data class SitePartnerCreateVerboseDto(
+
+    @field:JsonUnwrapped
+    val site: SiteVerboseDto,
+
+    @Schema(description = "Main address of this site")
+    val mainAddress: LogisticAddressVerboseDto,
+
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    val index: String?
 )

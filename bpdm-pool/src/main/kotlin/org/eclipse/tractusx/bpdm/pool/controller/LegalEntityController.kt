@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
@@ -62,7 +62,7 @@ class LegalEntityController(
     override fun getLegalEntities(
         bpSearchRequest: LegalEntityPropertiesSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LegalEntityMatchResponse> {
+    ): PageResponse<LegalEntityMatchVerboseDto> {
         return searchService.searchLegalEntities(
             BusinessPartnerSearchRequest(bpSearchRequest),
             paginationRequest
@@ -110,7 +110,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchLegalAddresses(
         bpnLs: Collection<String>
-    ): Collection<LegalAddressResponse> {
+    ): Collection<LegalAddressVerboseDto> {
         return addressService.findLegalAddresses(bpnLs)
     }
 

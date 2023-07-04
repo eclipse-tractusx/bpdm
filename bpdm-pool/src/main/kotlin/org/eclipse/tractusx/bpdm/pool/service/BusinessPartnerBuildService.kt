@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataMappingDto
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataMappingDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityIdentifierRepository
@@ -82,8 +82,14 @@ class BusinessPartnerBuildService(
 
         val legalEntities = legalEntityWithIndexByBpnMap.values.map { (legalEntity, _) -> legalEntity }
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.legalAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map {
+            ChangelogEntryVerboseDto(
+                it.legalAddress.bpn,
+                ChangelogType.CREATE,
+                ChangelogSubject.ADDRESS
+            )
+        })
 
         legalEntityRepository.saveAll(legalEntities)
 
@@ -119,8 +125,8 @@ class BusinessPartnerBuildService(
             .associateBy { (site, _) -> site.bpn }
         val sites = siteWithIndexByBpnMap.values.map { (site, _) -> site }
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.mainAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
 
         siteRepository.saveAll(sites)
 
@@ -149,7 +155,13 @@ class BusinessPartnerBuildService(
         val addressResponses = createAddressesForSite(siteRequests, errors, metadataMap)
             .plus(createAddressesForLegalEntity(legalEntityRequests, errors, metadataMap))
 
-        changelogService.createChangelogEntries(addressResponses.map { ChangelogEntryDto(it.address.bpna, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(addressResponses.map {
+            ChangelogEntryVerboseDto(
+                it.address.bpna,
+                ChangelogType.CREATE,
+                ChangelogSubject.ADDRESS
+            )
+        })
 
         return AddressPartnerCreateResponseWrapper(addressResponses, errors)
     }
@@ -180,8 +192,14 @@ class BusinessPartnerBuildService(
             updateLogisticAddress(it.legalAddress, request.legalAddress, addressMetadataMap)
         }
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryDto(it.legalAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map {
+            ChangelogEntryVerboseDto(
+                it.legalAddress.bpn,
+                ChangelogType.UPDATE,
+                ChangelogSubject.ADDRESS
+            )
+        })
 
         val validEntities = legalEntityRepository.saveAll(legalEntities).map { it.toUpsertDto(null) }
 
@@ -202,8 +220,8 @@ class BusinessPartnerBuildService(
             ErrorInfo(SiteUpdateError.SiteNotFound, "Site $it not updated: BPNS not found", it)
         }
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryDto(it.mainAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         val requestByBpnMap = requests.associateBy { it.bpns }
         sites.forEach {
@@ -231,7 +249,7 @@ class BusinessPartnerBuildService(
 
         validAddresses.forEach { updateLogisticAddress(it, requestByBpnMap[it.bpn]!!.address, metadataMap) }
 
-        changelogService.createChangelogEntries(validAddresses.map { ChangelogEntryDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(validAddresses.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
 
         val addressResponses = logisticAddressRepository.saveAll(validAddresses).map { it.toDto() }
         return AddressPartnerUpdateResponseWrapper(addressResponses, errors)
@@ -249,7 +267,7 @@ class BusinessPartnerBuildService(
         requests: Collection<AddressPartnerCreateRequest>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
-    ): Collection<AddressPartnerCreateResponse> {
+    ): Collection<AddressPartnerCreateVerboseDto> {
 
         fun findValidLegalEnities(requests: Collection<AddressPartnerCreateRequest>): Map<String, LegalEntity> {
             val bpnLsToFetch = requests.map { it.bpnParent }
@@ -281,7 +299,7 @@ class BusinessPartnerBuildService(
         requests: Collection<AddressPartnerCreateRequest>,
         errors: MutableList<ErrorInfo<AddressCreateError>>,
         metadataMap: AddressMetadataMappingDto
-    ): List<AddressPartnerCreateResponse> {
+    ): List<AddressPartnerCreateVerboseDto> {
 
         val bpnsToFetch = requests.map { it.bpnParent }
         val siteByBpnMap = siteRepository

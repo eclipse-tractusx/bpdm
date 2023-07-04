@@ -17,18 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.pool.dto
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
-
-@Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
-data class AddressMatchResponse(
-
-    @Schema(description = "Relative quality score of the match. The higher the better")
-    val score: Float,
-
-    @Schema(description = "Matched address business partner record")
-    val address: LogisticAddressVerboseDto
+data class ChangelogEntryVerboseDto(
+    val bpn: String,
+    val changelogType: ChangelogType,
+    val changelogSubject: ChangelogSubject
 )

@@ -19,19 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import java.time.Instant
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressPartnerCreateResponse", description = "Created business partners of type address")
-data class AddressPartnerCreateResponse(
+@Schema(name = "MainAddressResponse", description = "Main address for site")
+data class MainAddressVerboseDto(
 
-    @field:JsonUnwrapped
-    val address: LogisticAddressVerboseDto,
+    @Schema(description = "Physical postal address")
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
-    val index: String?
+    @Schema(description = "Alternative postal address")
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
+
+    @Schema(description = "BPN of the related site")
+    val bpnSite: String,
+
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

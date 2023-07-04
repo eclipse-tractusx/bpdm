@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -180,17 +180,17 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val addressPartnerCreate1 = AddressPartnerCreateResponse(
+    val addressPartnerCreate1 = AddressPartnerCreateVerboseDto(
         address = addressPartner1,
         index = CommonValues.index1
     )
 
-    val addressPartnerCreate2 = AddressPartnerCreateResponse(
+    val addressPartnerCreate2 = AddressPartnerCreateVerboseDto(
         address = addressPartner2,
         index = CommonValues.index2
     )
 
-    val addressPartnerCreate3 = AddressPartnerCreateResponse(
+    val addressPartnerCreate3 = AddressPartnerCreateVerboseDto(
         address = addressPartner3,
         index = CommonValues.index3
     )
@@ -222,7 +222,7 @@ object ResponseValues {
         updatedAt = CommonValues.now,
     )
 
-    val siteUpsert1 = SitePartnerCreateResponse(
+    val siteUpsert1 = SitePartnerCreateVerboseDto(
         site = site1,
         mainAddress = addressPartner1.copy(
             bpnSite = site1.bpns,
@@ -231,7 +231,7 @@ object ResponseValues {
         index = CommonValues.index1
     )
 
-    val siteUpsert2 = SitePartnerCreateResponse(
+    val siteUpsert2 = SitePartnerCreateVerboseDto(
         site = site2,
         mainAddress = addressPartner2.copy(
             bpnSite = site2.bpns,
@@ -240,7 +240,7 @@ object ResponseValues {
         index = CommonValues.index2
     )
 
-    val siteUpsert3 = SitePartnerCreateResponse(
+    val siteUpsert3 = SitePartnerCreateVerboseDto(
         site = site3,
         mainAddress = addressPartner3.copy(
             bpnSite = site3.bpns,
@@ -376,7 +376,7 @@ object ResponseValues {
         )
     )
 
-    val legalEntityUpsert1 = LegalEntityPartnerCreateResponse(
+    val legalEntityUpsert1 = LegalEntityPartnerCreateVerboseDto(
         legalName = CommonValues.name1,
         legalEntity = LegalEntityVerboseDto(
             bpnl = CommonValues.bpnL1,
@@ -396,7 +396,7 @@ object ResponseValues {
         index = CommonValues.index1
     )
 
-    val legalEntityUpsert2 = LegalEntityPartnerCreateResponse(
+    val legalEntityUpsert2 = LegalEntityPartnerCreateVerboseDto(
         legalName = CommonValues.name3,
         legalEntity = LegalEntityVerboseDto(
             bpnl = CommonValues.bpnL2,
@@ -415,7 +415,7 @@ object ResponseValues {
         index = CommonValues.index2
     )
 
-    val legalEntityUpsert3 = LegalEntityPartnerCreateResponse(
+    val legalEntityUpsert3 = LegalEntityPartnerCreateVerboseDto(
         legalName = CommonValues.name5,
         legalEntity = LegalEntityVerboseDto(
             bpnl = CommonValues.bpnL3,

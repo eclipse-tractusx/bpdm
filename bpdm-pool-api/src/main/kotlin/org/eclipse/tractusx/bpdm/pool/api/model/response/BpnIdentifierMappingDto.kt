@@ -20,25 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
-import java.time.Instant
 
-@Schema(name = "LegalAddressResponse", description = "Legal address for legal entity")
-data class LegalAddressResponse(
+@Schema(name = "BpnIdentifierMappingDto", description = "Mapping of Business Partner Number to identifier value")
+data class BpnIdentifierMappingDto(
 
-    @Schema(description = "Physical postal address")
-    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
+    @Schema(description = "Value of the identifier")
+    val idValue: String,
 
-    @Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
-
-    @Schema(description = "BPN of the related legal entity")
-    val bpnLegalEntity: String,
-
-    @Schema(description = "The timestamp the business partner data was created")
-    val createdAt: Instant,
-
-    @Schema(description = "The timestamp the business partner data was last updated")
-    val updatedAt: Instant
+    @Schema(description = "Business Partner Number")
+    val bpn: String
 )

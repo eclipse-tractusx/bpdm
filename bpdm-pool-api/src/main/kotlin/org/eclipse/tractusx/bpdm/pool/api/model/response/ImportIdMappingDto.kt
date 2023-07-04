@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 
-data class ImportIdMappingResponse(
+data class ImportIdMappingDto(
     val entries: Collection<ImportIdEntry>,
     val notFound: Collection<String>
 ) {

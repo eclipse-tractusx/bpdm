@@ -63,7 +63,7 @@ interface PoolAddressApi {
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressMatchResponse>
+    ): PageResponse<AddressMatchVerboseDto>
 
     @Operation(
         summary = "Get address partners by bpna",

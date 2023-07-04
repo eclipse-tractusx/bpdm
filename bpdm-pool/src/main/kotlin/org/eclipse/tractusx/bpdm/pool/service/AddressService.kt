@@ -25,8 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
@@ -73,7 +73,7 @@ class AddressService(
         return addressPage.toDto(addressPage.content.map { it.toDto() })
     }
 
-    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressResponse> {
+    fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressVerboseDto> {
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
         legalEntityRepository.joinLegalAddresses(legalEntities)
         val addresses = legalEntities.map { it.legalAddress }
@@ -81,7 +81,7 @@ class AddressService(
         return addresses.map { it.toLegalAddressResponse() }
     }
 
-    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressResponse> {
+    fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressVerboseDto> {
         val sites = siteRepository.findDistinctByBpnIn(bpnS)
         siteRepository.joinAddresses(sites)
         val addresses = sites.map { it.mainAddress }

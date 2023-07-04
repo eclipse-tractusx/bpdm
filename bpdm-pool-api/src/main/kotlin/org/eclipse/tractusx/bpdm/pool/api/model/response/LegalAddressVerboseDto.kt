@@ -19,26 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import java.time.Instant
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityMatchResponse", description = "Match with score for a business partner record of type legal entity")
-data class LegalEntityMatchResponse(
+@Schema(name = "LegalAddressVerboseDto", description = "Legal address for legal entity")
+data class LegalAddressVerboseDto(
 
-    @Schema(description = "Relative quality score of the match. The higher the better")
-    val score: Float,
+    @Schema(description = "Physical postal address")
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
-    @get:Schema(description = "Legal name the partner goes by")
-    val legalName: String,
+    @Schema(description = "Alternative postal address")
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityVerboseDto,
+    @Schema(description = "BPN of the related legal entity")
+    val bpnLegalEntity: String,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressVerboseDto,
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
+
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )
