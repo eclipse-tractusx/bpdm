@@ -177,8 +177,8 @@ fun toEntityAddress(dto: SiteStateDto, site: Site): SiteState {
     return SiteState(dto.description, dto.validFrom, dto.validTo, dto.type, site)
 }
 
-fun ChangelogEntry.toGateDto(): ChangelogResponse {
-    return ChangelogResponse(
+fun ChangelogEntry.toGateDto(): ChangelogGateDto {
+    return ChangelogGateDto(
         externalId = externalId,
         businessPartnerType = businessPartnerType,
         modifiedAt = createdAt
@@ -380,9 +380,9 @@ fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse
-fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputResponse {
+fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputDto {
 
-    return LegalEntityGateInputResponse(
+    return LegalEntityGateInputDto(
         legalEntity = legalEntity.toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
         externalId = legalEntity.externalId,
@@ -404,9 +404,9 @@ fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto>
 }
 
 //Site mapping to SiteGateInputResponse
-fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
+fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputDto {
 
-    return SiteGateInputResponse(
+    return SiteGateInputDto(
         site = sitePage.toSiteDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity.externalId,
@@ -416,9 +416,9 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputResponse {
 }
 
 //Logistic Address mapping to AddressGateOutputResponse
-fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputResponse {
+fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputDto {
 
-    val addressGateOutputResponse = AddressGateOutputResponse(
+    val addressGateOutputResponse = AddressGateOutputDto(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,

@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -39,7 +39,7 @@ class ChangelogController(
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getInputChangelog(
         paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
-    ): PageChangeLogResponse<ChangelogResponse> {
+    ): PageChangeLogResponse<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
             searchRequest.lsaTypes,
@@ -54,7 +54,7 @@ class ChangelogController(
     override fun getOutputChangelog(
         paginationRequest: PaginationRequest,
         searchRequest: ChangeLogSearchRequest
-    ): PageChangeLogResponse<ChangelogResponse> {
+    ): PageChangeLogResponse<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
             searchRequest.lsaTypes,

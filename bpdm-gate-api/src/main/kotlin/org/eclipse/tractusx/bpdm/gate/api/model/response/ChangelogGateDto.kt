@@ -19,29 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import java.time.Instant
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "SiteGateInputResponse", description = "Site with legal entity reference"
-)
-data class SiteGateInputResponse(
-
-    @field:JsonUnwrapped
-    val site: SiteGateDto,
-
-    @get:Schema(description = "Main address where this site resides")
-    val mainAddress: AddressGateInputResponse,
-
-    @Schema(description = "ID the record has in the external system where the record originates from")
+@Schema(name = "ChangelogGateDto", description = "Changelog entry for a business partner")
+data class ChangelogGateDto(
+    @Schema(description = "External ID of the changelog entry")
     val externalId: String,
-
-    @Schema(description = "External id of the related legal entity")
-    val legalEntityExternalId: String,
-
-    )
-
+    @Schema(description = "The type of the change")
+    val businessPartnerType: LsaType,
+    @Schema(description = "The timestamp of the operation")
+    val modifiedAt: Instant
+)

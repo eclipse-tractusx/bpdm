@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
 @Schema(name = "LegalEntityIdentifierVerboseDto", description = "Identifier record of a legal entity")
 data class LegalEntityIdentifierVerboseDto(
@@ -29,7 +29,7 @@ data class LegalEntityIdentifierVerboseDto(
     val value: String,
 
     @get:Schema(description = "Type of the identifier")
-    val type: TypeKeyNameDto<String>,
+    val type: TypeKeyNameVerboseDto<String>,
 
     @get:Schema(description = "Body which issued the identifier")
     val issuingBody: String? = null

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
 @Schema(name = "BasePostalAddressVerboseDto", description = "Address record of a business partner")
 data class BasePostalAddressVerboseDto(
@@ -31,7 +31,7 @@ data class BasePostalAddressVerboseDto(
     val geographicCoordinates: GeoCoordinateDto? = null,
 
     @get:Schema(description = "Describes the full name of the country")
-    val country: TypeKeyNameDto<CountryCode>,
+    val country: TypeKeyNameVerboseDto<CountryCode>,
 
     @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
     val postalCode: String? = null,

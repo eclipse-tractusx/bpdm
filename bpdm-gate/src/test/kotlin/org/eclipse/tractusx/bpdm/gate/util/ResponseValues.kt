@@ -23,25 +23,25 @@ import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import java.time.Instant
 
 object ResponseValues {
-    val language1 = TypeKeyNameDto(
+    val language1 = TypeKeyNameVerboseDto(
         technicalKey = CommonValues.language1,
         name = CommonValues.language1.getName()
     )
 
-    val language2 = TypeKeyNameDto(
+    val language2 = TypeKeyNameVerboseDto(
         technicalKey = CommonValues.language2,
         name = CommonValues.language2.getName()
     )
 
     val identifier1 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue1,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
             name = CommonValues.identifierTypeName1,
         ),
@@ -49,7 +49,7 @@ object ResponseValues {
     )
     val identifier2 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue2,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
             name = CommonValues.identifierTypeName2,
         ),
@@ -58,7 +58,7 @@ object ResponseValues {
     )
     val identifier3 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue3,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
             name = CommonValues.identifierTypeName3,
         ),
@@ -67,7 +67,7 @@ object ResponseValues {
     )
     val identifier4 = LegalEntityIdentifierVerboseDto(
         value = CommonValues.identifierValue4,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.identifierTypeTechnicalKey4,
             name = CommonValues.identifierTypeName4,
         ),
@@ -91,7 +91,7 @@ object ResponseValues {
         officialDenotation = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.businessStateType1,
             name = CommonValues.businessStateType1.getTypeName(),
         )
@@ -101,7 +101,7 @@ object ResponseValues {
         officialDenotation = CommonValues.businessStatusOfficialDenotation2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
-        type = TypeKeyNameDto(
+        type = TypeKeyNameVerboseDto(
             technicalKey = CommonValues.businessStateType2,
             name = CommonValues.businessStateType2.getTypeName(),
         )
@@ -132,11 +132,11 @@ object ResponseValues {
     )
 
 
-    val country1 = TypeKeyNameDto(
+    val country1 = TypeKeyNameVerboseDto(
         technicalKey = CommonValues.country1,
         name = CommonValues.country1.getName()
     )
-    val country2 = TypeKeyNameDto(
+    val country2 = TypeKeyNameVerboseDto(
         technicalKey = CommonValues.country2,
         name = CommonValues.country2.getName()
     )
@@ -186,7 +186,7 @@ object ResponseValues {
         )
     )
 
-    val logisticAddress1 = LogisticAddressGateResponse(
+    val logisticAddress1 = LogisticAddressGateVerboseDto(
         bpna = CommonValues.bpnAddress1,
         physicalPostalAddress = address1,
         bpnLegalEntity = CommonValues.bpn1,
@@ -195,7 +195,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val logisticAddress2 = LogisticAddressGateResponse(
+    val logisticAddress2 = LogisticAddressGateVerboseDto(
         bpna = CommonValues.bpnAddress2,
         physicalPostalAddress = address2,
         bpnLegalEntity = CommonValues.bpn2,
@@ -306,7 +306,7 @@ object ResponseValues {
     )
 
     //Output Response Values
-    val logisticAddressGateOutputResponse1 = AddressGateOutputResponse(
+    val logisticAddressGateOutputResponse1 = AddressGateOutputDto(
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
         ),
@@ -315,7 +315,7 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress1
     )
 
-    val logisticAddressGateOutputResponse2 = AddressGateOutputResponse(
+    val logisticAddressGateOutputResponse2 = AddressGateOutputDto(
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
         ),
@@ -324,7 +324,7 @@ object ResponseValues {
         bpn = CommonValues.bpnAddress2
     )
 
-    val legalEntityGateInputResponse1 = LegalEntityGateInputResponse(
+    val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
         legalEntity = RequestValues.legalEntity1,
         legalNameParts = listOf(CommonValues.name1),
         legalAddress = AddressGateInputResponse(
@@ -336,7 +336,7 @@ object ResponseValues {
         externalId = CommonValues.externalId1,
     )
 
-    val legalEntityGateInputResponse2 = LegalEntityGateInputResponse(
+    val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
         legalEntity = RequestValues.legalEntity2,
         legalNameParts = listOf(CommonValues.name2),
         legalAddress = AddressGateInputResponse(
@@ -355,7 +355,7 @@ object ResponseValues {
         legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
         bpn = CommonValues.bpn1,
-        legalAddress = AddressGateOutputResponse(
+        legalAddress = AddressGateOutputDto(
             address = RequestValues.address1,
             externalId = "${CommonValues.externalId1}_legalAddress",
             legalEntityExternalId = CommonValues.externalId1,
@@ -369,7 +369,7 @@ object ResponseValues {
         externalId = CommonValues.externalId2,
         legalNameParts = listOf(CommonValues.name2),
         bpn = CommonValues.bpn2,
-        legalAddress = AddressGateOutputResponse(
+        legalAddress = AddressGateOutputDto(
             address = RequestValues.address2,
             externalId = "${CommonValues.externalId2}_legalAddress",
             legalEntityExternalId = CommonValues.externalId2,
@@ -378,7 +378,7 @@ object ResponseValues {
         )
     )
 
-    val persistencesiteGateInputResponse1 = SiteGateInputResponse(
+    val persistencesiteGateInputResponse1 = SiteGateInputDto(
         site = RequestValues.site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
@@ -390,7 +390,7 @@ object ResponseValues {
         )
     )
 
-    val persistenceSiteGateInputResponse2 = SiteGateInputResponse(
+    val persistenceSiteGateInputResponse2 = SiteGateInputDto(
         site = RequestValues.site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
@@ -407,7 +407,7 @@ object ResponseValues {
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
         bpn = CommonValues.bpnSite1,
-        mainAddress = AddressGateOutputResponse(
+        mainAddress = AddressGateOutputDto(
             address = RequestValues.address1,
             externalId = "${CommonValues.externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -421,7 +421,7 @@ object ResponseValues {
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
         bpn = CommonValues.bpnSite2,
-        mainAddress = AddressGateOutputResponse(
+        mainAddress = AddressGateOutputDto(
             address = RequestValues.address2,
             externalId = "${CommonValues.externalIdSite2}_site",
             legalEntityExternalId = null,

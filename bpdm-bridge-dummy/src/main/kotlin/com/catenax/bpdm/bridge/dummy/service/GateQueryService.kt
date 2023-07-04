@@ -43,7 +43,7 @@ class GateQueryService(
     fun getChangedExternalIdsByLsaType(modifiedAfter: Instant?): Map<LsaType, Set<String>> {
         var page = 0
         var totalPages: Int
-        val content = mutableListOf<ChangelogResponse>()
+        val content = mutableListOf<ChangelogGateDto>()
 
         do {
             val pageResponse = gateClient.changelog().getInputChangelog(
@@ -138,13 +138,13 @@ class GateQueryService(
             .mapValues { it.value.bpn!! }
     }
 
-    private fun getLegalEntitiesInput(externalIds: Set<String>): Collection<LegalEntityGateInputResponse> {
+    private fun getLegalEntitiesInput(externalIds: Set<String>): Collection<LegalEntityGateInputDto> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<LegalEntityGateInputResponse>()
+        val validContent = mutableListOf<LegalEntityGateInputDto>()
 
         do {
             val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
@@ -159,13 +159,13 @@ class GateQueryService(
         return validContent
     }
 
-    private fun getSitesInput(externalIds: Set<String>): Collection<SiteGateInputResponse> {
+    private fun getSitesInput(externalIds: Set<String>): Collection<SiteGateInputDto> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<SiteGateInputResponse>()
+        val validContent = mutableListOf<SiteGateInputDto>()
 
         do {
             val pageResponse = gateClient.sites().getSitesByExternalIds(

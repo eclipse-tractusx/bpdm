@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
@@ -42,7 +42,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputResponse> {
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputDto> {
 
         val sitesPage = if (externalIds != null) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -59,13 +59,13 @@ class SiteService(
         )
     }
 
-    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputResponse> {
+    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputDto> {
         return sitePage.content.map { site ->
             site.toSiteGateInputResponse(site)
         }
     }
 
-    fun getSiteByExternalId(externalId: String): SiteGateInputResponse {
+    fun getSiteByExternalId(externalId: String): SiteGateInputDto {
         val siteRecord = siteRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Site", externalId)
 
         return siteRecord.toSiteGateInputResponse(siteRecord)

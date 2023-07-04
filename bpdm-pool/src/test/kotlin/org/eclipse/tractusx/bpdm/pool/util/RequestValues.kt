@@ -20,14 +20,14 @@
 package org.eclipse.tractusx.bpdm.pool.util
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 
 object RequestValues {
 
-    val identifierType1 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
-    val identifierType2 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
-    val identifierType3 = TypeKeyNameDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
+    val identifierType1 = TypeKeyNameVerboseDto(CommonValues.identifierTypeTechnicalKey1, CommonValues.identifierTypeName1)
+    val identifierType2 = TypeKeyNameVerboseDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
+    val identifierType3 = TypeKeyNameVerboseDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
     val identifierTypeDto1 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey1, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
     val identifierTypeDto2 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName2)

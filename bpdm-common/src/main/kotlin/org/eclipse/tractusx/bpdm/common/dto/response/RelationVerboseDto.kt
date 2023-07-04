@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.RelationType
 import java.time.LocalDateTime
 
@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 data class RelationVerboseDto(
 
     @get:Schema(description = "Type of relation like predecessor or ownership relation")
-    val type: TypeKeyNameDto<RelationType>,
+    val type: TypeKeyNameVerboseDto<RelationType>,
 
     @get:Schema(description = "BPN of partner which is the source of the relation")
     val startBpn: String,
