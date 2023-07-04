@@ -65,5 +65,5 @@ class LogisticAddress(
     val nameParts: MutableSet<NameParts> = mutableSetOf()
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val roles: MutableSet<LegalEntityRoles> = mutableSetOf()
+    val roles: MutableSet<Roles> = mutableSetOf()
 }

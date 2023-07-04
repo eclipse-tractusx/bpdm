@@ -58,7 +58,7 @@ class LegalEntity(
     lateinit var legalAddress: LogisticAddress
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val roles: MutableSet<LegalEntityRoles> = mutableSetOf()
+    val roles: MutableSet<Roles> = mutableSetOf()
 
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<LogisticAddress> = mutableSetOf()

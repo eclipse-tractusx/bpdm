@@ -44,7 +44,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
 @Entity
 @Table(name = "roles")
-class LegalEntityRoles(
+class Roles(
 
     @ManyToOne
     @JoinColumn(name = "legal_entity_id", nullable = false)

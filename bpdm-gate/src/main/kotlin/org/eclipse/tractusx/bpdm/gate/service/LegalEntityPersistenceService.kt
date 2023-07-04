@@ -90,7 +90,7 @@ class LegalEntityPersistenceService(
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toLegalEntityRoles(it, legalEntity, null, null) })
+        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity
@@ -107,7 +107,7 @@ class LegalEntityPersistenceService(
 
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.nameParts.map { toNameParts(it.namePart, address, null, null) })
-        address.roles.replace(changeAddress.roles.distinct().map { toLegalEntityRoles(it.roleName, null, null, address) })
+        address.roles.replace(changeAddress.roles.distinct().map { toRoles(it.roleName, null, null, address) })
 
     }
 
@@ -158,7 +158,7 @@ class LegalEntityPersistenceService(
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
         legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toLegalEntityRoles(it, legalEntity, null, null) })
+        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity

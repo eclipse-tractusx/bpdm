@@ -41,7 +41,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
-    logisticAddress.roles.addAll(this.address.roles.distinct().map { toLegalEntityRoles(it, null, null, logisticAddress) }.toSet())
+    logisticAddress.roles.addAll(this.address.roles.distinct().map { toRoles(it, null, null, logisticAddress) }.toSet())
 
     return logisticAddress
 }
@@ -60,7 +60,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
-    logisticAddress.roles.addAll(this.address.roles.distinct().map { toLegalEntityRoles(it, null, null, logisticAddress) }.toSet())
+    logisticAddress.roles.addAll(this.address.roles.distinct().map { toRoles(it, null, null, logisticAddress) }.toSet())
 
     return logisticAddress
 }
@@ -148,7 +148,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
     site.nameParts.addAll(this.site.nameParts.map { toNameParts(it, null, site, null) }.toSet())
-    site.roles.addAll(this.site.roles.distinct().map { toLegalEntityRoles(it, null, site, null) })
+    site.roles.addAll(this.site.roles.distinct().map { toRoles(it, null, site, null) })
 
     site.mainAddress = addressInputRequest.toAddressGate(null, site, datatype)
 
@@ -173,7 +173,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
     site.nameParts.addAll(this.site.nameParts.map { toNameParts(it, null, site, null) }.toSet())
-    site.roles.addAll(this.site.roles.distinct().map { toLegalEntityRoles(it, null, site, null) })
+    site.roles.addAll(this.site.roles.distinct().map { toRoles(it, null, site, null) })
 
     site.mainAddress = addressOutputRequest.toAddressGateOutput(null, site, datatype)
 
@@ -210,7 +210,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-    legalEntity.roles.addAll(this.roles.distinct().map { toLegalEntityRoles(it, legalEntity, null, null) })
+    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
@@ -237,7 +237,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-    legalEntity.roles.addAll(this.roles.distinct().map { toLegalEntityRoles(it, legalEntity, null, null) })
+    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
 
     legalEntity.legalAddress = addressOutputRequest.toAddressGateOutput(legalEntity, null, datatype)
@@ -246,8 +246,8 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
 }
 
-fun toLegalEntityRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?, address: LogisticAddress?): LegalEntityRoles {
-    return LegalEntityRoles(legalEntity, address, site, role)
+fun toRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?, address: LogisticAddress?): Roles {
+    return Roles(legalEntity, address, site, role)
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
