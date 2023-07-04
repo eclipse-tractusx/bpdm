@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
@@ -55,7 +55,7 @@ class AddressController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getAddress(
         bpna: String
-    ): LogisticAddressResponse {
+    ): LogisticAddressVerboseDto {
         return addressService.findByBpn(bpna.uppercase())
     }
 
@@ -63,7 +63,7 @@ class AddressController(
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressResponse> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 

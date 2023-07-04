@@ -206,7 +206,7 @@ object ResponseValues {
 
     val legalEntityResponsePool1 = PoolLegalEntityVerboseDto(
         legalName = CommonValues.name1,
-        legalAddress = LogisticAddressResponse(
+        legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnAddress1,
             physicalPostalAddress = address1,
             bpnLegalEntity = CommonValues.bpn1,
@@ -229,7 +229,7 @@ object ResponseValues {
 
     val legalEntityResponsePool2 = PoolLegalEntityVerboseDto(
         legalName = CommonValues.name3,
-        legalAddress = LogisticAddressResponse(
+        legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnAddress2,
             physicalPostalAddress = address2,
             bpnLegalEntity = CommonValues.bpn2,

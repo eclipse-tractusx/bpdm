@@ -119,7 +119,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
+                SitePoolResponse::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
@@ -172,7 +172,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
+                SitePoolResponse::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }
@@ -381,8 +381,8 @@ class SiteControllerIT @Autowired constructor(
             .ignoringFields(
                 SitePartnerCreateResponse::site.name + "." + SiteVerboseDto::bpns.name,
                 SitePartnerCreateResponse::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
-                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpna.name,
-                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressResponse::bpnSite.name
+                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SitePartnerCreateResponse::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }
