@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
@@ -58,7 +58,7 @@ class AddressController(
 
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getAddressByExternalId(externalId: String): AddressGateInputResponse {
+    override fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
         return addressService.getAddressByExternalId(externalId)
     }
@@ -67,12 +67,12 @@ class AddressController(
     override fun getAddressesByExternalIds(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>
-    ): PageDto<AddressGateInputResponse> {
+    ): PageDto<AddressGateInputDto> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size, externalIds = externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
-    override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputResponse> {
+    override fun getAddresses(paginationRequest: PaginationRequest): PageDto<AddressGateInputDto> {
         return addressService.getAddresses(page = paginationRequest.page, size = paginationRequest.size)
     }
 

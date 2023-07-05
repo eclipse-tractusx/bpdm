@@ -27,7 +27,7 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -54,7 +54,7 @@ interface GateChangelogApi {
     fun getInputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangeLogSearchRequest
-    ): PageChangeLogResponse<ChangelogGateDto>
+    ): PageChangeLogDto<ChangelogGateDto>
 
 
     @Operation(
@@ -72,5 +72,5 @@ interface GateChangelogApi {
     fun getOutputChangelog(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody searchRequest: ChangeLogSearchRequest
-    ): PageChangeLogResponse<ChangelogGateDto>
+    ): PageChangeLogDto<ChangelogGateDto>
 }

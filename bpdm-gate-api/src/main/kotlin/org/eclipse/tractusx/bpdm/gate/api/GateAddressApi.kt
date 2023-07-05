@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -76,7 +76,7 @@ interface GateAddressApi {
 
     @GetMapping("/input/addresses/{externalId}")
     @GetExchange("/input/addresses/{externalId}")
-    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInputResponse
+    fun getAddressByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): AddressGateInputDto
 
     @Operation(
         summary = "Get page of addresses filtered by a collection of externalIds",
@@ -93,7 +93,7 @@ interface GateAddressApi {
     fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<AddressGateInputResponse>
+    ): PageDto<AddressGateInputDto>
 
 
     @Operation(
@@ -108,7 +108,7 @@ interface GateAddressApi {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputResponse>
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputDto>
 
     @Operation(
         summary = "Get page of addresses (Output)",
