@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
@@ -70,7 +70,7 @@ class MetadataService(
         return identifierTypeRepository.save(entity).toDto()
     }
 
-    fun getIdentifierTypes(pageRequest: Pageable, lsaType: IdentifierLsaType, country: CountryCode? = null): PageResponse<IdentifierTypeDto> {
+    fun getIdentifierTypes(pageRequest: Pageable, lsaType: IdentifierLsaType, country: CountryCode? = null): PageDto<IdentifierTypeDto> {
         val spec = Specification.allOf(
             IdentifierTypeRepository.Specs.byLsaType(lsaType),
             IdentifierTypeRepository.Specs.byCountry(country)
@@ -95,7 +95,7 @@ class MetadataService(
         return legalFormRepository.save(legalForm).toDto()
     }
 
-    fun getLegalForms(pageRequest: Pageable): PageResponse<LegalFormDto> {
+    fun getLegalForms(pageRequest: Pageable): PageDto<LegalFormDto> {
         val page = legalFormRepository.findAll(pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }

@@ -26,7 +26,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
@@ -91,7 +91,7 @@ class OpenSearchControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         openSearchSyncService.clearOpenSearch()
 
-        val importCollection = PageResponse(
+        val importCollection = PageDto(
             partnerDocs.size.toLong(),
             1,
             0,
@@ -204,7 +204,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
     }
 
-    private fun searchBusinessPartnerByName(name: String): PageResponse<LegalEntityMatchVerboseDto> {
+    private fun searchBusinessPartnerByName(name: String): PageDto<LegalEntityMatchVerboseDto> {
 
         return poolClient.legalEntities().getLegalEntities(
             LegalEntityPropertiesSearchRequest(name),

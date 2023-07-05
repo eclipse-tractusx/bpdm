@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingDto
@@ -102,5 +102,5 @@ interface PoolSaasApi {
     )
     @GetMapping("/identifier-mappings")
     @GetExchange("/identifier-mappings")
-    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageResponse<ImportIdEntry>
+    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageDto<ImportIdEntry>
 }

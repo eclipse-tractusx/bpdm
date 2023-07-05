@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
@@ -90,7 +90,7 @@ interface GateSiteApi {
     fun getSitesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageResponse<SiteGateInputDto>
+    ): PageDto<SiteGateInputDto>
 
     @Operation(
         summary = "Get page of sites",
@@ -104,7 +104,7 @@ interface GateSiteApi {
     )
     @GetMapping("/input/sites")
     @GetExchange("/input/sites")
-    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<SiteGateInputDto>
+    fun getSites(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<SiteGateInputDto>
 
     @Operation(
         summary = "Get page of sites",
@@ -121,7 +121,7 @@ interface GateSiteApi {
     fun getSitesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageResponse<SiteGateOutputResponse>
+    ): PageDto<SiteGateOutputResponse>
 
     @Operation(
         summary = "Create or update output sites.",

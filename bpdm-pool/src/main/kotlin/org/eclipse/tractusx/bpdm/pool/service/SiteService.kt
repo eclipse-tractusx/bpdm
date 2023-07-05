@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
@@ -37,7 +37,7 @@ class SiteService(
     private val legalEntityRepository: LegalEntityRepository,
     private val addressService: AddressService
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<SiteVerboseDto> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -47,7 +47,7 @@ class SiteService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageResponse<SitePoolVerboseDto> {
+    fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SitePoolVerboseDto> {
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage =

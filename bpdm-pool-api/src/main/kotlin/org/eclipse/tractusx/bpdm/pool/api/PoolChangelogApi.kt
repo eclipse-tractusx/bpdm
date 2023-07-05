@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse
 import org.springdoc.core.annotations.ParameterObject
@@ -56,5 +56,5 @@ interface PoolChangelogApi {
     fun getChangelogEntries(
         @RequestBody changelogSearchRequest: ChangelogSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<ChangelogEntryResponse>
+    ): PageDto<ChangelogEntryResponse>
 }

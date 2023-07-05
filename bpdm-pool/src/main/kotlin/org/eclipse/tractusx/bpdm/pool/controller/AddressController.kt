@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolAddressApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
@@ -47,7 +47,7 @@ class AddressController(
     override fun getAddresses(
         addressSearchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<AddressMatchVerboseDto> {
+    ): PageDto<AddressMatchVerboseDto> {
 
         return searchService.searchAddresses(addressSearchRequest, paginationRequest)
     }
@@ -63,7 +63,7 @@ class AddressController(
     override fun searchAddresses(
         addressSearchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressVerboseDto> {
+    ): PageDto<LogisticAddressVerboseDto> {
         return addressService.findByPartnerAndSiteBpns(addressSearchRequest, paginationRequest)
     }
 

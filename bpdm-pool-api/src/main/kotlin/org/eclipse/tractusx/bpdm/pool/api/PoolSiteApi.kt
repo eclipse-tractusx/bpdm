@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
@@ -96,7 +96,7 @@ interface PoolSiteApi {
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SitePoolVerboseDto>
+    ): PageDto<SitePoolVerboseDto>
 
     @Operation(
         summary = "Create new site business partners",

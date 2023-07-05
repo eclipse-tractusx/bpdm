@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
@@ -46,7 +46,7 @@ class AddressService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<AddressGateInputResponse> {
+    fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputResponse> {
 
         val logisticAddressPage = if (externalIds != null) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -54,7 +54,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,
@@ -81,7 +81,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputDto> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -89,7 +89,7 @@ class AddressService(
             addressRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = logisticAddressPage.totalElements,
             totalPages = logisticAddressPage.totalPages,

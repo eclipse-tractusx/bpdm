@@ -43,7 +43,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
@@ -177,7 +177,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, emptyList())
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
-            PageResponse(
+            PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,
@@ -224,7 +224,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
-            PageResponse(
+            PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
                 page = pageValue,

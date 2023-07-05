@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
@@ -101,7 +101,7 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via name`() {
-        val expected = PageResponse(
+        val expected = PageDto(
             1, 1, 0, 1, listOf(
                 AddressMatchVerboseDto(0f, givenAddress1)
             )
@@ -123,7 +123,7 @@ class AddressControllerSearchIT @Autowired constructor(
      */
     @Test
     fun `search address via name not found`() {
-        val expected = PageResponse(
+        val expected = PageDto(
             0, 0, 0, 0, emptyList<AddressMatchVerboseDto>()
         )
 
@@ -137,7 +137,7 @@ class AddressControllerSearchIT @Autowired constructor(
     }
 
 
-    private fun assertPageEquals(actual: PageResponse<AddressMatchVerboseDto>, expected: PageResponse<AddressMatchVerboseDto>) {
+    private fun assertPageEquals(actual: PageDto<AddressMatchVerboseDto>, expected: PageDto<AddressMatchVerboseDto>) {
         testHelpers.assertRecursively(actual)
             .ignoringFieldsMatchingRegexes(".*${AddressMatchVerboseDto::score.name}")
             .isEqualTo(expected)
