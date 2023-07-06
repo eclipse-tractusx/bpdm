@@ -21,13 +21,12 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
+import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
+import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
@@ -36,6 +35,7 @@ import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
+import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -46,9 +46,10 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class MetadataService(
-    val identifierTypeRepository: IdentifierTypeRepository,
-    val legalFormRepository: LegalFormRepository,
-    val fieldQualityRuleRepository: FieldQualityRuleRepository
+    private val identifierTypeRepository: IdentifierTypeRepository,
+    private val legalFormRepository: LegalFormRepository,
+    private val fieldQualityRuleRepository: FieldQualityRuleRepository,
+    private val regionRepository: RegionRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -134,6 +135,28 @@ class MetadataService(
 
         resultList.sortedWith(compareBy({ it.schemaName }, { it.fieldPath }))
         return resultList
+    }
+
+    fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto {
+        val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
+        val idTypes = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(IdentifierLsaType.LEGAL_ENTITY, idTypeKeys)
+
+        val legalFormKeys = requests.mapNotNull { it.legalForm }.toSet()
+        val legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys)
+
+        return LegalEntityMetadataDto(idTypes, legalForms)
+    }
+
+    fun getMetadata(requests: Collection<LogisticAddressDto>): AddressMetadataDto {
+        val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
+        val idTypes = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(IdentifierLsaType.ADDRESS, idTypeKeys)
+
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress.areaPart.administrativeAreaLevel1 }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.areaPart?.administrativeAreaLevel1 })
+            .toSet()
+        val regions = regionRepository.findByRegionCodeIn(regionKeys)
+
+        return AddressMetadataDto(idTypes, regions)
     }
 
     /**

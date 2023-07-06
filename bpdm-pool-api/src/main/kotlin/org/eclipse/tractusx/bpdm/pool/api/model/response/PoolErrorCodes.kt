@@ -29,32 +29,49 @@ interface ErrorCode
 
 @Schema(description = "LegalEntityCreateError")
 enum class LegalEntityCreateError : ErrorCode {
-    LegalEntityDuplicateIdentifier
+    LegalEntityDuplicateIdentifier,
+    LegalFormNotFound,
+    LegalEntityIdentifierNotFound,
+    LegalAddressRegionNotFound,
+    LegalAddressIdentifierNotFound
 }
 
 @Schema(description = "LegalEntityUpdateError")
 enum class LegalEntityUpdateError : ErrorCode {
-    LegalEntityNotFound
+    LegalEntityNotFound,
+    LegalEntityDuplicateIdentifier,
+    LegalFormNotFound,
+    LegalEntityIdentifierNotFound,
+    LegalAddressRegionNotFound,
+    LegalAddressIdentifierNotFound
 }
 
 @Schema(description = "SiteCreateError")
 enum class SiteCreateError : ErrorCode {
-    LegalEntityNotFound
+    LegalEntityNotFound,
+    MainAddressIdentifierNotFound,
+    MainAddressRegionNotFound
 }
 
 @Schema(description = "SiteUpdateError")
 enum class SiteUpdateError : ErrorCode {
-    SiteNotFound
+    SiteNotFound,
+    MainAddressIdentifierNotFound,
+    MainAddressRegionNotFound
 }
 
 @Schema(description = "AddressCreateError")
 enum class AddressCreateError : ErrorCode {
     BpnNotValid,
     SiteNotFound,
-    LegalEntityNotFound
+    LegalEntityNotFound,
+    RegionNotFound,
+    IdentifierNotFound
 }
 
 @Schema(description = "AddressUpdateError")
 enum class AddressUpdateError : ErrorCode {
-    AddressNotFound
+    AddressNotFound,
+    RegionNotFound,
+    IdentifierNotFound
 }

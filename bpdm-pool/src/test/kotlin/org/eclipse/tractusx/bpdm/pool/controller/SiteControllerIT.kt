@@ -382,7 +382,8 @@ class SiteControllerIT @Autowired constructor(
                 SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpns.name,
                 SitePartnerCreateVerboseDto::site.name + "." + SiteVerboseDto::bpnLegalEntity.name,
                 SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
-                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name
+                SitePartnerCreateVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpnSite.name,
+                SitePartnerCreateVerboseDto::index.name
             )
             .isEqualTo(expected)
     }

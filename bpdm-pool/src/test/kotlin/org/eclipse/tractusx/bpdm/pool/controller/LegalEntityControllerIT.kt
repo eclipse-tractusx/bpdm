@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
@@ -34,7 +32,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -53,14 +50,6 @@ class LegalEntityControllerIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val poolClient: PoolClientImpl
 ) {
-    companion object {
-        @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-    }
-
 
     @BeforeEach
     fun beforeEach() {
@@ -482,6 +471,7 @@ class LegalEntityControllerIT @Autowired constructor(
         actuals.forEach { assertThat(it.legalEntity.bpnl).matches(testHelpers.bpnLPattern) }
 
         testHelpers.assertRecursively(actuals)
+            .ignoringFields(LegalEntityPartnerCreateVerboseDto::index.name)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFieldsMatchingRegexes(".*${LegalEntityVerboseDto::bpnl.name}")
             .isEqualTo(expected)

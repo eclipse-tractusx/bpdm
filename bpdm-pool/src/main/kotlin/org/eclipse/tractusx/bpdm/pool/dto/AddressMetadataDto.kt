@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.dto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.Region
 
-data class AddressMetadataMappingDto(
-    val idTypes: Map<String, IdentifierType>,
-    val regions: Map<String, Region>
+data class AddressMetadataDto(
+    val idTypes: Collection<IdentifierType>,
+    val regions: Collection<Region>
 )

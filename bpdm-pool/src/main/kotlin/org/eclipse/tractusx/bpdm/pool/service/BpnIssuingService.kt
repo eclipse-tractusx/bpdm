@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.ConfigurationEntry
 import org.eclipse.tractusx.bpdm.pool.exception.BpnInvalidCounterValueException
@@ -54,6 +55,17 @@ class BpnIssuingService(
     @Transactional
     fun issueSiteBpns(count: Int): List<String> {
         return issueBpns(count, bpnConfigProperties.siteChar, bpnConfigProperties.counterKeySites)
+    }
+
+    fun translateToLsaType(bpn: String): ChangelogSubject?{
+        return with(bpn){
+            when{
+                startsWith(bpnlPrefix) -> ChangelogSubject.LEGAL_ENTITY
+                startsWith(bpnsPrefix) -> ChangelogSubject.SITE
+                startsWith(bpnAPrefix) -> ChangelogSubject.ADDRESS
+                else -> null
+            }
+        }
     }
 
 
