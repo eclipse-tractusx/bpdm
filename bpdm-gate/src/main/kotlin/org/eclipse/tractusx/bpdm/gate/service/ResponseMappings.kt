@@ -212,6 +212,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
+    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
     return legalEntity
@@ -256,6 +257,10 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
 
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
     return Classification(dto.value, dto.code, dto.type, legalEntity)
+}
+
+fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
+    return LegalEntityIdentifier(dto.value, dto.type, dto.issuingBody, legalEntity)
 }
 
 fun getMainAddressForSiteExternalId(siteExternalId: String): String {
@@ -358,7 +363,6 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDt
         street = street?.toStreetDto(),
         areaPart = areaDistrictDto
     )
-
 }
 
 fun GeographicCoordinate.toGeographicCoordinateDto(): GeoCoordinateDto {
@@ -386,6 +390,7 @@ fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
         legalShortName = shortName,
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
+        identifiers = mapToLegalEntityIdentifiersDto(identifiers)
     )
 
 }
@@ -396,6 +401,10 @@ fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<L
 
 fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
     return classification.map { ClassificationDto(it.value, it.code, it.type) }
+}
+
+fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
+    return identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) }
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse

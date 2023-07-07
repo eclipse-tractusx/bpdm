@@ -66,4 +66,6 @@ class LegalEntity(
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
     val nameParts: MutableSet<NameParts> = mutableSetOf()
 
+    @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val identifiers: MutableSet<LegalEntityIdentifier> = mutableSetOf()
 }
