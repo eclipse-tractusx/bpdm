@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
@@ -81,7 +81,7 @@ class AddressService(
     /**
      * Get output addresses by fetching addresses from the database.
      */
-    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputResponse> {
+    fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageResponse<AddressGateOutputDto> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
             addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -99,7 +99,7 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputResponse> {
+    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputDto> {
         return logisticAddressPage.content.map { logisticAddress ->
             logisticAddress.toAddressGateOutputResponse(logisticAddress)
         }

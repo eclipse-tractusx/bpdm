@@ -17,15 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressIdentifierVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.AddressStateVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import java.time.Instant
 
 
-@Schema(name = "LogisticAddressResponse", description = "Logistic address ")
-data class LogisticAddressResponse(
+@Schema(name = "LogisticAddressGateVerboseDto", description = "Logistic address ")
+data class LogisticAddressGateVerboseDto(
 
     @get:Schema(description = "Business Partner Number of this address")
     val bpna: String,

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -40,5 +40,5 @@ data class LegalEntityMatchResponse(
     val legalEntity: LegalEntityVerboseDto,
 
     @get:Schema(description = "Address of the official seat of this legal entity")
-    val legalAddress: LogisticAddressResponse,
+    val legalAddress: LogisticAddressVerboseDto,
 )

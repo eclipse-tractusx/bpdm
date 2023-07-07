@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
@@ -34,5 +34,5 @@ data class SitePoolResponse(
     val site: SiteVerboseDto,
 
     @Schema(description = "Main address where this site resides")
-    val mainAddress: LogisticAddressResponse,
+    val mainAddress: LogisticAddressVerboseDto,
 )

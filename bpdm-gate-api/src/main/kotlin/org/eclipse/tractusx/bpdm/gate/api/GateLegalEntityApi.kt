@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -73,7 +73,7 @@ interface GateLegalEntityApi {
     )
     @GetMapping("/input/legal-entities/{externalId}")
     @GetExchange("/input/legal-entities/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputResponse
+    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputDto
 
     @Operation(
         summary = "Get page of legal-entities filtered by a collection of externalIds",
@@ -90,7 +90,7 @@ interface GateLegalEntityApi {
     fun getLegalEntitiesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageResponse<LegalEntityGateInputResponse>
+    ): PageResponse<LegalEntityGateInputDto>
 
     @Operation(
         summary = "Get page of legal entities",
@@ -104,7 +104,7 @@ interface GateLegalEntityApi {
     )
     @GetMapping("/input/legal-entities")
     @GetExchange("/input/legal-entities")
-    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputResponse>
+    fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<LegalEntityGateInputDto>
 
     @Operation(
         summary = "Get page of legal entities",

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 
 
 @Schema(name = "AddressMatchResponse", description = "Match with score for a business partner record of type address")
@@ -30,5 +30,5 @@ data class AddressMatchResponse(
     val score: Float,
 
     @Schema(description = "Matched address business partner record")
-    val address: LogisticAddressResponse
+    val address: LogisticAddressVerboseDto
 )

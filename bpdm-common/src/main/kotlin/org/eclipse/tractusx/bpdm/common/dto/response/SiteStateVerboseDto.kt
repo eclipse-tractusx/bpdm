@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
@@ -37,5 +37,5 @@ data class SiteStateVerboseDto(
     val validTo: LocalDateTime?,
 
     @get:Schema(description = "The type of this status")
-    val type: TypeKeyNameDto<BusinessStateType>
+    val type: TypeKeyNameVerboseDto<BusinessStateType>
 )

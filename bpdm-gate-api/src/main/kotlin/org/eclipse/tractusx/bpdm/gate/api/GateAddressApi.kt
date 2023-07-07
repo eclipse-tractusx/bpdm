@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -125,7 +125,7 @@ interface GateAddressApi {
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageResponse<AddressGateOutputResponse>
+    ): PageResponse<AddressGateOutputDto>
 
     @Operation(
         summary = "Create or update output addresses.",

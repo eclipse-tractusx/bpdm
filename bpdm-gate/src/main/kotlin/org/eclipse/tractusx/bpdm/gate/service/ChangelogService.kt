@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
@@ -45,7 +45,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         outputInputEnum: OutputInputEnum?,
         page: Int,
         pageSize: Int
-    ): PageChangeLogResponse<ChangelogResponse> {
+    ): PageChangeLogResponse<ChangelogGateDto> {
 
         val nonNullExternalIds = externalIds ?: emptySet()
 

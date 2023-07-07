@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.util
 import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponse
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponse
@@ -37,14 +37,14 @@ import java.time.ZoneOffset
  */
 object ResponseValues {
     val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
-    val language0 = TypeKeyNameDto(CommonValues.language0, CommonValues.language0.getName())
-    val language1 = TypeKeyNameDto(CommonValues.language1, CommonValues.language1.getName())
-    val language2 = TypeKeyNameDto(CommonValues.language2, CommonValues.language2.getName())
-    val language3 = TypeKeyNameDto(CommonValues.language3, CommonValues.language3.getName())
+    val language0 = TypeKeyNameVerboseDto(CommonValues.language0, CommonValues.language0.getName())
+    val language1 = TypeKeyNameVerboseDto(CommonValues.language1, CommonValues.language1.getName())
+    val language2 = TypeKeyNameVerboseDto(CommonValues.language2, CommonValues.language2.getName())
+    val language3 = TypeKeyNameVerboseDto(CommonValues.language3, CommonValues.language3.getName())
 
-    private val country1 = TypeKeyNameDto(CommonValues.country1, CommonValues.country1.getName())
-    private val country2 = TypeKeyNameDto(CommonValues.country2, CommonValues.country2.getName())
-    private val country3 = TypeKeyNameDto(CommonValues.country3, CommonValues.country3.getName())
+    private val country1 = TypeKeyNameVerboseDto(CommonValues.country1, CommonValues.country1.getName())
+    private val country2 = TypeKeyNameVerboseDto(CommonValues.country2, CommonValues.country2.getName())
+    private val country3 = TypeKeyNameVerboseDto(CommonValues.country3, CommonValues.country3.getName())
 
     private val identifier1 =
         LegalEntityIdentifierVerboseDto(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1)
@@ -69,9 +69,9 @@ object ResponseValues {
         abbreviation = CommonValues.legalFormAbbreviation3,
     )
 
-    private val statusType1 = TypeKeyNameDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName())
-    private val statusType2 = TypeKeyNameDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
-    private val statusType3 = TypeKeyNameDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
+    private val statusType1 = TypeKeyNameVerboseDto(CommonValues.statusType1, CommonValues.statusType1.getTypeName())
+    private val statusType2 = TypeKeyNameVerboseDto(CommonValues.statusType2, CommonValues.statusType2.getTypeName())
+    private val statusType3 = TypeKeyNameVerboseDto(CommonValues.statusType3, CommonValues.statusType3.getTypeName())
 
     private val leStatus1 = LegalEntityStateVerboseDto(CommonValues.statusDenotation1, CommonValues.statusValidFrom1, null, statusType1)
     private val leStatus2 = LegalEntityStateVerboseDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, statusType2)
@@ -81,7 +81,7 @@ object ResponseValues {
     private val siteStatus2 = SiteStateVerboseDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2.toDto())
     private val siteStatus3 = SiteStateVerboseDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3.toDto())
 
-    private val classificationType = TypeKeyNameDto(CommonValues.classificationType, CommonValues.classificationType.name)
+    private val classificationType = TypeKeyNameVerboseDto(CommonValues.classificationType, CommonValues.classificationType.name)
 
     private val classification1 = ClassificationVerboseDto(CommonValues.classification1, null, classificationType)
     private val classification2 = ClassificationVerboseDto(CommonValues.classification2, null, classificationType)
@@ -153,7 +153,7 @@ object ResponseValues {
         )
     )
 
-    val addressPartner1 = LogisticAddressResponse(
+    val addressPartner1 = LogisticAddressVerboseDto(
         bpna = CommonValues.bpnA1,
         physicalPostalAddress = address1,
         bpnLegalEntity = null,
@@ -162,7 +162,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val addressPartner2 = LogisticAddressResponse(
+    val addressPartner2 = LogisticAddressVerboseDto(
         bpna = CommonValues.bpnA2,
         physicalPostalAddress = address2,
         bpnLegalEntity = null,
@@ -171,7 +171,7 @@ object ResponseValues {
         updatedAt = Instant.now()
     )
 
-    val addressPartner3 = LogisticAddressResponse(
+    val addressPartner3 = LogisticAddressVerboseDto(
         bpna = CommonValues.bpnA3,
         physicalPostalAddress = address3,
         bpnLegalEntity = null,
@@ -262,7 +262,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressResponse(
+        legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(
@@ -304,7 +304,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressResponse(
+        legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(
@@ -346,7 +346,7 @@ object ResponseValues {
             createdAt = CommonValues.now,
             updatedAt = CommonValues.now,
         ),
-        legalAddress = LogisticAddressResponse(
+        legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 basePhysicalAddress = BasePhysicalAddressDto(

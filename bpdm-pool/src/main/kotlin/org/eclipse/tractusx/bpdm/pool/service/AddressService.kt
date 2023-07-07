@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressResponse
@@ -40,7 +40,7 @@ class AddressService(
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
 ) {
-    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<LogisticAddressResponse> {
+    fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageResponse<LogisticAddressVerboseDto> {
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -50,7 +50,7 @@ class AddressService(
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    fun findByBpn(bpn: String): LogisticAddressResponse {
+    fun findByBpn(bpn: String): LogisticAddressVerboseDto {
         val address = logisticAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDto()
     }
@@ -59,7 +59,7 @@ class AddressService(
     fun findByPartnerAndSiteBpns(
         searchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressResponse> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 

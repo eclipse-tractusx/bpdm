@@ -17,18 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.common.dto.response.type
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import java.time.Instant
 
-@Schema(name = "ChangelogResponse", description = "Changelog entry for a business partner")
-data class ChangelogResponse(
-    @Schema(description = "External ID of the changelog entry")
-    val externalId: String,
-    @Schema(description = "The type of the change")
-    val businessPartnerType: LsaType,
-    @Schema(description = "The timestamp of the operation")
-    val modifiedAt: Instant
+@Schema(description = "Named type uniquely identified by its technical key")
+data class TypeKeyNameVerboseDto<T>(
+    @Schema(description = "Unique key of this type for reference")
+    val technicalKey: T,
+
+    @Schema(description = "Name or denotation of this type")
+    val name: String,
 )

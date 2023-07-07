@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameDto
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
@@ -92,8 +92,8 @@ fun AddressIdentifier.toDto(): AddressIdentifierVerboseDto {
     return AddressIdentifierVerboseDto(value, type.toTypeKeyNameDto())
 }
 
-fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameDto<String> {
-    return TypeKeyNameDto(technicalKey, name)
+fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
+    return TypeKeyNameVerboseDto(technicalKey, name)
 }
 
 fun IdentifierType.toDto(): IdentifierTypeDto {
@@ -117,8 +117,8 @@ fun AddressState.toDto(): AddressStateVerboseDto {
     return AddressStateVerboseDto(description, validFrom, validTo, type.toDto())
 }
 
-fun LogisticAddress.toDto(): LogisticAddressResponse {
-    return LogisticAddressResponse(
+fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
+    return LogisticAddressVerboseDto(
         bpna = bpn,
         bpnLegalEntity = legalEntity?.bpn,
         isLegalAddress = legalEntity?.legalAddress == this,

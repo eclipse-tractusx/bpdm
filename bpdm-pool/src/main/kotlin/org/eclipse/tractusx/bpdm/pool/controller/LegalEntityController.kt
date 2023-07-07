@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
@@ -103,7 +103,7 @@ class LegalEntityController(
     override fun getAddresses(
         bpnl: String,
         paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressResponse> {
+    ): PageResponse<LogisticAddressVerboseDto> {
         return addressService.findByPartnerBpn(bpnl.uppercase(), paginationRequest.page, paginationRequest.size)
     }
 

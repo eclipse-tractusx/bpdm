@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
@@ -429,21 +429,21 @@ class AddressControllerIT @Autowired constructor(
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpna.name,
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnLegalEntity.name,
-                AddressPartnerCreateResponse::address.name + "." + LogisticAddressResponse::bpnSite.name
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpna.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpnLegalEntity.name,
+                AddressPartnerCreateResponse::address.name + "." + LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }
 
-    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressResponse>, expected: Collection<LogisticAddressResponse>) {
+    private fun assertAddressesAreEqual(actuals: Collection<LogisticAddressVerboseDto>, expected: Collection<LogisticAddressVerboseDto>) {
         actuals.forEach { assertThat(it.bpna).matches(testHelpers.bpnAPattern) }
 
         testHelpers.assertRecursively(actuals)
             .ignoringFields(
-                LogisticAddressResponse::bpna.name,
-                LogisticAddressResponse::bpnLegalEntity.name,
-                LogisticAddressResponse::bpnSite.name
+                LogisticAddressVerboseDto::bpna.name,
+                LogisticAddressVerboseDto::bpnLegalEntity.name,
+                LogisticAddressVerboseDto::bpnSite.name
             )
             .isEqualTo(expected)
     }

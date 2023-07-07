@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.gate.api.GateAddressApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
@@ -80,7 +80,7 @@ class AddressController(
     override fun getAddressesOutput(
         paginationRequest: PaginationRequest,
         externalIds: Collection<String>?
-    ): PageResponse<AddressGateOutputResponse> {
+    ): PageResponse<AddressGateOutputDto> {
         return addressService.getAddressesOutput(externalIds = externalIds, page = paginationRequest.page, size = paginationRequest.size)
     }
 
