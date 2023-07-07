@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
@@ -42,7 +42,7 @@ class SiteService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<SiteGateInputDto> {
+    fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
 
         val sitesPage = if (externalIds != null) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -50,7 +50,7 @@ class SiteService(
             siteRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = sitesPage.totalElements,
             totalPages = sitesPage.totalPages,
@@ -74,7 +74,7 @@ class SiteService(
     /**
      * Get output sites by first fetching sites from the database
      */
-    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<SiteGateOutputResponse> {
+    fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<SiteGateOutputResponse> {
 
         val sitePage = if (!externalIds.isNullOrEmpty()) {
             siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -82,7 +82,7 @@ class SiteService(
             siteRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = sitePage.totalElements,
             totalPages = sitePage.totalPages,

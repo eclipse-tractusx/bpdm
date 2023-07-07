@@ -17,13 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.dto
+package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-data class ChangelogEntryDto(
-    val bpn: String,
-    val changelogType: ChangelogType,
-    val changelogSubject: ChangelogSubject
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(name = "SitePoolVerboseDto", description = "Site with legal entity reference.")
+data class SitePoolVerboseDto(
+
+    @field:JsonUnwrapped
+    val site: SiteVerboseDto,
+
+    @Schema(description = "Main address where this site resides")
+    val mainAddress: LogisticAddressVerboseDto,
 )

@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
@@ -54,7 +54,7 @@ interface GateSharingStateApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "LSA Type") @RequestParam(required = false) lsaType: LsaType?,
         @Parameter(description = "External identifiers") @RequestParam(required = false) externalIds: Collection<String>?
-    ): PageResponse<SharingStateDto>
+    ): PageDto<SharingStateDto>
 
     @Operation(
         summary = "Insert/update sharing state (including error info and BPN) for business partner with LSA type and external ID"

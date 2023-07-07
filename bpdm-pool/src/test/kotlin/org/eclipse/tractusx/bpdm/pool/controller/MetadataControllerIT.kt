@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
@@ -55,7 +55,7 @@ import kotlin.math.ceil
 
 private typealias PostFunction = (client: WebTestClient, metaData: Any) -> Any
 private typealias PostFunctionWithoutExpectation = (client: WebTestClient, metaData: Any) -> WebTestClient.ResponseSpec
-private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) -> PageResponse<Any>
+private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) -> PageDto<Any>
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
@@ -87,7 +87,7 @@ class MetadataControllerIT @Autowired constructor(
         private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
             postMetadataSameResponseType(client, type, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
 
-        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageResponse<IdentifierTypeDto> =
+        private fun getIdentifierTypes(client: WebTestClient, page: Int, size: Int): PageDto<IdentifierTypeDto> =
 //            getMetadata<PageResponse<IdentifierTypeDto>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
@@ -102,7 +102,7 @@ class MetadataControllerIT @Autowired constructor(
         private fun postLegalForm(client: WebTestClient, type: LegalFormRequest) =
             postMetadata<LegalFormRequest, LegalFormDto>(client, type, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
 
-        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageResponse<LegalFormDto> =
+        private fun getLegalForms(client: WebTestClient, page: Int, size: Int): PageDto<LegalFormDto> =
 //            getMetadata<PageResponse<LegalFormResponse>>(client, page, size, EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_LEGAL_FORM_PATH,
@@ -226,7 +226,7 @@ class MetadataControllerIT @Autowired constructor(
         metadata.forEach { postMetadata(webTestClient, it) }
 
         val returnedPage = getMetadataPage(webTestClient, 0, metadata.size)
-        val expectedPage = PageResponse(expected.size.toLong(), 1, 0, expected.size, expected)
+        val expectedPage = PageDto(expected.size.toLong(), 1, 0, expected.size, expected)
 
         assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
     }
@@ -282,7 +282,7 @@ class MetadataControllerIT @Autowired constructor(
         metadata.forEach { postMetadata(webTestClient, it) }
 
         val returnedPage = getMetadataPage(webTestClient, 0, metadata.size + 1)
-        val expectedPage = PageResponse(expected.size.toLong(), 1, 0, expected.size, expected)
+        val expectedPage = PageDto(expected.size.toLong(), 1, 0, expected.size, expected)
 
         assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
     }
@@ -298,7 +298,7 @@ class MetadataControllerIT @Autowired constructor(
         metadata.forEach { postMetadata(webTestClient, it) }
 
         val returnedPage = getMetadataPage(webTestClient, metadata.size, 1)
-        val expectedPage = PageResponse(expected.size.toLong(), expected.size, expected.size, 0, emptyList<Any>())
+        val expectedPage = PageDto(expected.size.toLong(), expected.size, expected.size, 0, emptyList<Any>())
 
         assertThat(returnedPage).usingRecursiveComparison().ignoringCollectionOrder().isEqualTo(expectedPage)
     }
@@ -340,7 +340,7 @@ class MetadataControllerIT @Autowired constructor(
             identifierType3.toDto()
         )
 
-        val result = webTestClient.invokeGetEndpoint<PageResponse<IdentifierTypeDto>>(
+        val result = webTestClient.invokeGetEndpoint<PageDto<IdentifierTypeDto>>(
             EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
             Pair("lsaType", IdentifierLsaType.LEGAL_ENTITY.name),
             Pair("country", CountryCode.PL.alpha2)

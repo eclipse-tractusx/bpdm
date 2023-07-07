@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -86,7 +86,7 @@ interface PoolMetadataApi {
         @Parameter lsaType: IdentifierLsaType,
         @Parameter country: CountryCode?
     ):
-            PageResponse<IdentifierTypeDto>
+            PageDto<IdentifierTypeDto>
 
 
     @Operation(
@@ -117,7 +117,7 @@ interface PoolMetadataApi {
     )
     @GetMapping("/legal-forms")
     @GetExchange("/legal-forms")
-    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageResponse<LegalFormDto>
+    fun getLegalForms(@ParameterObject paginationRequest: PaginationRequest): PageDto<LegalFormDto>
 
 
     @Operation(

@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
-import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryDto
+import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository.Specs.byBpnsIn
@@ -49,7 +49,7 @@ class PartnerChangelogService(
     private val logger = KotlinLogging.logger { }
 
     @Transactional
-    fun createChangelogEntries(changelogEntries: Collection<ChangelogEntryDto>): List<PartnerChangelogEntry> {
+    fun createChangelogEntries(changelogEntries: Collection<ChangelogEntryVerboseDto>): List<PartnerChangelogEntry> {
         logger.debug { "Create ${changelogEntries.size} new change log entries" }
         val entities = changelogEntries.map { it.toEntity() }
         return partnerChangelogEntryRepository.saveAll(entities)
@@ -74,14 +74,14 @@ class PartnerChangelogService(
         fromTime: Instant?,
         pageIndex: Int,
         pageSize: Int
-    ): PageResponse<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse> {
+    ): PageDto<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryResponse> {
         val spec = Specification.allOf(byBpnsIn(bpns), byLsaTypesIn(lsaTypes), byUpdatedGreaterThan(fromTime))
         val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)
         return page.toDto(page.content.map { it.toDto() })
     }
 
-    private fun ChangelogEntryDto.toEntity(): PartnerChangelogEntry {
+    private fun ChangelogEntryVerboseDto.toEntity(): PartnerChangelogEntry {
         return PartnerChangelogEntry(this.changelogType, this.bpn, this.changelogSubject)
     }
 }

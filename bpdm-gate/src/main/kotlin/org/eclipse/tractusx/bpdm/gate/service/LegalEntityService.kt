@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
@@ -64,7 +64,7 @@ class LegalEntityService(
         return toValidSingleLegalEntity(legalEntity)
     }
 
-    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageResponse<LegalEntityGateInputDto> {
+    fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<LegalEntityGateInputDto> {
 
         val legalEntitiesPage = if (externalIds != null) {
             legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
@@ -72,7 +72,7 @@ class LegalEntityService(
             legalEntityRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = legalEntitiesPage.totalElements,
             totalPages = legalEntitiesPage.totalPages,
@@ -84,7 +84,7 @@ class LegalEntityService(
     /**
      * Get output legal entities by first fetching legal entities from the database
      */
-    fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageResponse<LegalEntityGateOutputResponse> {
+    fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<LegalEntityGateOutputResponse> {
 
         val legalEntityPage = if (!externalIds.isNullOrEmpty()) {
             legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
@@ -92,7 +92,7 @@ class LegalEntityService(
             legalEntityRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
         }
 
-        return PageResponse(
+        return PageDto(
             page = page,
             totalElements = legalEntityPage.totalElements,
             totalPages = legalEntityPage.totalPages,

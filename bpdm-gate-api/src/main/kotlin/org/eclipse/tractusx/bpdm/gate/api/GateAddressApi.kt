@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputResponse
@@ -93,7 +93,7 @@ interface GateAddressApi {
     fun getAddressesByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageResponse<AddressGateInputResponse>
+    ): PageDto<AddressGateInputResponse>
 
 
     @Operation(
@@ -108,7 +108,7 @@ interface GateAddressApi {
     )
     @GetMapping("/input/addresses")
     @GetExchange("/input/addresses")
-    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageResponse<AddressGateInputResponse>
+    fun getAddresses(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<AddressGateInputResponse>
 
     @Operation(
         summary = "Get page of addresses (Output)",
@@ -125,7 +125,7 @@ interface GateAddressApi {
     fun getAddressesOutput(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody(required = false) externalIds: Collection<String>?
-    ): PageResponse<AddressGateOutputDto>
+    ): PageDto<AddressGateOutputDto>
 
     @Operation(
         summary = "Create or update output addresses.",

@@ -25,11 +25,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.ImportIdEntry
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ImportIdFilterRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingResponse
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ImportIdMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -60,7 +60,7 @@ interface PoolSaasApi {
     )
     @PostMapping("/business-partner/sync")
     @PostExchange("/business-partner/sync")
-    fun importBusinessPartners(): SyncResponse
+    fun importBusinessPartners(): SyncDto
 
     @Operation(
         summary = "Fetch information about the SaaS synchronization",
@@ -74,7 +74,7 @@ interface PoolSaasApi {
     )
     @GetMapping("/business-partner/sync")
     @GetExchange("/business-partner/sync")
-    fun getSyncStatus(): SyncResponse
+    fun getSyncStatus(): SyncDto
 
     @Operation(
         summary = "Filter Identifier Mappings by CX-Pool Identifiers",
@@ -88,7 +88,7 @@ interface PoolSaasApi {
     )
     @PostMapping("/identifier-mappings/filter")
     @PostExchange("/identifier-mappings/filter")
-    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingResponse
+    fun getImportEntries(@RequestBody importIdFilterRequest: ImportIdFilterRequest): ImportIdMappingDto
 
     @Operation(
         summary = "Paginate Identifier Mappings by CX-Pool Identifiers",
@@ -102,5 +102,5 @@ interface PoolSaasApi {
     )
     @GetMapping("/identifier-mappings")
     @GetExchange("/identifier-mappings")
-    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageResponse<ImportIdEntry>
+    fun getImportEntries(@ParameterObject paginationRequest: PaginationRequest): PageDto<ImportIdEntry>
 }

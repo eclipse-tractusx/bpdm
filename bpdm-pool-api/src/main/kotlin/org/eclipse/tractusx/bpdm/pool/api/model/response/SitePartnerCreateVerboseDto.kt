@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SitePartnerCreateResponse", description = "Created business partner record of type site")
-data class SitePartnerCreateResponse(
+@Schema(name = "SitePartnerCreateVerboseDto", description = "Created business partner record of type site")
+data class SitePartnerCreateVerboseDto(
 
     @field:JsonUnwrapped
     val site: SiteVerboseDto,

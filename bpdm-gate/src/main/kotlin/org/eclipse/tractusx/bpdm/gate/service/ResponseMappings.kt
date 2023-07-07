@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
@@ -127,8 +127,8 @@ private fun StreetGateDto.toStreetEntity(): Street {
     )
 }
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
-    return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
+fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
+    return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
 // Site Mappers

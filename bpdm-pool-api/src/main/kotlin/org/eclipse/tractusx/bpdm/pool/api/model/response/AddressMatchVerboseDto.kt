@@ -20,25 +20,15 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 
-@Schema(name = "LegalAddressResponse", description = "Legal address for legal entity")
-data class LegalAddressResponse(
 
-    @Schema(description = "Physical postal address")
-    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
+@Schema(name = "AddressMatchVerboseDto", description = "Match with score for a business partner record of type address")
+data class AddressMatchVerboseDto(
 
-    @Schema(description = "Alternative postal address")
-    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
+    @Schema(description = "Relative quality score of the match. The higher the better")
+    val score: Float,
 
-    @Schema(description = "BPN of the related legal entity")
-    val bpnLegalEntity: String,
-
-    @Schema(description = "The timestamp the business partner data was created")
-    val createdAt: Instant,
-
-    @Schema(description = "The timestamp the business partner data was last updated")
-    val updatedAt: Instant
+    @Schema(description = "Matched address business partner record")
+    val address: LogisticAddressVerboseDto
 )

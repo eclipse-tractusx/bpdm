@@ -17,25 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import java.time.Instant
 
-@Schema(description = "Paginated collection of results")
-data class PageResponse<T>(
+@Schema(name = "MainAddressResponse", description = "Main address for site")
+data class MainAddressVerboseDto(
 
-    @get:Schema(description = "Total number of all results in all pages")
-    val totalElements: Long,
+    @Schema(description = "Physical postal address")
+    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
-    @get:Schema(description = "Total number pages")
-    val totalPages: Int,
+    @Schema(description = "Alternative postal address")
+    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
-    @get:Schema(description = "Current page number")
-    val page: Int,
+    @Schema(description = "BPN of the related site")
+    val bpnSite: String,
 
-    @get:Schema(description = "Number of results in the page")
-    val contentSize: Int,
+    @Schema(description = "The timestamp the business partner data was created")
+    val createdAt: Instant,
 
-    @get:Schema(description = "Collection of results in the page")
-    val content: Collection<T>
+    @Schema(description = "The timestamp the business partner data was last updated")
+    val updatedAt: Instant
 )

@@ -17,18 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-import org.eclipse.tractusx.bpdm.common.model.SyncStatus
-import org.eclipse.tractusx.bpdm.pool.api.model.SyncType
-import java.time.Instant
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class SyncResponse(
-    val type: SyncType,
-    val status: SyncStatus,
-    val count: Int = 0,
-    val progress: Float = 0f,
-    val errorDetails: String? = null,
-    val startedAt: Instant? = null,
-    val finishedAt: Instant? = null
+@Schema(description = "Paginated collection of results")
+data class PageDto<T>(
+
+    @get:Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+
+    @get:Schema(description = "Total number pages")
+    val totalPages: Int,
+
+    @get:Schema(description = "Current page number")
+    val page: Int,
+
+    @get:Schema(description = "Number of results in the page")
+    val contentSize: Int,
+
+    @get:Schema(description = "Collection of results in the page")
+    val content: Collection<T>
 )

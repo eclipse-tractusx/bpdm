@@ -28,12 +28,12 @@ import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
 
-fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageResponse<T> {
-    return PageResponse(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
+fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
+    return PageDto(this.totalElements, this.totalPages, this.number, this.numberOfElements, dtoContent)
 }
 
-fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
-    return LegalEntityMatchResponse(
+fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
+    return LegalEntityMatchVerboseDto(
         score = score,
         legalEntity = this.toDto(),
         legalName = this.legalName.value,
@@ -41,8 +41,8 @@ fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchResponse {
     )
 }
 
-fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateResponse {
-    return LegalEntityPartnerCreateResponse(
+fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDto {
+    return LegalEntityPartnerCreateVerboseDto(
         legalEntity = toDto(),
         legalAddress = legalAddress.toDto(),
         index = entryId,
@@ -134,8 +134,8 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
     )
 }
 
-fun LogisticAddress.toLegalAddressResponse(): LegalAddressResponse {
-    return LegalAddressResponse(
+fun LogisticAddress.toLegalAddressResponse(): LegalAddressVerboseDto {
+    return LegalAddressVerboseDto(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnLegalEntity = legalEntity?.bpn!!,
@@ -144,8 +144,8 @@ fun LogisticAddress.toLegalAddressResponse(): LegalAddressResponse {
     )
 }
 
-fun LogisticAddress.toMainAddressResponse(): MainAddressResponse {
-    return MainAddressResponse(
+fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
+    return MainAddressVerboseDto(
         physicalPostalAddress = physicalPostalAddress.toDto(),
         alternativePostalAddress = alternativePostalAddress?.toDto(),
         bpnSite = site?.bpn!!,
@@ -205,19 +205,19 @@ private fun Street.toDto(): StreetDto {
     )
 }
 
-fun LogisticAddress.toMatchDto(score: Float): AddressMatchResponse {
-    return AddressMatchResponse(score, this.toDto())
+fun LogisticAddress.toMatchDto(score: Float): AddressMatchVerboseDto {
+    return AddressMatchVerboseDto(score, this.toDto())
 }
 
-fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateResponse {
-    return AddressPartnerCreateResponse(
+fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateVerboseDto {
+    return AddressPartnerCreateVerboseDto(
         address = toDto(),
         index = index
     )
 }
 
-fun Site.toUpsertDto(entryId: String?): SitePartnerCreateResponse {
-    return SitePartnerCreateResponse(
+fun Site.toUpsertDto(entryId: String?): SitePartnerCreateVerboseDto {
+    return SitePartnerCreateVerboseDto(
         site = toDto(),
         mainAddress = mainAddress.toDto(),
         index = entryId
@@ -235,8 +235,8 @@ fun Site.toDto(): SiteVerboseDto {
     )
 }
 
-fun Site.toPoolDto(): SitePoolResponse {
-    return SitePoolResponse(
+fun Site.toPoolDto(): SitePoolVerboseDto {
+    return SitePoolVerboseDto(
 
         site = SiteVerboseDto(
             bpn,
@@ -269,8 +269,8 @@ fun Relation.toDto(): RelationVerboseDto {
     )
 }
 
-fun SyncRecord.toDto(): SyncResponse {
-    return SyncResponse(type, status, count, progress, errorDetails, startedAt, finishedAt)
+fun SyncRecord.toDto(): SyncDto {
+    return SyncDto(type, status, count, progress, errorDetails, startedAt, finishedAt)
 }
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryResponse {

@@ -27,11 +27,8 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityMatchResponse", description = "Match with score for a business partner record of type legal entity")
-data class LegalEntityMatchResponse(
-
-    @Schema(description = "Relative quality score of the match. The higher the better")
-    val score: Float,
+@Schema(name = "LegalEntityPartnerCreateVerboseDto", description = "Created business partner of type legal entity")
+data class LegalEntityPartnerCreateVerboseDto(
 
     @get:Schema(description = "Legal name the partner goes by")
     val legalName: String,
@@ -41,4 +38,7 @@ data class LegalEntityMatchResponse(
 
     @get:Schema(description = "Address of the official seat of this legal entity")
     val legalAddress: LogisticAddressVerboseDto,
+
+    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    val index: String?
 )

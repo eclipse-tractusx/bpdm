@@ -61,7 +61,7 @@ interface PoolLegalEntityApi {
     fun getLegalEntities(
         @ParameterObject bpSearchRequest: LegalEntityPropertiesSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<LegalEntityMatchResponse>
+    ): PageDto<LegalEntityMatchVerboseDto>
 
     @Operation(
         summary = "Get legal entity business partner by identifier",
@@ -146,7 +146,7 @@ interface PoolLegalEntityApi {
     fun getSites(
         @Parameter(description = "Bpnl value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<SiteVerboseDto>
+    ): PageDto<SiteVerboseDto>
 
     @Operation(
         summary = "Get address partners of a legal entity",
@@ -164,7 +164,7 @@ interface PoolLegalEntityApi {
     fun getAddresses(
         @Parameter(description = "Bpn value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressVerboseDto>
+    ): PageDto<LogisticAddressVerboseDto>
 
     @Operation(
         summary = "Search Legal Addresses",
@@ -181,7 +181,7 @@ interface PoolLegalEntityApi {
     fun searchLegalAddresses(
         @RequestBody
         bpnLs: Collection<String>
-    ): Collection<LegalAddressResponse>
+    ): Collection<LegalAddressVerboseDto>
 
     @Operation(
         summary = "Create new legal entity business partners",

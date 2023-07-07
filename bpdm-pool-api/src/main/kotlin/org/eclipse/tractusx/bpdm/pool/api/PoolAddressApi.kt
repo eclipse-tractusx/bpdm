@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageResponse
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
@@ -63,7 +63,7 @@ interface PoolAddressApi {
     fun getAddresses(
         @ParameterObject addressSearchRequest: AddressPartnerSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<AddressMatchResponse>
+    ): PageDto<AddressMatchVerboseDto>
 
     @Operation(
         summary = "Get address partners by bpna",
@@ -97,7 +97,7 @@ interface PoolAddressApi {
     fun searchAddresses(
         @RequestBody addressSearchRequest: AddressPartnerBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageResponse<LogisticAddressVerboseDto>
+    ): PageDto<LogisticAddressVerboseDto>
 
     @Operation(
         summary = "Create new address business partners",

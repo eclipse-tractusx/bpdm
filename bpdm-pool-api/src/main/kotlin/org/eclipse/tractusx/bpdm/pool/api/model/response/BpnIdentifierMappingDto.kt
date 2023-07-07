@@ -19,19 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressPartnerCreateResponse", description = "Created business partners of type address")
-data class AddressPartnerCreateResponse(
+@Schema(name = "BpnIdentifierMappingDto", description = "Mapping of Business Partner Number to identifier value")
+data class BpnIdentifierMappingDto(
 
-    @field:JsonUnwrapped
-    val address: LogisticAddressVerboseDto,
+    @Schema(description = "Value of the identifier")
+    val idValue: String,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
-    val index: String?
+    @Schema(description = "Business Partner Number")
+    val bpn: String
 )

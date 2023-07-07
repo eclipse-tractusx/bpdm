@@ -28,7 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncResponse
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SyncDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.junit.Assert
 import org.junit.jupiter.api.assertThrows
@@ -194,20 +194,20 @@ class TestHelpers(
     }
 
 
-    fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncResponse {
+    fun startSyncAndAwaitSuccess(client: WebTestClient, syncPath: String): SyncDto {
         return startSyncAndAwaitResult(client, syncPath, SyncStatus.SUCCESS)
     }
 
-    fun startSyncAndAwaitError(client: WebTestClient, syncPath: String): SyncResponse {
+    fun startSyncAndAwaitError(client: WebTestClient, syncPath: String): SyncDto {
         return startSyncAndAwaitResult(client, syncPath, SyncStatus.ERROR)
     }
 
-    private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncResponse {
+    private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncDto {
 
         client.invokePostEndpointWithoutResponse(syncPath)
         //check for async import to finish several times
         val timeOutAt = Instant.now().plusMillis(ASYNC_TIMEOUT_IN_MS)
-        var syncResponse: SyncResponse
+        var syncResponse: SyncDto
         do {
             Thread.sleep(ASYNC_CHECK_INTERVAL_IN_MS)
 
