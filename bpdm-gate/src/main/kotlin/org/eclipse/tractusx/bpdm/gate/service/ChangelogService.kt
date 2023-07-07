@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
@@ -45,7 +45,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         outputInputEnum: OutputInputEnum?,
         page: Int,
         pageSize: Int
-    ): PageChangeLogResponse<ChangelogGateDto> {
+    ): PageChangeLogDto<ChangelogGateDto> {
 
         val nonNullExternalIds = externalIds ?: emptySet()
 
@@ -74,7 +74,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         }
 
 
-        return PageChangeLogResponse(
+        return PageChangeLogDto(
             page = page, totalElements = pageDto.totalElements,
             totalPages = pageDto.totalPages,
             contentSize = pageDto.content.size,

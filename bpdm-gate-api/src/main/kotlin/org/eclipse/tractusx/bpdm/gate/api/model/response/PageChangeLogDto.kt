@@ -17,25 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 
-@Schema(name = "ChangelogEntryVerboseDto", description = "Changelog entry for a business partner")
-data class ChangelogEntryResponse(
 
-    @Schema(description = "Business Partner Number of the changelog entry")
-    val bpn: String,
-
-    @Schema(description = "The type of the change")
-    val changelogType: ChangelogType,
-
-    @Schema(description = "The timestamp of the change")
-    val timestamp: Instant,
-
-    @Schema(description = "The type of the business partner this change refers to")
-    val lsaType: ChangelogSubject
+@Schema(description = "Paginated collection of results")
+data class PageChangeLogDto<T>(
+    @Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
+    @Schema(description = "Total number pages")
+    val totalPages: Int,
+    @Schema(description = "Current page number")
+    val page: Int,
+    @Schema(description = "Number of results in the page")
+    val contentSize: Int,
+    @Schema(description = "Collection of results in the page")
+    val content: Collection<T>,
+    @Schema(description = "Number of entries in the page that have been omitted due to being invalid (error)")
+    val invalidEntries: Int,
+    @Schema(description = "Infos about the entries with errors")
+    val errors: Collection<ErrorInfo<ChangeLogOutputError>>,
 )
+

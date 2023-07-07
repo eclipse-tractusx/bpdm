@@ -180,13 +180,13 @@ class GateQueryService(
         return validContent
     }
 
-    private fun getAddressesInput(externalIds: Set<String>): Collection<AddressGateInputResponse> {
+    private fun getAddressesInput(externalIds: Set<String>): Collection<AddressGateInputDto> {
         if (externalIds.isEmpty()) {
             return emptyList()
         }
 
         var page = 0
-        val validContent = mutableListOf<AddressGateInputResponse>()
+        val validContent = mutableListOf<AddressGateInputDto>()
 
         do {
             val pageResponse = gateClient.addresses().getAddressesByExternalIds(

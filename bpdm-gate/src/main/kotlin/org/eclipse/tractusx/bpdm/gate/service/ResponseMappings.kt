@@ -267,9 +267,9 @@ fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {
 }
 
 //Logistic Address mapping to AddressGateInputResponse
-fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddress): AddressGateInputResponse {
+fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddress): AddressGateInputDto {
 
-    val addressGateInputResponse = AddressGateInputResponse(
+    val addressGateInputResponse = AddressGateInputDto(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
         legalEntityExternalId = legalEntity?.externalId,

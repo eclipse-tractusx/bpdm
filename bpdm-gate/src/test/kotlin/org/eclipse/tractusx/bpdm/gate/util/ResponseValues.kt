@@ -271,7 +271,7 @@ object ResponseValues {
         updatedAt = CommonValues.now,
     )
 
-    val addressGateInputResponse1 = AddressGateInputResponse(
+    val addressGateInputResponse1 = AddressGateInputDto(
         address = RequestValues.address1
             .copy(
                 nameParts = listOf(CommonValues.name1),
@@ -280,7 +280,7 @@ object ResponseValues {
         legalEntityExternalId = CommonValues.externalId1,
     )
 
-    val addressGateInputResponse2 = AddressGateInputResponse(
+    val addressGateInputResponse2 = AddressGateInputDto(
         address = RequestValues.address2
             .copy(
                 nameParts = listOf(CommonValues.nameSite1),
@@ -289,7 +289,7 @@ object ResponseValues {
         siteExternalId = CommonValues.externalIdSite1,
     )
 
-    val logisticAddressGateInputResponse1 = AddressGateInputResponse(
+    val logisticAddressGateInputResponse1 = AddressGateInputDto(
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
         ),
@@ -297,7 +297,7 @@ object ResponseValues {
         legalEntityExternalId = null,
     )
 
-    val logisticAddressGateInputResponse2 = AddressGateInputResponse(
+    val logisticAddressGateInputResponse2 = AddressGateInputDto(
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
         ),
@@ -327,7 +327,7 @@ object ResponseValues {
     val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
         legalEntity = RequestValues.legalEntity1,
         legalNameParts = listOf(CommonValues.name1),
-        legalAddress = AddressGateInputResponse(
+        legalAddress = AddressGateInputDto(
             address = RequestValues.logisticAddress1,
             externalId = "${CommonValues.externalId1}_legalAddress",
             legalEntityExternalId = CommonValues.externalId1,
@@ -339,7 +339,7 @@ object ResponseValues {
     val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
         legalEntity = RequestValues.legalEntity2,
         legalNameParts = listOf(CommonValues.name2),
-        legalAddress = AddressGateInputResponse(
+        legalAddress = AddressGateInputDto(
             address = RequestValues.logisticAddress2,
             externalId = "${CommonValues.externalId2}_legalAddress",
             legalEntityExternalId = CommonValues.externalId2,
@@ -382,7 +382,7 @@ object ResponseValues {
         site = RequestValues.site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
-        mainAddress = AddressGateInputResponse(
+        mainAddress = AddressGateInputDto(
             address = RequestValues.address1,
             externalId = "${CommonValues.externalIdSite1}_site",
             legalEntityExternalId = null,
@@ -394,7 +394,7 @@ object ResponseValues {
         site = RequestValues.site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
-        mainAddress = AddressGateInputResponse(
+        mainAddress = AddressGateInputDto(
             address = RequestValues.address2,
             externalId = "${CommonValues.externalIdSite2}_site",
             legalEntityExternalId = null,

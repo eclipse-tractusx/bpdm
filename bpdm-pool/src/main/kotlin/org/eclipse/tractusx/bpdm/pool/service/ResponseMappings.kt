@@ -273,6 +273,6 @@ fun SyncRecord.toDto(): SyncDto {
     return SyncDto(type, status, count, progress, errorDetails, startedAt, finishedAt)
 }
 
-fun PartnerChangelogEntry.toDto(): ChangelogEntryResponse {
-    return ChangelogEntryResponse(bpn, changelogType, createdAt, changelogSubject)
+fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
+    return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, changelogSubject)
 }
