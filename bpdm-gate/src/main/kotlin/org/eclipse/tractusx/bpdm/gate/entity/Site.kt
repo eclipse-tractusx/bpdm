@@ -48,6 +48,9 @@ class Site(
     @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
     val addresses: MutableSet<LogisticAddress> = mutableSetOf()
 
+    @OneToMany(mappedBy = "site", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val roles: MutableSet<Roles> = mutableSetOf()
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "main_address_id", nullable = false)
     lateinit var mainAddress: LogisticAddress

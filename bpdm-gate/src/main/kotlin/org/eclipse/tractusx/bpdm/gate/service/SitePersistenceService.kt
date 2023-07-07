@@ -93,6 +93,7 @@ class SitePersistenceService(
 
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
         site.nameParts.replace(updatedSite.site.nameParts.map { toNameParts(it, null, site, null) })
+        site.roles.replace(updatedSite.site.roles.distinct().map { toRoles(it, null, site, null) })
 
     }
 
@@ -105,6 +106,8 @@ class SitePersistenceService(
 
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.nameParts.map { toNameParts(it.namePart, address, null, null) })
+        address.roles.replace(changeAddress.roles.distinct().map { toRoles(it.roleName, null, null, address) })
+
     }
 
     fun toEntityAddress(dto: AddressState, address: LogisticAddress): AddressState {
@@ -150,6 +153,7 @@ class SitePersistenceService(
 
         site.states.replace(updatedSite.site.states.map { toEntityAddress(it, site) })
         site.nameParts.replace(updatedSite.site.nameParts.map { toNameParts(it, null, site, null) })
+        site.roles.replace(updatedSite.site.roles.distinct().map { toRoles(it, null, site, null) })
 
     }
 }

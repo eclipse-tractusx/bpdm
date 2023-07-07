@@ -121,6 +121,7 @@ private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateI
     return LegalEntityGateInputResponse(
         legalEntity = legalEntity.toLegalEntityDto(),
         legalNameParts = getNamePartValuesToList(legalEntity.nameParts),
+        roles = legalEntity.roles.map { it.roleName },
         legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
         externalId = legalEntity.externalId
     )

@@ -75,6 +75,10 @@ class PhysicalPostalAddress(
     @AttributeOverride(name = "houseNumber", column = Column(name = "phy_street_number"))
     @AttributeOverride(name = "milestone", column = Column(name = "phy_street_milestone"))
     @AttributeOverride(name = "direction", column = Column(name = "phy_street_direction"))
+    @AttributeOverride(name = "namePrefix", column = Column(name = "phy_name_prefix"))
+    @AttributeOverride(name = "additionalNamePrefix", column = Column(name = "phy_additional_name_prefix"))
+    @AttributeOverride(name = "nameSuffix", column = Column(name = "phy_name_suffix"))
+    @AttributeOverride(name = "additionalNameSuffix", column = Column(name = "phy_additional_name_suffix"))
     val street: Street? = null,
 
     // specific for PhysicalPostalAddress
