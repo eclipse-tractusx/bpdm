@@ -1,29 +1,10 @@
 bpdm-gate:
   enabled: true
-  replicaCount: 1
-  image:
-    registry: ghcr.io
-    repository: catenax-ng/tx-bpdm/gate
-    pullPolicy: Always
-    tag: ""
-  # ... more configuration for bpdm-gate if need...
-  applicationConfig:
-# Use this configuration to specify custom base-urls for the bpdm pool and gate.
-# Only needed if the automatic default deploy is not used.
-#    bpdm:
-#      pool:
-#        base-url: ""
   postgres:
     enabled: false
 
 bpdm-pool:
   enabled: true
-  replicaCount: 1
-  image:
-    registry: ghcr.io
-    repository: catenax-ng/tx-bpdm/pool
-    pullPolicy: Always
-    tag: ""
   opensearch:
     enabled: false
     masterService: ""
@@ -32,21 +13,7 @@ bpdm-pool:
     enabled: false
 
 bpdm-bridge-dummy:
-  enabled: true
-  replicaCount: 1
-  image:
-    registry: ghcr.io
-    repository: catenax-ng/tx-bpdm/bridge-dummy
-    pullPolicy: Always
-    tag: ""
-  applicationConfig:
-# Use this configuration to specify custom base-urls for the bpdm pool and gate.
-# Only needed if the automatic default deploy is not used.
-#    bpdm:
-#      pool:
-#        base-url: ""
-#      gate:
-#        base-url: ""
+  enabled: true"
   postgres:
     enabled: false
 

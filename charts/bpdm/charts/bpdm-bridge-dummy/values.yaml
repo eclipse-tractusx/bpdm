@@ -24,8 +24,8 @@ fullnameOverride:
 replicaCount: 1
 
 image:
-  registry: ghcr.io
-  repository: catenax-ng/tx-bpdm/bridge-dummy
+  registry: docker.io
+  repository: tractusx/bpdm-bridge-dummy
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -108,7 +108,7 @@ startupProbe:
     path: "/actuator/health/readiness"
     port: 8083
     scheme: HTTP
-  initialDelaySeconds: 10
+  initialDelaySeconds: 60
   failureThreshold: 20
   periodSeconds: 15
 
