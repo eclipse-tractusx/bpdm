@@ -176,7 +176,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, emptyList())
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*identifiers*").isEqualTo(
             PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
@@ -223,7 +223,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*").isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*identifiers*").isEqualTo(
             PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,

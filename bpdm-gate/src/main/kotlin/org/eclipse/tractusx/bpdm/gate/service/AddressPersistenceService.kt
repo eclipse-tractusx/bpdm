@@ -72,7 +72,7 @@ class AddressPersistenceService(
         address.site = siteRecord
         address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
-
+        address.identifiers.replace(changeAddress.address.identifiers.distinct().map { toEntityAddressIdentifiers(it, address) })
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
         address.roles.replace(changeAddress.address.roles.distinct().map { toRoles(it, null, null, address) })
@@ -114,7 +114,7 @@ class AddressPersistenceService(
         address.site = siteRecord
         address.physicalPostalAddress = changeAddress.address.physicalPostalAddress.toPhysicalPostalAddressEntity()
         address.alternativePostalAddress = changeAddress.address.alternativePostalAddress?.toAlternativePostalAddressEntity()
-
+        address.identifiers.replace(changeAddress.address.identifiers.distinct().map { toEntityAddressIdentifiers(it, address) })
         address.states.replace(changeAddress.address.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
         address.roles.replace(changeAddress.address.roles.distinct().map { toRoles(it, null, null, address) })
