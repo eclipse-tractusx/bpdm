@@ -36,7 +36,7 @@ data class SharingStateDto(
     val externalId: String,
 
     @get:Schema(description = "Type of sharing state")
-    val sharingStateType: SharingStateType,
+    val sharingStateType: SharingStateType = SharingStateType.Initial,
 
     @get:Schema(description = "Sharing error code (for error)")
     val sharingErrorCode: BusinessPartnerSharingError? = null,

@@ -47,6 +47,7 @@ class LegalEntityService(
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
         legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
+
     }
 
     /**

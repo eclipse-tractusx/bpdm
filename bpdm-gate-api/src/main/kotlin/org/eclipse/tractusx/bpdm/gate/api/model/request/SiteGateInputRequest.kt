@@ -31,7 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
     name = "SiteGateInputRequest", description = "Site with legal entity reference"
 )
 data class SiteGateInputRequest(
-    
+
     @field:JsonUnwrapped
     val site: SiteGateDto,
 
