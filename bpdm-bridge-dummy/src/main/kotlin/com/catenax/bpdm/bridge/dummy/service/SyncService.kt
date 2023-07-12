@@ -63,51 +63,54 @@ class SyncService(
     private fun syncLegalEntities(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
         val entries = gateQueryService.getLegalEntityInfos(externalIdsRequested)
+        val entryByExternalId = entries.associateBy { it.externalId }
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
         if (entriesToCreate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.createLegalEntitiesInPool(entriesToCreate)
-            gateUpdateService.handleLegalEntityCreateResponse(responseWrapper)
+            gateUpdateService.handleLegalEntityCreateResponse(responseWrapper, entryByExternalId)
         }
         if (entriesToUpdate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.updateLegalEntitiesInPool(entriesToUpdate)
             val externalIdByBpn = entriesToUpdate.associateBy { it.bpn!! }.mapValues { (_, entry) -> entry.externalId }
-            gateUpdateService.handleLegalEntityUpdateResponse(responseWrapper, externalIdByBpn)
+            gateUpdateService.handleLegalEntityUpdateResponse(responseWrapper, externalIdByBpn, entryByExternalId)
         }
     }
 
     private fun syncSites(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
         val entries = gateQueryService.getSiteInfos(externalIdsRequested)
+        val entryByExternalId = entries.associateBy { it.externalId }
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
         if (entriesToCreate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.createSitesInPool(entriesToCreate)
-            gateUpdateService.handleSiteCreateResponse(responseWrapper)
+            gateUpdateService.handleSiteCreateResponse(responseWrapper, entryByExternalId)
         }
         if (entriesToUpdate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.updateSitesInPool(entriesToUpdate)
             val externalIdByBpn = entriesToUpdate.associateBy { it.bpn!! }.mapValues { (_, entry) -> entry.externalId }
-            gateUpdateService.handleSiteUpdateResponse(responseWrapper, externalIdByBpn)
+            gateUpdateService.handleSiteUpdateResponse(responseWrapper, externalIdByBpn, entryByExternalId)
         }
     }
 
     private fun syncAddresses(externalIdsRequested: Set<String>) {
         // Retrieve business partners (LSA) from Gate
         val entries = gateQueryService.getAddressInfos(externalIdsRequested)
+        val entryByExternalId = entries.associateBy { it.externalId }
         val (entriesToCreate, entriesToUpdate) = entries.partition { it.bpn == null }
 
         // Create or update (LSAs) in Pool
         if (entriesToCreate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.createAddressesInPool(entriesToCreate)
-            gateUpdateService.handleAddressCreateResponse(responseWrapper)
+            gateUpdateService.handleAddressCreateResponse(responseWrapper, entryByExternalId)
         }
         if (entriesToUpdate.isNotEmpty()) {
             val responseWrapper = poolUpdateService.updateAddressesInPool(entriesToUpdate)
             val externalIdByBpn = entriesToUpdate.associateBy { it.bpn!! }.mapValues { (_, entry) -> entry.externalId }
-            gateUpdateService.handleAddressUpdateResponse(responseWrapper, externalIdByBpn)
+            gateUpdateService.handleAddressUpdateResponse(responseWrapper, externalIdByBpn, entryByExternalId)
         }
     }
 

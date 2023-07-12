@@ -19,11 +19,16 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
+import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springframework.stereotype.Service
@@ -37,108 +42,197 @@ class GateUpdateService(
     private val logger = KotlinLogging.logger { }
 
     fun handleLegalEntityCreateResponse(
-        responseWrapper: LegalEntityPartnerCreateResponseWrapper
+        responseWrapper: LegalEntityPartnerCreateResponseWrapper,
+        requestEntryByExternalId: Map<String, GateLegalEntityInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.LEGAL_ENTITY, externalId, entity.legalEntity.bpnl, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            // TODO It's confusing that both the PUT methods for the output and sharing state take a BPN independently.
+            putLegalEntityOutput(
+                buildLegalEntityGateOutputRequest(requestEntry, entity)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.LEGAL_ENTITY, externalId, entity.legalEntity.bpnl, true)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
-            buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, null, errorInfo, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, null, errorInfo, true)
+            )
+
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new legal entities were updated in the Gate" }
     }
 
     fun handleLegalEntityUpdateResponse(
         responseWrapper: LegalEntityPartnerUpdateResponseWrapper,
-        externalIdByBpn: Map<String, String>
+        externalIdByBpn: Map<String, String>,
+        requestEntryByExternalId: Map<String, GateLegalEntityInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val bpn = entity.legalEntity.bpnl
             val externalId = externalIdByBpn[bpn]
-            buildSuccessSharingStateDto(LsaType.LEGAL_ENTITY, externalId, bpn, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            putLegalEntityOutput(
+                buildLegalEntityGateOutputRequest(requestEntry, entity)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.LEGAL_ENTITY, externalId, bpn, false)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
-            buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, bpn, errorInfo, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, bpn, errorInfo, false)
+            )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified legal entities were updated in the Gate" }
     }
 
     fun handleSiteCreateResponse(
-        responseWrapper: SitePartnerCreateResponseWrapper
+        responseWrapper: SitePartnerCreateResponseWrapper,
+        requestEntryByExternalId: Map<String, GateSiteInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.SITE, externalId, entity.site.bpns, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            putSiteOutput(
+                buildSiteGateOutputRequest(requestEntry, entity)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.SITE, externalId, entity.site.bpns, true)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
-            buildErrorSharingStateDto(LsaType.SITE, externalId, null, errorInfo, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.SITE, externalId, null, errorInfo, true)
+            )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new sites were updated in the Gate" }
     }
 
     fun handleSiteUpdateResponse(
         responseWrapper: SitePartnerUpdateResponseWrapper,
-        externalIdByBpn: Map<String, String>
+        externalIdByBpn: Map<String, String>,
+        requestEntryByExternalId: Map<String, GateSiteInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val bpn = entity.site.bpns
             val externalId = externalIdByBpn[bpn]
-            buildSuccessSharingStateDto(LsaType.SITE, externalId, bpn, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            putSiteOutput(
+                buildSiteGateOutputRequest(requestEntry, entity)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.SITE, externalId, bpn, false)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
-            buildErrorSharingStateDto(LsaType.SITE, externalId, bpn, errorInfo, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.SITE, externalId, bpn, errorInfo, false)
+            )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified sites were updated in the Gate" }
     }
 
     fun handleAddressCreateResponse(
-        responseWrapper: AddressPartnerCreateResponseWrapper
+        responseWrapper: AddressPartnerCreateResponseWrapper,
+        requestEntryByExternalId: Map<String, GateAddressInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val externalId = entity.index
-            buildSuccessSharingStateDto(LsaType.ADDRESS, externalId, entity.address.bpna, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            putAddressOutput(
+                buildAddressGateOutputRequest(requestEntry, entity.address)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.ADDRESS, externalId, entity.address.bpna, true)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
-            buildErrorSharingStateDto(LsaType.ADDRESS, externalId, null, errorInfo, true)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.ADDRESS, externalId, null, errorInfo, true)
+            )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new addresses were updated in the Gate" }
     }
 
     fun handleAddressUpdateResponse(
         responseWrapper: AddressPartnerUpdateResponseWrapper,
-        externalIdByBpn: Map<String, String>
+        externalIdByBpn: Map<String, String>,
+        requestEntryByExternalId: Map<String, GateAddressInfo>
     ) {
         for (entity in responseWrapper.entities) {
             val bpn = entity.bpna
             val externalId = externalIdByBpn[bpn]
-            buildSuccessSharingStateDto(LsaType.ADDRESS, externalId, bpn, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            val requestEntry = requestEntryByExternalId[externalId]
+            putAddressOutput(
+                buildAddressGateOutputRequest(requestEntry, entity)
+            )
+            upsertSharingState(
+                buildSuccessSharingStateDto(LsaType.ADDRESS, externalId, bpn, false)
+            )
         }
         for (errorInfo in responseWrapper.errors) {
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
-            buildErrorSharingStateDto(LsaType.ADDRESS, externalId, bpn, errorInfo, false)
-                ?.let { gateClient.sharingState().upsertSharingState(it) }
+            upsertSharingState(
+                buildErrorSharingStateDto(LsaType.ADDRESS, externalId, bpn, errorInfo, false)
+            )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified addresses were updated in the Gate" }
+    }
+
+    private fun buildLegalEntityGateOutputRequest(
+        requestEntry: GateLegalEntityInfo?,
+        poolResponse: LegalEntityPartnerCreateVerboseDto
+    ): LegalEntityGateOutputRequest? {
+        if (requestEntry == null) {
+            logger.warn { "No matching request for Pool response for ${poolResponse.legalEntity.bpnl} found, can't update the Gate output state" }
+            return null
+        }
+        return LegalEntityGateOutputRequest(
+            legalNameParts = listOfNotNull(poolResponse.legalName),
+            legalEntity = poolToGateLegalEntity(poolResponse.legalEntity),
+            legalAddress = poolToGateAddressChild(poolResponse.legalAddress),
+            externalId = requestEntry.externalId,
+            bpn = poolResponse.legalEntity.bpnl
+        )
+    }
+
+    private fun buildSiteGateOutputRequest(requestEntry: GateSiteInfo?, poolResponse: SitePartnerCreateVerboseDto): SiteGateOutputRequest? {
+        if (requestEntry == null) {
+            logger.warn { "No matching request for Pool response for ${poolResponse.site.bpns} found, can't update the Gate output state" }
+            return null
+        }
+        return SiteGateOutputRequest(
+            site = poolToGateSite(poolResponse.site),
+            mainAddress = poolToGateAddressChild(poolResponse.mainAddress),
+            externalId = requestEntry.externalId,
+            bpn = poolResponse.site.bpns,
+            legalEntityExternalId = requestEntry.legalEntityExternalId
+        )
+    }
+
+    private fun buildAddressGateOutputRequest(requestEntry: GateAddressInfo?, poolResponse: LogisticAddressVerboseDto): AddressGateOutputRequest? {
+        if (requestEntry == null) {
+            logger.warn { "No matching request for Pool response for ${poolResponse.bpna} found, can't update the Gate output state" }
+            return null
+        }
+        return AddressGateOutputRequest(
+            address = poolToGateLogisticAddress(poolResponse),
+            externalId = requestEntry.externalId,
+            bpn = poolResponse.bpna,
+            legalEntityExternalId = requestEntry.legalEntityExternalId,
+            siteExternalId = requestEntry.siteExternalId
+        )
     }
 
     private fun buildSuccessSharingStateDto(lsaType: LsaType, externalId: String?, bpn: String, processStarted: Boolean): SharingStateDto? {
@@ -176,5 +270,25 @@ class GateUpdateService(
             sharingProcessStarted = if (processStarted) LocalDateTime.now() else null
         )
     }
+
+    private fun putLegalEntityOutput(request: LegalEntityGateOutputRequest?) =
+        request?.let {
+            gateClient.legalEntities().upsertLegalEntitiesOutput(listOf(it))
+        }
+
+    private fun putSiteOutput(request: SiteGateOutputRequest?) =
+        request?.let {
+            gateClient.sites().upsertSitesOutput(listOf(it))
+        }
+
+    private fun putAddressOutput(request: AddressGateOutputRequest?) =
+        request?.let {
+            gateClient.addresses().putAddressesOutput(listOf(it))
+        }
+
+    private fun upsertSharingState(request: SharingStateDto?) =
+        request?.let {
+            gateClient.sharingState().upsertSharingState(it)
+        }
 
 }

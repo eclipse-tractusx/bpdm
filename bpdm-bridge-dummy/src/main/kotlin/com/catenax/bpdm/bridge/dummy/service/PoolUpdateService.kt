@@ -19,17 +19,11 @@
 
 package com.catenax.bpdm.bridge.dummy.service
 
-import com.catenax.bpdm.bridge.dummy.dto.GateAddressInfo
-import com.catenax.bpdm.bridge.dummy.dto.GateLegalEntityInfo
-import com.catenax.bpdm.bridge.dummy.dto.GateSiteInfo
+import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.PhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
-import org.eclipse.tractusx.bpdm.common.dto.StreetDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -42,33 +36,6 @@ class PoolUpdateService(
 ) {
 
     private val logger = KotlinLogging.logger { }
-
-    fun gateToPoolPhysicalAddress(gateDto: PhysicalPostalAddressGateDto): PhysicalPostalAddressDto {
-
-        return PhysicalPostalAddressDto(
-            baseAddress = gateDto.baseAddress,
-            areaPart = gateDto.areaPart,
-            basePhysicalAddress = gateDto.basePhysicalAddress,
-            street = StreetDto(
-                name = gateDto.street?.name,
-                houseNumber = gateDto.street?.houseNumber,
-                milestone = gateDto.street?.milestone,
-                direction = gateDto.street?.direction,
-            ),
-        )
-    }
-
-    fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressDto {
-
-        return LogisticAddressDto(
-            name = gateDto.nameParts.firstOrNull(),
-            states = gateDto.states,
-            identifiers = gateDto.identifiers,
-            physicalPostalAddress = gateToPoolPhysicalAddress(gateDto.physicalPostalAddress),
-            alternativePostalAddress = gateDto.alternativePostalAddress
-        )
-    }
-
 
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
         val createRequests = entriesToCreate.map {
