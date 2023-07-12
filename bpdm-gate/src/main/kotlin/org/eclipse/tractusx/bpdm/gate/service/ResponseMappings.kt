@@ -110,11 +110,14 @@ fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity(): PhysicalPostal
 }
 
 fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
-    return GeographicCoordinate(longitude, latitude, altitude)
+    return GeographicCoordinate(
+        latitude = latitude,
+        longitude = longitude,
+        altitude = altitude
+    )
 }
 
 private fun StreetGateDto.toStreetEntity(): Street {
-
     return Street(
         name = name,
         houseNumber = houseNumber,
@@ -211,7 +214,6 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
-
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
@@ -238,9 +240,9 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-
+    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
+    legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
     legalEntity.legalAddress = addressOutputRequest.toAddressGateOutput(legalEntity, null, datatype)
 
     return legalEntity
