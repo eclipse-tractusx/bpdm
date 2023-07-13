@@ -6,31 +6,12 @@ This Helm Chart deploys the BPDM Gate service to a Kubernetes environment.
 
 * [Kubernetes Cluster](https://kubernetes.io)
 * [Helm](https://helm.sh/docs/)
-* SaaS storage and datasource
 * Running BPDM Pool instance
 
-For the default deployment you need to specify a valid SaaS hostname, storage, datasource and API key for the application to connect with.
-The easiest way to provide this information is by creating your own values files and overwrite the default `applicationConfig` and `applicationSecrets` values.
-
-my_release-values.yaml:
-
-```yaml
-applicationConfig:
-  bpdm:
-    saas:
-      host: https://saas
-      storage: your_storage_id
-      datasource: your_datasource_id
-applicationSecrets:
-  bpdm:
-    saas:
-      api-key: your_api_key
-```
-
-Given such a values file you can deploy the application via the following command:
+In an existing Kubernetes cluster the application can be deployed with the following command:
 
 ```bash
-helm install release_name ./charts/gate --namespace your_namespace -f /path/to/my_release-values.yaml
+helm install release_name ./charts/bpdm-gate --namespace your_namespace -f /path/to/my_release-values.yaml
 ```
 
 This will install a new release of the BPDM Gate in the given namespace.
@@ -50,7 +31,7 @@ In your values file you can overwrite the default tag:
 
 ```yaml
 image:
-  tag: "v2.0.2"
+  tag: "latest"
 ```
 
 ## Profiles
@@ -78,9 +59,9 @@ ingress:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
   hosts:
-    - host: partners-gate.your-domain.net
+    - host: business-partners.your-domain.net
       paths:
-        - path: /
+        - path: /companies/test-company
           pathType: Prefix
 ```
 

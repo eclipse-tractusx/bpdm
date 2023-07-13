@@ -10,21 +10,21 @@ This Helm Chart deploys the BPDM Pool service to a Kubernetes environment.
 In an existing Kubernetes cluster the application can be deployed with the following command:
 
 ```bash
-helm install release_name ./charts/pool --namespace your_namespace
+helm install release_name ./charts/bpdm-pool --namespace your_namespace
 ```
 
 This will install a new release of the BPDM Pool in the given namespace.
 On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
-The application is run on default profile (without authorization and SaaS connection).
+The application is run on default profile (without authorization).
 Additionally, the Helm deployment contains a PostgreSQL database and Opensearch instance which the BPDM Pool connects to.
 
 On the default values deployment no further action is needed to make the BPDM Pool deployment run.
-However, per default, ingress as well as authentication for endpoints and import from SaaS are all disabled.
+However, per default, ingress as well as authentication for endpoints are disabled.
 
 By giving your own values file you can configure the Helm deployment of the BPDM Pool freely:
 
 ```bash
-helm install release_name ./charts/pool --namespace your_namespace -f ./path/to/your/values.yaml
+helm install release_name ./charts/bpdm-pool --namespace your_namespace -f ./path/to/your/values.yaml
 ```
 
 In the following sections you can have a look at the most important configuration options.
@@ -45,12 +45,11 @@ image:
 ## Profiles
 
 You can also activate Spring profiles in which the BPDM Pool should be run.
-In case you want to run the Pool with authorization and SaaS connection enabled you can write the following:
+In case you want to run the Pool with authorization enabled you can write the following:
 
 ```yaml
 springProfiles:
   - auth
-  - saas
 ```
 
 ## Ingress
@@ -67,18 +66,17 @@ ingress:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
   hosts:
-    - host: partners-pool.your-domain.net
+    - host: business-partners.your-domain.net
       paths:
-        - path: /
+        - path: /pool
           pathType: Prefix
 ```
 
 ## Pool Configuration
 
 The Helm deployment comes with the ability to configure the BPDM Pool application directly over the values file.
-This way you are able to overwrite any configuration property of the `application.properties`,  `application-auth.properties` and  `application-saas.properties`
-files.
-Consider that you would need to turn on `auth` and `saas` profile first before overwriting any property in the corresponding properties file could take effect.
+This way you are able to overwrite any configuration property of the `application.properties` and `application-auth.properties` files.
+Consider that you would need to turn on `auth`  profile first before overwriting any property in the corresponding properties file could take effect.
 Overwriting configuration properties can be useful to connect to a remote service:
 
 ```yaml
