@@ -74,6 +74,7 @@ class GateQueryService(
 
         return entries.map {
             GateLegalEntityInfo(
+                legalNameParts = it.legalNameParts,
                 legalEntity = it.legalEntity,
                 legalAddress = it.legalAddress,
                 externalId = it.externalId,
