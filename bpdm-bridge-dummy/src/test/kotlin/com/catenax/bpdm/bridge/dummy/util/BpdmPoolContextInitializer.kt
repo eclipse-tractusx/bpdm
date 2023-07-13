@@ -26,7 +26,9 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
 import org.testcontainers.lifecycle.Startable
+import java.time.Duration
 
 /**
  * When used on a spring boot test, starts a singleton postgres db container that is shared between all integration tests.
@@ -36,14 +38,16 @@ import org.testcontainers.lifecycle.Startable
 class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     companion object {
+        const val POOL_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
         const val BPDM_PORT = 8080
+        const val IMAGE = "maven-pool"
 
         val bpdmPoolContainer: GenericContainer<*> =
-            GenericContainer("ghcr.io/catenax-ng/tx-bpdm/pool:4.0.0-alpha.4")
+            GenericContainer(IMAGE)
                 .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer))
                 .withNetwork(postgreSQLContainer.getNetwork())
                 .withExposedPorts(BPDM_PORT)
-
+                .withStartupTimeout(Duration.ofSeconds(210))
 
     }
 
@@ -54,6 +58,12 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
         val dataBase = postgreSQLContainer.getDatabaseName()
         val bpdmAlias = applicationContext.environment.getProperty("bpdm.pool.alias")
         bpdmPoolContainer.withNetworkAliases(bpdmAlias)
+            .waitingFor(
+                HttpWaitStrategy()
+                    .forPort(BPDM_PORT)
+                    .forStatusCodeMatching { response -> response == 200 || response == 401 }
+                    .withStartupTimeout(Duration.ofSeconds(POOL_CONTAINER_STARTUP_TIMEOUT_SEC))
+            )
 
         bpdmPoolContainer.withEnv(
             "spring.datasource.url", "jdbc:postgresql://${postgresNetworkAlias}:5432/${dataBase}?loggerLevel=OFF"
