@@ -13,7 +13,7 @@ bpdm-pool:
     enabled: false
 
 bpdm-bridge-dummy:
-  enabled: true"
+  enabled: true
   postgres:
     enabled: false
 
