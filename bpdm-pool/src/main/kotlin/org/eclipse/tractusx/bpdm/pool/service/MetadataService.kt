@@ -24,13 +24,11 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
-import org.eclipse.tractusx.bpdm.pool.entity.FieldQualityRule
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
-import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
-import org.eclipse.tractusx.bpdm.pool.entity.LegalForm
+import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmAlreadyExists
 import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
@@ -46,10 +44,10 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class MetadataService(
-    private val identifierTypeRepository: IdentifierTypeRepository,
-    private val legalFormRepository: LegalFormRepository,
-    private val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    private val regionRepository: RegionRepository
+    val identifierTypeRepository: IdentifierTypeRepository,
+    val legalFormRepository: LegalFormRepository,
+    val fieldQualityRuleRepository: FieldQualityRuleRepository,
+    val regionRepository: RegionRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -169,6 +167,26 @@ class MetadataService(
         }
 
         return countryRule
+    }
+
+
+    @Transactional
+    fun createRegion(request: RegionDto): RegionDto {
+
+        logger.info { "Create new Region with key ${request.regionCode} and name ${request.regionName}" }
+
+        val region = Region(
+            countryCode = request.countryCode,
+            regionCode = request.regionCode,
+            regionName = request.regionName
+        )
+
+        return regionRepository.save(region).toDto()
+    }
+
+    fun getRegions(pageRequest: Pageable): PageDto<RegionDto> {
+        val page = regionRepository.findAll(pageRequest)
+        return page.toDto(page.content.map { it.toDto() })
     }
 
 }

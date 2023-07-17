@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
@@ -134,4 +135,35 @@ interface PoolMetadataApi {
     @GetMapping("/field-quality-rules/")
     @GetExchange("/field-quality-rules/")
     fun getFieldQualityRules(@Parameter(description = "ISO 3166-1 alpha-2 country code") @RequestParam country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>>
+
+    @Operation(
+        summary = "Create new Region",
+        description = "Create a new region which can be referenced by business partner records. "
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "New region successfully created"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
+
+        ]
+    )
+    @PostMapping("/regions")
+    @PostExchange("/regions")
+    fun createRegion(@RequestBody type: RegionDto): RegionDto
+
+    @Operation(
+        summary = "Get page of regions",
+        description = "Lists all currently known regions in a paginated result"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing regions, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/regions")
+    @GetExchange("/regions")
+    fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
+
+
 }

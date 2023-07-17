@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
@@ -63,5 +64,15 @@ class MetadataController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
     override fun getFieldQualityRules(country: CountryCode): ResponseEntity<Collection<FieldQualityRuleDto>> {
         return ResponseEntity(metadataService.getFieldQualityRules(country), HttpStatus.OK)
+    }
+
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
+        return metadataService.getRegions(PageRequest.of(paginationRequest.page, paginationRequest.size))
+    }
+
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")
+    override fun createRegion(type: RegionDto): RegionDto {
+        return metadataService.createRegion(type)
     }
 }
