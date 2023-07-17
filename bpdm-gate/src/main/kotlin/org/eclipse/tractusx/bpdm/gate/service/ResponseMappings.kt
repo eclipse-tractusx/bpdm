@@ -418,6 +418,10 @@ fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifier>): Coll
     return identifiers.map { AddressIdentifierDto(it.value, it.type) }
 }
 
+fun AddressIdentifier.mapToAddressIdentifiersDto(): AddressIdentifierDto {
+    return AddressIdentifierDto(value, type)
+}
+
 //LegalEntity mapping to LegalEntityGateInputResponse
 fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputDto {
 
