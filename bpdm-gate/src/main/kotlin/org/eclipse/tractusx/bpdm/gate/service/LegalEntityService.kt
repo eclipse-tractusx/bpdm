@@ -19,10 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import jakarta.persistence.EntityManager
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.util.JpaMermaidCreator
+import org.eclipse.tractusx.bpdm.common.util.JpaMetaModelReader
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
@@ -36,7 +39,8 @@ import org.springframework.stereotype.Service
 @Service
 class LegalEntityService(
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
+    private val entityManager: EntityManager
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -115,6 +119,13 @@ class LegalEntityService(
         }
     }
 
+
+    fun getMermaid(): String {
+
+        val allClassInfos = JpaMetaModelReader().createJpaClassInfos(this.entityManager.metamodel)
+        return JpaMermaidCreator().getMermaid(allClassInfos, "Gate persistence")
+    }
+
 }
 
 private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
@@ -126,4 +137,5 @@ private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateI
         legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
         externalId = legalEntity.externalId
     )
+
 }
