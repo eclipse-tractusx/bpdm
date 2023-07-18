@@ -26,9 +26,11 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.toDto
 import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
 import org.springframework.data.domain.PageRequest
@@ -40,7 +42,8 @@ import org.springframework.stereotype.Service
 @Service
 class SearchServiceMock(
     val legalEntityRepository: LegalEntityRepository,
-    val logisticAddressRepository: LogisticAddressRepository
+    val logisticAddressRepository: LogisticAddressRepository,
+    val siteRepository: SiteRepository
 ) : SearchService {
 
     private val logger = KotlinLogging.logger { }
@@ -71,6 +74,14 @@ class SearchServiceMock(
         logger.info { "Mock search: Returning ${resultPage.size} addresses from database" }
 
         return resultPage.toDto(resultPage.content.map { it.toMatchDto(1f) })
+    }
+
+    override fun searchSites(paginationRequest: PaginationRequest): PageDto<SiteMatchVerboseDto> {
+        val resultPage = siteRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        logger.info { "Mock search: Returning ${resultPage.size} sites from database" }
+
+        return resultPage.toDto(resultPage.content.map { it.toMatchDto() })
     }
 
 }

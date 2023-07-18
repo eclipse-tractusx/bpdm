@@ -26,19 +26,19 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.pool.entity.Site
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmOpenSearchUserException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
-import org.eclipse.tractusx.bpdm.pool.service.AddressService
-import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerFetchService
-import org.eclipse.tractusx.bpdm.pool.service.toDto
-import org.eclipse.tractusx.bpdm.pool.service.toMatchDto
+import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.pool.service.*
 import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -54,7 +54,9 @@ class SearchServiceImpl(
     val addressDocSearchRepository: AddressDocSearchRepository,
     val legalEntityRepository: LegalEntityRepository,
     val logisticAddressRepository: LogisticAddressRepository,
+    val siteRepository: SiteRepository,
     val addressService: AddressService,
+    val siteService: SiteService,
     val businessPartnerFetchService: BusinessPartnerFetchService,
     val openSearchConfigProperties: OpenSearchConfigProperties
 ) : SearchService {
@@ -97,6 +99,17 @@ class SearchServiceImpl(
         }
     }
 
+    override fun searchSites(paginationRequest: PaginationRequest): PageDto<SiteMatchVerboseDto> {
+        val sitePage = searchAndPreparePageSite(paginationRequest)
+
+        siteService.fetchSiteDependenciesPage(sitePage.content.map { site -> site }.toSet())
+
+        return with(sitePage) {
+            PageDto(totalElements, totalPages, page, contentSize,
+                content.map { site -> site.toMatchDto() })
+        }
+    }
+
     private fun searchAndPreparePage(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
@@ -120,6 +133,14 @@ class SearchServiceImpl(
         }
     }
 
+    private fun searchAndPreparePageSite(
+        paginationRequest: PaginationRequest
+    ): PageDto<Site> {
+
+        return paginateSite(paginationRequest)
+
+    }
+
     private fun paginateLegalEntities(paginationRequest: PaginationRequest): PageDto<Pair<Float, LegalEntity>> {
         logger.debug { "Paginate database for legal entities" }
         val legalEntityPage = legalEntityRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
@@ -132,6 +153,13 @@ class SearchServiceImpl(
         val addressPage = logisticAddressRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
 
         return addressPage.toDto(addressPage.content.map { Pair(0f, it) }) // assign 0 score as no search has been conducted
+    }
+
+    private fun paginateSite(paginationRequest: PaginationRequest): PageDto<Site> {
+        logger.debug { "Paginate database for sites" }
+        val sitePage = siteRepository.findAll(PageRequest.of(paginationRequest.page, paginationRequest.size))
+
+        return sitePage.toDto(sitePage.content.map { it })
     }
 
     private fun searchIndex(

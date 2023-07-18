@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequ
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
 
 /**
  * Provides search functionality on the Catena-x data for the BPDM system
@@ -46,5 +47,12 @@ interface SearchService {
         searchRequest: AddressPartnerSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<AddressMatchVerboseDto>
+
+    /**
+     * Find sites by matching their field values to [searchRequest] field query texts
+     */
+    fun searchSites(
+        paginationRequest: PaginationRequest
+    ): PageDto<SiteMatchVerboseDto>
 
 }

@@ -216,6 +216,13 @@ fun LogisticAddress.toCreateResponse(index: String?): AddressPartnerCreateVerbos
     )
 }
 
+fun Site.toMatchDto(): SiteMatchVerboseDto {
+    return SiteMatchVerboseDto(
+        mainAddress = this.mainAddress.toDto(),
+        site = this.toDto(),
+    )
+}
+
 fun Site.toUpsertDto(entryId: String?): SitePartnerCreateVerboseDto {
     return SitePartnerCreateVerboseDto(
         site = toDto(),

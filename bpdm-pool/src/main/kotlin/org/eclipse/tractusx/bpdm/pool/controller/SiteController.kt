@@ -23,12 +23,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
@@ -39,7 +36,8 @@ import org.springframework.web.bind.annotation.RestController
 class SiteController(
     private val siteService: SiteService,
     private val businessPartnerBuildService: BusinessPartnerBuildService,
-    private val addressService: AddressService
+    private val addressService: AddressService,
+    val searchService: SearchService,
 ) : PoolSiteApi {
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
@@ -76,5 +74,12 @@ class SiteController(
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper {
         return businessPartnerBuildService.updateSites(requests)
+    }
+
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
+    override fun getSitesPaginated(
+        paginationRequest: PaginationRequest
+    ): PageDto<SiteMatchVerboseDto> {
+        return searchService.searchSites(paginationRequest)
     }
 }
