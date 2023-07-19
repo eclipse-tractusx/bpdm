@@ -25,10 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -372,6 +369,36 @@ class SiteControllerIT @Autowired constructor(
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
+    }
+
+    @Test
+    fun `retrieve sites with pagination`() {
+
+        lateinit var site1: SiteVerboseDto
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate1))
+                )
+            )
+        )
+
+        val legalAddress1: LogisticAddressVerboseDto =
+            ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1, bpna = "BPNA0000000001YN")
+        site1 = givenStructure[0].siteStructures[0].site.site
+
+        val expectedFirstPage = PageDto(
+            1, 1, 0, 1, listOf(
+                SiteMatchVerboseDto(mainAddress = legalAddress1, site = site1)
+            )
+        )
+
+        val firstPage = poolClient.sites().getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
+
+        testHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
+
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {
