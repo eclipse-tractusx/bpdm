@@ -374,24 +374,32 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `retrieve sites with pagination`() {
 
-        lateinit var site1: SiteVerboseDto
-
-        val givenStructure = testHelpers.createBusinessPartnerStructure(
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
                     legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate1))
+                    siteStructures = listOf(
+                        SiteStructureRequest(site = RequestValues.siteCreate1),
+                        SiteStructureRequest(site = RequestValues.siteCreate2)
+                    )
                 )
             )
         )
 
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
+
         val legalAddress1: LogisticAddressVerboseDto =
             ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1, bpna = "BPNA0000000001YN")
-        site1 = givenStructure[0].siteStructures[0].site.site
+        val site1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL1)
+
+        val legalAddress2: LogisticAddressVerboseDto =
+            ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2, bpna = "BPNA0000000002XY")
+        val site2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL1)
 
         val expectedFirstPage = PageDto(
-            1, 1, 0, 1, listOf(
-                SiteMatchVerboseDto(mainAddress = legalAddress1, site = site1)
+            2, 1, 0, 2, listOf(
+                SiteMatchVerboseDto(mainAddress = legalAddress1, site = site1),
+                SiteMatchVerboseDto(mainAddress = legalAddress2, site = site2)
             )
         )
 
