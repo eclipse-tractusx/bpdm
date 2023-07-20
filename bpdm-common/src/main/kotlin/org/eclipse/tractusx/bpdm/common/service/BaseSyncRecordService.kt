@@ -72,12 +72,12 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
             record.fromTime = record.startedAt ?: syncStartTime
             record.errorDetails = null
             record.errorSave = null
-            record.startedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
             record.finishedAt = null
             record.count = 0
             record.progress = 0f
         }
         record.status = SyncStatus.RUNNING
+        record.startedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
 
         return save(record)
     }

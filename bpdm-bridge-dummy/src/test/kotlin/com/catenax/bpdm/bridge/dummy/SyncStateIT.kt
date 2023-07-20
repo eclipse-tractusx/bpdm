@@ -178,11 +178,9 @@ class SyncStateIT @Autowired constructor(
         )
 
         // 2nd sync fails
-        val tsBeforeFailedSync = Instant.now()
         assertThrows(WebClientResponseException.InternalServerError::class.java) {
             syncService.sync()
         }
-        val tsAfterFailedSync = Instant.now()
 
         // 3rd sync fails
         assertThrows(WebClientResponseException.InternalServerError::class.java) {
@@ -230,11 +228,7 @@ class SyncStateIT @Autowired constructor(
 
         // 5th sync polls from around timestamp of 2nd successful sync
         val pollFrom5thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[4]).fromTime
-        // TODO Didn't expect this!
-        //  If there is one or more sync errors followed by a successful sync, the poll-from timestamp is updated to the start-time of the first failed sync,
-        //  not of the successful sync!
-//        Assertions.assertThat(pollFrom5thSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
-        Assertions.assertThat(pollFrom5thSync).isBetween(tsBeforeFailedSync, tsAfterFailedSync)
+        Assertions.assertThat(pollFrom5thSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
     }
 
     private inline fun <reified T> parseBody(loggedRequest: LoggedRequest): T {
