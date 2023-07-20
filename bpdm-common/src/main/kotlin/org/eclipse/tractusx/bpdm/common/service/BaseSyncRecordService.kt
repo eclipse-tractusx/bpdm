@@ -32,17 +32,27 @@ import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 
 /**
+ * This services manages data about the most current sync run for each SYNC_TYPE.
+ *
+ * How to use:
+ * - At the start of a sync run you should call #setSynchronizationStart(type).
+ *  The returned record contains the automatically updated timestamp after which new data should be considered (#fromTime).
+ *  If the last sync has failed #errorSave might contain state info to allow resuming near the failure position.
+ *  If another sync for the same type is currently running a BpdmSyncConflictException is thrown.
+ * - If the sync run was successful you should call #setSynchronizationSuccess(type).
+ * - If the sync run has failed you should call #setSynchronizationError(type, errorMessage, saveState).
+ *
  * Uses transaction isolation level "serializable" in order to make sure that in case of parallel execution on different spring boot instances,
  * only one instance can get the sync record and make changes like setting it to "running" state at the same time.
  */
 abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSyncRecord<SYNC_TYPE>> {
     companion object {
-        val syncStartTime: Instant = LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC)
+        val INITIAL_FROM_TIME: Instant = LocalDateTime.of(2000, 1, 1, 0, 0).toInstant(ZoneOffset.UTC)
     }
 
     protected abstract val logger: KLogger
 
-    protected abstract fun newSyncRecord(type: SYNC_TYPE, syncStartTime: Instant): SYNC_RECORD
+    protected abstract fun newSyncRecord(type: SYNC_TYPE, initialFromTime: Instant): SYNC_RECORD
 
     protected abstract fun save(record: SYNC_RECORD): SYNC_RECORD
 
@@ -52,7 +62,7 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
     open fun getOrCreateRecord(type: SYNC_TYPE): SYNC_RECORD {
         return findByType(type) ?: run {
             logger.info { "Create new sync record entry for type $type" }
-            val newEntry = newSyncRecord(type, syncStartTime)
+            val newEntry = newSyncRecord(type, INITIAL_FROM_TIME)
             save(newEntry)
         }
     }
@@ -66,18 +76,17 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.RUNNING}" }
 
-        record.errorDetails = null
-
         if (record.status != SyncStatus.ERROR) {
-            record.fromTime = record.startedAt ?: syncStartTime
-            record.errorDetails = null
-            record.errorSave = null
-            record.finishedAt = null
-            record.count = 0
-            record.progress = 0f
+            // For error status the field fromTime is preserved to not miss any data
+            record.fromTime = record.startedAt ?: INITIAL_FROM_TIME
         }
+
+        record.errorDetails = null
         record.status = SyncStatus.RUNNING
         record.startedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        record.finishedAt = null
+        record.count = 0
+        record.progress = 0f
 
         return save(record)
     }
@@ -138,7 +147,7 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
         record.finishedAt = null
         record.count = 0
         record.progress = 0f
-        record.fromTime = syncStartTime
+        record.fromTime = INITIAL_FROM_TIME
 
         return save(record)
     }

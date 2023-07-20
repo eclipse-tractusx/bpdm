@@ -45,7 +45,7 @@ import org.springframework.test.context.DynamicPropertySource
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.Instant
 
-val TS_INITIAL_POLL_FROM: Instant = BaseSyncRecordService.syncStartTime
+val TS_INITIAL_POLL_FROM: Instant = BaseSyncRecordService.INITIAL_FROM_TIME
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
