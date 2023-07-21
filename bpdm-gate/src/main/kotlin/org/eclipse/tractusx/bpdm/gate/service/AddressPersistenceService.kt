@@ -54,6 +54,10 @@ class AddressPersistenceService(
             val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
             val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
 
+            if (legalEntityRecord == null && siteRecord == null) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Neither legal entity record nor site record found for externalID")
+            }
+
             val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord, dataType)
 
             addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }?.let { existingAddress ->
@@ -90,6 +94,10 @@ class AddressPersistenceService(
 
             val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
             val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
+
+            if (legalEntityRecord == null && siteRecord == null) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Neither legal entity record nor site record found for externalID")
+            }
 
             val fullAddress = address.toAddressGateOutput(legalEntityRecord, siteRecord, dataType)
 

@@ -53,6 +53,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParam
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParamLegalEntity
 import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParamNotFound
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -172,7 +173,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
+            .isEqualTo(
+                listOf(
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                )
+            )
     }
 
     /**
@@ -203,7 +209,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
+            .isEqualTo(
+                listOf(
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                )
+            )
     }
 
     /**
@@ -219,7 +230,13 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
+            .isEqualTo(
+                listOf(
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
+                    ChangelogGateDto(CommonValues.externalId1, lsaTypeParamLegalEntity, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                )
+            )
     }
 
     fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
@@ -239,6 +256,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val addresses = listOf(
             RequestValues.addressGateInputRequest1
         )
+
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
         gateClient.addresses().upsertAddresses(addresses)
     }
 
