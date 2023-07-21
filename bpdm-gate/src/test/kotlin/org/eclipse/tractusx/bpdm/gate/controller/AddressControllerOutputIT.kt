@@ -162,6 +162,35 @@ internal class AddressControllerOutputIT @Autowired constructor(
     }
 
     /**
+     * If there isn't a parent legal Entity persisted,
+     * when upserting an output address, it should show an 400
+     */
+    @Test
+    fun `upsert output addresses, no parent legal entity found`() {
+        val addresses = listOf(
+            RequestValues.addressGateOutputRequest1.copy(legalEntityExternalId = "NonExistent"),
+        )
+
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val legalEntityOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1
+        )
+
+        try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntity)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+
+            gateClient.addresses().putAddressesOutput(addresses)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+
+    }
+
+    /**
      * Given output addresses exists in the database
      * When getting addresses page via output route
      * Then addresses page should be returned
