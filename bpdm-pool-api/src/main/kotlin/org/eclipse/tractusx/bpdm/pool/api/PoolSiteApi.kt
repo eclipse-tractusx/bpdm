@@ -30,10 +30,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -134,4 +131,21 @@ interface PoolSiteApi {
         @RequestBody
         requests: Collection<SitePartnerUpdateRequest>
     ): SitePartnerUpdateResponseWrapper
+
+    @Operation(
+        summary = "Get page of sites matching the pagination search criteria",
+        description = "This endpoint retrieves all existing business partners of type sites." +
+                "Note that when using search parameters the max page is \${bpdm.opensearch.max-page}."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of business partners matching the search criteria, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()])
+        ]
+    )
+    @GetMapping
+    @GetExchange
+    fun getSitesPaginated(
+        @ParameterObject paginationRequest: PaginationRequest
+    ): PageDto<SiteMatchVerboseDto>
 }

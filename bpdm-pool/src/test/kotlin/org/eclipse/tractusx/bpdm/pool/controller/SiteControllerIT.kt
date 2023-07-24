@@ -25,10 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -372,6 +369,44 @@ class SiteControllerIT @Autowired constructor(
 
         val response = poolClient.sites().searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
+    }
+
+    @Test
+    fun `retrieve sites with pagination`() {
+
+        val createdStructures = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(site = RequestValues.siteCreate1),
+                        SiteStructureRequest(site = RequestValues.siteCreate2)
+                    )
+                )
+            )
+        )
+
+        val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
+
+        val legalAddress1: LogisticAddressVerboseDto =
+            ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1, bpna = "BPNA0000000001YN")
+        val site1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL1)
+
+        val legalAddress2: LogisticAddressVerboseDto =
+            ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2, bpna = "BPNA0000000002XY")
+        val site2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL1)
+
+        val expectedFirstPage = PageDto(
+            2, 1, 0, 2, listOf(
+                SiteMatchVerboseDto(mainAddress = legalAddress1, site = site1),
+                SiteMatchVerboseDto(mainAddress = legalAddress2, site = site2)
+            )
+        )
+
+        val firstPage = poolClient.sites().getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
+
+        testHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
+
     }
 
     private fun assertThatCreatedSitesEqual(actuals: Collection<SitePartnerCreateVerboseDto>, expected: Collection<SitePartnerCreateVerboseDto>) {
