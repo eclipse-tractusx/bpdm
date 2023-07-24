@@ -140,4 +140,19 @@ interface GateSiteApi {
     @PutExchange("/output/sites")
     fun upsertSitesOutput(@RequestBody sites: Collection<SiteGateOutputRequest>): ResponseEntity<Unit>
 
+    @Operation(
+        summary = "Get csv file of a page of sites",
+        description = "Get csv file of a page of sites."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Sites CSV file was successfully provided"),
+            ApiResponse(responseCode = "404", description = "Sites CSV file was not successful", content = [Content()])
+        ]
+    )
+
+    @GetMapping("/input/sites/search/csv")
+    @GetExchange("/input/sites/search/csv")
+    fun getSitesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
+
 }

@@ -33,13 +33,15 @@ import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.io.Writer
 
 @Service
 class SiteService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val sitePersistenceService: SitePersistenceService,
     private val siteRepository: SiteRepository,
-    private val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService,
+    private val businessPartnersCsvService: BusinessPartnersCsvService
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -116,4 +118,8 @@ class SiteService(
         sitePersistenceService.persistSitesOutputBP(sites, OutputInputEnum.Output)
     }
 
+    fun downloadSitesCsv(page: Int, size: Int): Writer {
+        return businessPartnersCsvService.downloadSitesCsv(page, size)
+
+    }
 }

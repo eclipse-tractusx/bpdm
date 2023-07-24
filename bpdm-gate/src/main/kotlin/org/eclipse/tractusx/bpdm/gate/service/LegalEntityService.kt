@@ -32,11 +32,13 @@ import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.io.Writer
 
 @Service
 class LegalEntityService(
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
+    private val businessPartnersCsvService: BusinessPartnersCsvService,
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -115,6 +117,10 @@ class LegalEntityService(
         }
     }
 
+    fun downloadLegalEntitiesCsv(page: Int, size: Int): Writer {
+        return businessPartnersCsvService.downloadLegalEntitiesCsv(page, size)
+
+    }
 }
 
 private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
@@ -126,5 +132,4 @@ private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateI
         legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
         externalId = legalEntity.externalId
     )
-
 }

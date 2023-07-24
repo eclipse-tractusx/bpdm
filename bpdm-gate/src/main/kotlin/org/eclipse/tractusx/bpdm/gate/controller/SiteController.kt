@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -82,4 +83,12 @@ class SiteController(
         return ResponseEntity(HttpStatus.OK)
     }
 
+    @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
+    override fun getSitesToCsv(paginationRequest: PaginationRequest): ResponseEntity<Any?> {
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"sites\"")
+            .body(siteService.downloadSitesCsv(page = paginationRequest.page, size = paginationRequest.size).toString())
+    }
 }

@@ -140,4 +140,18 @@ interface GateLegalEntityApi {
     @PutExchange("/output/legal-entities")
     fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit>
 
+    @Operation(
+        summary = "Get csv file of a page of Legal entities",
+        description = "Get csv file of a page of Legal entities."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Legal entities CSV file was successfully provided"),
+            ApiResponse(responseCode = "404", description = "Legal entities CSV file was not successful", content = [Content()])
+        ]
+    )
+
+    @GetMapping("/input/legal-entities/search/csv")
+    @GetExchange("/input/legal-entities/search/csv")
+    fun getLegalEntitiesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
 }

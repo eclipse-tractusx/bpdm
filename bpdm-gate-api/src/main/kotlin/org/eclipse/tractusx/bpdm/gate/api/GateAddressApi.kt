@@ -145,4 +145,20 @@ interface GateAddressApi {
     @PutExchange("/output/addresses")
     fun putAddressesOutput(@RequestBody addresses: Collection<AddressGateOutputRequest>): ResponseEntity<Unit>
 
+
+    @Operation(
+        summary = "Get csv file of a page of address",
+        description = "Get csv file of a page of address."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Address CSV file was successfully provided"),
+            ApiResponse(responseCode = "404", description = "Address CSV file was not successful", content = [Content()])
+        ]
+    )
+
+    @GetMapping("/input/addresses/search/csv")
+    @GetExchange("/input/addresses/search/csv")
+    fun getAddressToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
+
 }

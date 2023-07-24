@@ -31,12 +31,15 @@ import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.io.StringWriter
+
 
 @Service
 class AddressService(
     private val addressPersistenceService: AddressPersistenceService,
     private val addressRepository: GateAddressRepository,
-    private val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService,
+    private val businessPartnersCsvService: BusinessPartnersCsvService,
 ) {
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
@@ -110,6 +113,12 @@ class AddressService(
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
+    }
+
+    fun downloadAddressCsv(page: Int, size: Int): StringWriter {
+
+        return businessPartnersCsvService.downloadAddressCsv(page, size)
+
     }
 
 }
