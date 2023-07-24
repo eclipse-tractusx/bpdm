@@ -43,3 +43,4 @@ data class LegalEntityPartnerUpdateRequest(
     val legalAddress: LogisticAddressDto,
 
     )
+

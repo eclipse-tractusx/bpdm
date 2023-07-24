@@ -19,43 +19,28 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
-    val webTestClient: WebTestClient,
     val poolClient: PoolApiClient
 ) {
-    companion object {
-        @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-    }
-
 
     @BeforeEach
     fun beforeEach() {
@@ -311,6 +296,11 @@ class AddressControllerIT @Autowired constructor(
         val expected = listOf(
             ResponseValues.addressPartnerCreate1,
         )
+        val expectedErrors = listOf(
+            ErrorInfo(AddressCreateError.BpnNotValid, "message ignored", CommonValues.index3),
+            ErrorInfo(AddressCreateError.SiteNotFound, "message ignored", CommonValues.index1),
+            ErrorInfo(AddressCreateError.LegalEntityNotFound, "message ignored ", CommonValues.index2)
+        )
 
         val invalidSiteBpn = "BPNSXXXXXXXXXX"
         val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
@@ -328,9 +318,9 @@ class AddressControllerIT @Autowired constructor(
 //        testHelpers.assertRecursively(response.entities).ignoringFields(LogisticAddressResponse::bpn.name).isEqualTo(expected)
 
         assertThat(response.errorCount).isEqualTo(3)
-        testHelpers.assertErrorResponse(response.errors.elementAt(0), AddressCreateError.BpnNotValid, CommonValues.index3)   // BPN validity check always first
-        testHelpers.assertErrorResponse(response.errors.elementAt(1), AddressCreateError.SiteNotFound, CommonValues.index1)
-        testHelpers.assertErrorResponse(response.errors.elementAt(2), AddressCreateError.LegalEntityNotFound, CommonValues.index2)
+        testHelpers.assertRecursively(response.errors)
+            .ignoringFields(ErrorInfo<AddressCreateError>::message.name)
+            .isEqualTo(expectedErrors)
     }
 
     /**
