@@ -175,7 +175,7 @@ private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerbos
         baseAddress = baseAddress,
         areaPart = areaPart,
         deliveryServiceNumber = address.deliveryServiceNumber,
-        deliveryServiceType = address.type,
+        deliveryServiceType = address.deliveryServiceType,
         deliveryServiceQualifier = address.deliveryServiceQualifier
     )
 }
