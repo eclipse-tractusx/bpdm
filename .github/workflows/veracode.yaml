@@ -53,6 +53,10 @@ jobs:
       - name: Copy Gate JAR
         run: cp bpdm-gate/target/bpdm-gate.jar target/veracode/bpdm-gate.jar
 
+      #Copy the bpdm-bridge-dummy jar to directory which gets uploaded to Veracode
+      - name: Copy Bridge Dummy JAR
+        run: cp bpdm-bridge-dummy/target/bpdm-bridge-dummy.jar target/veracode/bpdm-bridge-dummy.jar
+
       #Start Veracode scan
       - name: Run Veracode Upload And Scan
         uses: veracode/veracode-uploadandscan-action@0.2.1
