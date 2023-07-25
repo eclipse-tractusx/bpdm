@@ -106,7 +106,7 @@ fun LegalForm.toDto(): LegalFormDto {
 }
 
 fun LegalEntityState.toDto(): LegalEntityStateVerboseDto {
-    return LegalEntityStateVerboseDto(officialDenotation, validFrom, validTo, type.toDto())
+    return LegalEntityStateVerboseDto(description, validFrom, validTo, type.toDto())
 }
 
 fun SiteState.toDto(): SiteStateVerboseDto {

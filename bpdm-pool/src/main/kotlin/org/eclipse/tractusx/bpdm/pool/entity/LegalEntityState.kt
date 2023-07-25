@@ -32,8 +32,8 @@ import java.time.LocalDateTime
     ]
 )
 class LegalEntityState (
-    @Column(name = "official_denotation")
-    val officialDenotation: String?,
+    @Column(name = "description")
+    val description: String?,
 
     @Column(name = "valid_from")
     val validFrom: LocalDateTime?,

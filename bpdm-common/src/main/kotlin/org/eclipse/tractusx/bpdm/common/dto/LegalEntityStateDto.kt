@@ -26,7 +26,7 @@ import java.time.LocalDateTime
 @Schema(name = "LegalEntityState", description = "Status record of a legal entity")
 data class LegalEntityStateDto(
     @get:Schema(description = "Exact, official denotation of the status")
-    val officialDenotation: String?,
+    val description: String?,
 
     @get:Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,

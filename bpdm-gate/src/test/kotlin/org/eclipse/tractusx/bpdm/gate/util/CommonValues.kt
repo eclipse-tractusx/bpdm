@@ -152,8 +152,8 @@ object CommonValues {
     const val legalFormAbbreviation1 = "LLC"
     const val legalFormAbbreviation2 = "GmbH"
 
-    const val businessStatusOfficialDenotation1 = "Active"
-    const val businessStatusOfficialDenotation2 = "Insolvent"
+    const val businessStatusDescription1 = "Active"
+    const val businessStatusDescription2 = "Insolvent"
 
     val businessStatusValidFrom1 = LocalDateTime.of(2020, 1, 1, 0, 0)
     val businessStatusValidFrom2 = LocalDateTime.of(2019, 1, 1, 0, 0)

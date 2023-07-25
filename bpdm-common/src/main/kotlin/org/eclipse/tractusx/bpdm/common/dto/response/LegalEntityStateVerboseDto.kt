@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 data class LegalEntityStateVerboseDto(
 
     @get:Schema(description = "Exact, official denotation of the status")
-    val officialDenotation: String?,
+    val description: String?,
 
     @get:Schema(description = "Since when the status is/was valid")
     val validFrom: LocalDateTime?,
