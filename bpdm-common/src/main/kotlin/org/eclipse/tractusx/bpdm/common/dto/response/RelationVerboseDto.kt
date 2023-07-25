@@ -31,10 +31,10 @@ data class RelationVerboseDto(
     val type: TypeKeyNameVerboseDto<RelationType>,
 
     @get:Schema(description = "BPN of partner which is the source of the relation")
-    val startBpn: String,
+    val startBpnl: String,
 
     @get:Schema(description = "BPN of partner which is the target of the relation")
-    val endBpn: String,
+    val endBpnl: String,
 
     @get:Schema(description = "Time when the relation started")
     val validFrom: LocalDateTime? = null,
