@@ -21,10 +21,10 @@ package com.catenax.bpdm.bridge.dummy.service
 
 import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
@@ -56,7 +56,7 @@ class GateUpdateService(
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, null, errorInfo, true)
+                buildErrorSharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId, null, errorInfo, true)
             )
 
         }
@@ -80,7 +80,7 @@ class GateUpdateService(
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.LEGAL_ENTITY, externalId, bpn, errorInfo, false)
+                buildErrorSharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId, bpn, errorInfo, false)
             )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified legal entities were updated in the Gate" }
@@ -100,7 +100,7 @@ class GateUpdateService(
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.SITE, externalId, null, errorInfo, true)
+                buildErrorSharingStateDto(BusinessPartnerType.SITE, externalId, null, errorInfo, true)
             )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new sites were updated in the Gate" }
@@ -123,7 +123,7 @@ class GateUpdateService(
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.SITE, externalId, bpn, errorInfo, false)
+                buildErrorSharingStateDto(BusinessPartnerType.SITE, externalId, bpn, errorInfo, false)
             )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified sites were updated in the Gate" }
@@ -143,7 +143,7 @@ class GateUpdateService(
         for (errorInfo in responseWrapper.errors) {
             val externalId = errorInfo.entityKey
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.ADDRESS, externalId, null, errorInfo, true)
+                buildErrorSharingStateDto(BusinessPartnerType.ADDRESS, externalId, null, errorInfo, true)
             )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid new addresses were updated in the Gate" }
@@ -166,7 +166,7 @@ class GateUpdateService(
             val bpn = errorInfo.entityKey
             val externalId = externalIdByBpn[bpn]
             upsertSharingState(
-                buildErrorSharingStateDto(LsaType.ADDRESS, externalId, bpn, errorInfo, false)
+                buildErrorSharingStateDto(BusinessPartnerType.ADDRESS, externalId, bpn, errorInfo, false)
             )
         }
         logger.info { "Sharing states for ${responseWrapper.entityCount} valid and ${responseWrapper.errorCount} invalid modified addresses were updated in the Gate" }
@@ -217,13 +217,18 @@ class GateUpdateService(
         )
     }
 
-    private fun buildSuccessSharingStateDto(lsaType: LsaType, externalId: String?, bpn: String, processStarted: Boolean): SharingStateDto? {
+    private fun buildSuccessSharingStateDto(
+        businessPartnerType: BusinessPartnerType,
+        externalId: String?,
+        bpn: String,
+        processStarted: Boolean
+    ): SharingStateDto? {
         if (externalId == null) {
             logger.warn { "Encountered externalId=null in Pool response for $bpn, can't update the Gate sharing state" }
             return null
         }
         return SharingStateDto(
-            lsaType = lsaType,
+            businessPartnerType = businessPartnerType,
             externalId = externalId,
             sharingStateType = SharingStateType.Success,
             bpn = bpn,
@@ -232,7 +237,7 @@ class GateUpdateService(
     }
 
     private fun buildErrorSharingStateDto(
-        lsaType: LsaType,
+        businessPartnerType: BusinessPartnerType,
         externalId: String?,
         bpn: String?,
         errorInfo: ErrorInfo<*>,
@@ -243,7 +248,7 @@ class GateUpdateService(
             return null
         }
         return SharingStateDto(
-            lsaType = lsaType,
+            businessPartnerType = businessPartnerType,
             externalId = externalId,
             sharingStateType = SharingStateType.Error,
             bpn = bpn,

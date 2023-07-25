@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
@@ -77,8 +77,8 @@ class LegalEntityPersistenceService(
 
     //Creates Changelog For both Legal Entity and Logistic Address when they are created or updated
     private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(externalId), LsaType.ADDRESS, outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, LsaType.LEGAL_ENTITY, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(externalId), BusinessPartnerType.ADDRESS, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.LEGAL_ENTITY, outputInputEnum))
     }
 
     private fun updateLegalEntity(

@@ -21,7 +21,7 @@ package com.catenax.bpdm.bridge.dummy.service
 
 import com.catenax.bpdm.bridge.dummy.entity.SyncType
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -35,7 +35,7 @@ class SyncService(
 
     private val logger = KotlinLogging.logger { }
 
-    // TODO For improved robustness we should maybe persistently track all sync entries (status) by LSAType/externalID.
+    // TODO For improved robustness we should maybe persistently track all sync entries (status) by businessPartnerType/externalID.
 
     fun sync() {
         logger.info("Bridge sync started...")
@@ -53,11 +53,11 @@ class SyncService(
 
     private fun syncInternal(modifiedAfter: Instant) {
         // Check changelog entries from Gate (after last sync time)
-        val externalIdsByType = gateQueryService.getChangedExternalIdsByLsaType(modifiedAfter)
+        val externalIdsByType = gateQueryService.getChangedExternalIdsByBusinessPartnerType(modifiedAfter)
 
-        externalIdsByType[LsaType.LEGAL_ENTITY]?.let { syncLegalEntities(it) }
-        externalIdsByType[LsaType.SITE]?.let { syncSites(it) }
-        externalIdsByType[LsaType.ADDRESS]?.let { syncAddresses(it) }
+        externalIdsByType[BusinessPartnerType.LEGAL_ENTITY]?.let { syncLegalEntities(it) }
+        externalIdsByType[BusinessPartnerType.SITE]?.let { syncSites(it) }
+        externalIdsByType[BusinessPartnerType.ADDRESS]?.let { syncAddresses(it) }
     }
 
     private fun syncLegalEntities(externalIdsRequested: Set<String>) {

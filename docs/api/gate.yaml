@@ -31,7 +31,7 @@ paths:
             minimum: 0
             type: string
             default: '10'
-        - name: lsaType
+        - name: businessPartnerType
           in: query
           description: LSA Type
           required: false

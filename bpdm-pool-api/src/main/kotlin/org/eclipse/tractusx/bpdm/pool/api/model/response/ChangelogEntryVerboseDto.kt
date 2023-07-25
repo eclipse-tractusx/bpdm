@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import java.time.Instant
 
@@ -37,5 +37,5 @@ data class ChangelogEntryVerboseDto(
     val timestamp: Instant,
 
     @Schema(description = "The type of the business partner this change refers to")
-    val lsaType: ChangelogSubject
+    val businessPartnerType: BusinessPartnerType
 )

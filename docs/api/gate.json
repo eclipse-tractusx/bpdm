@@ -44,7 +44,7 @@
             }
           },
           {
-            "name": "lsaType",
+            "name": "businessPartnerType",
             "in": "query",
             "description": "LSA Type",
             "required": false,

@@ -29,9 +29,12 @@ object RequestValues {
     val identifierType2 = TypeKeyNameVerboseDto(CommonValues.identifierTypeTechnicalKey2, CommonValues.identifierTypeName2)
     val identifierType3 = TypeKeyNameVerboseDto(CommonValues.identifierTypeTechnicalKey3, CommonValues.identifierTypeName3)
 
-    val identifierTypeDto1 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey1, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
-    val identifierTypeDto2 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
-    val identifierTypeDto3 = IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey3, IdentifierLsaType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
+    val identifierTypeDto1 =
+        IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey1, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName1)
+    val identifierTypeDto2 =
+        IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey2, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName2)
+    val identifierTypeDto3 =
+        IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey3, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName3)
 
     val identifier1 = LegalEntityIdentifierDto(
         value = CommonValues.identifierValue1,

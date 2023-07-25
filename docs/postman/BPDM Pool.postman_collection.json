@@ -72,7 +72,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{Pool-Host}}/api/catena/identifier-types?page=0&size=100&lsaType=ADDRESS",
+              "raw": "{{Pool-Host}}/api/catena/identifier-types?page=0&size=100&businessPartnerType=ADDRESS",
               "host": [
                 "{{Pool-Host}}"
               ],
@@ -91,7 +91,7 @@
                   "value": "100"
                 },
                 {
-                  "key": "lsaType",
+                  "key": "businessPartnerType",
                   "value": "ADDRESS"
                 }
               ]
@@ -106,7 +106,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"technicalKey\": \"CUSTOM_ID_ADD_TYPE\",\n  \"lsaType\": \"ADDRESS\",\n  \"name\": \"Custom Identifier Type of Address for Testing\",\n  \"details\": [\n    {\n      \"country\": \"DE\",\n      \"mandatory\": true\n    }\n  ]\n}",
+              "raw": "{\n  \"technicalKey\": \"CUSTOM_ID_ADD_TYPE\",\n  \"businessPartnerType\": \"ADDRESS\",\n  \"name\": \"Custom Identifier Type of Address for Testing\",\n  \"details\": [\n    {\n      \"country\": \"DE\",\n      \"mandatory\": true\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -876,7 +876,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"lsaType\": \"LEGAL_ENTITY\",\n    \"idType\": \"CUSTOM_ID_TYPE\",\n    \"idValues\": [\n        \"123456789\"\n    ]\n}",
+              "raw": "{\n    \"businessPartnerType\": \"LEGAL_ENTITY\",\n    \"idType\": \"CUSTOM_ID_TYPE\",\n    \"idValues\": [\n        \"123456789\"\n    ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -910,7 +910,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromTime\": \"2023-03-21T09:00:25.298594Z\",\n  \"bpns\": [\n    \"BPNL000000000001\"\n  ],\n  \"lsaTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
+              "raw": "{\n  \"fromTime\": \"2023-03-21T09:00:25.298594Z\",\n  \"bpns\": [\n    \"BPNL000000000001\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

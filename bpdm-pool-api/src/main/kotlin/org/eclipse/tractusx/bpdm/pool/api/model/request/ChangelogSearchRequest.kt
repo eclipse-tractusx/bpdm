@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 
@@ -28,8 +28,10 @@ import java.time.Instant
 data class ChangelogSearchRequest(
     @Schema(description = "Changelog entries should be created after this time", example = "2023-03-20T10:23:28.194Z")
     val fromTime: Instant? = null,
+
     @Schema(description = "Only show changelog entries for business partners with the given BPNs. Empty means no restriction.")
     val bpns: Set<String>? = null,
+
     @Schema(description = "Only show changelog entries for business partners with the given LSA types. Empty means no restriction.")
-    val lsaTypes: Set<ChangelogSubject>? = null
+    val businessPartnerTypes: Set<BusinessPartnerType>? = null
 )

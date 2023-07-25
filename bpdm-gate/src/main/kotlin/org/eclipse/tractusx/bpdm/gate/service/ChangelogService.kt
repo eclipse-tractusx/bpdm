@@ -19,16 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byBusinessPartnerTypes
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byLsaTypes
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byOutputInputEnum
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
@@ -40,7 +40,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
     fun getChangeLogEntries(
         externalIds: Set<String>?,
-        lsaTypes: Set<LsaType>?,
+        businessPartnerTypes: Set<BusinessPartnerType>?,
         createdAt: Instant?,
         outputInputEnum: OutputInputEnum?,
         page: Int,
@@ -52,7 +52,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         val spec = Specification.allOf(
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
-            byLsaTypes(lsaTypes),
+            byBusinessPartnerTypes(businessPartnerTypes),
             byOutputInputEnum(outputInputEnum)
         )
 

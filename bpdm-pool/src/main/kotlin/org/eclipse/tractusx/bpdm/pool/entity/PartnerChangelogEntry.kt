@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
 @Entity
@@ -32,10 +32,8 @@ class PartnerChangelogEntry(
     val changelogType: ChangelogType,
     @Column(name = "bpn", nullable = false, updatable = false)
     val bpn: String,
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_subject", nullable = false, updatable = false)
-    val changelogSubject: ChangelogSubject
+    @Column(name = "business_partner_type", nullable = false, updatable = false)
+    val businessPartnerType: BusinessPartnerType
 ) : BaseEntity()
-
-
-

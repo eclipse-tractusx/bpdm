@@ -54,13 +54,13 @@ class MetadataService(
 
     @Transactional
     fun createIdentifierType(type: IdentifierTypeDto): IdentifierTypeDto {
-        if (identifierTypeRepository.findByLsaTypeAndTechnicalKey(type.lsaType, type.technicalKey) != null)
-            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, "${type.technicalKey}/${type.lsaType}")
+        if (identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(type.businessPartnerType, type.technicalKey) != null)
+            throw BpdmAlreadyExists(IdentifierType::class.simpleName!!, "${type.technicalKey}/${type.businessPartnerType}")
 
-        logger.info { "Create new Identifier-Type with key ${type.technicalKey}, lsaType ${type.lsaType} and name ${type.name}" }
+        logger.info { "Create new Identifier-Type with key ${type.technicalKey}, businessPartnerType ${type.businessPartnerType} and name ${type.name}" }
         val entity = IdentifierType(
             technicalKey = type.technicalKey,
-            lsaType = type.lsaType,
+            businessPartnerType = type.businessPartnerType,
             name = type.name
         )
         entity.details.addAll(
@@ -69,9 +69,13 @@ class MetadataService(
         return identifierTypeRepository.save(entity).toDto()
     }
 
-    fun getIdentifierTypes(pageRequest: Pageable, lsaType: IdentifierLsaType, country: CountryCode? = null): PageDto<IdentifierTypeDto> {
+    fun getIdentifierTypes(
+        pageRequest: Pageable,
+        businessPartnerType: IdentifierBusinessPartnerType,
+        country: CountryCode? = null
+    ): PageDto<IdentifierTypeDto> {
         val spec = Specification.allOf(
-            IdentifierTypeRepository.Specs.byLsaType(lsaType),
+            IdentifierTypeRepository.Specs.byBusinessPartnerType(businessPartnerType),
             IdentifierTypeRepository.Specs.byCountry(country)
         )
         val page = identifierTypeRepository.findAll(spec, pageRequest)
@@ -137,7 +141,7 @@ class MetadataService(
 
     fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
-        val idTypes = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(IdentifierLsaType.LEGAL_ENTITY, idTypeKeys)
+        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
 
         val legalFormKeys = requests.mapNotNull { it.legalForm }.toSet()
         val legalForms = legalFormRepository.findByTechnicalKeyIn(legalFormKeys)
@@ -147,7 +151,7 @@ class MetadataService(
 
     fun getMetadata(requests: Collection<LogisticAddressDto>): AddressMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
-        val idTypes = identifierTypeRepository.findByLsaTypeAndTechnicalKeyIn(IdentifierLsaType.ADDRESS, idTypeKeys)
+        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
         val regionKeys = requests.mapNotNull { it.physicalPostalAddress.areaPart.administrativeAreaLevel1 }
             .plus(requests.mapNotNull { it.alternativePostalAddress?.areaPart?.administrativeAreaLevel1 })

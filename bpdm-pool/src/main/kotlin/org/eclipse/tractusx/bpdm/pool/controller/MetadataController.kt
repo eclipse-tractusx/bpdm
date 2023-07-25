@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
@@ -47,8 +47,12 @@ class MetadataController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
-    override fun getIdentifierTypes(paginationRequest: PaginationRequest, lsaType: IdentifierLsaType, country: CountryCode?): PageDto<IdentifierTypeDto> {
-        return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), lsaType, country)
+    override fun getIdentifierTypes(
+        paginationRequest: PaginationRequest,
+        businessPartnerType: IdentifierBusinessPartnerType,
+        country: CountryCode?
+    ): PageDto<IdentifierTypeDto> {
+        return metadataService.getIdentifierTypes(PageRequest.of(paginationRequest.page, paginationRequest.size), businessPartnerType, country)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")

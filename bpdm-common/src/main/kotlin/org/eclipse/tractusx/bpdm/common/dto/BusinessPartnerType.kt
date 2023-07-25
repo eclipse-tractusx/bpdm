@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
-enum class ChangelogSubject {
+package org.eclipse.tractusx.bpdm.common.dto
+
+enum class BusinessPartnerType {
     LEGAL_ENTITY,
-    ADDRESS,
-    SITE
+    SITE,
+    ADDRESS
 }

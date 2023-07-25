@@ -20,24 +20,24 @@
 package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 
 @Entity
 @Table(
     name = "identifier_types",
     uniqueConstraints = [UniqueConstraint(
-        name = "uc_identifier_types_technical_key_lsa_type",
-        columnNames = ["technical_key", "lsa_type"]
+        name = "uc_identifier_types_technical_key_business_partner_type",
+        columnNames = ["technical_key", "business_partner_type"]
     )]
 )
 class IdentifierType(
     @Column(name = "technical_key", nullable = false)
     val technicalKey: String,
 
-    @Column(name = "lsa_type", nullable = false)
+    @Column(name = "business_partner_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val lsaType: IdentifierLsaType,
+    val businessPartnerType: IdentifierBusinessPartnerType,
 
     @Column(name = "name", nullable = false)
     val name: String,
