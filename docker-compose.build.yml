@@ -1,0 +1,19 @@
+# compose file to generate the images for the bridge dummy test
+# docker compose -f docker-compose.build.yml build
+
+version: '2'
+
+services:
+  gate:
+    build:
+      context: .
+      dockerfile: ./bpdm-gate/Dockerfile
+    image: maven-gate
+    working_dir: .
+
+  pool:
+    build:
+      context: .
+      dockerfile: ./bpdm-pool/Dockerfile
+    image: maven-pool
+    working_dir: .

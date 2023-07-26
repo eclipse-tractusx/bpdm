@@ -27,7 +27,9 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
 import org.testcontainers.lifecycle.Startable
+import java.time.Duration
 
 /**
  * When used on a spring boot test, starts a singleton postgres db container that is shared between all integration tests.
@@ -37,10 +39,12 @@ import org.testcontainers.lifecycle.Startable
 class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     companion object {
+        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
         const val BPDM_PORT = 8081
+        const val IMAGE = "maven-gate"
 
         private val bpdmGateContainer: GenericContainer<*> =
-            GenericContainer("ghcr.io/catenax-ng/tx-bpdm/gate:4.0.0-alpha.4")
+            GenericContainer(IMAGE)
                 .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer, bpdmPoolContainer))
                 .withNetwork(postgreSQLContainer.getNetwork())
                 .withExposedPorts(BPDM_PORT)
@@ -53,6 +57,12 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
         val postgresNetworkAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
         val bpdmPoolAlias = applicationContext.environment.getProperty("bpdm.pool.alias")
         val dataBase = postgreSQLContainer.getDatabaseName()
+        bpdmGateContainer.waitingFor(
+            HttpWaitStrategy()
+                .forPort(BPDM_PORT)
+                .forStatusCodeMatching { response -> response == 200 || response == 401 }
+                .withStartupTimeout(Duration.ofSeconds(GATE_CONTAINER_STARTUP_TIMEOUT_SEC))
+        )
         bpdmGateContainer.withEnv(
             "spring.datasource.url", "jdbc:postgresql://${postgresNetworkAlias}:5432/${dataBase}?loggerLevel=OFF"
         )
