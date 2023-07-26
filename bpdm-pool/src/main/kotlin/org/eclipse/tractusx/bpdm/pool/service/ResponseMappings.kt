@@ -190,7 +190,7 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
         areaPart = AreaDistrictAlternativVerboseDto(
             administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
         ),
-        type = deliveryServiceType,
+        deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier
     )
