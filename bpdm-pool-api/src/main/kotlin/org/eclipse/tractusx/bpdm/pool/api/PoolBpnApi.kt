@@ -39,7 +39,7 @@ import org.springframework.web.service.annotation.PostExchange
 interface PoolBpnApi {
 
     @Operation(
-        summary = "Find business partner numbers by identifiers",
+        summary = "Returns a list of identifier mappings of an identifier to a BPNL/A/S, specified by a business partner type, identifier type and identifier values",
         description = "Find business partner numbers by identifiers. " +
                 "The response can contain less results than the number of identifier values that were requested, if some of the identifiers did not exist. " +
                 "For a single request, the maximum number of identifier values to search for is limited to \${bpdm.bpn.search-request-limit} entries."

@@ -49,9 +49,9 @@ class SiteController(
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getSite(
-        bpn: String
+        bpns: String
     ): SitePoolVerboseDto {
-        return siteService.findByBpn(bpn.uppercase())
+        return siteService.findByBpn(bpns.uppercase())
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")

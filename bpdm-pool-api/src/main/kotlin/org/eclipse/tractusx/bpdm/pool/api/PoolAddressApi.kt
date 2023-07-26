@@ -46,7 +46,7 @@ import org.springframework.web.service.annotation.PutExchange
 interface PoolAddressApi {
 
     @Operation(
-        summary = "Get page of addresses matching the search criteria",
+        summary = "Returns addresses by different search parameters",
         description = "This endpoint tries to find matches among all existing business partners of type address, " +
                 "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
                 "The match of a partner is better the higher its relevancy score. " +
@@ -66,25 +66,25 @@ interface PoolAddressApi {
     ): PageDto<AddressMatchVerboseDto>
 
     @Operation(
-        summary = "Get address partners by bpna",
-        description = "Get business partners of type address by bpn-a ignoring case."
+        summary = "Returns an address by its BPNA",
+        description = "Get business partners of type address by BPNA ignoring case."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Found address with specified bpna"),
+            ApiResponse(responseCode = "200", description = "Found address with specified BPNA"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No address found under specified bpna", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No address found under specified BPNA", content = [Content()])
         ]
     )
     @GetMapping("/{bpna}")
     @GetExchange("/{bpna}")
     fun getAddress(
-        @Parameter(description = "Bpn value") @PathVariable bpna: String
+        @Parameter(description = "BPNA value") @PathVariable bpna: String
     ): LogisticAddressVerboseDto
 
     @Operation(
-        summary = "Search address partners by BPNs and/or parent BPNs",
-        description = "Search business partners of type address by their BPN or their parent partners BPN (BPNLs or BPNS)."
+        summary = "Returns addresses by an array of BPNA and/or an array of corresponding BPNS and/or an array of corresponding BPNL.",
+        description = "Search business partners of type address by their BPNA or their parents' BPNL or BPNS."
     )
     @ApiResponses(
         value = [
@@ -100,7 +100,7 @@ interface PoolAddressApi {
     ): PageDto<LogisticAddressVerboseDto>
 
     @Operation(
-        summary = "Create new address business partners",
+        summary = "Creates a new address",
         description = "Create new business partners of type address by specifying the BPN of the parent each address belongs to. " +
                 "A parent can be either a site or legal entity business partner. " +
                 "If the parent cannot be found, the record is ignored." +
@@ -120,7 +120,7 @@ interface PoolAddressApi {
     ): AddressPartnerCreateResponseWrapper
 
     @Operation(
-        summary = "Update existing address business partners",
+        summary = "Updates an existing address",
         description = "Update existing business partner records of type address referenced via BPNA. " +
                 "The endpoint expects to receive the full updated record, including values that didn't change."
     )

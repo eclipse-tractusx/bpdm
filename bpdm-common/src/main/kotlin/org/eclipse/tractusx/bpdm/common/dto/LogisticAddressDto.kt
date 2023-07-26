@@ -21,9 +21,9 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-
-@Schema(name = "LogisticAddressDto", description = "Address record for a business partner")
+@Schema(description = LogisticAddressDescription.header)
 data class LogisticAddressDto(
     @get:Schema(
         description = "Name of the logistic address of the business partner. This is not according to official\n" +
