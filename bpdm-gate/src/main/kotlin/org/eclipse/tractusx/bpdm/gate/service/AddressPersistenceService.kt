@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
@@ -113,6 +114,7 @@ class AddressPersistenceService(
                     gateAddressRepository.save(fullAddress)
                 }
             }
+            sharingStateService.upsertSharingState(address.toSharingStateDTO(SharingStateType.Success))
         }
     }
 

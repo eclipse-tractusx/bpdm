@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.AddressState
@@ -145,6 +146,7 @@ class LegalEntityPersistenceService(
                     saveChangelog(legalEntity.externalId, datatype)
                 }
             }
+            sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO(SharingStateType.Success))
         }
     }
 

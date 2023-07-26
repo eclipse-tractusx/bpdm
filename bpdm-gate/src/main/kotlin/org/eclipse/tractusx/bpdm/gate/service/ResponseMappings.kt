@@ -514,4 +514,19 @@ fun LegalEntityGateInputRequest.toSharingStateDTO():SharingStateDto {
     return SharingStateDto(LsaType.LEGAL_ENTITY,externalId)
 }
 
+fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+
+    return SharingStateDto(LsaType.ADDRESS,externalId, sharingStateType = sharingStateType)
+}
+
+fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+
+    return SharingStateDto(LsaType.SITE,externalId, sharingStateType = sharingStateType)
+}
+
+fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+
+    return SharingStateDto(LsaType.LEGAL_ENTITY,externalId, sharingStateType = sharingStateType)
+}
+
 
