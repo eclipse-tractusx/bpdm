@@ -87,19 +87,5 @@ class LegalEntityController(
         legalEntityService.upsertLegalEntitiesOutput(legalEntities)
         return ResponseEntity(HttpStatus.OK)
     }
-
-    @Operation(
-        summary = "Get Mermaid class Diagramm form Pool JPA model",
-        description = "List the country specific data rules for entity fields." +
-                "All fields that are not in this list are considered to be forbidden."
-    )
-    @ApiResponses(
-        value = [
-            ApiResponse(responseCode = "200", description = "Enity Model as Mermaid"),
-        ]
-    )
-    @GetMapping("/mermaid/", produces = [MediaType.TEXT_PLAIN_VALUE])
-    fun getMermaid(): ResponseEntity<String> {
-        return ResponseEntity(legalEntityService.getMermaid(), HttpStatus.OK)
-    }
+    
 }
