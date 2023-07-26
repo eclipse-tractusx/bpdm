@@ -17,12 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.common.dto.response
 
-import org.eclipse.tractusx.bpdm.pool.entity.Region
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
+import com.neovisionaries.i18n.CountryCode
+import io.swagger.v3.oas.annotations.media.Schema
 
-interface RegionRepository : PagingAndSortingRepository<Region, Long>, CrudRepository<Region, Long> {
-    fun findByRegionCodeIn(regionCodes: Set<String>): Set<Region>
-}
+@Schema(name = "RegionDto", description = "Region within a country")
+data class RegionDto(
+
+    @get:Schema(description = "Country code")
+    val countryCode: CountryCode,
+
+    @get:Schema(description = "Abbreviation or shorthand of the area")
+    val regionCode: String,
+
+    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
+    val regionName: String
+)

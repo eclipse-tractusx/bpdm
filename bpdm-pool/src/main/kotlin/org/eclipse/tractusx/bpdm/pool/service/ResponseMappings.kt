@@ -164,7 +164,7 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
         ),
         street = street?.toDto(),
         areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeVerboseDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
             administrativeAreaLevel2 = administrativeAreaLevel2,
             administrativeAreaLevel3 = administrativeAreaLevel3,
             district = districtLevel1,
@@ -188,7 +188,7 @@ fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
             city = city,
         ),
         areaPart = AreaDistrictAlternativVerboseDto(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { NameRegioncodeVerboseDto(it.regionName, it.regionCode) },
+            administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
         ),
         type = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
@@ -282,4 +282,8 @@ fun SyncRecord.toDto(): SyncDto {
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
     return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, changelogSubject)
+}
+
+fun Region.toDto(): RegionDto {
+    return RegionDto(countryCode, regionCode, regionName)
 }

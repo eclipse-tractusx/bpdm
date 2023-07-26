@@ -20,11 +20,10 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeVerboseDto
 
 @Schema(name = "AreaDistrictAlternativVerboseDto", description = "Record for administrativeAreaLevel and district part of an alternativ address")
 data class AreaDistrictAlternativVerboseDto(
 
     @get:Schema(description = "Region within the country")
-    val administrativeAreaLevel1: NameRegioncodeVerboseDto? = null,
+    val administrativeAreaLevel1: RegionDto? = null,
 )
