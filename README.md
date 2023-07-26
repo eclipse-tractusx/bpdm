@@ -30,6 +30,12 @@ Via the Gate service they can add their own business partner records but also re
 Shared business partner records that have successfully gone through the sharing process end up in the BPDM Pool and will receive a BPN there (or merge with an
 existing record).
 
+## BPDM Bridge Dummy
+
+The BPDM Bridge Dummy offers an API for Eclipse Tractus-X
+members to sync between Gate and Pool. It is nothing but Bridge between Gate and Pool as a simple replacement for a dedicated sharing service.
+Via Bridge dummy service they can sync their added business partner records through the sharing process end up in the BPDM Pool.
+
 ## Installation
 
 For installation instructions for the BPDM applications please refer to the [INSTALL](INSTALL.md) file.
@@ -48,6 +54,12 @@ Source:
 
 * [temurin-build](https://github.com/adoptium/temurin-build)
 * [temurin docker repo info](https://github.com/docker-library/repo-info/tree/master/repos/eclipse-temurin)
+
+## Notice for Docker image
+
+* [BPDM Pool](./bpdm-pool/DOCKER_NOTICE.md)
+* [BPDM Gate](./bpdm-gate/DOCKER_NOTICE.md)
+* [BPDM Bridge Dummy](./bpdm-bridge-dummy/DOCKER_NOTICE.md)
 
 ## GitHub Workflows
 
