@@ -42,7 +42,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
     logisticAddress.roles.addAll(this.address.roles.distinct().map { toRoles(it, null, null, logisticAddress) }.toSet())
-
+    logisticAddress.identifiers.addAll(this.address.identifiers.distinct().map { toEntityAddressIdentifiers(it, logisticAddress) }.toSet())
     return logisticAddress
 }
 
@@ -61,7 +61,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
     logisticAddress.nameParts.addAll(this.address.nameParts.map { toNameParts(it, logisticAddress, null, null) }.toSet())
     logisticAddress.roles.addAll(this.address.roles.distinct().map { toRoles(it, null, null, logisticAddress) }.toSet())
-
+    logisticAddress.identifiers.addAll(this.address.identifiers.distinct().map { toEntityAddressIdentifiers(it, logisticAddress) }.toSet())
     return logisticAddress
 }
 
@@ -253,6 +253,10 @@ fun toRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?, a
     return Roles(legalEntity, address, site, role)
 }
 
+fun toEntityAddressIdentifiers(dto: AddressIdentifierDto, address: LogisticAddress): AddressIdentifier {
+    return AddressIdentifier(dto.value, dto.type, address)
+}
+
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
     return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
@@ -295,6 +299,7 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
         roles = roles.map { it.roleName },
         physicalPostalAddress = physicalPostalAddress.toPhysicalPostalAddress(),
         alternativePostalAddress = alternativePostalAddress?.toAlternativePostalAddressDto(),
+        identifiers = mapToAddressIdentifiersDto(identifiers)
     )
 
     return logisticAddress
@@ -407,6 +412,14 @@ fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification
 
 fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
     return identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) }
+}
+
+fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifier>): Collection<AddressIdentifierDto> {
+    return identifiers.map { AddressIdentifierDto(it.value, it.type) }
+}
+
+fun AddressIdentifier.mapToAddressIdentifiersDto(): AddressIdentifierDto {
+    return AddressIdentifierDto(value, type)
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse

@@ -103,7 +103,7 @@ class SitePersistenceService(
         address.legalEntity = changeAddress.legalEntity
         address.physicalPostalAddress = changeAddress.physicalPostalAddress
         address.alternativePostalAddress = changeAddress.alternativePostalAddress
-
+        address.identifiers.replace(changeAddress.identifiers.map { toEntityAddressIdentifiers(it.mapToAddressIdentifiersDto(), address) })
         address.states.replace(changeAddress.states.map { toEntityAddress(it, address) })
         address.nameParts.replace(changeAddress.nameParts.map { toNameParts(it.namePart, address, null, null) })
         address.roles.replace(changeAddress.roles.distinct().map { toRoles(it.roleName, null, null, address) })

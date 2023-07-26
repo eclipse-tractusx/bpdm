@@ -150,15 +150,14 @@ internal class AddressControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddresses(paginationValue)
 
-        assertThat(pageResponse).isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedAddresses
-            )
+        val expectedPage = PageDto(
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = pageValue,
+            contentSize = contentSize,
+            content = expectedAddresses
         )
+        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
     }
 
 
@@ -194,15 +193,14 @@ internal class AddressControllerInputIT @Autowired constructor(
         val pagination = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesByExternalIds(pagination, listExternalIds)
 
-        assertThat(pageResponse).isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedAddresses
-            )
+        val expectedPage = PageDto(
+            totalElements = totalElements,
+            totalPages = totalPages,
+            page = pageValue,
+            contentSize = contentSize,
+            content = expectedAddresses
         )
+        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
     }
 
     /**

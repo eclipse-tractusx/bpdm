@@ -66,4 +66,7 @@ class LogisticAddress(
 
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
     val roles: MutableSet<Roles> = mutableSetOf()
+
+    @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val identifiers: MutableSet<AddressIdentifier> = mutableSetOf()
 }

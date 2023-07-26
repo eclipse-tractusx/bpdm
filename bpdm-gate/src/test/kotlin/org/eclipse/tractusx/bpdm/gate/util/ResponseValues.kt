@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
@@ -292,6 +293,9 @@ object ResponseValues {
     val logisticAddressGateInputResponse1 = AddressGateInputDto(
         address = RequestValues.logisticAddress1.copy(
             nameParts = listOf(CommonValues.name1),
+            identifiers = listOf(
+                AddressIdentifierDto(RequestValues.identifier1.value!!, RequestValues.identifier1.type!!)
+            )
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
@@ -300,6 +304,9 @@ object ResponseValues {
     val logisticAddressGateInputResponse2 = AddressGateInputDto(
         address = RequestValues.logisticAddress2.copy(
             nameParts = listOf(CommonValues.name2),
+            identifiers = listOf(
+                AddressIdentifierDto(RequestValues.identifier1.value!!, RequestValues.identifier1.type!!)
+            )
         ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = null,
