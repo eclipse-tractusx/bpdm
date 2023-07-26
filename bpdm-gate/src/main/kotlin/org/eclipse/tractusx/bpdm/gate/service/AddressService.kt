@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
@@ -28,10 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -39,13 +34,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class AddressService(
-    private val bpnConfigProperties: BpnConfigProperties,
-    private val changelogRepository: ChangelogRepository,
     private val addressPersistenceService: AddressPersistenceService,
     private val addressRepository: GateAddressRepository,
     private val sharingStateService: SharingStateService
 ) {
-    private val logger = KotlinLogging.logger { }
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
 
@@ -110,12 +102,6 @@ class AddressService(
      * Upsert addresses input to the database
      **/
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
-
-        // create changelog entry if all goes well from saasClient
-        addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, BusinessPartnerType.ADDRESS, OutputInputEnum.Input))
-        }
-
         addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
     }
 
@@ -123,14 +109,7 @@ class AddressService(
      * Upsert addresses output to the database
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
-
-        // create changelog entry if all goes well from saasClient
-        addresses.forEach { address ->
-            changelogRepository.save(ChangelogEntry(address.externalId, BusinessPartnerType.ADDRESS, OutputInputEnum.Output))
-        }
-
         addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
-
     }
 
 }

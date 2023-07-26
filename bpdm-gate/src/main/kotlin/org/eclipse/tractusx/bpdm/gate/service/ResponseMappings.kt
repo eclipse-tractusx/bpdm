@@ -139,7 +139,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
 
     val addressInputRequest = AddressGateInputRequest(
         address = mainAddress,
-        externalId = getMainAddressForSiteExternalId(externalId),
+        externalId = getMainAddressExternalIdForSiteExternalId(externalId),
         siteExternalId = externalId
     )
 
@@ -162,7 +162,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
 
     val addressOutputRequest = AddressGateOutputRequest(
         address = mainAddress.address,
-        externalId = getMainAddressForSiteExternalId(externalId),
+        externalId = getMainAddressExternalIdForSiteExternalId(externalId),
         legalEntityExternalId = externalId,
         bpn = mainAddress.bpn
     )
@@ -191,7 +191,8 @@ fun ChangelogEntry.toGateDto(): ChangelogGateDto {
     return ChangelogGateDto(
         externalId = externalId,
         businessPartnerType = businessPartnerType,
-        modifiedAt = createdAt
+        timestamp = createdAt,
+        changelogType = changelogType
     )
 }
 
@@ -199,7 +200,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
 
     val addressInputRequest = AddressGateInputRequest(
         address = legalAddress,
-        externalId = getMainAddressForLegalEntityExternalId(externalId),
+        externalId = getLegalAddressExternalIdForLegalEntityExternalId(externalId),
         legalEntityExternalId = externalId
     )
 
@@ -225,7 +226,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
 
     val addressOutputRequest = AddressGateOutputRequest(
         address = legalAddress.address,
-        externalId = getMainAddressForLegalEntityExternalId(externalId),
+        externalId = getLegalAddressExternalIdForLegalEntityExternalId(externalId),
         legalEntityExternalId = externalId,
         bpn = legalAddress.bpn
     )
@@ -269,12 +270,12 @@ fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity)
     return LegalEntityIdentifier(dto.value, dto.type, dto.issuingBody, legalEntity)
 }
 
-fun getMainAddressForSiteExternalId(siteExternalId: String): String {
+fun getMainAddressExternalIdForSiteExternalId(siteExternalId: String): String {
     return siteExternalId + "_site"
 }
 
-fun getMainAddressForLegalEntityExternalId(siteExternalId: String): String {
-    return siteExternalId + "_legalAddress"
+fun getLegalAddressExternalIdForLegalEntityExternalId(legalEntityExternalId: String): String {
+    return legalEntityExternalId + "_legalAddress"
 }
 
 //Logistic Address mapping to AddressGateInputResponse

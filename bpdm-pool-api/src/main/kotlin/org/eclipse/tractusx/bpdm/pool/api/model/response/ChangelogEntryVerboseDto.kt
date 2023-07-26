@@ -30,12 +30,12 @@ data class ChangelogEntryVerboseDto(
     @Schema(description = "Business Partner Number of the changelog entry")
     val bpn: String,
 
-    @Schema(description = "The type of the change")
-    val changelogType: ChangelogType,
+    @Schema(description = "The type of the business partner this change refers to")
+    val businessPartnerType: BusinessPartnerType,
 
     @Schema(description = "The timestamp of the change")
     val timestamp: Instant,
 
-    @Schema(description = "The type of the business partner this change refers to")
-    val businessPartnerType: BusinessPartnerType
+    @Schema(description = "The type of the change")
+    val changelogType: ChangelogType
 )

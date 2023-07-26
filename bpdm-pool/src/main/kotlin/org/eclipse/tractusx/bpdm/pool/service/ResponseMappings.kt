@@ -281,7 +281,7 @@ fun SyncRecord.toDto(): SyncDto {
 }
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
-    return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, businessPartnerType)
+    return ChangelogEntryVerboseDto(bpn, businessPartnerType, createdAt, changelogType)
 }
 
 fun Region.toDto(): RegionDto {

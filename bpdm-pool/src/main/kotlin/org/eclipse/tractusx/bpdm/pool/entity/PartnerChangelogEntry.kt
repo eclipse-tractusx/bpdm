@@ -27,13 +27,16 @@ import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 @Entity
 @Table(name = "partner_changelog_entries")
 class PartnerChangelogEntry(
-    @Enumerated(EnumType.STRING)
-    @Column(name = "changelog_type", nullable = false, updatable = false)
-    val changelogType: ChangelogType,
+
     @Column(name = "bpn", nullable = false, updatable = false)
     val bpn: String,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "business_partner_type", nullable = false, updatable = false)
-    val businessPartnerType: BusinessPartnerType
+    val businessPartnerType: BusinessPartnerType,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "changelog_type", nullable = false, updatable = false)
+    val changelogType: ChangelogType
+
 ) : BaseEntity()

@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.dto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
-data class ChangelogEntryVerboseDto(
+data class ChangelogEntryCreateRequest(
     val bpn: String,
     val changelogType: ChangelogType,
     val businessPartnerType: BusinessPartnerType

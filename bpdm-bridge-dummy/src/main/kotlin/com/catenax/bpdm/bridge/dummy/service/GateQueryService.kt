@@ -47,7 +47,7 @@ class GateQueryService(
 
         do {
             val pageResponse = gateClient.changelog().getInputChangelog(
-                searchRequest = ChangeLogSearchRequest(fromTime = modifiedAfter),
+                searchRequest = ChangeLogSearchRequest(timestampAfter = modifiedAfter),
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
             page++
