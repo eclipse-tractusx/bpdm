@@ -45,6 +45,6 @@ data class AddressGateOutputDto(
     val siteExternalId: String? = null,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String
+    val bpna: String
 
 )

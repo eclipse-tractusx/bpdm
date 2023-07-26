@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(name = "LegalEntityGateOutputResponse", description = "Legal entity with external id")
 data class LegalEntityGateOutputResponse(
+
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
@@ -44,6 +45,6 @@ data class LegalEntityGateOutputResponse(
     val externalId: String,
 
     @Schema(description = "Business Partner Number")
-    val bpn: String
+    val bpnl: String
 
 )

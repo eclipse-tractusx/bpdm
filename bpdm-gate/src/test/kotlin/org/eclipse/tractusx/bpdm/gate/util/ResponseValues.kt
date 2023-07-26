@@ -319,7 +319,7 @@ object ResponseValues {
         ),
         externalId = CommonValues.externalIdAddress1,
         legalEntityExternalId = null,
-        bpn = CommonValues.bpnAddress1
+        bpna = CommonValues.bpnAddress1
     )
 
     val logisticAddressGateOutputResponse2 = AddressGateOutputDto(
@@ -328,7 +328,7 @@ object ResponseValues {
         ),
         externalId = CommonValues.externalIdAddress2,
         siteExternalId = null,
-        bpn = CommonValues.bpnAddress2
+        bpna = CommonValues.bpnAddress2
     )
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
@@ -361,13 +361,13 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity1,
         legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
-        bpn = CommonValues.bpn1,
+        bpnl = CommonValues.bpn1,
         legalAddress = AddressGateOutputDto(
             address = RequestValues.address1,
             externalId = "${CommonValues.externalId1}_legalAddress",
             legalEntityExternalId = CommonValues.externalId1,
             siteExternalId = null,
-            bpn = CommonValues.bpnAddress1
+            bpna = CommonValues.bpnAddress1
         )
     )
 
@@ -375,13 +375,13 @@ object ResponseValues {
         legalEntity = RequestValues.legalEntity2,
         externalId = CommonValues.externalId2,
         legalNameParts = listOf(CommonValues.name2),
-        bpn = CommonValues.bpn2,
+        bpnl = CommonValues.bpn2,
         legalAddress = AddressGateOutputDto(
             address = RequestValues.address2,
             externalId = "${CommonValues.externalId2}_legalAddress",
             legalEntityExternalId = CommonValues.externalId2,
             siteExternalId = null,
-            bpn = CommonValues.bpnAddress2
+            bpna = CommonValues.bpnAddress2
         )
     )
 
@@ -413,13 +413,13 @@ object ResponseValues {
         site = RequestValues.site1,
         externalId = CommonValues.externalIdSite1,
         legalEntityExternalId = CommonValues.externalId1,
-        bpn = CommonValues.bpnSite1,
+        bpns = CommonValues.bpnSite1,
         mainAddress = AddressGateOutputDto(
             address = RequestValues.address1,
             externalId = "${CommonValues.externalIdSite1}_site",
             legalEntityExternalId = null,
             siteExternalId = CommonValues.externalIdSite1,
-            bpn = CommonValues.bpnAddress1
+            bpna = CommonValues.bpnAddress1
         )
     )
 
@@ -427,13 +427,13 @@ object ResponseValues {
         site = RequestValues.site2,
         externalId = CommonValues.externalIdSite2,
         legalEntityExternalId = CommonValues.externalId2,
-        bpn = CommonValues.bpnSite2,
+        bpns = CommonValues.bpnSite2,
         mainAddress = AddressGateOutputDto(
             address = RequestValues.address2,
             externalId = "${CommonValues.externalIdSite2}_site",
             legalEntityExternalId = null,
             siteExternalId = CommonValues.externalIdSite2,
-            bpn = CommonValues.bpnAddress2
+            bpna = CommonValues.bpnAddress2
         )
     )
 }

@@ -269,8 +269,8 @@ fun Classification.toDto(): ClassificationVerboseDto {
 fun Relation.toDto(): RelationVerboseDto {
     return RelationVerboseDto(
         type = type.toDto(),
-        startBpn = startNode.bpn,
-        endBpn = endNode.bpn,
+        startBpnl = startNode.bpn,
+        endBpnl = endNode.bpn,
         validFrom = validFrom,
         validTo = validTo
     )
