@@ -89,7 +89,7 @@ object ResponseValues {
     )
 
     val leBusinessStatus1 = LegalEntityStateVerboseDto(
-        officialDenotation = CommonValues.businessStatusOfficialDenotation1,
+        description = CommonValues.businessStatusDescription1,
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,
         type = TypeKeyNameVerboseDto(
@@ -99,7 +99,7 @@ object ResponseValues {
     )
 
     val leBusinessStatus2 = LegalEntityStateVerboseDto(
-        officialDenotation = CommonValues.businessStatusOfficialDenotation2,
+        description = CommonValues.businessStatusDescription2,
         validFrom = CommonValues.businessStatusValidFrom2,
         validTo = CommonValues.businessStatusValidUntil2,
         type = TypeKeyNameVerboseDto(

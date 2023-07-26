@@ -486,7 +486,7 @@ class BusinessPartnerBuildService(
 
     private fun toEntity(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
         return LegalEntityState(
-            officialDenotation = dto.officialDenotation,
+            description = dto.description,
             validFrom = dto.validFrom,
             validTo = dto.validTo,
             type = dto.type,

@@ -58,7 +58,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): LegalEntityDto {
     }
     val states = legalEntity.states.map {
         LegalEntityStateDto(
-            officialDenotation = it.officialDenotation,
+            description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,
             type = it.type.technicalKey

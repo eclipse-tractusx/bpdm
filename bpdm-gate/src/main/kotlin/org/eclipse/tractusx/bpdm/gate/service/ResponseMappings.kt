@@ -258,7 +258,7 @@ fun toEntityAddressIdentifiers(dto: AddressIdentifierDto, address: LogisticAddre
 }
 
 fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
-    return LegalEntityState(dto.officialDenotation, dto.validFrom, dto.validTo, dto.type, legalEntity)
+    return LegalEntityState(dto.description, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
 fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
@@ -403,7 +403,7 @@ fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
 }
 
 fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
-    return states.map { LegalEntityStateDto(it.officialDenotation, it.validFrom, it.validTo, it.type) }
+    return states.map { LegalEntityStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
 fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
