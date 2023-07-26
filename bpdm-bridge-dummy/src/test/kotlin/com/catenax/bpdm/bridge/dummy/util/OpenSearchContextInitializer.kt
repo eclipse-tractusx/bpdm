@@ -26,6 +26,8 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy
+import org.testcontainers.lifecycle.Startable
+import java.time.Duration
 
 /**
  * When used on a spring boot test, starts a singleton opensearch container that is shared between all integration tests.
@@ -39,6 +41,7 @@ class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableA
             .waitingFor(HttpWaitStrategy()
                 .forPort(OPENSEARCH_PORT)
                 .forStatusCodeMatching { response -> response == 200 || response == 401 }
+                .withStartupTimeout(Duration.ofSeconds(180))
             )
             // based on sample docker-compose for development from https://opensearch.org/docs/latest/opensearch/install/docker
             .withEnv("cluster.name", "cdqbridge")
@@ -51,6 +54,8 @@ class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableA
             .withCreateContainerCmdModifier { cmd ->
                 cmd.hostConfig!!.withUlimits(arrayOf(Ulimit("nofile", 65536L, 65536L), Ulimit("memlock", -1L, -1L)))
             }
+            .withNetwork(PostgreSQLContextInitializer.postgreSQLContainer.getNetwork())
+            .dependsOn(listOf<Startable>(PostgreSQLContextInitializer.postgreSQLContainer))
     }
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
