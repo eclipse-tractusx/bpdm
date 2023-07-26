@@ -100,7 +100,7 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val valueResponse = gateClient.addresses().getAddressByExternalId(externalIdToQuery)
 
-        assertThat(valueResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*identifiers*").isEqualTo(expectedAddress)
+        assertThat(valueResponse).usingRecursiveComparison().isEqualTo(expectedAddress)
     }
 
     /**
@@ -157,7 +157,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             contentSize = contentSize,
             content = expectedAddresses
         )
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*identifiers*").isEqualTo(expectedPage)
+        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
     }
 
 
@@ -200,7 +200,7 @@ internal class AddressControllerInputIT @Autowired constructor(
             contentSize = contentSize,
             content = expectedAddresses
         )
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*identifiers*").isEqualTo(expectedPage)
+        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
     }
 
     /**
