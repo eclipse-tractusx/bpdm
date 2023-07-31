@@ -25,3 +25,4 @@ target
 /charts/bpdm/charts/bpdm-pool/Chart.lock
 #Developer application properties
 application-developer.properties
+*.drawio.svg.bkp
