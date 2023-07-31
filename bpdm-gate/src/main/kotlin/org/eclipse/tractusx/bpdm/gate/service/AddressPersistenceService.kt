@@ -38,7 +38,8 @@ import org.springframework.web.server.ResponseStatusException
 class AddressPersistenceService(
     private val gateAddressRepository: GateAddressRepository,
     private val legalEntityRepository: LegalEntityRepository,
-    private val siteEntityRepository: SiteRepository
+    private val siteEntityRepository: SiteRepository,
+    private val sharingStateService: SharingStateService
 ) {
 
     @Transactional
@@ -61,6 +62,7 @@ class AddressPersistenceService(
                 gateAddressRepository.save(existingAddress)
             } ?: run {
                 gateAddressRepository.save(fullAddress)
+                sharingStateService.upsertSharingState(address.toSharingStateDTO())
             }
         }
     }

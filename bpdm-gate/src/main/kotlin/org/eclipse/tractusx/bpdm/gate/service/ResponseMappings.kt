@@ -499,4 +499,19 @@ fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): Legal
     )
 }
 
+fun AddressGateInputRequest.toSharingStateDTO():SharingStateDto {
+
+    return SharingStateDto(LsaType.ADDRESS,externalId)
+}
+
+fun SiteGateInputRequest.toSharingStateDTO():SharingStateDto {
+
+    return SharingStateDto(LsaType.SITE,externalId)
+}
+
+fun LegalEntityGateInputRequest.toSharingStateDTO():SharingStateDto {
+
+    return SharingStateDto(LsaType.LEGAL_ENTITY,externalId)
+}
+
 

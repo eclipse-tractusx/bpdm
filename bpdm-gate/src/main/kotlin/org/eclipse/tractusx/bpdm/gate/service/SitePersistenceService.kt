@@ -40,7 +40,8 @@ class SitePersistenceService(
     private val siteRepository: SiteRepository,
     private val legalEntityRepository: LegalEntityRepository,
     private val addressRepository: GateAddressRepository,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val sharingStateService: SharingStateService
 ) {
 
     @Transactional
@@ -66,6 +67,7 @@ class SitePersistenceService(
             } ?: run {
                 siteRepository.save(fullSite)
                 saveChangelog(site.externalId, datatype)
+                sharingStateService.upsertSharingState(site.toSharingStateDTO())
             }
         }
     }

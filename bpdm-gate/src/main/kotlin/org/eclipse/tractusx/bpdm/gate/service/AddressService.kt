@@ -42,7 +42,8 @@ class AddressService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val changelogRepository: ChangelogRepository,
     private val addressPersistenceService: AddressPersistenceService,
-    private val addressRepository: GateAddressRepository
+    private val addressRepository: GateAddressRepository,
+    private val sharingStateService: SharingStateService
 ) {
     private val logger = KotlinLogging.logger { }
 

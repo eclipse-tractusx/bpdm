@@ -42,7 +42,8 @@ import org.springframework.web.server.ResponseStatusException
 class LegalEntityPersistenceService(
     private val gateLegalEntityRepository: LegalEntityRepository,
     private val gateAddressRepository: GateAddressRepository,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val sharingStateService: SharingStateService
 ) {
 
     @Transactional
@@ -68,6 +69,7 @@ class LegalEntityPersistenceService(
             } ?: run {
                 gateLegalEntityRepository.save(fullLegalEntity)
                 saveChangelog(legalEntity.externalId, datatype)
+                sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO())
             }
         }
     }

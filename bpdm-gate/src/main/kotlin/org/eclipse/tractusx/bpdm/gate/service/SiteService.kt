@@ -38,7 +38,8 @@ import org.springframework.stereotype.Service
 class SiteService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val sitePersistenceService: SitePersistenceService,
-    private val siteRepository: SiteRepository
+    private val siteRepository: SiteRepository,
+    private val sharingStateService: SharingStateService
 ) {
     private val logger = KotlinLogging.logger { }
 
