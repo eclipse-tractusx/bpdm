@@ -89,13 +89,23 @@ internal class AddressControllerInputIT @Autowired constructor(
     @Test
     fun `get address by external id`() {
 
-        val externalIdToQuery = CommonValues.externalIdAddress2
-        val expectedAddress = ResponseValues.logisticAddressGateInputResponse2
+        val externalIdToQuery = CommonValues.externalIdAddress1
+        val expectedAddress = ResponseValues.logisticAddressGateInputResponse1
 
-        val addresses = listOf(
-            RequestValues.addressGateInputRequest2
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
         )
 
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1
+        )
+
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
+        gateClient.sites().upsertSites(site)
         gateClient.addresses().upsertAddresses(addresses)
 
         val valueResponse = gateClient.addresses().getAddressByExternalId(externalIdToQuery)
@@ -130,6 +140,8 @@ internal class AddressControllerInputIT @Autowired constructor(
         val expectedAddresses = listOf(
             ResponseValues.logisticAddressGateInputResponse1,
             ResponseValues.logisticAddressGateInputResponse2,
+            ResponseValues.addressGateInputResponseLegalEntity1,
+            ResponseValues.addressGateInputResponseSite1
         )
 
         val addresses = listOf(
@@ -137,14 +149,24 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
         val page = 0
         val size = 10
 
-        val totalElements = 2L
+        val totalElements = 4L
         val totalPages = 1
         val pageValue = 0
-        val contentSize = 2
+        val contentSize = 4
 
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
+        gateClient.sites().upsertSites(site)
         gateClient.addresses().upsertAddresses(addresses)
 
         val paginationValue = PaginationRequest(page, size)
@@ -178,6 +200,14 @@ internal class AddressControllerInputIT @Autowired constructor(
             ResponseValues.logisticAddressGateInputResponse2,
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
         val page = 0
         val size = 10
 
@@ -188,6 +218,8 @@ internal class AddressControllerInputIT @Autowired constructor(
 
         val listExternalIds = addresses.map { it.externalId }
 
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
+        gateClient.sites().upsertSites(site)
         gateClient.addresses().upsertAddresses(addresses)
 
         val pagination = PaginationRequest(page, size)
@@ -235,7 +267,17 @@ internal class AddressControllerInputIT @Autowired constructor(
             RequestValues.addressGateInputRequest2
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
         try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntity)
+            gateClient.sites().upsertSites(site)
             gateClient.addresses().upsertAddresses(addresses)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
@@ -337,6 +379,24 @@ internal class AddressControllerInputIT @Autowired constructor(
                 siteExternalId = CommonValues.externalIdSite1,
                 legalEntityExternalId = CommonValues.externalId1
             )
+        )
+
+        try {
+            gateClient.addresses().upsertAddresses(addresses)
+        } catch (e: WebClientResponseException) {
+            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+
+    }
+
+    /**
+     * When upserting an address without a persisted parent legal entity
+     * Then a bad request response should be sent
+     */
+    @Test
+    fun `upsert address with no parent legal entity`() {
+        val addresses = listOf(
+            RequestValues.addressGateInputRequest1,
         )
 
         try {

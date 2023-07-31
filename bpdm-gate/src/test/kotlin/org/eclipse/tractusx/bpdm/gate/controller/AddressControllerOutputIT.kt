@@ -104,7 +104,29 @@ internal class AddressControllerOutputIT @Autowired constructor(
             RequestValues.addressGateOutputRequest2
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val legalEntityOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
+        val siteOutput = listOf(
+            RequestValues.siteGateOutputRequest1
+        )
+
         try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntity)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+
+            gateClient.sites().upsertSites(site)
+            gateClient.sites().upsertSitesOutput(siteOutput)
+
             gateClient.addresses().upsertAddresses(addresses)
             gateClient.addresses().putAddressesOutput(addressesOutput)
         } catch (e: WebClientResponseException) {
@@ -140,6 +162,35 @@ internal class AddressControllerOutputIT @Autowired constructor(
     }
 
     /**
+     * If there isn't a parent legal Entity persisted,
+     * when upserting an output address, it should show an 400
+     */
+    @Test
+    fun `upsert output addresses, no parent legal entity found`() {
+        val addresses = listOf(
+            RequestValues.addressGateOutputRequest1.copy(legalEntityExternalId = "NonExistent"),
+        )
+
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val legalEntityOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1
+        )
+
+        try {
+            gateClient.legalEntities().upsertLegalEntities(legalEntity)
+            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+
+            gateClient.addresses().putAddressesOutput(addresses)
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
+
+    }
+
+    /**
      * Given output addresses exists in the database
      * When getting addresses page via output route
      * Then addresses page should be returned
@@ -153,21 +204,45 @@ internal class AddressControllerOutputIT @Autowired constructor(
 
         val addressesOutput = listOf(
             RequestValues.addressGateOutputRequest1,
-            RequestValues.addressGateOutputRequest2
+            RequestValues.addressGateOutputRequest2,
         )
 
         val expectedAddresses = listOf(
             ResponseValues.logisticAddressGateOutputResponse1,
             ResponseValues.logisticAddressGateOutputResponse2,
+            ResponseValues.addressGateOutputResponseLegalEntity1,
+            ResponseValues.addressGateOutputResponseSite1
+        )
+
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val legalEntityOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
+        val siteOutput = listOf(
+            RequestValues.siteGateOutputRequest1
         )
 
         val page = 0
         val size = 10
 
-        val totalElements = 2L
+        val totalElements = 4L
         val totalPages = 1
         val pageValue = 0
-        val contentSize = 2
+        val contentSize = 4
+
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+
+        gateClient.sites().upsertSites(site)
+        gateClient.sites().upsertSitesOutput(siteOutput)
 
         gateClient.addresses().upsertAddresses(addresses)
         gateClient.addresses().putAddressesOutput(addressesOutput)
@@ -209,6 +284,22 @@ internal class AddressControllerOutputIT @Autowired constructor(
             ResponseValues.logisticAddressGateOutputResponse2,
         )
 
+        val legalEntity = listOf(
+            RequestValues.legalEntityGateInputRequest1
+        )
+
+        val legalEntityOutput = listOf(
+            RequestValues.legalEntityGateOutputRequest1
+        )
+
+        val site = listOf(
+            RequestValues.siteGateInputRequest1
+        )
+
+        val siteOutput = listOf(
+            RequestValues.siteGateOutputRequest1
+        )
+
         val page = 0
         val size = 10
 
@@ -216,6 +307,12 @@ internal class AddressControllerOutputIT @Autowired constructor(
         val totalPages = 1
         val pageValue = 0
         val contentSize = 2
+
+        gateClient.legalEntities().upsertLegalEntities(legalEntity)
+        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+
+        gateClient.sites().upsertSites(site)
+        gateClient.sites().upsertSitesOutput(siteOutput)
 
         gateClient.addresses().upsertAddresses(addresses)
         gateClient.addresses().putAddressesOutput(addressesOutput)

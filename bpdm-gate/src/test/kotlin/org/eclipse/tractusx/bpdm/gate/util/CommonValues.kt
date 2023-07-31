@@ -45,6 +45,7 @@ object CommonValues {
     const val externalId5 = "external-5"
 
     val lsaTypeParam = LsaType.ADDRESS
+    val lsaTypeParamLegalEntity = LsaType.LEGAL_ENTITY
     val lsaTypeParamNotFound = LsaType.SITE
     val lsaNone = OptionalLsaType.None
 
@@ -53,6 +54,9 @@ object CommonValues {
 
     const val externalIdAddress1 = "address-external-1"
     const val externalIdAddress2 = "address-external-2"
+
+    const val legalEntityAddressId = "external-1_legalAddress"
+    const val siteAddressId = "site-external-1_site"
 
     const val bpn1 = "BPNL0000000000XY"
     const val bpn2 = "BPNL0000000001XZ"

@@ -272,21 +272,22 @@ object ResponseValues {
         updatedAt = CommonValues.now,
     )
 
-    val addressGateInputResponse1 = AddressGateInputDto(
+    //Response values for Site and LegalEntity created Addresses (Input)
+    val addressGateInputResponseLegalEntity1 = AddressGateInputDto(
         address = RequestValues.address1
             .copy(
-                nameParts = listOf(CommonValues.name1),
+                nameParts = emptyList(), //listOf(CommonValues.name1),
             ),
-        externalId = CommonValues.externalIdAddress1,
+        externalId = CommonValues.legalEntityAddressId,
         legalEntityExternalId = CommonValues.externalId1,
     )
 
-    val addressGateInputResponse2 = AddressGateInputDto(
-        address = RequestValues.address2
+    val addressGateInputResponseSite1 = AddressGateInputDto(
+        address = RequestValues.address1
             .copy(
-                nameParts = listOf(CommonValues.nameSite1),
+                nameParts = emptyList(), //listOf(CommonValues.nameSite1),
             ),
-        externalId = CommonValues.externalIdAddress2,
+        externalId = CommonValues.siteAddressId,
         siteExternalId = CommonValues.externalIdSite1,
     )
 
@@ -298,7 +299,7 @@ object ResponseValues {
             )
         ),
         externalId = CommonValues.externalIdAddress1,
-        legalEntityExternalId = null,
+        legalEntityExternalId = CommonValues.externalId1,
     )
 
     val logisticAddressGateInputResponse2 = AddressGateInputDto(
@@ -309,7 +310,7 @@ object ResponseValues {
             )
         ),
         externalId = CommonValues.externalIdAddress2,
-        siteExternalId = null,
+        siteExternalId = CommonValues.externalIdSite1,
     )
 
     //Output Response Values
@@ -318,7 +319,7 @@ object ResponseValues {
             nameParts = listOf(CommonValues.name1),
         ),
         externalId = CommonValues.externalIdAddress1,
-        legalEntityExternalId = null,
+        legalEntityExternalId = CommonValues.externalId1,
         bpna = CommonValues.bpnAddress1
     )
 
@@ -327,7 +328,7 @@ object ResponseValues {
             nameParts = listOf(CommonValues.name2),
         ),
         externalId = CommonValues.externalIdAddress2,
-        siteExternalId = null,
+        siteExternalId = CommonValues.externalIdSite1,
         bpna = CommonValues.bpnAddress2
     )
 
@@ -436,4 +437,32 @@ object ResponseValues {
             bpna = CommonValues.bpnAddress2
         )
     )
+
+    //Response values for Site and LegalEntity created Addresses (Output)
+    val addressGateOutputResponseLegalEntity1 = AddressGateOutputDto(
+        address = RequestValues.address1
+            .copy(
+                nameParts = emptyList(),
+                identifiers = listOf(
+                    AddressIdentifierDto(RequestValues.identifier1.value!!, RequestValues.identifier1.type!!)
+                )
+            ),
+        externalId = CommonValues.legalEntityAddressId,
+        legalEntityExternalId = CommonValues.externalId1,
+        bpna = CommonValues.bpnAddress1
+    )
+
+    val addressGateOutputResponseSite1 = AddressGateOutputDto(
+        address = RequestValues.address1
+            .copy(
+                nameParts = emptyList(),
+                identifiers = listOf(
+                    AddressIdentifierDto(RequestValues.identifier1.value!!, RequestValues.identifier1.type!!)
+                )
+            ),
+        externalId = CommonValues.siteAddressId,
+        siteExternalId = CommonValues.externalIdSite1,
+        bpna = CommonValues.bpnAddress1
+    )
+
 }
