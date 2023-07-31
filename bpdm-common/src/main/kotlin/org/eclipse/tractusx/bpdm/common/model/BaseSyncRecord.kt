@@ -21,22 +21,52 @@ package org.eclipse.tractusx.bpdm.common.model
 
 import java.time.Instant
 
+/**
+ * Info about most current sync run by type
+ */
 interface BaseSyncRecord<SYNC_TYPE> {
+    /**
+     * Discriminator to allow multiple sync records in the DB
+     */
     var type: SYNC_TYPE
 
+    /**
+     * @see SyncStatus
+     */
     var status: SyncStatus
 
+    /**
+     * Sync run considers only data after this instant
+     */
     var fromTime: Instant
 
+    /**
+     * Progress from 0 ot 1
+     */
     var progress: Float
 
+    /**
+     * Progress counter
+     */
     var count: Int
 
+    /**
+     * Plain message for error status
+     */
     var errorDetails: String?
 
+    /**
+     * Optional serialized state to allow resume after error status
+     */
     var errorSave: String?
 
+    /**
+     * Instant this sync run was started
+     */
     var startedAt: Instant?
 
+    /**
+     * Instant this sync run was finished
+     */
     var finishedAt: Instant?
 }

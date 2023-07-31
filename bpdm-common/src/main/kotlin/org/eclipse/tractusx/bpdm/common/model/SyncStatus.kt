@@ -19,10 +19,17 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class SyncStatus{
+enum class SyncStatus {
+    // never synced
     NOT_SYNCED,
+
+    // sync currently running
     RUNNING,
+
+    // last sync successful
     SUCCESS,
+
+    // last sync failed
     ERROR
 }
 

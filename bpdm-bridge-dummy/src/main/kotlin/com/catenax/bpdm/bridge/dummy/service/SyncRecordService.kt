@@ -35,8 +35,12 @@ class SyncRecordService(
 
     override val logger = KotlinLogging.logger { }
 
-    override fun newSyncRecord(type: SyncType, syncStartTime: Instant) =
-        SyncRecord(type, SyncStatus.NOT_SYNCED, syncStartTime)
+    override fun newSyncRecord(type: SyncType, initialFromTime: Instant) =
+        SyncRecord(
+            type = type,
+            status = SyncStatus.NOT_SYNCED,
+            fromTime = initialFromTime
+        )
 
     override fun save(record: SyncRecord) =
         syncRecordRepository.save(record)
