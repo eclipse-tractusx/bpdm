@@ -71,6 +71,8 @@ class OpenApiConfig(
                                 .tokenUrl(securityProperties.tokenUrl)
                                 .refreshUrl(securityProperties.refreshUrl)
                                 .scopes(Scopes())
+                        ).clientCredentials(
+                            OAuthFlow().tokenUrl(securityProperties.tokenUrl)
                         )
                     )
                 )
