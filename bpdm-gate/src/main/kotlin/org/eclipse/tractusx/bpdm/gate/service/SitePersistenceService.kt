@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
@@ -75,8 +75,8 @@ class SitePersistenceService(
 
     //Creates Changelog For both Site and Logistic Address when they are created or updated
     private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(externalId), LsaType.ADDRESS, outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, LsaType.SITE, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(externalId), BusinessPartnerType.ADDRESS, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, outputInputEnum))
     }
 
     private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {

@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.doc.AddressPartnerDoc
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressPartnerDocRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocRepository
@@ -48,10 +48,15 @@ class OpenSearchSyncPageService(
     fun exportPartnersToOpenSearch(fromTime: Instant, pageIndex: Int, pageSize: Int): Page<PartnerChangelogEntry> {
         logger.debug { "Export page $pageIndex" }
         val changelogEntriesPage =
-            changelogService.getChangelogEntriesCreatedAfter(fromTime, listOf(ChangelogSubject.LEGAL_ENTITY, ChangelogSubject.ADDRESS), pageIndex, pageSize)
-        val changelogEntriesBySubject = changelogEntriesPage.groupBy { it.changelogSubject }
+            changelogService.getChangelogEntriesCreatedAfter(
+                fromTime,
+                listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.ADDRESS),
+                pageIndex,
+                pageSize
+            )
+        val changelogEntriesBySubject = changelogEntriesPage.groupBy { it.businessPartnerType }
 
-        val legalEntityBpns = changelogEntriesBySubject[ChangelogSubject.LEGAL_ENTITY]?.map { it.bpn }?.toSet()
+        val legalEntityBpns = changelogEntriesBySubject[BusinessPartnerType.LEGAL_ENTITY]?.map { it.bpn }?.toSet()
         if (!legalEntityBpns.isNullOrEmpty()) {
             val legalEntitiesToExport = legalEntityRepository.findDistinctByBpnIn(legalEntityBpns)
             logger.debug { "Exporting ${legalEntitiesToExport.size} legal entity records" }
@@ -59,7 +64,7 @@ class OpenSearchSyncPageService(
             legalEntityDocRepository.saveAll(partnerDocs)
         }
 
-        val addressBpns = changelogEntriesBySubject[ChangelogSubject.ADDRESS]?.map { it.bpn }?.toSet()
+        val addressBpns = changelogEntriesBySubject[BusinessPartnerType.ADDRESS]?.map { it.bpn }?.toSet()
         if (!addressBpns.isNullOrEmpty()) {
             val addressesToExport = logisticAddressRepository.findDistinctByBpnIn(addressBpns)
             logger.debug { "Exporting ${addressesToExport.size} address records" }

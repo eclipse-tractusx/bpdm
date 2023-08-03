@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
@@ -40,7 +40,7 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
             Specification<ChangelogEntry> { root, _, _ ->
                 externalIds?.let {
                     if(externalIds.isNotEmpty())
-                        root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds.map { externalId -> externalId })
+                        root.get<String>(ChangelogEntry::externalId.name).`in`(externalIds)
                     else
                         null
                 }
@@ -57,13 +57,13 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
             }
 
         /**
-         * Restrict to entries for the LsaType; ignore if empty
+         * Restrict to entries for the BusinessPartnerType; ignore if empty
          */
-        fun byLsaTypes(lsaTypes: Set<LsaType>?) =
+        fun byBusinessPartnerTypes(businessPartnerTypes: Set<BusinessPartnerType>?) =
             Specification<ChangelogEntry> { root, _, builder ->
-                lsaTypes?.let {
-                    if(lsaTypes.isNotEmpty())
-                        root.get<String>(ChangelogEntry::businessPartnerType.name).`in`(lsaTypes.map { lsaType -> lsaType })
+                businessPartnerTypes?.let {
+                    if (businessPartnerTypes.isNotEmpty())
+                        root.get<String>(ChangelogEntry::businessPartnerType.name).`in`(businessPartnerTypes)
                     else
                         null
                 }

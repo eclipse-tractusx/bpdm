@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
@@ -81,11 +81,15 @@ class BusinessPartnerFetchService(
      * Find bpn to identifier value mappings by [idValues] of [identifierTypeKey]
      */
     @Transactional
-    fun findBpnsByIdentifiers(identifierTypeKey: String, lsaType: IdentifierLsaType, idValues: Collection<String>): Set<BpnIdentifierMappingDto> {
-        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, lsaType)
-        return when (lsaType) {
-            IdentifierLsaType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
-            IdentifierLsaType.ADDRESS -> addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
+    fun findBpnsByIdentifiers(
+        identifierTypeKey: String,
+        businessPartnerType: IdentifierBusinessPartnerType,
+        idValues: Collection<String>
+    ): Set<BpnIdentifierMappingDto> {
+        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, businessPartnerType)
+        return when (businessPartnerType) {
+            IdentifierBusinessPartnerType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
+            IdentifierBusinessPartnerType.ADDRESS -> addressIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)
         }
     }
 
@@ -124,13 +128,13 @@ class BusinessPartnerFetchService(
     }
 
     fun findLegalEntityOrThrow(identifierTypeKey: String, identifierValue: String): LegalEntity {
-        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, IdentifierLsaType.LEGAL_ENTITY)
+        val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, IdentifierBusinessPartnerType.LEGAL_ENTITY)
         return legalEntityRepository.findByIdentifierTypeAndValueIgnoreCase(identifierType, identifierValue)
             ?: throw BpdmNotFoundException("Identifier Value", identifierValue)
     }
 
-    private fun findIdentifierTypeOrThrow(identifierTypeKey: String, lsaType: IdentifierLsaType) =
-        identifierTypeRepository.findByLsaTypeAndTechnicalKey(lsaType, identifierTypeKey)
-            ?: throw BpdmNotFoundException(IdentifierType::class, "$identifierTypeKey/$lsaType")
+    private fun findIdentifierTypeOrThrow(identifierTypeKey: String, businessPartnerType: IdentifierBusinessPartnerType) =
+        identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType, identifierTypeKey)
+            ?: throw BpdmNotFoundException(IdentifierType::class, "$identifierTypeKey/$businessPartnerType")
 
 }

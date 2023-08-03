@@ -52,9 +52,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.util.*
-import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParam
-import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParamLegalEntity
-import org.eclipse.tractusx.bpdm.gate.util.CommonValues.lsaTypeParamNotFound
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues.businessPartnerTypeParamAddress
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues.businessPartnerTypeParamLegalEntity
+import org.eclipse.tractusx.bpdm.gate.util.CommonValues.businessPartnerTypeParamNotFound
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -104,7 +104,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         assertRecursively(searchResult.content)
             .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
+            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)))
     }
 
 
@@ -157,39 +157,39 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)))
+            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)))
     }
 
     /**
-     * Given a lsaType a changeLog exists in database
-     * When getting changeLog by lsaType
+     * Given a businessPartnerType a changeLog exists in database
+     * When getting changeLog by businessPartnerType
      * Then changeLog mapped to the catena data model should be returned
      */
     @Test
-    fun `get changeLog by lsaType`() {
+    fun `get changeLog by businessPartnerType`() {
 
-        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParam))
+        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamAddress))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
                 )
             )
     }
 
     /**
-     * Given lsaType does not exist in database
-     * When getting changeLog by lsaType
+     * Given businessPartnerType does not exist in database
+     * When getting changeLog by businessPartnerType
      * Then changeLog mapped to the catena data model should not be returned
      */
 
     @Test
-    fun `get changeLog by lsaType not found`() {
-        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParamNotFound))
+    fun `get changeLog by businessPartnerType not found`() {
+        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamNotFound))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -198,21 +198,21 @@ internal class ChangeLogControllerIT @Autowired constructor(
     }
 
     /**
-     * Given lsaType and timestamp a changeLog exist in database
-     * When getting changeLog by lsaType and timestamp
+     * Given businessPartnerType and timestamp a changeLog exist in database
+     * When getting changeLog by businessPartnerType and timestamp
      * Then changeLog mapped to the catena data model should be returned
      */
     @Test
-    fun `get changeLog by lsaType and timeStamp`() {
-        val searchRequest = ChangeLogSearchRequest(lsaTypes = setOf(lsaTypeParam), fromTime = instant)
+    fun `get changeLog by businessPartnerType and timeStamp`() {
+        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamAddress), fromTime = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
                 )
             )
     }
@@ -225,16 +225,16 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(lsaTypes = emptySet(), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(businessPartnerType = emptySet(), fromTime = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, lsaTypeParam, instant),
-                    ChangelogGateDto(CommonValues.externalId1, lsaTypeParamLegalEntity, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, lsaTypeParam, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
+                    ChangelogGateDto(CommonValues.externalId1, businessPartnerTypeParamLegalEntity, instant),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
                 )
             )
     }

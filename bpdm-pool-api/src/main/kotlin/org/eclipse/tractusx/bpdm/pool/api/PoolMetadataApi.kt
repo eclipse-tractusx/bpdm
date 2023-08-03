@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
@@ -48,7 +48,7 @@ interface PoolMetadataApi {
 
     companion object DescriptionObject {
         const val technicalKeyDisclaimer =
-            "The technical key can be freely chosen but needs to be unique for the lsaType as it is used as reference by the business partner records. " +
+            "The technical key can be freely chosen but needs to be unique for the businessPartnerType as it is used as reference by the business partner records. " +
                     "A recommendation for technical keys: They should be short, descriptive and " +
                     "use a restricted common character set in order to ensure compatibility with older systems."
     }
@@ -71,7 +71,7 @@ interface PoolMetadataApi {
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
     @Operation(
-        summary = "Get page of identifier types filtered by lsaType and (optionally) country (specified by its ISO 3166-1 alpha-2 country code)",
+        summary = "Get page of identifier types filtered by businessPartnerType and (optionally) country (specified by its ISO 3166-1 alpha-2 country code)",
         description = "Lists all matching identifier types including validity details in a paginated result"
     )
     @ApiResponses(
@@ -84,7 +84,7 @@ interface PoolMetadataApi {
     @GetExchange("/identifier-types")
     fun getIdentifierTypes(
         @ParameterObject paginationRequest: PaginationRequest,
-        @Parameter lsaType: IdentifierLsaType,
+        @Parameter businessPartnerType: IdentifierBusinessPartnerType,
         @Parameter country: CountryCode?
     ):
             PageDto<IdentifierTypeDto>

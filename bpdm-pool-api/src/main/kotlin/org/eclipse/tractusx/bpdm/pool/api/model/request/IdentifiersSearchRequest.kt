@@ -20,12 +20,13 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 
 @Schema(name = "IdentifiersSearchRequest", description = "Contains identifiers to search legal entities by")
 data class IdentifiersSearchRequest(
+
     @Schema(description = "Legal entities (L) or addresses (A)")
-    val lsaType: IdentifierLsaType,
+    val businessPartnerType: IdentifierBusinessPartnerType,
 
     @Schema(description = "Technical key of the type to which the identifiers belongs to")
     val idType: String,

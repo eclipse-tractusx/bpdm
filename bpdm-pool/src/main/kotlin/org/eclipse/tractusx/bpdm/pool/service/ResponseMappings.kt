@@ -97,7 +97,7 @@ fun IdentifierType.toTypeKeyNameDto(): TypeKeyNameVerboseDto<String> {
 }
 
 fun IdentifierType.toDto(): IdentifierTypeDto {
-    return IdentifierTypeDto(technicalKey, lsaType, name,
+    return IdentifierTypeDto(technicalKey, businessPartnerType, name,
         details.map { IdentifierTypeDetailDto(it.countryCode, it.mandatory) })
 }
 
@@ -281,7 +281,7 @@ fun SyncRecord.toDto(): SyncDto {
 }
 
 fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
-    return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, changelogSubject)
+    return ChangelogEntryVerboseDto(bpn, changelogType, createdAt, businessPartnerType)
 }
 
 fun Region.toDto(): RegionDto {

@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.dto
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 
 data class ChangelogEntryVerboseDto(
     val bpn: String,
     val changelogType: ChangelogType,
-    val changelogSubject: ChangelogSubject
+    val businessPartnerType: BusinessPartnerType
 )

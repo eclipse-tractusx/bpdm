@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -36,8 +36,12 @@ class SharingStateController(
     private val logger = KotlinLogging.logger { }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
-    override fun getSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageDto<SharingStateDto> {
-        return sharingStateService.findSharingStates(paginationRequest, lsaType, externalIds)
+    override fun getSharingStates(
+        paginationRequest: PaginationRequest,
+        businessPartnerType: BusinessPartnerType?,
+        externalIds: Collection<String>?
+    ): PageDto<SharingStateDto> {
+        return sharingStateService.findSharingStates(paginationRequest, businessPartnerType, externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")

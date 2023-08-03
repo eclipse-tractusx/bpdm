@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
 import org.springframework.data.jpa.domain.Specification
@@ -32,9 +32,9 @@ interface IdentifierTypeRepository :
     PagingAndSortingRepository<IdentifierType, Long>, CrudRepository<IdentifierType, Long>, JpaSpecificationExecutor<IdentifierType> {
 
     object Specs {
-        fun byLsaType(lsaType: IdentifierLsaType) =
+        fun byBusinessPartnerType(businessPartnerType: IdentifierBusinessPartnerType) =
             Specification<IdentifierType> { root, _, builder ->
-                builder.equal(root.get<IdentifierLsaType>(IdentifierType::lsaType.name), lsaType)
+                builder.equal(root.get<IdentifierBusinessPartnerType>(IdentifierType::businessPartnerType.name), businessPartnerType)
             }
 
         fun byCountry(countryCode: CountryCode?) =
@@ -63,6 +63,6 @@ interface IdentifierTypeRepository :
             }
     }
 
-    fun findByLsaTypeAndTechnicalKey(lsaType: IdentifierLsaType, key: String): IdentifierType?
-    fun findByLsaTypeAndTechnicalKeyIn(lsaType: IdentifierLsaType, technicalKeys: Set<String>): Set<IdentifierType>
+    fun findByBusinessPartnerTypeAndTechnicalKey(businessPartnerType: IdentifierBusinessPartnerType, key: String): IdentifierType?
+    fun findByBusinessPartnerTypeAndTechnicalKeyIn(businessPartnerType: IdentifierBusinessPartnerType, technicalKeys: Set<String>): Set<IdentifierType>
 }

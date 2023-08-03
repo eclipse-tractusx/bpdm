@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.CountryCode.*
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierLsaType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.QualityLevel
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
@@ -91,7 +91,7 @@ class MetadataControllerIT @Autowired constructor(
 //            getMetadata<PageResponse<IdentifierTypeDto>>(client, page, size, EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH)
             client.invokeGetEndpoint(
                 EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
-                Pair("lsaType", IdentifierLsaType.LEGAL_ENTITY.name),
+                Pair("businessPartnerType", IdentifierBusinessPartnerType.LEGAL_ENTITY.name),
                 Pair(PaginationRequest::page.name, page.toString()),
                 Pair(PaginationRequest::size.name, size.toString())
             )
@@ -312,21 +312,21 @@ class MetadataControllerIT @Autowired constructor(
     fun getValidIdentifiersForCountry() {
         val identifierType1 = IdentifierType(
             technicalKey = CommonValues.identifierTypeTechnicalKey1,
-            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = CommonValues.identifierTypeName1,
         )
         identifierType1.details.add(IdentifierTypeDetail(identifierType1, null, true))
 
         val identifierType2 = IdentifierType(
             technicalKey = CommonValues.identifierTypeTechnicalKey2,
-            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = CommonValues.identifierTypeName2
         )
         identifierType2.details.add(IdentifierTypeDetail(identifierType2, CountryCode.UK, false))
 
         val identifierType3 = IdentifierType(
             technicalKey = CommonValues.identifierTypeTechnicalKey3,
-            lsaType = IdentifierLsaType.LEGAL_ENTITY,
+            businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = CommonValues.identifierTypeName3
         )
         identifierType3.details.add(IdentifierTypeDetail(identifierType3, CountryCode.PL, false))
@@ -342,7 +342,7 @@ class MetadataControllerIT @Autowired constructor(
 
         val result = webTestClient.invokeGetEndpoint<PageDto<IdentifierTypeDto>>(
             EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
-            Pair("lsaType", IdentifierLsaType.LEGAL_ENTITY.name),
+            Pair("businessPartnerType", IdentifierBusinessPartnerType.LEGAL_ENTITY.name),
             Pair("country", CountryCode.PL.alpha2)
         )
 

@@ -501,32 +501,32 @@ fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): Legal
 
 fun AddressGateInputRequest.toSharingStateDTO():SharingStateDto {
 
-    return SharingStateDto(LsaType.ADDRESS,externalId)
+    return SharingStateDto(BusinessPartnerType.ADDRESS, externalId)
 }
 
 fun SiteGateInputRequest.toSharingStateDTO():SharingStateDto {
 
-    return SharingStateDto(LsaType.SITE,externalId)
+    return SharingStateDto(BusinessPartnerType.SITE, externalId)
 }
 
 fun LegalEntityGateInputRequest.toSharingStateDTO():SharingStateDto {
 
-    return SharingStateDto(LsaType.LEGAL_ENTITY,externalId)
+    return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId)
 }
 
 fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
 
-    return SharingStateDto(LsaType.ADDRESS,externalId, sharingStateType = sharingStateType, bpn = bpn)
+    return SharingStateDto(BusinessPartnerType.ADDRESS, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
 fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
 
-    return SharingStateDto(LsaType.SITE,externalId, sharingStateType = sharingStateType,bpn = bpn)
+    return SharingStateDto(BusinessPartnerType.SITE, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
 fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
 
-    return SharingStateDto(LsaType.LEGAL_ENTITY,externalId, sharingStateType = sharingStateType,bpn = bpn)
+    return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
 

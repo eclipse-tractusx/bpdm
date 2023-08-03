@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.repository
 
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -56,20 +56,20 @@ interface PartnerChangelogEntryRepository : JpaRepository<PartnerChangelogEntry,
         /**
          * Restrict to entries with any one of the given LSA types; ignore if empty
          */
-        fun byLsaTypesIn(lsaTypes: Set<ChangelogSubject>?) =
+        fun byBusinessPartnerTypesIn(businessPartnerTypes: Set<BusinessPartnerType>?) =
             Specification<PartnerChangelogEntry> { root, _, _ ->
-                lsaTypes?.let {
-                    if(lsaTypes.isNotEmpty())
-                        root.get<String>(PartnerChangelogEntry::changelogSubject.name).`in`(lsaTypes.map { type -> type })
+                businessPartnerTypes?.let {
+                    if (businessPartnerTypes.isNotEmpty())
+                        root.get<String>(PartnerChangelogEntry::businessPartnerType.name).`in`(businessPartnerTypes)
                     else
                         null
                 }
             }
     }
 
-    fun findByCreatedAtAfterAndChangelogSubjectIn(
+    fun findByCreatedAtAfterAndBusinessPartnerTypeIn(
         createdAt: Instant,
-        changelogSubject: Collection<ChangelogSubject>,
+        businessPartnerType: Collection<BusinessPartnerType>,
         pageable: Pageable
     ): Page<PartnerChangelogEntry>
 }

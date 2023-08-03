@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -40,16 +40,16 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
             }
 
         /**
-         * Restrict to entries with the given lsaType; ignore if null
+         * Restrict to entries with the given businessPartnerType; ignore if null
          */
-        fun byLsaType(lsaType: LsaType?) =
+        fun byBusinessPartnerType(businessPartnerType: BusinessPartnerType?) =
             Specification<SharingState> { root, _, builder ->
-                lsaType?.let {
-                    builder.equal(root.get<LsaType>(SharingState::lsaType.name), lsaType)
+                businessPartnerType?.let {
+                    builder.equal(root.get<BusinessPartnerType>(SharingState::businessPartnerType.name), businessPartnerType)
                 }
             }
     }
 
-    fun findByExternalIdAndLsaType(externalId: String, businessPartnerType: LsaType): SharingState?
+    fun findByExternalIdAndBusinessPartnerType(externalId: String, businessPartnerType: BusinessPartnerType): SharingState?
 
 }

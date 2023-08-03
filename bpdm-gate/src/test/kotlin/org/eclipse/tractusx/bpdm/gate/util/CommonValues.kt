@@ -21,13 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.NameType
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
-import org.eclipse.tractusx.bpdm.gate.api.model.OptionalLsaType
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -44,10 +43,9 @@ object CommonValues {
     const val externalId4 = "external-4"
     const val externalId5 = "external-5"
 
-    val lsaTypeParam = LsaType.ADDRESS
-    val lsaTypeParamLegalEntity = LsaType.LEGAL_ENTITY
-    val lsaTypeParamNotFound = LsaType.SITE
-    val lsaNone = OptionalLsaType.None
+    val businessPartnerTypeParamAddress = BusinessPartnerType.ADDRESS
+    val businessPartnerTypeParamLegalEntity = BusinessPartnerType.LEGAL_ENTITY
+    val businessPartnerTypeParamNotFound = BusinessPartnerType.SITE
 
     const val externalIdSite1 = "site-external-1"
     const val externalIdSite2 = "site-external-2"

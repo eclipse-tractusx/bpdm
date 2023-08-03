@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -83,12 +82,12 @@ class BusinessPartnerBuildService(
 
         val legalEntities = requestsByLegalEntities.keys
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, BusinessPartnerType.LEGAL_ENTITY) })
         changelogService.createChangelogEntries(legalEntities.map {
             ChangelogEntryVerboseDto(
                 it.legalAddress.bpn,
                 ChangelogType.CREATE,
-                ChangelogSubject.ADDRESS
+                BusinessPartnerType.ADDRESS
             )
         })
 
@@ -127,8 +126,8 @@ class BusinessPartnerBuildService(
 
         val sites = requestsBySites.keys
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, ChangelogSubject.SITE) })
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.CREATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.CREATE, BusinessPartnerType.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS) })
 
         siteRepository.saveAll(sites)
 
@@ -145,8 +144,11 @@ class BusinessPartnerBuildService(
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
-        fun isLegalEntityRequest(request: AddressPartnerCreateRequest) = bpnIssuingService.translateToLsaType(request.bpnParent) == ChangelogSubject.LEGAL_ENTITY
-        fun isSiteRequest(request: AddressPartnerCreateRequest) = bpnIssuingService.translateToLsaType(request.bpnParent) == ChangelogSubject.SITE
+        fun isLegalEntityRequest(request: AddressPartnerCreateRequest) =
+            bpnIssuingService.translateToBusinessPartnerType(request.bpnParent) == BusinessPartnerType.LEGAL_ENTITY
+
+        fun isSiteRequest(request: AddressPartnerCreateRequest) =
+            bpnIssuingService.translateToBusinessPartnerType(request.bpnParent) == BusinessPartnerType.SITE
 
         val legalEntityRequests = validRequests.filter { isLegalEntityRequest(it) }
         val siteRequests = validRequests.filter { isSiteRequest(it) }
@@ -160,7 +162,7 @@ class BusinessPartnerBuildService(
             ChangelogEntryVerboseDto(
                 it.address.bpna,
                 ChangelogType.CREATE,
-                ChangelogSubject.ADDRESS
+                BusinessPartnerType.ADDRESS
             )
         })
 
@@ -185,12 +187,12 @@ class BusinessPartnerBuildService(
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnsToFetch)
         businessPartnerFetchService.fetchDependenciesWithLegalAddress(legalEntities)
 
-        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.LEGAL_ENTITY) })
+        changelogService.createChangelogEntries(legalEntities.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.LEGAL_ENTITY) })
         changelogService.createChangelogEntries(legalEntities.map {
             ChangelogEntryVerboseDto(
                 it.legalAddress.bpn,
                 ChangelogType.UPDATE,
-                ChangelogSubject.ADDRESS
+                BusinessPartnerType.ADDRESS
             )
         })
 
@@ -220,11 +222,11 @@ class BusinessPartnerBuildService(
         val bpnsToFetch = validRequests.map { it.bpns }
         val sites = siteRepository.findDistinctByBpnIn(bpnsToFetch)
 
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.SITE) })
-        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.SITE) })
+        changelogService.createChangelogEntries(sites.map { ChangelogEntryVerboseDto(it.mainAddress.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS) })
 
         val requestByBpnMap = validRequests.associateBy { it.bpns }
-        val updatedSites =  sites.map {
+        val updatedSites = sites.map {
             val request = requestByBpnMap[it.bpn]!!
             updateSite(it, request.site)
             updateLogisticAddress(it.mainAddress, request.site.mainAddress, addressMetadataMap)
@@ -246,7 +248,7 @@ class BusinessPartnerBuildService(
         val addresses = logisticAddressRepository.findDistinctByBpnIn(validRequests.map { it.bpna })
         val metadataMap = metadataService.getMetadata(validRequests.map { it.address }).toMapping()
 
-        changelogService.createChangelogEntries(addresses.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, ChangelogSubject.ADDRESS) })
+        changelogService.createChangelogEntries(addresses.map { ChangelogEntryVerboseDto(it.bpn, ChangelogType.UPDATE, BusinessPartnerType.ADDRESS) })
 
         val requestsByBpn = validRequests.associateBy { it.bpna }
         val updatedAddresses = addresses.map{ address ->

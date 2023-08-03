@@ -19,14 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byBusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byLsaType
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -36,7 +36,7 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
 
     fun upsertSharingState(request: SharingStateDto) {
 
-        val sharingState = this.stateRepository.findByExternalIdAndLsaType(request.externalId, request.lsaType)
+        val sharingState = this.stateRepository.findByExternalIdAndBusinessPartnerType(request.externalId, request.businessPartnerType)
         if (sharingState == null) {
             insertSharingState(request)
         } else {
@@ -49,7 +49,7 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
         this.stateRepository.save(
             SharingState(
                 externalId = dto.externalId,
-                lsaType = dto.lsaType,
+                businessPartnerType = dto.businessPartnerType,
                 sharingStateType = dto.sharingStateType,
                 sharingErrorCode = dto.sharingErrorCode,
                 sharingErrorMessage = dto.sharingErrorMessage,
@@ -72,16 +72,20 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
         this.stateRepository.save(entity)
     }
 
-    fun findSharingStates(paginationRequest: PaginationRequest, lsaType: LsaType?, externalIds: Collection<String>?): PageDto<SharingStateDto> {
+    fun findSharingStates(
+        paginationRequest: PaginationRequest,
+        businessPartnerType: BusinessPartnerType?,
+        externalIds: Collection<String>?
+    ): PageDto<SharingStateDto> {
 
-        val spec = Specification.allOf(byLsaType(lsaType), byExternalIdsIn(externalIds))
+        val spec = Specification.allOf(byBusinessPartnerType(businessPartnerType), byExternalIdsIn(externalIds))
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
         val page = stateRepository.findAll(spec, pageRequest)
 
         return page.toDto(page.content.map {
             SharingStateDto(
                 externalId = it.externalId,
-                lsaType = it.lsaType,
+                businessPartnerType = it.businessPartnerType,
                 sharingStateType = it.sharingStateType,
                 sharingErrorCode = it.sharingErrorCode,
                 sharingErrorMessage = it.sharingErrorMessage,

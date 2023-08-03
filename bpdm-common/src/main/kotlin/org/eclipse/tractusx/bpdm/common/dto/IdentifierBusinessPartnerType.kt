@@ -15,12 +15,13 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
+ */
+package org.eclipse.tractusx.bpdm.common.dto
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+import io.swagger.v3.oas.annotations.media.Schema
 
-enum class LsaType {
+@Schema(description = "Specifies if an identifier type is valid for legal entities (L) or addresses (A). Sites (S) are not supported.")
+enum class IdentifierBusinessPartnerType {
     LEGAL_ENTITY,
-    SITE,
     ADDRESS
 }

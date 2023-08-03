@@ -19,9 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogSubject
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -182,13 +182,13 @@ class RequestValidationService(
         val mainAddressRequests = requests.map { it.address }
         val addressMetadata = metadataService.getMetadata(mainAddressRequests).toKeys()
 
-        val requestsWithParentType = requests.map { Pair(it, bpnIssuingService.translateToLsaType(it.bpnParent)) }
+        val requestsWithParentType = requests.map { Pair(it, bpnIssuingService.translateToBusinessPartnerType(it.bpnParent)) }
         val requestsByParentType = requestsWithParentType.groupBy({ it.second }, { it.first })
 
-        val legalEntityParentBpns = requestsByParentType[ChangelogSubject.LEGAL_ENTITY]?.map { it.bpnParent } ?: emptyList()
+        val legalEntityParentBpns = requestsByParentType[BusinessPartnerType.LEGAL_ENTITY]?.map { it.bpnParent } ?: emptyList()
         val existingLegalEntities = legalEntityRepository.findDistinctByBpnIn(legalEntityParentBpns).map { it.bpn }.toSet()
 
-        val siteParentBpns = requestsByParentType[ChangelogSubject.SITE]?.map { it.bpnParent } ?: emptyList()
+        val siteParentBpns = requestsByParentType[BusinessPartnerType.SITE]?.map { it.bpnParent } ?: emptyList()
         val existingSites = siteRepository.findDistinctByBpnIn(siteParentBpns).map { it.bpn }.toSet()
 
         return requestsWithParentType.flatMap { (request, type) ->
@@ -328,20 +328,20 @@ class RequestValidationService(
 
     private fun validateAddressParent(
         request: AddressPartnerCreateRequest,
-        type: ChangelogSubject?,
+        type: BusinessPartnerType?,
         existingLegalEntities: Set<String>,
         existingSites: Set<String>
     )
             : Collection<ErrorInfo<AddressCreateError>> {
         return when (type) {
-            ChangelogSubject.LEGAL_ENTITY -> validateParentBpnExists(
+            BusinessPartnerType.LEGAL_ENTITY -> validateParentBpnExists(
                 request.bpnParent,
                 request.index,
                 existingLegalEntities,
                 AddressCreateError.LegalEntityNotFound
             )
 
-            ChangelogSubject.SITE -> validateParentBpnExists(request.bpnParent, request.index, existingSites, AddressCreateError.SiteNotFound)
+            BusinessPartnerType.SITE -> validateParentBpnExists(request.bpnParent, request.index, existingSites, AddressCreateError.SiteNotFound)
             else -> listOf(ErrorInfo(AddressCreateError.BpnNotValid, "Parent '${request.bpnParent}' is not a valid BPNL/BPNS", request.index))
         }
     }

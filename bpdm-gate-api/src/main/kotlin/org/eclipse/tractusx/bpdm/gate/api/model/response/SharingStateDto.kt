@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.LocalDateTime
 
@@ -30,7 +30,7 @@ import java.time.LocalDateTime
 )
 data class SharingStateDto(
     @get:Schema(description = "LSA Type")
-    val lsaType: LsaType,
+    val businessPartnerType: BusinessPartnerType,
 
     @get:Schema(description = "External identifier")
     val externalId: String,

@@ -41,7 +41,7 @@ class BpnController(
         if (request.idValues.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val bpnIdentifierMappings = businessPartnerFetchService.findBpnsByIdentifiers(request.idType, request.lsaType, request.idValues)
+        val bpnIdentifierMappings = businessPartnerFetchService.findBpnsByIdentifiers(request.idType, request.businessPartnerType, request.idValues)
         return ResponseEntity(bpnIdentifierMappings, HttpStatus.OK)
     }
 }

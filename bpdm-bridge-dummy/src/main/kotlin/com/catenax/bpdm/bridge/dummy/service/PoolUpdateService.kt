@@ -21,9 +21,9 @@ package com.catenax.bpdm.bridge.dummy.service
 
 import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -68,7 +68,7 @@ class PoolUpdateService(
     fun createSitesInPool(entriesToCreate: Collection<GateSiteInfo>): SitePartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
             .map { it.legalEntityExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.LEGAL_ENTITY, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(BusinessPartnerType.LEGAL_ENTITY, it.toSet()) }
         val createRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
@@ -113,7 +113,7 @@ class PoolUpdateService(
     fun createAddressesInPool(entriesToCreate: Collection<GateAddressInfo>): AddressPartnerCreateResponseWrapper {
         val leParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.legalEntityExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.LEGAL_ENTITY, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(BusinessPartnerType.LEGAL_ENTITY, it.toSet()) }
         val leParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             leParentBpnByExternalId[entry.legalEntityExternalId]
                 ?.let { leParentBpn ->
@@ -127,7 +127,7 @@ class PoolUpdateService(
 
         val siteParentBpnByExternalId = entriesToCreate
             .mapNotNull { it.siteExternalId }
-            .let { gateQueryService.getBpnByExternalId(LsaType.SITE, it.toSet()) }
+            .let { gateQueryService.getBpnByExternalId(BusinessPartnerType.SITE, it.toSet()) }
         val siteParentsCreateRequests = entriesToCreate.mapNotNull { entry ->
             siteParentBpnByExternalId[entry.siteExternalId]
                 ?.let { siteParentBpn ->

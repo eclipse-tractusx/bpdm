@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.Parameter
-import org.eclipse.tractusx.bpdm.gate.api.model.LsaType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 data class ChangeLogSearchRequest(
@@ -32,5 +32,5 @@ data class ChangeLogSearchRequest(
     val externalIds: Set<String> = emptySet(),
 
     @field:Parameter(description = "Lsa-Types of business partners for which to search changelog entries. Ignored if empty", required = false)
-    val lsaTypes: Set<LsaType> = emptySet()
+    val businessPartnerType: Set<BusinessPartnerType> = emptySet()
 )

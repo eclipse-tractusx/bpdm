@@ -50,7 +50,7 @@ class ChangelogController(
 
         return partnerChangelogService.getChangeLogEntries(
             changelogSearchRequest.bpns,
-            changelogSearchRequest.lsaTypes,
+            changelogSearchRequest.businessPartnerTypes,
             changelogSearchRequest.fromTime,
             paginationRequest.page,
             paginationRequest.size
