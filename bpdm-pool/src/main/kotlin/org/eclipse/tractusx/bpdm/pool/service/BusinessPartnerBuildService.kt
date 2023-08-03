@@ -406,8 +406,8 @@ class BusinessPartnerBuildService(
             bpn = bpn,
             legalEntity = null,
             site = null,
-            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress),
-            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it) },
+            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap),
+            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) },
             name = dto.name
         )
 
@@ -418,8 +418,8 @@ class BusinessPartnerBuildService(
 
     private fun updateLogisticAddress(address: LogisticAddress, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
         address.name = dto.name
-        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress)
-        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it) }
+        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap)
+        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
 
         address.identifiers.apply {
             clear()
@@ -431,17 +431,13 @@ class BusinessPartnerBuildService(
         }
     }
 
-    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto): PhysicalPostalAddress {
+    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMapping): PhysicalPostalAddress {
         val baseAddress = physicalAddress.baseAddress
         val area = physicalAddress.areaPart
         return PhysicalPostalAddress(
             geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
             country = baseAddress.country,
-            // TODO enable regionCodes later
-//            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
-//                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
-//            },
-            administrativeAreaLevel1 = null,
+            administrativeAreaLevel1 = metadataMap.regions[area.administrativeAreaLevel1],
             administrativeAreaLevel2 = area.administrativeAreaLevel2,
             administrativeAreaLevel3 = area.administrativeAreaLevel3,
             postCode = baseAddress.postalCode,
@@ -456,17 +452,13 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto): AlternativePostalAddress {
+    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMapping): AlternativePostalAddress {
         val baseAddress = alternativeAddress.baseAddress
         val area = alternativeAddress.areaPart
         return AlternativePostalAddress(
             geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
             country = baseAddress.country,
-            // TODO enable regionCodes later
-//            administrativeAreaLevel1 = baseAddress.administrativeAreaLevel1?.let {
-//                metadataMap.regions[it] ?: throw BpdmNotFoundException(Region::class, it)
-//            },
-            administrativeAreaLevel1 = null,
+            administrativeAreaLevel1 = metadataMap.regions[area.administrativeAreaLevel1],
             postCode = baseAddress.postalCode,
             city = baseAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
