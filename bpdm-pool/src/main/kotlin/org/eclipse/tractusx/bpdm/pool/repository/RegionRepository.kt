@@ -24,5 +24,7 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
 interface RegionRepository : PagingAndSortingRepository<Region, Long>, CrudRepository<Region, Long> {
+
     fun findByRegionCodeIn(regionCodes: Set<String>): Set<Region>
+
 }
