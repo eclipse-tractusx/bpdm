@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.pool.api.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
+import java.time.Duration
 
 class PoolClientImpl(
     private val webClientProvider: () -> WebClient
@@ -34,6 +35,7 @@ class PoolClientImpl(
         HttpServiceProxyFactory
             .builder(WebClientAdapter.forClient(webClientProvider()))
             .customArgumentResolver(ParameterObjectArgumentResolver())
+            .blockTimeout(Duration.ofSeconds(30))
             .build()
     }
 

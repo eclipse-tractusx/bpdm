@@ -17,18 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.client
+package com.catenax.bpdm.bridge.dummy.client
 
+import com.catenax.bpdm.bridge.dummy.controller.BridgeApi
 import org.eclipse.tractusx.bpdm.common.service.ParameterObjectArgumentResolver
-import org.eclipse.tractusx.bpdm.gate.api.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 import java.time.Duration
 
-class GateClientImpl(
+class BridgeClientImpl(
     private val webClientProvider: () -> WebClient
-) : GateClient {
+) : BridgeClient {
 
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
         HttpServiceProxyFactory
@@ -38,23 +38,7 @@ class GateClientImpl(
             .build()
     }
 
-    private val gateClientAddress by lazy { httpServiceProxyFactory.createClient(GateAddressApi::class.java) }
-    private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateLegalEntityApi::class.java) }
-    private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateSiteApi::class.java) }
-    private val gateClientChangelog by lazy { httpServiceProxyFactory.createClient(GateChangelogApi::class.java) }
-    private val gateClientSharingState by lazy { httpServiceProxyFactory.createClient(GateSharingStateApi::class.java) }
+    private val bridgeClient by lazy { httpServiceProxyFactory.createClient(BridgeApi::class.java) }
 
-    override fun addresses() = gateClientAddress
-
-    override fun legalEntities() = gateClientLegalEntity
-
-    override fun sites() = gateClientSite
-
-    override fun changelog() = gateClientChangelog
-
-    override fun sharingState() = gateClientSharingState
-
+    override fun bridge() = bridgeClient
 }
-
-
-

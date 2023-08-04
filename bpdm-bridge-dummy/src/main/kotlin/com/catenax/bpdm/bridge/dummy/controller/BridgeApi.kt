@@ -19,24 +19,21 @@
 
 package com.catenax.bpdm.bridge.dummy.controller
 
-import com.catenax.bpdm.bridge.dummy.service.SyncService
 import io.swagger.v3.oas.annotations.Operation
-import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 
-@RestController
-class BridgeController(
-    val syncService: SyncService
-) : BridgeApi {
+@RequestMapping("/api/bridge", produces = [MediaType.APPLICATION_JSON_VALUE])
+@HttpExchange("/api/bridge")
+interface BridgeApi {
 
     @Operation(
         summary = "Start sync between Gate and Pool"
     )
     @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
-    override fun triggerSync() {
-        syncService.sync()
-    }
+    @PostExchange("/sync")
+    fun triggerSync()
 }

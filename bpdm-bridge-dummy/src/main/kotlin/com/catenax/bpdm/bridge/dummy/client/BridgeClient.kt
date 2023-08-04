@@ -17,26 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.controller
+package com.catenax.bpdm.bridge.dummy.client
 
-import com.catenax.bpdm.bridge.dummy.service.SyncService
-import io.swagger.v3.oas.annotations.Operation
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import com.catenax.bpdm.bridge.dummy.controller.BridgeApi
 
-@RestController
-class BridgeController(
-    val syncService: SyncService
-) : BridgeApi {
+interface BridgeClient {
 
-    @Operation(
-        summary = "Start sync between Gate and Pool"
-    )
-    @PostMapping("/sync")
-    @PreAuthorize("hasAnyAuthority(@bridgeAuthProperties.syncAuthority)")
-    override fun triggerSync() {
-        syncService.sync()
-    }
+    fun bridge(): BridgeApi
 }
