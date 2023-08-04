@@ -23,8 +23,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 
 // TODO rename to LogisticAddressSearchRequest / adjust
-@Schema(name = "AddressPartnerSearchRequest", description = "Contains keywords used for searching in address properties")
-data class AddressPartnerSearchRequest constructor(
+@Schema(description = "Contains keywords used for searching in address properties")
+data class AddressPartnerSearchRequest(
+
     @field:Parameter(description = "Filter business partners by name")
     var name: String? = null
 ) {
@@ -32,5 +33,3 @@ data class AddressPartnerSearchRequest constructor(
         val EmptySearchRequest = AddressPartnerSearchRequest()
     }
 }
-
-

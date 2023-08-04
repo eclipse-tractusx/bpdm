@@ -21,20 +21,20 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
-@Schema(name = "PostalAdress", description = "Address record for a business partner")
 data class BasePostalAddressDto(
 
-    @get:Schema(description = "Geographic coordinates to find this location")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = PostalAddressDescription.headerGeoCoordinates)
     val geographicCoordinates: GeoCoordinateDto? = null,
 
-    @get:Schema(description = "Describes the country")
+    @get:Schema(description = PostalAddressDescription.country)
     val country: CountryCode,
 
-    @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
+    @get:Schema(description = PostalAddressDescription.postalCode)
     val postalCode: String? = null,
 
-    @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
+    @get:Schema(description = PostalAddressDescription.city)
     val city: String,
-
-    )
+)

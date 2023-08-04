@@ -22,23 +22,26 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityPartnerCreateVerboseDto", description = "Created business partner of type legal entity")
+@Schema(description = LegalEntityDescription.headerCreateResponse)
 data class LegalEntityPartnerCreateVerboseDto(
 
-    @get:Schema(description = "Legal name the partner goes by")
+    @get:Schema(description = LegalEntityDescription.legalName)
     val legalName: String,
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityVerboseDto,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityDescription.legalAddress)
     val legalAddress: LogisticAddressVerboseDto,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry from the request")
+    @get:Schema(description = CommonDescription.index)
     val index: String?
 )

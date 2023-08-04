@@ -20,14 +20,15 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
-@Schema(name = "AddressIdentifierVerboseDto", description = "Identifier record of a logistic address")
+@Schema(description = AddressIdentifierDescription.header)
 data class AddressIdentifierVerboseDto(
 
-    @get:Schema(description = "Value of the identifier")
+    @get:Schema(description = AddressIdentifierDescription.value)
     val value: String,
 
-    @get:Schema(description = "Type of the identifier")
+    @get:Schema(description = AddressIdentifierDescription.type)
     val type: TypeKeyNameVerboseDto<String>,
 )

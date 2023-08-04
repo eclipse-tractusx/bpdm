@@ -17,22 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+object SiteStateDescription {
+    const val header = "A site state indicates if the site is active or inactive. This does not describe the relation " +
+            "between a sharing member and a business partner and whether they have active business, " +
+            "but it describes whether the site is still operating."
 
-@Schema(description = LegalEntityIdentifierDescription.header)
-data class LegalEntityIdentifierVerboseDto(
-
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    const val description = "The description from the original source indicating the state of the site."
+    const val validFrom = "The date from which the state is valid."
+    const val validTo = "The date until the state is valid."
+    const val type = "One of the state types: active, inactive."
+}

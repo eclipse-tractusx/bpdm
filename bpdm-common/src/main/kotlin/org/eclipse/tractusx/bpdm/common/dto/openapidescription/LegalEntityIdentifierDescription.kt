@@ -17,22 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+object LegalEntityIdentifierDescription {
+    const val header = "A legal entity identifier (uniquely) identifies the legal entity, such as the German " +
+            "Handelsregisternummer, a VAT number, etc."
 
-@Schema(description = LegalEntityIdentifierDescription.header)
-data class LegalEntityIdentifierVerboseDto(
-
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    const val value = "The value of the identifier like \"DE123465789\"."
+    const val type = "The type of the identifier."
+    const val issuingBody = "The name of the official register, where the identifier is registered. " +
+            "For example, a Handelsregisternummer in Germany is only valid with its corresponding Handelsregister."
+}

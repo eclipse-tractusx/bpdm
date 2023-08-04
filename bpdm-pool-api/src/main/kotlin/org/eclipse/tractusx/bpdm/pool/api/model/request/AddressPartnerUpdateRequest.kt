@@ -23,12 +23,14 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AddressPartnerUpdateRequest", description = "Request for updating a business partner record of type address")
+@Schema(description = LogisticAddressDescription.headerUpdateRequest)
 data class AddressPartnerUpdateRequest(
-    @Schema(description = "Business Partner Number of this address")
+
+    @Schema(description = LogisticAddressDescription.bpna)
     val bpna: String,
 
     @field:JsonUnwrapped

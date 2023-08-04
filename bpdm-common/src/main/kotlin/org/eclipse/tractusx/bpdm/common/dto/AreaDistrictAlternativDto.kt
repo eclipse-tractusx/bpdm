@@ -20,10 +20,10 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
-@Schema(name = "AreaDistrictDto", description = "Record for administrativeAreaLevel and district part of an alternativ address")
 data class AreaDistrictAlternativDto(
 
-    @get:Schema(description = "Identifying code of the Region within the country (e.g. Bayern)")
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
     val administrativeAreaLevel1: String? = null,
 )

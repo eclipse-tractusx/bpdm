@@ -17,22 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+object ClassificationDescription {
+    const val header = "A legal entity classification is an assignment of the legal entity to an industry. It does not " +
+            "necessarily have to be the only industry the company is active in (see large companies " +
+            "operating in different industries). Multiple assignments to several industries are possible per " +
+            "classification type."
 
-@Schema(description = LegalEntityIdentifierDescription.header)
-data class LegalEntityIdentifierVerboseDto(
-
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    const val value = "The name of the class belonging to the classification."
+    const val code = "The identifier of the class belonging to the classification."
+    const val type = "Type of classification."
+}

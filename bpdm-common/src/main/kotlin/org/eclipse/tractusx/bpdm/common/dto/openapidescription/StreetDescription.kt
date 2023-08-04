@@ -17,22 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+object StreetDescription {
+    const val header = "The street of the physical postal address, synonyms: road, avenue, lane, boulevard, highway"
 
-@Schema(description = LegalEntityIdentifierDescription.header)
-data class LegalEntityIdentifierVerboseDto(
-
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    const val name = "The name of the street."
+    const val houseNumber = "The number representing the exact location of a building within the street."
+    const val milestone = "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
+    const val direction = "The cardinal direction describing where the exit to the location of the addressed object on large highways / " +
+            "motorways is located, such as Highway 101 South."
+}

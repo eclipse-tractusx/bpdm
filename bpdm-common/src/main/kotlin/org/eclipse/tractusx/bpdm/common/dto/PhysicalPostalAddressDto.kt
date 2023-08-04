@@ -22,16 +22,19 @@ package org.eclipse.tractusx.bpdm.common.dto
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "PhysicalPostalAddress", description = "Physical Postal Address Part")
+@Schema(description = PostalAddressDescription.headerPhysical)
 data class PhysicalPostalAddressDto(
 
     @field:JsonUnwrapped
     val baseAddress: BasePostalAddressDto,
 
-    @get:Schema(description = "Address Street")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = StreetDescription.header)
     val street: StreetDto? = null,
 
     @field:JsonUnwrapped

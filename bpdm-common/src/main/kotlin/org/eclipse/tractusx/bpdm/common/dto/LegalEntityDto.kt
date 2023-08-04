@@ -21,23 +21,22 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
-@Schema(name = "LegalEntity")
+@Schema(description = LegalEntityDescription.header)
 data class LegalEntityDto(
-    @ArraySchema(arraySchema = Schema(description = "Additional identifiers (except BPN)", required = false))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers, required = false))
     val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
-    
-    @get:Schema(description = "Abbreviated name or shorthand")
+
+    @get:Schema(description = LegalEntityDescription.legalShortName)
     val legalShortName: String?,
 
-    @get:Schema(description = "Technical key of the legal form")
+    @get:Schema(description = LegalEntityDescription.legalForm)
     val legalForm: String? = null,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
     val states: Collection<LegalEntityStateDto> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "Classifications", required = false))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
     val classifications: Collection<ClassificationDto> = emptyList(),
-
-
-    )
+)

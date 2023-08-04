@@ -23,17 +23,20 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SitePartnerCreateRequest", description = "Request for creating new business partner record of type site")
+@Schema(description = SiteDescription.headerCreateRequest)
 data class SitePartnerCreateRequest(
+
     @field:JsonUnwrapped
     val site: SiteDto,
 
-    @Schema(description = "Business Partner Number of the legal entity this site belongs to")
+    @Schema(description = SiteDescription.bpnlParent)
     val bpnlParent: String,
 
-    @Schema(description = "User defined index to conveniently match this entry to the corresponding entry in the response")
+    @Schema(description = CommonDescription.index)
     val index: String?
 )

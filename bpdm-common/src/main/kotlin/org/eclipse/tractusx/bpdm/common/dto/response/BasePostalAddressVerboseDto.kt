@@ -22,21 +22,22 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
-@Schema(name = "BasePostalAddressVerboseDto", description = "Address record of a business partner")
 data class BasePostalAddressVerboseDto(
 
-    @get:Schema(description = "Geographic coordinates to find this location")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = PostalAddressDescription.headerGeoCoordinates)
     val geographicCoordinates: GeoCoordinateDto? = null,
 
-    @get:Schema(description = "Describes the full name of the country")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = PostalAddressDescription.country)
     val country: TypeKeyNameVerboseDto<CountryCode>,
 
-    @get:Schema(description = "A postal code, also known as postcode, PIN or ZIP Code")
+    @get:Schema(description = PostalAddressDescription.postalCode)
     val postalCode: String? = null,
 
-    @get:Schema(description = "The city of the address (Synonym: Town, village, municipality)")
+    @get:Schema(description = PostalAddressDescription.city)
     val city: String,
-
-    )
+)

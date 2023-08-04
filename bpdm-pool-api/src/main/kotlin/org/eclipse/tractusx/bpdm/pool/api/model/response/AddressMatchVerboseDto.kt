@@ -20,15 +20,18 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 
 
-@Schema(name = "AddressMatchVerboseDto", description = "Match with score for a business partner record of type address")
+@Schema(description = LogisticAddressDescription.headerMatchResponse)
 data class AddressMatchVerboseDto(
 
-    @Schema(description = "Relative quality score of the match. The higher the better")
+    @get:Schema(description = CommonDescription.score)
     val score: Float,
 
-    @Schema(description = "Matched address business partner record")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.address)
     val address: LogisticAddressVerboseDto
 )

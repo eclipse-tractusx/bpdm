@@ -45,7 +45,7 @@ interface PoolSiteApi {
 
 
     @Operation(
-        summary = "Search Main Addresses",
+        summary = "Search for sites' main addresses",
         description = "Search main addresses of site business partners by BPNS"
     )
     @ApiResponses(

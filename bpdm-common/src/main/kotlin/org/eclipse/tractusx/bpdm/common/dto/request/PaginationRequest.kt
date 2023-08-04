@@ -25,8 +25,9 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.PositiveOrZero
 
-@Schema(name = "PaginationRequest", description = "Defines pagination information for requesting collection results")
+@Schema(description = "Defines pagination information for requesting collection results")
 data class PaginationRequest (
+
     @field:Parameter(
         description = "Number of page to get results from", schema =
         Schema(defaultValue = "0"))

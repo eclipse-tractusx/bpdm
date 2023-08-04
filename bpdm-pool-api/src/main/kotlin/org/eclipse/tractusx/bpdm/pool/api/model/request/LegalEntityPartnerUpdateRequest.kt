@@ -24,23 +24,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
-
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityPartnerUpdateRequest", description = "Request for updating a business partner record of type legal entity")
+@Schema(description = LegalEntityDescription.headerUpdateRequest)
 data class LegalEntityPartnerUpdateRequest(
-    @Schema(description = "Business Partner Number")
+
+    @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String,
 
-    @get:Schema(description = "Legal name the partner goes by")
+    @get:Schema(description = LegalEntityDescription.legalName)
     val legalName: String,
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityDescription.legalAddress)
     val legalAddress: LogisticAddressDto,
-
-    )
-
+)

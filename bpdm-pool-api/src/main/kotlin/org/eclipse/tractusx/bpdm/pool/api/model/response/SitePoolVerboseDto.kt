@@ -22,17 +22,19 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SitePoolVerboseDto", description = "Site with legal entity reference.")
+@Schema(description = SiteDescription.header)
 data class SitePoolVerboseDto(
 
     @field:JsonUnwrapped
     val site: SiteVerboseDto,
 
-    @Schema(description = "Main address where this site resides")
+    // TODO OpenAPI description for complex field does not work!!
+    @Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressVerboseDto,
 )

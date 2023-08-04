@@ -20,16 +20,18 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(name = "Classification", description = "Classification record for a business partner")
+@Schema(description = ClassificationDescription.header)
 data class ClassificationDto(
-    @get:Schema(description = "Name of the classification")
+
+    @get:Schema(description = ClassificationDescription.value)
     val value: String?,
 
-    @get:Schema(description = "Identifying code of the classification, if applicable")
+    @get:Schema(description = ClassificationDescription.code)
     val code: String?,
 
-    @get:Schema(description = "Type of specified classification")
+    @get:Schema(description = ClassificationDescription.type)
     val type: ClassificationType
 )

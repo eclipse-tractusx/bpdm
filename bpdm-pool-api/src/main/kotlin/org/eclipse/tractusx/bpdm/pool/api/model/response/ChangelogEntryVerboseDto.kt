@@ -21,21 +21,22 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ChangelogDescription
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import java.time.Instant
 
-@Schema(name = "ChangelogEntryVerboseDto", description = "Changelog entry for a business partner")
+@Schema(description = ChangelogDescription.header)
 data class ChangelogEntryVerboseDto(
 
-    @Schema(description = "Business Partner Number of the changelog entry")
+    @get:Schema(description = ChangelogDescription.bpn)
     val bpn: String,
 
-    @Schema(description = "The type of the business partner this change refers to")
+    @get:Schema(description = ChangelogDescription.businessPartnerType)
     val businessPartnerType: BusinessPartnerType,
 
-    @Schema(description = "The timestamp of the change")
+    @get:Schema(description = ChangelogDescription.timestamp)
     val timestamp: Instant,
 
-    @Schema(description = "The type of the change")
+    @get:Schema(description = ChangelogDescription.changelogType)
     val changelogType: ChangelogType
 )

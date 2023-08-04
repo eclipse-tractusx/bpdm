@@ -17,22 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+object LegalFormDescription {
+    const val header = "A legal form is a mandatory corporate legal framework by which companies can conduct " +
+            "business, charitable or other permissible activities."
 
-@Schema(description = LegalEntityIdentifierDescription.header)
-data class LegalEntityIdentifierVerboseDto(
-
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    const val technicalKey = "The technical identifier of the legal form according to ISO 20275."
+    const val name = "The name of legal form according to ISO 20275."
+    const val abbreviation = "The abbreviated name of the legal form, such as AG for German Aktiengesellschaft."
+}

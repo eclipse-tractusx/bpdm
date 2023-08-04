@@ -21,26 +21,28 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import java.time.Instant
 
-@Schema(name = "SiteVerboseDto", description = "Site of a legal entity")
+@Schema(description = SiteDescription.header)
 data class SiteVerboseDto(
-    
-    @get:Schema(description = "Business Partner Number, main identifier value for sites")
+
+    @get:Schema(description = SiteDescription.bpns)
     val bpns: String,
 
-    @get:Schema(description = "Site name")
+    @get:Schema(description = SiteDescription.name)
     val name: String,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    @ArraySchema(arraySchema = Schema(description = SiteDescription.states))
     val states: Collection<SiteStateVerboseDto> = emptyList(),
 
-    @get:Schema(description = "Business Partner Number of the related legal entity")
+    @get:Schema(description = SiteDescription.bpnLegalEntity)
     val bpnLegalEntity: String,
 
-    @get:Schema(description = "The timestamp the business partner data was created")
+    @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
-    @get:Schema(description = "The timestamp the business partner data was last updated")
+    @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant
 )
