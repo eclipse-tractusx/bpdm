@@ -126,4 +126,5 @@ private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateI
         legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
         externalId = legalEntity.externalId
     )
+
 }
