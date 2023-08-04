@@ -47,6 +47,7 @@ import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
@@ -103,8 +104,8 @@ internal class ChangeLogControllerIT @Autowired constructor(
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
-            .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)))
+            .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
+            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)))
     }
 
 
@@ -151,13 +152,12 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id and timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
-
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
-            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)))
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
+            .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)))
     }
 
     /**
@@ -168,15 +168,15 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by businessPartnerType`() {
 
-        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamAddress))
+        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)
                 )
             )
     }
@@ -189,7 +189,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
     @Test
     fun `get changeLog by businessPartnerType not found`() {
-        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamNotFound))
+        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamNotFound))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -204,15 +204,15 @@ internal class ChangeLogControllerIT @Autowired constructor(
      */
     @Test
     fun `get changeLog by businessPartnerType and timeStamp`() {
-        val searchRequest = ChangeLogSearchRequest(businessPartnerType = setOf(businessPartnerTypeParamAddress), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)
                 )
             )
     }
@@ -225,16 +225,16 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(businessPartnerType = emptySet(), fromTime = instant)
+        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = emptySet(), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
-        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::modifiedAt.name}")
+        assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant),
-                    ChangelogGateDto(CommonValues.externalId1, businessPartnerTypeParamLegalEntity, instant),
-                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant)
+                    ChangelogGateDto(CommonValues.legalEntityAddressId, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE),
+                    ChangelogGateDto(CommonValues.externalId1, businessPartnerTypeParamLegalEntity, instant, ChangelogType.CREATE),
+                    ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)
                 )
             )
     }

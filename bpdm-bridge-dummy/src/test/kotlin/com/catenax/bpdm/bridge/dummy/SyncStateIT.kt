@@ -125,15 +125,15 @@ class SyncStateIT @Autowired constructor(
         Assertions.assertThat(loggedRequests.size).isEqualTo(3)
 
         // 1st sync polls from initial timestamp (2000-01-01)
-        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).fromTime
+        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).timestampAfter
         Assertions.assertThat(pollFrom1stSync).isEqualTo(TS_INITIAL_POLL_FROM)
 
         // 2nd sync polls from around timestamp of 1st successful sync
-        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).fromTime
+        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).timestampAfter
         Assertions.assertThat(pollFrom2ndSync).isBetween(tsBefore1stSuccessfulSync, tsAfter1stSuccessfulSync)
 
         // 3rd sync polls from around timestamp of 2nd successful sync
-        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).fromTime
+        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).timestampAfter
         Assertions.assertThat(pollFrom3rdSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
     }
 
@@ -211,23 +211,23 @@ class SyncStateIT @Autowired constructor(
         Assertions.assertThat(loggedRequests.size).isEqualTo(5)
 
         // 1st sync polls from initial timestamp (2000-01-01)
-        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).fromTime
+        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).timestampAfter
         Assertions.assertThat(pollFrom1stSync).isEqualTo(TS_INITIAL_POLL_FROM)
 
         // 2nd sync polls from around timestamp of 1st successful sync
-        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).fromTime
+        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).timestampAfter
         Assertions.assertThat(pollFrom2ndSync).isBetween(tsBefore1stSuccessfulSync, tsAfter1stSuccessfulSync)
 
         // 3rd sync still polls from same timestamp because last sync has failed!
-        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).fromTime
+        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).timestampAfter
         Assertions.assertThat(pollFrom3rdSync).isEqualTo(pollFrom2ndSync)
 
         // 4th sync still polls from same timestamp because last sync has failed!
-        val pollFrom4thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[3]).fromTime
+        val pollFrom4thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[3]).timestampAfter
         Assertions.assertThat(pollFrom4thSync).isEqualTo(pollFrom2ndSync)
 
         // 5th sync polls from around timestamp of 2nd successful sync
-        val pollFrom5thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[4]).fromTime
+        val pollFrom5thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[4]).timestampAfter
         Assertions.assertThat(pollFrom5thSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
     }
 

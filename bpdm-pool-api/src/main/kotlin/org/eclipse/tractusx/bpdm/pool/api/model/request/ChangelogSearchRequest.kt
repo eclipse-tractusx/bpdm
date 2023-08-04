@@ -26,8 +26,9 @@ import java.time.Instant
 
 @Schema(name = "ChangeLogSearchRequest", description = "Request for searching and filtering the business partner changelog")
 data class ChangelogSearchRequest(
+
     @Schema(description = "Changelog entries should be created after this time", example = "2023-03-20T10:23:28.194Z")
-    val fromTime: Instant? = null,
+    val timestampAfter: Instant? = null,
 
     @Schema(description = "Only show changelog entries for business partners with the given BPNs. Empty means no restriction.")
     val bpns: Set<String>? = null,

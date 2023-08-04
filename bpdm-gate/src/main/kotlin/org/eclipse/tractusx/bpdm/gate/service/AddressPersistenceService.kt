@@ -20,14 +20,18 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.entity.Site
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
@@ -40,7 +44,8 @@ class AddressPersistenceService(
     private val gateAddressRepository: GateAddressRepository,
     private val legalEntityRepository: LegalEntityRepository,
     private val siteEntityRepository: SiteRepository,
-    private val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService,
+    private val changelogRepository: ChangelogRepository
 ) {
 
     @Transactional
@@ -62,13 +67,17 @@ class AddressPersistenceService(
 
             val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord, dataType)
 
-            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }?.let { existingAddress ->
-                updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
-                gateAddressRepository.save(existingAddress)
-            } ?: run {
-                gateAddressRepository.save(fullAddress)
-                sharingStateService.upsertSharingState(address.toSharingStateDTO())
-            }
+            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }
+                ?.let { existingAddress ->
+                    updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
+                    gateAddressRepository.save(existingAddress)
+                    saveChangelog(address.externalId, ChangelogType.UPDATE, dataType)
+                }
+                ?: run {
+                    gateAddressRepository.save(fullAddress)
+                    sharingStateService.upsertSharingState(address.toSharingStateDTO())
+                    saveChangelog(address.externalId, ChangelogType.CREATE, dataType)
+                }
         }
     }
 
@@ -104,16 +113,20 @@ class AddressPersistenceService(
 
             val fullAddress = address.toAddressGateOutput(legalEntityRecord, siteRecord, dataType)
 
-            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }?.let { existingAddress ->
-                updateAddressOutput(existingAddress, address, legalEntityRecord, siteRecord)
-                gateAddressRepository.save(existingAddress)
-            } ?: run {
-                if (addressRecord.find { it.externalId == fullAddress.externalId && it.dataType == OutputInputEnum.Input } == null) {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Logistic Address doesn't exist")
-                } else {
-                    gateAddressRepository.save(fullAddress)
+            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }
+                ?.let { existingAddress ->
+                    updateAddressOutput(existingAddress, address, legalEntityRecord, siteRecord)
+                    gateAddressRepository.save(existingAddress)
+                    saveChangelog(address.externalId, ChangelogType.UPDATE, dataType)
                 }
-            }
+                ?: run {
+                    if (addressRecord.find { it.externalId == fullAddress.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Logistic Address doesn't exist")
+                    } else {
+                        gateAddressRepository.save(fullAddress)
+                        saveChangelog(address.externalId, ChangelogType.CREATE, dataType)
+                    }
+                }
             sharingStateService.upsertSharingState(address.toSharingStateDTO(SharingStateType.Success))
         }
     }
@@ -131,6 +144,10 @@ class AddressPersistenceService(
         address.nameParts.replace(changeAddress.address.nameParts.map { toNameParts(it, address, null, null) })
         address.roles.replace(changeAddress.address.roles.distinct().map { toRoles(it, null, null, address) })
 
+    }
+
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, outputInputEnum: OutputInputEnum) {
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.ADDRESS, changelogType, outputInputEnum))
     }
 
 }

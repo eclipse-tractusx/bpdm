@@ -23,7 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
-
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 
 @Entity
 @Table(name = "changelog_entries")
@@ -31,15 +31,17 @@ class ChangelogEntry(
 
     @Column(name = "external_id", nullable = false, updatable = false)
     val externalId: String,
+
     @Enumerated(EnumType.STRING)
     @Column(name = "business_partner_type", nullable = false, updatable = false)
     val businessPartnerType: BusinessPartnerType,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "changelog_type", nullable = false, updatable = false)
+    val changelogType: ChangelogType,
+
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
     var dataType: OutputInputEnum
 
-
 ) : BaseEntity()
-
-
-

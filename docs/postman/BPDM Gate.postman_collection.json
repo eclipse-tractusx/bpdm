@@ -641,7 +641,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromTime\": \"2020-12-16T05:54:48.942Z\",\n  \"externalIds\": [\n    \"12044444\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
+              "raw": "{\n  \"timestampAfter\": \"2020-12-16T05:54:48.942Z\",\n  \"externalIds\": [\n    \"12044444\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -681,7 +681,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromTime\": \"2020-12-16T05:54:48.942Z\",\n  \"externalIds\": [\n    \"12044444\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
+              "raw": "{\n  \"timestampAfter\": \"2020-12-16T05:54:48.942Z\",\n  \"externalIds\": [\n    \"12044444\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

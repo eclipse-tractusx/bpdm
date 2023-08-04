@@ -910,7 +910,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromTime\": \"2023-03-21T09:00:25.298594Z\",\n  \"bpns\": [\n    \"BPNL000000000001\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
+              "raw": "{\n  \"timestampAfter\": \"2023-03-21T09:00:25.298594Z\",\n  \"bpns\": [\n    \"BPNL000000000001\"\n  ],\n  \"businessPartnerTypes\": [\n    \"LEGAL_ENTITY\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

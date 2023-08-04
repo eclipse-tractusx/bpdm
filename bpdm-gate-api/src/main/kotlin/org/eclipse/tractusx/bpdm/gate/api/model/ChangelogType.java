@@ -17,20 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.request
+package org.eclipse.tractusx.bpdm.gate.api.model;
 
-import io.swagger.v3.oas.annotations.Parameter
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import java.time.Instant
-
-data class ChangeLogSearchRequest(
-
-    @field:Parameter(description = "From when to search changelog entries", example = "2023-03-20T10:23:28.194Z", required = false)
-    val timestampAfter: Instant? = null,
-
-    @field:Parameter(description = "External-IDs of business partners for which to search changelog entries. Ignored if empty", required = false)
-    val externalIds: Set<String>? = emptySet(),
-
-    @field:Parameter(description = "Business partner types for which to search changelog entries. Ignored if empty", required = false)
-    val businessPartnerTypes: Set<BusinessPartnerType>? = emptySet()
-)
+public enum ChangelogType {
+    CREATE,
+    UPDATE
+}

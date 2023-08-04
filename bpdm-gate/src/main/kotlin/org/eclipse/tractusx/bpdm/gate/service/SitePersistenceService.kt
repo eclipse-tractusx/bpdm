@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -57,26 +58,28 @@ class SitePersistenceService(
 
             val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }?.let { existingSite ->
+            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }
+                ?.let { existingSite ->
+                    val logisticAddressRecord = getAddressRecord(getMainAddressExternalIdForSiteExternalId(site.externalId), datatype)
 
-                val logisticAddressRecord = getAddressRecord(getMainAddressForSiteExternalId(site.externalId), datatype)
-
-                updateAddress(logisticAddressRecord, fullSite.mainAddress)
-                updateSite(existingSite, site, legalEntityRecord)
-                siteRepository.save(existingSite)
-                saveChangelog(site.externalId, datatype)
-            } ?: run {
-                siteRepository.save(fullSite)
-                saveChangelog(site.externalId, datatype)
-                sharingStateService.upsertSharingState(site.toSharingStateDTO())
-            }
+                    updateAddress(logisticAddressRecord, fullSite.mainAddress)
+                    updateSite(existingSite, site, legalEntityRecord)
+                    siteRepository.save(existingSite)
+                    saveChangelog(site.externalId, ChangelogType.UPDATE, datatype)
+                }
+                ?: run {
+                    siteRepository.save(fullSite)
+                    saveChangelog(site.externalId, ChangelogType.CREATE, datatype)
+                    sharingStateService.upsertSharingState(site.toSharingStateDTO())
+                }
         }
     }
 
     //Creates Changelog For both Site and Logistic Address when they are created or updated
-    private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForSiteExternalId(externalId), BusinessPartnerType.ADDRESS, outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, outputInputEnum))
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, outputInputEnum: OutputInputEnum) {
+        val mainAddressExternalId = getMainAddressExternalIdForSiteExternalId(externalId)
+        changelogRepository.save(ChangelogEntry(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, changelogType, outputInputEnum))
     }
 
     private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {
@@ -129,22 +132,23 @@ class SitePersistenceService(
 
             val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }?.let { existingSite ->
+            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }
+                ?.let { existingSite ->
+                    val logisticAddressRecord = getAddressRecord(getMainAddressExternalIdForSiteExternalId(site.externalId), datatype)
 
-                val logisticAddressRecord = getAddressRecord(getMainAddressForSiteExternalId(site.externalId), datatype)
-
-                updateAddress(logisticAddressRecord, fullSite.mainAddress)
-                updateSiteOutput(existingSite, site, legalEntityRecord)
-                siteRepository.save(existingSite)
-                saveChangelog(site.externalId, datatype)
-            } ?: run {
-                if (siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
-                } else {
-                    siteRepository.save(fullSite)
-                    saveChangelog(site.externalId, datatype)
+                    updateAddress(logisticAddressRecord, fullSite.mainAddress)
+                    updateSiteOutput(existingSite, site, legalEntityRecord)
+                    siteRepository.save(existingSite)
+                    saveChangelog(site.externalId, ChangelogType.UPDATE, datatype)
                 }
-            }
+                ?: run {
+                    if (siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
+                    } else {
+                        siteRepository.save(fullSite)
+                        saveChangelog(site.externalId, ChangelogType.CREATE, datatype)
+                    }
+                }
             sharingStateService.upsertSharingState(site.toSharingStateDTO(SharingStateType.Success))
         }
     }

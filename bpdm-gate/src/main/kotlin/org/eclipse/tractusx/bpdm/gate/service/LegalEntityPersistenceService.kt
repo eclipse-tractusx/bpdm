@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.AddressState
@@ -56,29 +57,34 @@ class LegalEntityPersistenceService(
         //Business Partner persist
         legalEntities.forEach { legalEntity ->
             val fullLegalEntity = legalEntity.toLegalEntity(datatype)
-            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }?.let { existingLegalEntity ->
+            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }
+                ?.let { existingLegalEntity ->
+                    val logisticAddressRecord =
+                        gateAddressRepository.findByExternalIdAndDataType(
+                            getLegalAddressExternalIdForLegalEntityExternalId(existingLegalEntity.externalId),
+                            datatype
+                        )
+                            ?: throw BpdmNotFoundException("Business Partner", "Error")
 
-                val logisticAddressRecord =
-                    gateAddressRepository.findByExternalIdAndDataType(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId), datatype)
-                        ?: throw BpdmNotFoundException("Business Partner", "Error")
+                    updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
+                    updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
 
-                updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
-                updateLegalEntity(existingLegalEntity, legalEntity, logisticAddressRecord)
-
-                gateLegalEntityRepository.save(existingLegalEntity)
-                saveChangelog(legalEntity.externalId, datatype)
-            } ?: run {
-                gateLegalEntityRepository.save(fullLegalEntity)
-                saveChangelog(legalEntity.externalId, datatype)
-                sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO())
-            }
+                    gateLegalEntityRepository.save(existingLegalEntity)
+                    saveChangelog(legalEntity.externalId, ChangelogType.UPDATE, datatype)
+                }
+                ?: run {
+                    gateLegalEntityRepository.save(fullLegalEntity)
+                    saveChangelog(legalEntity.externalId, ChangelogType.CREATE, datatype)
+                    sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO())
+                }
         }
     }
 
-    //Creates Changelog For both Legal Entity and Logistic Address when they are created or updated
-    private fun saveChangelog(externalId: String, outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(getMainAddressForLegalEntityExternalId(externalId), BusinessPartnerType.ADDRESS, outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.LEGAL_ENTITY, outputInputEnum))
+    //Creates Changelog for both Legal Entity and Logistic Address when they are created or updated
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, outputInputEnum: OutputInputEnum) {
+        val legalAddressExternalId = getLegalAddressExternalIdForLegalEntityExternalId(externalId)
+        changelogRepository.save(ChangelogEntry(legalAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.LEGAL_ENTITY, changelogType, outputInputEnum))
     }
 
     private fun updateLegalEntity(
@@ -127,25 +133,29 @@ class LegalEntityPersistenceService(
         //Business Partner persist
         legalEntities.forEach { legalEntity ->
             val fullLegalEntity = legalEntity.toLegalEntity(datatype)
-            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }?.let { existingLegalEntity ->
+            legalEntityRecord.find { it.externalId == legalEntity.externalId && it.dataType == datatype }
+                ?.let { existingLegalEntity ->
+                    val logisticAddressRecord =
+                        gateAddressRepository.findByExternalIdAndDataType(
+                            getLegalAddressExternalIdForLegalEntityExternalId(existingLegalEntity.externalId),
+                            datatype
+                        )
+                            ?: throw BpdmNotFoundException("Business Partner", "Error")
 
-                val logisticAddressRecord =
-                    gateAddressRepository.findByExternalIdAndDataType(getMainAddressForLegalEntityExternalId(existingLegalEntity.externalId), datatype)
-                        ?: throw BpdmNotFoundException("Business Partner", "Error")
+                    updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
+                    updateLegalEntityOutput(existingLegalEntity, legalEntity, logisticAddressRecord)
 
-                updateAddress(logisticAddressRecord, fullLegalEntity.legalAddress)
-                updateLegalEntityOutput(existingLegalEntity, legalEntity, logisticAddressRecord)
-
-                gateLegalEntityRepository.save(existingLegalEntity)
-                saveChangelog(legalEntity.externalId, datatype)
-            } ?: run {
-                if (legalEntityRecord.find { it.externalId == fullLegalEntity.externalId && it.dataType == OutputInputEnum.Input } == null) {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Legal Entity doesn't exist")
-                } else {
-                    gateLegalEntityRepository.save(fullLegalEntity)
-                    saveChangelog(legalEntity.externalId, datatype)
+                    gateLegalEntityRepository.save(existingLegalEntity)
+                    saveChangelog(legalEntity.externalId, ChangelogType.UPDATE, datatype)
                 }
-            }
+                ?: run {
+                    if (legalEntityRecord.find { it.externalId == fullLegalEntity.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                        throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Legal Entity doesn't exist")
+                    } else {
+                        gateLegalEntityRepository.save(fullLegalEntity)
+                        saveChangelog(legalEntity.externalId, ChangelogType.CREATE, datatype)
+                    }
+                }
             sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO(SharingStateType.Success))
         }
     }
