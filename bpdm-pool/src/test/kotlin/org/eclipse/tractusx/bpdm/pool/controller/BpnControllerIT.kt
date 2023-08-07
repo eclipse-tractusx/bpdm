@@ -19,21 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
-import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.pool.util.RequestValues
-import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -44,18 +38,11 @@ import org.springframework.test.context.ContextConfiguration
     properties = ["bpdm.controller.search-request-limit=2"]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
-    companion object {
-        @RegisterExtension
-        val wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-    }
 
     val identifierType = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().type
     val identifierValue1 = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().value

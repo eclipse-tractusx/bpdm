@@ -198,9 +198,7 @@ class TestHelpers(
         return startSyncAndAwaitResult(client, syncPath, SyncStatus.SUCCESS)
     }
 
-    fun startSyncAndAwaitError(client: WebTestClient, syncPath: String): SyncDto {
-        return startSyncAndAwaitResult(client, syncPath, SyncStatus.ERROR)
-    }
+
 
     private fun startSyncAndAwaitResult(client: WebTestClient, syncPath: String, status: SyncStatus): SyncDto {
 

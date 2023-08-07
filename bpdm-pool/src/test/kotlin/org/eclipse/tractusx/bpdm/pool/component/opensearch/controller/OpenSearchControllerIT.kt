@@ -21,9 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.component.opensearch.controller
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
@@ -35,13 +32,10 @@ import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSear
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.reactive.server.WebTestClient
 
 
@@ -61,23 +55,7 @@ class OpenSearchControllerIT @Autowired constructor(
     private val poolClient: PoolClientImpl
 ) {
 
-    companion object {
-        // Configuration properties of Saas mock
-        private val exchangeApiUrl: String = "data-exchange/rest/v4"
-        private val storage: String = "storage_id"
-        val readBusinessPartnerUrl = "/${exchangeApiUrl}/storages/${storage}/businesspartners"
 
-        @RegisterExtension
-        var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-        @JvmStatic
-        @DynamicPropertySource
-        fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.saas.host") { wireMockServer.baseUrl() }
-        }
-    }
 
     // We import 3 legal entities which result in 6 OpenSearch records: 3 for the LEs itself and 3 for the corresponding legal addresses.
     val partnerDocs = listOf(
@@ -99,14 +77,6 @@ class OpenSearchControllerIT @Autowired constructor(
             partnerDocs
         )
 
-        wireMockServer.stubFor(
-            WireMock.get(WireMock.urlPathMatching(readBusinessPartnerUrl))
-                .willReturn(
-                    WireMock.aResponse()
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(objectMapper.writeValueAsString(importCollection))
-                )
-        )
         testHelpers.createTestMetadata()
         testHelpers.createBusinessPartnerStructure(
             listOf(
