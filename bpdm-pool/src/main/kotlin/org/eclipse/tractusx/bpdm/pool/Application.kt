@@ -25,14 +25,7 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 
 
-@SpringBootApplication(
-    scanBasePackages = [
-        "org.eclipse.tractusx.bpdm.pool.config",
-        "org.eclipse.tractusx.bpdm.pool.controller",
-        "org.eclipse.tractusx.bpdm.pool.repository",
-        "org.eclipse.tractusx.bpdm.pool.service"
-    ]
-)
+@SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableScheduling
 class Application

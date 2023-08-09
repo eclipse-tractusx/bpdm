@@ -75,7 +75,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         testHelpers.truncateDbTables()
-        //webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
+
         poolClient.opensearch().clear()
         testHelpers.createTestMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))

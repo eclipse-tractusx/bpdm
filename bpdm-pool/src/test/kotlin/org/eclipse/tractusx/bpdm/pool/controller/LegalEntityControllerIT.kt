@@ -44,7 +44,7 @@ import java.time.Instant
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,

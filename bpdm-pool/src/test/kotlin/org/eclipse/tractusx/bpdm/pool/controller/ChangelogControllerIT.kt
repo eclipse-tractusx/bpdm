@@ -43,7 +43,7 @@ import java.util.*
     properties = ["bpdm.controller.search-request-limit=2"]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
 class ChangelogControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl

@@ -36,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolApiClient

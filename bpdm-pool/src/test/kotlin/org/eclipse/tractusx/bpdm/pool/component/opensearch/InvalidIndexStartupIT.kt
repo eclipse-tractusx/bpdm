@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -32,7 +30,6 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.opensearch.client.opensearch.OpenSearchClient
 import org.opensearch.client.opensearch._types.Refresh
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,13 +52,7 @@ class InvalidIndexStartupIT @Autowired constructor(
     private val poolClient: PoolClientImpl
 ) {
 
-    companion object {
-        @RegisterExtension
-        var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
 
-    }
 
     val bpnBogusDocument = "BPN_FAKE"
 

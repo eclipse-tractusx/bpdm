@@ -19,8 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.component.opensearch
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -31,7 +29,6 @@ import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
@@ -51,13 +48,6 @@ class ValidIndexStartupIT @Autowired constructor(
     val poolClient: PoolClientImpl
 ) {
 
-    companion object {
-        @RegisterExtension
-        var wireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
-
-    }
 
     /**
      * Not a real test but prepares the OpenSearch container for the next test that will be run in a fresh Spring-Boot context

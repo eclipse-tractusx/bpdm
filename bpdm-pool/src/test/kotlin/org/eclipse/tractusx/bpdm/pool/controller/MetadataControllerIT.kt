@@ -61,7 +61,7 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
 class MetadataControllerIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val webTestClient: WebTestClient,

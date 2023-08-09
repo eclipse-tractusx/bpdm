@@ -21,13 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.util
 
 object EndpointValues {
 
-    const val TEXT_PARAM_NAME = "text"
-
     const val CATENA_PATH = "/api/catena"
 
-    const val CATENA_BUSINESS_PARTNERS_PATH = "$CATENA_PATH/business-partners"
-    const val CATENA_BUSINESS_PARTNER_LEGACY_PATH = "$CATENA_PATH/business-partner"
-    const val CATENA_CHANGELOG_PATH_POSTFIX = "/changelog"
     const val CATENA_LEGAL_ENTITY_PATH = "$CATENA_PATH/legal-entities"
 
 
