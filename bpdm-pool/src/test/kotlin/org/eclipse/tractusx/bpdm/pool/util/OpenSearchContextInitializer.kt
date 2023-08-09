@@ -57,8 +57,7 @@ class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableA
         TestPropertyValues.of(
             "bpdm.opensearch.host=${openSearchContainer.host}",
             "bpdm.opensearch.port=${openSearchContainer.getMappedPort(OPENSEARCH_PORT)}",
-            "bpdm.opensearch.scheme=http",
-            "bpdm.opensearch.enabled=true"
+            "bpdm.opensearch.scheme=http"
         ).applyTo(applicationContext.environment)
     }
 }

@@ -24,7 +24,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "bpdm.opensearch")
 class OpenSearchConfigProperties(
-    val enabled: Boolean = false,
     val host: String = "localhost",
     val port: Int = 9200,
     val scheme: String = "http",

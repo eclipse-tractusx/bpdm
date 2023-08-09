@@ -66,7 +66,6 @@ class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableA
             "bpdm.opensearch.host=${openSearchContainer.host}",
             "bpdm.opensearch.port=${openSearchContainer.getMappedPort(OPENSEARCH_PORT)}",
             "bpdm.opensearch.scheme=http",
-            "bpdm.opensearch.enabled=true",
         ).applyTo(applicationContext.environment)
     }
 }
