@@ -85,8 +85,6 @@ object RequestValues {
     val classification5 = ClassificationDto(CommonValues.classification5, null, CommonValues.classificationType)
 
 
-    val version1 = AddressVersionDto(CommonValues.characterSet1, CommonValues.language0)
-
     val postalAddress1 = PhysicalPostalAddressDto(
         basePhysicalAddress = BasePhysicalAddressDto(
             companyPostalCode = CommonValues.postCode2,
