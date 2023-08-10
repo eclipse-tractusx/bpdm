@@ -22,7 +22,7 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the gate and pool applications
-version: 3.0.2
+version: 3.0.3
 appVersion: "4.0.0"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
