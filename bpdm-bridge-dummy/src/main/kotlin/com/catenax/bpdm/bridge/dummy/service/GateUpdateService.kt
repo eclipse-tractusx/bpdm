@@ -270,7 +270,7 @@ class GateUpdateService(
 
     private fun putAddressOutput(request: AddressGateOutputRequest?) =
         request?.let {
-            gateClient.addresses().putAddressesOutput(listOf(it))
+            gateClient.addresses().upsertAddressesOutput(listOf(it))
         }
 
     private fun upsertSharingState(request: SharingStateDto?) =

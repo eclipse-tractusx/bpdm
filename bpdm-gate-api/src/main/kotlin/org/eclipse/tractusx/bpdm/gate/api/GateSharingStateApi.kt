@@ -41,7 +41,7 @@ import org.springframework.web.service.annotation.PutExchange
 interface GateSharingStateApi {
 
     @Operation(
-        summary = "Get sharing states (including error info and BPN) for business partners, optionally filtered by LSA type and external ID"
+        summary = "Returns sharing states of business partners, optionally filtered by a business partner type and an array of external IDs"
     )
     @ApiResponses(
         value = [
@@ -53,20 +53,19 @@ interface GateSharingStateApi {
     fun getSharingStates(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @Parameter(description = "Business partner type") @RequestParam(required = false) businessPartnerType: BusinessPartnerType?,
-        @Parameter(description = "External identifiers") @RequestParam(required = false) externalIds: Collection<String>?
+        @Parameter(description = "External IDs") @RequestParam(required = false) externalIds: Collection<String>?
     ): PageDto<SharingStateDto>
 
     @Operation(
-        summary = "Insert/update sharing state (including error info and BPN) for business partner with LSA type and external ID"
+        summary = "Creates or updates a sharing state of a business partner"
     )
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "204", description = "Operation completed successfully"),
-            ApiResponse(responseCode = "400", description = "Invalid data (e.g. externalId)", content = [Content()])
+            ApiResponse(responseCode = "400", description = "Invalid data (e.g. external ID)", content = [Content()])
         ]
     )
     @PutMapping
     @PutExchange
     fun upsertSharingState(@RequestBody request: SharingStateDto)
-
 }

@@ -45,10 +45,10 @@ import org.springframework.web.service.annotation.PutExchange
 interface GateLegalEntityApi {
 
     @Operation(
-        summary = "Create or update legal entities.",
+        summary = "Creates or updates an existing legal entity in the input stage",
         description = "Create or update legal entities. " +
-                "Updates instead of creating a new legal entity if an already existing external id is used. " +
-                "The same external id may not occur more than once in a single request. " +
+                "Updates instead of creating a new legal entity if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a single request. " +
                 "For a single request, the maximum number of legal entities in the request is limited to \${bpdm.api.upsert-limit} entries."
     )
     @ApiResponses(
@@ -62,22 +62,22 @@ interface GateLegalEntityApi {
     fun upsertLegalEntities(@RequestBody legalEntities: Collection<LegalEntityGateInputRequest>): ResponseEntity<Unit>
 
     @Operation(
-        summary = "Get legal entity by external identifier",
-        description = "Get legal entity by external identifier."
+        summary = "Returns legal entity by external ID from the input stage",
+        description = "Returns legal entity by external ID from the input stage."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Found legal entity with external identifier"),
-            ApiResponse(responseCode = "404", description = "No legal entity found under specified external identifier", content = [Content()])
+            ApiResponse(responseCode = "200", description = "Found legal entity with external ID"),
+            ApiResponse(responseCode = "404", description = "No legal entity found under specified external ID", content = [Content()])
         ]
     )
     @GetMapping("/input/legal-entities/{externalId}")
     @GetExchange("/input/legal-entities/{externalId}")
-    fun getLegalEntityByExternalId(@Parameter(description = "External identifier") @PathVariable externalId: String): LegalEntityGateInputDto
+    fun getLegalEntityByExternalId(@Parameter(description = "External ID") @PathVariable externalId: String): LegalEntityGateInputDto
 
     @Operation(
-        summary = "Get page of legal-entities filtered by a collection of externalIds",
-        description = "Get page of legal-entities filtered by a collection of externalIds."
+        summary = "Returns legal entities by an array of external IDs from the input stage",
+        description = "Returns page of legal entities from the input stage. Can optionally be filtered by external IDs."
     )
     @ApiResponses(
         value = [
@@ -93,8 +93,8 @@ interface GateLegalEntityApi {
     ): PageDto<LegalEntityGateInputDto>
 
     @Operation(
-        summary = "Get page of legal entities",
-        description = "Get page of legal entities."
+        summary = "Returns legal entities from the input stage",
+        description = "Returns page of legal entities from the input stage."
     )
     @ApiResponses(
         value = [
@@ -107,8 +107,8 @@ interface GateLegalEntityApi {
     fun getLegalEntities(@ParameterObject @Valid paginationRequest: PaginationRequest): PageDto<LegalEntityGateInputDto>
 
     @Operation(
-        summary = "Get page of legal entities",
-        description = "Get page of legal entities. Can optionally be filtered by external ids."
+        summary = "Returns legal entities by an array of external IDs from the output stage",
+        description = "Get page of legal entities from the output stage. Can optionally be filtered by external IDs."
     )
     @ApiResponses(
         value = [
@@ -124,10 +124,10 @@ interface GateLegalEntityApi {
     ): PageDto<LegalEntityGateOutputResponse>
 
     @Operation(
-        summary = "Create or update output legal entities.",
+        summary = "Creates or updates an existing legal entity in the output stage",
         description = "Create or update legal entities (Output). " +
-                "Updates instead of creating a new legal entity if an already existing external id is used. " +
-                "The same external id may not occur more than once in a single request. " +
+                "Updates instead of creating a new legal entity if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a single request. " +
                 "For a single request, the maximum number of legal entities in the request is limited to \${bpdm.api.upsert-limit} entries."
     )
     @ApiResponses(
@@ -139,5 +139,4 @@ interface GateLegalEntityApi {
     @PutMapping("/output/legal-entities")
     @PutExchange("/output/legal-entities")
     fun upsertLegalEntitiesOutput(@RequestBody legalEntities: Collection<LegalEntityGateOutputRequest>): ResponseEntity<Unit>
-
 }

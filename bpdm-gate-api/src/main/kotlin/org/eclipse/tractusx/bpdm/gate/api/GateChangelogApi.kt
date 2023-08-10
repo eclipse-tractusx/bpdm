@@ -38,10 +38,10 @@ import org.springframework.web.service.annotation.PostExchange
 @HttpExchange("/api/catena")
 interface GateChangelogApi {
 
-
     @Operation(
-        summary = "Get business partner changelog entries for changes to the business partner input data",
-        description = "Get business partner changelog entries for changes to the business partner input data. Filter by list external id, from timestamp and/or lsa type"
+        summary = "Returns changelog entries for changes to the business partner input stage",
+        description = "Returns changelog entries as of a specified timestamp from the input stage, " +
+                "optionally filtered by timestamp, an array of external IDs and a business partner type."
     )
     @ApiResponses(
         value = [
@@ -56,10 +56,10 @@ interface GateChangelogApi {
         @RequestBody searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto>
 
-
     @Operation(
-        summary = "Get business partner changelog entries for changes to the business partner output data",
-        description = "Get business partner changelog entries for changes to the business partner output data. Filter by list external id, from timestamp and/or lsa type"
+        summary = "Returns changelog entries for changes to the business partner output stage",
+        description = "Returns changelog entries as of a specified timestamp from the output stage, " +
+                "optionally filtered by timestamp, an array of external IDs and a business partner type."
     )
     @ApiResponses(
         value = [

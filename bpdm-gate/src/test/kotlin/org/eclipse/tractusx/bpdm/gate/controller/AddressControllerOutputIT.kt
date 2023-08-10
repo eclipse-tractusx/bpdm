@@ -128,7 +128,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
             gateClient.sites().upsertSitesOutput(siteOutput)
 
             gateClient.addresses().upsertAddresses(addresses)
-            gateClient.addresses().putAddressesOutput(addressesOutput)
+            gateClient.addresses().upsertAddressesOutput(addressesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -154,7 +154,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.addresses().putAddressesOutput(addresses)
+            gateClient.addresses().upsertAddressesOutput(addresses)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -183,7 +183,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
             gateClient.legalEntities().upsertLegalEntities(legalEntity)
             gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
 
-            gateClient.addresses().putAddressesOutput(addresses)
+            gateClient.addresses().upsertAddressesOutput(addresses)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -245,7 +245,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         gateClient.sites().upsertSitesOutput(siteOutput)
 
         gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().putAddressesOutput(addressesOutput)
+        gateClient.addresses().upsertAddressesOutput(addressesOutput)
 
 
         val paginationValue = PaginationRequest(page, size)
@@ -315,7 +315,7 @@ internal class AddressControllerOutputIT @Autowired constructor(
         gateClient.sites().upsertSitesOutput(siteOutput)
 
         gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().putAddressesOutput(addressesOutput)
+        gateClient.addresses().upsertAddressesOutput(addressesOutput)
 
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))

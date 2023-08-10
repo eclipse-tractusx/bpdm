@@ -28,7 +28,7 @@ data class ChangelogSearchRequest(
     @field:Parameter(description = "From when to search changelog entries", example = "2023-03-20T10:23:28.194Z", required = false)
     val timestampAfter: Instant? = null,
 
-    @field:Parameter(description = "External-IDs of business partners for which to search changelog entries. Ignored if empty", required = false)
+    @field:Parameter(description = "External IDs of business partners for which to search changelog entries. Ignored if empty", required = false)
     val externalIds: Set<String>? = emptySet(),
 
     @field:Parameter(description = "Business partner types for which to search changelog entries. Ignored if empty", required = false)
