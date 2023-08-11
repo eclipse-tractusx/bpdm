@@ -26,27 +26,33 @@ import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import java.time.LocalDateTime
 
 @Schema(
-    name = "SharingState"
+    description = "A sharing state entry shows the progress in the sharing process and is updated each time the " +
+            "progress for a business partner changes. The business partner is identified by a combination " +
+            "of external ID and business partner type."
 )
 data class SharingStateDto(
-    @get:Schema(description = "LSA Type")
+
+    @get:Schema(description = "One of the types of business partners for which the sharing state entry was created.")
     val businessPartnerType: BusinessPartnerType,
 
-    @get:Schema(description = "External identifier")
+    @get:Schema(description = "The external identifier of the business partner for which the sharing state entry was created.")
     val externalId: String,
 
-    @get:Schema(description = "Type of sharing state")
+    @get:Schema(description = "One of the sharing state types of the current sharing state.")
     val sharingStateType: SharingStateType = SharingStateType.Initial,
 
-    @get:Schema(description = "Sharing error code (for error)")
+    @get:Schema(description = "One of the sharing error codes in case the current sharing state type is \"error\".")
     val sharingErrorCode: BusinessPartnerSharingError? = null,
 
-    @get:Schema(description = "Sharing error message (for error)")
+    @get:Schema(description = "The error message in case the current sharing state type is \"error\".")
     val sharingErrorMessage: String? = null,
 
-    @get:Schema(description = "BPN (for success)")
+    @get:Schema(
+        description = "The business partner number associated to the combination of external identifier and business partner type " +
+                "in case the sharing state type is “success”. Can be either a BPNL, BPNS or BPNA."
+    )
     val bpn: String? = null,
 
-    @get:Schema(description = "Sharing process started (not updated if null)")
+    @get:Schema(description = "The date and time when the sharing process was started.")
     val sharingProcessStarted: LocalDateTime? = null
 )

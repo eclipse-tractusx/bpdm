@@ -306,13 +306,7 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
     return logisticAddress
 }
 
-//Collection
 fun getNamePartValues(nameparts: MutableSet<NameParts>): Collection<String> {
-    return nameparts.map { it.namePart }
-}
-
-//List
-fun getNamePartValuesToList(nameparts: MutableSet<NameParts>): List<String> {
     return nameparts.map { it.namePart }
 }
 
@@ -431,7 +425,7 @@ fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalE
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
         roles = roles.map { it.roleName },
         externalId = legalEntity.externalId,
-        legalNameParts = getNamePartValuesToList(nameParts)
+        legalNameParts = getNamePartValues(nameParts)
     )
 }
 

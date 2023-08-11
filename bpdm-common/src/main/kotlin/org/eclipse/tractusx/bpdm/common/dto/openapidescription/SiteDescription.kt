@@ -31,16 +31,22 @@ object SiteDescription {
             "addresses belong to which site. A site is uniquely identified by the BPNS."
     const val headerCreateRequest = "Request for creating new business partner record of type site. $header"
     const val headerUpdateRequest = "Request for updating a business partner record of type site. $header"
-    const val headerCreateResponse = "Created business partner of type site. $header"
+    const val headerUpsertRequest = "Request for creating/updating a business partner record of type site. $header"
+    const val headerUpsertResponse = "Created/updated business partner of type site. $header"
     const val headerMatchResponse = "Match for a business partner record of type site. $header"
 
     const val bpns = "A BPNS represents and uniquely identifies a site, which is where for example a production plant, " +
             "a warehouse, or an office building is located."
     const val name = "The name of the site. This is not according to official registers but according to the name the owner chooses."
+    const val nameParts = "The list of name parts of the site to accommodate the different number of name fields in different systems. " +
+            "This is not according to official registers but according to the name the owner chooses."
     const val states = "The list of the (temporary) states of the site."
     const val bpnLegalEntity = "The BPNL of the legal entity owning the site."
     const val mainAddress = "The address, where typically the main entrance or the reception is located, or where the mail is delivered to."
+    const val roles = "Roles this business partner takes in relation to the sharing member."
 
     const val bpnlParent = "The BPNL of the legal entity owning the site."
+    const val legalEntityExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
+            "the business partner owning the site."
     const val site = "Site information"
 }

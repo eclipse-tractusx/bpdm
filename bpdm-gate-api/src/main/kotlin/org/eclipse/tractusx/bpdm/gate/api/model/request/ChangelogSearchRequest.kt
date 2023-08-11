@@ -19,18 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
-import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 data class ChangelogSearchRequest(
 
-    @field:Parameter(description = "From when to search changelog entries", example = "2023-03-20T10:23:28.194Z", required = false)
+    @get:Schema(
+        description = "Only changelog entries created after this time. Ignored if empty.",
+        example = "2023-03-20T10:23:28.194Z"
+    )
     val timestampAfter: Instant? = null,
 
-    @field:Parameter(description = "External IDs of business partners for which to search changelog entries. Ignored if empty", required = false)
+    @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of external IDs. Ignored if empty."))
     val externalIds: Set<String>? = emptySet(),
 
-    @field:Parameter(description = "Business partner types for which to search changelog entries. Ignored if empty", required = false)
+    @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of business partner types. Ignored if empty."))
     val businessPartnerTypes: Set<BusinessPartnerType>? = emptySet()
 )

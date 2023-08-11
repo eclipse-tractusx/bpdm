@@ -22,26 +22,26 @@ package org.eclipse.tractusx.bpdm.gate.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "SiteGateInputRequest", description = "Site with legal entity reference"
-)
+@Schema(description = SiteDescription.headerUpsertRequest)
 data class SiteGateInputRequest(
 
     @field:JsonUnwrapped
     val site: SiteGateDto,
 
-    @get:Schema(description = "Main address where this site resides")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressGateDto,
 
-    @Schema(description = "ID the record has in the external system where the record originates from")
+    @get:Schema(description = CommonDescription.externalId)
     val externalId: String,
 
-    @Schema(description = "External id of the related legal entity")
+    @get:Schema(description = SiteDescription.legalEntityExternalId)
     val legalEntityExternalId: String,
-
-    )
+)

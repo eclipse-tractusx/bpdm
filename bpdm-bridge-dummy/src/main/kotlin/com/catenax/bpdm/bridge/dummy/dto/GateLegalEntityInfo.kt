@@ -23,7 +23,7 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 
 data class GateLegalEntityInfo(
-    val legalNameParts: List<String>,
+    val legalNameParts: Collection<String>,
     val legalEntity: LegalEntityDto,
     val legalAddress: AddressGateInputDto,
     val externalId: String,

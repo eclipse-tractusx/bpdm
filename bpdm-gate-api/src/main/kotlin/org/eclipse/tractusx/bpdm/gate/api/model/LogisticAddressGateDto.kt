@@ -24,27 +24,28 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.AddressStateDto
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-
-@Schema(name = "LogisticAddressGateDto", description = "Address record for a business partner")
+@Schema(description = LogisticAddressDescription.header)
 data class LogisticAddressGateDto(
-    @get:Schema(
-        description = "Name of the logistic address of the business partner. This is not according to official\n" +
-                "registers but according to the name the uploading sharing member chooses."
-    )
+
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.nameParts))
     val nameParts: Collection<String> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "Indicates if the LogisticAddress is \"Active\" or \"Inactive\"."))
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
     val states: Collection<AddressStateDto> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "List of identifiers"))
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
     val identifiers: Collection<AddressIdentifierDto> = emptyList(),
 
-    @get:Schema(description = "Physical postal address")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
     val physicalPostalAddress: PhysicalPostalAddressGateDto,
 
-    @get:Schema(description = "Alternative postal address")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
     val alternativePostalAddress: AlternativePostalAddressDto? = null,
 
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList()
 )

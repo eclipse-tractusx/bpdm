@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = LegalEntityDescription.headerCreateResponse)
+@Schema(description = LegalEntityDescription.headerUpsertResponse)
 data class LegalEntityPartnerCreateVerboseDto(
 
     @get:Schema(description = LegalEntityDescription.legalName)

@@ -27,4 +27,5 @@ object ChangelogDescription {
     const val timestamp = "The date and time when the changelog entry was created."
     const val businessPartnerType = "One of the types of business partners for which the changelog entry was created: legal entity, site, address."
     const val bpn = "The business partner number for which the changelog entry was created. Can be either a BPNL, BPNS or BPNA."
+    const val externalId = "The external identifier of the business partner for which the changelog entry was created."
 }

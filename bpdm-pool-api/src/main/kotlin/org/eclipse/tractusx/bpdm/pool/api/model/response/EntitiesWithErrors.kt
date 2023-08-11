@@ -36,37 +36,37 @@ open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
         get() = errors.size
 }
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class LegalEntityPartnerCreateResponseWrapper(
     override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityCreateError>>
 ) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityCreateError>(entities, errors)
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class LegalEntityPartnerUpdateResponseWrapper(
     override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityUpdateError>>
 ) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityUpdateError>(entities, errors)
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class SitePartnerCreateResponseWrapper(
     override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteCreateError>>
 ) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteCreateError>(entities, errors)
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class SitePartnerUpdateResponseWrapper(
     override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteUpdateError>>
 ) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteUpdateError>(entities, errors)
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class AddressPartnerCreateResponseWrapper(
     override val entities: Collection<AddressPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressCreateError>>
 ) : EntitiesWithErrors<AddressPartnerCreateVerboseDto, AddressCreateError>(entities, errors)
 
-@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
+@Schema(description = CommonDescription.headerEntityWithErrorsWrapper)
 data class AddressPartnerUpdateResponseWrapper(
     override val entities: Collection<LogisticAddressVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressUpdateError>>

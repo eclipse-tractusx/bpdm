@@ -20,11 +20,13 @@
 package org.eclipse.tractusx.bpdm.common.dto.openapidescription
 
 object CommonDescription {
+    const val headerEntityWithErrorsWrapper = "Holds information about successfully and failed entities after the creating/updating of several objects"
+
     const val createdAt = "The date when the data record has been created."
     const val updatedAt = "The date when the data record has been last updated."
 
     const val index = "User defined index to conveniently match this entry to the corresponding entry in the response."
     const val score = "Relative quality score of the match. The higher the better."
 
-    const val entityWithErrorsWrapperHeader = "Holds information about successfully and failed entities after the creating/updating of several objects"
+    const val externalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
 }

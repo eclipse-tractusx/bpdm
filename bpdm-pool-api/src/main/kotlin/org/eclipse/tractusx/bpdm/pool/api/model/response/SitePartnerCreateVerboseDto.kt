@@ -29,16 +29,16 @@ import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = SiteDescription.headerCreateResponse)
+@Schema(description = SiteDescription.headerUpsertResponse)
 data class SitePartnerCreateVerboseDto(
 
     @field:JsonUnwrapped
     val site: SiteVerboseDto,
 
     // TODO OpenAPI description for complex field does not work!!
-    @Schema(description = SiteDescription.mainAddress)
+    @get:Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressVerboseDto,
 
-    @Schema(description = CommonDescription.index)
+    @get:Schema(description = CommonDescription.index)
     val index: String?
 )
