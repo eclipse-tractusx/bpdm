@@ -151,7 +151,7 @@ interface GateLegalEntityApi {
         ]
     )
 
-    @GetMapping("/input/legal-entities/search/csv")
+    @GetMapping("/input/legal-entities/search/csv", produces = ["text/csv"])
     @GetExchange("/input/legal-entities/search/csv")
-    fun getLegalEntitiesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
+    fun getLegalEntitiesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): String
 }

@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputRe
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.LegalEntityService
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -85,11 +84,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
-    override fun getLegalEntitiesToCsv(paginationRequest: PaginationRequest): ResponseEntity<Any?> {
-
-        return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"legalEntities\"")
-            .body(legalEntityService.downloadLegalEntitiesCsv(page = paginationRequest.page, size = paginationRequest.size).toString())
+    override fun getLegalEntitiesToCsv(paginationRequest: PaginationRequest): String {
+        return legalEntityService.downloadLegalEntitiesCsv(page = paginationRequest.page, size = paginationRequest.size).toString()
     }
 }

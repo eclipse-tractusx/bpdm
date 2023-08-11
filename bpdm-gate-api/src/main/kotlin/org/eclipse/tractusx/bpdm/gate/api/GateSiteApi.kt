@@ -151,8 +151,8 @@ interface GateSiteApi {
         ]
     )
 
-    @GetMapping("/input/sites/search/csv")
+    @GetMapping("/input/sites/search/csv", produces = ["text/csv"])
     @GetExchange("/input/sites/search/csv")
-    fun getSitesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
+    fun getSitesToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): String
 
 }

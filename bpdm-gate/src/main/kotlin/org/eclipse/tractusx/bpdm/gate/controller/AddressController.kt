@@ -29,7 +29,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -96,12 +95,9 @@ class AddressController(
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
-    override fun getAddressToCsv(paginationRequest: PaginationRequest): ResponseEntity<Any?> {
+    override fun getAddressToCsv(paginationRequest: PaginationRequest): String {
 
-        return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_TYPE, "text/csv; charset=UTF-8")
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"addresses\"")
-            .body(addressService.downloadAddressCsv(page = paginationRequest.page, size = paginationRequest.size).toString())
+        return addressService.downloadAddressCsv(page = paginationRequest.page, size = paginationRequest.size).toString()
     }
 
 }

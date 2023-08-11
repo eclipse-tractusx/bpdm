@@ -157,8 +157,8 @@ interface GateAddressApi {
         ]
     )
 
-    @GetMapping("/input/addresses/search/csv")
+    @GetMapping("/input/addresses/search/csv", produces = ["text/csv"])
     @GetExchange("/input/addresses/search/csv")
-    fun getAddressToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): ResponseEntity<Any?>
+    fun getAddressToCsv(@ParameterObject @Valid paginationRequest: PaginationRequest): String
 
 }
