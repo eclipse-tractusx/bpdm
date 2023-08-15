@@ -4,16 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [4.0.0] - 2023-08-04
+## [4.0.0] - 2023-08-15
+
+### Note
+
+This version introduces breaking changes. Migration files will DELETE existing data in order to perform migration.
+Please create a back-up of your business partner data before updating.
 
 ### Changed
-  - BPDM Pool API: Adapt new data model for easier and more intuitive usage, independent of SaaS data model.
-  - BPDM Gate API: Adapt new data model for easier and more intuitive usage, independent of SaaS data model.
-  - BPDM: Update dependencies to mitigate vulnerabilities in old versions.
+
+- BPDM Pool API: Adapt new data model for easier and more intuitive usage, independent of SaaS data model.
+- BPDM Gate API: Adapt new data model for easier and more intuitive usage, independent of SaaS data model.
+- BPDM: Update dependencies to mitigate vulnerabilities in old versions.
 
 ### Added
-  - BPDM bridge dummy: As new application module.
-  - BPDM: Umbrella Chart with BPDM Bridge Dummy.
+
+- BPDM bridge dummy: As new application module.
+- BPDM: Umbrella Chart with BPDM Bridge Dummy.
 
 ### Fixed
   - BPDM: Deprecated endpoints for retrieving business partners in legacy format.
