@@ -30,12 +30,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
@@ -44,6 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest as GateChangelogSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest as PoolChangelogSearchRequest
 
 private val DEFAULT_PAGINATION_REQUEST = PaginationRequest(0, 100)
 
@@ -67,7 +67,7 @@ class BridgeSyncIT @Autowired constructor(
     fun `just use API clients`() {
         assertGateChangelogHasCount(0)
         val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
-            paginationRequest = DEFAULT_PAGINATION_REQUEST, changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
+            paginationRequest = DEFAULT_PAGINATION_REQUEST, changelogSearchRequest = PoolChangelogSearchRequest(timestampAfter = null, bpns = null)
         )
         assertThat(poolChangelogResponses.contentSize).isZero()
         bridgeClient.bridge().triggerSync()
@@ -220,7 +220,7 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertGateChangelogHasCount(changelogCount: Int) {
         val gateChangelogResponses = gateClient.changelog().getInputChangelog(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
-            searchRequest = ChangeLogSearchRequest(timestampAfter = null, businessPartnerTypes = emptySet())
+            searchRequest = GateChangelogSearchRequest(timestampAfter = null, businessPartnerTypes = emptySet())
         )
         assertThat(gateChangelogResponses.contentSize).isEqualTo(changelogCount)
     }
@@ -228,7 +228,7 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertPoolChangelogHasCount(changelogCount: Int) {
         val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
-            changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
+            changelogSearchRequest = PoolChangelogSearchRequest(timestampAfter = null, bpns = null)
 
         )
         assertThat(poolChangelogResponses.contentSize).isEqualTo(changelogCount)

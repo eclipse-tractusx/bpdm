@@ -48,7 +48,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -99,7 +99,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id`() {
 
-        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1))
+        val searchRequest = ChangelogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -117,7 +117,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id not found`() {
 
-        val searchRequest = ChangeLogSearchRequest(externalIds = setOf("NONEXIST"))
+        val searchRequest = ChangelogSearchRequest(externalIds = setOf("NONEXIST"))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -152,7 +152,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by external id and timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), timestampAfter = instant)
+        val searchRequest = ChangelogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -168,7 +168,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog by businessPartnerType`() {
 
-        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress))
+        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -189,7 +189,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
     @Test
     fun `get changeLog by businessPartnerType not found`() {
-        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamNotFound))
+        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamNotFound))
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -204,7 +204,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
      */
     @Test
     fun `get changeLog by businessPartnerType and timeStamp`() {
-        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress), timestampAfter = instant)
+        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
 
@@ -225,7 +225,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     @Test
     fun `get changeLog from timeStamp`() {
 
-        val searchRequest = ChangeLogSearchRequest(businessPartnerTypes = emptySet(), timestampAfter = instant)
+        val searchRequest = ChangelogSearchRequest(businessPartnerTypes = emptySet(), timestampAfter = instant)
 
         val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 

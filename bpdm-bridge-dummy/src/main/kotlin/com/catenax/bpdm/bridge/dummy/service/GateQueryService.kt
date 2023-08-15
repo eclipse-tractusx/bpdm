@@ -27,7 +27,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -47,7 +47,7 @@ class GateQueryService(
 
         do {
             val pageResponse = gateClient.changelog().getInputChangelog(
-                searchRequest = ChangeLogSearchRequest(timestampAfter = modifiedAfter),
+                searchRequest = ChangelogSearchRequest(timestampAfter = modifiedAfter),
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
             page++
