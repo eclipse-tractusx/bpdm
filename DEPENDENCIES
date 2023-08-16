@@ -4,13 +4,13 @@ maven/mavencentral/com.carrotsearch/hppc/0.8.1, Apache-2.0, approved, CQ22339
 maven/mavencentral/com.fasterxml.jackson.core/jackson-annotations/2.15.2, Apache-2.0, approved, #7947
 maven/mavencentral/com.fasterxml.jackson.core/jackson-core/2.15.2, MIT AND Apache-2.0, approved, #7932
 maven/mavencentral/com.fasterxml.jackson.core/jackson-databind/2.15.2, Apache-2.0, approved, #7934
-maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.15.2, Apache-2.0, restricted, clearlydefined
-maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.15.2, Apache-2.0, restricted, clearlydefined
+maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.15.2, Apache-2.0, approved, #10053
+maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-smile/2.15.2, Apache-2.0, approved, #10052
 maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-toml/2.15.2, Apache-2.0, approved, #9160
 maven/mavencentral/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.15.2, Apache-2.0, approved, #8802
 maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.15.2, Apache-2.0, approved, #8808
 maven/mavencentral/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.15.2, Apache-2.0, approved, #7930
-maven/mavencentral/com.fasterxml.jackson.module/jackson-module-kotlin/2.15.2, Apache-2.0, restricted, clearlydefined
+maven/mavencentral/com.fasterxml.jackson.module/jackson-module-kotlin/2.15.2, Apache-2.0, approved, #10051
 maven/mavencentral/com.fasterxml.jackson.module/jackson-module-parameter-names/2.15.2, Apache-2.0, approved, #8803
 maven/mavencentral/com.fasterxml/classmate/1.5.1, Apache-2.0, approved, clearlydefined
 maven/mavencentral/com.github.spullara.mustache.java/compiler/0.9.10, Apache-2.0, approved, CQ14417
@@ -132,7 +132,6 @@ maven/mavencentral/org.springdoc/springdoc-openapi-starter-webmvc-ui/2.0.0, Apac
 maven/mavencentral/org.springframework.boot/spring-boot-actuator-autoconfigure/3.1.2, Apache-2.0, approved, #9348
 maven/mavencentral/org.springframework.boot/spring-boot-actuator/3.1.2, Apache-2.0, approved, #9342
 maven/mavencentral/org.springframework.boot/spring-boot-autoconfigure/3.1.2, Apache-2.0, approved, #9341
-maven/mavencentral/org.springframework.boot/spring-boot-configuration-processor/3.1.2, , restricted, clearlydefined
 maven/mavencentral/org.springframework.boot/spring-boot-starter-actuator/3.1.2, Apache-2.0, approved, #9344
 maven/mavencentral/org.springframework.boot/spring-boot-starter-aop/3.1.2, Apache-2.0, approved, #9338
 maven/mavencentral/org.springframework.boot/spring-boot-starter-data-jpa/3.1.2, Apache-2.0, approved, #9733
