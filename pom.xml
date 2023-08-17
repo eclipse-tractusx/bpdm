@@ -233,6 +233,7 @@
                                 <sourceDirs>
                                     <sourceDir>src/main/kotlin</sourceDir>
                                 </sourceDirs>
+                                <!-- Excluded spring-boot-configuration-processor from the actual build -->
                                 <annotationProcessorPaths>
                                     <annotationProcessorPath>
                                         <groupId>org.springframework.boot</groupId>
