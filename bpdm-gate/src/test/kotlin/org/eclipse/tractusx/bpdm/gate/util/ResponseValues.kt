@@ -187,24 +187,6 @@ object ResponseValues {
         )
     )
 
-    val logisticAddress1 = LogisticAddressGateVerboseDto(
-        bpna = CommonValues.bpnAddress1,
-        physicalPostalAddress = address1,
-        bpnLegalEntity = CommonValues.bpn1,
-        bpnSite = "BPNS0000000001XY",
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-    )
-
-    val logisticAddress2 = LogisticAddressGateVerboseDto(
-        bpna = CommonValues.bpnAddress2,
-        physicalPostalAddress = address2,
-        bpnLegalEntity = CommonValues.bpn2,
-        bpnSite = "BPNS0000000002XY",
-        createdAt = Instant.now(),
-        updatedAt = Instant.now()
-    )
-
     val legalEntityResponsePool1 = PoolLegalEntityVerboseDto(
         legalName = CommonValues.name1,
         legalAddress = LogisticAddressVerboseDto(

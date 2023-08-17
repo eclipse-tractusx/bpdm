@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
-data class ChangeLogSearchRequest(
+data class ChangelogSearchRequest(
 
     @field:Parameter(description = "From when to search changelog entries", example = "2023-03-20T10:23:28.194Z", required = false)
     val timestampAfter: Instant? = null,

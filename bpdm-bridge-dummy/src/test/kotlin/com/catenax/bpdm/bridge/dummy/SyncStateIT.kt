@@ -29,7 +29,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.service.BaseSyncRecordService
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -125,15 +125,15 @@ class SyncStateIT @Autowired constructor(
         Assertions.assertThat(loggedRequests.size).isEqualTo(3)
 
         // 1st sync polls from initial timestamp (2000-01-01)
-        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).timestampAfter
+        val pollFrom1stSync = parseBody<ChangelogSearchRequest>(loggedRequests[0]).timestampAfter
         Assertions.assertThat(pollFrom1stSync).isEqualTo(TS_INITIAL_POLL_FROM)
 
         // 2nd sync polls from around timestamp of 1st successful sync
-        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).timestampAfter
+        val pollFrom2ndSync = parseBody<ChangelogSearchRequest>(loggedRequests[1]).timestampAfter
         Assertions.assertThat(pollFrom2ndSync).isBetween(tsBefore1stSuccessfulSync, tsAfter1stSuccessfulSync)
 
         // 3rd sync polls from around timestamp of 2nd successful sync
-        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).timestampAfter
+        val pollFrom3rdSync = parseBody<ChangelogSearchRequest>(loggedRequests[2]).timestampAfter
         Assertions.assertThat(pollFrom3rdSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
     }
 
@@ -211,23 +211,23 @@ class SyncStateIT @Autowired constructor(
         Assertions.assertThat(loggedRequests.size).isEqualTo(5)
 
         // 1st sync polls from initial timestamp (2000-01-01)
-        val pollFrom1stSync = parseBody<ChangeLogSearchRequest>(loggedRequests[0]).timestampAfter
+        val pollFrom1stSync = parseBody<ChangelogSearchRequest>(loggedRequests[0]).timestampAfter
         Assertions.assertThat(pollFrom1stSync).isEqualTo(TS_INITIAL_POLL_FROM)
 
         // 2nd sync polls from around timestamp of 1st successful sync
-        val pollFrom2ndSync = parseBody<ChangeLogSearchRequest>(loggedRequests[1]).timestampAfter
+        val pollFrom2ndSync = parseBody<ChangelogSearchRequest>(loggedRequests[1]).timestampAfter
         Assertions.assertThat(pollFrom2ndSync).isBetween(tsBefore1stSuccessfulSync, tsAfter1stSuccessfulSync)
 
         // 3rd sync still polls from same timestamp because last sync has failed!
-        val pollFrom3rdSync = parseBody<ChangeLogSearchRequest>(loggedRequests[2]).timestampAfter
+        val pollFrom3rdSync = parseBody<ChangelogSearchRequest>(loggedRequests[2]).timestampAfter
         Assertions.assertThat(pollFrom3rdSync).isEqualTo(pollFrom2ndSync)
 
         // 4th sync still polls from same timestamp because last sync has failed!
-        val pollFrom4thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[3]).timestampAfter
+        val pollFrom4thSync = parseBody<ChangelogSearchRequest>(loggedRequests[3]).timestampAfter
         Assertions.assertThat(pollFrom4thSync).isEqualTo(pollFrom2ndSync)
 
         // 5th sync polls from around timestamp of 2nd successful sync
-        val pollFrom5thSync = parseBody<ChangeLogSearchRequest>(loggedRequests[4]).timestampAfter
+        val pollFrom5thSync = parseBody<ChangelogSearchRequest>(loggedRequests[4]).timestampAfter
         Assertions.assertThat(pollFrom5thSync).isBetween(tsBefore2ndSuccessfulSync, tsAfter2ndSuccessfulSync)
     }
 

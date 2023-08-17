@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
-import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangeLogSearchRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.PageChangeLogDto
 import org.eclipse.tractusx.bpdm.gate.service.ChangelogService
@@ -38,7 +38,7 @@ class ChangelogController(
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyInputDataAsRole())")
     override fun getInputChangelog(
-        paginationRequest: PaginationRequest, searchRequest: ChangeLogSearchRequest
+        paginationRequest: PaginationRequest, searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
@@ -53,7 +53,7 @@ class ChangelogController(
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getReadCompanyOutputDataAsRole())")
     override fun getOutputChangelog(
         paginationRequest: PaginationRequest,
-        searchRequest: ChangeLogSearchRequest
+        searchRequest: ChangelogSearchRequest
     ): PageChangeLogDto<ChangelogGateDto> {
         return changelogService.getChangeLogEntries(
             searchRequest.externalIds,
