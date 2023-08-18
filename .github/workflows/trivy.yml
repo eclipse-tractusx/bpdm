@@ -59,7 +59,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "ghcr.io/${{ github.repository }}/pool:latest"
+          image-ref: "docker.io/tractusx/bpdm-pool:latest"
           format: "sarif"
           output: "trivy-results2.sarif"
           exit-code: "1"
@@ -92,7 +92,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "ghcr.io/${{ github.repository }}/gate:latest"
+          image-ref: "docker.io/tractusx/bpdm-gate:latest"
           format: "sarif"
           output: "trivy-results3.sarif"
           exit-code: "1"
@@ -125,7 +125,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "ghcr.io/${{ github.repository }}/bridge-dummy:latest"
+          image-ref: "docker.io/tractusx/bpdm-bridge-dummy:latest"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "1"
