@@ -174,3 +174,10 @@ The Swagger login uses the client specified in the property `springdoc.swagger-u
 
 This repository contains Helm files for deploying the BPDM Bridge Dummy to a Kubernetes environment.
 See the [BPDM Bridge Dummy Helm README](/charts/bpdm/charts/bpdm-bridge-dummy/README.md) for details.
+
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- Source URL: https://github.com/eclipse-tractusx/bpdm
