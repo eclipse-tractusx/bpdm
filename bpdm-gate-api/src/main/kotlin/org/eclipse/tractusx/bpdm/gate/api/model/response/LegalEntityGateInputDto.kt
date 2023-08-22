@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
@@ -43,8 +44,7 @@ data class LegalEntityGateInputDto(
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
+    @get:Schema(ref = LogisticAddressDescription.legalAddressAliasForAddressGateInputDto)
     val legalAddress: AddressGateInputDto,
 
     @get:Schema(description = CommonDescription.externalId, required = true)

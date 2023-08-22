@@ -45,8 +45,6 @@ object LegalEntityDescription {
     const val legalNameParts = "The list of name parts of the legal entity to accommodate the different number of name fields in different systems."
     const val legalShortName = "The abbreviated name of the legal entity."
     const val legalForm = "The legal form of the legal entity."
-    const val legalAddress = "The official, legal correspondence address to be provided to government and tax authorities " +
-            "and used in all legal or court documents."
 
     const val identifiers = "The list of identifiers of the legal entity."
     const val states = "The list of (temporary) states of the legal entity."

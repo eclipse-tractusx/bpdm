@@ -60,4 +60,13 @@ object LogisticAddressDescription {
     const val siteExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
             "the business partner, representing the site, that the address belongs to."
     const val address = "Address information"
+
+    const val legalAddressAliasForAddressGateInputDto = "legalAddressAliasForAddressGateInputDto"
+    const val legalAddressAliasForAddressGateOutputDto = "legalAddressAliasForAddressGateOutputDto"
+    const val legalAddressAliasForAddressGateOutputChildRequest = "legalAddressAliasForAddressGateOutputChildRequest"
+    const val legalAddressAliasForLogisticAddressDto = "legalAddressAliasForLogisticAddressDto"
+    const val legalAddressAliasForLogisticAddressGateDto = "legalAddressAliasForLogisticAddressGateDto"
+    const val legalAddressAliasForLogisticAddressVerboseDto = "legalAddressAliasForLogisticAddressVerboseDto"
+    const val legalAddress = "The official, legal correspondence address to be provided to government and tax authorities " +
+            "and used in all legal or court documents."
 }

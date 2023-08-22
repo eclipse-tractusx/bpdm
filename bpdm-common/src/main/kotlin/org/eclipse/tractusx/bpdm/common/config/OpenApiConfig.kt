@@ -28,7 +28,10 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.*
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.GenericDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.springdoc.core.customizers.OpenApiCustomizer
 import org.springdoc.core.models.GroupedOpenApi
@@ -67,7 +70,17 @@ abstract class OpenApiConfig {
     open fun getSchemaOverrides(): Collection<SchemaOverrideInfo> {
         return setOf(
             // Generic types
-            schemaOverride<TypeKeyNameVerboseDto<CountryCode>>(GenericDescription.typeKeyNameCountryCode)
+            schemaOverride<TypeKeyNameVerboseDto<CountryCode>>(GenericDescription.typeKeyNameCountryCode),
+
+            // Schema copies with alternative description
+            schemaOverride<LogisticAddressDto>(
+                LogisticAddressDescription.legalAddress,
+                LogisticAddressDescription.legalAddressAliasForLogisticAddressDto
+            ),
+            schemaOverride<LogisticAddressVerboseDto>(
+                LogisticAddressDescription.legalAddress,
+                LogisticAddressDescription.legalAddressAliasForLogisticAddressVerboseDto
+            )
         )
     }
 

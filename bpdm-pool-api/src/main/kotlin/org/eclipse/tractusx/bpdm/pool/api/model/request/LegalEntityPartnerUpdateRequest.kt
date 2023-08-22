@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -40,7 +41,6 @@ data class LegalEntityPartnerUpdateRequest(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
+    @get:Schema(ref = LogisticAddressDescription.legalAddressAliasForLogisticAddressDto)
     val legalAddress: LogisticAddressDto,
 )

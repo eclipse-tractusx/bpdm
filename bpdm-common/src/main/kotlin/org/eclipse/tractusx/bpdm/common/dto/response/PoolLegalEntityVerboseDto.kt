@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -35,7 +36,6 @@ data class PoolLegalEntityVerboseDto(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityVerboseDto,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
+    @get:Schema(ref = LogisticAddressDescription.legalAddressAliasForLogisticAddressVerboseDto)
     val legalAddress: LogisticAddressVerboseDto,
 )

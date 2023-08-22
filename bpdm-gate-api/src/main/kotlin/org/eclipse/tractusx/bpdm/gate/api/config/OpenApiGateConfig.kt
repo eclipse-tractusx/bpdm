@@ -22,10 +22,42 @@ package org.eclipse.tractusx.bpdm.gate.api.config
 import org.eclipse.tractusx.bpdm.common.config.AppInfoProperties
 import org.eclipse.tractusx.bpdm.common.config.OpenApiConfig
 import org.eclipse.tractusx.bpdm.common.config.SecurityConfigProperties
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class OpenApiGateConfig(
     override val securityProperties: SecurityConfigProperties,
     override val infoProperties: AppInfoProperties
-) : OpenApiConfig()
+) : OpenApiConfig() {
+
+    override fun getSchemaOverrides(): Collection<SchemaOverrideInfo> {
+        return super.getSchemaOverrides()
+            .union(
+                setOf(
+                    // Schema copies with alternative description
+                    schemaOverride<AddressGateInputDto>(
+                        LogisticAddressDescription.legalAddress,
+                        LogisticAddressDescription.legalAddressAliasForAddressGateInputDto
+                    ),
+                    schemaOverride<AddressGateOutputDto>(
+                        LogisticAddressDescription.legalAddress,
+                        LogisticAddressDescription.legalAddressAliasForAddressGateOutputDto
+                    ),
+                    schemaOverride<AddressGateOutputChildRequest>(
+                        LogisticAddressDescription.legalAddress,
+                        LogisticAddressDescription.legalAddressAliasForAddressGateOutputChildRequest
+                    ),
+                    schemaOverride<LogisticAddressGateDto>(
+                        LogisticAddressDescription.legalAddress,
+                        LogisticAddressDescription.legalAddressAliasForLogisticAddressGateDto
+                    )
+                )
+            )
+    }
+
+}
