@@ -25,10 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -85,6 +82,53 @@ class LegalEntityControllerIT @Autowired constructor(
             .ignoringAllOverriddenEquals()
             .isEqualTo(expected)
         assertThat(response.errorCount).isEqualTo(0)
+    }
+
+    /**
+     * Given no legal entities
+     * When creating new legal entity with duplicate identifiers on legal entity and address
+     * Then new legal entity is returned with error
+     */
+    @Test
+    fun `create new legal entity and get duplicate error`() {
+
+        val expectedBpn = CommonValues.bpnL1
+        val expected = with(ResponseValues.legalEntityUpsert1) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    bpnl = expectedBpn
+                )
+            )
+        }
+
+
+        val toCreate = RequestValues.legalEntityCreate1
+        val secondRequest = toCreate.copy(index = CommonValues.index4)
+        val toCreate2 = RequestValues.legalEntityCreate3
+
+        // Create a new instance of LogisticAddressDto with the modified identifiers list
+        val response = poolClient.legalEntities().createBusinessPartners(listOf(toCreate,secondRequest,toCreate2))
+
+        val identifier = toCreate.legalEntity.identifiers.toList().get(0)
+
+
+
+        val expectedErrors = listOf(
+            ErrorInfo(
+                LegalEntityCreateError.LegalEntityDuplicateIdentifier,
+                "Identifier $identifier is duplicated among legal entities in the request",
+               toCreate.index
+            ) ,
+                    ErrorInfo(
+                    LegalEntityCreateError.LegalEntityDuplicateIdentifier,
+            "Identifier $identifier is duplicated among legal entities in the request",
+                        secondRequest.index
+        )
+        )
+
+        assertThat(response.errorCount).isEqualTo(2)
+        testHelpers.assertRecursively(response.errors)
+            .isEqualTo(expectedErrors)
     }
 
     /**

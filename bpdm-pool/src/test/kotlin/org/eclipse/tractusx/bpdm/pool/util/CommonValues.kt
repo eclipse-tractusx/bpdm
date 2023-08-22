@@ -52,6 +52,7 @@ object CommonValues {
     val index1 = "1"
     val index2 = "2"
     val index3 = "3"
+    val index4 = "4"
 
     val uuid1 = UUID.fromString("e9975a48-b190-4bf1-a7e6-73c6a1744de8")
 
