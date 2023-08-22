@@ -175,6 +175,15 @@
                     <exclude>*.properties</exclude>
                 </excludes>
             </resource>
+            <resource>
+                <directory>${project.basedir}/..</directory>
+                <includes>
+                    <include>LICENSE</include>
+                    <include>NOTICE.md</include>
+                    <include>DEPENDENCIES</include>
+                </includes>
+                <targetPath>META-INF/</targetPath>
+            </resource>
         </resources>
         <plugins>
             <plugin>
