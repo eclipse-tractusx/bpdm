@@ -20,22 +20,22 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
-@Schema(name = "BasePhysicalAddressDto", description = "Address record for the basical physical address fields")
 data class BasePhysicalAddressDto(
 
-    @get:Schema(description = "A separate postal code for a company, also known as postcode, PIN or ZIP Code")
+    @get:Schema(description = PostalAddressDescription.companyPostalCode)
     val companyPostalCode: String? = null,
 
-    @get:Schema(description = "The practice of designating an area for industrial development")
+    @get:Schema(description = PostalAddressDescription.industrialZone)
     val industrialZone: String? = null,
 
-    @get:Schema(description = "Describes a specific building within the address")
+    @get:Schema(description = PostalAddressDescription.building)
     val building: String? = null,
 
-    @get:Schema(description = "Describes the floor/level the delivery shall take place")
+    @get:Schema(description = PostalAddressDescription.floor)
     val floor: String? = null,
 
-    @get:Schema(description = "Describes the  door/room/suite on the respective floor the delivery shall take place")
+    @get:Schema(description = PostalAddressDescription.door)
     val door: String? = null,
 )

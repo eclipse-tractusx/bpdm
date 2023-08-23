@@ -20,22 +20,24 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteStateDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(name = "SiteStateVerboseDto", description = "Status record of a site")
+@Schema(description = SiteStateDescription.header)
 data class SiteStateVerboseDto(
 
-    @get:Schema(description = "Description of the status")
+    @get:Schema(description = SiteStateDescription.description)
     val description: String?,
 
-    @get:Schema(description = "Since when the status is/was valid")
+    @get:Schema(description = SiteStateDescription.validFrom)
     val validFrom: LocalDateTime?,
 
-    @get:Schema(description = "Until the status was valid, if applicable")
+    @get:Schema(description = SiteStateDescription.validTo)
     val validTo: LocalDateTime?,
 
-    @get:Schema(description = "The type of this status")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = SiteStateDescription.type)
     val type: TypeKeyNameVerboseDto<BusinessStateType>
 )

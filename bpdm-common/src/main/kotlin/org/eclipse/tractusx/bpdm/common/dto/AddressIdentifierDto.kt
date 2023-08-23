@@ -20,12 +20,14 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 
-@Schema(name = "AddressIdentifier", description = "Identifier record for a logistic address")
+@Schema(description = AddressIdentifierDescription.header)
 data class AddressIdentifierDto(
-    @get:Schema(description = "Value of the identifier")
+
+    @get:Schema(description = AddressIdentifierDescription.value)
     val value: String,
 
-    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
+    @get:Schema(description = AddressIdentifierDescription.type)
     val type: String,
 )

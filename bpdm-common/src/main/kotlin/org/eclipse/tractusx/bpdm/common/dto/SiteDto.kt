@@ -21,15 +21,18 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
-@Schema(name = "Site", description = "Site record")
+@Schema(description = SiteDescription.header)
 data class SiteDto(
-    @get:Schema(description = "Site name")
+
+    @get:Schema(description = SiteDescription.name)
     val name: String,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    @ArraySchema(arraySchema = Schema(description = SiteDescription.states))
     val states: Collection<SiteStateDto> = emptyList(),
 
-    @get:Schema(description = "Main address where this site resides")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressDto
 )

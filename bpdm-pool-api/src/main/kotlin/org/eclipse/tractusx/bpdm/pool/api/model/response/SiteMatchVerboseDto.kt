@@ -21,20 +21,23 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SiteMatchVerboseDto", description = "Match with score for a business partner record of type site.")
+@Schema(description = SiteDescription.headerMatchResponse)
 data class SiteMatchVerboseDto(
 
 //    @Schema(description = "Relative quality score of the match. The higher the better")
 //    val score: Float,
 
-    @Schema(description = "Main address where this site resides")
+    // TODO OpenAPI description for complex field does not work!!
+    @Schema(description = SiteDescription.mainAddress)
     val mainAddress: LogisticAddressVerboseDto,
 
-    @Schema(description = "Site information")
+    // TODO OpenAPI description for complex field does not work!!
+    @Schema(description = SiteDescription.site)
     val site: SiteVerboseDto,
 )

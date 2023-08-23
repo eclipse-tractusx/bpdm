@@ -23,12 +23,14 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "SitePartnerUpdateRequest", description = "Request for updating a business partner record of type site")
+@Schema(description = SiteDescription.headerUpdateRequest)
 data class SitePartnerUpdateRequest(
-    @Schema(description = "Business Partner Number of this site")
+
+    @Schema(description = SiteDescription.bpns)
     val bpns: String,
 
     @field:JsonUnwrapped

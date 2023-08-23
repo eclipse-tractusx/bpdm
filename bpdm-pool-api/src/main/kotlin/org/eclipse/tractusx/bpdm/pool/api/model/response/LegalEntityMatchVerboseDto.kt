@@ -22,23 +22,26 @@ package org.eclipse.tractusx.bpdm.pool.api.model.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityMatchVerboseDto", description = "Match with score for a business partner record of type legal entity")
+@Schema(description = LegalEntityDescription.headerMatchResponse)
 data class LegalEntityMatchVerboseDto(
 
-    @Schema(description = "Relative quality score of the match. The higher the better")
+    @get:Schema(description = CommonDescription.score)
     val score: Float,
 
-    @get:Schema(description = "Legal name the partner goes by")
+    @get:Schema(description = LegalEntityDescription.legalName)
     val legalName: String,
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityVerboseDto,
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityDescription.legalAddress)
     val legalAddress: LogisticAddressVerboseDto,
 )

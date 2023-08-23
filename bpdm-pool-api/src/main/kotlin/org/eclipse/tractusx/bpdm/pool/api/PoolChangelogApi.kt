@@ -41,8 +41,7 @@ import org.springframework.web.service.annotation.PostExchange
 interface PoolChangelogApi {
 
     @Operation(
-        summary = "Get business partner changelog entries from time, by BPN and/or LSA type",
-        description = "Get business partner changelog entries from time, by BPN and/or LSA type"
+        summary = "Returns changelog entries as of a specified timestamp, optionally filtered by a list of BPNL/S/A, or business partner types"
     )
     @ApiResponses(
         value = [

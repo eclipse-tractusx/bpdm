@@ -45,7 +45,7 @@ interface PoolSiteApi {
 
 
     @Operation(
-        summary = "Search Main Addresses",
+        summary = "Search for sites' main addresses",
         description = "Search main addresses of site business partners by BPNS"
     )
     @ApiResponses(
@@ -62,24 +62,24 @@ interface PoolSiteApi {
     ): Collection<MainAddressVerboseDto>
 
     @Operation(
-        summary = "Get site partners by bpn",
-        description = "Get business partners of type site by bpn-s ignoring case."
+        summary = "Returns a site by its BPNS",
+        description = "Get business partners of type site by BPNS ignoring case."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Found site with specified bpn"),
+            ApiResponse(responseCode = "200", description = "Found site with specified BPNS"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No site found under specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No site found under specified BPNS", content = [Content()])
         ]
     )
-    @GetMapping("/{bpn}")
-    @GetExchange("/{bpn}")
+    @GetMapping("/{bpns}")
+    @GetExchange("/{bpns}")
     fun getSite(
-        @Parameter(description = "Bpn value") @PathVariable bpn: String
+        @Parameter(description = "BPNS value") @PathVariable bpns: String
     ): SitePoolVerboseDto
 
     @Operation(
-        summary = "Search site partners by BPNs and/or parent BPNs",
+        summary = "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
         description = "Search business partners of type site by their BPNSs or by the BPNLs of their parent legal entities"
     )
     @ApiResponses(
@@ -96,7 +96,7 @@ interface PoolSiteApi {
     ): PageDto<SitePoolVerboseDto>
 
     @Operation(
-        summary = "Create new site business partners",
+        summary = "Creates a new site",
         description = "Create new business partners of type site by specifying the BPNL of the legal entity each site belongs to. " +
                 "If the legal entitiy cannot be found, the record is ignored." +
                 "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
@@ -115,7 +115,7 @@ interface PoolSiteApi {
     ): SitePartnerCreateResponseWrapper
 
     @Operation(
-        summary = "Update existing site business partners",
+        summary = "Updates an existing site",
         description = "Update existing business partner records of type site referenced via BPNS. " +
                 "The endpoint expects to receive the full updated record, including values that didn't change."
     )

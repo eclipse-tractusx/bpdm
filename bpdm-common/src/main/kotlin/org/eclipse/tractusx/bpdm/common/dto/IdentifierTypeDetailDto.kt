@@ -21,12 +21,14 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDescription
 
-@Schema(name = "IdentifierTypeDetailDto", description = "Identifier type validity details")
+@Schema(description = IdentifierTypeDescription.headerDetail)
 data class IdentifierTypeDetailDto(
-    @get:Schema(description = "Country in which this identifier is valid, null for universal identifiers")
+
+    @get:Schema(description = IdentifierTypeDescription.detailCountry)
     val country: CountryCode?,
 
-    @get:Schema(description = "True if identifier is mandatory in this country")
+    @get:Schema(description = IdentifierTypeDescription.detailMandatory)
     val mandatory: Boolean
 )

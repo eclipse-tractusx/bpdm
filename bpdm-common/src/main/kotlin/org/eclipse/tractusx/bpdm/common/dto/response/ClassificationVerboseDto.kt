@@ -20,18 +20,20 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(name = "ClassificationVerboseDto", description = "Classification record of a business partner")
+@Schema(description = ClassificationDescription.header)
 data class ClassificationVerboseDto(
 
-    @get:Schema(description = "Name of the classification")
+    @get:Schema(description = ClassificationDescription.value)
     val value: String? = null,
 
-    @get:Schema(description = "Identifying code of the classification, if applicable")
+    @get:Schema(description = ClassificationDescription.code)
     val code: String? = null,
 
-    @get:Schema(description = "Type of specified classification")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = ClassificationDescription.type)
     val type: TypeKeyNameVerboseDto<ClassificationType>
 )

@@ -21,48 +21,49 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import java.time.Instant
 
 
-@Schema(name = "LogisticAddressVerboseDto", description = "Logistic address ")
+@Schema(description = LogisticAddressDescription.header)
 data class LogisticAddressVerboseDto(
 
-    @get:Schema(description = "Business Partner Number of this address")
+    @get:Schema(description = LogisticAddressDescription.bpna)
     val bpna: String,
 
-    @get:Schema(
-        description = "Name of the logistic address of the business partner. This is not according to official\n" +
-                "registers but according to the name the uploading sharing member chooses."
-    )
+    @get:Schema(description = LogisticAddressDescription.name)
     val name: String? = null,
 
-    @ArraySchema(arraySchema = Schema(description = "Address status"))
+    @ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
     val states: Collection<AddressStateVerboseDto> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "All identifiers of the Address"))
+    @ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
     val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
 
-    @get:Schema(description = "Physical postal address")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
     val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
 
-    @get:Schema(description = "Alternative postal address")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
     val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
-    @get:Schema(description = "BPN of the related legal entity, if available")
+    @get:Schema(description = LogisticAddressDescription.bpnLegalEntity)
     val bpnLegalEntity: String?,
 
-    @get:Schema(name = "isLegalAddress", description = "Flag if this is the legal address of its related legal entity")
+    @get:Schema(name = "isLegalAddress", description = LogisticAddressDescription.isLegalAddress)
     val isLegalAddress: Boolean = false,
 
-    @get:Schema(description = "BPN of the related site, if available")
+    @get:Schema(description = LogisticAddressDescription.bpnSite)
     val bpnSite: String?,
 
-    @get:Schema(name = "isMainAddress", description = "Flag if this is the main address of its related site")
+    @get:Schema(name = "isMainAddress", description = LogisticAddressDescription.isMainAddress)
     val isMainAddress: Boolean = false,
 
-    @get:Schema(description = "The timestamp the business partner data was created")
+    @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
-    @get:Schema(description = "The timestamp the business partner data was last updated")
+    @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant
 )

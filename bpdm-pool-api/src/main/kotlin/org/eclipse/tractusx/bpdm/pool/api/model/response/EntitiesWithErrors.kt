@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 
 open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
@@ -35,59 +36,38 @@ open class EntitiesWithErrors<ENTITY, out ERROR : ErrorCode>(
         get() = errors.size
 }
 
-@Schema(
-    name = "LegalEntityCreateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class LegalEntityPartnerCreateResponseWrapper(
     override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityCreateError>>
 ) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityCreateError>(entities, errors)
 
-@Schema(
-    name = "LegalEntityUpdateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class LegalEntityPartnerUpdateResponseWrapper(
     override val entities: Collection<LegalEntityPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<LegalEntityUpdateError>>
 ) : EntitiesWithErrors<LegalEntityPartnerCreateVerboseDto, LegalEntityUpdateError>(entities, errors)
 
-@Schema(
-    name = "SiteCreateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class SitePartnerCreateResponseWrapper(
     override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteCreateError>>
 ) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteCreateError>(entities, errors)
 
-@Schema(
-    name = "SiteUpdateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class SitePartnerUpdateResponseWrapper(
     override val entities: Collection<SitePartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<SiteUpdateError>>
 ) : EntitiesWithErrors<SitePartnerCreateVerboseDto, SiteUpdateError>(entities, errors)
 
-@Schema(
-    name = "AddressCreateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class AddressPartnerCreateResponseWrapper(
     override val entities: Collection<AddressPartnerCreateVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressCreateError>>
 ) : EntitiesWithErrors<AddressPartnerCreateVerboseDto, AddressCreateError>(entities, errors)
 
-@Schema(
-    name = "AddressUpdateWrapper",
-    description = "Holds information about successfully and failed entities after the creating/updating of several objects"
-)
+@Schema(description = CommonDescription.entityWithErrorsWrapperHeader)
 data class AddressPartnerUpdateResponseWrapper(
     override val entities: Collection<LogisticAddressVerboseDto>,
     override val errors: Collection<ErrorInfo<AddressUpdateError>>
 ) : EntitiesWithErrors<LogisticAddressVerboseDto, AddressUpdateError>(entities, errors)
-
-
-

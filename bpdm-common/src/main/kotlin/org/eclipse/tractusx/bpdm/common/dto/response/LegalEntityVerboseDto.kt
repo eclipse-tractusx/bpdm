@@ -21,39 +21,42 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import java.time.Instant
 
 
-@Schema(name = "LegalEntityVerboseDto", description = "Legal entity record")
+@Schema(description = LegalEntityDescription.header)
 data class LegalEntityVerboseDto(
 
-    @get:Schema(description = "Business Partner Number of this legal entity")
+    @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String,
 
-    @ArraySchema(arraySchema = Schema(description = "All identifiers of the business partner, including BPN information"))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers))
     val identifiers: Collection<LegalEntityIdentifierVerboseDto> = emptyList(),
 
-    @get:Schema(description = "Abbreviated name or shorthand")
+    @get:Schema(description = LegalEntityDescription.legalShortName)
     val legalShortName: String? = null,
 
-    @get:Schema(description = "Legal form of the business partner")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityDescription.legalForm)
     val legalForm: LegalFormDto? = null,
 
-    @ArraySchema(arraySchema = Schema(description = "Business status"))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
     val states: Collection<LegalEntityStateVerboseDto> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "Classifications"))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications))
     val classifications: Collection<ClassificationVerboseDto> = emptyList(),
 
-    @ArraySchema(arraySchema = Schema(description = "Relations to other business partners"))
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.relations))
     val relations: Collection<RelationVerboseDto> = emptyList(),
 
-    @get:Schema(description = "The timestamp the business partner data was last indicated to be still current")
+    @get:Schema(description = LegalEntityDescription.currentness)
     val currentness: Instant,
 
-    @get:Schema(description = "The timestamp the business partner data was created")
+    @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
-    @get:Schema(description = "The timestamp the business partner data was last updated")
+    @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
 )

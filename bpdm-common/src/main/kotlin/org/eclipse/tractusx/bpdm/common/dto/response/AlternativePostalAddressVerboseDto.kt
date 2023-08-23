@@ -22,11 +22,12 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "AlternativePostalAddressVerboseDto", description = "Alternative Postal Address Part")
+@Schema(description = PostalAddressDescription.headerAlternative)
 data class AlternativePostalAddressVerboseDto(
 
     @field:JsonUnwrapped
@@ -35,12 +36,12 @@ data class AlternativePostalAddressVerboseDto(
     @field:JsonUnwrapped
     val areaPart: AreaDistrictAlternativVerboseDto,
 
-    @get:Schema(description = "Describes the PO Box or private Bag number the delivery should be placed at.")
+    @get:Schema(description = PostalAddressDescription.deliveryServiceNumber)
     val deliveryServiceNumber: String = "",
 
-    @get:Schema(description = "The type of this specified delivery")
+    @get:Schema(description = PostalAddressDescription.deliveryServiceType)
     val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
 
-    @get:Schema(description = "Delivery Service Qualifier")
+    @get:Schema(description = PostalAddressDescription.deliveryServiceQualifier)
     val deliveryServiceQualifier: String?,
 )

@@ -44,7 +44,7 @@ import org.springframework.web.service.annotation.PutExchange
 interface PoolLegalEntityApi {
 
     @Operation(
-        summary = "Get page of legal entity business partners matching the search criteria",
+        summary = "Returns legal entities by different search parameters",
         description = "This endpoint tries to find matches among all existing business partners of type legal entity, " +
                 "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
                 "The match of a partner is better the higher its relevancy score. " +
@@ -64,7 +64,7 @@ interface PoolLegalEntityApi {
     ): PageDto<LegalEntityMatchVerboseDto>
 
     @Operation(
-        summary = "Get legal entity business partner by identifier",
+        summary = "Returns a legal entity by identifier, like BPN, DUNS or EU VAT ID, specified by the identifier type",
         description = "This endpoint tries to find a business partner by the specified identifier. " +
                 "The identifier value is case insensitively compared but needs to be given exactly. " +
                 "By default the value given is interpreted as a BPN. " +
@@ -105,11 +105,11 @@ interface PoolLegalEntityApi {
     @PostMapping("/{bpnl}/confirm-up-to-date")
     @PostExchange("/{bpnl}/confirm-up-to-date")
     fun setLegalEntityCurrentness(
-        @Parameter(description = "Bpnl value") @PathVariable bpnl: String
+        @Parameter(description = "BPNL value") @PathVariable bpnl: String
     )
 
     @Operation(
-        summary = "Search legal entity partners by BPNLs",
+        summary = "Returns legal entities by an array of BPNL",
         description = "Search legal entity partners by their BPNLs. " +
                 "The response can contain less results than the number of BPNLs that were requested, if some of the BPNLs did not exist. " +
                 "For a single request, the maximum number of BPNLs to search for is limited to \${bpdm.bpn.search-request-limit} entries."
@@ -131,7 +131,7 @@ interface PoolLegalEntityApi {
     ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>>
 
     @Operation(
-        summary = "Get site partners of a legal entity",
+        summary = "Returns all sites of a legal entity with a specific BPNL",
         description = "Get business partners of type site belonging to a business partner of type legal entity, identified by the business partner's bpnl ignoring case."
     )
     @ApiResponses(
@@ -144,25 +144,25 @@ interface PoolLegalEntityApi {
     @GetMapping("/{bpnl}/sites")
     @GetExchange("/{bpnl}/sites")
     fun getSites(
-        @Parameter(description = "Bpnl value") @PathVariable bpnl: String,
+        @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<SiteVerboseDto>
 
     @Operation(
-        summary = "Get address partners of a legal entity",
-        description = "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's bpn ignoring case."
+        summary = "Returns all addresses of a legal entity with a specific BPNL",
+        description = "Get business partners of type address belonging to a business partner of type legal entity, identified by the business partner's BPNL ignoring case."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The addresses for the specified bpn"),
+            ApiResponse(responseCode = "200", description = "The addresses for the specified BPNL"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
-            ApiResponse(responseCode = "404", description = "No business partner found for specified bpn", content = [Content()])
+            ApiResponse(responseCode = "404", description = "No business partner found for specified BPNL", content = [Content()])
         ]
     )
     @GetMapping("/{bpnl}/addresses")
     @GetExchange("/{bpnl}/addresses")
     fun getAddresses(
-        @Parameter(description = "Bpn value") @PathVariable bpnl: String,
+        @Parameter(description = "BPNL value") @PathVariable bpnl: String,
         @ParameterObject paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto>
 
@@ -184,7 +184,7 @@ interface PoolLegalEntityApi {
     ): Collection<LegalAddressVerboseDto>
 
     @Operation(
-        summary = "Create new legal entity business partners",
+        summary = "Creates a new legal entity",
         description = "Create new business partners of type legal entity. " +
                 "The given additional identifiers of a record need to be unique, otherwise they are ignored. " +
                 "For matching purposes, on each record you can specify your own index value which will reappear in the corresponding record of the response."
@@ -204,7 +204,7 @@ interface PoolLegalEntityApi {
 
 
     @Operation(
-        summary = "Update existing legal entity business partners",
+        summary = "Updates an existing legal entity",
         description = "Update existing business partner records of type legal entity referenced via BPNL. " +
                 "The endpoint expects to receive the full updated record, including values that didn't change."
     )

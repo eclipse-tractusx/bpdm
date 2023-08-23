@@ -20,17 +20,19 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
-@Schema(name = "LegalEntityIdentifierVerboseDto", description = "Identifier record of a legal entity")
+@Schema(description = LegalEntityIdentifierDescription.header)
 data class LegalEntityIdentifierVerboseDto(
 
-    @get:Schema(description = "Value of the identifier")
+    @get:Schema(description = LegalEntityIdentifierDescription.value)
     val value: String,
 
-    @get:Schema(description = "Type of the identifier")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityIdentifierDescription.type)
     val type: TypeKeyNameVerboseDto<String>,
 
-    @get:Schema(description = "Body which issued the identifier")
+    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
     val issuingBody: String? = null
 )

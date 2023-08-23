@@ -19,20 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import java.time.Instant
 
 
-@Schema(name = "ChangeLogSearchRequest", description = "Request for searching and filtering the business partner changelog")
+@Schema(description = "Request for searching and filtering the business partner changelog")
 data class ChangelogSearchRequest(
 
-    @Schema(description = "Changelog entries should be created after this time", example = "2023-03-20T10:23:28.194Z")
+    @get:Schema(
+        description = "Only changelog entries created after this time. Ignored if empty.",
+        example = "2023-03-20T10:23:28.194Z"
+    )
     val timestampAfter: Instant? = null,
 
-    @Schema(description = "Only show changelog entries for business partners with the given BPNs. Empty means no restriction.")
+    @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of BPNL/S/A. Ignored if empty."))
     val bpns: Set<String>? = null,
 
-    @Schema(description = "Only show changelog entries for business partners with the given LSA types. Empty means no restriction.")
+    @get:ArraySchema(arraySchema = Schema(description = "Only for business partners with the given array of business partner types. Ignored if empty."))
     val businessPartnerTypes: Set<BusinessPartnerType>? = null
 )

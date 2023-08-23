@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
-@Schema(name = "GeoCoordinates", description = "Geo coordinates record for an address")
+@Schema(description = PostalAddressDescription.headerGeoCoordinates)
 data class GeoCoordinateDto(
 
     @get:Schema(description = "Longitude coordinate")

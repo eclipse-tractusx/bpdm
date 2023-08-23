@@ -54,7 +54,7 @@ interface PoolMetadataApi {
     }
 
     @Operation(
-        summary = "Create new identifier type",
+        summary = "Creates a new identifier type",
         description = "Create a new identifier type (including validity details) which can be referenced by business partner records. " +
                 "Identifier types such as BPN or VAT determine with which kind of values a business partner can be identified with. " +
                 "The actual name of the identifier type is free to choose and doesn't need to be unique. $technicalKeyDisclaimer"
@@ -71,7 +71,7 @@ interface PoolMetadataApi {
     fun createIdentifierType(@RequestBody identifierType: IdentifierTypeDto): IdentifierTypeDto
 
     @Operation(
-        summary = "Get page of identifier types filtered by businessPartnerType and (optionally) country (specified by its ISO 3166-1 alpha-2 country code)",
+        summary = "Returns all identifier types filtered by business partner type and country.",
         description = "Lists all matching identifier types including validity details in a paginated result"
     )
     @ApiResponses(
@@ -91,7 +91,7 @@ interface PoolMetadataApi {
 
 
     @Operation(
-        summary = "Create new legal form",
+        summary = "Creates a new legal form",
         description = "Create a new legal form which can be referenced by business partner records. " +
                 "The actual name of the legal form is free to choose and doesn't need to be unique. " + technicalKeyDisclaimer
     )
@@ -107,7 +107,7 @@ interface PoolMetadataApi {
     fun createLegalForm(@RequestBody type: LegalFormRequest): LegalFormDto
 
     @Operation(
-        summary = "Get page of legal forms",
+        summary = "Returns all legal forms",
         description = "Lists all currently known legal forms in a paginated result"
     )
     @ApiResponses(

@@ -20,15 +20,17 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 
-@Schema(name = "LegalEntityIdentifier", description = "Identifier record for a legal entity")
+@Schema(description = LegalEntityIdentifierDescription.header)
 data class LegalEntityIdentifierDto(
-    @get:Schema(description = "Value of the identifier")
+
+    @get:Schema(description = LegalEntityIdentifierDescription.value)
     val value: String,
 
-    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
+    @get:Schema(description = LegalEntityIdentifierDescription.type)
     val type: String,
 
-    @get:Schema(description = "Body which issued the identifier")
+    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
     val issuingBody: String?
 )

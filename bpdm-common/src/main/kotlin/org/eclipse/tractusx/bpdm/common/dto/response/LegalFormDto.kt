@@ -20,16 +20,17 @@
 package org.eclipse.tractusx.bpdm.common.dto.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
 
-@Schema(name = "LegalFormDto", description = "Legal form a business partner can have")
+@Schema(description = LegalFormDescription.header)
 data class LegalFormDto(
 
-    @get:Schema(description = "Unique key to be used for reference")
+    @get:Schema(description = LegalFormDescription.technicalKey)
     val technicalKey: String,
 
-    @get:Schema(description = "Full name of the legal form")
+    @get:Schema(description = LegalFormDescription.name)
     val name: String,
 
-    @get:Schema(description = "Abbreviation of the legal form name")
+    @get:Schema(description = LegalFormDescription.abbreviation)
     val abbreviation: String? = null,
 )
