@@ -268,8 +268,8 @@ class RequestValidationService(
     private fun <ERROR : ErrorCode> validateRegionExists(request: LogisticAddressDto, existingRegions: Set<String>, error: ERROR, entityKey: String?)
             : Collection<ErrorInfo<ERROR>> {
         val requestedTypes = listOfNotNull(
-            request.physicalPostalAddress.areaPart.administrativeAreaLevel1,
-            request.alternativePostalAddress?.areaPart?.administrativeAreaLevel1
+            request.physicalPostalAddress.administrativeAreaLevel1,
+            request.alternativePostalAddress?.administrativeAreaLevel1
         )
 
         val missingTypes = requestedTypes - existingRegions

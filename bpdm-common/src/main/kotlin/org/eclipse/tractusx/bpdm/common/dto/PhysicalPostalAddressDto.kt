@@ -19,27 +19,45 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = PostalAddressDescription.headerPhysical)
 data class PhysicalPostalAddressDto(
 
-    @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressDto,
+    override val geographicCoordinates: GeoCoordinateDto?,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = StreetDescription.header)
-    val street: StreetDto? = null,
+    @get:Schema(description = PostalAddressDescription.country)
+    val country: CountryCode,
 
-    @field:JsonUnwrapped
-    val areaPart: AreaDistrictDto,
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
+    val administrativeAreaLevel1: String?,
 
-    @field:JsonUnwrapped
-    val basePhysicalAddress: BasePhysicalAddressDto
-)
+    override val administrativeAreaLevel2: String?,
+
+    override val administrativeAreaLevel3: String?,
+
+    override val postalCode: String?,
+
+    override val city: String,
+
+    override val district: String?,
+
+    // OpenAPI description for complex field does not work!
+    val street: StreetDto?,
+
+    override val companyPostalCode: String?,
+
+    override val industrialZone: String?,
+
+    override val building: String?,
+
+    override val floor: String?,
+
+    override val door: String?
+
+) : IBasePhysicalPostalAddressDto

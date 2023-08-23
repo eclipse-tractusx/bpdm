@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.pool.util
 
-import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
@@ -90,67 +89,54 @@ object ResponseValues {
     private val classification5 = ClassificationVerboseDto(CommonValues.classification5, null, classificationType)
 
     private val address1 = PhysicalPostalAddressVerboseDto(
-        basePhysicalAddress = BasePhysicalAddressDto(
-            companyPostalCode = CommonValues.postCode2,
-            industrialZone = CommonValues.industrialZone1,
-            building = CommonValues.building1,
-            floor = CommonValues.floor1,
-            door = CommonValues.door1
-        ),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
-            administrativeAreaLevel2 = CommonValues.county1,
-            district = CommonValues.district1,
-        ),
+        geographicCoordinates = null,
+        country = country1,
+        postalCode = CommonValues.postCode1,
+        city = CommonValues.city1,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
+        administrativeAreaLevel2 = CommonValues.county1,
+        administrativeAreaLevel3 = null,
+        district = CommonValues.district1,
+        companyPostalCode = CommonValues.postCode2,
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
         street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = null,
-            country = country1,
-            postalCode = CommonValues.postCode1,
-            city = CommonValues.city1,
-        )
     )
 
     private val address2 = PhysicalPostalAddressVerboseDto(
-        basePhysicalAddress = BasePhysicalAddressDto(
-            industrialZone = CommonValues.industrialZone2,
-            building = CommonValues.building2,
-            floor = CommonValues.floor2,
-            door = CommonValues.door2
-        ),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
-            administrativeAreaLevel2 = CommonValues.county2,
-            district = CommonValues.district2,
-        ),
+        geographicCoordinates = null,
+        country = country2,
+        postalCode = CommonValues.postCode2,
+        city = CommonValues.city2,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
+        administrativeAreaLevel2 = CommonValues.county2,
+        administrativeAreaLevel3 = null,
+        district = CommonValues.district2,
+        companyPostalCode = null,
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
         street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = null,
-            country = country2,
-            postalCode = CommonValues.postCode2,
-            city = CommonValues.city2,
-        )
     )
 
     private val address3 = PhysicalPostalAddressVerboseDto(
-        basePhysicalAddress = BasePhysicalAddressDto(
-            industrialZone = CommonValues.industrialZone3,
-            building = CommonValues.building3,
-            floor = CommonValues.floor3,
-            door = CommonValues.door3
-        ),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
-            administrativeAreaLevel2 = CommonValues.county3,
-            district = CommonValues.district3,
-        ),
+        geographicCoordinates = null,
+        country = country3,
+        postalCode = CommonValues.postCode3,
+        city = CommonValues.city3,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region3,
+        administrativeAreaLevel2 = CommonValues.county3,
+        administrativeAreaLevel3 = null,
+        district = CommonValues.district3,
+        companyPostalCode = null,
+        industrialZone = CommonValues.industrialZone3,
+        building = CommonValues.building3,
+        floor = CommonValues.floor3,
+        door = CommonValues.door3,
         street = StreetDto(CommonValues.street3, CommonValues.houseNumber3),
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = null,
-            country = country3,
-            postalCode = CommonValues.postCode3,
-            city = CommonValues.city3,
-        )
     )
 
     val addressPartner1 = LogisticAddressVerboseDto(
@@ -265,25 +251,20 @@ object ResponseValues {
         legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
-                basePhysicalAddress = BasePhysicalAddressDto(
-                    companyPostalCode = null,
-                    industrialZone = null,
-                    building = null,
-                    floor = null,
-                    door = null
-                ),
-                areaPart = AreaDistrictVerboseDto(
-                    administrativeAreaLevel1 = null,
-                    administrativeAreaLevel2 = null,
-                    district = null,
-                ),
+                geographicCoordinates = null,
+                country = country1,
+                postalCode = null,
+                city = CommonValues.locality1,
+                administrativeAreaLevel1 = null,
+                administrativeAreaLevel2 = null,
+                administrativeAreaLevel3 = null,
+                district = null,
+                companyPostalCode = null,
+                industrialZone = null,
+                building = null,
+                floor = null,
+                door = null,
                 street = null,
-                baseAddress = BasePostalAddressVerboseDto(
-                    geographicCoordinates = null,
-                    country = country1,
-                    postalCode = null,
-                    city = CommonValues.locality1,
-                )
             ),
             bpnLegalEntity = null,
             bpnSite = null,
@@ -307,25 +288,20 @@ object ResponseValues {
         legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
-                basePhysicalAddress = BasePhysicalAddressDto(
-                    companyPostalCode = null,
-                    industrialZone = null,
-                    building = null,
-                    floor = null,
-                    door = null
-                ),
-                areaPart = AreaDistrictVerboseDto(
-                    administrativeAreaLevel1 = null,
-                    administrativeAreaLevel2 = null,
-                    district = null,
-                ),
+                geographicCoordinates = null,
+                country = country2,
+                postalCode = null,
+                city = CommonValues.locality3,
+                administrativeAreaLevel1 = null,
+                administrativeAreaLevel2 = null,
+                administrativeAreaLevel3 = null,
+                district = null,
+                companyPostalCode = null,
+                industrialZone = null,
+                building = null,
+                floor = null,
+                door = null,
                 street = null,
-                baseAddress = BasePostalAddressVerboseDto(
-                    geographicCoordinates = null,
-                    country = country2,
-                    postalCode = null,
-                    city = CommonValues.locality3,
-                )
             ),
             bpnLegalEntity = null,
             bpnSite = null,
@@ -349,25 +325,20 @@ object ResponseValues {
         legalAddress = LogisticAddressVerboseDto(
             bpna = CommonValues.bpnA1,
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
-                basePhysicalAddress = BasePhysicalAddressDto(
-                    companyPostalCode = null,
-                    industrialZone = null,
-                    building = null,
-                    floor = null,
-                    door = null
-                ),
-                areaPart = AreaDistrictVerboseDto(
-                    administrativeAreaLevel1 = null,
-                    administrativeAreaLevel2 = null,
-                    district = null,
-                ),
+                geographicCoordinates = null,
+                country = country3,
+                postalCode = null,
+                city = CommonValues.locality5,
+                administrativeAreaLevel1 = null,
+                administrativeAreaLevel2 = null,
+                administrativeAreaLevel3 = null,
+                district = null,
+                companyPostalCode = null,
+                industrialZone = null,
+                building = null,
+                floor = null,
+                door = null,
                 street = null,
-                baseAddress = BasePostalAddressVerboseDto(
-                    geographicCoordinates = null,
-                    country = country3,
-                    postalCode = null,
-                    city = CommonValues.locality5,
-                )
             ),
             bpnLegalEntity = null,
             bpnSite = null,

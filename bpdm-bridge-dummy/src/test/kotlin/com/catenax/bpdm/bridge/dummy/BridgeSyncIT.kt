@@ -448,10 +448,10 @@ class BridgeSyncIT @Autowired constructor(
         assertThat(poolVersion.legalEntity.legalShortName).isEqualTo(gateVersion.legalEntity.legalShortName)
         //       assertThat(poolVersion.legalAddress.name).isEqualTo(gateVersion.legalAddress.nameParts.first())
         assertThat(poolVersion.legalAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.legalAddress.physicalPostalAddress.street?.name)
-        assertThat(poolVersion.legalAddress.physicalPostalAddress.baseAddress.city).isEqualTo(gateVersion.legalAddress.physicalPostalAddress.baseAddress.city)
+        assertThat(poolVersion.legalAddress.physicalPostalAddress.city).isEqualTo(gateVersion.legalAddress.physicalPostalAddress.city)
 //        assertThat(poolVersion.legalName).isEqualTo(gateVersion.legalNameParts.first())       // TODO not working, not yet persisted!
         assertThat(poolVersion.legalAddress.alternativePostalAddress?.deliveryServiceNumber).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.deliveryServiceNumber)
-        assertThat(poolVersion.legalAddress.alternativePostalAddress?.baseAddress?.city).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.baseAddress?.city)
+        assertThat(poolVersion.legalAddress.alternativePostalAddress?.city).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.city)
     }
 
     private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SitePoolVerboseDto) {
@@ -463,8 +463,8 @@ class BridgeSyncIT @Autowired constructor(
     private fun assertEqualAddress(gateVersion: AddressGateInputRequest, poolVersion: LogisticAddressVerboseDto) {
         assertThat(poolVersion.name).isEqualTo(gateVersion.address.nameParts.first())
         assertThat(poolVersion.physicalPostalAddress.street?.name).isEqualTo(gateVersion.address.physicalPostalAddress.street?.name)
-        assertThat(poolVersion.physicalPostalAddress.baseAddress.city).isEqualTo(gateVersion.address.physicalPostalAddress.baseAddress.city)
+        assertThat(poolVersion.physicalPostalAddress.city).isEqualTo(gateVersion.address.physicalPostalAddress.city)
         assertThat(poolVersion.alternativePostalAddress?.deliveryServiceNumber).isEqualTo(gateVersion.address.alternativePostalAddress?.deliveryServiceNumber)
-        assertThat(poolVersion.alternativePostalAddress?.baseAddress?.city).isEqualTo(gateVersion.address.alternativePostalAddress?.baseAddress?.city)
+        assertThat(poolVersion.alternativePostalAddress?.city).isEqualTo(gateVersion.address.alternativePostalAddress?.city)
     }
 }

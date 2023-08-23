@@ -19,10 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
@@ -30,18 +33,22 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(description = PostalAddressDescription.headerAlternative)
 data class AlternativePostalAddressVerboseDto(
 
-    @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressVerboseDto,
+    override val geographicCoordinates: GeoCoordinateDto?,
 
-    @field:JsonUnwrapped
-    val areaPart: AreaDistrictAlternativVerboseDto,
+    // OpenAPI description for complex field does not work!
+    val country: TypeKeyNameVerboseDto<CountryCode>,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceNumber)
-    val deliveryServiceNumber: String = "",
+    // OpenAPI description for complex field does not work!
+    val administrativeAreaLevel1: RegionDto?,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceType)
-    val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
+    override val postalCode: String?,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceQualifier)
-    val deliveryServiceQualifier: String?,
-)
+    override val city: String,
+
+    override val deliveryServiceType: DeliveryServiceType,
+
+    override val deliveryServiceQualifier: String?,
+
+    override val deliveryServiceNumber: String
+
+) : IBaseAlternativePostalAddressDto

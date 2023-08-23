@@ -73,41 +73,35 @@ fun toNameParts(namePartsValue: String, address: LogisticAddress?, site: Site?, 
     return NameParts(address, site, legalEntity, namePartsValue)
 }
 
-fun AlternativePostalAddressDto.toAlternativePostalAddressEntity(): AlternativePostalAddress {
-
-    return AlternativePostalAddress(
-        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
-        country = baseAddress.country,
-        administrativeAreaLevel1 = areaPart.administrativeAreaLevel1,
-        postCode = baseAddress.postalCode,
-        city = baseAddress.city,
+fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
+    AlternativePostalAddress(
+        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = country,
+        administrativeAreaLevel1 = administrativeAreaLevel1,
+        postCode = postalCode,
+        city = city,
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier
     )
 
-}
-
-fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity(): PhysicalPostalAddress {
-
-    return PhysicalPostalAddress(
-        geographicCoordinates = baseAddress.geographicCoordinates?.toGeographicCoordinateEntity(),
-        country = baseAddress.country,
-        administrativeAreaLevel1 = areaPart.administrativeAreaLevel1,
-        administrativeAreaLevel2 = areaPart.administrativeAreaLevel2,
-        administrativeAreaLevel3 = areaPart.administrativeAreaLevel3,
-        postCode = baseAddress.postalCode,
-        city = baseAddress.city,
-        districtLevel1 = areaPart.district,
+fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity() =
+    PhysicalPostalAddress(
+        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
+        country = country,
+        administrativeAreaLevel1 = administrativeAreaLevel1,
+        administrativeAreaLevel2 = administrativeAreaLevel2,
+        administrativeAreaLevel3 = administrativeAreaLevel3,
+        postCode = postalCode,
+        city = city,
+        districtLevel1 = district,
         street = street?.toStreetEntity(),
-        companyPostCode = basePhysicalAddress.companyPostalCode,
-        industrialZone = basePhysicalAddress.industrialZone,
-        building = basePhysicalAddress.building,
-        floor = basePhysicalAddress.floor,
-        door = basePhysicalAddress.door
+        companyPostCode = companyPostalCode,
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door
     )
-
-}
 
 fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
     return GeographicCoordinate(
@@ -314,58 +308,35 @@ fun mapToDtoStates(states: MutableSet<AddressState>): Collection<AddressStateDto
     return states.map { AddressStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalAddressDto {
-
-    val basePostalAddressDto = BasePostalAddressDto(
-        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
-        country = country,
-        postalCode = postCode,
-        city = city
-    )
-
-    val areaDistrictAlternativDto = AreaDistrictAlternativDto(
-        administrativeAreaLevel1 = administrativeAreaLevel1
-    )
-
-    return AlternativePostalAddressDto(
+fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalAddressDto =
+    AlternativePostalAddressDto(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier,
-        areaPart = areaDistrictAlternativDto,
-        baseAddress = basePostalAddressDto
-    )
-
-}
-
-fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDto {
-
-    val basePostalAddressDto = BasePostalAddressDto(
+        administrativeAreaLevel1 = administrativeAreaLevel1,
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
         postalCode = postCode,
         city = city
     )
 
-    val areaDistrictDto = AreaDistrictDto(
+fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDto =
+    PhysicalPostalAddressGateDto(
+        geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
+        country = country,
+        postalCode = postCode,
+        city = city,
         administrativeAreaLevel1 = administrativeAreaLevel1,
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
-        district = districtLevel1
+        district = districtLevel1,
+        companyPostalCode = companyPostCode,
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door,
+        street = street?.toStreetDto()
     )
-
-    return PhysicalPostalAddressGateDto(
-        baseAddress = basePostalAddressDto,
-        basePhysicalAddress = BasePhysicalAddressDto(
-            companyPostalCode = companyPostCode,
-            industrialZone = industrialZone,
-            building = building,
-            floor = floor,
-            door = door,
-        ),
-        street = street?.toStreetDto(),
-        areaPart = areaDistrictDto
-    )
-}
 
 fun GeographicCoordinate.toGeographicCoordinateDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
@@ -494,32 +465,32 @@ fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): Legal
     )
 }
 
-fun AddressGateInputRequest.toSharingStateDTO():SharingStateDto {
+fun AddressGateInputRequest.toSharingStateDTO(): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.ADDRESS, externalId)
 }
 
-fun SiteGateInputRequest.toSharingStateDTO():SharingStateDto {
+fun SiteGateInputRequest.toSharingStateDTO(): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.SITE, externalId)
 }
 
-fun LegalEntityGateInputRequest.toSharingStateDTO():SharingStateDto {
+fun LegalEntityGateInputRequest.toSharingStateDTO(): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId)
 }
 
-fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+fun AddressGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.ADDRESS, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
-fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+fun SiteGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.SITE, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }
 
-fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType):SharingStateDto {
+fun LegalEntityGateOutputRequest.toSharingStateDTO(sharingStateType: SharingStateType): SharingStateDto {
 
     return SharingStateDto(BusinessPartnerType.LEGAL_ENTITY, externalId, sharingStateType = sharingStateType, bpn = bpn)
 }

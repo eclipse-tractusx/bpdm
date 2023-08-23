@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
@@ -146,45 +145,37 @@ object ResponseValues {
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
 
     val address1 = PhysicalPostalAddressVerboseDto(
-        basePhysicalAddress = BasePhysicalAddressDto(
-            industrialZone = CommonValues.industrialZone1,
-            building = CommonValues.building1,
-            floor = CommonValues.floor1,
-            door = CommonValues.door1
-        ),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
-            administrativeAreaLevel2 = CommonValues.county1,
-            district = CommonValues.district1,
-        ),
+        geographicCoordinates = geoCoordinate1,
+        country = country1,
+        postalCode = CommonValues.postCode1,
+        city = CommonValues.city1,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region1,
+        administrativeAreaLevel2 = CommonValues.county1,
+        administrativeAreaLevel3 = null,
+        district = CommonValues.district1,
+        companyPostalCode = null,
+        industrialZone = CommonValues.industrialZone1,
+        building = CommonValues.building1,
+        floor = CommonValues.floor1,
+        door = CommonValues.door1,
         street = StreetDto(CommonValues.street1, CommonValues.houseNumber1),
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = geoCoordinate1,
-            country = country1,
-            postalCode = CommonValues.postCode1,
-            city = CommonValues.city1,
-        )
     )
 
     val address2 = PhysicalPostalAddressVerboseDto(
-        basePhysicalAddress = BasePhysicalAddressDto(
-            industrialZone = CommonValues.industrialZone2,
-            building = CommonValues.building2,
-            floor = CommonValues.floor2,
-            door = CommonValues.door2
-        ),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
-            administrativeAreaLevel2 = CommonValues.county2,
-            district = CommonValues.district2,
-        ),
+        geographicCoordinates = geoCoordinate2,
+        country = country2,
+        postalCode = CommonValues.postCode2,
+        city = CommonValues.city2,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1Region2,
+        administrativeAreaLevel2 = CommonValues.county2,
+        administrativeAreaLevel3 = null,
+        district = CommonValues.district2,
+        companyPostalCode = null,
+        industrialZone = CommonValues.industrialZone2,
+        building = CommonValues.building2,
+        floor = CommonValues.floor2,
+        door = CommonValues.door2,
         street = StreetDto(CommonValues.street2, CommonValues.houseNumber2),
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = geoCoordinate2,
-            country = country2,
-            postalCode = CommonValues.postCode2,
-            city = CommonValues.city2,
-        )
     )
 
     val legalEntityResponsePool1 = PoolLegalEntityVerboseDto(

@@ -22,20 +22,41 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
-data class BasePhysicalAddressDto(
+/**
+ * Contains the common fields for all PhysicalPostalAddress-DTOs, whether Pool or Gate.
+ */
+interface IBasePhysicalPostalAddressDto {
+
+    // OpenAPI description for complex field does not work!
+    val geographicCoordinates: GeoCoordinateDto?
+
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel2)
+    val administrativeAreaLevel2: String?
+
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel3)
+    val administrativeAreaLevel3: String?
+
+    @get:Schema(description = PostalAddressDescription.postalCode)
+    val postalCode: String?
+
+    @get:Schema(description = PostalAddressDescription.city)
+    val city: String
+
+    @get:Schema(description = PostalAddressDescription.district)
+    val district: String?
 
     @get:Schema(description = PostalAddressDescription.companyPostalCode)
-    val companyPostalCode: String? = null,
+    val companyPostalCode: String?
 
     @get:Schema(description = PostalAddressDescription.industrialZone)
-    val industrialZone: String? = null,
+    val industrialZone: String?
 
     @get:Schema(description = PostalAddressDescription.building)
-    val building: String? = null,
+    val building: String?
 
     @get:Schema(description = PostalAddressDescription.floor)
-    val floor: String? = null,
+    val floor: String?
 
     @get:Schema(description = PostalAddressDescription.door)
-    val door: String? = null,
-)
+    val door: String?
+}

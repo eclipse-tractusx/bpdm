@@ -19,29 +19,49 @@
 
 package org.eclipse.tractusx.bpdm.common.dto.response
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BasePhysicalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBasePhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = PostalAddressDescription.headerPhysical)
 data class PhysicalPostalAddressVerboseDto(
 
-    @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressVerboseDto,
+    override val geographicCoordinates: GeoCoordinateDto?,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = StreetDescription.header)
-    val street: StreetDto? = null,
+    // OpenAPI description for complex field does not work!
+    val country: TypeKeyNameVerboseDto<CountryCode>,
 
-    @field:JsonUnwrapped
-    val areaPart: AreaDistrictVerboseDto,
+    // OpenAPI description for complex field does not work!
+    val administrativeAreaLevel1: RegionDto?,
 
-    @field:JsonUnwrapped
-    val basePhysicalAddress: BasePhysicalAddressDto
-)
+    override val administrativeAreaLevel2: String?,
+
+    override val administrativeAreaLevel3: String?,
+
+    override val postalCode: String?,
+
+    override val city: String,
+
+    override val district: String?,
+
+    // OpenAPI description for complex field does not work!
+    val street: StreetDto?,
+
+    override val companyPostalCode: String?,
+
+    override val industrialZone: String?,
+
+    override val building: String?,
+
+    override val floor: String?,
+
+    override val door: String?
+
+) : IBasePhysicalPostalAddressDto
