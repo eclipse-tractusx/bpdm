@@ -3,6 +3,48 @@ entries:
   bpdm:
   - apiVersion: v2
     appVersion: 4.0.0
+    created: "2023-08-24T12:18:53.767999418Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 4.0.0
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 5.0.0
+    - alias: bpdm-bridge-dummy
+      condition: bpdm-bridge-dummy.enabled
+      name: bpdm-bridge-dummy
+      repository: ""
+      version: 1.0.1
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.12.2
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.13
+    description: A Helm chart for Kubernetes that deploys the gate and pool applications
+    digest: 9f42c62a1f1a76e32a43edfce75bd9e5335d24989a21efc99d8f01d16a242232
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Fabio D. Mota
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-3.0.3/bpdm-3.0.3.tgz
+    version: 3.0.3
+  - apiVersion: v2
+    appVersion: 4.0.0
     created: "2023-08-18T14:36:58.839810856Z"
     dependencies:
     - alias: bpdm-gate
@@ -1241,4 +1283,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-08-18T14:36:58.839958963Z"
+generated: "2023-08-24T12:18:53.768415846Z"
