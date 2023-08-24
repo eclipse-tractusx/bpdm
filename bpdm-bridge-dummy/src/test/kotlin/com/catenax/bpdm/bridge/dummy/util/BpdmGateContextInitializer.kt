@@ -42,7 +42,7 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
     private val logger = KotlinLogging.logger { }
 
     companion object {
-        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
+        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 300L
         const val BPDM_PORT = 8081
         const val DEBUG_PORT = 8051
         const val IMAGE = "maven-gate"

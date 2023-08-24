@@ -41,7 +41,7 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
     private val logger = KotlinLogging.logger { }
 
     companion object {
-        const val POOL_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
+        const val POOL_CONTAINER_STARTUP_TIMEOUT_SEC = 300L
         const val BPDM_PORT = 8080
         const val DEBUG_PORT = 8050
         const val IMAGE = "maven-pool"
@@ -55,7 +55,6 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
                     "JAVA_OPTIONS",
                     "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:$DEBUG_PORT"
                 )
-                .withStartupTimeout(Duration.ofSeconds(210))
     }
 
 
