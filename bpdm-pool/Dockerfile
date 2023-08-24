@@ -16,4 +16,4 @@ RUN adduser -u $USERID -S $USERNAME $USERNAME
 USER $USERNAME
 WORKDIR /usr/local/lib/bpdm
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT java $JAVA_OPTIONS -jar app.jar

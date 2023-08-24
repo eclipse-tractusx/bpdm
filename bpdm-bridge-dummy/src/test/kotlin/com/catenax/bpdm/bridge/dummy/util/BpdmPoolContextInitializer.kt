@@ -22,6 +22,7 @@ package com.catenax.bpdm.bridge.dummy.util
 
 import com.catenax.bpdm.bridge.dummy.util.OpenSearchContextInitializer.Companion.openSearchContainer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
+import mu.KotlinLogging
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -37,18 +38,24 @@ import java.time.Duration
 
 class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+    private val logger = KotlinLogging.logger { }
+
     companion object {
         const val POOL_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
         const val BPDM_PORT = 8080
+        const val DEBUG_PORT = 8050
         const val IMAGE = "maven-pool"
 
         val bpdmPoolContainer: GenericContainer<*> =
             GenericContainer(IMAGE)
                 .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer))
                 .withNetwork(postgreSQLContainer.getNetwork())
-                .withExposedPorts(BPDM_PORT)
+                .withExposedPorts(BPDM_PORT, DEBUG_PORT)
+                .withEnv(
+                    "JAVA_OPTIONS",
+                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:$DEBUG_PORT"
+                )
                 .withStartupTimeout(Duration.ofSeconds(210))
-
     }
 
 
@@ -79,11 +86,13 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
             )
             .withEnv(
                 "spring.datasource.password", postgreSQLContainer.password
-            ).start()
+            )
+            .start()
 
         TestPropertyValues.of(
-            "bpdm.pool.base-url=http://localhost:${bpdmPoolContainer.getMappedPort(8080)}",
+            "bpdm.pool.base-url=http://localhost:${bpdmPoolContainer.getMappedPort(BPDM_PORT)}",
         ).applyTo(applicationContext.environment)
 
+        logger.info { "[!!!] Pool can be remote-debugged on port ${bpdmPoolContainer.getMappedPort(DEBUG_PORT)} " }
     }
 }
