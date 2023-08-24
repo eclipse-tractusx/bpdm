@@ -50,9 +50,16 @@ object GateRequestValues {
         )
     val identifier4 =
         LegalEntityIdentifierDto(
-            value = CommonValues.identifierValue4,
+            value = CommonValues.identifierValue5,
             type = CommonValues.identifierTypeTechnicalKey4,
             issuingBody = CommonValues.identifierIssuingBodyName4,
+        )
+
+    val identifier5 =
+        LegalEntityIdentifierDto(
+            value = CommonValues.identifierValue5,
+            type = CommonValues.identifierTypeTechnicalKey5,
+            issuingBody = CommonValues.identifierIssuingBodyName5,
         )
 
     val genericIdentifier =
@@ -262,7 +269,7 @@ object GateRequestValues {
     )
 
     val legalEntity3 = LegalEntityDto(
-        identifiers = listOf(identifier1, identifier2),
+        identifiers = listOf(identifier5),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),

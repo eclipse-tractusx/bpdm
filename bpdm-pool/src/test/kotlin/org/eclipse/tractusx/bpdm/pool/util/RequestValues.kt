@@ -204,6 +204,20 @@ object RequestValues {
         index = CommonValues.index3
     )
 
+    val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
+        legalEntity = LegalEntityDto(
+            legalShortName = null,
+            identifiers = listOf(identifier1, identifier2),
+            legalForm = CommonValues.legalFormTechnicalKey1,
+            states = listOf(leStatus1),
+            classifications = listOf(classification1, classification2),
+        ),
+        legalAddress = logisticAddress1,
+        legalName = CommonValues.name1,
+        index = CommonValues.index1
+    )
+
+
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpnl = CommonValues.bpnL1,
         legalName = legalEntityCreate1.legalName,
@@ -223,6 +237,13 @@ object RequestValues {
         legalName = legalEntityCreate3.legalName,
         legalEntity = legalEntityCreate3.legalEntity,
         legalAddress = legalEntityCreate3.legalAddress,
+    )
+
+    val legalEntityUpdateMultipleIdentifier = LegalEntityPartnerUpdateRequest(
+        bpnl = CommonValues.bpnL1,
+        legalName = legalEntityCreateMultipleIdentifier.legalName,
+        legalEntity = legalEntityCreateMultipleIdentifier.legalEntity,
+        legalAddress = legalEntityCreateMultipleIdentifier.legalAddress,
     )
 
     val siteCreate1 = SitePartnerCreateRequest(

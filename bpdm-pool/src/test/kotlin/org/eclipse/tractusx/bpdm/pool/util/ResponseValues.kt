@@ -434,5 +434,27 @@ object ResponseValues {
         index = CommonValues.index3
     )
 
+    val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
+        legalName = CommonValues.name1,
+        legalEntity = LegalEntityVerboseDto(
+            bpnl = CommonValues.bpnL1,
+            identifiers = listOf(
+                LegalEntityIdentifierVerboseDto(CommonValues.identifierValue1, RequestValues.identifierType1, CommonValues.issuingBody1),
+                LegalEntityIdentifierVerboseDto(CommonValues.identifierValue2, RequestValues.identifierType2, CommonValues.issuingBody2)
+            ),
+            legalForm = legalForm1,
+            states = listOf(leStatus1),
+            classifications = listOf(classification1, classification2),
+            currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
+
+            ),
+        legalAddress = addressPartner1.copy(
+            bpnLegalEntity = legalEntity1.legalEntity.bpnl,
+            isLegalAddress = true
+        ),
+        index = CommonValues.index1
+    )
 
 }

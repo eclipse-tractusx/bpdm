@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreat
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -44,7 +45,7 @@ import java.time.Instant
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
@@ -155,6 +156,34 @@ class LegalEntityControllerIT @Autowired constructor(
         val response = poolClient.legalEntities().updateBusinessPartners(listOf(toUpdate))
 
         assertThatModifiedLegalEntitiesEqual(response.entities, listOf(expected))
+        assertThat(response.errorCount).isEqualTo(0)
+    }
+
+    /**
+     * Given several legal entity with multiple identifiers
+     * When updating values of legal entity via BPN
+     * Then legal entity updated with the values
+     */
+    @Disabled("Fix insert with same identifiers")
+    @Test
+    fun `update existing legal entities multiple identifier`() {
+        val given = listOf(RequestValues.legalEntityCreateMultipleIdentifier, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
+
+        val createResponses = poolClient.legalEntities().createBusinessPartners(given)
+            .entities
+
+        val createResponse = createResponses.filter { response ->
+            response.index.equals(RequestValues.legalEntityCreateMultipleIdentifier.index)
+        }[0]
+
+        val givenBpnL = createResponse.legalEntity.bpnl
+
+        val toUpdate = RequestValues.legalEntityUpdateMultipleIdentifier.copy(
+            bpnl = givenBpnL,
+            legalEntity = RequestValues.legalEntityCreateMultipleIdentifier.legalEntity.copy(legalShortName = "ChangedShortNam"),
+        )
+        val response = poolClient.legalEntities().updateBusinessPartners(listOf(toUpdate))
+
         assertThat(response.errorCount).isEqualTo(0)
     }
 

@@ -21,7 +21,6 @@ package com.catenax.bpdm.bridge.dummy.testdata
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.dto.NameRegioncodeVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
@@ -81,6 +80,7 @@ object CommonValues {
     const val identifierValue2 = "US123456789"
     const val identifierValue3 = "FR123456789"
     const val identifierValue4 = "NL123456789"
+    const val identifierValue5 = "US777882222"
 
     const val identifierIssuingBodyTechnicalKey1 = "issuing body 1"
     const val identifierIssuingBodyTechnicalKey2 = "issuing body 2"
@@ -91,6 +91,7 @@ object CommonValues {
     const val identifierIssuingBodyName2 = "Body Y"
     const val identifierIssuingBodyName3 = "Official Z"
     const val identifierIssuingBodyName4 = "Gov A"
+    const val identifierIssuingBodyName5 = "Gov B"
 
     const val identifierIssuingBody1 = "Agency X"
     const val identifierIssuingBody2 = "Body Y"
@@ -126,6 +127,7 @@ object CommonValues {
     const val identifierTypeTechnicalKey2 = "VAT_US"
     const val identifierTypeTechnicalKey3 = "VAT_FR"
     const val identifierTypeTechnicalKey4 = "VAT_NL"
+    const val identifierTypeTechnicalKey5 = "VAT_US"
 
     val nameType1 = NameType.OTHER
 
@@ -174,16 +176,8 @@ object CommonValues {
     const val context1 = "Context1"
     const val context2 = "Context2"
 
-    // TODO enable regionCodes later
-//    val adminAreaLevel1RegionCode_1 = "BW"
-//    val adminAreaLevel1Region1 = NameRegioncodeDto(adminAreaLevel1RegionCode_1, "Baden-Württemberg")
-//    val adminAreaLevel1RegionCode_2 = "GA"
-//    val adminAreaLevel1Region2 = NameRegioncodeDto(adminAreaLevel1RegionCode_2, "Georgia")
-
-    val adminAreaLevel1RegionCode_1: String? = null
-    val adminAreaLevel1Region1: NameRegioncodeVerboseDto? = null
-    val adminAreaLevel1RegionCode_2: String? = null
-    val adminAreaLevel1Region2: NameRegioncodeVerboseDto? = null
+    val adminAreaLevel1RegionCode_1: String = "adminAreaLevel1RegionCode_1"
+    val adminAreaLevel1RegionCode_2: String = "adminAreaLevel1RegionCode_2"
 
     const val county1 = "Stuttgart"
     const val county2 = " Fulton County"
