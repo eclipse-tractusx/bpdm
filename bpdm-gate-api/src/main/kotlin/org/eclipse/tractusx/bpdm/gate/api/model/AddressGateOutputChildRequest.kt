@@ -22,17 +22,17 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(
-    name = "AddressGateOutputChildRequest",
-    description = "DTO for setting the output address data with BPN."
-)
+@Schema(description = LogisticAddressDescription.header)
 data class AddressGateOutputChildRequest(
+
     @field:JsonUnwrapped
     val address: LogisticAddressGateDto,
 
-    @Schema(description = "Business Partner Number")
+    // TODO rename to bpna
+    @get:Schema(description = LogisticAddressDescription.bpna)
     val bpn: String
 )

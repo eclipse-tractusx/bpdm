@@ -27,4 +27,9 @@ object StreetDescription {
     const val milestone = "The number representing the exact location of an addressed object within a street without house numbers, such as within long roads."
     const val direction = "The cardinal direction describing where the exit to the location of the addressed object on large highways / " +
             "motorways is located, such as Highway 101 South."
+
+    const val namePrefix = "The street related information, which is usually printed before the official street name on an address label."
+    const val additionalNamePrefix = "The additional street related information, which is usually printed before the official street name on an address label."
+    const val nameSuffix = "The street related information, which is usually printed after the official street name on an address label."
+    const val additionalNameSuffix = "The additional street related information, which is usually printed after the official street name on an address label."
 }

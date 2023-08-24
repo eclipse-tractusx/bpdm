@@ -21,30 +21,34 @@ package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(name = "LegalEntityGateOutputResponse", description = "Legal entity with external id")
+@Schema(description = LegalEntityDescription.header)
 data class LegalEntityGateOutputResponse(
+
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))
+    val legalNameParts: Collection<String>,
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
-    val legalNameParts: Collection<String>,
-
-    @Schema(description = "Which roles this business partner takes in relation to the sharing member")
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LegalEntityDescription.legalAddress)
     val legalAddress: AddressGateOutputDto,
 
-    @Schema(description = "ID the record has in the external system where the record originates from", required = true)
+    @get:Schema(description = CommonDescription.externalId, required = true)
     val externalId: String,
 
-    @Schema(description = "Business Partner Number")
+    @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String
-
 )

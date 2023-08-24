@@ -25,10 +25,12 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.ErrorCode
 @Schema(title = "ErrorInfo", description = "Holds information about failures")
 data class ErrorInfo<out ERROR : ErrorCode>(
 
-    @Schema(description = "Error code identifying the error")
+    @get:Schema(description = "Error code identifying the error")
     val errorCode: ERROR,
-    @Schema(description = "Error message that explains the error")
+
+    @get:Schema(description = "Error message that explains the error")
     val message: String,
-    @Schema(description = "Key (externalId) of the entity that failed")
+
+    @get:Schema(description = "Key (externalId) of the entity that failed")
     val entityKey: String?
 )

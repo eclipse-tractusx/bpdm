@@ -32,6 +32,7 @@ object LogisticAddressDescription {
             "uniquely identified by the BPNA."
     const val headerCreateRequest = "Request for creating new business partner record of type address. $header"
     const val headerUpdateRequest = "Request for updating a business partner record of type address. $header"
+    const val headerUpsertRequest = "Request for creating/updating a business partner record of type address. $header"
     const val headerCreateResponse = "Created business partner of type address. $header"
     const val headerMatchResponse = "Match for a business partner record of type address. $header"
 
@@ -40,6 +41,8 @@ object LogisticAddressDescription {
             "It is important to note that only the BPNL must be used to uniquely identify a legal entity. " +
             "Even in the case that the BPNA represents the legal address of the legal entity, it shall not be used to uniquely identify the legal entity."
     const val name = "The name of the address. This is not according to official registers but according to the name the sharing member chooses."
+    const val nameParts = "The list of name parts of the address to accommodate the different number of name fields in different systems. " +
+            "This is not according to official registers but according to the name the sharing member chooses."
     const val states = "The list of (temporary) states of the address."
     const val identifiers = "The list of identifiers of the address."
     const val physicalPostalAddress = "The physical postal address of the address, such as an office, warehouse, gate, etc."
@@ -49,7 +52,12 @@ object LogisticAddressDescription {
     const val bpnSite = "The BPNS of the site the address belongs to."
     const val isMainAddress = "Indicates if the address is the main address to a site. " +
             "This is where typically the main entrance or the reception is located, or where the mail is delivered to."
+    const val roles = "Roles this business partner takes in relation to the sharing member."
 
     const val bpnParent = "BPNL of the legal entity or BPNS of the site this address belongs to."
+    const val legalEntityExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
+            "the business partner, representing the legal entity, that owns the address."
+    const val siteExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
+            "the business partner, representing the site, that the address belongs to."
     const val address = "Address information"
 }

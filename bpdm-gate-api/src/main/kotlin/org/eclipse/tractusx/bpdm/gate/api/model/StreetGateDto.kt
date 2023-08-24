@@ -20,32 +20,32 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 
-@Schema(name = "StreetGate", description = "A public road in a city, town, or village, typically with houses and buildings on one or both sides.")
+@Schema(description = StreetDescription.header)
 data class StreetGateDto(
 
-
-    @get:Schema(description = "Describes the official name prefix  of the Street.")
+    @get:Schema(description = StreetDescription.namePrefix)
     val namePrefix: String? = null,
 
-    @get:Schema(description = "Describes the additional name prefix of the Street.")
+    @get:Schema(description = StreetDescription.additionalNamePrefix)
     val additionalNamePrefix: String? = null,
 
-    @get:Schema(description = "Describes the Name of the Street.")
+    @get:Schema(description = StreetDescription.name)
     val name: String? = null,
 
-    @get:Schema(description = "Describes the name suffix of the Street.")
+    @get:Schema(description = StreetDescription.nameSuffix)
     val nameSuffix: String? = null,
 
-    @get:Schema(description = "Describes the additional name suffix of the Street.")
+    @get:Schema(description = StreetDescription.additionalNameSuffix)
     val additionalNameSuffix: String? = null,
 
-    @get:Schema(description = "Describes the House Number")
+    @get:Schema(description = StreetDescription.houseNumber)
     val houseNumber: String? = null,
 
-    @get:Schema(description = "The Milestone is relevant for long roads without specific house numbers.")
+    @get:Schema(description = StreetDescription.milestone)
     val milestone: String? = null,
 
-    @get:Schema(description = "Describes the direction")
+    @get:Schema(description = StreetDescription.direction)
     val direction: String? = null
 )

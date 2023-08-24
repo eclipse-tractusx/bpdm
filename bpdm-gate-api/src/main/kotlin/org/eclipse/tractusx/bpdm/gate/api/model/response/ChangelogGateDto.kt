@@ -21,21 +21,22 @@ package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ChangelogDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import java.time.Instant
 
-@Schema(name = "ChangelogGateDto", description = "Changelog entry for a business partner")
+@Schema(description = ChangelogDescription.header)
 data class ChangelogGateDto(
 
-    @Schema(description = "External ID of the changelog entry")
+    @get:Schema(description = ChangelogDescription.externalId)
     val externalId: String,
 
-    @Schema(description = "The type of the business partner this change refers to")
+    @get:Schema(description = ChangelogDescription.businessPartnerType)
     val businessPartnerType: BusinessPartnerType,
 
-    @Schema(description = "The timestamp of the operation")
+    @get:Schema(description = ChangelogDescription.timestamp)
     val timestamp: Instant,
 
-    @Schema(description = "The type of the change")
+    @get:Schema(description = ChangelogDescription.changelogType)
     val changelogType: ChangelogType
 )
