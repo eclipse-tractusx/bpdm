@@ -1,21 +1,24 @@
 bpdm-gate:
   enabled: true
   postgres:
-    enabled: false
+    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
+    fullnameOverride: ""
 
 bpdm-pool:
   enabled: true
   opensearch:
-    enabled: false
+    enabled: true
     masterService: ""
     fullnameOverride: "bpdm-pool-opensearch"
   postgres:
-    enabled: false
+    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
+    fullnameOverride: ""
 
 bpdm-bridge-dummy:
   enabled: true
   postgres:
-    enabled: false
+    # use the name that was override on postgres.fullnameOverride to be used by the application on connection
+    fullnameOverride: ""
 
 opensearch:
   masterService: ""
@@ -63,6 +66,8 @@ opensearch:
         privileged: true
 
 postgres:
+  # override the name of the postgres deploy
+  fullnameOverride: ""
   enabled: true
   auth:
     database: bpdm
