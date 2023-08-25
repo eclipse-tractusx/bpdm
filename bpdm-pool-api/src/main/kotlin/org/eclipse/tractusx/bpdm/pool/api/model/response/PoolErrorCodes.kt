@@ -66,7 +66,8 @@ enum class AddressCreateError : ErrorCode {
     SiteNotFound,
     LegalEntityNotFound,
     RegionNotFound,
-    IdentifierNotFound
+    IdentifierNotFound,
+    MainAddressDuplicateIdentifier,
 }
 
 @Schema(description = "AddressUpdateError")

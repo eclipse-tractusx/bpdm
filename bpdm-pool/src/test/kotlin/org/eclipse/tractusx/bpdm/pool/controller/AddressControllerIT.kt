@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
@@ -27,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.RequestValues.addressIdentifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +39,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolApiClient
@@ -281,6 +284,59 @@ class AddressControllerIT @Autowired constructor(
 //            .ignoringFields(LogisticAddressResponse::bpn.name)
 //            .isEqualTo(expected)
         assertThat(response.errorCount).isEqualTo(0)
+    }
+
+    /**
+     * Given no legal entities
+     * When creating new legal entity with duplicate identifiers on legal entity and address
+     * Then new legal entity is returned with error
+     */
+    @Test
+    fun `create new addresses and get duplicate error`() {
+
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                ),
+            )
+        )
+
+        val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
+
+
+        val toCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL)
+        val secondCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = CommonValues.index4)
+
+        val response = poolClient.addresses().createAddresses(listOf(toCreate, secondCreate))
+
+        val identifier = toCreate.address.identifiers.toList().get(0)
+
+        val expectedErrors = listOf(
+            ErrorInfo(
+                AddressCreateError.MainAddressDuplicateIdentifier,
+                "Identifier $identifier is duplicated among address entities in the request",
+                toCreate.index
+            ),
+            ErrorInfo(
+                AddressCreateError.MainAddressDuplicateIdentifier,
+                "Identifier $identifier is duplicated among address entities in the request",
+                secondCreate.index
+            )
+
+        )
+
+        assertThat(response.errorCount).isEqualTo(2)
+        testHelpers.assertRecursively(response.errors)
+            .isEqualTo(expectedErrors)
     }
 
     /**

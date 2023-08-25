@@ -54,6 +54,11 @@ object RequestValues {
         issuingBody = CommonValues.issuingBody3,
     )
 
+    val addressIdentifier = AddressIdentifierDto(
+        value = CommonValues.identifierValue3,
+        type = CommonValues.identifierTypeTechnicalKey3,
+    )
+
     val legalForm1 = LegalFormRequest(
         technicalKey = CommonValues.legalFormTechnicalKey1,
         name = CommonValues.legalFormName1,
@@ -164,6 +169,9 @@ object RequestValues {
         physicalPostalAddress = postalAddress1, name = CommonValues.name1
     )
 
+    val logisticAddress5 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress1, identifiers = listOf(addressIdentifier)
+    )
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
@@ -314,6 +322,13 @@ object RequestValues {
         bpnParent = legalEntityUpdate3.bpnl,
         index = CommonValues.index3
     )
+
+    val addressPartnerCreate5 = AddressPartnerCreateRequest(
+        address = logisticAddress5,
+        bpnParent = legalEntityUpdate3.bpnl,
+        index = CommonValues.index3
+    )
+
 
     val addressPartnerUpdate1 = AddressPartnerUpdateRequest(
         bpna = CommonValues.bpnA1,

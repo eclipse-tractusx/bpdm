@@ -19,10 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -52,6 +49,7 @@ class RequestValidationService(
         val legalEntityMetadata = metadataService.getMetadata(legalEntityRequests).toKeys()
         val addressMetadata = metadataService.getMetadata(legalAddressRequests).toKeys()
         val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidates(legalEntityRequests)
+
         val duplicateIdentifiers = findDuplicateLegalEntityIdentifiers(legalEntityRequests)
         return requests.flatMap { request ->
             val legalEntity = request.legalEntity
@@ -79,19 +77,34 @@ class RequestValidationService(
                             LegalEntityCreateError.LegalEntityDuplicateIdentifier,
                             request.index
                         ) +
-                        validateDuplicates(legalEntity,duplicateIdentifiers,request.index)
+                        validateLegalEntityDuplicates(legalEntity,duplicateIdentifiers,request.index)
             validationErrors.map { Pair(request, it) }
 
         }.groupBy({ it.first }, { it.second })
     }
 
-    fun validateDuplicates(legalEntity: LegalEntityDto,duplicateIdentifiers: Set<LegalEntityIdentifierDto>, entityKey: String?) : Collection<ErrorInfo<LegalEntityCreateError>> {
+    fun validateLegalEntityDuplicates(legalEntity: LegalEntityDto, duplicateIdentifiers: Set<LegalEntityIdentifierDto>, entityKey: String?) : Collection<ErrorInfo<LegalEntityCreateError>> {
         val errorList = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
         duplicateIdentifiers.forEach { duplicate ->
             if (legalEntity.identifiers.contains(duplicate)) {
                 val error = ErrorInfo(
                     LegalEntityCreateError.LegalEntityDuplicateIdentifier,
                     "Identifier $duplicate is duplicated among legal entities in the request",
+                    entityKey
+                )
+                errorList.add(error)
+            }
+        }
+
+        return errorList
+    }
+    fun validateAddressDuplicates(address: LogisticAddressDto, duplicateIdentifiers: Set<AddressIdentifierDto>, entityKey: String?) : MutableList<ErrorInfo<AddressCreateError>> {
+        val errorList = mutableListOf<ErrorInfo<AddressCreateError>>()
+        duplicateIdentifiers.forEach { duplicate ->
+            if (address.identifiers.contains(duplicate)) {
+                val error = ErrorInfo(
+                    AddressCreateError.MainAddressDuplicateIdentifier,
+                    "Identifier $duplicate is duplicated among address entities in the request",
                     entityKey
                 )
                 errorList.add(error)
@@ -206,12 +219,16 @@ class RequestValidationService(
         val siteParentBpns = requestsByParentType[BusinessPartnerType.SITE]?.map { it.bpnParent } ?: emptyList()
         val existingSites = siteRepository.findDistinctByBpnIn(siteParentBpns).map { it.bpn }.toSet()
 
+
+        val duplicateIdentifiers = findDuplicateAddressIdentifiers(mainAddressRequests)
+
         return requestsWithParentType.flatMap { (request, type) ->
             val address = request.address
 
             val validationErrors = validateAddressParent(request, type, existingLegalEntities, existingSites) +
                     validateRegionExists(address, addressMetadata.regions, AddressCreateError.RegionNotFound, request.index) +
-                    validateIdentifierTypeExists(address, addressMetadata.idTypes, AddressCreateError.IdentifierNotFound, request.index)
+                    validateIdentifierTypeExists(address, addressMetadata.idTypes, AddressCreateError.IdentifierNotFound, request.index) +
+                    validateAddressDuplicates(address,duplicateIdentifiers,request.index)
 
             validationErrors.map { Pair(request, it) }
 
@@ -246,6 +263,16 @@ class RequestValidationService(
     ): Set<LegalEntityIdentifierDto> {
         val allIdentifiers = legalEntityRequests.flatMap { it.identifiers }
 
+        return allIdentifiers.groupBy { it }
+            .filter { it.value.size > 1 }
+            .keys
+            .toSet()
+    }
+
+    fun findDuplicateAddressIdentifiers(
+        allIdentifiers: List<LogisticAddressDto>
+    ): Set<AddressIdentifierDto> {
+        val allIdentifiers = allIdentifiers.flatMap { it.identifiers }
         return allIdentifiers.groupBy { it }
             .filter { it.value.size > 1 }
             .keys
