@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -50,9 +51,8 @@ class RequestValidationService(
 
         val legalEntityMetadata = metadataService.getMetadata(legalEntityRequests).toKeys()
         val addressMetadata = metadataService.getMetadata(legalAddressRequests).toKeys()
-
         val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidates(legalEntityRequests)
-
+        val duplicateIdentifiers = findDuplicateLegalEntityIdentifiers(legalEntityRequests)
         return requests.flatMap { request ->
             val legalEntity = request.legalEntity
             val legalAddress = request.legalAddress
@@ -78,13 +78,28 @@ class RequestValidationService(
                             null,
                             LegalEntityCreateError.LegalEntityDuplicateIdentifier,
                             request.index
-                        )
-
+                        ) +
+                        validateDuplicates(legalEntity,duplicateIdentifiers,request.index)
             validationErrors.map { Pair(request, it) }
 
         }.groupBy({ it.first }, { it.second })
     }
 
+    fun validateDuplicates(legalEntity: LegalEntityDto,duplicateIdentifiers: Set<LegalEntityIdentifierDto>, entityKey: String?) : Collection<ErrorInfo<LegalEntityCreateError>> {
+        val errorList = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
+        duplicateIdentifiers.forEach { duplicate ->
+            if (legalEntity.identifiers.contains(duplicate)) {
+                val error = ErrorInfo(
+                    LegalEntityCreateError.LegalEntityDuplicateIdentifier,
+                    "Identifier $duplicate is duplicated among legal entities in the request",
+                    entityKey
+                )
+                errorList.add(error)
+            }
+        }
+
+        return errorList
+    }
     fun validateLegalEntityUpdates(
         requests: Collection<LegalEntityPartnerUpdateRequest>
     ): Map<LegalEntityPartnerUpdateRequest, Collection<ErrorInfo<LegalEntityUpdateError>>> {
@@ -224,6 +239,19 @@ class RequestValidationService(
 
         }.groupBy({ it.first }, { it.second })
     }
+
+
+    fun findDuplicateLegalEntityIdentifiers(
+        legalEntityRequests: List<LegalEntityDto>
+    ): Set<LegalEntityIdentifierDto> {
+        val allIdentifiers = legalEntityRequests.flatMap { it.identifiers }
+
+        return allIdentifiers.groupBy { it }
+            .filter { it.value.size > 1 }
+            .keys
+            .toSet()
+    }
+
 
     private fun <ERROR : ErrorCode> validateIdentifierTypesExists(request: LegalEntityDto, existingTypes: Set<String>, error: ERROR, entityKey: String?)
             : Collection<ErrorInfo<ERROR>> {
