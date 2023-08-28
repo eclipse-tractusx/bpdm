@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.0.1] - 2023-08-28
+
+### Changed
+
+- BPDM Pool API: Adjust API text descriptions to BPDM Standard
+- BPDM Gate API: Adjust API text descriptions to BPDM Standard
+
+### Added
+
+- BPDM Apps: Add legal files to packaged Jar files: LICENSE, NOTICE and DEPENDENCIES
+- BPDM Bridge Dummy: Add missing tests for updating business partners
+
+### Fixed
+
+- BPDM Pool: Fix duplicate identifier validation on creating new legal entities
+
 ## [4.0.0] - 2023-08-15
 
 ### Note
