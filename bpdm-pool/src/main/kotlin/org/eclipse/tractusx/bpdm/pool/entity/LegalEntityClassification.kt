@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity
+package org.eclipse.tractusx.bpdm.pool.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
@@ -30,7 +30,7 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
         Index(columnList = "legal_entity_id")
     ]
 )
-class Classification (
+class LegalEntityClassification(
     @Column(name = "`value`")
     val value: String?,
 

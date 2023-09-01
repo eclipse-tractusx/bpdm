@@ -17,32 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.entity
+package org.eclipse.tractusx.bpdm.gate.repository.generic
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
-@Entity
-@Table(
-    name = "classifications",
-    indexes = [
-        Index(columnList = "legal_entity_id")
-    ]
-)
-class Classification (
-    @Column(name = "`value`")
-    val value: String?,
-
-    @Column(name = "code")
-    val code: String?,
-
-    @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    val type: ClassificationType,
-
-    @ManyToOne
-    @JoinColumn(name = "legal_entity_id", nullable = false)
-    var legalEntity: LegalEntity
-
-) : BaseEntity()
+@Repository
+interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>
