@@ -20,6 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.*
@@ -201,6 +204,131 @@ class SiteControllerIT @Autowired constructor(
 
         assertThatCreatedSitesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
+    }
+
+
+    /**
+     * Given no legal entities
+     * When creating some sites entities in one request that have duplicate identifiers on the address (regarding type and value)
+     * Then for these sites entities an error is returned
+     */
+    @Test
+    fun `create sites entities and get duplicate identifier error on address`() {
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = RequestValues.addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
+            )
+        )
+
+        val givenLegalEntities =
+            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+
+        val request1 = with(RequestValues.siteCreate1) {
+            copy(
+                index = CommonValues.index1,
+                site = SiteDto(
+                    name = CommonValues.siteName1,
+                    states = listOf(RequestValues.siteStatus1),
+                    mainAddress = RequestValues.logisticAddress3.copy(
+                        identifiers = listOf(RequestValues.addressIdentifier)
+                    )
+                )
+            )
+        }
+        val request2 = with(RequestValues.siteCreate2) {
+            copy(
+                index = CommonValues.index1,
+                site = SiteDto(
+                    name = CommonValues.siteName1,
+                    states = listOf(RequestValues.siteStatus1),
+                    mainAddress = RequestValues.logisticAddress2.copy(
+                        identifiers = listOf(RequestValues.addressIdentifier)
+                    )
+                )
+            )
+        }
+
+        val response = poolClient.sites().createSite(
+            listOf(request1, request2)
+        )
+
+        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], SiteCreateError.MainAddressDuplicateIdentifier, request1.index!!)
+        testHelpers.assertErrorResponse(errors[1], SiteCreateError.MainAddressDuplicateIdentifier, request2.index!!)
+
+    }
+
+    /**
+     * Given no legal entities
+     * When creating some site entities in one request that have duplicate identifiers (regarding type and value)
+     * Then for these site entities an error is returned
+     */
+    @Test
+    fun `update site entities and get duplicate identifier error`() {
+
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = RequestValues.addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
+            )
+        )
+
+        val givenLegalEntities =
+            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+
+        val toCreate1 = listOf(RequestValues.siteCreate1, RequestValues.siteCreate2)
+        val response1 = poolClient.sites().createSite(toCreate1)
+
+
+        assertThat(response1.errorCount).isEqualTo(0)
+        val bpnList = response1.entities.map { it.site.bpns }
+
+        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
+        val referenceIdentifier = RequestValues.identifier3.copy(
+            issuingBody = CommonValues.issuingBody1
+        )
+        val equivalentIdentifier = referenceIdentifier.copy(
+            issuingBody = CommonValues.issuingBody2
+        )
+
+        // 3 requests using these equivalent identifiers & 1 different request
+        val toUpdate1 = with(RequestValues.siteUpdate1) {
+            copy(
+                bpns = bpnList[0],
+                site = SiteDto(
+                    name = CommonValues.siteName1,
+                    states = listOf(RequestValues.siteStatus1),
+                    mainAddress = RequestValues.logisticAddress3.copy(
+                        identifiers = listOf(RequestValues.addressIdentifier)
+                    )
+                )
+            )
+        }
+        val toUpdate2 = with(RequestValues.siteUpdate2) {
+            copy(
+                bpns = bpnList[1],
+                site = SiteDto(
+                    name = CommonValues.siteName1,
+                    states = listOf(RequestValues.siteStatus1),
+                    mainAddress = RequestValues.logisticAddress2.copy(
+                        identifiers = listOf(RequestValues.addressIdentifier)
+                    )
+                )
+            )
+        }
+
+        val response = poolClient.sites().updateSite(
+            listOf(toUpdate1, toUpdate2)
+        )
+
+        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], SiteUpdateError.MainAddressDuplicateIdentifier, toUpdate1.bpns)
+        testHelpers.assertErrorResponse(errors[1], SiteUpdateError.MainAddressDuplicateIdentifier, toUpdate2.bpns)
     }
 
     /**

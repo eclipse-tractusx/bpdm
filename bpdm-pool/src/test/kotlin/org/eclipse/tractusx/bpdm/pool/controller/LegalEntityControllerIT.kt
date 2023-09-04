@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
@@ -27,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.RequestValues.addressIdentifier
+import org.eclipse.tractusx.bpdm.pool.util.RequestValues.logisticAddress3
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -86,49 +90,155 @@ class LegalEntityControllerIT @Autowired constructor(
 
     /**
      * Given no legal entities
-     * When creating new legal entity with duplicate identifiers on legal entity and address
-     * Then new legal entity is returned with error
+     * When creating some legal entities in one request that have duplicate identifiers (regarding type and value)
+     * Then for these legal entities an error is returned
      */
     @Test
-    fun `create new legal entity and get duplicate error`() {
+    fun `create legal entities and get duplicate identifier error`() {
 
-        val expectedBpn = CommonValues.bpnL1
-        val expected = with(ResponseValues.legalEntityUpsert1) {
+        // 3 equivalent identifiers (in regard to fields type and value)
+        val referenceIdentifier = RequestValues.identifier1.copy(
+            issuingBody = CommonValues.issuingBody1
+        )
+        val identicalIdentifier = RequestValues.identifier1.copy()
+        val equivalentIdentifier = referenceIdentifier.copy(
+            issuingBody = CommonValues.issuingBody2
+        )
+
+        // 3 requests using these equivalent identifiers & 1 different request
+        val request1 = with(RequestValues.legalEntityCreate1) {
             copy(
+                index = CommonValues.index1,
                 legalEntity = legalEntity.copy(
-                    bpnl = expectedBpn
+
+                )
+            )
+        }
+        val request2 = with(RequestValues.legalEntityCreate1) {
+            copy(
+                index = CommonValues.index2,
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(identicalIdentifier)
+                )
+            )
+        }
+        val request3 = with(RequestValues.legalEntityCreate1) {
+            copy(
+                index = CommonValues.index3,
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(equivalentIdentifier)
+                )
+            )
+        }
+        val requestOkay = RequestValues.legalEntityCreate3
+
+        val response = poolClient.legalEntities().createBusinessPartners(
+            listOf(request1, request2, request3, requestOkay)
+        )
+
+        assertThat(response.errorCount).isEqualTo(3)
+        assertThat(response.entityCount).isEqualTo(1)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], LegalEntityCreateError.LegalEntityDuplicateIdentifier, request1.index!!)
+        testHelpers.assertErrorResponse(errors[1], LegalEntityCreateError.LegalEntityDuplicateIdentifier, request2.index!!)
+        testHelpers.assertErrorResponse(errors[2], LegalEntityCreateError.LegalEntityDuplicateIdentifier, request3.index!!)
+    }
+
+
+    /**
+     * Given no legal entities
+     * When creating some legal entities in one request that have duplicate identifiers on the address (regarding type and value)
+     * Then for these legal entities an error is returned
+     */
+    @Test
+    fun `create legal entities and get duplicate identifier error on address`() {
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val request1 = with(RequestValues.legalEntityCreate1) {
+            copy(
+                index = CommonValues.index1,
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf()
+                ),
+                legalAddress = logisticAddress3.copy(identifiers = listOf(addressIdentifier))
+            )
+        }
+        val request2 = with(RequestValues.legalEntityCreate1) {
+            copy(
+                index = CommonValues.index2,
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf()
+                ),
+                legalAddress = logisticAddress3.copy(identifiers = listOf(addressIdentifier))
+            )
+        }
+
+        val response = poolClient.legalEntities().createBusinessPartners(
+            listOf(request1, request2)
+        )
+
+        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], LegalEntityCreateError.LegalAddressDuplicateIdentifier, request1.index!!)
+        testHelpers.assertErrorResponse(errors[1], LegalEntityCreateError.LegalAddressDuplicateIdentifier, request2.index!!)
+
+    }
+
+    /**
+     * Given no legal entities
+     * When creating some legal entities in one request that have duplicate identifiers (regarding type and value)
+     * Then for these legal entities an error is returned
+     */
+    @Test
+    fun `update legal entities and get duplicate identifier error`() {
+
+        val toCreate1 = listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)
+        val response1 = poolClient.legalEntities().createBusinessPartners(toCreate1)
+
+        assertThat(response1.errorCount).isEqualTo(0)
+        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+
+        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
+        val referenceIdentifier = RequestValues.identifier3.copy(
+            issuingBody = CommonValues.issuingBody1
+        )
+        val equivalentIdentifier = referenceIdentifier.copy(
+            issuingBody = CommonValues.issuingBody2
+        )
+
+        // 3 requests using these equivalent identifiers & 1 different request
+        val toUpdate1 = with(RequestValues.legalEntityUpdate1) {
+            copy(
+                bpnl = bpnList[0],
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(referenceIdentifier)
+                )
+            )
+        }
+        val toUpdate2 = with(RequestValues.legalEntityUpdate2) {
+            copy(
+                bpnl = bpnList[1],
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf(equivalentIdentifier)
                 )
             )
         }
 
-
-        val toCreate = RequestValues.legalEntityCreate1
-        val secondRequest = toCreate.copy(index = CommonValues.index4)
-        val toCreate2 = RequestValues.legalEntityCreate3
-
-        // Create a new instance of LogisticAddressDto with the modified identifiers list
-        val response = poolClient.legalEntities().createBusinessPartners(listOf(toCreate,secondRequest,toCreate2))
-
-        val identifier = toCreate.legalEntity.identifiers.toList().get(0)
-
-
-
-        val expectedErrors = listOf(
-            ErrorInfo(
-                LegalEntityCreateError.LegalEntityDuplicateIdentifier,
-                "Identifier $identifier is duplicated among legal entities in the request",
-               toCreate.index
-            ) ,
-                    ErrorInfo(
-                    LegalEntityCreateError.LegalEntityDuplicateIdentifier,
-            "Identifier $identifier is duplicated among legal entities in the request",
-                        secondRequest.index
-        )
+        val response = poolClient.legalEntities().updateBusinessPartners(
+            listOf(toUpdate1, toUpdate2)
         )
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertRecursively(response.errors)
-            .isEqualTo(expectedErrors)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], LegalEntityUpdateError.LegalEntityDuplicateIdentifier, toUpdate1.bpnl)
+        testHelpers.assertErrorResponse(errors[1], LegalEntityUpdateError.LegalEntityDuplicateIdentifier, toUpdate2.bpnl)
     }
 
     /**
@@ -150,7 +260,7 @@ class LegalEntityControllerIT @Autowired constructor(
     /**
      * Given legal entity
      * When creating legal entities
-     * Then only create new legal entities with different identifiers
+     * Then only create new legal entities with different identifiers from entities already in DB
      */
     @Test
     fun `don't create legal entity with same identifier`() {
@@ -245,10 +355,12 @@ class LegalEntityControllerIT @Autowired constructor(
         val bpnL = createdEntity.legalEntity.bpnl
         val bpnA = createdEntity.legalAddress.bpna
 
-        val toUpdate = listOf(
-            RequestValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT"),
-            RequestValues.legalEntityUpdate3.copy(bpnl = bpnL)
-        )
+        val toUpdate1 =
+            RequestValues.legalEntityUpdate3.copy(bpnl = "NONEXISTENT", legalEntity = RequestValues.legalEntityCreate1.legalEntity.copy(identifiers = listOf()))
+        val toUpdate2 =
+            RequestValues.legalEntityUpdate3.copy(bpnl = bpnL, legalEntity = RequestValues.legalEntityCreate3.legalEntity.copy(identifiers = listOf()))
+
+        val toUpdate = listOf(toUpdate1, toUpdate2)
 
         val expected = with(ResponseValues.legalEntityUpsert3) {
             copy(
@@ -258,6 +370,7 @@ class LegalEntityControllerIT @Autowired constructor(
                 ),
                 legalEntity = legalEntity.copy(
                     bpnl = bpnL,
+                    identifiers = listOf()
                 ),
 
                 )
@@ -555,7 +668,7 @@ class LegalEntityControllerIT @Autowired constructor(
         expected: Collection<LegalEntityPartnerCreateVerboseDto>
     ) {
         val now = Instant.now()
-        val justBeforeCreate = now.minusSeconds(2)
+        val justBeforeCreate = now.minusSeconds(3)
         actuals.forEach { assertThat(it.legalEntity.currentness).isBetween(justBeforeCreate, now) }
 
         testHelpers.assertRecursively(actuals)

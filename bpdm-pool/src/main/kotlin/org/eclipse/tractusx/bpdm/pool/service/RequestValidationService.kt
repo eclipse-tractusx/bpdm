@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -48,9 +50,10 @@ class RequestValidationService(
 
         val legalEntityMetadata = metadataService.getMetadata(legalEntityRequests).toKeys()
         val addressMetadata = metadataService.getMetadata(legalAddressRequests).toKeys()
-        val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidates(legalEntityRequests)
+        val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidatesInDB(legalEntityRequests)
+        val duplicateIdentifiers = getDuplicateIdentifiersByTypeAndValueOnRequest(legalEntityRequests)
+        val duplicateAddressIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(legalAddressRequests)
 
-        val duplicateIdentifiers = findDuplicateLegalEntityIdentifiers(legalEntityRequests)
         return requests.flatMap { request ->
             val legalEntity = request.legalEntity
             val legalAddress = request.legalAddress
@@ -76,43 +79,64 @@ class RequestValidationService(
                             null,
                             LegalEntityCreateError.LegalEntityDuplicateIdentifier,
                             request.index
-                        ) +
-                        validateLegalEntityDuplicates(legalEntity,duplicateIdentifiers,request.index)
+                        ) + validateLegalEntityDuplicates(
+                    legalEntity,
+                    duplicateIdentifiers,
+                    LegalEntityCreateError.LegalEntityDuplicateIdentifier,
+                    request.index
+                ) + validateAddressDuplicates(
+                    request.legalAddress,
+                    duplicateAddressIdentifiers,
+                    LegalEntityCreateError.LegalAddressDuplicateIdentifier,
+                    request.index
+                )
             validationErrors.map { Pair(request, it) }
 
         }.groupBy({ it.first }, { it.second })
     }
 
-    fun validateLegalEntityDuplicates(legalEntity: LegalEntityDto, duplicateIdentifiers: Set<LegalEntityIdentifierDto>, entityKey: String?) : Collection<ErrorInfo<LegalEntityCreateError>> {
-        val errorList = mutableListOf<ErrorInfo<LegalEntityCreateError>>()
-        duplicateIdentifiers.forEach { duplicate ->
-            if (legalEntity.identifiers.contains(duplicate)) {
-                val error = ErrorInfo(
-                    LegalEntityCreateError.LegalEntityDuplicateIdentifier,
-                    "Identifier $duplicate is duplicated among legal entities in the request",
+    private fun <ERROR : ErrorCode> validateLegalEntityDuplicates(
+        legalEntity: LegalEntityDto,
+        duplicateIdentifierKeys: Set<IdentifierCandidateKey>,
+        errorType: ERROR,
+        entityKey: String?
+    ): Collection<ErrorInfo<ERROR>> {
+        return legalEntity.identifiers.mapNotNull { identifier ->
+            val identifierKey = IdentifierCandidateKey(type = identifier.type, value = identifier.value)
+            if (duplicateIdentifierKeys.contains(identifierKey)) {
+                ErrorInfo(
+                    errorType,
+                    "Duplicate Legal Entity Identifier: Value '${identifier.value}' of Type '${identifier.type}'",
                     entityKey
                 )
-                errorList.add(error)
+            } else {
+                null
             }
         }
-
-        return errorList
     }
-    fun validateAddressDuplicates(address: LogisticAddressDto, duplicateIdentifiers: Set<AddressIdentifierDto>, entityKey: String?) : MutableList<ErrorInfo<AddressCreateError>> {
-        val errorList = mutableListOf<ErrorInfo<AddressCreateError>>()
-        duplicateIdentifiers.forEach { duplicate ->
-            if (address.identifiers.contains(duplicate)) {
-                val error = ErrorInfo(
-                    AddressCreateError.MainAddressDuplicateIdentifier,
-                    "Identifier $duplicate is duplicated among address entities in the request",
+
+
+    private fun <ERROR : ErrorCode> validateAddressDuplicates(
+        address: LogisticAddressDto,
+        duplicateIdentifierKeys: Set<IdentifierCandidateKey>,
+        errorType: ERROR,
+        entityKey: String?
+    ): Collection<ErrorInfo<ERROR>> {
+        return address.identifiers.mapNotNull { identifier ->
+            val identifierKey = IdentifierCandidateKey(type = identifier.type, value = identifier.value)
+            if (duplicateIdentifierKeys.contains(identifierKey)) {
+                ErrorInfo(
+                    errorType,
+                    "Duplicate Address Identifier: Value '${identifier.value}' of Type '${identifier.type}'",
                     entityKey
                 )
-                errorList.add(error)
+            } else {
+                null
             }
         }
-
-        return errorList
     }
+
+
     fun validateLegalEntityUpdates(
         requests: Collection<LegalEntityPartnerUpdateRequest>
     ): Map<LegalEntityPartnerUpdateRequest, Collection<ErrorInfo<LegalEntityUpdateError>>> {
@@ -123,7 +147,9 @@ class RequestValidationService(
         val legalEntityMetadata = metadataService.getMetadata(legalEntityRequests).toKeys()
         val addressMetadata = metadataService.getMetadata(legalAddressRequests).toKeys()
 
-        val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidates(requests.map { it.legalEntity })
+        val duplicateIdentifierCandidates = getDuplicateLegalEntityCandidatesInDB(requests.map { it.legalEntity })
+        val duplicateIdentifiers = getDuplicateIdentifiersByTypeAndValueOnRequest(legalEntityRequests)
+        val duplicateAddressIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(legalAddressRequests)
         val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(requests.map { it.bpnl }).map { it.bpn }.toSet()
 
         return requests.flatMap { request ->
@@ -151,9 +177,15 @@ class RequestValidationService(
                             request.bpnl,
                             LegalEntityUpdateError.LegalEntityDuplicateIdentifier,
                             request.bpnl
-                        ) +
-                        validateUpdateBpnExists(request.bpnl, existingLegalEntityBpns, LegalEntityUpdateError.LegalEntityNotFound)
-
+                        ) + validateUpdateBpnExists(
+                    request.bpnl, existingLegalEntityBpns, LegalEntityUpdateError.LegalEntityNotFound
+                ) + validateLegalEntityDuplicates(legalEntity, duplicateIdentifiers, LegalEntityUpdateError.LegalEntityDuplicateIdentifier, request.bpnl) +
+                        validateAddressDuplicates(
+                            request.legalAddress,
+                            duplicateAddressIdentifiers,
+                            LegalEntityUpdateError.LegalAddressDuplicateIdentifier,
+                            request.bpnl
+                        )
             validationErrors.map { Pair(request, it) }
 
         }.groupBy({ it.first }, { it.second })
@@ -168,13 +200,20 @@ class RequestValidationService(
 
         val requestedParentBpns = requests.map { it.bpnlParent }
         val existingParentBpns = legalEntityRepository.findDistinctByBpnIn(requestedParentBpns).map { it.bpn }.toSet()
+        val duplicateAddressIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(mainAddressRequests)
 
         return requests.flatMap { request ->
             val mainAddress = request.site.mainAddress
 
             val validationErrors = validateRegionExists(mainAddress, addressMetadata.regions, SiteCreateError.MainAddressRegionNotFound, request.index) +
                     validateIdentifierTypeExists(mainAddress, addressMetadata.idTypes, SiteCreateError.MainAddressIdentifierNotFound, request.index) +
-                    validateParentBpnExists(request.bpnlParent, request.index, existingParentBpns, SiteCreateError.LegalEntityNotFound)
+                    validateParentBpnExists(request.bpnlParent, request.index, existingParentBpns, SiteCreateError.LegalEntityNotFound) +
+                    validateAddressDuplicates(
+                        request.site.mainAddress,
+                        duplicateAddressIdentifiers,
+                        SiteCreateError.MainAddressDuplicateIdentifier,
+                        request.index
+                    )
 
             validationErrors.map { Pair(request, it) }
 
@@ -190,13 +229,15 @@ class RequestValidationService(
 
         val requestedSiteBpns = requests.map { it.bpns }
         val existingSiteBpns = siteRepository.findDistinctByBpnIn(requestedSiteBpns).map { it.bpn }.toSet()
+        val duplicateAddressIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(mainAddressRequests)
 
         return requests.flatMap { request ->
             val mainAddress = request.site.mainAddress
 
             val validationErrors = validateRegionExists(mainAddress, addressMetadata.regions, SiteUpdateError.MainAddressRegionNotFound, request.bpns) +
                     validateIdentifierTypeExists(mainAddress, addressMetadata.idTypes, SiteUpdateError.MainAddressIdentifierNotFound, request.bpns) +
-                    validateUpdateBpnExists(request.bpns, existingSiteBpns, SiteUpdateError.SiteNotFound)
+                    validateUpdateBpnExists(request.bpns, existingSiteBpns, SiteUpdateError.SiteNotFound) +
+                    validateAddressDuplicates(mainAddress, duplicateAddressIdentifiers, SiteUpdateError.MainAddressDuplicateIdentifier, request.bpns)
 
             validationErrors.map { Pair(request, it) }
 
@@ -220,7 +261,7 @@ class RequestValidationService(
         val existingSites = siteRepository.findDistinctByBpnIn(siteParentBpns).map { it.bpn }.toSet()
 
 
-        val duplicateIdentifiers = findDuplicateAddressIdentifiers(mainAddressRequests)
+        val duplicateIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(mainAddressRequests)
 
         return requestsWithParentType.flatMap { (request, type) ->
             val address = request.address
@@ -228,7 +269,7 @@ class RequestValidationService(
             val validationErrors = validateAddressParent(request, type, existingLegalEntities, existingSites) +
                     validateRegionExists(address, addressMetadata.regions, AddressCreateError.RegionNotFound, request.index) +
                     validateIdentifierTypeExists(address, addressMetadata.idTypes, AddressCreateError.IdentifierNotFound, request.index) +
-                    validateAddressDuplicates(address,duplicateIdentifiers,request.index)
+                    validateAddressDuplicates(address, duplicateIdentifiers, AddressCreateError.AddressDuplicateIdentifier, request.index)
 
             validationErrors.map { Pair(request, it) }
 
@@ -245,12 +286,15 @@ class RequestValidationService(
         val requestedAddressBpns = requests.map { it.bpna }
         val existingAddressBpns = addressRepository.findDistinctByBpnIn(requestedAddressBpns).map { it.bpn }.toSet()
 
+        val duplicateIdentifiers = getDuplicateAddressIdentifiersByTypeAndValue(mainAddressRequests)
+
         return requests.flatMap { request ->
             val address = request.address
 
             val validationErrors = validateRegionExists(address, addressMetadata.regions, AddressUpdateError.RegionNotFound, request.bpna) +
                     validateIdentifierTypeExists(address, addressMetadata.idTypes, AddressUpdateError.IdentifierNotFound, request.bpna) +
-                    validateUpdateBpnExists(request.bpna, existingAddressBpns, AddressUpdateError.AddressNotFound)
+                    validateUpdateBpnExists(request.bpna, existingAddressBpns, AddressUpdateError.AddressNotFound) +
+                    validateAddressDuplicates(address, duplicateIdentifiers, AddressUpdateError.AddressDuplicateIdentifier, request.bpna)
 
             validationErrors.map { Pair(request, it) }
 
@@ -258,24 +302,27 @@ class RequestValidationService(
     }
 
 
-    fun findDuplicateLegalEntityIdentifiers(
+    private fun getDuplicateIdentifiersByTypeAndValueOnRequest(
         legalEntityRequests: List<LegalEntityDto>
-    ): Set<LegalEntityIdentifierDto> {
+    ): Set<IdentifierCandidateKey> {
         val allIdentifiers = legalEntityRequests.flatMap { it.identifiers }
+            .map { IdentifierCandidateKey(it.type, it.value) }
 
         return allIdentifiers.groupBy { it }
             .filter { it.value.size > 1 }
-            .keys
+            .flatMap { it.value }
             .toSet()
     }
 
-    fun findDuplicateAddressIdentifiers(
-        allIdentifiers: List<LogisticAddressDto>
-    ): Set<AddressIdentifierDto> {
-        val allIdentifiers = allIdentifiers.flatMap { it.identifiers }
+    private fun getDuplicateAddressIdentifiersByTypeAndValue(
+        addressRequests: List<LogisticAddressDto>
+    ): Set<IdentifierCandidateKey> {
+        val allIdentifiers = addressRequests.flatMap { it.identifiers }
+            .map { IdentifierCandidateKey(it.type, it.value) }
+
         return allIdentifiers.groupBy { it }
             .filter { it.value.size > 1 }
-            .keys
+            .flatMap { it.value }
             .toSet()
     }
 
@@ -354,7 +401,7 @@ class RequestValidationService(
             emptyList()
     }
 
-    private fun getDuplicateLegalEntityCandidates(requests: Collection<LegalEntityDto>)
+    private fun getDuplicateLegalEntityCandidatesInDB(requests: Collection<LegalEntityDto>)
             : Map<IdentifierCandidateKey, IdentifierCandidate> {
         val idValues = requests.flatMap { it.identifiers }.map { it.value }
         return legalEntityIdentifierRepository.findByValueIn(idValues)

@@ -318,25 +318,72 @@ class AddressControllerIT @Autowired constructor(
 
         val response = poolClient.addresses().createAddresses(listOf(toCreate, secondCreate))
 
-        val identifier = toCreate.address.identifiers.toList().get(0)
-
-        val expectedErrors = listOf(
-            ErrorInfo(
-                AddressCreateError.MainAddressDuplicateIdentifier,
-                "Identifier $identifier is duplicated among address entities in the request",
-                toCreate.index
-            ),
-            ErrorInfo(
-                AddressCreateError.MainAddressDuplicateIdentifier,
-                "Identifier $identifier is duplicated among address entities in the request",
-                secondCreate.index
-            )
-
-        )
 
         assertThat(response.errorCount).isEqualTo(2)
-        testHelpers.assertRecursively(response.errors)
-            .isEqualTo(expectedErrors)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], AddressCreateError.AddressDuplicateIdentifier, toCreate.index!!)
+        testHelpers.assertErrorResponse(errors[1], AddressCreateError.AddressDuplicateIdentifier, secondCreate.index!!)
+
+    }
+
+    /**
+     * Given no address entities
+     * When creating some address entities in one request that have duplicate identifiers (regarding type and value)
+     * Then for these address entities an error is returned
+     */
+    @Test
+    fun `update address entities and get duplicate identifier error`() {
+
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate1,
+                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                        )
+                    )
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                )
+            )
+        )
+
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
+        val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].address.bpna
+        val bpnA3 = givenStructure[1].addresses[0].address.bpna
+
+        val expected = listOf(
+            ResponseValues.addressPartner1.copy(bpna = bpnA2),
+            ResponseValues.addressPartner2.copy(bpna = bpnA3),
+            ResponseValues.addressPartner3.copy(bpna = bpnA1)
+        )
+
+        val toUpdate = listOf(
+            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA2, address = RequestValues.logisticAddress5),
+            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA3, address = RequestValues.logisticAddress5),
+            RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1, address = RequestValues.logisticAddress5)
+        )
+
+        val response = poolClient.addresses().updateAddresses(toUpdate)
+
+        assertThat(response.errorCount).isEqualTo(3)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[0].bpna)
+        testHelpers.assertErrorResponse(errors[1], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[1].bpna)
+        testHelpers.assertErrorResponse(errors[2], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[2].bpna)
     }
 
     /**
