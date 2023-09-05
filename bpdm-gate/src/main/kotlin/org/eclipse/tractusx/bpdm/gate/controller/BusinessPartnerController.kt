@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -39,4 +40,10 @@ class BusinessPartnerController() : GateBusinessPartnerApi {
     ): PageDto<BusinessPartnerInputDto> {
         TODO("Not yet implemented")
     }
+
+    override fun getBusinessPartnersOutput(paginationRequest: PaginationRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDto> {
+        TODO("Not yet implemented")
+    }
+
+
 }

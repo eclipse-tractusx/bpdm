@@ -24,7 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 
-interface IBaseBusinessPartnerInputDto {
+
+interface IBaseBusinessPartnerDto {
 
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String
@@ -52,11 +53,4 @@ interface IBaseBusinessPartnerInputDto {
 
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
     val isOwner: Boolean
-
-    @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: BusinessPartnerPostalAddressInputDto
-
-
 }
-
-

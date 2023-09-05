@@ -28,6 +28,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -65,7 +66,7 @@ interface GateBusinessPartnerApi {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The requested page of business partners"),
+            ApiResponse(responseCode = "200", description = "The requested page of busines partners"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
@@ -75,5 +76,24 @@ interface GateBusinessPartnerApi {
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
     ): PageDto<BusinessPartnerInputDto>
+
+
+    @Operation(
+        summary = "Search business partners by an array of external IDs from the output stage",
+        description = "Get page of business partners output data filtered by a collection of external IDs. " +
+                "An empty external ID list will return a paginated list of all business partners."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "The requested page of business partners"),
+            ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
+        ]
+    )
+    @PostMapping("/output/business-partners/search")
+    @PostExchange("/output/business-partners/search")
+    fun getBusinessPartnersOutput(
+        @ParameterObject @Valid paginationRequest: PaginationRequest,
+        @RequestBody(required = false) externalIds: Collection<String>?
+    ): PageDto<BusinessPartnerOutputDto>
 
 }
