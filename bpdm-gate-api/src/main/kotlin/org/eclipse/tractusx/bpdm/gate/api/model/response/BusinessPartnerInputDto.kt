@@ -27,7 +27,7 @@ import java.time.Instant
 
 
 @Schema(description = "Generic business partner with external id", requiredProperties = ["externalId", "postalAddress"])
-data class BusinessPartnerInputResponseDto(
+data class BusinessPartnerInputDto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val shortName: String?,

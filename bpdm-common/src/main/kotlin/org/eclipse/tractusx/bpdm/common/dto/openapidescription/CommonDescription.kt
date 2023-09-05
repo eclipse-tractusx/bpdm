@@ -29,4 +29,7 @@ object CommonDescription {
     const val score = "Relative quality score of the match. The higher the better."
 
     const val externalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+
+    const val roles = "Roles this business partner takes in relation to the sharing member."
+
 }

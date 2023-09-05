@@ -27,7 +27,7 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputResponseDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
@@ -45,8 +45,8 @@ interface GateBusinessPartnerApi {
     @Operation(
         summary = "Create or update business partner with given external ID",
         description = "Create or update generic business partner. " +
-                "Updates instead of creating a new business partner if an already existing external id is used. " +
-                "The same external id may not occur more than once in a single request. " +
+                "Updates instead of creating a new business partner if an already existing external ID is used. " +
+                "The same external ID may not occur more than once in a single request. " +
                 "For a single request, the maximum number of business partners in the request is limited to \${bpdm.api.upsert-limit} entries."
     )
     @ApiResponses(
@@ -57,15 +57,15 @@ interface GateBusinessPartnerApi {
     )
     @PutMapping("/input/business-partners")
     @PutExchange("/input/business-partners")
-    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): Collection<BusinessPartnerInputResponseDto>
+    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): Collection<BusinessPartnerInputDto>
 
     @Operation(
         summary = "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
-        description = "Get page of business partners filtered by a collection of externalIds."
+        description = "Get page of business partners filtered by a collection of external IDs."
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "The requested page of busines partners"),
+            ApiResponse(responseCode = "200", description = "The requested page of business partners"),
             ApiResponse(responseCode = "400", description = "On malformed pagination request", content = [Content()]),
         ]
     )
@@ -74,6 +74,6 @@ interface GateBusinessPartnerApi {
     fun getBusinessPartnersInputByExternalIds(
         @ParameterObject @Valid paginationRequest: PaginationRequest,
         @RequestBody externalIds: Collection<String>
-    ): PageDto<BusinessPartnerInputResponseDto>
+    ): PageDto<BusinessPartnerInputDto>
 
 }

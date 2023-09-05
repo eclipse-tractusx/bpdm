@@ -22,12 +22,11 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 
 interface IBaseBusinessPartnerInputDto {
 
-    @get:Schema(description = "ID the record has in the external system where the record originates from")
+    @get:Schema(description = CommonDescription.externalId)
     val externalId: String
 
     @get:Schema(description = "")
@@ -36,25 +35,25 @@ interface IBaseBusinessPartnerInputDto {
     @get:Schema(description = "Abbreviated name or shorthand")
     val shortName: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner."))
     val identifiers: Collection<BusinessPartnerIdentifierDto>
 
-    @get:Schema(description = "Technical key of the legal form")
+    @get:Schema(description = "Technical key of the legal form.")
     val legalForm: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner."))
     val states: Collection<BusinessPartnerStateDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the legal entity, such as a specific industry."))
     val classifications: Collection<ClassificationDto>
 
-    @get:Schema(description = "Which roles this business partner takes in relation to the sharing member")
+    @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
     val roles: Collection<BusinessPartnerRole>
 
-    @get:Schema(description = "")
+    @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
     val isOwner: Boolean
 
-    @get:Schema(description = "Address of the official seat of this legal entity")
+    @get:Schema(description = "Address of the official seat of this business partner.")
     val postalAddress: BusinessPartnerPostalAddressDto
 
 

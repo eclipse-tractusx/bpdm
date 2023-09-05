@@ -39,7 +39,7 @@ data class LegalEntityGateOutputResponse(
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.roles))
+    @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList(),
 
     // TODO OpenAPI description for complex field does not work!!

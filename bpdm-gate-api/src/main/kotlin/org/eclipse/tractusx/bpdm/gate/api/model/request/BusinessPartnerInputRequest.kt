@@ -24,7 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 
 
-@Schema(name = "BusinessPartnerInputDto", description = "Generic business partner with external id", requiredProperties = ["externalId", "postalAddress"])
+@Schema(description = "Generic business partner with external id", requiredProperties = ["externalId", "postalAddress"])
 data class BusinessPartnerInputRequest(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),

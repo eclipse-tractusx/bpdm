@@ -27,15 +27,15 @@ import java.time.LocalDateTime
 @Schema(description = LegalEntityStateDescription.header, requiredProperties = ["type"])
 data class BusinessPartnerStateDto(
 
-    @get:Schema(description = "Exact, official denotation of the status")
+    @get:Schema(description = "Denotation of the status.")
     val description: String?,
 
-    @get:Schema(description = "Date since when the status is/was valid")
+    @get:Schema(description = "Date since when the status is/was valid.")
     val validFrom: LocalDateTime?,
 
-    @get:Schema(description = "Date until the status was valid, if applicable")
+    @get:Schema(description = "Date until the status was valid, if applicable.")
     val validTo: LocalDateTime?,
 
-    @get:Schema(description = "The type of this specified status")
+    @get:Schema(description = "The type of this specified status.")
     val type: BusinessStateType
 )

@@ -52,5 +52,5 @@ object LegalEntityDescription {
     const val states = "The list of (temporary) states of the legal entity."
     const val classifications = "The list of classifications of the legal entity, such as a specific industry."
     const val relations = "Relations to other business partners."
-    const val roles = "Roles this business partner takes in relation to the sharing member."
+
 }
