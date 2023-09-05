@@ -280,6 +280,43 @@ class LegalEntityControllerIT @Autowired constructor(
 
     /**
      * Given legal entity
+     * When creating legal entities
+     * Then only create new legal entities with different address identifiers from entities already in DB
+     */
+    @Test
+    fun `don't create legal entity with same address identifier`() {
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val given = with(RequestValues.legalEntityCreate1) {
+            copy(
+                legalEntity = legalEntity.copy(
+                    identifiers = listOf()
+                ),
+                legalAddress = legalAddress.copy(
+                    identifiers = listOf(addressIdentifier)
+                )
+            )
+        }
+        poolClient.legalEntities().createBusinessPartners(listOf(given))
+        val expected = listOf(ResponseValues.legalEntityUpsert2, ResponseValues.legalEntityUpsert3)
+
+        val toCreate = listOf(given, RequestValues.legalEntityCreate2, RequestValues.legalEntityCreate3)
+        val response = poolClient.legalEntities().createBusinessPartners(toCreate)
+
+        // 2 entities created
+        assertThatCreatedLegalEntitiesEqual(response.entities, expected)
+        // 1 error because identifier already exists
+        assertThat(response.errorCount).isEqualTo(1)
+        testHelpers.assertErrorResponse(response.errors.first(), LegalEntityCreateError.LegalAddressDuplicateIdentifier, given.index!!)
+    }
+
+    /**
+     * Given legal entity
      * When updating values of legal entity via BPN
      * Then legal entity updated with the values
      */

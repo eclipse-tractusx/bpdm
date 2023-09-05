@@ -23,3 +23,8 @@ fun <T> MutableCollection<T>.replace(elements: Collection<T>) {
     clear()
     addAll(elements)
 }
+
+fun <T> Collection<T>.findDuplicates(): Set<T> =
+    this.groupBy { it }
+        .filter { it.value.size > 1 }
+        .keys
