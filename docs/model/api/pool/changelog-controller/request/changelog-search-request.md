@@ -2,9 +2,9 @@
 classDiagram
  
 class ChangeLogSearchRequest{
-+date: fromTime
++date: timestampAfter
 +string[]: bpns
-+string[]: lsaTypes
++string[]: businessPartnerTypes
 }
 
 ````

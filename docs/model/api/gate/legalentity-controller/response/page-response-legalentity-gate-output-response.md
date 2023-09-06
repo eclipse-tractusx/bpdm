@@ -63,7 +63,7 @@ class LegalEntityGateOutputResponse{
 +string[]: legalNameParts
 +string[]: roles
 +string: externalId
-+string: bpn
++string: bpnl
 +LegalEntityIdentifier[]: identifiers;
 +LegalEntityState[]: states;
 +Classification[]: classifications;
@@ -75,7 +75,7 @@ class LegalEntityIdentifier{
 +string: issuingBody
 }
 class LegalEntityState{
-+string: officialDenotation
++string: description
 +date: validFrom
 +date: validTo
 +string: type

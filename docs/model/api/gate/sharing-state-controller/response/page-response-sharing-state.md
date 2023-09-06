@@ -4,7 +4,7 @@ classDiagram
 PageResponseSharingState ..> SharingState
 
 class SharingState{
-+string: lsaType
++string: businessPartnerType
 +string: externalId
 +string: sharingStateType
 +string: sharingErrorCode

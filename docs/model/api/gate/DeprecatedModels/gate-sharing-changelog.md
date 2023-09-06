@@ -13,15 +13,16 @@ PageResponseSharingState ..> SharingState
     note for PageChangeLogResponseChangelogResponse  "/api/catena/output/changelog/search [POST] [response]"
     note for PageChangeLogResponseChangelogResponse "/api/catena/input/changelog/search [POST] [response]"
 
-class ChangeLogSearchRequest{
+class ChangelogSearchRequest{
 +date: fromTime
 +string[]: externalIds
-+string[]: lsaTypes
++string[]: businessPartnerTypes
 }
 class ChangelogResponse{
 +string: externalId
 +string: businessPartnerType
-+date: modifiedAt
++date: timestamp
++string: changelogType 
 }
 class ErrorInfoChangeLogOutputError{
 +string: errorCode
@@ -38,7 +39,7 @@ class PageChangeLogResponseChangelogResponse{
 +ErrorInfoChangeLogOutputError[]: errors;
 }
 class SharingState{
-+string: lsaType
++string: businessPartnerType
 +string: externalId
 +string: sharingStateType
 +string: sharingErrorCode

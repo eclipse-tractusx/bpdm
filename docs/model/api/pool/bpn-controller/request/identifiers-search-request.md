@@ -2,7 +2,7 @@
 classDiagram
 
 class IdentifiersSearchRequest{
-+string: lsaType
++string: businessPartnerType
 +string: idType
 +string[]: idValues
 }

@@ -70,7 +70,7 @@ class LegalEntityIdentifier{
 +string: issuingBody
 }
 class LegalEntityState{
-+string: officialDenotation
++string: description
 +date: validFrom
 +date: validTo
 +string: type

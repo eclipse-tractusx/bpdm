@@ -29,7 +29,7 @@ class BpnIdentifierMappingResponse{
 class ChangeLogSearchRequest{
 +date: fromTime
 +string[]: bpns
-+string[]: lsaTypes
++string[]: businessPartnerTypes
 }
 class FieldQualityRuleDto{
 +string: fieldPath
@@ -38,7 +38,7 @@ class FieldQualityRuleDto{
 +string: qualityLevel
 }
 class IdentifiersSearchRequest{
-+string: lsaType
++string: businessPartnerType
 +string: idType
 +string[]: idValues
 }
@@ -69,7 +69,7 @@ class IdentifierTypeDetailDto{
 }
 class IdentifierTypeDto{
 +string: technicalKey
-+string: lsaType
++string: businessPartnerType
 +string: name
 +IdentifierTypeDetailDto[]: details;
 }

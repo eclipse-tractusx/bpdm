@@ -7,7 +7,8 @@ PageChangeLogResponseChangelogResponse ..> ErrorInfoChangeLogOutputError
 class ChangelogResponse{
 +string: externalId
 +string: businessPartnerType
-+date: modifiedAt
++date: timestamp
++string: changelogType 
 }
 class ErrorInfoChangeLogOutputError{
 +string: errorCode

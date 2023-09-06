@@ -1,9 +1,9 @@
 ````mermaid
 classDiagram
 
-class ChangeLogSearchRequest{
-+date: fromTime
+class ChangelogSearchRequest{
++date: timestampAfter
 +string[]: externalIds
-+string[]: lsaTypes
++string[]: businessPartnerTypes
 }
 ````

@@ -111,7 +111,7 @@ class SiteGateOutputResponse{
 +string[]: roles
 +string: externalId
 +string: legalEntityExternalId
-+string: bpn
++string: bpns
 +SiteState[]: states;
 +AddressGateInputResponse: mainAddress;
 }

@@ -17,7 +17,7 @@ class IdentifierTypeDetailDto{
 }
 class IdentifierTypeDto{
 +string: technicalKey
-+string: lsaType
++string: businessPartnerType
 +string: name
 +IdentifierTypeDetailDto[]: details;
 }
