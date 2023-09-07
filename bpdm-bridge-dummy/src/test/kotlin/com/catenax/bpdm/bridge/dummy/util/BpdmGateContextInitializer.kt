@@ -23,6 +23,7 @@ package com.catenax.bpdm.bridge.dummy.util
 import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer.Companion.bpdmPoolContainer
 import com.catenax.bpdm.bridge.dummy.util.OpenSearchContextInitializer.Companion.openSearchContainer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
+import mu.KotlinLogging
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
@@ -38,18 +39,23 @@ import java.time.Duration
 
 class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+    private val logger = KotlinLogging.logger { }
+
     companion object {
-        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 180L
+        const val GATE_CONTAINER_STARTUP_TIMEOUT_SEC = 300L
         const val BPDM_PORT = 8081
+        const val DEBUG_PORT = 8051
         const val IMAGE = "maven-gate"
 
         private val bpdmGateContainer: GenericContainer<*> =
             GenericContainer(IMAGE)
                 .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer, bpdmPoolContainer))
                 .withNetwork(postgreSQLContainer.getNetwork())
-                .withExposedPorts(BPDM_PORT)
-
-
+                .withExposedPorts(BPDM_PORT, DEBUG_PORT)
+                .withEnv(
+                    "JAVA_OPTIONS",
+                    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:$DEBUG_PORT"
+                )
     }
 
 
@@ -73,12 +79,14 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
             )
             .withEnv(
                 "spring.datasource.password", postgreSQLContainer.password
-            ).start()
+            )
+            .start()
 
 
         TestPropertyValues.of(
             "bpdm.gate.base-url=http://localhost:${bpdmGateContainer.getMappedPort(BPDM_PORT)}",
         ).applyTo(applicationContext.environment)
 
+        logger.info { "[!!!] Gate can be remote-debugged on port ${bpdmGateContainer.getMappedPort(DEBUG_PORT)} " }
     }
 }

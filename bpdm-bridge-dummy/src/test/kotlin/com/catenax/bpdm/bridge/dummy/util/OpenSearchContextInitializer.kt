@@ -35,13 +35,15 @@ import java.time.Duration
 
 class OpenSearchContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     companion object {
+        const val OPENSEARCH_CONTAINER_STARTUP_TIMEOUT_SEC = 270L
         const val OPENSEARCH_PORT = 9200
+
         val openSearchContainer: GenericContainer<*> = GenericContainer("opensearchproject/opensearch:2.1.0")
             .withExposedPorts(OPENSEARCH_PORT)
             .waitingFor(HttpWaitStrategy()
                 .forPort(OPENSEARCH_PORT)
                 .forStatusCodeMatching { response -> response == 200 || response == 401 }
-                .withStartupTimeout(Duration.ofSeconds(180))
+                .withStartupTimeout(Duration.ofSeconds(OPENSEARCH_CONTAINER_STARTUP_TIMEOUT_SEC))
             )
             // based on sample docker-compose for development from https://opensearch.org/docs/latest/opensearch/install/docker
             .withEnv("cluster.name", "cdqbridge")
