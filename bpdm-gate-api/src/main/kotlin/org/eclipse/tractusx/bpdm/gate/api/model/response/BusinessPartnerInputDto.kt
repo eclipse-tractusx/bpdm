@@ -36,7 +36,7 @@ data class BusinessPartnerInputDto(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressDto,
+    override val postalAddress: BusinessPartnerPostalAddressInputDto,
     override val isOwner: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)

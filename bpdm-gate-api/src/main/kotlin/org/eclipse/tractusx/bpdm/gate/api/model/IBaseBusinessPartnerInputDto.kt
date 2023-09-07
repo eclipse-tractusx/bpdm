@@ -54,7 +54,7 @@ interface IBaseBusinessPartnerInputDto {
     val isOwner: Boolean
 
     @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: BusinessPartnerPostalAddressDto
+    val postalAddress: BusinessPartnerPostalAddressInputDto
 
 
 }

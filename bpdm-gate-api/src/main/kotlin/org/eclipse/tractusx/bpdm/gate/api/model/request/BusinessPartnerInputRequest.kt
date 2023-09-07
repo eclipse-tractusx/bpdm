@@ -34,6 +34,6 @@ data class BusinessPartnerInputRequest(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressDto,
+    override val postalAddress: BusinessPartnerPostalAddressInputDto,
     override val isOwner: Boolean
 ) : IBaseBusinessPartnerInputDto
