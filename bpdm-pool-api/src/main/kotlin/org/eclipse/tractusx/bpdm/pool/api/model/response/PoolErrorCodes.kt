@@ -33,7 +33,8 @@ enum class LegalEntityCreateError : ErrorCode {
     LegalFormNotFound,
     LegalEntityIdentifierNotFound,
     LegalAddressRegionNotFound,
-    LegalAddressIdentifierNotFound
+    LegalAddressIdentifierNotFound,
+    LegalAddressDuplicateIdentifier,
 }
 
 @Schema(description = "LegalEntityUpdateError")
@@ -43,21 +44,24 @@ enum class LegalEntityUpdateError : ErrorCode {
     LegalFormNotFound,
     LegalEntityIdentifierNotFound,
     LegalAddressRegionNotFound,
-    LegalAddressIdentifierNotFound
+    LegalAddressIdentifierNotFound,
+    LegalAddressDuplicateIdentifier
 }
 
 @Schema(description = "SiteCreateError")
 enum class SiteCreateError : ErrorCode {
     LegalEntityNotFound,
     MainAddressIdentifierNotFound,
-    MainAddressRegionNotFound
+    MainAddressRegionNotFound,
+    MainAddressDuplicateIdentifier
 }
 
 @Schema(description = "SiteUpdateError")
 enum class SiteUpdateError : ErrorCode {
     SiteNotFound,
     MainAddressIdentifierNotFound,
-    MainAddressRegionNotFound
+    MainAddressRegionNotFound,
+    MainAddressDuplicateIdentifier
 }
 
 @Schema(description = "AddressCreateError")
@@ -66,12 +70,14 @@ enum class AddressCreateError : ErrorCode {
     SiteNotFound,
     LegalEntityNotFound,
     RegionNotFound,
-    IdentifierNotFound
+    IdentifierNotFound,
+    AddressDuplicateIdentifier,
 }
 
 @Schema(description = "AddressUpdateError")
 enum class AddressUpdateError : ErrorCode {
     AddressNotFound,
     RegionNotFound,
-    IdentifierNotFound
+    IdentifierNotFound,
+    AddressDuplicateIdentifier,
 }

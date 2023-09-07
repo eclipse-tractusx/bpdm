@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
@@ -27,6 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.RequestValues.addressIdentifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +39,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class AddressControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolApiClient
@@ -281,6 +284,106 @@ class AddressControllerIT @Autowired constructor(
 //            .ignoringFields(LogisticAddressResponse::bpn.name)
 //            .isEqualTo(expected)
         assertThat(response.errorCount).isEqualTo(0)
+    }
+
+    /**
+     * Given no legal entities
+     * When creating new legal entity with duplicate identifiers on legal entity and address
+     * Then new legal entity is returned with error
+     */
+    @Test
+    fun `create new addresses and get duplicate error`() {
+
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                ),
+            )
+        )
+
+        val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
+
+
+        val toCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL)
+        val secondCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = CommonValues.index4)
+
+        val response = poolClient.addresses().createAddresses(listOf(toCreate, secondCreate))
+
+
+        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], AddressCreateError.AddressDuplicateIdentifier, toCreate.index!!)
+        testHelpers.assertErrorResponse(errors[1], AddressCreateError.AddressDuplicateIdentifier, secondCreate.index!!)
+
+    }
+
+    /**
+     * Given no address entities
+     * When creating some address entities in one request that have duplicate identifiers (regarding type and value)
+     * Then for these address entities an error is returned
+     */
+    @Test
+    fun `update address entities and get duplicate identifier error`() {
+
+        poolClient.metadata().createIdentifierType(
+            IdentifierTypeDto(
+                technicalKey = addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
+            )
+        )
+
+        val givenStructure = testHelpers.createBusinessPartnerStructure(
+            listOf(
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate1,
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = RequestValues.siteCreate1,
+                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                        )
+                    )
+                ),
+                LegalEntityStructureRequest(
+                    legalEntity = RequestValues.legalEntityCreate2,
+                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                )
+            )
+        )
+
+        val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
+        val bpnA2 = givenStructure[0].siteStructures[0].addresses[1].address.bpna
+        val bpnA3 = givenStructure[1].addresses[0].address.bpna
+
+        val expected = listOf(
+            ResponseValues.addressPartner1.copy(bpna = bpnA2),
+            ResponseValues.addressPartner2.copy(bpna = bpnA3),
+            ResponseValues.addressPartner3.copy(bpna = bpnA1)
+        )
+
+        val toUpdate = listOf(
+            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA2, address = RequestValues.logisticAddress5),
+            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA3, address = RequestValues.logisticAddress5),
+            RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1, address = RequestValues.logisticAddress5)
+        )
+
+        val response = poolClient.addresses().updateAddresses(toUpdate)
+
+        assertThat(response.errorCount).isEqualTo(3)
+        assertThat(response.entityCount).isEqualTo(0)
+        val errors = response.errors.toList()
+        testHelpers.assertErrorResponse(errors[0], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[0].bpna)
+        testHelpers.assertErrorResponse(errors[1], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[1].bpna)
+        testHelpers.assertErrorResponse(errors[2], AddressUpdateError.AddressDuplicateIdentifier, toUpdate[2].bpna)
     }
 
     /**
