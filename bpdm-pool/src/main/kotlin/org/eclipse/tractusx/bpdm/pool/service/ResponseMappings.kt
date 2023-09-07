@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDetailDto
+import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
@@ -156,40 +159,30 @@ fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
 
 fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
     return PhysicalPostalAddressVerboseDto(
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = geographicCoordinates?.toDto(),
-            country = country.toDto(),
-            postalCode = postCode,
-            city = city,
-        ),
-        street = street?.toDto(),
-        areaPart = AreaDistrictVerboseDto(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
-            administrativeAreaLevel2 = administrativeAreaLevel2,
-            administrativeAreaLevel3 = administrativeAreaLevel3,
-            district = districtLevel1,
-        ),
-        basePhysicalAddress = BasePhysicalAddressDto(
-            companyPostalCode = companyPostCode,
-            industrialZone = industrialZone,
-            building = building,
-            floor = floor,
-            door = door
-        )
+        geographicCoordinates = geographicCoordinates?.toDto(),
+        country = country.toDto(),
+        postalCode = postCode,
+        city = city,
+        administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
+        administrativeAreaLevel2 = administrativeAreaLevel2,
+        administrativeAreaLevel3 = administrativeAreaLevel3,
+        district = districtLevel1,
+        companyPostalCode = companyPostCode,
+        industrialZone = industrialZone,
+        building = building,
+        floor = floor,
+        door = door,
+        street = street?.toDto()
     )
 }
 
 fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
     return AlternativePostalAddressVerboseDto(
-        baseAddress = BasePostalAddressVerboseDto(
-            geographicCoordinates = geographicCoordinates?.toDto(),
-            country = country.toDto(),
-            postalCode = postCode,
-            city = city,
-        ),
-        areaPart = AreaDistrictAlternativVerboseDto(
-            administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
-        ),
+        geographicCoordinates = geographicCoordinates?.toDto(),
+        country = country.toDto(),
+        postalCode = postCode,
+        city = city,
+        administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier

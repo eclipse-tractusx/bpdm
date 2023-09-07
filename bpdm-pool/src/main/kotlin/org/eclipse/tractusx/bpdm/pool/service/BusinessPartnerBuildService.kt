@@ -436,35 +436,31 @@ class BusinessPartnerBuildService(
     }
 
     private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMapping): PhysicalPostalAddress {
-        val baseAddress = physicalAddress.baseAddress
-        val area = physicalAddress.areaPart
         return PhysicalPostalAddress(
-            geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
-            country = baseAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[area.administrativeAreaLevel1],
-            administrativeAreaLevel2 = area.administrativeAreaLevel2,
-            administrativeAreaLevel3 = area.administrativeAreaLevel3,
-            postCode = baseAddress.postalCode,
-            city = baseAddress.city,
-            districtLevel1 = area.district,
+            geographicCoordinates = physicalAddress.geographicCoordinates?.let { toEntity(it) },
+            country = physicalAddress.country,
+            administrativeAreaLevel1 = metadataMap.regions[physicalAddress.administrativeAreaLevel1],
+            administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
+            administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
+            postCode = physicalAddress.postalCode,
+            city = physicalAddress.city,
+            districtLevel1 = physicalAddress.district,
             street = physicalAddress.street?.let { createStreet(it) },
-            companyPostCode = physicalAddress.basePhysicalAddress.companyPostalCode,
-            industrialZone = physicalAddress.basePhysicalAddress.industrialZone,
-            building = physicalAddress.basePhysicalAddress.building,
-            floor = physicalAddress.basePhysicalAddress.floor,
-            door = physicalAddress.basePhysicalAddress.door
+            companyPostCode = physicalAddress.companyPostalCode,
+            industrialZone = physicalAddress.industrialZone,
+            building = physicalAddress.building,
+            floor = physicalAddress.floor,
+            door = physicalAddress.door
         )
     }
 
     private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMapping): AlternativePostalAddress {
-        val baseAddress = alternativeAddress.baseAddress
-        val area = alternativeAddress.areaPart
         return AlternativePostalAddress(
-            geographicCoordinates = baseAddress.geographicCoordinates?.let { toEntity(it) },
-            country = baseAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[area.administrativeAreaLevel1],
-            postCode = baseAddress.postalCode,
-            city = baseAddress.city,
+            geographicCoordinates = alternativeAddress.geographicCoordinates?.let { toEntity(it) },
+            country = alternativeAddress.country,
+            administrativeAreaLevel1 = metadataMap.regions[alternativeAddress.administrativeAreaLevel1],
+            postCode = alternativeAddress.postalCode,
+            city = alternativeAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
             deliveryServiceNumber = alternativeAddress.deliveryServiceNumber,
             deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier

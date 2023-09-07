@@ -21,9 +21,28 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-data class AreaDistrictAlternativDto(
+/**
+ * Contains the common fields for all AlternativePostalAddress-DTOs, whether Pool or Gate.
+ */
+interface IBaseAlternativePostalAddressDto {
 
-    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
-    val administrativeAreaLevel1: String? = null,
-)
+    // OpenAPI description for complex field does not work!
+    val geographicCoordinates: GeoCoordinateDto?
+
+    @get:Schema(description = PostalAddressDescription.postalCode)
+    val postalCode: String?
+
+    @get:Schema(description = PostalAddressDescription.city)
+    val city: String
+
+    @get:Schema(description = PostalAddressDescription.deliveryServiceType)
+    val deliveryServiceType: DeliveryServiceType
+
+    @get:Schema(description = PostalAddressDescription.deliveryServiceQualifier)
+    val deliveryServiceQualifier: String?
+
+    @get:Schema(description = PostalAddressDescription.deliveryServiceNumber)
+    val deliveryServiceNumber: String
+}

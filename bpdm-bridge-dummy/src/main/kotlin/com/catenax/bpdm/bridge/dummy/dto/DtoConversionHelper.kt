@@ -35,15 +35,25 @@ fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressD
 
 fun gateToPoolPhysicalAddress(gateDto: PhysicalPostalAddressGateDto): PhysicalPostalAddressDto {
     return PhysicalPostalAddressDto(
-        baseAddress = gateDto.baseAddress,
-        areaPart = gateDto.areaPart,
-        basePhysicalAddress = gateDto.basePhysicalAddress,
+        geographicCoordinates = gateDto.geographicCoordinates,
+        country = gateDto.country,
+        postalCode = gateDto.postalCode,
+        city = gateDto.city,
+        administrativeAreaLevel1 = gateDto.administrativeAreaLevel1,
+        administrativeAreaLevel2 = gateDto.administrativeAreaLevel2,
+        administrativeAreaLevel3 = gateDto.administrativeAreaLevel3,
+        district = gateDto.district,
+        companyPostalCode = gateDto.companyPostalCode,
+        industrialZone = gateDto.industrialZone,
+        building = gateDto.building,
+        floor = gateDto.floor,
+        door = gateDto.door,
         street = StreetDto(
             name = gateDto.street?.name,
             houseNumber = gateDto.street?.houseNumber,
             milestone = gateDto.street?.milestone,
-            direction = gateDto.street?.direction,
-        ),
+            direction = gateDto.street?.direction
+        )
     )
 }
 
@@ -127,14 +137,6 @@ fun poolToGateLogisticAddress(address: LogisticAddressVerboseDto): LogisticAddre
 }
 
 private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto): PhysicalPostalAddressGateDto {
-    val baseAddress = address.baseAddress.let {
-        BasePostalAddressDto(
-            geographicCoordinates = it.geographicCoordinates,
-            country = it.country.technicalKey,
-            postalCode = it.postalCode,
-            city = it.city
-        )
-    }
     val street = address.street?.let {
         StreetGateDto(
             name = it.name,
@@ -143,37 +145,31 @@ private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto):
             direction = it.direction
         )
     }
-    val areaPart = address.areaPart.let {
-        AreaDistrictDto(
-            administrativeAreaLevel1 = it.administrativeAreaLevel1?.regionCode,
-            administrativeAreaLevel2 = it.administrativeAreaLevel2,
-            administrativeAreaLevel3 = it.administrativeAreaLevel3,
-            district = it.district
-        )
-    }
     return PhysicalPostalAddressGateDto(
-        baseAddress = baseAddress,
-        basePhysicalAddress = address.basePhysicalAddress,
+        geographicCoordinates = address.geographicCoordinates,
+        country = address.country.technicalKey,
+        postalCode = address.postalCode,
+        city = address.city,
+        administrativeAreaLevel1 = address.administrativeAreaLevel1?.regionCode,
+        administrativeAreaLevel2 = address.administrativeAreaLevel2,
+        administrativeAreaLevel3 = address.administrativeAreaLevel3,
+        district = address.district,
+        companyPostalCode = address.companyPostalCode,
+        industrialZone = address.industrialZone,
+        building = address.building,
+        floor = address.floor,
+        door = address.door,
         street = street,
-        areaPart = areaPart
     )
 }
 
 private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): AlternativePostalAddressDto {
-    val baseAddress = address.baseAddress.let {
-        BasePostalAddressDto(
-            geographicCoordinates = it.geographicCoordinates,
-            country = it.country.technicalKey,
-            postalCode = it.postalCode,
-            city = it.city
-        )
-    }
-    val areaPart = AreaDistrictAlternativDto(
-        address.areaPart.administrativeAreaLevel1?.regionCode
-    )
     return AlternativePostalAddressDto(
-        baseAddress = baseAddress,
-        areaPart = areaPart,
+        geographicCoordinates = address.geographicCoordinates,
+        country = address.country.technicalKey,
+        postalCode = address.postalCode,
+        city = address.city,
+        administrativeAreaLevel1 = address.administrativeAreaLevel1?.regionCode,
         deliveryServiceNumber = address.deliveryServiceNumber,
         deliveryServiceType = address.deliveryServiceType,
         deliveryServiceQualifier = address.deliveryServiceQualifier

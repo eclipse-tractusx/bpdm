@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -30,18 +30,22 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 @Schema(description = PostalAddressDescription.headerAlternative)
 data class AlternativePostalAddressDto(
 
-    @field:JsonUnwrapped
-    val baseAddress: BasePostalAddressDto,
+    override val geographicCoordinates: GeoCoordinateDto?,
 
-    @field:JsonUnwrapped
-    val areaPart: AreaDistrictAlternativDto,
+    @get:Schema(description = PostalAddressDescription.country)
+    val country: CountryCode,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceNumber)
-    val deliveryServiceNumber: String = "",
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
+    val administrativeAreaLevel1: String?,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceType)
-    val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
+    override val postalCode: String?,
 
-    @get:Schema(description = PostalAddressDescription.deliveryServiceQualifier)
-    val deliveryServiceQualifier: String?,
-)
+    override val city: String,
+
+    override val deliveryServiceType: DeliveryServiceType,
+
+    override val deliveryServiceQualifier: String?,
+
+    override val deliveryServiceNumber: String
+
+) : IBaseAlternativePostalAddressDto
