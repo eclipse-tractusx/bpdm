@@ -36,7 +36,7 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
 
     fun upsertSharingState(request: SharingStateDto) {
 
-        val sharingState = this.stateRepository.findByExternalIdAndBusinessPartnerType(request.externalId, request.businessPartnerType)
+        val sharingState = this.stateRepository.findByExternalId(request.externalId)
         if (sharingState == null) {
             insertSharingState(request)
         } else {

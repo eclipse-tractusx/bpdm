@@ -33,7 +33,7 @@ import java.time.LocalDateTime
 data class SharingStateDto(
 
     @get:Schema(description = "One of the types of business partners for which the sharing state entry was created.")
-    val businessPartnerType: BusinessPartnerType,
+    val businessPartnerType: BusinessPartnerType?,
 
     @get:Schema(description = "The external identifier of the business partner for which the sharing state entry was created.")
     val externalId: String,

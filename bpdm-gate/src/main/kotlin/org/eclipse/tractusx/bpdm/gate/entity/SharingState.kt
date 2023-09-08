@@ -35,8 +35,8 @@ class SharingState(
     var externalId: String,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "business_partner_type", nullable = false)
-    var businessPartnerType: BusinessPartnerType,
+    @Column(name = "business_partner_type", nullable = true)
+    var businessPartnerType: BusinessPartnerType?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sharing_state_type", nullable = false)
