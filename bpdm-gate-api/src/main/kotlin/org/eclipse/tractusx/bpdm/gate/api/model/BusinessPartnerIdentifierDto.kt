@@ -17,19 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.openapidescription
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-object CommonDescription {
-    const val headerEntityWithErrorsWrapper = "Holds information about successfully and failed entities after the creating/updating of several objects"
+import io.swagger.v3.oas.annotations.media.Schema
 
-    const val createdAt = "The date when the data record has been created."
-    const val updatedAt = "The date when the data record has been last updated."
+@Schema(description = "Identifier record for a business partner", requiredProperties = ["type"])
+data class BusinessPartnerIdentifierDto(
 
-    const val index = "User defined index to conveniently match this entry to the corresponding entry in the response."
-    const val score = "Relative quality score of the match. The higher the better."
+    @get:Schema(description = "Value of the identifier")
+    val value: String?,
 
-    const val externalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
+    val type: String,
 
-    const val roles = "Roles this business partner takes in relation to the sharing member."
-
-}
+    @get:Schema(description = "Body which issued the identifier")
+    val issuingBody: String?
+)

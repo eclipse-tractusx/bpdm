@@ -17,19 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.openapidescription
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-object CommonDescription {
-    const val headerEntityWithErrorsWrapper = "Holds information about successfully and failed entities after the creating/updating of several objects"
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-    const val createdAt = "The date when the data record has been created."
-    const val updatedAt = "The date when the data record has been last updated."
+@Schema(description = LegalEntityStateDescription.header, requiredProperties = ["type"])
+data class BusinessPartnerStateDto(
 
-    const val index = "User defined index to conveniently match this entry to the corresponding entry in the response."
-    const val score = "Relative quality score of the match. The higher the better."
+    @get:Schema(description = "Denotation of the status.")
+    val description: String?,
 
-    const val externalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) the business partner."
+    @get:Schema(description = "Date since when the status is/was valid.")
+    val validFrom: LocalDateTime?,
 
-    const val roles = "Roles this business partner takes in relation to the sharing member."
+    @get:Schema(description = "Date until the status was valid, if applicable.")
+    val validTo: LocalDateTime?,
 
-}
+    @get:Schema(description = "The type of this specified status.")
+    val type: BusinessStateType
+)
