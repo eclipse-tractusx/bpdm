@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 
 @Entity
@@ -42,6 +42,6 @@ class ChangelogEntry(
 
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
-    var dataType: OutputInputEnum
+    var stage: StageType
 
 ) : BaseEntity()

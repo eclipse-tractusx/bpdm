@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.model
 
-enum class OutputInputEnum {
+enum class StageType {
     Input,
     Output
 }

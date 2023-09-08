@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -47,7 +47,7 @@ class SitePersistenceService(
 ) {
 
     @Transactional
-    fun persistSitesBP(sites: Collection<SiteGateInputRequest>, datatype: OutputInputEnum) {
+    fun persistSitesBP(sites: Collection<SiteGateInputRequest>, datatype: StageType) {
 
         //Finds Site in DB
         val siteRecord = siteRepository.findByExternalIdIn(sites.map { it.externalId })
@@ -58,7 +58,7 @@ class SitePersistenceService(
 
             val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }
+            siteRecord.find { it.externalId == site.externalId && it.stage == datatype }
                 ?.let { existingSite ->
                     val logisticAddressRecord = getAddressRecord(getMainAddressExternalIdForSiteExternalId(site.externalId), datatype)
 
@@ -76,19 +76,19 @@ class SitePersistenceService(
     }
 
     //Creates Changelog For both Site and Logistic Address when they are created or updated
-    private fun saveChangelog(externalId: String, changelogType: ChangelogType, outputInputEnum: OutputInputEnum) {
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
         val mainAddressExternalId = getMainAddressExternalIdForSiteExternalId(externalId)
-        changelogRepository.save(ChangelogEntry(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, outputInputEnum))
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, changelogType, outputInputEnum))
+        changelogRepository.save(ChangelogEntry(mainAddressExternalId, BusinessPartnerType.ADDRESS, changelogType, stage))
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.SITE, changelogType, stage))
     }
 
-    private fun getAddressRecord(externalId: String, datatype: OutputInputEnum): LogisticAddress {
-        return addressRepository.findByExternalIdAndDataType(externalId, datatype)
+    private fun getAddressRecord(externalId: String, datatype: StageType): LogisticAddress {
+        return addressRepository.findByExternalIdAndStage(externalId, datatype)
             ?: throw BpdmNotFoundException("Business Partner", "Error")
     }
 
-    private fun getLegalEntityRecord(externalId: String, datatype: OutputInputEnum): LegalEntity {
-        return legalEntityRepository.findByExternalIdAndDataType(externalId, datatype)
+    private fun getLegalEntityRecord(externalId: String, datatype: StageType): LegalEntity {
+        return legalEntityRepository.findByExternalIdAndStage(externalId, datatype)
             ?: throw BpdmNotFoundException("Business Partner", externalId)
     }
 
@@ -121,7 +121,7 @@ class SitePersistenceService(
     }
 
     @Transactional
-    fun persistSitesOutputBP(sites: Collection<SiteGateOutputRequest>, datatype: OutputInputEnum) {
+    fun persistSitesOutputBP(sites: Collection<SiteGateOutputRequest>, datatype: StageType) {
 
         //Finds Site in DB
         val siteRecord = siteRepository.findByExternalIdIn(sites.map { it.externalId })
@@ -132,7 +132,7 @@ class SitePersistenceService(
 
             val fullSite = site.toSiteGate(legalEntityRecord, datatype)
 
-            siteRecord.find { it.externalId == site.externalId && it.dataType == datatype }
+            siteRecord.find { it.externalId == site.externalId && it.stage == datatype }
                 ?.let { existingSite ->
                     val logisticAddressRecord = getAddressRecord(getMainAddressExternalIdForSiteExternalId(site.externalId), datatype)
 
@@ -142,7 +142,7 @@ class SitePersistenceService(
                     saveChangelog(site.externalId, ChangelogType.UPDATE, datatype)
                 }
                 ?: run {
-                    if (siteRecord.find { it.externalId == fullSite.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    if (siteRecord.find { it.externalId == fullSite.externalId && it.stage == StageType.Input } == null) {
                         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Site doesn't exist")
                     } else {
                         siteRepository.save(fullSite)

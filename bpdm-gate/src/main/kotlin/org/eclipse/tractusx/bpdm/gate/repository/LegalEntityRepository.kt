@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -32,9 +32,9 @@ interface LegalEntityRepository : JpaRepository<LegalEntity, Long>, CrudReposito
 
     fun findByExternalId(externalId: String): LegalEntity?
 
-    fun findByExternalIdAndDataType(externalId: String, dataType: OutputInputEnum): LegalEntity?
+    fun findByExternalIdAndStage(externalId: String, stage: StageType): LegalEntity?
 
-    fun findByExternalIdInAndDataType(externalId: Collection<String>?, dataType: OutputInputEnum, pageable: Pageable): Page<LegalEntity>
+    fun findByExternalIdInAndStage(externalId: Collection<String>?, stage: StageType, pageable: Pageable): Page<LegalEntity>
 
-    fun findByDataType(dataType: OutputInputEnum, pageable: Pageable): Page<LegalEntity>
+    fun findByStage(stage: StageType, pageable: Pageable): Page<LegalEntity>
 }

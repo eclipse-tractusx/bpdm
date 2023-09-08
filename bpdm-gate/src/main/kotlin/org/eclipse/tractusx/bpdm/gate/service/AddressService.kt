@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
@@ -42,9 +42,9 @@ class AddressService(
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
 
         val logisticAddressPage = if (externalIds != null) {
-            addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
+            addressRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
         } else {
-            addressRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
+            addressRepository.findByStage(StageType.Input, PageRequest.of(page, size))
         }
 
         return PageDto(
@@ -65,7 +65,7 @@ class AddressService(
     fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
         val logisticAddress =
-            addressRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
+            addressRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
 
         return logisticAddress.toAddressGateInputResponse(logisticAddress)
 
@@ -77,9 +77,9 @@ class AddressService(
     fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
         val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
-            addressRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+            addressRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
         } else {
-            addressRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+            addressRepository.findByStage(StageType.Output, PageRequest.of(page, size))
         }
 
         return PageDto(
@@ -102,14 +102,14 @@ class AddressService(
      * Upsert addresses input to the database
      **/
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
-        addressPersistenceService.persistAddressBP(addresses, OutputInputEnum.Input)
+        addressPersistenceService.persistAddressBP(addresses, StageType.Input)
     }
 
     /**
      * Upsert addresses output to the database
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
-        addressPersistenceService.persistOutputAddressBP(addresses, OutputInputEnum.Output)
+        addressPersistenceService.persistOutputAddressBP(addresses, StageType.Output)
     }
 
 }

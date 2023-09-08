@@ -21,14 +21,14 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.*
 import org.springframework.data.domain.Page
 
-fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?, datatype: OutputInputEnum): LogisticAddress {
+fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?, datatype: StageType): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         externalId = externalId,
@@ -36,7 +36,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
         site = site,
-        dataType = datatype
+        stage = datatype
     )
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
@@ -46,7 +46,7 @@ fun AddressGateInputRequest.toAddressGate(legalEntity: LegalEntity?, site: Site?
     return logisticAddress
 }
 
-fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site: Site?, datatype: OutputInputEnum): LogisticAddress {
+fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site: Site?, datatype: StageType): LogisticAddress {
 
     val logisticAddress = LogisticAddress(
         bpn = bpn,
@@ -55,7 +55,7 @@ fun AddressGateOutputRequest.toAddressGateOutput(legalEntity: LegalEntity?, site
         alternativePostalAddress = address.alternativePostalAddress?.toAlternativePostalAddressEntity(),
         legalEntity = legalEntity,
         site = site,
-        dataType = datatype
+        stage = datatype
     )
 
     logisticAddress.states.addAll(this.address.states.map { toEntityAddress(it, logisticAddress) }.toSet())
@@ -129,7 +129,7 @@ fun <S, T> Page<S>.toDto(dtoContent: Collection<T>): PageDto<T> {
 }
 
 // Site Mappers
-fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputInputEnum): Site {
+fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: StageType): Site {
 
     val addressInputRequest = AddressGateInputRequest(
         address = mainAddress,
@@ -140,7 +140,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     val site = Site(
         externalId = externalId,
         legalEntity = legalEntity,
-        dataType = datatype
+        stage = datatype
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
@@ -152,7 +152,7 @@ fun SiteGateInputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputIn
     return site
 }
 
-fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputInputEnum): Site {
+fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: StageType): Site {
 
     val addressOutputRequest = AddressGateOutputRequest(
         address = mainAddress.address,
@@ -165,7 +165,7 @@ fun SiteGateOutputRequest.toSiteGate(legalEntity: LegalEntity, datatype: OutputI
         bpn = bpn,
         externalId = externalId,
         legalEntity = legalEntity,
-        dataType = datatype
+        stage = datatype
     )
 
     site.states.addAll(this.site.states.map { toEntityAddress(it, site) }.toSet())
@@ -190,7 +190,7 @@ fun ChangelogEntry.toGateDto(): ChangelogGateDto {
     )
 }
 
-fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalEntity {
+fun LegalEntityGateInputRequest.toLegalEntity(datatype: StageType): LegalEntity {
 
     val addressInputRequest = AddressGateInputRequest(
         address = legalAddress,
@@ -202,7 +202,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
         externalId = externalId,
         legalForm = legalEntity.legalForm,
         shortName = legalEntity.legalShortName,
-        dataType = datatype
+        stage = datatype
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
@@ -216,7 +216,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: OutputInputEnum): LegalE
 
 }
 
-fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): LegalEntity {
+fun LegalEntityGateOutputRequest.toLegalEntity(datatype: StageType): LegalEntity {
 
     val addressOutputRequest = AddressGateOutputRequest(
         address = legalAddress.address,
@@ -230,7 +230,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: OutputInputEnum): Legal
         externalId = externalId,
         legalForm = legalEntity.legalForm,
         shortName = legalEntity.legalShortName,
-        dataType = datatype
+        stage = datatype
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })

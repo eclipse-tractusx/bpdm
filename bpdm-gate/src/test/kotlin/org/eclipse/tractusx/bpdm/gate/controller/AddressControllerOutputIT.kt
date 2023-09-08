@@ -44,7 +44,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
@@ -134,10 +134,10 @@ internal class AddressControllerOutputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val addressExternal1 = gateAddressRepository.findByExternalIdAndDataType("address-external-1", OutputInputEnum.Output)
+        val addressExternal1 = gateAddressRepository.findByExternalIdAndStage("address-external-1", StageType.Output)
         Assertions.assertNotEquals(addressExternal1, null)
 
-        val addressExternal2 = gateAddressRepository.findByExternalIdAndDataType("address-external-2", OutputInputEnum.Output)
+        val addressExternal2 = gateAddressRepository.findByExternalIdAndStage("address-external-2", StageType.Output)
         Assertions.assertNotEquals(addressExternal2, null)
 
     }

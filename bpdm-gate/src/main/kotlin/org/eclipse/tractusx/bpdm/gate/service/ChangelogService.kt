@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ErrorInfo
@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byBusinessPartnerTypes
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byCreatedAtGreaterThan
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byExternalIdsIn
-import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byOutputInputEnum
+import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository.Specs.byStage
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -42,7 +42,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         externalIds: Set<String>?,
         businessPartnerTypes: Set<BusinessPartnerType>?,
         createdAt: Instant?,
-        outputInputEnum: OutputInputEnum?,
+        stage: StageType?,
         page: Int,
         pageSize: Int
     ): PageChangeLogDto<ChangelogGateDto> {
@@ -53,7 +53,7 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
             byExternalIdsIn(externalIds = nonNullExternalIds),
             byCreatedAtGreaterThan(createdAt = createdAt),
             byBusinessPartnerTypes(businessPartnerTypes),
-            byOutputInputEnum(outputInputEnum)
+            byStage(stage)
         )
 
         val pageable = PageRequest.of(page, pageSize)

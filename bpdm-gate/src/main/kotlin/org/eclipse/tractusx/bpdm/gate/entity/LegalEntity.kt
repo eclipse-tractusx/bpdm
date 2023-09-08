@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 
 @Entity
 @Table(
@@ -43,7 +43,7 @@ class LegalEntity(
 
     @Column(name = "data_type")
     @Enumerated(EnumType.STRING)
-    var dataType: OutputInputEnum
+    var stage: StageType
 
 ) : BaseEntity() {
 
