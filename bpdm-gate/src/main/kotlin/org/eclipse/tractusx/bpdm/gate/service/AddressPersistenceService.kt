@@ -21,10 +21,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.transaction.Transactional
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -49,7 +49,7 @@ class AddressPersistenceService(
 ) {
 
     @Transactional
-    fun persistAddressBP(addresses: Collection<AddressGateInputRequest>, dataType: OutputInputEnum) {
+    fun persistAddressBP(addresses: Collection<AddressGateInputRequest>, dataType: StageType) {
 
         val externalIdColl: MutableCollection<String> = mutableListOf()
         addresses.forEach { externalIdColl.add(it.externalId) }
@@ -58,8 +58,8 @@ class AddressPersistenceService(
 
         addresses.forEach { address ->
 
-            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
-            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
+            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndStage(it, dataType) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndStage(it, dataType) }
 
             if (legalEntityRecord == null && siteRecord == null) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Neither legal entity record nor site record found for externalID")
@@ -67,7 +67,7 @@ class AddressPersistenceService(
 
             val fullAddress = address.toAddressGate(legalEntityRecord, siteRecord, dataType)
 
-            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }
+            addressRecord.find { it.externalId == address.externalId && it.stage == dataType }
                 ?.let { existingAddress ->
                     updateAddress(existingAddress, address, legalEntityRecord, siteRecord)
                     gateAddressRepository.save(existingAddress)
@@ -96,7 +96,7 @@ class AddressPersistenceService(
     }
 
     @Transactional
-    fun persistOutputAddressBP(addresses: Collection<AddressGateOutputRequest>, dataType: OutputInputEnum) {
+    fun persistOutputAddressBP(addresses: Collection<AddressGateOutputRequest>, dataType: StageType) {
         val externalIdColl: MutableCollection<String> = mutableListOf()
         addresses.forEach { externalIdColl.add(it.externalId) }
 
@@ -104,8 +104,8 @@ class AddressPersistenceService(
 
         addresses.forEach { address ->
 
-            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndDataType(it, dataType) }
-            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndDataType(it, dataType) }
+            val legalEntityRecord = address.legalEntityExternalId?.let { legalEntityRepository.findByExternalIdAndStage(it, dataType) }
+            val siteRecord = address.siteExternalId?.let { siteEntityRepository.findByExternalIdAndStage(it, dataType) }
 
             if (legalEntityRecord == null && siteRecord == null) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Neither legal entity record nor site record found for externalID")
@@ -113,14 +113,14 @@ class AddressPersistenceService(
 
             val fullAddress = address.toAddressGateOutput(legalEntityRecord, siteRecord, dataType)
 
-            addressRecord.find { it.externalId == address.externalId && it.dataType == dataType }
+            addressRecord.find { it.externalId == address.externalId && it.stage == dataType }
                 ?.let { existingAddress ->
                     updateAddressOutput(existingAddress, address, legalEntityRecord, siteRecord)
                     gateAddressRepository.save(existingAddress)
                     saveChangelog(address.externalId, ChangelogType.UPDATE, dataType)
                 }
                 ?: run {
-                    if (addressRecord.find { it.externalId == fullAddress.externalId && it.dataType == OutputInputEnum.Input } == null) {
+                    if (addressRecord.find { it.externalId == fullAddress.externalId && it.stage == StageType.Input } == null) {
                         throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Input Logistic Address doesn't exist")
                     } else {
                         gateAddressRepository.save(fullAddress)
@@ -146,8 +146,8 @@ class AddressPersistenceService(
 
     }
 
-    private fun saveChangelog(externalId: String, changelogType: ChangelogType, outputInputEnum: OutputInputEnum) {
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.ADDRESS, changelogType, outputInputEnum))
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
+        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.ADDRESS, changelogType, stage))
     }
 
 }

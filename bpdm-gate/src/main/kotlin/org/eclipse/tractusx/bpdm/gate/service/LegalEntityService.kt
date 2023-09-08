@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
@@ -46,7 +46,7 @@ class LegalEntityService(
      **/
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, OutputInputEnum.Input)
+        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, StageType.Input)
 
     }
 
@@ -55,22 +55,22 @@ class LegalEntityService(
      **/
     fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>) {
 
-        legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, OutputInputEnum.Output)
+        legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, StageType.Output)
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
 
         val legalEntity =
-            legalEntityRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("LegalEntity", externalId)
+            legalEntityRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("LegalEntity", externalId)
         return toValidSingleLegalEntity(legalEntity)
     }
 
     fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<LegalEntityGateInputDto> {
 
         val legalEntitiesPage = if (externalIds != null) {
-            legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
+            legalEntityRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
         } else {
-            legalEntityRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
+            legalEntityRepository.findByStage(StageType.Input, PageRequest.of(page, size))
         }
 
         return PageDto(
@@ -88,9 +88,9 @@ class LegalEntityService(
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<LegalEntityGateOutputResponse> {
 
         val legalEntityPage = if (!externalIds.isNullOrEmpty()) {
-            legalEntityRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+            legalEntityRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
         } else {
-            legalEntityRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+            legalEntityRepository.findByStage(StageType.Output, PageRequest.of(page, size))
         }
 
         return PageDto(

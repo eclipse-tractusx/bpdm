@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
@@ -69,10 +69,10 @@ interface ChangelogRepository : JpaRepository<ChangelogEntry, Long>, JpaSpecific
                 }
             }
 
-        fun byOutputInputEnum(outputInputEnum: OutputInputEnum?) =
+        fun byStage(stage: StageType?) =
             Specification<ChangelogEntry> { root, _, builder ->
-                outputInputEnum?.let {
-                    builder.equal(root.get<OutputInputEnum>(ChangelogEntry::dataType.name), outputInputEnum)
+                stage?.let {
+                    builder.equal(root.get<StageType>(ChangelogEntry::stage.name), stage)
                 }
             }
     }

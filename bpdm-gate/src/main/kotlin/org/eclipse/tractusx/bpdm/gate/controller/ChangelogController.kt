@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.GateChangelogApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.ChangelogGateDto
@@ -44,7 +44,7 @@ class ChangelogController(
             searchRequest.externalIds,
             searchRequest.businessPartnerTypes,
             searchRequest.timestampAfter,
-            OutputInputEnum.Input,
+            StageType.Input,
             paginationRequest.page,
             paginationRequest.size
         )
@@ -59,7 +59,7 @@ class ChangelogController(
             searchRequest.externalIds,
             searchRequest.businessPartnerTypes,
             searchRequest.timestampAfter,
-            OutputInputEnum.Output,
+            StageType.Output,
             paginationRequest.page,
             paginationRequest.size
         )

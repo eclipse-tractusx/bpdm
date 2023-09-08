@@ -25,7 +25,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
@@ -105,10 +105,10 @@ internal class SiteControllerOutputIT @Autowired constructor(
         }
 
         //Check if persisted site data
-        val siteExternal1 = gateSiteRepository.findByExternalIdAndDataType("site-external-1", OutputInputEnum.Output)
+        val siteExternal1 = gateSiteRepository.findByExternalIdAndStage("site-external-1", StageType.Output)
         Assertions.assertNotEquals(siteExternal1, null)
 
-        val siteExternal2 = gateSiteRepository.findByExternalIdAndDataType("site-external-2", OutputInputEnum.Output)
+        val siteExternal2 = gateSiteRepository.findByExternalIdAndStage("site-external-2", StageType.Output)
         Assertions.assertNotEquals(siteExternal2, null)
 
     }

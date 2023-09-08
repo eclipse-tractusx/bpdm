@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
@@ -46,9 +46,9 @@ class SiteService(
     fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
 
         val sitesPage = if (externalIds != null) {
-            siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Input, PageRequest.of(page, size))
+            siteRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
         } else {
-            siteRepository.findByDataType(OutputInputEnum.Input, PageRequest.of(page, size))
+            siteRepository.findByStage(StageType.Input, PageRequest.of(page, size))
         }
 
         return PageDto(
@@ -67,7 +67,7 @@ class SiteService(
     }
 
     fun getSiteByExternalId(externalId: String): SiteGateInputDto {
-        val siteRecord = siteRepository.findByExternalIdAndDataType(externalId, OutputInputEnum.Input) ?: throw BpdmNotFoundException("Site", externalId)
+        val siteRecord = siteRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("Site", externalId)
 
         return siteRecord.toSiteGateInputResponse(siteRecord)
     }
@@ -78,9 +78,9 @@ class SiteService(
     fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<SiteGateOutputResponse> {
 
         val sitePage = if (!externalIds.isNullOrEmpty()) {
-            siteRepository.findByExternalIdInAndDataType(externalIds, OutputInputEnum.Output, PageRequest.of(page, size))
+            siteRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
         } else {
-            siteRepository.findByDataType(OutputInputEnum.Output, PageRequest.of(page, size))
+            siteRepository.findByStage(StageType.Output, PageRequest.of(page, size))
         }
 
         return PageDto(
@@ -104,7 +104,7 @@ class SiteService(
      **/
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        sitePersistenceService.persistSitesBP(sites, OutputInputEnum.Input)
+        sitePersistenceService.persistSitesBP(sites, StageType.Input)
 
     }
 
@@ -113,7 +113,7 @@ class SiteService(
      **/
     fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>) {
 
-        sitePersistenceService.persistSitesOutputBP(sites, OutputInputEnum.Output)
+        sitePersistenceService.persistSitesOutputBP(sites, StageType.Output)
     }
 
 }

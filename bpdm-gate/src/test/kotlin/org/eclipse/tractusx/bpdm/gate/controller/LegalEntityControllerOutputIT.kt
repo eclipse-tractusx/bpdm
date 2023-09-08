@@ -25,7 +25,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.OutputInputEnum
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
@@ -94,10 +94,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val legalEntityExternal1 = gateLegalEntityRepository.findByExternalIdAndDataType(CommonValues.externalId1, OutputInputEnum.Output)
+        val legalEntityExternal1 = gateLegalEntityRepository.findByExternalIdAndStage(CommonValues.externalId1, StageType.Output)
         Assertions.assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = gateLegalEntityRepository.findByExternalIdAndDataType(CommonValues.externalId2, OutputInputEnum.Output)
+        val legalEntityExternal2 = gateLegalEntityRepository.findByExternalIdAndStage(CommonValues.externalId2, StageType.Output)
         Assertions.assertNotEquals(legalEntityExternal2, null)
 
     }
