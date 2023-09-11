@@ -56,24 +56,24 @@ class AddressControllerSearchIT @Autowired constructor(
     //  the expected result, ideally with minimal effort utilizing helper functions or probably Kotlin's powerful builders.
 
     val partnerStructure1 = LegalEntityStructureRequest(
-        legalEntity = RequestValues.legalEntityCreate1,
-        addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate3)
+        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+        addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate3)
     )
 
 
     val partnerStructure2 = LegalEntityStructureRequest(
-        legalEntity = RequestValues.legalEntityCreate2,
+        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
         siteStructures = listOf(
             SiteStructureRequest(
-                site = RequestValues.siteCreate1,
-                addresses = listOf(RequestValues.addressPartnerCreate2)
+                site = BusinessPartnerNonVerboseValues.siteCreate1,
+                addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)
             )
         )
     )
 
     val partnerStructure3 = LegalEntityStructureRequest(
-        legalEntity = RequestValues.legalEntityCreate1,
-        addresses = listOf(RequestValues.addressPartnerCreate4)
+        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+        addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate4)
     )
 
     private lateinit var givenAddress1: LogisticAddressVerboseDto
@@ -109,7 +109,7 @@ class AddressControllerSearchIT @Autowired constructor(
 
 
         val addressSearchRequest = AddressPartnerSearchRequest()
-        addressSearchRequest.name = RequestValues.addressPartnerCreate4.address.name
+        addressSearchRequest.name = BusinessPartnerNonVerboseValues.addressPartnerCreate4.address.name
 
         val pageResponse = poolClient.addresses.getAddresses(addressSearchRequest, PaginationRequest())
 

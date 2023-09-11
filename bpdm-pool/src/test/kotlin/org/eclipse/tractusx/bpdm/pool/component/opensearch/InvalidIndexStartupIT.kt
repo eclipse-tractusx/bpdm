@@ -106,7 +106,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                 )
             )
         )

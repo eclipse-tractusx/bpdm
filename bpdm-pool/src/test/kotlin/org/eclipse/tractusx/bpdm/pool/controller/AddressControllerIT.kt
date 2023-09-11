@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
-import org.eclipse.tractusx.bpdm.pool.util.RequestValues.addressIdentifier
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,8 +61,8 @@ class AddressControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    addresses = listOf(RequestValues.addressPartnerCreate2)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)
                 )
             )
         )
@@ -93,8 +93,8 @@ class AddressControllerIT @Autowired constructor(
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    addresses = listOf(RequestValues.addressPartnerCreate1)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1)
                 )
             )
         )
@@ -114,8 +114,8 @@ class AddressControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2, RequestValues.addressPartnerCreate3)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate2, BusinessPartnerNonVerboseValues.addressPartnerCreate3)
                 )
             )
         )
@@ -128,8 +128,8 @@ class AddressControllerIT @Autowired constructor(
             poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            ResponseValues.addressPartner1,
-            ResponseValues.addressPartner2
+            BusinessPartnerVerboseValues.addressPartner1,
+            BusinessPartnerVerboseValues.addressPartner2
         )
 
         assertAddressesAreEqual(searchResult.content, expected)
@@ -145,12 +145,12 @@ class AddressControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     // no additional addresses
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate3)
                 )
             )
         )
@@ -161,8 +161,8 @@ class AddressControllerIT @Autowired constructor(
         val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            ResponseValues.addressPartner2.copy(isLegalAddress = true),
-            ResponseValues.addressPartner3
+            BusinessPartnerVerboseValues.addressPartner2.copy(isLegalAddress = true),
+            BusinessPartnerVerboseValues.addressPartner3
         )
 
         assertAddressesAreEqual(searchResult.content, expected)
@@ -178,20 +178,20 @@ class AddressControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
                         SiteStructureRequest(
-                            site = RequestValues.siteCreate1,
-                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                            site = BusinessPartnerNonVerboseValues.siteCreate1,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate2)
                         )
                     )
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
                     siteStructures = listOf(
                         SiteStructureRequest(
-                            site = RequestValues.siteCreate2,
-                            addresses = listOf(RequestValues.addressPartnerCreate3)
+                            site = BusinessPartnerNonVerboseValues.siteCreate2,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate3)
                         )
                     )
                 )
@@ -207,9 +207,9 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        ResponseValues.addressPartner1.copy(isMainAddress = true),
-                        ResponseValues.addressPartner1,
-                        ResponseValues.addressPartner2,
+                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1,
+                        BusinessPartnerVerboseValues.addressPartner2,
                     )
                 )
             }
@@ -220,8 +220,8 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        ResponseValues.addressPartner2.copy(isMainAddress = true),
-                        ResponseValues.addressPartner3,
+                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
             }
@@ -233,12 +233,12 @@ class AddressControllerIT @Autowired constructor(
                 assertAddressesAreEqual(
                     it.content, listOf(
                         // site1
-                        ResponseValues.addressPartner1.copy(isMainAddress = true),
-                        ResponseValues.addressPartner1,
-                        ResponseValues.addressPartner2,
+                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1,
+                        BusinessPartnerVerboseValues.addressPartner2,
                         // site2
-                        ResponseValues.addressPartner2.copy(isMainAddress = true),
-                        ResponseValues.addressPartner3,
+                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
             }
@@ -255,8 +255,8 @@ class AddressControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
                 ),
             )
         )
@@ -265,15 +265,15 @@ class AddressControllerIT @Autowired constructor(
         val bpnS = givenStructure[0].siteStructures[0].site.site.bpns
 
         val expected = listOf(
-            ResponseValues.addressPartnerCreate1,
-            ResponseValues.addressPartnerCreate2,
-            ResponseValues.addressPartnerCreate3
+            BusinessPartnerVerboseValues.addressPartnerCreate1,
+            BusinessPartnerVerboseValues.addressPartnerCreate2,
+            BusinessPartnerVerboseValues.addressPartnerCreate3
         )
 
         val toCreate = listOf(
-            RequestValues.addressPartnerCreate1.copy(bpnParent = bpnL),
-            RequestValues.addressPartnerCreate2.copy(bpnParent = bpnL),
-            RequestValues.addressPartnerCreate3.copy(bpnParent = bpnS)
+            BusinessPartnerNonVerboseValues.addressPartnerCreate1.copy(bpnParent = bpnL),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate2.copy(bpnParent = bpnL),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate3.copy(bpnParent = bpnS)
         )
 
         val response = poolClient.addresses.createAddresses(toCreate)
@@ -304,8 +304,8 @@ class AddressControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
                 ),
             )
         )
@@ -313,8 +313,8 @@ class AddressControllerIT @Autowired constructor(
         val bpnL = givenStructure[0].legalEntity.legalEntity.bpnl
 
 
-        val toCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL)
-        val secondCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = CommonValues.index4)
+        val toCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL)
+        val secondCreate = BusinessPartnerNonVerboseValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = BusinessPartnerNonVerboseValues.addressPartnerCreate4.index)
 
         val response = poolClient.addresses.createAddresses(listOf(toCreate, secondCreate))
 
@@ -345,17 +345,17 @@ class AddressControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
                         SiteStructureRequest(
-                            site = RequestValues.siteCreate1,
-                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                            site = BusinessPartnerNonVerboseValues.siteCreate1,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate2)
                         )
                     )
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate3)
                 )
             )
         )
@@ -365,15 +365,15 @@ class AddressControllerIT @Autowired constructor(
         val bpnA3 = givenStructure[1].addresses[0].address.bpna
 
         val expected = listOf(
-            ResponseValues.addressPartner1.copy(bpna = bpnA2),
-            ResponseValues.addressPartner2.copy(bpna = bpnA3),
-            ResponseValues.addressPartner3.copy(bpna = bpnA1)
+            BusinessPartnerVerboseValues.addressPartner1.copy(bpna = bpnA2),
+            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA3),
+            BusinessPartnerVerboseValues.addressPartner3.copy(bpna = bpnA1)
         )
 
         val toUpdate = listOf(
-            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA2, address = RequestValues.logisticAddress5),
-            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA3, address = RequestValues.logisticAddress5),
-            RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1, address = RequestValues.logisticAddress5)
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(bpna = bpnA2, address = BusinessPartnerNonVerboseValues.logisticAddress5),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA3, address = BusinessPartnerNonVerboseValues.logisticAddress5),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate3.copy(bpna = bpnA1, address = BusinessPartnerNonVerboseValues.logisticAddress5)
         )
 
         val response = poolClient.addresses.updateAddresses(toUpdate)
@@ -393,26 +393,26 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create addresses with non-existent parent`() {
-        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1))
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1))
             .entities.single().legalEntity.bpnl
 
         val expected = listOf(
-            ResponseValues.addressPartnerCreate1,
+            BusinessPartnerVerboseValues.addressPartnerCreate1,
         )
         val expectedErrors = listOf(
-            ErrorInfo(AddressCreateError.BpnNotValid, "message ignored", CommonValues.index3),
-            ErrorInfo(AddressCreateError.SiteNotFound, "message ignored", CommonValues.index1),
-            ErrorInfo(AddressCreateError.LegalEntityNotFound, "message ignored ", CommonValues.index2)
+            ErrorInfo(AddressCreateError.BpnNotValid, "message ignored", BusinessPartnerNonVerboseValues.addressPartnerCreate3.index),
+            ErrorInfo(AddressCreateError.SiteNotFound, "message ignored", BusinessPartnerNonVerboseValues.addressPartnerCreate1.index),
+            ErrorInfo(AddressCreateError.LegalEntityNotFound, "message ignored ", BusinessPartnerNonVerboseValues.addressPartnerCreate2.index)
         )
 
         val invalidSiteBpn = "BPNSXXXXXXXXXX"
         val invalidLegalEntityBpn = "BPNLXXXXXXXXXX"
         val completelyInvalidBpn = "XYZ"
         val toCreate = listOf(
-            RequestValues.addressPartnerCreate1.copy(bpnParent = bpnL),
-            RequestValues.addressPartnerCreate1.copy(bpnParent = invalidSiteBpn),
-            RequestValues.addressPartnerCreate2.copy(bpnParent = invalidLegalEntityBpn),
-            RequestValues.addressPartnerCreate3.copy(bpnParent = completelyInvalidBpn),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate1.copy(bpnParent = bpnL),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate1.copy(bpnParent = invalidSiteBpn),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate2.copy(bpnParent = invalidLegalEntityBpn),
+            BusinessPartnerNonVerboseValues.addressPartnerCreate3.copy(bpnParent = completelyInvalidBpn),
         )
 
         val response = poolClient.addresses.createAddresses(toCreate)
@@ -436,17 +436,17 @@ class AddressControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
                         SiteStructureRequest(
-                            site = RequestValues.siteCreate1,
-                            addresses = listOf(RequestValues.addressPartnerCreate1, RequestValues.addressPartnerCreate2)
+                            site = BusinessPartnerNonVerboseValues.siteCreate1,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1, BusinessPartnerNonVerboseValues.addressPartnerCreate2)
                         )
                     )
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    addresses = listOf(RequestValues.addressPartnerCreate3)
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate3)
                 )
             )
         )
@@ -456,15 +456,15 @@ class AddressControllerIT @Autowired constructor(
         val bpnA3 = givenStructure[1].addresses[0].address.bpna
 
         val expected = listOf(
-            ResponseValues.addressPartner1.copy(bpna = bpnA2),
-            ResponseValues.addressPartner2.copy(bpna = bpnA3),
-            ResponseValues.addressPartner3.copy(bpna = bpnA1)
+            BusinessPartnerVerboseValues.addressPartner1.copy(bpna = bpnA2),
+            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA3),
+            BusinessPartnerVerboseValues.addressPartner3.copy(bpna = bpnA1)
         )
 
         val toUpdate = listOf(
-            RequestValues.addressPartnerUpdate1.copy(bpna = bpnA2),
-            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA3),
-            RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1)
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(bpna = bpnA2),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA3),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate3.copy(bpna = bpnA1)
         )
 
         val response = poolClient.addresses.updateAddresses(toUpdate)
@@ -483,11 +483,11 @@ class AddressControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
                         SiteStructureRequest(
-                            site = RequestValues.siteCreate1,
-                            addresses = listOf(RequestValues.addressPartnerCreate1)
+                            site = BusinessPartnerNonVerboseValues.siteCreate1,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1)
                         )
                     )
                 )
@@ -497,15 +497,15 @@ class AddressControllerIT @Autowired constructor(
         val bpnA1 = givenStructure[0].siteStructures[0].addresses[0].address.bpna
 
         val expected = listOf(
-            ResponseValues.addressPartner2.copy(bpna = bpnA1)
+            BusinessPartnerVerboseValues.addressPartner2.copy(bpna = bpnA1)
         )
 
         val firstInvalidBpn = "BPNLXXXXXXXX"
         val secondInvalidBpn = "BPNAXXXXXXXX"
         val toUpdate = listOf(
-            RequestValues.addressPartnerUpdate2.copy(bpna = bpnA1),
-            RequestValues.addressPartnerUpdate2.copy(bpna = firstInvalidBpn),
-            RequestValues.addressPartnerUpdate3.copy(bpna = secondInvalidBpn)
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA1),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = firstInvalidBpn),
+            BusinessPartnerNonVerboseValues.addressPartnerUpdate3.copy(bpna = secondInvalidBpn)
         )
 
         val response = poolClient.addresses.updateAddresses(toUpdate)

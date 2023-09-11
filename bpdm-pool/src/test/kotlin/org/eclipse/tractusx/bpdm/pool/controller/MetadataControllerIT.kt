@@ -71,17 +71,17 @@ class MetadataControllerIT @Autowired constructor(
 ) {
     companion object {
 
-        private val identifierTypeDtos = listOf(RequestValues.identifierTypeDto1, RequestValues.identifierTypeDto2, RequestValues.identifierTypeDto3)
+        private val identifierTypeDtos = listOf(BusinessPartnerNonVerboseValues.identifierTypeDto1, BusinessPartnerNonVerboseValues.identifierTypeDto2, BusinessPartnerNonVerboseValues.identifierTypeDto3)
 
         private val legalFormRequests = listOf(
-            RequestValues.legalForm1,
-            RequestValues.legalForm2,
-            RequestValues.legalForm3
+            BusinessPartnerNonVerboseValues.legalForm1,
+            BusinessPartnerNonVerboseValues.legalForm2,
+            BusinessPartnerNonVerboseValues.legalForm3
         )
         private val legalFormExpected = listOf(
-            ResponseValues.legalForm1,
-            ResponseValues.legalForm2,
-            ResponseValues.legalForm3
+            BusinessPartnerVerboseValues.legalForm1,
+            BusinessPartnerVerboseValues.legalForm2,
+            BusinessPartnerVerboseValues.legalForm3
         )
 
         private fun postIdentifierType(client: WebTestClient, type: IdentifierTypeDto) =
@@ -132,13 +132,13 @@ class MetadataControllerIT @Autowired constructor(
         fun creationTestArguments(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
-                    RequestValues.identifierTypeDto1,
-                    RequestValues.identifierTypeDto1,
+                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
+                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
                     ::postIdentifierType
                 ),
                 Arguments.of(
-                    RequestValues.legalForm1,
-                    ResponseValues.legalForm1,
+                    BusinessPartnerNonVerboseValues.legalForm1,
+                    BusinessPartnerVerboseValues.legalForm1,
                     ::postLegalForm
                 )
             )
@@ -147,14 +147,14 @@ class MetadataControllerIT @Autowired constructor(
         fun conflictTestArguments(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
-                    RequestValues.identifierTypeDto1,
-                    RequestValues.identifierTypeDto1,
+                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
+                    BusinessPartnerNonVerboseValues.identifierTypeDto1,
                     ::postIdentifierTypeWithoutExpectation,
                     ::getIdentifierTypes
                 ),
                 Arguments.of(
-                    RequestValues.legalForm1,
-                    ResponseValues.legalForm1,
+                    BusinessPartnerNonVerboseValues.legalForm1,
+                    BusinessPartnerVerboseValues.legalForm1,
                     ::postLegalFormWithoutExpectation,
                     ::getLegalForms
                 )
@@ -311,23 +311,23 @@ class MetadataControllerIT @Autowired constructor(
     @Test
     fun getValidIdentifiersForCountry() {
         val identifierType1 = IdentifierType(
-            technicalKey = CommonValues.identifierTypeTechnicalKey1,
+            technicalKey = BusinessPartnerNonVerboseValues.identifierType1.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
-            name = CommonValues.identifierTypeName1,
+            name = BusinessPartnerNonVerboseValues.identifierType1.name,
         )
         identifierType1.details.add(IdentifierTypeDetail(identifierType1, null, true))
 
         val identifierType2 = IdentifierType(
-            technicalKey = CommonValues.identifierTypeTechnicalKey2,
+            technicalKey = BusinessPartnerNonVerboseValues.identifierType2.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
-            name = CommonValues.identifierTypeName2
+            name = BusinessPartnerNonVerboseValues.identifierType2.name
         )
         identifierType2.details.add(IdentifierTypeDetail(identifierType2, CountryCode.UK, false))
 
         val identifierType3 = IdentifierType(
-            technicalKey = CommonValues.identifierTypeTechnicalKey3,
+            technicalKey = BusinessPartnerNonVerboseValues.identifierType3.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
-            name = CommonValues.identifierTypeName3
+            name = BusinessPartnerNonVerboseValues.identifierType3.name
         )
         identifierType3.details.add(IdentifierTypeDetail(identifierType3, CountryCode.PL, false))
 

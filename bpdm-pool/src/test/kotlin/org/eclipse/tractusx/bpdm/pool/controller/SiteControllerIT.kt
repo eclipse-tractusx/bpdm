@@ -58,7 +58,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s`() {
-        val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
+        val createdStructures = testHelpers.createBusinessPartnerStructure(listOf(BusinessPartnerNonVerboseValues.partnerStructure1))
 
         val importedPartner = createdStructures.single().legalEntity
         importedPartner.legalEntity.bpnl
@@ -76,7 +76,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `get site by bpn-s, not found`() {
-        testHelpers.createBusinessPartnerStructure(listOf(RequestValues.partnerStructure1))
+        testHelpers.createBusinessPartnerStructure(listOf(BusinessPartnerNonVerboseValues.partnerStructure1))
         testHelpers.`get site by bpn-s, not found`("NONEXISTENT_BPN")
     }
 
@@ -90,11 +90,11 @@ class SiteControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
-                        SiteStructureRequest(site = RequestValues.siteCreate1),
-                        SiteStructureRequest(site = RequestValues.siteCreate2),
-                        SiteStructureRequest(site = RequestValues.siteCreate3)
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate2),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate3)
                     )
                 )
             )
@@ -108,12 +108,12 @@ class SiteControllerIT @Autowired constructor(
         val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 = SitePoolVerboseDto(
-            site = ResponseValues.site1.copy(bpnLegalEntity = bpnL),
-            mainAddress = ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1)
+            site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
+            mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
         )
         val expectedSiteWithReference2 = SitePoolVerboseDto(
-            site = ResponseValues.site2.copy(bpnLegalEntity = bpnL),
-            mainAddress = ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2)
+            site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
+            mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
         )
 
         testHelpers.assertRecursively(searchResult.content)
@@ -134,15 +134,15 @@ class SiteControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
-                        SiteStructureRequest(site = RequestValues.siteCreate1),
-                        SiteStructureRequest(site = RequestValues.siteCreate2),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate2),
                     )
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate3))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    siteStructures = listOf(SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate3))
                 )
             )
         )
@@ -155,18 +155,18 @@ class SiteControllerIT @Autowired constructor(
 
         val expectedSiteWithReference1 =
             SitePoolVerboseDto(
-                site = ResponseValues.site1.copy(bpnLegalEntity = bpnL1),
-                mainAddress = ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1)
+                site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
+                mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
             )
         val expectedSiteWithReference2 =
             SitePoolVerboseDto(
-                site = ResponseValues.site2.copy(bpnLegalEntity = bpnL1),
-                mainAddress = ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2)
+                site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
+                mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
             )
         val expectedSiteWithReference3 =
             SitePoolVerboseDto(
-                site = ResponseValues.site3.copy(bpnLegalEntity = bpnL2),
-                mainAddress = ResponseValues.addressPartner3.copy(isMainAddress = true, bpnSite = CommonValues.bpnS3)
+                site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
+                mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site3.bpns)
             )
 
         testHelpers.assertRecursively(searchResult.content)
@@ -187,17 +187,17 @@ class SiteControllerIT @Autowired constructor(
     fun `create new sites`() {
 
         val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().legalEntity.bpnl
         val bpnL2 = givenLegalEntities.last().legalEntity.bpnl
 
-        val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2, ResponseValues.siteUpsert3)
+        val expected = listOf(BusinessPartnerVerboseValues.siteUpsert1, BusinessPartnerVerboseValues.siteUpsert2, BusinessPartnerVerboseValues.siteUpsert3)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(bpnlParent = bpnL1),
-            RequestValues.siteCreate2.copy(bpnlParent = bpnL2),
-            RequestValues.siteCreate3.copy(bpnlParent = bpnL2)
+            BusinessPartnerNonVerboseValues.siteCreate1.copy(bpnlParent = bpnL1),
+            BusinessPartnerNonVerboseValues.siteCreate2.copy(bpnlParent = bpnL2),
+            BusinessPartnerNonVerboseValues.siteCreate3.copy(bpnlParent = bpnL2)
         )
 
         val response = poolClient.sites.createSite(toCreate)
@@ -216,34 +216,34 @@ class SiteControllerIT @Autowired constructor(
     fun `create sites entities and get duplicate identifier error on address`() {
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
-                technicalKey = RequestValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
+                technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
             )
         )
 
         val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
-        val request1 = with(RequestValues.siteCreate1) {
+        val request1 = with(BusinessPartnerNonVerboseValues.siteCreate1) {
             copy(
-                index = CommonValues.index1,
+                index = BusinessPartnerNonVerboseValues.siteCreate1.index,
                 site = SiteDto(
-                    name = CommonValues.siteName1,
-                    states = listOf(RequestValues.siteStatus1),
-                    mainAddress = RequestValues.logisticAddress3.copy(
-                        identifiers = listOf(RequestValues.addressIdentifier)
+                    name = BusinessPartnerNonVerboseValues.siteCreate1.site.name,
+                    states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
+                    mainAddress = BusinessPartnerNonVerboseValues.logisticAddress3.copy(
+                        identifiers = listOf(BusinessPartnerNonVerboseValues.addressIdentifier)
                     )
                 )
             )
         }
-        val request2 = with(RequestValues.siteCreate2) {
+        val request2 = with(BusinessPartnerNonVerboseValues.siteCreate2) {
             copy(
-                index = CommonValues.index1,
+                index = BusinessPartnerNonVerboseValues.siteCreate1.index,
                 site = SiteDto(
-                    name = CommonValues.siteName1,
-                    states = listOf(RequestValues.siteStatus1),
-                    mainAddress = RequestValues.logisticAddress2.copy(
-                        identifiers = listOf(RequestValues.addressIdentifier)
+                    name = BusinessPartnerNonVerboseValues.siteCreate1.site.name,
+                    states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
+                    mainAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
+                        identifiers = listOf(BusinessPartnerNonVerboseValues.addressIdentifier)
                     )
                 )
             )
@@ -271,15 +271,15 @@ class SiteControllerIT @Autowired constructor(
 
         poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
-                technicalKey = RequestValues.addressIdentifier.type,
-                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
+                technicalKey = BusinessPartnerNonVerboseValues.addressIdentifier.type,
+                businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = BusinessPartnerNonVerboseValues.addressIdentifier.value
             )
         )
 
         val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
-        val toCreate1 = listOf(RequestValues.siteCreate1, RequestValues.siteCreate2)
+        val toCreate1 = listOf(BusinessPartnerNonVerboseValues.siteCreate1, BusinessPartnerNonVerboseValues.siteCreate2)
         val response1 = poolClient.sites.createSite(toCreate1)
 
 
@@ -287,34 +287,34 @@ class SiteControllerIT @Autowired constructor(
         val bpnList = response1.entities.map { it.site.bpns }
 
         // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
-        val referenceIdentifier = RequestValues.identifier3.copy(
-            issuingBody = CommonValues.issuingBody1
+        val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
+            issuingBody = BusinessPartnerNonVerboseValues.identifier1.issuingBody
         )
         val equivalentIdentifier = referenceIdentifier.copy(
-            issuingBody = CommonValues.issuingBody2
+            issuingBody = BusinessPartnerNonVerboseValues.identifier2.issuingBody
         )
 
         // 3 requests using these equivalent identifiers & 1 different request
-        val toUpdate1 = with(RequestValues.siteUpdate1) {
+        val toUpdate1 = with(BusinessPartnerNonVerboseValues.siteUpdate1) {
             copy(
                 bpns = bpnList[0],
                 site = SiteDto(
-                    name = CommonValues.siteName1,
-                    states = listOf(RequestValues.siteStatus1),
-                    mainAddress = RequestValues.logisticAddress3.copy(
-                        identifiers = listOf(RequestValues.addressIdentifier)
+                    name = BusinessPartnerNonVerboseValues.siteUpdate1.site.name,
+                    states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
+                    mainAddress = BusinessPartnerNonVerboseValues.logisticAddress3.copy(
+                        identifiers = listOf(BusinessPartnerNonVerboseValues.addressIdentifier)
                     )
                 )
             )
         }
-        val toUpdate2 = with(RequestValues.siteUpdate2) {
+        val toUpdate2 = with(BusinessPartnerNonVerboseValues.siteUpdate2) {
             copy(
                 bpns = bpnList[1],
                 site = SiteDto(
-                    name = CommonValues.siteName1,
-                    states = listOf(RequestValues.siteStatus1),
-                    mainAddress = RequestValues.logisticAddress2.copy(
-                        identifiers = listOf(RequestValues.addressIdentifier)
+                    name = BusinessPartnerNonVerboseValues.siteUpdate1.site.name,
+                    states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
+                    mainAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
+                        identifiers = listOf(BusinessPartnerNonVerboseValues.addressIdentifier)
                     )
                 )
             )
@@ -341,18 +341,18 @@ class SiteControllerIT @Autowired constructor(
 
 
         val givenLegalEntities =
-            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(BusinessPartnerNonVerboseValues.legalEntityCreate1, BusinessPartnerNonVerboseValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().legalEntity.bpnl
         val bpnL2 = givenLegalEntities.last().legalEntity.bpnl
 
 
-        val expected = listOf(ResponseValues.siteUpsert1, ResponseValues.siteUpsert2)
+        val expected = listOf(BusinessPartnerVerboseValues.siteUpsert1, BusinessPartnerVerboseValues.siteUpsert2)
 
         val toCreate = listOf(
-            RequestValues.siteCreate1.copy(bpnlParent = bpnL1),
-            RequestValues.siteCreate2.copy(bpnlParent = bpnL2),
-            RequestValues.siteCreate3.copy(bpnlParent = "NONEXISTENT")
+            BusinessPartnerNonVerboseValues.siteCreate1.copy(bpnlParent = bpnL1),
+            BusinessPartnerNonVerboseValues.siteCreate2.copy(bpnlParent = bpnL2),
+            BusinessPartnerNonVerboseValues.siteCreate3.copy(bpnlParent = "NONEXISTENT")
         )
         val response = poolClient.sites.createSite(toCreate)
 
@@ -360,7 +360,7 @@ class SiteControllerIT @Autowired constructor(
         assertThatCreatedSitesEqual(response.entities, expected)
         // 1 error
         assertThat(response.errorCount).isEqualTo(1)
-        testHelpers.assertErrorResponse(response.errors.first(), SiteCreateError.LegalEntityNotFound, CommonValues.index3)
+        testHelpers.assertErrorResponse(response.errors.first(), SiteCreateError.LegalEntityNotFound, BusinessPartnerVerboseValues.siteUpsert3.index!!)
     }
 
     /**
@@ -373,12 +373,12 @@ class SiteControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate3))
                 )
             )
         )
@@ -388,15 +388,15 @@ class SiteControllerIT @Autowired constructor(
         val bpnS3 = givenStructure[1].siteStructures[1].site.site.bpns
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpns = bpnS3), index = null) },
-            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpns = bpnS1), index = null) },
-            ResponseValues.siteUpsert3.run { copy(site = site.copy(bpns = bpnS2), index = null) },
+            BusinessPartnerVerboseValues.siteUpsert1.run { copy(site = site.copy(bpns = bpnS3), index = null) },
+            BusinessPartnerVerboseValues.siteUpsert2.run { copy(site = site.copy(bpns = bpnS1), index = null) },
+            BusinessPartnerVerboseValues.siteUpsert3.run { copy(site = site.copy(bpns = bpnS2), index = null) },
         )
 
         val toUpdate = listOf(
-            RequestValues.siteUpdate1.copy(bpns = bpnS3),
-            RequestValues.siteUpdate2.copy(bpns = bpnS1),
-            RequestValues.siteUpdate3.copy(bpns = bpnS2)
+            BusinessPartnerNonVerboseValues.siteUpdate1.copy(bpns = bpnS3),
+            BusinessPartnerNonVerboseValues.siteUpdate2.copy(bpns = bpnS1),
+            BusinessPartnerNonVerboseValues.siteUpdate3.copy(bpns = bpnS2)
         )
 
         val response = poolClient.sites.updateSite(toUpdate)
@@ -415,8 +415,8 @@ class SiteControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1), SiteStructureRequest(RequestValues.siteCreate2))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2))
                 )
             )
         )
@@ -425,14 +425,14 @@ class SiteControllerIT @Autowired constructor(
         val bpnS2 = givenStructure[0].siteStructures[1].site.site.bpns
 
         val expected = listOf(
-            ResponseValues.siteUpsert1.run { copy(site = site.copy(bpns = bpnS2), index = null) },
-            ResponseValues.siteUpsert2.run { copy(site = site.copy(bpns = bpnS1), index = null) },
+            BusinessPartnerVerboseValues.siteUpsert1.run { copy(site = site.copy(bpns = bpnS2), index = null) },
+            BusinessPartnerVerboseValues.siteUpsert2.run { copy(site = site.copy(bpns = bpnS1), index = null) },
         )
 
         val toUpdate = listOf(
-            RequestValues.siteUpdate1.copy(bpns = bpnS2),
-            RequestValues.siteUpdate2.copy(bpns = bpnS1),
-            RequestValues.siteUpdate3.copy(bpns = "NONEXISTENT"),
+            BusinessPartnerNonVerboseValues.siteUpdate1.copy(bpns = bpnS2),
+            BusinessPartnerNonVerboseValues.siteUpdate2.copy(bpns = bpnS1),
+            BusinessPartnerNonVerboseValues.siteUpdate3.copy(bpns = "NONEXISTENT"),
         )
         val response = poolClient.sites.updateSite(toUpdate)
 
@@ -453,12 +453,12 @@ class SiteControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate3))
                 )
             )
         )
@@ -481,12 +481,12 @@ class SiteControllerIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1))
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
-                    siteStructures = listOf(SiteStructureRequest(RequestValues.siteCreate2), SiteStructureRequest(RequestValues.siteCreate3))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
+                    siteStructures = listOf(SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2), SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate3))
                 )
             )
         )
@@ -505,10 +505,10 @@ class SiteControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
-                        SiteStructureRequest(site = RequestValues.siteCreate1),
-                        SiteStructureRequest(site = RequestValues.siteCreate2)
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate2)
                     )
                 )
             )
@@ -517,12 +517,12 @@ class SiteControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
 
         val legalAddress1: LogisticAddressVerboseDto =
-            ResponseValues.addressPartner1.copy(isMainAddress = true, bpnSite = CommonValues.bpnS1, bpna = "BPNA0000000001YN")
-        val site1 = ResponseValues.site1.copy(bpnLegalEntity = bpnL1)
+            BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns, bpna = "BPNA0000000001YN")
+        val site1 = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1)
 
         val legalAddress2: LogisticAddressVerboseDto =
-            ResponseValues.addressPartner2.copy(isMainAddress = true, bpnSite = CommonValues.bpnS2, bpna = "BPNA0000000002XY")
-        val site2 = ResponseValues.site2.copy(bpnLegalEntity = bpnL1)
+            BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns, bpna = "BPNA0000000002XY")
+        val site2 = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1)
 
         val expectedFirstPage = PageDto(
             2, 1, 0, 2, listOf(

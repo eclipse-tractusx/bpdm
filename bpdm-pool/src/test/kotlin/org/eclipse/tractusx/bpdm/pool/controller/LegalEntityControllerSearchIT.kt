@@ -52,16 +52,16 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 ) {
 
     private val partnerStructure1 = LegalEntityStructureRequest(
-        legalEntity = RequestValues.legalEntityCreate1,
+        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
         siteStructures = listOf(
-            SiteStructureRequest(RequestValues.siteCreate1)
+            SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1)
         )
     )
     private val partnerStructure2 = LegalEntityStructureRequest(
-        legalEntity = RequestValues.legalEntityCreate2,
+        legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
         siteStructures = listOf(
-            SiteStructureRequest(RequestValues.siteCreate2),
-            SiteStructureRequest(RequestValues.siteCreate1) //same site here to attain multiple results when needed
+            SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate2),
+            SiteStructureRequest(BusinessPartnerNonVerboseValues.siteCreate1) //same site here to attain multiple results when needed
         )
     )
 
@@ -104,7 +104,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
             )
         )
 
-        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 0, size = 100)
+        val pageResponse = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 0, size = 100)
 
         assertPageEquals(pageResponse, expected)
     }
@@ -128,8 +128,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
             )
         )
 
-        val firstPage = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 0, size = 1)
-        val secondPage = searchBusinessPartnerBySiteName(RequestValues.siteCreate1.site.name, page = 1, size = 1)
+        val firstPage = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 0, size = 1)
+        val secondPage = searchBusinessPartnerBySiteName(BusinessPartnerNonVerboseValues.siteCreate1.site.name, page = 1, size = 1)
 
         assertPageEquals(firstPage, expectedFirstPage)
         assertPageEquals(secondPage, expectedSecondPage)

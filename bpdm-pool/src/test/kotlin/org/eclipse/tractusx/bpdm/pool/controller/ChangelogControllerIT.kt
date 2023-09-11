@@ -67,8 +67,8 @@ class ChangelogControllerIT @Autowired constructor(
 
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2)
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2)
             )
         )
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
@@ -80,8 +80,8 @@ class ChangelogControllerIT @Autowired constructor(
 
         poolClient.legalEntities.updateBusinessPartners(
             listOf(
-                RequestValues.legalEntityUpdate1.copy(bpnl = bpnL1),
-                RequestValues.legalEntityUpdate2.copy(bpnl = bpnL2)
+                BusinessPartnerNonVerboseValues.legalEntityUpdate1.copy(bpnl = bpnL1),
+                BusinessPartnerNonVerboseValues.legalEntityUpdate2.copy(bpnl = bpnL2)
             )
         )
 
@@ -122,10 +122,10 @@ class ChangelogControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     siteStructures = listOf(
-                        SiteStructureRequest(site = RequestValues.siteCreate1),
-                        SiteStructureRequest(site = RequestValues.siteCreate2),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1),
+                        SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate2),
                     )
                 )
             )
@@ -139,8 +139,8 @@ class ChangelogControllerIT @Autowired constructor(
 
         poolClient.sites.updateSite(
             listOf(
-                RequestValues.siteUpdate1.copy(bpns = bpnS1),
-                RequestValues.siteUpdate2.copy(bpns = bpnS2)
+                BusinessPartnerNonVerboseValues.siteUpdate1.copy(bpns = bpnS1),
+                BusinessPartnerNonVerboseValues.siteUpdate2.copy(bpns = bpnS2)
             )
         )
 
@@ -183,9 +183,9 @@ class ChangelogControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    addresses = listOf(RequestValues.addressPartnerCreate1),
-                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate1, addresses = listOf(RequestValues.addressPartnerCreate2)))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1),
+                    siteStructures = listOf(SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1, addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)))
                 )
             )
         )
@@ -198,8 +198,8 @@ class ChangelogControllerIT @Autowired constructor(
 
         poolClient.addresses.updateAddresses(
             listOf(
-                RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
-                RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
+                BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(bpna = bpnA1),
+                BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA2)
             )
         )
 
@@ -241,9 +241,9 @@ class ChangelogControllerIT @Autowired constructor(
 
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3),
             )
         )
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
@@ -293,8 +293,8 @@ class ChangelogControllerIT @Autowired constructor(
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
-                    siteStructures = listOf(SiteStructureRequest(site = RequestValues.siteCreate1))
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
+                    siteStructures = listOf(SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1))
                 )
             )
         )
@@ -355,9 +355,9 @@ class ChangelogControllerIT @Autowired constructor(
 
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3)
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3)
             )
         )
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
@@ -392,7 +392,7 @@ class ChangelogControllerIT @Autowired constructor(
 
         testHelpers.createBusinessPartnerStructure(
             listOf(
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate1)
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1)
             )
         )
 
@@ -401,8 +401,8 @@ class ChangelogControllerIT @Autowired constructor(
 
         val createdStructures = testHelpers.createBusinessPartnerStructure(
             listOf(
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate2),
-                LegalEntityStructureRequest(legalEntity = RequestValues.legalEntityCreate3)
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2),
+                LegalEntityStructureRequest(legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3)
             )
         )
 

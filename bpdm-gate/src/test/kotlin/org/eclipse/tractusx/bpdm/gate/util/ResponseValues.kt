@@ -220,25 +220,25 @@ object ResponseValues {
     )
 
     val legalEntityResponseGate1 = LegalEntityVerboseDto(
-        bpnl = CommonValues.bpn1,
-        legalShortName = CommonValues.shortName1,
-        legalForm = legalForm1,
-        states = listOf(leBusinessStatus1),
-        classifications = listOf(classification1, classification2),
-        currentness = CommonValues.now,
-        createdAt = CommonValues.now,
-        updatedAt = CommonValues.now,
+            bpnl = CommonValues.bpn1,
+            legalShortName = CommonValues.shortName1,
+            legalForm = legalForm1,
+            states = listOf(leBusinessStatus1),
+            classifications = listOf(classification1, classification2),
+            currentness = CommonValues.now,
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
     )
 
     val legalEntityResponseGate2 = LegalEntityVerboseDto(
-        bpnl = CommonValues.bpn2,
-        legalShortName = CommonValues.shortName3,
-        legalForm = legalForm2,
-        states = listOf(leBusinessStatus2),
-        classifications = listOf(classification3, classification4),
-        currentness = CommonValues.now,
-        createdAt = CommonValues.now,
-        updatedAt = CommonValues.now,
+            bpnl = CommonValues.bpn2,
+            legalShortName = CommonValues.shortName3,
+            legalForm = legalForm2,
+            states = listOf(leBusinessStatus2),
+            classifications = listOf(classification3, classification4),
+            currentness = CommonValues.now,
+            createdAt = CommonValues.now,
+            updatedAt = CommonValues.now,
     )
 
     //Response values for Site and LegalEntity created Addresses (Input)
