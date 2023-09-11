@@ -36,7 +36,10 @@ data class BusinessPartnerInputDto(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressInputDto,
+
+    @get:Schema(description = "Address of the official seat of this business partner.")
+    val postalAddress: BusinessPartnerPostalAddressInputDto,
+
     override val isOwner: Boolean,
 
     @get:Schema(description = CommonDescription.createdAt)
@@ -44,4 +47,5 @@ data class BusinessPartnerInputDto(
 
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
-) : IBaseBusinessPartnerInputDto
+
+    ) : IBaseBusinessPartnerDto
