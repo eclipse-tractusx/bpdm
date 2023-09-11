@@ -64,7 +64,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
-internal class AddressControllerOutputIT @Autowired constructor(
+internal class PostalAddressControllerOutputIT @Autowired constructor(
     val gateClient: GateClient,
     private val gateAddressRepository: GateAddressRepository,
     val testHelpers: DbTestHelpers

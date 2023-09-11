@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
 @Embeddable
 class AlternativePostalAddress(
+
     @Embedded
     @AttributeOverride(name = "latitude", column = Column(name = "alt_latitude"))
     @AttributeOverride(name = "longitude", column = Column(name = "alt_longitude"))
@@ -39,17 +40,18 @@ class AlternativePostalAddress(
      * Region within the country
      */
     @Column(name = "alt_admin_area_l1_region")
-    val administrativeAreaLevel1: String? = null,
+    val administrativeAreaLevel1: String?,
 
     /**
      * A postal code, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "alt_postcode")
-    val postCode: String? = null,
+    val postalCode: String?,
 
     /**
      * The city of the address (Synonym: Town, village, municipality)
      */
+    // TODO Should it be optional?
     @Column(name = "alt_city")
     val city: String,
 
@@ -58,14 +60,17 @@ class AlternativePostalAddress(
      */
     @Column(name = "alt_delivery_service_type")
     @Enumerated(EnumType.STRING)
-    val deliveryServiceType: DeliveryServiceType = DeliveryServiceType.PO_BOX,
+    val deliveryServiceType: DeliveryServiceType,
 
     /**
-     * Describes the PO Box or private Bag number the delivery should be placed at.
+     * The qualifier uniquely identifies the delivery service endpoint in conjunction with the delivery service number
      */
-    @Column(name = "alt_delivery_service_number")
-    val deliveryServiceNumber: String = "",
-
     @Column(name = "alt_delivery_service_qualifier")
     val deliveryServiceQualifier: String?,
+
+    /**
+     * Describes the PO Box or private Bag number the delivery should be placed at
+     */
+    @Column(name = "alt_delivery_service_number")
+    val deliveryServiceNumber: String
 )

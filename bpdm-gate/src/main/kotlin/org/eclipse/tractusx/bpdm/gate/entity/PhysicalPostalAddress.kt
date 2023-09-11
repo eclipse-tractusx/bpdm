@@ -24,6 +24,7 @@ import jakarta.persistence.*
 
 @Embeddable
 class PhysicalPostalAddress(
+
     @Embedded
     @AttributeOverride(name = "latitude", column = Column(name = "phy_latitude"))
     @AttributeOverride(name = "longitude", column = Column(name = "phy_longitude"))
@@ -38,29 +39,30 @@ class PhysicalPostalAddress(
      * Region within the country
      */
     @Column(name = "phy_admin_area_l1_region")
-    val administrativeAreaLevel1: String? = null,
+    val administrativeAreaLevel1: String?,
 
     /**
      * Further possibility to describe the region/address(e.g. County)
      */
     @Column(name = "phy_admin_area_l2")
-    val administrativeAreaLevel2: String? = null,
+    val administrativeAreaLevel2: String?,
 
     /**
      * Further possibility to describe the region/address(e.g. Township)
      */
     @Column(name = "phy_admin_area_l3")
-    val administrativeAreaLevel3: String? = null,
+    val administrativeAreaLevel3: String?,
 
     /**
      * A postal code, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "phy_postcode")
-    val postCode: String? = null,
+    val postalCode: String?,
 
     /**
      * The city of the address (Synonym: Town, village, municipality)
      */
+    // TODO Should it be optional?
     @Column(name = "phy_city")
     val city: String,
 
@@ -68,7 +70,7 @@ class PhysicalPostalAddress(
      * Divides the city in several smaller areas
      */
     @Column(name = "phy_district_l1")
-    val districtLevel1: String? = null,
+    val district: String?,
 
     @Embedded
     @AttributeOverride(name = "name", column = Column(name = "phy_street_name"))
@@ -79,7 +81,7 @@ class PhysicalPostalAddress(
     @AttributeOverride(name = "additionalNamePrefix", column = Column(name = "phy_additional_name_prefix"))
     @AttributeOverride(name = "nameSuffix", column = Column(name = "phy_name_suffix"))
     @AttributeOverride(name = "additionalNameSuffix", column = Column(name = "phy_additional_name_suffix"))
-    val street: Street? = null,
+    val street: Street?,
 
     // specific for PhysicalPostalAddress
 
@@ -87,30 +89,29 @@ class PhysicalPostalAddress(
      * A separate postal code for a company, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "phy_company_postcode")
-    val companyPostCode: String? = null,
+    val companyPostalCode: String?,
 
     /**
      * The practice of designating an area for industrial development
      */
     @Column(name = "phy_industrial_zone")
-    val industrialZone: String? = null,
+    val industrialZone: String?,
 
     /**
      * Describes a specific building within the address
      */
     @Column(name = "phy_building")
-    val building: String? = null,
+    val building: String?,
 
     /**
      * Describes the floor/level the delivery shall take place
      */
     @Column(name = "phy_floor")
-    val floor: String? = null,
+    val floor: String?,
 
     /**
      * Describes the door/room/suite on the respective floor the delivery shall take place
      */
     @Column(name = "phy_door")
-    val door: String? = null,
-
-    )
+    val door: String?
+)

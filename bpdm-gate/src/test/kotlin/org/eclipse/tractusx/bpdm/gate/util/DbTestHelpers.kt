@@ -25,6 +25,7 @@ import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.springframework.stereotype.Component
 import java.time.Instant
+import java.time.LocalDateTime
 
 private const val BPDM_DB_SCHEMA_NAME: String = "bpdmgate"
 
@@ -59,7 +60,7 @@ class DbTestHelpers(entityManagerFactory: EntityManagerFactory) {
             .usingRecursiveComparison()
             .ignoringCollectionOrder()
             .ignoringAllOverriddenEquals()
-            .ignoringFieldsOfTypes(Instant::class.java)
+            .ignoringFieldsOfTypes(Instant::class.java, LocalDateTime::class.java)
     }
 
 }

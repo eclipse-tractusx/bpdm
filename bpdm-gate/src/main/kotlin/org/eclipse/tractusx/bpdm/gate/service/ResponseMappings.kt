@@ -78,7 +78,7 @@ fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
         administrativeAreaLevel1 = administrativeAreaLevel1,
-        postCode = postalCode,
+        postalCode = postalCode,
         city = city,
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
@@ -92,11 +92,11 @@ fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity() =
         administrativeAreaLevel1 = administrativeAreaLevel1,
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
-        postCode = postalCode,
+        postalCode = postalCode,
         city = city,
-        districtLevel1 = district,
+        district = district,
         street = street?.toStreetEntity(),
-        companyPostCode = companyPostalCode,
+        companyPostalCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
@@ -256,8 +256,8 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
     return LegalEntityState(dto.description, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
-fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): Classification {
-    return Classification(dto.value, dto.code, dto.type, legalEntity)
+fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): LegalEntityClassification {
+    return LegalEntityClassification(dto.value, dto.code, dto.type, legalEntity)
 }
 
 fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
@@ -316,7 +316,7 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalA
         administrativeAreaLevel1 = administrativeAreaLevel1,
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
-        postalCode = postCode,
+        postalCode = postalCode,
         city = city
     )
 
@@ -324,13 +324,13 @@ fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDt
     PhysicalPostalAddressGateDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
-        postalCode = postCode,
+        postalCode = postalCode,
         city = city,
         administrativeAreaLevel1 = administrativeAreaLevel1,
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
-        district = districtLevel1,
-        companyPostalCode = companyPostCode,
+        district = district,
+        companyPostalCode = companyPostalCode,
         industrialZone = industrialZone,
         building = building,
         floor = floor,
@@ -372,7 +372,7 @@ fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<L
     return states.map { LegalEntityStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun mapToLegalEntityClassificationsDto(classification: MutableSet<Classification>): Collection<ClassificationDto> {
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<ClassificationDto> {
     return classification.map { ClassificationDto(it.value, it.code, it.type) }
 }
 

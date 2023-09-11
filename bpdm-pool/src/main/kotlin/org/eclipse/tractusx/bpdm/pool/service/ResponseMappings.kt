@@ -255,7 +255,7 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-fun Classification.toDto(): ClassificationVerboseDto {
+fun LegalEntityClassification.toDto(): ClassificationVerboseDto {
     return ClassificationVerboseDto(value, code, type.toDto())
 }
 

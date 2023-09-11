@@ -17,11 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.repository
+package org.eclipse.tractusx.bpdm.gate.repository.generic
 
-import org.eclipse.tractusx.bpdm.pool.entity.Classification
-import org.springframework.data.repository.CrudRepository
-import org.springframework.data.repository.PagingAndSortingRepository
+import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddress
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 
-interface ClassificationRepository : PagingAndSortingRepository<Classification, Long>, CrudRepository<Classification, Long> {
-}
+@Repository
+interface PostalAddressRepository : JpaRepository<PostalAddress, Long>
