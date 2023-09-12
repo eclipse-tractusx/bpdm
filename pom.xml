@@ -43,6 +43,7 @@
         <module>bpdm-gate-api</module>
         <module>bpdm-gate</module>
         <module>bpdm-bridge-dummy</module>
+        <module>bpdm-cleaning-service-dummy</module>
     </modules>
 
     <properties>
@@ -79,6 +80,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-cleaning-service-dummy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
