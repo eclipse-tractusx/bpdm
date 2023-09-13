@@ -28,7 +28,10 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDesc
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = PostalAddressDescription.headerPhysical)
+@Schema(
+    description = PostalAddressDescription.headerPhysical,
+    requiredProperties = ["country", "city"]
+)
 data class PhysicalPostalAddressGateDto(
 
     override val geographicCoordinates: GeoCoordinateDto?,

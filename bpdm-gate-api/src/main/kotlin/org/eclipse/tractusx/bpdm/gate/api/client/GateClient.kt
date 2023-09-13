@@ -23,6 +23,8 @@ import org.eclipse.tractusx.bpdm.gate.api.*
 
 interface GateClient {
 
+    fun businessParters(): GateBusinessPartnerApi
+
     fun addresses(): GateAddressApi
 
     fun legalEntities(): GateLegalEntityApi

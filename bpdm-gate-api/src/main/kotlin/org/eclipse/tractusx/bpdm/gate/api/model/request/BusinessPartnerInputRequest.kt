@@ -24,11 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 
 
-@Schema(description = "Generic business partner with external id", requiredProperties = ["externalId", "postalAddress"])
+@Schema(
+    description = "Generic business partner with external id",
+    requiredProperties = ["externalId", "postalAddress"]
+)
 data class BusinessPartnerInputRequest(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
-    override val shortName: String?,
+    override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
@@ -38,6 +41,6 @@ data class BusinessPartnerInputRequest(
     @get:Schema(description = "Address of the official seat of this business partner.")
     val postalAddress: BusinessPartnerPostalAddressInputDto,
 
-    override val isOwner: Boolean
+    override val isOwner: Boolean = false
 
 ) : IBaseBusinessPartnerDto

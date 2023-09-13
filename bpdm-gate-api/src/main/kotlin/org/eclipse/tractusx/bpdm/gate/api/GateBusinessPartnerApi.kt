@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -58,7 +59,7 @@ interface GateBusinessPartnerApi {
     )
     @PutMapping("/input/business-partners")
     @PutExchange("/input/business-partners")
-    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): Collection<BusinessPartnerInputDto>
+    fun upsertBusinessPartnersInput(@RequestBody businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>>
 
     @Operation(
         summary = "Search business partner by external ID. An empty external ID list returns a paginated list of all business partners.",
@@ -72,9 +73,9 @@ interface GateBusinessPartnerApi {
     )
     @PostMapping("/input/business-partners/search")
     @PostExchange("/input/business-partners/search")
-    fun getBusinessPartnersInputByExternalIds(
-        @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @RequestBody externalIds: Collection<String>
+    fun getBusinessPartnersInput(
+        @RequestBody externalIds: Collection<String>? = null,
+        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<BusinessPartnerInputDto>
 
 
@@ -92,8 +93,8 @@ interface GateBusinessPartnerApi {
     @PostMapping("/output/business-partners/search")
     @PostExchange("/output/business-partners/search")
     fun getBusinessPartnersOutput(
-        @ParameterObject @Valid paginationRequest: PaginationRequest,
-        @RequestBody(required = false) externalIds: Collection<String>?
+        @RequestBody externalIds: Collection<String>? = null,
+        @ParameterObject @Valid paginationRequest: PaginationRequest = PaginationRequest()
     ): PageDto<BusinessPartnerOutputDto>
 
 }

@@ -21,10 +21,14 @@ package org.eclipse.tractusx.bpdm.common.service
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 
 fun <T : NamedUrlType> T.toDto(): TypeKeyNameUrlDto<T> {
     return TypeKeyNameUrlDto(this, getTypeName(), getUrl())
@@ -41,3 +45,15 @@ fun LanguageCode.toDto(): TypeKeyNameVerboseDto<LanguageCode> {
 fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
     return TypeKeyNameVerboseDto(this, getName())
 }
+
+fun PaginationRequest.toPageRequest() =
+    PageRequest.of(page, size)
+
+fun <T, R> Page<T>.toPageDto(contentMapper: (T) -> R): PageDto<R> =
+    PageDto(
+        page = number,
+        totalElements = totalElements,
+        totalPages = totalPages,
+        contentSize = content.size,
+        content = content.map(contentMapper)
+    )
