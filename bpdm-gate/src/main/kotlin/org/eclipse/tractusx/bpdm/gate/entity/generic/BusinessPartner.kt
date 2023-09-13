@@ -62,16 +62,16 @@ class BusinessPartner(
     var legalForm: String?,
 
     @Column(name = "is_owner")
-    var isOwner: Boolean?,
+    var isOwner: Boolean,
 
-    @Column(name = "address_bpn")
-    var bpnA: String?,
-
-    @Column(name = "legal_entity_bpn")
+    @Column(name = "bpnl")
     var bpnL: String?,
 
-    @Column(name = "site_bpn")
+    @Column(name = "bpns")
     var bpnS: String?,
+
+    @Column(name = "bpna")
+    var bpnA: String?,
 
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "postal_address_id", unique = true)

@@ -31,7 +31,7 @@ class PostalAddress(
 
     @Column(name = "address_type")
     @Enumerated(EnumType.STRING)
-    var addressType: AddressType,
+    var addressType: AddressType?,
 
     @Embedded
     var physicalPostalAddress: PhysicalPostalAddress,
