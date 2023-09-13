@@ -23,6 +23,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
+import java.util.*
 
 @Entity
 @Table(name = "business_partners")
@@ -40,19 +41,19 @@ class BusinessPartner(
     @CollectionTable(name = "business_partners_roles", joinColumns = [JoinColumn(name = "business_partner_id")])
     @Enumerated(EnumType.STRING)
     @Column(name = "role_name")
-    var roles: MutableList<BusinessPartnerRole> = mutableListOf(),
+    var roles: SortedSet<BusinessPartnerRole> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_identifiers", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var identifiers: MutableList<Identifier> = mutableListOf(),
+    var identifiers: SortedSet<Identifier> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_states", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var states: MutableList<State> = mutableListOf(),
+    var states: SortedSet<State> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_classifications", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var classifications: MutableList<Classification> = mutableListOf(),
+    var classifications: SortedSet<Classification> = sortedSetOf(),
 
     @Column(name = "short_name")
     var shortName: String?,

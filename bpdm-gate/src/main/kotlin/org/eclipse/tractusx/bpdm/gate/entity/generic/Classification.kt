@@ -28,14 +28,23 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Embeddable
 data class Classification(
-    @Column(name = "value")
-    var value: String?,
-
-    @Column(name = "code")
-    var code: String?,
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     val type: ClassificationType,
 
-    )
+    @Column(name = "code")
+    var code: String?,
+
+    @Column(name = "value")
+    var value: String?
+
+) : Comparable<Classification> {
+
+    // Natural order by "type", "code", "value"
+    override fun compareTo(other: Classification) = compareBy(
+        Classification::type,
+        Classification::code,
+        Classification::value
+    ).compare(this, other)
+}

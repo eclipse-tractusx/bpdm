@@ -373,7 +373,7 @@ fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<L
 }
 
 fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<ClassificationDto> {
-    return classification.map { ClassificationDto(it.value, it.code, it.type) }
+    return classification.map { ClassificationDto(it.type, it.code, it.value) }
 }
 
 fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {

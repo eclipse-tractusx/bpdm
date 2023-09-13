@@ -25,13 +25,22 @@ import jakarta.persistence.Embeddable
 
 @Embeddable
 data class Identifier(
-    @Column(name = "value", nullable = false)
-    var value: String,
 
     @Column(name = "type", nullable = false)
     var type: String,
 
-    @Column(name = "issuing_body")
-    var issuingBody: String?,
+    @Column(name = "value", nullable = false)
+    var value: String,
 
-    )
+    @Column(name = "issuing_body")
+    var issuingBody: String?
+
+) : Comparable<Identifier> {
+
+    //  Natural order by "type", "value", "issuingBody"
+    override fun compareTo(other: Identifier) = compareBy(
+        Identifier::type,
+        Identifier::value,
+        Identifier::issuingBody
+    ).compare(this, other)
+}
