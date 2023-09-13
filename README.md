@@ -59,6 +59,7 @@ Source:
 
 * [BPDM Pool](./bpdm-pool/DOCKER_NOTICE.md)
 * [BPDM Gate](./bpdm-gate/DOCKER_NOTICE.md)
+* [BPDM Orchestrator](./bpdm-orchestrator/DOCKER_NOTICE.md)
 * [BPDM Cleaning Service Dummy](./bpdm-cleaning-service-dummy/DOCKER_NOTICE.md)
 * [BPDM Bridge Dummy](./bpdm-bridge-dummy/DOCKER_NOTICE.md)
 

@@ -42,8 +42,9 @@
         <module>bpdm-pool</module>
         <module>bpdm-gate-api</module>
         <module>bpdm-gate</module>
-        <module>bpdm-bridge-dummy</module>
         <module>bpdm-cleaning-service-dummy</module>
+        <module>bpdm-orchestrator</module>
+        <module>bpdm-bridge-dummy</module>
     </modules>
 
     <properties>
@@ -82,11 +83,6 @@
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>bpdm-cleaning-service-dummy</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -98,6 +94,16 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bpdm-gate-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-cleaning-service-dummy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bpdm-orchestrator</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

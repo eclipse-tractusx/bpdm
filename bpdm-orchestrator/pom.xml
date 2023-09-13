@@ -23,9 +23,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bpdm-cleaning-service-dummy</artifactId>
-    <name>Business Partner Data Management Cleaning Service Dummy</name>
-    <description>Place holder for the cleaning service provider</description>
+    <artifactId>bpdm-orchestrator</artifactId>
+    <name>Business Partner Data Management Orchestrator</name>
+    <description>Orchestrator component acts as a passive component and offers for each processing steps individual endpoints </description>
     <packaging>jar</packaging>
 
     <parent>
@@ -38,14 +38,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>bpdm-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>bpdm-pool-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>bpdm-orchestrator</artifactId>
         </dependency>
 
         <dependency>
@@ -109,7 +101,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-           <!-- Test -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -132,7 +124,7 @@
 
     <build>
         <!-- Name jar without version to make it easier to reference it during CI/CD -->
-        <finalName>bpdm-cleaning-service-dummy</finalName>
+        <finalName>bpdm-orchestrator</finalName>
 
         <resources>
             <resource>
@@ -173,4 +165,6 @@
             <url>https://maven.pkg.github.com/catenax-ng/tx-bpdm</url>
         </repository>
     </distributionManagement>
+
+
 </project>
