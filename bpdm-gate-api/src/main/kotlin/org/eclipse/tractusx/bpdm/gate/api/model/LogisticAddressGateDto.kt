@@ -30,13 +30,13 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDe
 data class LogisticAddressGateDto(
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.nameParts))
-    val nameParts: Collection<String> = emptyList(),
+    val nameParts: List<String> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    val states: Collection<AddressStateDto> = emptyList(),
+    val states: List<AddressStateDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+    val identifiers: List<AddressIdentifierDto> = emptyList(),
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
@@ -47,5 +47,5 @@ data class LogisticAddressGateDto(
     val alternativePostalAddress: AlternativePostalAddressGateDto? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList()
+    val roles: List<BusinessPartnerRole> = emptyList()
 )

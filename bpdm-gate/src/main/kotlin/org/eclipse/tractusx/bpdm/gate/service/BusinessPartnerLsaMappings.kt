@@ -26,6 +26,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 
 
 fun LegalEntityGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequest {
@@ -96,16 +101,15 @@ fun AddressGateInputRequest.toBusinessPartnerDto(parentId: String?, parentType: 
 private fun toBusinessPartnerIdentifier(dto: LegalEntityIdentifierDto): BusinessPartnerIdentifierDto {
 
     return BusinessPartnerIdentifierDto(
-        value = dto.value,
+        value= dto.value,
         type = dto.type,
-        issuingBody = dto.issuingBody
-    )
+        issuingBody = dto.issuingBody)
 }
 
 private fun toBusinessPartnerIdentifier(dto: AddressIdentifierDto): BusinessPartnerIdentifierDto {
 
     return BusinessPartnerIdentifierDto(
-        value = dto.value,
+        value= dto.value,
         type = dto.type,
         issuingBody = null
     )
@@ -114,7 +118,7 @@ private fun toBusinessPartnerIdentifier(dto: AddressIdentifierDto): BusinessPart
 fun toBusinessPartnerState(dto: LegalEntityStateDto): BusinessPartnerStateDto {
 
     return BusinessPartnerStateDto(
-        description = dto.description,
+        description= dto.description,
         validFrom = dto.validFrom,
         validTo = dto.validTo,
         type = dto.type
@@ -124,7 +128,7 @@ fun toBusinessPartnerState(dto: LegalEntityStateDto): BusinessPartnerStateDto {
 fun toBusinessPartnerState(dto: SiteStateDto): BusinessPartnerStateDto {
 
     return BusinessPartnerStateDto(
-        description = dto.description,
+        description= dto.description,
         validFrom = dto.validFrom,
         validTo = dto.validTo,
         type = dto.type
@@ -134,7 +138,7 @@ fun toBusinessPartnerState(dto: SiteStateDto): BusinessPartnerStateDto {
 fun toBusinessPartnerState(dto: AddressStateDto): BusinessPartnerStateDto {
 
     return BusinessPartnerStateDto(
-        description = dto.description,
+        description= dto.description,
         validFrom = dto.validFrom,
         validTo = dto.validTo,
         type = dto.type

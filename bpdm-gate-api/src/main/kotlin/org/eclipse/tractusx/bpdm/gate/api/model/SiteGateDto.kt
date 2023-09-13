@@ -29,11 +29,11 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 data class SiteGateDto(
 
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.nameParts))
-    val nameParts: Collection<String> = emptyList(),
+    val nameParts: List<String> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.states))
-    val states: Collection<SiteStateDto> = emptyList(),
+    val states: List<SiteStateDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList(),
+    val roles: List<BusinessPartnerRole> = emptyList(),
 )

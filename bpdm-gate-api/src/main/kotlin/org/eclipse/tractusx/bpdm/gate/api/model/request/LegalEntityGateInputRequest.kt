@@ -35,13 +35,13 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
 data class LegalEntityGateInputRequest(
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))
-    val legalNameParts: Collection<String> = emptyList(),
+    val legalNameParts: List<String> = emptyList(),
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
     @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList(),
+    val roles: List<BusinessPartnerRole> = emptyList(),
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)

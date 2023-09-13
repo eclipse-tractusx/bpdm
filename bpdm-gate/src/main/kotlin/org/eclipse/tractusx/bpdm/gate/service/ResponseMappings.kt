@@ -300,11 +300,11 @@ fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
     return logisticAddress
 }
 
-fun getNamePartValues(nameparts: MutableSet<NameParts>): Collection<String> {
+fun getNamePartValues(nameparts: MutableSet<NameParts>): List<String> {
     return nameparts.map { it.namePart }
 }
 
-fun mapToDtoStates(states: MutableSet<AddressState>): Collection<AddressStateDto> {
+fun mapToDtoStates(states: MutableSet<AddressState>): List<AddressStateDto> {
     return states.map { AddressStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
@@ -368,19 +368,19 @@ fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
 
 }
 
-fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
+fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): List<LegalEntityStateDto> {
     return states.map { LegalEntityStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<ClassificationDto> {
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): List<ClassificationDto> {
     return classification.map { ClassificationDto(it.type, it.code, it.value) }
 }
 
-fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {
+fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): List<LegalEntityIdentifierDto> {
     return identifiers.map { LegalEntityIdentifierDto(it.value, it.type, it.issuingBody) }
 }
 
-fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifier>): Collection<AddressIdentifierDto> {
+fun mapToAddressIdentifiersDto(identifiers: MutableSet<AddressIdentifier>): List<AddressIdentifierDto> {
     return identifiers.map { AddressIdentifierDto(it.value, it.type) }
 }
 
@@ -410,7 +410,7 @@ fun Site.toSiteDto(): SiteGateDto {
     )
 }
 
-fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto> {
+fun mapToDtoSitesStates(states: MutableSet<SiteState>): List<SiteStateDto> {
     return states.map { SiteStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 

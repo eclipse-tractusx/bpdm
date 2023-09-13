@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescri
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityDto(
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers, required = false))
-    val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+    val identifiers: List<LegalEntityIdentifierDto> = emptyList(),
 
     @get:Schema(description = LegalEntityDescription.legalShortName)
     val legalShortName: String?,
@@ -35,8 +35,8 @@ data class LegalEntityDto(
     val legalForm: String? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
-    val states: Collection<LegalEntityStateDto> = emptyList(),
+    val states: List<LegalEntityStateDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
-    val classifications: Collection<ClassificationDto> = emptyList(),
+    val classifications: List<ClassificationDto> = emptyList(),
 )
