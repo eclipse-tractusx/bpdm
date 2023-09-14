@@ -20,10 +20,31 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 
 object RequestValues {
+
+    val bpIdentifier1 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey1,
+        value = CommonValues.identifierValue1,
+        issuingBody = CommonValues.identifierIssuingBody1
+    )
+
+    val bpIdentifier2 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey2,
+        value = CommonValues.identifierValue2,
+        issuingBody = CommonValues.identifierIssuingBody2
+    )
+
+    val bpIdentifier3 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey3,
+        value = CommonValues.identifierValue3,
+        issuingBody = null
+    )
+
     val identifier1 =
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue1,
@@ -56,6 +77,20 @@ object RequestValues {
         )
 
     val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
+
+    val bpState1 = BusinessPartnerStateDto(
+        validFrom = CommonValues.businessStatusValidFrom1,
+        validTo = CommonValues.businessStatusValidUntil1,
+        type = BusinessStateType.ACTIVE,
+        description = CommonValues.businessStatusDescription1
+    )
+
+    val bpState2 = BusinessPartnerStateDto(
+        validFrom = CommonValues.businessStatusValidFrom2,
+        validTo = CommonValues.businessStatusValidUntil2,
+        type = BusinessStateType.INACTIVE,
+        description = CommonValues.businessStatusDescription2
+    )
 
     val leBusinessStatus1 = LegalEntityStateDto(
         description = CommonValues.businessStatusDescription1,
@@ -111,6 +146,34 @@ object RequestValues {
 
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
     val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
+
+    val physicalAddressMinimal = PhysicalPostalAddressGateDto(
+        country = CommonValues.country1,
+        city = CommonValues.city1,
+        geographicCoordinates = null,
+        postalCode = null,
+        administrativeAreaLevel1 = null,
+        administrativeAreaLevel2 = null,
+        administrativeAreaLevel3 = null,
+        district = null,
+        companyPostalCode = null,
+        industrialZone = null,
+        building = null,
+        floor = null,
+        door = null,
+        street = null,
+    )
+
+    val alternativeAddressMinimal = AlternativePostalAddressDto(
+        country = CommonValues.country1,
+        city = CommonValues.city1,
+        deliveryServiceType = DeliveryServiceType.PO_BOX,
+        deliveryServiceQualifier = null,
+        deliveryServiceNumber = "1234",
+        geographicCoordinates = null,
+        postalCode = null,
+        administrativeAreaLevel1 = null,
+    )
 
     val postalAddress1 = PhysicalPostalAddressGateDto(
         geographicCoordinates = geoCoordinate1,
@@ -218,6 +281,35 @@ object RequestValues {
         physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
+
+    val bpPostalAddressInputDtoMinimal = BusinessPartnerPostalAddressInputDto(
+        addressType = null,
+        physicalPostalAddress = physicalAddressMinimal
+    )
+
+    val bpPostalAddressInputDtoDefault = BusinessPartnerPostalAddressInputDto(
+        addressType = AddressType.LegalAddress,
+        physicalPostalAddress = postalAddress2,
+        alternativePostalAddress = alternativeAddressMinimal
+    )
+
+    val bpInputRequestMinimal = BusinessPartnerInputRequest(
+        externalId = CommonValues.externalId2,
+        postalAddress = bpPostalAddressInputDtoMinimal
+    )
+
+    val bpInputRequestDefault = BusinessPartnerInputRequest(
+        externalId = CommonValues.externalId1,
+        nameParts = listOf(CommonValues.name1, CommonValues.name2, CommonValues.name3, CommonValues.name4),
+        shortName = CommonValues.shortName1,
+        legalForm = CommonValues.legalFormName1,
+        isOwner = true,
+        identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
+        classifications = listOf(classification1, classification2, classification3),
+        states = listOf(bpState1, bpState2),
+        roles = listOf(BusinessPartnerRole.SUPPLIER),
+        postalAddress = bpPostalAddressInputDtoDefault
+    )
 
     val legalEntity1 = LegalEntityDto(
         legalShortName = CommonValues.shortName1,
