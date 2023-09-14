@@ -158,10 +158,10 @@ internal class BusinessPartnerIT @Autowired constructor(
             bpnL = "testLegalEntityBpn",
             bpnS = "testSiteBpn",
             postalAddress = postalAddress,
-            roles = mutableListOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-            identifiers = mutableListOf(createIdentifier()),
-            states = mutableListOf(createState()),
-            classifications = mutableListOf(createClassification()),
+            roles = sortedSetOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
+            identifiers = sortedSetOf(createIdentifier()),
+            states = sortedSetOf(createState()),
+            classifications = sortedSetOf(createClassification()),
             stage = StageType.Input
         )
     }

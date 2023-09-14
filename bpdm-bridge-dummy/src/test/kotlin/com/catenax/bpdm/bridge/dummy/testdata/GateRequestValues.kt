@@ -99,27 +99,27 @@ object GateRequestValues {
     )
 
     val classification1 = ClassificationDto(
-        value = CommonValues.classificationValue1,
+        type = CommonValues.classificationType,
         code = CommonValues.classificationCode1,
-        type = CommonValues.classificationType
+        value = CommonValues.classificationValue1
     )
 
     val classification2 = ClassificationDto(
-        value = CommonValues.classificationValue2,
+        type = CommonValues.classificationType,
         code = CommonValues.classificationCode2,
-        type = CommonValues.classificationType
+        value = CommonValues.classificationValue2
     )
 
     val classification3 = ClassificationDto(
-        value = CommonValues.classificationValue3,
+        type = CommonValues.classificationType,
         code = CommonValues.classificationCode3,
-        type = CommonValues.classificationType
+        value = CommonValues.classificationValue3
     )
 
     val classification4 = ClassificationDto(
-        value = CommonValues.classificationValue4,
+        type = CommonValues.classificationType,
         code = CommonValues.classificationCode4,
-        type = CommonValues.classificationType
+        value = CommonValues.classificationValue4
     )
 
     val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)

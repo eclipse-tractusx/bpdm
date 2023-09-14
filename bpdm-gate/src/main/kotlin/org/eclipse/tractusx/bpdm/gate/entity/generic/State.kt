@@ -29,9 +29,6 @@ import java.time.LocalDateTime
 @Embeddable
 data class State(
 
-    @Column(name = "description")
-    var description: String?,
-
     @Column(name = "valid_from")
     var validFrom: LocalDateTime?,
 
@@ -41,4 +38,17 @@ data class State(
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     val type: BusinessStateType,
-)
+
+    @Column(name = "description")
+    var description: String?
+
+) : Comparable<State> {
+
+    // Natural order by "validFrom", "validTo", "type", "description"
+    override fun compareTo(other: State) =
+        compareBy(nullsFirst(), State::validFrom)       // here null means MIN
+            .thenBy(nullsLast(), State::validTo)        // here null means MAX
+            .thenBy(State::type)
+            .thenBy(State::description)
+            .compare(this, other)
+}

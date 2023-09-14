@@ -83,11 +83,11 @@ object RequestValues {
     val siteStatus2 = SiteStateDto(CommonValues.statusDenotation2, CommonValues.statusValidFrom2, null, CommonValues.statusType2)
     val siteStatus3 = SiteStateDto(CommonValues.statusDenotation3, CommonValues.statusValidFrom3, null, CommonValues.statusType3)
 
-    val classification1 = ClassificationDto(CommonValues.classification1, null, CommonValues.classificationType)
-    val classification2 = ClassificationDto(CommonValues.classification2, null, CommonValues.classificationType)
-    val classification3 = ClassificationDto(CommonValues.classification3, null, CommonValues.classificationType)
-    val classification4 = ClassificationDto(CommonValues.classification4, null, CommonValues.classificationType)
-    val classification5 = ClassificationDto(CommonValues.classification5, null, CommonValues.classificationType)
+    val classification1 = ClassificationDto(CommonValues.classificationType, null, CommonValues.classification1)
+    val classification2 = ClassificationDto(CommonValues.classificationType, null, CommonValues.classification2)
+    val classification3 = ClassificationDto(CommonValues.classificationType, null, CommonValues.classification3)
+    val classification4 = ClassificationDto(CommonValues.classificationType, null, CommonValues.classification4)
+    val classification5 = ClassificationDto(CommonValues.classificationType, null, CommonValues.classification5)
 
 
     val postalAddress1 = PhysicalPostalAddressDto(
