@@ -70,14 +70,6 @@ object RequestValues {
             issuingBody = CommonValues.identifierIssuingBodyName4,
         )
 
-    val genericIdentifier =
-        GenericIdentifierDto(
-            CommonValues.identifierValue1,
-            CommonValues.identifierTypeTechnicalKey1
-        )
-
-    val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
-
     val bpState1 = BusinessPartnerStateDto(
         validFrom = CommonValues.businessStatusValidFrom1,
         validTo = CommonValues.businessStatusValidUntil1,

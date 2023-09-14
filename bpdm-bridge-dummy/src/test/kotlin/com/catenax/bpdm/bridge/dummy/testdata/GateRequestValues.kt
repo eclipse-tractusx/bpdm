@@ -62,14 +62,6 @@ object GateRequestValues {
             issuingBody = CommonValues.identifierIssuingBodyName5,
         )
 
-    val genericIdentifier =
-        GenericIdentifierDto(
-            CommonValues.identifierValue1,
-            CommonValues.identifierTypeTechnicalKey1
-        )
-
-    val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
-
     val leBusinessStatus1 = LegalEntityStateDto(
         description = CommonValues.businessStatusOfficialDenotation1,
         validFrom = CommonValues.businessStatusValidFrom1,
