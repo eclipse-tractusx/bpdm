@@ -22,7 +22,7 @@ apiVersion: v2
 name: bpdm
 type: application
 description: A Helm chart for Kubernetes that deploys the gate and pool applications
-version: 3.1.0-alpha.3
+version: 3.1.0-alpha.4
 appVersion: "4.1.0-alpha.3"
 home: https://github.com/eclipse-tractusx/bpdm
 sources:
@@ -48,6 +48,10 @@ dependencies:
     version: 1.0.0-alpha.2
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
+  - name: bpdm-orchestrator
+    version: 1.0.0-alpha.0
+    alias: bpdm-orchestrator
+    condition: bpdm-orchestrator.enabled
   - name: opensearch
     version: 2.12.2
     repository: https://opensearch-project.github.io/helm-charts/

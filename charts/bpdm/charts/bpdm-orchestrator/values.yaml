@@ -25,7 +25,7 @@ replicaCount: 1
 
 image:
   registry: docker.io
-  repository: tractusx/bpdm-cleaning-service-dummy
+  repository: tractusx/bpdm-orchestrator
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -49,7 +49,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 8080
-  targetPort: 8084
+  targetPort: 8085
 
 autoscaling:
   enabled: false
@@ -62,11 +62,11 @@ ingress:
 
 resources:
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 1000m
+    memory: 1Gi
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 200m
+    memory: 1Gi
 
 nodeSelector: {}
 
@@ -86,7 +86,7 @@ affinity:
 livenessProbe:
   httpGet:
     path: "/actuator/health/liveness"
-    port: 8084
+    port: 8085
     scheme: HTTP
   failureThreshold: 3
   initialDelaySeconds: 5
@@ -96,7 +96,7 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: "/actuator/health/readiness"
-    port: 8084
+    port: 8085
     scheme: HTTP
   failureThreshold: 3
   initialDelaySeconds: 5
@@ -106,7 +106,7 @@ readinessProbe:
 startupProbe:
   httpGet:
     path: "/actuator/health/readiness"
-    port: 8084
+    port: 8085
     scheme: HTTP
   initialDelaySeconds: 60
   failureThreshold: 20
@@ -116,13 +116,13 @@ startupProbe:
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
 #  bpdm:
-#    pool:
-#      base-url: ...
+#    api:
+#      upsert-limit: ...
 
 # Used to overwrite the secret property values of the application configuration
 applicationSecrets:
 #  bpdm:
-#    saas:
-#     api-key: ...
+#    security:
+#     client-id: ...
 
 

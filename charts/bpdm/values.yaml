@@ -23,6 +23,9 @@ bpdm-bridge-dummy:
 bpdm-cleaning-service-dummy:
   enabled: true
 
+bpdm-orchestrator:
+  enabled: true
+
 
 opensearch:
   masterService: ""
