@@ -31,7 +31,7 @@
     <parent>
         <artifactId>bpdm-parent</artifactId>
         <groupId>org.eclipse.tractusx</groupId>
-        <version>4.0.2-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <properties>

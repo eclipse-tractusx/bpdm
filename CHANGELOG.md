@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.1.0] - tbd
+
+### Added
+
+- BPDM Gate API: Endpoints for creating and querying generic business partners
+- Docs: Postman collection for API tests
+- BPDM Pool: Load initial set of regions according to ISO-3166-2
+
+### Fixed
+
+- BPDM Pool: Validation for duplicate legal entity and address identifiers
+
 ## [4.0.1] - 2023-08-28
 
 ### Changed
