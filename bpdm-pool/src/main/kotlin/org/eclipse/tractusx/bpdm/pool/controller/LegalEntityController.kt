@@ -79,7 +79,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
-    override fun searchSites(
+    override fun searchLegalEntitys(
         bpnLs: Collection<String>
     ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
