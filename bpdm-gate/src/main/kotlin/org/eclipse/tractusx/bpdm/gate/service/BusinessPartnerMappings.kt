@@ -115,7 +115,7 @@ class BusinessPartnerMappings {
 
     private fun toPostalAddressOutputDto(entity: PostalAddress) =
         BusinessPartnerPostalAddressOutputDto(
-            addressType = entity.addressType,
+            addressType = entity.addressType!!, //An entity of stage output is expected to have a non-null addressType
             physicalPostalAddress = entity.physicalPostalAddress.let(::toPhysicalPostalAddressDto),
             alternativePostalAddress = entity.alternativePostalAddress?.let(::toAlternativePostalAddressDto)
         )
