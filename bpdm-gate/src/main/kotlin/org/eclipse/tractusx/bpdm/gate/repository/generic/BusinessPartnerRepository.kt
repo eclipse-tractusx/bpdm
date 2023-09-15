@@ -19,9 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.gate.repository.generic
 
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>
+interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>, CrudRepository<BusinessPartner, Long> {
+
+    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartner>
+
+    fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartner>
+
+    fun findByStage(stage: StageType, pageable: Pageable): Page<BusinessPartner>
+}
