@@ -28,6 +28,7 @@ on:
       - bpdm-common/**
       - bpdm-gate-api/**
       - bpdm-bridge-dummy/**
+      - bpdm-cleaning-service-dummy/**
       - .github/workflows/**
     tags:
       - 'v*.*.*'
@@ -62,4 +63,12 @@ jobs:
     with:
       imageName: bpdm-bridge-dummy
       dockerfilePath: ./bpdm-bridge-dummy
+      push: ${{ github.event_name != 'pull_request' }}
+
+  build-docker-cleaning-service:
+    uses: ./.github/workflows/build-docker.yaml
+    secrets: inherit
+    with:
+      imageName: bpdm-cleaning-service-dummy
+      dockerfilePath: ./bpdm-cleaning-service-dummy
       push: ${{ github.event_name != 'pull_request' }}
