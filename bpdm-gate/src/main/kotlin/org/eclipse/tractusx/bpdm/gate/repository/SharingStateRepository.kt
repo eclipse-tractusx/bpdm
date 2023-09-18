@@ -50,6 +50,6 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
             }
     }
 
-    fun findByExternalId(externalId: String): SharingState?
+    fun findByExternalIdAndBusinessPartnerType(externalId: String, businessPartnerType: BusinessPartnerType?): SharingState?
 
 }
