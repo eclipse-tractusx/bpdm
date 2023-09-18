@@ -20,6 +20,10 @@ bpdm-bridge-dummy:
     # use the name that was override on postgres.fullnameOverride to be used by the application on connection
     fullnameOverride: ""
 
+bpdm-cleaning-service-dummy:
+  enabled: true
+
+
 opensearch:
   masterService: ""
   fullnameOverride: "bpdm-pool-opensearch"
