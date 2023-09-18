@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.CharacterSet
@@ -83,6 +84,7 @@ object CommonValues {
     const val name2 = "Company ABC AG"
     const val name3 = "Another Organisation Corp"
     const val name4 = "Catena Test Name"
+    const val nameChina = "好公司  合伙制企业"
 
     const val nameSite1 = "Site A"
     const val nameSite2 = "Site B"
@@ -153,6 +155,7 @@ object CommonValues {
 
     const val legalFormAbbreviation1 = "LLC"
     const val legalFormAbbreviation2 = "GmbH"
+    const val legalFormAbbreviationChina = "股份有限"
 
     const val businessStatusDescription1 = "Active"
     const val businessStatusDescription2 = "Insolvent"
@@ -172,6 +175,7 @@ object CommonValues {
     const val classificationValue2 = "Data processing, hosting and related activities"
     const val classificationValue3 = "Other information service activities"
     const val classificationValue4 = "Financial and insurance activities"
+    const val classificationValueChina = "北京市"
 
     const val classificationCode1 = "code1"
     const val classificationCode2 = "code2"
@@ -194,13 +198,14 @@ object CommonValues {
     val adminAreaLevel1Region1: RegionDto? = null
     val adminAreaLevel1RegionCode_2: String = "adminAreaLevel1RegionCode_2"
     val adminAreaLevel1Region2: RegionDto? = null
+    val adminAreaChina = "河北省"
 
     const val county1 = "Stuttgart"
     const val county2 = " Fulton County"
 
     const val city1 = "Stuttgart"
     const val city2 = "Atlanta"
-
+    const val cityChina = "北京市"
 
     const val district1 = "Vaihingen"
     const val district2 = "TODO"
@@ -236,7 +241,7 @@ object CommonValues {
     const val postCode1 = "70546 "
     const val postCode2 = "70547"
 
-    val geoCoordinates1 = Triple(0f, 0f, 0f)
-    val geoCoordinates2 = Triple(1f, 1f, 0f)
+    val geoCoordinates1 = GeoCoordinateDto(13.178f, 48.946f)
+    val geoCoordinates2 = GeoCoordinateDto(7.619f, 45.976f, 4478f)
 
 }

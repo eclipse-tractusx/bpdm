@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
@@ -141,11 +140,8 @@ object ResponseValues {
         name = CommonValues.country2.getName()
     )
 
-    val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
-    val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
-
     val address1 = PhysicalPostalAddressVerboseDto(
-        geographicCoordinates = geoCoordinate1,
+        geographicCoordinates = CommonValues.geoCoordinates1,
         country = country1,
         postalCode = CommonValues.postCode1,
         city = CommonValues.city1,
@@ -162,7 +158,7 @@ object ResponseValues {
     )
 
     val address2 = PhysicalPostalAddressVerboseDto(
-        geographicCoordinates = geoCoordinate2,
+        geographicCoordinates = CommonValues.geoCoordinates2,
         country = country2,
         postalCode = CommonValues.postCode2,
         city = CommonValues.city2,
