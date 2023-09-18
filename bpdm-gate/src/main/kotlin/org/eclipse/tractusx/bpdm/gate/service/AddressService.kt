@@ -27,13 +27,14 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -50,33 +51,31 @@ class AddressService(
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
 
-        val logisticAddressPage = if (externalIds != null) {
-            addressRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
-        } else {
-            addressRepository.findByStage(StageType.Input, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(page, size), externalIds)
 
-        return PageDto(
+        return PageDto( //TODO totalElements and totalPages need change
             page = page,
-            totalElements = logisticAddressPage.totalElements,
-            totalPages = logisticAddressPage.totalPages,
-            contentSize = logisticAddressPage.content.size,
-            content = toValidLogisticAddresses(logisticAddressPage),
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidLogisticAddressesGeneric(businessPartnerPage).size,
+            content = toValidLogisticAddressesGeneric(businessPartnerPage)
         )
     }
 
-    private fun toValidLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateInputDto> {
-        return logisticAddressPage.content.map { logisticAddress ->
-            logisticAddress.toAddressGateInputResponse(logisticAddress)
-        }
+    private fun toValidLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<AddressGateInputDto> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .map { it.toAddressGateInputDto() }
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
-        val logisticAddress =
-            addressRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("Logistic Address", externalId)
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(0, 1), listOf(externalId))
 
-        return logisticAddress.toAddressGateInputResponse(logisticAddress)
+        val businessPartner = businessPartnerPage.content.firstOrNull { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            ?: throw BpdmNotFoundException(("Address does not exist"), externalId)
+
+        return businessPartner.toAddressGateInputDto()
 
     }
 
@@ -85,27 +84,24 @@ class AddressService(
      */
     fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
-        val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
-            addressRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
-        } else {
-            addressRepository.findByStage(StageType.Output, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutput(PageRequest.of(page, size), externalIds)
 
         return PageDto(
             page = page,
-            totalElements = logisticAddressPage.totalElements,
-            totalPages = logisticAddressPage.totalPages,
-            contentSize = logisticAddressPage.content.size,
-            content = toValidOutputLogisticAddresses(logisticAddressPage),
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidOutputLogisticAddressesGeneric(businessPartnerPage).size,
+            content = toValidOutputLogisticAddressesGeneric(businessPartnerPage),
         )
 
     }
 
-    private fun toValidOutputLogisticAddresses(logisticAddressPage: Page<LogisticAddress>): List<AddressGateOutputDto> {
-        return logisticAddressPage.content.map { logisticAddress ->
-            logisticAddress.toAddressGateOutputResponse(logisticAddress)
-        }
+    private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<AddressGateOutputDto> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .map { it.toAddressGateOutputDto() }
     }
+
 
     /**
      * Upsert addresses input to the database

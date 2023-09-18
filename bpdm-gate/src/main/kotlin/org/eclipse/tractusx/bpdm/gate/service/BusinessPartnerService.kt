@@ -60,7 +60,6 @@ class BusinessPartnerService(
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerOutput(dto) }
         return upsertBusinessPartnersOutput(entities).map(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
-
     fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDto> {
         val stage = StageType.Input
         return getBusinessPartners(pageRequest, externalIds, stage)

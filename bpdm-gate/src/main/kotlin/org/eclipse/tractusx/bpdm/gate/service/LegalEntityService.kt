@@ -25,9 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
@@ -105,26 +106,31 @@ class LegalEntityService(
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
 
-        val legalEntity =
-            legalEntityRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("LegalEntity", externalId)
-        return toValidSingleLegalEntity(legalEntity)
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(0, 1), listOf(externalId))
+
+        val businessPartner = businessPartnerPage.content.firstOrNull { it.postalAddress.addressType == AddressType.LegalAddress }
+            ?: throw BpdmNotFoundException(("LegalEntity does not exist"), externalId)
+
+        return businessPartner.toLegalEntityGateInputDto()
     }
 
     fun getLegalEntities(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<LegalEntityGateInputDto> {
 
-        val legalEntitiesPage = if (externalIds != null) {
-            legalEntityRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
-        } else {
-            legalEntityRepository.findByStage(StageType.Input, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(page, size), externalIds)
 
-        return PageDto(
+        return PageDto( //TODO totalElements and totalPages need change
             page = page,
-            totalElements = legalEntitiesPage.totalElements,
-            totalPages = legalEntitiesPage.totalPages,
-            contentSize = legalEntitiesPage.content.size,
-            content = toValidLegalEntities(legalEntitiesPage)
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidLegalEntitiesGeneric(businessPartnerPage).size,
+            content = toValidLegalEntitiesGeneric(businessPartnerPage)
         )
+    }
+
+    private fun toValidLegalEntitiesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<LegalEntityGateInputDto> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.LegalAddress }
+            .map { it.toLegalEntityGateInputDto() }
     }
 
     /**
@@ -132,44 +138,22 @@ class LegalEntityService(
      */
     fun getLegalEntitiesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<LegalEntityGateOutputResponse> {
 
-        val legalEntityPage = if (!externalIds.isNullOrEmpty()) {
-            legalEntityRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
-        } else {
-            legalEntityRepository.findByStage(StageType.Output, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutput(PageRequest.of(page, size), externalIds)
 
         return PageDto(
             page = page,
-            totalElements = legalEntityPage.totalElements,
-            totalPages = legalEntityPage.totalPages,
-            contentSize = legalEntityPage.content.size,
-            content = toValidOutputLegalEntities(legalEntityPage),
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidOutputLogisticAddressesGeneric(businessPartnerPage).size,
+            content = toValidOutputLogisticAddressesGeneric(businessPartnerPage),
         )
 
     }
 
-    private fun toValidOutputLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateOutputResponse> {
-        return legalEntityPage.content.map { legalEntity ->
-            legalEntity.toLegalEntityGateOutputResponse(legalEntity)
-        }
+    private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<LegalEntityGateOutputResponse> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .map { it.toLegalEntityGateOutputResponse() }
     }
-
-    private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputDto> {
-        return legalEntityPage.content.map { legalEntity ->
-            legalEntity.toLegalEntityGateInputResponse(legalEntity)
-        }
-    }
-
-}
-
-private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
-
-    return LegalEntityGateInputDto(
-        legalEntity = legalEntity.toLegalEntityDto(),
-        legalNameParts = getNamePartValues(legalEntity.nameParts),
-        roles = legalEntity.roles.map { it.roleName },
-        legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
-        externalId = legalEntity.externalId
-    )
 
 }

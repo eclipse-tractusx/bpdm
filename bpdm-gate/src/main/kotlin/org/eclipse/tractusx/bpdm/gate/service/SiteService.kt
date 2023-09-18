@@ -24,10 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
@@ -53,31 +55,32 @@ class SiteService(
 
     fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
 
-        val sitesPage = if (externalIds != null) {
-            siteRepository.findByExternalIdInAndStage(externalIds, StageType.Input, PageRequest.of(page, size))
-        } else {
-            siteRepository.findByStage(StageType.Input, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(page, size), externalIds)
 
-        return PageDto(
+        return PageDto( //TODO totalElements and totalPages need change
             page = page,
-            totalElements = sitesPage.totalElements,
-            totalPages = sitesPage.totalPages,
-            contentSize = sitesPage.content.size,
-            content = toValidSite(sitesPage)
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidSiteGeneric(businessPartnerPage).size,
+            content = toValidSiteGeneric(businessPartnerPage)
         )
     }
 
-    private fun toValidSite(sitePage: Page<Site>): List<SiteGateInputDto> {
-        return sitePage.content.map { site ->
-            site.toSiteGateInputResponse(site)
-        }
+    private fun toValidSiteGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<SiteGateInputDto> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.SiteMainAddress }
+            .map { it.toSiteGateInputDto() }
     }
 
     fun getSiteByExternalId(externalId: String): SiteGateInputDto {
-        val siteRecord = siteRepository.findByExternalIdAndStage(externalId, StageType.Input) ?: throw BpdmNotFoundException("Site", externalId)
 
-        return siteRecord.toSiteGateInputResponse(siteRecord)
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(0, 1), listOf(externalId))
+
+        val businessPartner = businessPartnerPage.content.firstOrNull { it.postalAddress.addressType == AddressType.SiteMainAddress }
+            ?: throw BpdmNotFoundException(("site does not exist"), externalId)
+
+        return businessPartner.toSiteGateInputDto()
+
     }
 
     /**
@@ -85,26 +88,21 @@ class SiteService(
      */
     fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<SiteGateOutputResponse> {
 
-        val sitePage = if (!externalIds.isNullOrEmpty()) {
-            siteRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
-        } else {
-            siteRepository.findByStage(StageType.Output, PageRequest.of(page, size))
-        }
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutput(PageRequest.of(page, size), externalIds)
 
         return PageDto(
             page = page,
-            totalElements = sitePage.totalElements,
-            totalPages = sitePage.totalPages,
-            contentSize = sitePage.content.size,
-            content = toValidOutputSites(sitePage),
+            totalElements = businessPartnerPage.totalElements,
+            totalPages = businessPartnerPage.totalPages,
+            contentSize = toValidOutputSitesGeneric(businessPartnerPage).size,
+            content = toValidOutputSitesGeneric(businessPartnerPage),
         )
-
     }
 
-    private fun toValidOutputSites(sitePage: Page<Site>): List<SiteGateOutputResponse> {
-        return sitePage.content.map { sites ->
-            sites.toSiteGateOutputResponse(sites)
-        }
+    private fun toValidOutputSitesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<SiteGateOutputResponse> {
+        return businessPartnerPage.content
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .map { it.toSiteGateOutputResponse() }
     }
 
     /**
