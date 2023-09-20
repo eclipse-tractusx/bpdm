@@ -53,4 +53,13 @@ interface IBaseBusinessPartnerDto {
 
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
     val isOwner: Boolean
+
+    @get:Schema(description = "BPNL")
+    val bpnL: String?
+
+    @get:Schema(description = "BPNS")
+    val bpnS: String?
+
+    @get:Schema(description = "BPNA")
+    val bpnA: String?
 }
