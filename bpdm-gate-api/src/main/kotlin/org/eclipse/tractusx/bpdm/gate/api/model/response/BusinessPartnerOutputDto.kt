@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.*
 import java.time.Instant
 
 
-@Schema(description = "Generic business partner output with external id", requiredProperties = ["externalId", "postalAddress", "bpna", "bpnl"])
+@Schema(description = "Generic business partner output with external id", requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"])
 data class BusinessPartnerOutputDto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),

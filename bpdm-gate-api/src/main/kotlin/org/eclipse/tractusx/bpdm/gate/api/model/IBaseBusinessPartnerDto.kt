@@ -30,25 +30,25 @@ interface IBaseBusinessPartnerDto {
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String
 
-    @get:Schema(description = "")
+    @get:ArraySchema(arraySchema = Schema(description = "The list of name parts to accommodate the different number of name fields in different systems."))
     val nameParts: List<String>
 
-    @get:Schema(description = "Abbreviated name or shorthand")
+    @get:Schema(description = "Abbreviated name or shorthand.")
     val shortName: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates are removed."))
     val identifiers: Collection<BusinessPartnerIdentifierDto>
 
     @get:Schema(description = "Technical key of the legal form.")
     val legalForm: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates are removed."))
     val states: Collection<BusinessPartnerStateDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the legal entity, such as a specific industry."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates are removed."))
     val classifications: Collection<ClassificationDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
+    @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates are removed."))
     val roles: Collection<BusinessPartnerRole>
 
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
