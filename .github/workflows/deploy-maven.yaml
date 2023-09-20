@@ -34,6 +34,6 @@ jobs:
 
       #Deploy  bpdm-common jar to GitHub Maven registry
       - name: Deploy
-        run: ./mvnw -pl bpdm-common,bpdm-gate-api,bpdm-pool-api deploy
+        run: ./mvnw -pl bpdm-common,bpdm-gate-api,bpdm-pool-api,bpdm-orchestrator-api deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
