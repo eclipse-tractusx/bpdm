@@ -61,7 +61,7 @@ class ValidIndexStartupIT @Autowired constructor(
         testHelpers.createTestMetadata()
         //Clear and set up a fresh valid OpenSearch context
         // webTestClient.invokeDeleteEndpointWithoutResponse(EndpointValues.OPENSEARCH_SYNC_PATH)
-        poolClient.opensearch().clear()
+        poolClient.opensearch.clear()
 
         //Import values to DB
         testHelpers.createBusinessPartnerStructure(
@@ -81,7 +81,7 @@ class ValidIndexStartupIT @Autowired constructor(
         //Export to OpenSearch index
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
         //Make sure entries are indeed there
-        val searchResult = poolClient.legalEntities().getLegalEntities(
+        val searchResult = poolClient.legalEntities.getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             PaginationRequest()
         )
@@ -98,7 +98,7 @@ class ValidIndexStartupIT @Autowired constructor(
     @Order(1)
     fun acceptValidIndexOnStartup() {
 
-        val searchResult = poolClient.legalEntities().getLegalEntities(
+        val searchResult = poolClient.legalEntities.getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             PaginationRequest()
         )

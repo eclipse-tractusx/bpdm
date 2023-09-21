@@ -105,7 +105,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL = createdStructures[0].legalEntity.legalEntity.bpnl
 
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
-        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
+        val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 = SitePoolVerboseDto(
             site = ResponseValues.site1.copy(bpnLegalEntity = bpnL),
@@ -151,7 +151,7 @@ class SiteControllerIT @Autowired constructor(
         val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
         val siteSearchRequest = SiteBpnSearchRequest(listOf(bpnL1, bpnL2))
-        val searchResult = poolClient.sites().searchSites(siteSearchRequest, PaginationRequest())
+        val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 =
             SitePoolVerboseDto(
@@ -187,7 +187,7 @@ class SiteControllerIT @Autowired constructor(
     fun `create new sites`() {
 
         val givenLegalEntities =
-            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().legalEntity.bpnl
         val bpnL2 = givenLegalEntities.last().legalEntity.bpnl
@@ -200,7 +200,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate3.copy(bpnlParent = bpnL2)
         )
 
-        val response = poolClient.sites().createSite(toCreate)
+        val response = poolClient.sites.createSite(toCreate)
 
         assertThatCreatedSitesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -214,7 +214,7 @@ class SiteControllerIT @Autowired constructor(
      */
     @Test
     fun `create sites entities and get duplicate identifier error on address`() {
-        poolClient.metadata().createIdentifierType(
+        poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = RequestValues.addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
@@ -222,7 +222,7 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val givenLegalEntities =
-            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val request1 = with(RequestValues.siteCreate1) {
             copy(
@@ -249,7 +249,7 @@ class SiteControllerIT @Autowired constructor(
             )
         }
 
-        val response = poolClient.sites().createSite(
+        val response = poolClient.sites.createSite(
             listOf(request1, request2)
         )
 
@@ -269,7 +269,7 @@ class SiteControllerIT @Autowired constructor(
     @Test
     fun `update site entities and get duplicate identifier error`() {
 
-        poolClient.metadata().createIdentifierType(
+        poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = RequestValues.addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = RequestValues.addressIdentifier.value
@@ -277,10 +277,10 @@ class SiteControllerIT @Autowired constructor(
         )
 
         val givenLegalEntities =
-            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val toCreate1 = listOf(RequestValues.siteCreate1, RequestValues.siteCreate2)
-        val response1 = poolClient.sites().createSite(toCreate1)
+        val response1 = poolClient.sites.createSite(toCreate1)
 
 
         assertThat(response1.errorCount).isEqualTo(0)
@@ -320,7 +320,7 @@ class SiteControllerIT @Autowired constructor(
             )
         }
 
-        val response = poolClient.sites().updateSite(
+        val response = poolClient.sites.updateSite(
             listOf(toUpdate1, toUpdate2)
         )
 
@@ -341,7 +341,7 @@ class SiteControllerIT @Autowired constructor(
 
 
         val givenLegalEntities =
-            poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
+            poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1, RequestValues.legalEntityCreate2)).entities
 
         val bpnL1 = givenLegalEntities.first().legalEntity.bpnl
         val bpnL2 = givenLegalEntities.last().legalEntity.bpnl
@@ -354,7 +354,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteCreate2.copy(bpnlParent = bpnL2),
             RequestValues.siteCreate3.copy(bpnlParent = "NONEXISTENT")
         )
-        val response = poolClient.sites().createSite(toCreate)
+        val response = poolClient.sites.createSite(toCreate)
 
         // 2 entities okay
         assertThatCreatedSitesEqual(response.entities, expected)
@@ -399,7 +399,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate3.copy(bpns = bpnS2)
         )
 
-        val response = poolClient.sites().updateSite(toUpdate)
+        val response = poolClient.sites.updateSite(toUpdate)
 
         assertThatCreatedSitesEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -434,7 +434,7 @@ class SiteControllerIT @Autowired constructor(
             RequestValues.siteUpdate2.copy(bpns = bpnS1),
             RequestValues.siteUpdate3.copy(bpns = "NONEXISTENT"),
         )
-        val response = poolClient.sites().updateSite(toUpdate)
+        val response = poolClient.sites.updateSite(toUpdate)
 
         // 2 entities okay
         assertThatCreatedSitesEqual(response.entities, expected)
@@ -467,7 +467,7 @@ class SiteControllerIT @Autowired constructor(
 
         val toSearch = expected.map { it.bpnSite!! }
 
-        val response = poolClient.sites().searchMainAddresses(toSearch)
+        val response = poolClient.sites.searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -495,7 +495,7 @@ class SiteControllerIT @Autowired constructor(
 
         val toSearch = expected.map { it.bpnSite!! }.plus("NON-EXISTENT")
 
-        val response = poolClient.sites().searchMainAddresses(toSearch)
+        val response = poolClient.sites.searchMainAddresses(toSearch)
         testHelpers.assertRecursively(response).isEqualTo(expected)
     }
 
@@ -531,7 +531,7 @@ class SiteControllerIT @Autowired constructor(
             )
         )
 
-        val firstPage = poolClient.sites().getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
+        val firstPage = poolClient.sites.getSitesPaginated(paginationRequest = PaginationRequest(0, 10))
 
         testHelpers.assertRecursively(firstPage).ignoringFieldsOfTypes(Instant::class.java).isEqualTo(expectedFirstPage)
 
@@ -551,8 +551,8 @@ class SiteControllerIT @Autowired constructor(
             .isEqualTo(expected)
     }
 
-    private fun requestSite(bpnSite: String) = poolClient.sites().getSite(bpnSite)
+    private fun requestSite(bpnSite: String) = poolClient.sites.getSite(bpnSite)
 
-    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities().getSites(bpn, PaginationRequest())
+    private fun requestSitesOfLegalEntity(bpn: String) = poolClient.legalEntities.getSites(bpn, PaginationRequest())
 
 }

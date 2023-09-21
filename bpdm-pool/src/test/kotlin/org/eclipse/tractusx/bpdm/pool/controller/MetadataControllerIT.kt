@@ -357,15 +357,15 @@ class MetadataControllerIT @Autowired constructor(
         val ruleDE1 = addressRuleMandatory(country = DE, field = "path1.field1")
         fieldQualityRuleRepository.saveAll(listOf(rulePL1, rulePL2, ruleDE1))
 
-        val resultPl = poolClient.metadata().getFieldQualityRules(PL).body
+        val resultPl = poolClient.metadata.getFieldQualityRules(PL).body
         assertThat(resultPl?.size).isEqualTo(2)
         assertThat(resultPl?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1", "path1.field2")
 
-        val resultDe = poolClient.metadata().getFieldQualityRules(DE).body
+        val resultDe = poolClient.metadata.getFieldQualityRules(DE).body
         assertThat(resultDe?.size).isEqualTo(1)
         assertThat(resultDe?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1")
 
-        val resultUs = poolClient.metadata().getFieldQualityRules(US).body
+        val resultUs = poolClient.metadata.getFieldQualityRules(US).body
         assertThat(resultUs?.size).isEqualTo(0)
     }
 
@@ -382,7 +382,7 @@ class MetadataControllerIT @Autowired constructor(
         val ruleDE1 = addressRuleMandatory(country = DE, field = "path1.field1")
         fieldQualityRuleRepository.saveAll(listOf(ruleDefault1, ruleDefault2, ruleDefault3, ruleDefault4, rulePL1, rulePL2, ruleDE1))
 
-        val resultPl = poolClient.metadata().getFieldQualityRules(PL).body
+        val resultPl = poolClient.metadata.getFieldQualityRules(PL).body
         assertThat(resultPl?.size).isEqualTo(3)
         assertThat(resultPl?.map { it.fieldPath }).containsExactlyInAnyOrder("path1.field1", "path1.field2", "path1.field3")
         assertThat(resultPl?.filter { it.fieldPath == "path1.field1" }?.map { it.qualityLevel }).describedAs("PL optional overwrites default mandatory")

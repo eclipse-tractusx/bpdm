@@ -113,7 +113,7 @@ class InvalidIndexStartupIT @Autowired constructor(
         //export to index and check whether the imported business partner can be found as normal
         testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
 
-        val searchResult = poolClient.legalEntities().getLegalEntities(
+        val searchResult = poolClient.legalEntities.getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             PaginationRequest()
         )

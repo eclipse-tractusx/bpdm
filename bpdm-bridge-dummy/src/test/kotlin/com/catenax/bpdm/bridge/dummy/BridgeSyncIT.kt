@@ -69,7 +69,7 @@ class BridgeSyncIT @Autowired constructor(
     @Test
     fun `just use API clients`() {
         assertGateChangelogHasCount(0)
-        val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
+        val poolChangelogResponses = poolClient.changelogs.getChangelogEntries(
             paginationRequest = DEFAULT_PAGINATION_REQUEST, changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
         )
         assertThat(poolChangelogResponses.contentSize).isZero()
@@ -101,7 +101,7 @@ class BridgeSyncIT @Autowired constructor(
 
         val gateLegalEntityRequestByBpn = gateLegalEntityRequests.associateBy { bpnByExternalId[it.externalId]!! }
 
-        val poolLegalEntityResponses = poolClient.legalEntities().getLegalEntities(
+        val poolLegalEntityResponses = poolClient.legalEntities.getLegalEntities(
             bpSearchRequest = LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -150,7 +150,7 @@ class BridgeSyncIT @Autowired constructor(
 
         val gateSiteRequestsByBpn = gateSiteRequests.associateBy { bpnByExternalId[it.externalId]!! }
 
-        val poolSiteResponses = poolClient.sites().searchSites(
+        val poolSiteResponses = poolClient.sites.searchSites(
             siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -201,7 +201,7 @@ class BridgeSyncIT @Autowired constructor(
 
         val gateAddressRequestsByBpn = gateAddressRequests.associateBy { bpnByExternalId[it.externalId]!! }
 
-        val poolAddressResponses = poolClient.addresses().searchAddresses(
+        val poolAddressResponses = poolClient.addresses.searchAddresses(
             addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -298,7 +298,7 @@ class BridgeSyncIT @Autowired constructor(
         val bpnByExternalId = buildBpnByExternalIdMap(sharingStatesOkay)
         val gateSiteRequestsByBpn = gateSiteRequests.associateBy { bpnByExternalId[it.externalId]!! }
 
-        val poolSiteResponses = poolClient.sites().searchSites(
+        val poolSiteResponses = poolClient.sites.searchSites(
             siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -318,7 +318,7 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.sites.upsertSites(listOf(siteRquestUpdate))
         bridgeClient.bridge().triggerSync()
-        val poolSiteUpdateResponses = poolClient.sites().searchSites(
+        val poolSiteUpdateResponses = poolClient.sites.searchSites(
             siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -364,7 +364,7 @@ class BridgeSyncIT @Autowired constructor(
         val bpnByExternalId = buildBpnByExternalIdMap(readSuccessfulSharingStatesWithBpn())
         val gateAddressRequestsByBpn = gateAddressRequests.associateBy { bpnByExternalId[it.externalId]!! }
 
-        val poolAddressResponses = poolClient.addresses().searchAddresses(
+        val poolAddressResponses = poolClient.addresses.searchAddresses(
             addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         ).content
@@ -385,7 +385,7 @@ class BridgeSyncIT @Autowired constructor(
             )
         gateClient.addresses.upsertAddresses(listOf(addressRequestUpdate))
         bridgeClient.bridge().triggerSync()
-        val poolAddressUpdateResponses = poolClient.addresses().searchAddresses(
+        val poolAddressUpdateResponses = poolClient.addresses.searchAddresses(
             addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         ).content
@@ -402,7 +402,7 @@ class BridgeSyncIT @Autowired constructor(
     }
 
     private fun allLegalEntitiesFromPool(): Collection<LegalEntityMatchVerboseDto> {
-        val poolLegalEntityResponses = poolClient.legalEntities().getLegalEntities(
+        val poolLegalEntityResponses = poolClient.legalEntities.getLegalEntities(
             bpSearchRequest = LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             paginationRequest = DEFAULT_PAGINATION_REQUEST
         )
@@ -424,7 +424,7 @@ class BridgeSyncIT @Autowired constructor(
     }
 
     private fun assertPoolChangelogHasCount(changelogCount: Int) {
-        val poolChangelogResponses = poolClient.changelogs().getChangelogEntries(
+        val poolChangelogResponses = poolClient.changelogs.getChangelogEntries(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
             changelogSearchRequest = ChangelogSearchRequest(timestampAfter = null, bpns = null)
 

@@ -47,7 +47,7 @@ class PoolUpdateService(
             )
         }
 
-        return poolClient.legalEntities().createBusinessPartners(createRequests)
+        return poolClient.legalEntities.createBusinessPartners(createRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} new legal entities, ${it.errorCount} were refused" } }
     }
 
@@ -61,7 +61,7 @@ class PoolUpdateService(
             )
         }
 
-        return poolClient.legalEntities().updateBusinessPartners(updateRequests)
+        return poolClient.legalEntities.updateBusinessPartners(updateRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} updated legal entities, ${it.errorCount} were refused" } }
     }
 
@@ -90,7 +90,7 @@ class PoolUpdateService(
                         "because some parent BPN-L entries are missing!"
             }
         }
-        return poolClient.sites().createSite(createRequests)
+        return poolClient.sites.createSite(createRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} new sites, ${it.errorCount} were refused" } }
     }
 
@@ -106,7 +106,7 @@ class PoolUpdateService(
             )
         }
 
-        return poolClient.sites().updateSite(updateRequests)
+        return poolClient.sites.updateSite(updateRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} updated sites, ${it.errorCount} were refused" } }
     }
 
@@ -156,7 +156,7 @@ class PoolUpdateService(
                         "because some parent BPN-L/S entries are missing!"
             }
         }
-        return poolClient.addresses().createAddresses(createRequests)
+        return poolClient.addresses.createAddresses(createRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} new addresses, ${it.errorCount} were refused" } }
     }
 
@@ -187,7 +187,7 @@ class PoolUpdateService(
             )
         }
 
-        return poolClient.addresses().updateAddresses(updateRequests)
+        return poolClient.addresses.updateAddresses(updateRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} updated addresses, ${it.errorCount} were refused" } }
     }
 

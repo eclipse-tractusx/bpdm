@@ -39,29 +39,22 @@ class PoolClientImpl(
             .build()
     }
 
+    override val addresses by lazy { createClient<PoolAddressApi>() }
 
-    private val poolClientAddress by lazy { httpServiceProxyFactory.createClient(PoolAddressApi::class.java) }
-    private val poolClientBpn by lazy { httpServiceProxyFactory.createClient(PoolBpnApi::class.java) }
-    private val poolClientChangelog by lazy { httpServiceProxyFactory.createClient(PoolChangelogApi::class.java) }
-    private val poolClientLegalEntity by lazy { httpServiceProxyFactory.createClient(PoolLegalEntityApi::class.java) }
-    private val poolClientMetadata by lazy { httpServiceProxyFactory.createClient(PoolMetadataApi::class.java) }
-    private val poolClientSite by lazy { httpServiceProxyFactory.createClient(PoolSiteApi::class.java) }
-    private val poolClientOpenSearch by lazy { httpServiceProxyFactory.createClient(PoolOpenSearchApi::class.java) }
-    private val poolClientSaas by lazy { httpServiceProxyFactory.createClient(PoolSaasApi::class.java) }
+    override val bpns by lazy { createClient<PoolBpnApi>() }
 
-    override fun addresses() = poolClientAddress
+    override val changelogs by lazy { createClient<PoolChangelogApi>() }
 
-    override fun bpns() = poolClientBpn
+    override val legalEntities by lazy { createClient<PoolLegalEntityApi>() }
 
-    override fun changelogs() = poolClientChangelog
+    override val metadata by lazy { createClient<PoolMetadataApi>() }
 
-    override fun legalEntities() = poolClientLegalEntity
+    override val sites by lazy { createClient<PoolSiteApi>() }
 
-    override fun metadata() = poolClientMetadata
+    override val opensearch by lazy { createClient<PoolOpenSearchApi>() }
 
-    override fun sites() = poolClientSite
+    override val saas by lazy { createClient<PoolSaasApi>() }
 
-    override fun opensearch() = poolClientOpenSearch
-
-    override fun saas() = poolClientSaas
+    private inline fun <reified T> createClient() =
+        httpServiceProxyFactory.createClient(T::class.java)
 }
