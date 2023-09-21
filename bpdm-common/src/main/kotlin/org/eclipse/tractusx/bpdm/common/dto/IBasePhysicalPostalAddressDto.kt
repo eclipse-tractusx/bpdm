@@ -30,6 +30,12 @@ interface IBasePhysicalPostalAddressDto {
     // OpenAPI description for complex field does not work!
     val geographicCoordinates: GeoCoordinateDto?
 
+    @get:Schema(description = PostalAddressDescription.country)
+    val country: Any?
+
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
+    val administrativeAreaLevel1: Any?
+
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel2)
     val administrativeAreaLevel2: String?
 
@@ -40,10 +46,13 @@ interface IBasePhysicalPostalAddressDto {
     val postalCode: String?
 
     @get:Schema(description = PostalAddressDescription.city)
-    val city: String
+    val city: String?
 
     @get:Schema(description = PostalAddressDescription.district)
     val district: String?
+
+    // OpenAPI description for complex field does not work!
+    val street: Any?
 
     @get:Schema(description = PostalAddressDescription.companyPostalCode)
     val companyPostalCode: String?

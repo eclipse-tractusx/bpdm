@@ -51,6 +51,9 @@ interface IBaseBusinessPartnerDto {
     @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>
 
+    @get:Schema(description = "Address of the official seat of this business partner.")
+    val postalAddress: IBaseBusinessPartnerPostalAddressDto
+
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
     val isOwner: Boolean
 

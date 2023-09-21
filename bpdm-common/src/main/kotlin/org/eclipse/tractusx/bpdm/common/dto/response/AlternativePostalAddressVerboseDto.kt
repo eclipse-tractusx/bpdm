@@ -36,10 +36,10 @@ data class AlternativePostalAddressVerboseDto(
     override val geographicCoordinates: GeoCoordinateDto?,
 
     // OpenAPI description for complex field does not work!
-    val country: TypeKeyNameVerboseDto<CountryCode>,
+    override val country: TypeKeyNameVerboseDto<CountryCode>,
 
     // OpenAPI description for complex field does not work!
-    val administrativeAreaLevel1: RegionDto?,
+    override val administrativeAreaLevel1: RegionDto?,
 
     override val postalCode: String?,
 

@@ -21,20 +21,12 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.openapidescription.BusinessPartnerAddressDescription
 
 @Schema(description = "Postal address of a input business partner", requiredProperties = ["physicalPostalAddress"])
 data class BusinessPartnerPostalAddressInputDto(
 
-    @get:Schema( description = BusinessPartnerAddressDescription.addressType)
-    val addressType: AddressType?,
+    override val addressType: AddressType?,
+    override val physicalPostalAddress: PhysicalPostalAddressGateDto,
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
-    val physicalPostalAddress: PhysicalPostalAddressGateDto,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
-    val alternativePostalAddress: AlternativePostalAddressDto? = null
-)
+) : IBaseBusinessPartnerPostalAddressDto

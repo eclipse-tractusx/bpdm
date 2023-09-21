@@ -36,11 +36,9 @@ data class PhysicalPostalAddressGateDto(
 
     override val geographicCoordinates: GeoCoordinateDto?,
 
-    @get:Schema(description = PostalAddressDescription.country)
-    val country: CountryCode,
+    override val country: CountryCode,
 
-    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
-    val administrativeAreaLevel1: String?,
+    override val administrativeAreaLevel1: String?,
 
     override val administrativeAreaLevel2: String?,
 
@@ -52,8 +50,7 @@ data class PhysicalPostalAddressGateDto(
 
     override val district: String?,
 
-    // OpenAPI description for complex field does not work!
-    val street: StreetGateDto?,
+    override val street: StreetGateDto?,
 
     override val companyPostalCode: String?,
 

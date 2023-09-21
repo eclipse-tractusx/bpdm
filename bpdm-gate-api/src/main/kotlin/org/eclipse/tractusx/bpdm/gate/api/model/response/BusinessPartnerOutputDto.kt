@@ -36,12 +36,8 @@ data class BusinessPartnerOutputDto(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-
-    @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: BusinessPartnerPostalAddressOutputDto,
-
+    override val postalAddress: BusinessPartnerPostalAddressOutputDto,
     override val isOwner: Boolean,
-
     override val bpnL: String,
     override val bpnS: String?,
     override val bpnA: String,

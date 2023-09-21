@@ -37,12 +37,8 @@ data class BusinessPartnerInputRequest(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-
-    @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: BusinessPartnerPostalAddressInputDto,
-
+    override val postalAddress: BusinessPartnerPostalAddressInputDto,
     override val isOwner: Boolean = false,
-
     override val bpnL: String? = null,
     override val bpnS: String? = null,
     override val bpnA: String? = null
