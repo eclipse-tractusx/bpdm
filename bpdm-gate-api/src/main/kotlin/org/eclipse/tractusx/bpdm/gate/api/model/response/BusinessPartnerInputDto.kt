@@ -42,10 +42,14 @@ data class BusinessPartnerInputDto(
 
     override val isOwner: Boolean,
 
+    override val bpnL: String?,
+    override val bpnS: String?,
+    override val bpnA: String?,
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
     @get:Schema(description = CommonDescription.updatedAt)
-    val updatedAt: Instant,
+    val updatedAt: Instant
 
-    ) : IBaseBusinessPartnerDto
+) : IBaseBusinessPartnerDto

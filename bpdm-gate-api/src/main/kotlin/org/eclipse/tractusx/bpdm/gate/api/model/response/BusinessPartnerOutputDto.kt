@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.*
 import java.time.Instant
 
 
-@Schema(description = "Generic business partner output with external id", requiredProperties = ["externalId", "postalAddress", "bpna", "bpnl"])
+@Schema(description = "Generic business partner output with external id", requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"])
 data class BusinessPartnerOutputDto(
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
@@ -42,19 +42,14 @@ data class BusinessPartnerOutputDto(
 
     override val isOwner: Boolean,
 
-    @get:Schema(description = "BPNA")
-    val bpna: String,
-
-    @get:Schema(description = "BPNS")
-    val bpns: String?,
-
-    @get:Schema(description = "BPNL")
-    val bpnl: String,
+    override val bpnL: String,
+    override val bpnS: String?,
+    override val bpnA: String,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
     @get:Schema(description = CommonDescription.updatedAt)
-    val updatedAt: Instant,
+    val updatedAt: Instant
 
-    ) : IBaseBusinessPartnerDto
+) : IBaseBusinessPartnerDto

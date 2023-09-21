@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -43,13 +44,16 @@ class BusinessPartnerMappings {
             externalId = entity.externalId,
             nameParts = entity.nameParts,
             shortName = entity.shortName,
-            legalForm = entity.legalForm,
             identifiers = entity.identifiers.map(::toIdentifierDto),
+            legalForm = entity.legalForm,
             states = entity.states.map(::toStateDto),
             classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
             postalAddress = toPostalAddressInputDto(entity.postalAddress),
-            isOwner = entity.isOwner ?: false,      // TODO should be mandatory in entity
+            isOwner = entity.isOwner,
+            bpnL = entity.bpnL,
+            bpnS = entity.bpnS,
+            bpnA = entity.bpnA,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -60,16 +64,18 @@ class BusinessPartnerMappings {
             externalId = entity.externalId,
             nameParts = entity.nameParts,
             shortName = entity.shortName,
-            legalForm = entity.legalForm,
             identifiers = entity.identifiers.map(::toIdentifierDto),
+            legalForm = entity.legalForm,
             states = entity.states.map(::toStateDto),
             classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
             postalAddress = toPostalAddressOutputDto(entity.postalAddress),
-            isOwner = entity.isOwner ?: false,      // TODO should be mandatory in entity
-            bpnl = entity.bpnL ?: throw NullPointerException("bpnL is null"),
-            bpns = entity.bpnS,
-            bpna = entity.bpnA ?: throw NullPointerException("bpnA is null"),
+            isOwner = entity.isOwner,
+            bpnL = entity.bpnL
+                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnL, entity.externalId),
+            bpnS = entity.bpnS,
+            bpnA = entity.bpnA
+                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnA, entity.externalId),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -87,9 +93,9 @@ class BusinessPartnerMappings {
             shortName = dto.shortName,
             legalForm = dto.legalForm,
             isOwner = dto.isOwner,
-            bpnL = null,
-            bpnS = null,
-            bpnA = null,
+            bpnL = dto.bpnL,
+            bpnS = dto.bpnS,
+            bpnA = dto.bpnA,
             postalAddress = toPostalAddress(dto.postalAddress)
         )
     }
@@ -103,6 +109,9 @@ class BusinessPartnerMappings {
         entity.shortName = dto.shortName
         entity.legalForm = dto.legalForm
         entity.isOwner = dto.isOwner
+        entity.bpnL = dto.bpnL
+        entity.bpnS = dto.bpnS
+        entity.bpnA = dto.bpnA
         updatePostalAddress(entity.postalAddress, dto.postalAddress)
     }
 
@@ -122,7 +131,7 @@ class BusinessPartnerMappings {
 
     private fun toPostalAddress(dto: BusinessPartnerPostalAddressInputDto) =
         PostalAddress(
-            addressType = dto.addressType ?: AddressType.AdditionalAddress,     // TODO should be optional in entity
+            addressType = dto.addressType,
             physicalPostalAddress = dto.physicalPostalAddress.let(::toPhysicalPostalAddress),
             alternativePostalAddress = dto.alternativePostalAddress?.let(::toAlternativePostalAddress)
         )
