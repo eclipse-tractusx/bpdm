@@ -52,7 +52,7 @@ interface IBasePhysicalPostalAddressDto {
     val district: String?
 
     // OpenAPI description for complex field does not work!
-    val street: Any?
+    val street: IBaseStreetDto?
 
     @get:Schema(description = PostalAddressDescription.companyPostalCode)
     val companyPostalCode: String?
