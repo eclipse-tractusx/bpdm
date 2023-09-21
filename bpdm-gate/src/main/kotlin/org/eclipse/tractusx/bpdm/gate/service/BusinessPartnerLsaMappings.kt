@@ -26,11 +26,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
-import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 
 
 fun LegalEntityGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequest {
@@ -159,7 +154,7 @@ fun BusinessPartnerInputDto.toLegalEntityGateInputDto(): LegalEntityGateInputDto
             identifiers = identifiers.map(::toLegalEntityIdentifierDto),
             legalForm = legalForm,
             states = states.map(::toLegalEntityStateDto),
-            classifications = classifications,
+            classifications = classifications.toList(),
         ),
 
         legalAddress = AddressGateInputDto(
@@ -176,7 +171,7 @@ fun BusinessPartnerInputDto.toSiteGateInputDto(): SiteGateInputDto {
 
     return SiteGateInputDto(
         externalId = externalId,
-        legalEntityExternalId = "",
+        legalEntityExternalId = parentId.toString(),
         site = SiteGateDto(
             nameParts = nameParts,
             states = states.map(::toSiteStateDto),
@@ -194,8 +189,16 @@ fun BusinessPartnerInputDto.toSiteGateInputDto(): SiteGateInputDto {
 
 fun BusinessPartnerInputDto.toAddressGateInputDto(): AddressGateInputDto {
 
+    val (legalEntityId, siteId) = when (parentType) {
+        BusinessPartnerType.LEGAL_ENTITY -> parentId to null
+        BusinessPartnerType.SITE -> null to parentId
+        else -> null to null
+    }
+
     return AddressGateInputDto(
         externalId = externalId,
+        legalEntityExternalId = legalEntityId,
+        siteExternalId = siteId,
         address = LogisticAddressGateDto(
             nameParts = nameParts,
             states = states.map(::toAddressStateDto),
@@ -304,7 +307,7 @@ fun BusinessPartnerOutputDto.toSiteGateOutputResponse(): SiteGateOutputResponse 
 
     return SiteGateOutputResponse(
         externalId = externalId,
-        legalEntityExternalId = "",
+        legalEntityExternalId = parentId.toString(),
         bpns = bpnS.toString(),
         site = SiteGateDto(
             nameParts = nameParts,
@@ -324,8 +327,16 @@ fun BusinessPartnerOutputDto.toSiteGateOutputResponse(): SiteGateOutputResponse 
 
 fun BusinessPartnerOutputDto.toAddressGateOutputDto(): AddressGateOutputDto {
 
+    val (legalEntityId, siteId) = when (parentType) {
+        BusinessPartnerType.LEGAL_ENTITY -> parentId to null
+        BusinessPartnerType.SITE -> null to parentId
+        else -> null to null
+    }
+
     return AddressGateOutputDto(
         externalId = externalId,
+        legalEntityExternalId = legalEntityId,
+        siteExternalId = siteId,
         bpna = bpnA,
         address = LogisticAddressGateDto(
             nameParts = nameParts,
@@ -339,7 +350,6 @@ fun BusinessPartnerOutputDto.toAddressGateOutputDto(): AddressGateOutputDto {
 }
 
 //Mapping of Output Upserts
-
 fun LegalEntityGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOutputRequest {
 
     return BusinessPartnerOutputRequest(
@@ -357,7 +367,7 @@ fun LegalEntityGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOu
             alternativePostalAddress = legalAddress.address.alternativePostalAddress
         ),
         isOwner = false,
-        bpnL = bpn,
+        bpnL = bpn, //TODO Not sure about BPN Mappings
         bpnA = legalAddress.bpn
     )
 }
@@ -381,6 +391,8 @@ fun SiteGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOutputReq
         isOwner = false,
         parentId = legalEntityExternalId,
         parentType = BusinessPartnerType.LEGAL_ENTITY,
+        bpnA = mainAddress.bpn, //TODO Not sure about BPN Mappings
+        bpnL = "NOVALUE",
         bpnS = bpn
     )
 }
@@ -404,6 +416,8 @@ fun AddressGateOutputRequest.toBusinessPartnerOutputDto(parentId: String?, paren
         isOwner = false,
         parentId = parentId,
         parentType = parentType,
+        bpnS = "NOVALUE",
+        bpnL = "NOVALUE",
         bpnA = bpn
     )
 }

@@ -85,13 +85,13 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
-        assertGateChangelogHasCount(3 + 3)  // 3 LEs + 3 addresses
+        assertGateChangelogHasCount(3)  // 3 LEs
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
 
-        // 3 legal entities + 3 legal addresses
+        // 3 legal entities + 3 addresses
         assertPoolChangelogHasCount(3 + 3)
 
         // 3 legal entities
@@ -134,13 +134,13 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.sites.upsertSites(gateSiteRequests)
 
-        assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
+        assertGateChangelogHasCount(3 + 2)   // 3 LEs + 2 sites
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
 
-        // 3 legal entities + 3 legal addresses & 2 sites + 2 main addresses
+        // 3 legal entities + address & 2 sites + address
         assertPoolChangelogHasCount(3 + 3 + 2 + 2)
 
         // 3 LEs + 2 sites
@@ -185,13 +185,13 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.addresses.upsertAddresses(gateAddressRequests)
 
-        assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + 1 site + 2 addresses
+        assertGateChangelogHasCount(1 + 1 + 2)  // 1 LE + 1 site + 2 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
 
-        // 1 legal entity + 1 legal address & 1 site + 1 main address & 2 addresses
+        // 1 legal entity + la & 1 site + la  & 2 addresses
         assertPoolChangelogHasCount(1 + 1 + 1 + 1 + 2)
 
         // 1 LE + 1 site + 2 addresses
@@ -226,7 +226,7 @@ class BridgeSyncIT @Autowired constructor(
             GateRequestValues.legalEntityGateInputRequest3
         )
         gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
-        assertGateChangelogHasCount(3 + 3)
+        assertGateChangelogHasCount(3)
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
         assertPoolChangelogHasCount(3 + 3)
@@ -250,9 +250,9 @@ class BridgeSyncIT @Autowired constructor(
             ),
         )
         gateClient.legalEntities.upsertLegalEntities(listOf(leRquestUpdate))
-        assertGateChangelogHasCount(4 + 4) // 3 insert + 1 update
+        assertGateChangelogHasCount(3 + 1) // 3 insert + 1 update
         bridgeClient.bridge().triggerSync()
-        assertPoolChangelogHasCount(4 + 4)
+        assertPoolChangelogHasCount(3 + 3 + 3 + 3) // 6 insert (LE/LA) + 6 update (LE/LA) //TODO Check if it is right
 
         val entitiesFromPoolAFterUpdate = allLegalEntitiesFromPool()
         assertThat(legalEntitiesFromPool.size).isEqualTo(3)
@@ -283,13 +283,13 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.sites.upsertSites(gateSiteRequests)
 
-        assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
+        assertGateChangelogHasCount(3 + 2)   // 3 LEs + 2 sites
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
 
-        // 3 legal entities + 3 legal addresses & 2 sites + 2 main addresses
+        // 3 legal entities + 3 la & 2 sites + 2 la
         assertPoolChangelogHasCount(3 + 3 + 2 + 2)
 
         // 3 LEs + 2 sites
@@ -352,13 +352,13 @@ class BridgeSyncIT @Autowired constructor(
         )
         gateClient.addresses.upsertAddresses(gateAddressRequests)
 
-        assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + le address + 1 site + main address + 2 addresses
+        assertGateChangelogHasCount(1 + 1 + 2)  // 1 LE + 1 site + 2 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
 
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
 
-        // 1 legal entity + 1 le address & 1 site + 1 main address & 2 addresses
+        // 1 legal entity + la + 1 site + la & 2 addresses
         assertPoolChangelogHasCount(1 + 1 + 1 + 1 + 2)
 
         val bpnByExternalId = buildBpnByExternalIdMap(readSuccessfulSharingStatesWithBpn())

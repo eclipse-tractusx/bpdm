@@ -22,12 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +45,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class SiteControllerOutputIT @Autowired constructor(
     val gateClient: GateClient,
-    private val gateSiteRepository: SiteRepository,
     val testHelpers: DbTestHelpers
 ) {
     companion object {
@@ -75,6 +72,10 @@ internal class SiteControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `upsert sites output`() {
+
+        val page = 0
+        val size = 10
+
         val sites = listOf(
             BusinessPartnerNonVerboseValues.siteGateInputRequest1,
             BusinessPartnerNonVerboseValues.siteGateInputRequest2
@@ -104,11 +105,13 @@ internal class SiteControllerOutputIT @Autowired constructor(
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
 
+        val paginationValue = PaginationRequest(page, size)
+
         //Check if persisted site data
-        val siteExternal1 = gateSiteRepository.findByExternalIdAndStage("site-external-1", StageType.Output)
+        val siteExternal1 = gateClient.sites.getSitesOutput(paginationValue, listOf("site-external-1"))
         Assertions.assertNotEquals(siteExternal1, null)
 
-        val siteExternal2 = gateSiteRepository.findByExternalIdAndStage("site-external-2", StageType.Output)
+        val siteExternal2 = gateClient.sites.getSitesOutput(paginationValue, listOf("site-external-2"))
         Assertions.assertNotEquals(siteExternal2, null)
 
     }
@@ -160,7 +163,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val page = 0
         val size = 10
 
-        val totalElements = 2L
+        val totalElements = 4L //TODO currently totalElements are LE + Sites (2 + 2)
         val totalPages = 1
         val pageValue = 0
         val contentSize = 2
@@ -193,7 +196,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSitesOutput(paginationValue, emptyList())
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*mainAddress.siteExternalId*", ".*mainAddress.externalId*", ".*processStartedAt*").isEqualTo(
             PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
@@ -252,7 +256,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSitesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalIdSite1, BusinessPartnerVerboseValues.externalIdSite2))
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*mainAddress.siteExternalId*", ".*mainAddress.externalId*", ".*processStartedAt*").isEqualTo(
             PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,

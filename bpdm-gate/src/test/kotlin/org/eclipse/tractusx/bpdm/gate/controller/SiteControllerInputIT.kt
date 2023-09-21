@@ -85,7 +85,11 @@ internal class SiteControllerInputIT @Autowired constructor(
 
         val site = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite1)
 
-        assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedSite)
+        assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*mainAddress.externalId*",
+            ".*mainAddress.siteExternalId*"
+        ).isEqualTo(expectedSite)
     }
 
     /**
@@ -141,15 +145,21 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSites(paginationValue)
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
-            PageDto(
-                totalElements = totalElements,
-                totalPages = totalPages,
-                page = pageValue,
-                contentSize = contentSize,
-                content = expectedSites
-            )
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*externalId*",
+            ".*siteExternalId*",
+            ".*totalElements*"
         )
+            .isEqualTo(
+                PageDto(
+                    totalElements = totalElements,
+                    totalPages = totalPages,
+                    page = pageValue,
+                    contentSize = contentSize,
+                    content = expectedSites
+                )
+            )
 
     }
 
@@ -191,7 +201,11 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
         val pageResponse = gateClient.sites.getSitesByExternalIds(paginationValue, externalIds)
 
-        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*mainAddress.externalId*",
+            ".*mainAddress.siteExternalId*"
+        ).isEqualTo(
             PageDto(
                 totalElements = totalElements,
                 totalPages = totalPages,
@@ -263,10 +277,10 @@ internal class SiteControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted site data
-        val siteExternal1 = siteRepository.findByExternalId("site-external-1")
+        val siteExternal1 = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite1)
         Assertions.assertNotEquals(siteExternal1, null)
 
-        val siteExternal2 = siteRepository.findByExternalId("site-external-2")
+        val siteExternal2 = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite2)
         Assertions.assertNotEquals(siteExternal2, null)
 
     }

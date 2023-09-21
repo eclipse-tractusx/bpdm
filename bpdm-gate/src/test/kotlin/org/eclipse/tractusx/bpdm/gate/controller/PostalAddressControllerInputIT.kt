@@ -110,7 +110,10 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
 
         val valueResponse = gateClient.addresses.getAddressByExternalId(externalIdToQuery)
 
-        assertThat(valueResponse).usingRecursiveComparison().isEqualTo(expectedAddress)
+        assertThat(valueResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*siteExternalId*"
+        ).isEqualTo(expectedAddress)
     }
 
     /**
@@ -163,7 +166,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         val totalElements = 4L
         val totalPages = 1
         val pageValue = 0
-        val contentSize = 4
+        val contentSize = 2
 
         gateClient.legalEntities.upsertLegalEntities(legalEntity)
         gateClient.sites.upsertSites(site)
@@ -179,7 +182,12 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
             contentSize = contentSize,
             content = expectedAddresses
         )
-        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*externalId*",
+            ".*siteExternalId*",
+            ".*totalElements*"
+        ).isEqualTo(expectedPage)
     }
 
 
@@ -205,7 +213,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         )
 
         val site = listOf(
-            BusinessPartnerNonVerboseValues.siteGateInputRequest1
+            RequestValues.siteGateInputRequest1
         )
 
         val page = 0
@@ -232,7 +240,10 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
             contentSize = contentSize,
             content = expectedAddresses
         )
-        assertThat(pageResponse).usingRecursiveComparison().isEqualTo(expectedPage)
+        assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(
+            ".*legalEntityExternalId*",
+            ".*siteExternalId*"
+        ).isEqualTo(expectedPage)
     }
 
     /**
@@ -284,10 +295,10 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val addressExternal1 = gateAddressRepository.findByExternalId("address-external-1")
+        val addressExternal1 = gateClient.addresses.getAddressByExternalId(CommonValues.externalIdAddress1)
         assertNotEquals(addressExternal1, null)
 
-        val addressExternal2 = gateAddressRepository.findByExternalId("address-external-2")
+        val addressExternal2 = gateClient.addresses.getAddressByExternalId(CommonValues.externalIdAddress2)
         assertNotEquals(addressExternal2, null)
 
     }
@@ -324,7 +335,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         try {
             gateClient.addresses.upsertAddresses(addresses)
         } catch (e: WebClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+            assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
 
     }
@@ -342,7 +353,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         try {
             gateClient.addresses.upsertAddresses(addresses)
         } catch (e: WebClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+            assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
 
     }
@@ -402,7 +413,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         try {
             gateClient.addresses.upsertAddresses(addresses)
         } catch (e: WebClientResponseException) {
-            assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+            assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
 
     }

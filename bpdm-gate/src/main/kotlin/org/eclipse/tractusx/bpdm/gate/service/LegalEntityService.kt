@@ -25,16 +25,15 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -61,10 +60,10 @@ class LegalEntityService(
 
             val mapBusinessPartner = legalEntity.toBusinessPartnerDto()
 
-            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
-            if (duplicateBP?.parentType != null) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
-            }
+//            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
+//            if (duplicateBP?.parentType != null) {
+//                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
+//            }
 
             mappedGBP.add(mapBusinessPartner)
         }
@@ -129,7 +128,7 @@ class LegalEntityService(
 
     private fun toValidLegalEntitiesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<LegalEntityGateInputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.LegalAddress }
+            .filter { it.postalAddress.addressType == AddressType.LegalAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress }
             .map { it.toLegalEntityGateInputDto() }
     }
 
@@ -144,15 +143,15 @@ class LegalEntityService(
             page = page,
             totalElements = businessPartnerPage.totalElements,
             totalPages = businessPartnerPage.totalPages,
-            contentSize = toValidOutputLogisticAddressesGeneric(businessPartnerPage).size,
-            content = toValidOutputLogisticAddressesGeneric(businessPartnerPage),
+            contentSize = toValidOutputLegalEntitiesGeneric(businessPartnerPage).size,
+            content = toValidOutputLegalEntitiesGeneric(businessPartnerPage),
         )
 
     }
 
-    private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<LegalEntityGateOutputResponse> {
+    private fun toValidOutputLegalEntitiesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<LegalEntityGateOutputResponse> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .filter { it.postalAddress.addressType == AddressType.LegalAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress }
             .map { it.toLegalEntityGateOutputResponse() }
     }
 

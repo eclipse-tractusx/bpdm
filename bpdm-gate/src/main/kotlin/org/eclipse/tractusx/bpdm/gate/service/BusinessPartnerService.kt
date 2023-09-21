@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -26,6 +27,8 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -55,6 +58,17 @@ class BusinessPartnerService(
         return upsertBusinessPartnersInput(entities).map(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
+    private fun checkBusinessPartnerType(type: AddressType?): List<BusinessPartnerType>? {
+        return when (type) {
+            AddressType.LegalAndSiteMainAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.SITE)
+            AddressType.AdditionalAddress -> listOf(BusinessPartnerType.ADDRESS)
+            AddressType.LegalAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY)
+            AddressType.SiteMainAddress -> listOf(BusinessPartnerType.SITE)
+            else -> null
+        }
+    }
+
+    //Output Logic
     @Transactional
     fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerOutputDto> {
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerOutput(dto) }
@@ -101,9 +115,24 @@ class BusinessPartnerService(
         }
     }
 
-    private fun initSharingState(entity: BusinessPartner) {
-        // TODO make businessPartnerType optional
-        sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, entity.externalId))
+    private fun initSharingState(dto: IBaseBusinessPartnerGateDto, businessPartnerType: List<BusinessPartnerType>?) {
+        businessPartnerType?.forEach { type ->
+            sharingStateService.upsertSharingState(SharingStateDto(type, dto.externalId))
+        } ?: sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId)) //TODO Type should be diferent
+    }
+
+    private fun updateSharingStateStatus(dto: IBaseBusinessPartnerGateDto, businessPartnerType: List<BusinessPartnerType>?) {
+
+        val bpn = when (dto.postalAddress.addressType) {
+            AddressType.LegalAddress -> dto.bpnL
+            AddressType.SiteMainAddress -> dto.bpnS
+            AddressType.AdditionalAddress -> dto.bpnA
+            else -> null
+        }
+
+        businessPartnerType?.forEach { type ->
+            sharingStateService.upsertSharingState(SharingStateDto(type, dto.externalId, SharingStateType.Success, bpn = bpn))
+        } ?: sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId, SharingStateType.Success, bpn = bpn))
     }
 
     private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {

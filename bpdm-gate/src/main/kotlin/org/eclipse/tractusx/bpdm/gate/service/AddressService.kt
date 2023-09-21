@@ -27,14 +27,13 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
-import org.springframework.data.domain.Page
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -114,7 +113,7 @@ class AddressService(
 
             val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.externalId)
 
-            if (duplicateBP != null && (duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress || duplicateBP.postalAddress.addressType != AddressType.LegalAndSiteMainAddress)) {
+            if (duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
             }
 
@@ -124,7 +123,7 @@ class AddressService(
 
                 val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.SiteMainAddress) {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
+                    throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Input Site doesn't exist")
                 }
 
                 mappedGBP.add(mapBusinessPartner)
@@ -135,7 +134,7 @@ class AddressService(
 
                 val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Legal Entity doesn't exist")
+                    throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Input Legal Entity doesn't exist")
                 }
 
                 mappedGBP.add(mapBusinessPartner)
@@ -144,9 +143,6 @@ class AddressService(
         }
 
         businessPartnerService.upsertBusinessPartnersInput(mappedGBP)
-
-
-        //addressPersistenceService.persistAddressBP(addresses, StageType.Input)
 
     }
 
@@ -165,7 +161,7 @@ class AddressService(
             }
 
             val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, address.externalId)
-            if (duplicateBP != null && (duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress || duplicateBP.postalAddress.addressType != AddressType.LegalAndSiteMainAddress)) {
+            if (duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
             }
 

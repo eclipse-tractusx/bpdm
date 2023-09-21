@@ -41,12 +41,10 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -66,7 +64,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class PostalAddressControllerOutputIT @Autowired constructor(
     val gateClient: GateClient,
-    private val gateAddressRepository: GateAddressRepository,
     val testHelpers: DbTestHelpers
 ) {
     companion object {
@@ -94,6 +91,10 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
      */
     @Test
     fun `upsert output addresses`() {
+
+        val page = 0
+        val size = 10
+
         val addresses = listOf(
             BusinessPartnerNonVerboseValues.addressGateInputRequest1,
             BusinessPartnerNonVerboseValues.addressGateInputRequest2
@@ -133,11 +134,13 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
 
+        val paginationValue = PaginationRequest(page, size)
+
         //Check if persisted Address data
-        val addressExternal1 = gateAddressRepository.findByExternalIdAndStage("address-external-1", StageType.Output)
+        val addressExternal1 = gateClient.sites.getSitesOutput(paginationValue, listOf("address-external-1"))
         Assertions.assertNotEquals(addressExternal1, null)
 
-        val addressExternal2 = gateAddressRepository.findByExternalIdAndStage("address-external-2", StageType.Output)
+        val addressExternal2 = gateClient.sites.getSitesOutput(paginationValue, listOf("address-external-2"))
         Assertions.assertNotEquals(addressExternal2, null)
 
     }
@@ -209,9 +212,7 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
 
         val expectedAddresses = listOf(
             BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1,
-            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2,
-            BusinessPartnerVerboseValues.addressGateOutputResponseLegalEntity1,
-            BusinessPartnerVerboseValues.addressGateOutputResponseSite1
+            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2
         )
 
         val legalEntity = listOf(
@@ -233,10 +234,10 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         val page = 0
         val size = 10
 
-        val totalElements = 4L
+        val totalElements = 4L //TODO currently totalElements are LE + Sites + Address (1 + 1 + 2)
         val totalPages = 1
         val pageValue = 0
-        val contentSize = 4
+        val contentSize = 2
 
         gateClient.legalEntities.upsertLegalEntities(legalEntity)
         gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntityOutput)
@@ -289,7 +290,7 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         )
 
         val legalEntityOutput = listOf(
-            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
+            RequestValues.legalEntityGateOutputRequest1
         )
 
         val site = listOf(

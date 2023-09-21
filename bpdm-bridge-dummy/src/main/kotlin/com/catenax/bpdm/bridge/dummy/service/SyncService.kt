@@ -21,7 +21,6 @@ package com.catenax.bpdm.bridge.dummy.service
 
 import com.catenax.bpdm.bridge.dummy.entity.SyncType
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -52,12 +51,15 @@ class SyncService(
     }
 
     private fun syncInternal(modifiedAfter: Instant) {
-        // Check changelog entries from Gate (after last sync time)
-        val externalIdsByType = gateQueryService.getChangedExternalIdsByBusinessPartnerType(modifiedAfter)
+// Check changelog entries from Gate (after last sync time)
+        val externalIds = gateQueryService.getChangedExternalIds(modifiedAfter)
 
-        externalIdsByType[BusinessPartnerType.LEGAL_ENTITY]?.let { syncLegalEntities(it) }
-        externalIdsByType[BusinessPartnerType.SITE]?.let { syncSites(it) }
-        externalIdsByType[BusinessPartnerType.ADDRESS]?.let { syncAddresses(it) }
+        syncLegalEntities(externalIds)
+        syncSites(externalIds)
+        syncAddresses(externalIds)
+// externalIdsByType[BusinessPartnerType.LEGAL_ENTITY]?.let { syncLegalEntities(it) }
+// externalIdsByType[BusinessPartnerType.SITE]?.let { syncSites(it) }
+// externalIdsByType[BusinessPartnerType.ADDRESS]?.let { syncAddresses(it) }
     }
 
     private fun syncLegalEntities(externalIdsRequested: Set<String>) {

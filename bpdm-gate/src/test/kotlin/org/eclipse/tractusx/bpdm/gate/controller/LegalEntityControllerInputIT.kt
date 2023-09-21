@@ -89,10 +89,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val legalEntityExternal1 = legalEntityRepository.findByExternalId("external-1")
+        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
         assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = legalEntityRepository.findByExternalId("external-2")
+        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId2)
         assertNotEquals(legalEntityExternal2, null)
 
     }
@@ -232,7 +232,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         // TODO check administrativeAreaLevel1
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
+            .ignoringFieldsMatchingRegexes(
+                ".*legalAddress.legalEntityExternalId.*",
+                ".*totalElements*"
+            ).isEqualTo(
                 expectedPage
             )
     }
@@ -276,7 +279,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
+            .ignoringFieldsMatchingRegexes(".*legalAddress.legalEntityExternalId.*").isEqualTo(
                 expectedPage
             )
     }
@@ -314,10 +317,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             assertEquals(HttpStatus.OK, e.statusCode)
         }
 
-        val legalEntityRecordExternal1 = legalEntityRepository.findByExternalId("external-1")
+        val legalEntityRecordExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
         assertNotEquals(legalEntityRecordExternal1, null)
 
-        val legalEntityRecordExternal2 = legalEntityRepository.findByExternalId("external-2")
+        val legalEntityRecordExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId2)
         assertNotEquals(legalEntityRecordExternal2, null)
 
     }

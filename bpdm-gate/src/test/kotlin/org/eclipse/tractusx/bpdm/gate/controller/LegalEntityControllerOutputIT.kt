@@ -22,12 +22,11 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +46,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 internal class LegalEntityControllerOutputIT @Autowired constructor(
     val gateClient: GateClient,
-    private val gateLegalEntityRepository: LegalEntityRepository,
     private val testHelpers: DbTestHelpers
 ) {
     companion object {
@@ -76,6 +74,9 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert output legal entities`() {
 
+        val page = 0
+        val size = 10
+
         val legalEntities = listOf(
             BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
             BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
@@ -93,11 +94,13 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
 
+        val paginationValue = PaginationRequest(page, size)
+
         //Check if persisted Address data
-        val legalEntityExternal1 = gateLegalEntityRepository.findByExternalIdAndStage(BusinessPartnerVerboseValues.externalId1, StageType.Output)
+        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1))
         Assertions.assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = gateLegalEntityRepository.findByExternalIdAndStage(BusinessPartnerVerboseValues.externalId2, StageType.Output)
+        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId2))
         Assertions.assertNotEquals(legalEntityExternal2, null)
 
     }
@@ -168,7 +171,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*legalAddress.legalEntityExternalId.*", ".*legalAddress.externalId.*")
             .isEqualTo(expectedPage)
     }
 
@@ -218,7 +221,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*administrativeAreaLevel1*.")
+            .ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*legalAddress.legalEntityExternalId.*", ".*legalAddress.externalId.*")
             .isEqualTo(expectedPage)
     }
 }
