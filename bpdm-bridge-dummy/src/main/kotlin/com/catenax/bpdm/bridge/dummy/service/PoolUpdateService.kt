@@ -162,14 +162,14 @@ class PoolUpdateService(
 
     private fun isSiteMainAddress(it: GateAddressInfo): Boolean {
 
-        val mainAdressExternalId = it.siteExternalId?.let { it1 -> gateQueryService.gateClient.sites().getSiteByExternalId(it1).mainAddress.externalId }
+        val mainAdressExternalId = it.siteExternalId?.let { it1 -> gateQueryService.gateClient.sites.getSiteByExternalId(it1).mainAddress.externalId }
         return it.externalId == mainAdressExternalId
     }
 
     private fun isLegalAddress(it: GateAddressInfo): Boolean {
 
         val legalAdressExternalId =
-            it.legalEntityExternalId?.let { it1 -> gateQueryService.gateClient.legalEntities().getLegalEntityByExternalId(it1).legalAddress.externalId }
+            it.legalEntityExternalId?.let { it1 -> gateQueryService.gateClient.legalEntities.getLegalEntityByExternalId(it1).legalAddress.externalId }
         return it.externalId == legalAdressExternalId
     }
 

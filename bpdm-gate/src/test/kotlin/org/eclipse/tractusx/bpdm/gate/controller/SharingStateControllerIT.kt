@@ -126,7 +126,7 @@ class SharingStateControllerIT @Autowired constructor(
             bpn = null
         )
 
-        gateClient.sharingState().upsertSharingState(updatedAddress1)
+        gateClient.sharingState.upsertSharingState(updatedAddress1)
 
         val readUpdatedAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
         assertThat(readUpdatedAddress).hasSize(1)
@@ -150,7 +150,7 @@ class SharingStateControllerIT @Autowired constructor(
             sharingProcessStarted = null,
             sharingErrorMessage = "Changed",
         )
-        gateClient.sharingState().upsertSharingState(updatedWithEmpyStarted)
+        gateClient.sharingState.upsertSharingState(updatedWithEmpyStarted)
 
         val readUpdatedAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
         assertThat(readUpdatedAddress.first().sharingStateType).isEqualTo(SharingStateType.Error)
@@ -173,7 +173,7 @@ class SharingStateControllerIT @Autowired constructor(
             sharingErrorMessage = null,
             bpn = null
         )
-        gateClient.sharingState().upsertSharingState(newState)
+        gateClient.sharingState.upsertSharingState(newState)
         return newState
     }
 
@@ -191,13 +191,13 @@ class SharingStateControllerIT @Autowired constructor(
             sharingErrorMessage = "Error in $businessPartnerType with external id $externalId",
             bpn = "BPN" + externalId
         )
-        gateClient.sharingState().upsertSharingState(newState)
+        gateClient.sharingState.upsertSharingState(newState)
         return newState
     }
 
     fun readSharingStates(businessPartnerType: BusinessPartnerType?, vararg externalIds: String): Collection<SharingStateDto> {
 
-        return gateClient.sharingState().getSharingStates(PaginationRequest(), businessPartnerType, externalIds.asList()).content
+        return gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType, externalIds.asList()).content
     }
 
 

@@ -83,7 +83,7 @@ class BridgeSyncIT @Autowired constructor(
             GateRequestValues.legalEntityGateInputRequest2,
             GateRequestValues.legalEntityGateInputRequest3
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
         assertGateChangelogHasCount(3 + 3)  // 3 LEs + 3 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -126,13 +126,13 @@ class BridgeSyncIT @Autowired constructor(
             GateRequestValues.legalEntityGateInputRequest2,
             GateRequestValues.legalEntityGateInputRequest3
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
         val gateSiteRequests = listOf(
             GateRequestValues.siteGateInputRequest1,
             GateRequestValues.siteGateInputRequest2
         )
-        gateClient.sites().upsertSites(gateSiteRequests)
+        gateClient.sites.upsertSites(gateSiteRequests)
 
         assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -173,17 +173,17 @@ class BridgeSyncIT @Autowired constructor(
         val gateLegalEntityRequests = listOf(
             GateRequestValues.legalEntityGateInputRequest1,
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
         val gateSiteRequests = listOf(
             GateRequestValues.siteGateInputRequest1,
         )
-        gateClient.sites().upsertSites(gateSiteRequests)
+        gateClient.sites.upsertSites(gateSiteRequests)
 
         val gateAddressRequests = listOf(
             addressGateInputRequest1,
             GateRequestValues.addressGateInputRequest2
         )
-        gateClient.addresses().upsertAddresses(gateAddressRequests)
+        gateClient.addresses.upsertAddresses(gateAddressRequests)
 
         assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + 1 site + 2 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -225,7 +225,7 @@ class BridgeSyncIT @Autowired constructor(
             GateRequestValues.legalEntityGateInputRequest2,
             GateRequestValues.legalEntityGateInputRequest3
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
         assertGateChangelogHasCount(3 + 3)
         // Action: Sync from Gate to Pool and BPN back to Gate
         bridgeClient.bridge().triggerSync()
@@ -249,7 +249,7 @@ class BridgeSyncIT @Autowired constructor(
                 ),
             ),
         )
-        gateClient.legalEntities().upsertLegalEntities(listOf(leRquestUpdate))
+        gateClient.legalEntities.upsertLegalEntities(listOf(leRquestUpdate))
         assertGateChangelogHasCount(4 + 4) // 3 insert + 1 update
         bridgeClient.bridge().triggerSync()
         assertPoolChangelogHasCount(4 + 4)
@@ -275,13 +275,13 @@ class BridgeSyncIT @Autowired constructor(
             GateRequestValues.legalEntityGateInputRequest2,
             GateRequestValues.legalEntityGateInputRequest3
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
 
         val gateSiteRequests = listOf(
             GateRequestValues.siteGateInputRequest1,
             GateRequestValues.siteGateInputRequest2
         )
-        gateClient.sites().upsertSites(gateSiteRequests)
+        gateClient.sites.upsertSites(gateSiteRequests)
 
         assertGateChangelogHasCount(3 + 2 + 3 + 2)   // 3 LEs + 2 sites + 3 le addresses + 2 site main addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -316,7 +316,7 @@ class BridgeSyncIT @Autowired constructor(
                 ),
             )
         )
-        gateClient.sites().upsertSites(listOf(siteRquestUpdate))
+        gateClient.sites.upsertSites(listOf(siteRquestUpdate))
         bridgeClient.bridge().triggerSync()
         val poolSiteUpdateResponses = poolClient.sites().searchSites(
             siteSearchRequest = SiteBpnSearchRequest(sites = gateSiteRequestsByBpn.keys),
@@ -340,17 +340,17 @@ class BridgeSyncIT @Autowired constructor(
         val gateLegalEntityRequests = listOf(
             GateRequestValues.legalEntityGateInputRequest1,
         )
-        gateClient.legalEntities().upsertLegalEntities(gateLegalEntityRequests)
+        gateClient.legalEntities.upsertLegalEntities(gateLegalEntityRequests)
         val gateSiteRequests = listOf(
             GateRequestValues.siteGateInputRequest1,
         )
-        gateClient.sites().upsertSites(gateSiteRequests)
+        gateClient.sites.upsertSites(gateSiteRequests)
 
         val gateAddressRequests = listOf(
             addressGateInputRequest1,
             GateRequestValues.addressGateInputRequest2
         )
-        gateClient.addresses().upsertAddresses(gateAddressRequests)
+        gateClient.addresses.upsertAddresses(gateAddressRequests)
 
         assertGateChangelogHasCount(1 + 1 + 2 + 2)  // 1 LE + le address + 1 site + main address + 2 addresses
         assertThat(readSuccessfulSharingStatesWithBpn().size).isEqualTo(0)
@@ -383,7 +383,7 @@ class BridgeSyncIT @Autowired constructor(
             ),
 
             )
-        gateClient.addresses().upsertAddresses(listOf(addressRequestUpdate))
+        gateClient.addresses.upsertAddresses(listOf(addressRequestUpdate))
         bridgeClient.bridge().triggerSync()
         val poolAddressUpdateResponses = poolClient.addresses().searchAddresses(
             addressSearchRequest = AddressPartnerBpnSearchRequest(addresses = gateAddressRequestsByBpn.keys),
@@ -416,7 +416,7 @@ class BridgeSyncIT @Autowired constructor(
             .mapValues { it.value.bpn }
 
     private fun assertGateChangelogHasCount(changelogCount: Int) {
-        val gateChangelogResponses = gateClient.changelog().getInputChangelog(
+        val gateChangelogResponses = gateClient.changelog.getInputChangelog(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
             searchRequest = org.eclipse.tractusx.bpdm.gate.api.model.request.ChangelogSearchRequest(timestampAfter = null, businessPartnerTypes = emptySet())
         )
@@ -434,7 +434,7 @@ class BridgeSyncIT @Autowired constructor(
     }
 
     private fun readSuccessfulSharingStatesWithBpn(): List<SharingStateDto> {
-        val sharingStates = gateClient.sharingState().getSharingStates(
+        val sharingStates = gateClient.sharingState.getSharingStates(
             paginationRequest = DEFAULT_PAGINATION_REQUEST,
             businessPartnerType = null,
             externalIds = null

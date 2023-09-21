@@ -260,22 +260,22 @@ class GateUpdateService(
 
     private fun putLegalEntityOutput(request: LegalEntityGateOutputRequest?) =
         request?.let {
-            gateClient.legalEntities().upsertLegalEntitiesOutput(listOf(it))
+            gateClient.legalEntities.upsertLegalEntitiesOutput(listOf(it))
         }
 
     private fun putSiteOutput(request: SiteGateOutputRequest?) =
         request?.let {
-            gateClient.sites().upsertSitesOutput(listOf(it))
+            gateClient.sites.upsertSitesOutput(listOf(it))
         }
 
     private fun putAddressOutput(request: AddressGateOutputRequest?) =
         request?.let {
-            gateClient.addresses().upsertAddressesOutput(listOf(it))
+            gateClient.addresses.upsertAddressesOutput(listOf(it))
         }
 
     private fun upsertSharingState(request: SharingStateDto?) =
         request?.let {
-            gateClient.sharingState().upsertSharingState(it)
+            gateClient.sharingState.upsertSharingState(it)
         }
 
 }

@@ -80,10 +80,10 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInputRequest1
         )
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.sites().upsertSites(sites)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        gateClient.sites.upsertSites(sites)
 
-        val site = gateClient.sites().getSiteByExternalId(CommonValues.externalIdSite1)
+        val site = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite1)
 
         assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedSite)
     }
@@ -97,7 +97,7 @@ internal class SiteControllerInputIT @Autowired constructor(
     fun `get site by external id, not found`() {
 
         try {
-            gateClient.sites().getSiteByExternalId("nonexistent-externalid123")
+            gateClient.sites.getSiteByExternalId("nonexistent-externalid123")
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
@@ -135,11 +135,11 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInputRequest2
         )
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.sites().upsertSites(sites)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        gateClient.sites.upsertSites(sites)
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.sites().getSites(paginationValue)
+        val pageResponse = gateClient.sites.getSites(paginationValue)
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
             PageDto(
@@ -183,13 +183,13 @@ internal class SiteControllerInputIT @Autowired constructor(
             RequestValues.siteGateInputRequest2
         )
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.sites().upsertSites(sites)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        gateClient.sites.upsertSites(sites)
 
         val externalIds = sites.map { it.externalId }
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.sites().getSitesByExternalIds(paginationValue, externalIds)
+        val pageResponse = gateClient.sites.getSitesByExternalIds(paginationValue, externalIds)
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(
             PageDto(
@@ -212,7 +212,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(0, 10)
 
         try {
-            gateClient.sites().getSites(paginationValue)
+            gateClient.sites.getSites(paginationValue)
         } catch (e: WebClientResponseException) {
             val statusCode: HttpStatusCode = e.statusCode
             val statusCodeValue: Int = statusCode.value()
@@ -231,7 +231,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         val paginationValue = PaginationRequest(0, 999999)
 
         try {
-            gateClient.sites().getSites(paginationValue)
+            gateClient.sites.getSites(paginationValue)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -256,8 +256,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
-            gateClient.sites().upsertSites(sites)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
+            gateClient.sites.upsertSites(sites)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -288,8 +288,8 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
-            gateClient.sites().upsertSites(sites)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
+            gateClient.sites.upsertSites(sites)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -308,7 +308,7 @@ internal class SiteControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.sites().upsertSites(sites)
+            gateClient.sites.upsertSites(sites)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }

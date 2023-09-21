@@ -121,14 +121,14 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntity)
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+            gateClient.legalEntities.upsertLegalEntities(legalEntity)
+            gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntityOutput)
 
-            gateClient.sites().upsertSites(site)
-            gateClient.sites().upsertSitesOutput(siteOutput)
+            gateClient.sites.upsertSites(site)
+            gateClient.sites.upsertSitesOutput(siteOutput)
 
-            gateClient.addresses().upsertAddresses(addresses)
-            gateClient.addresses().upsertAddressesOutput(addressesOutput)
+            gateClient.addresses.upsertAddresses(addresses)
+            gateClient.addresses.upsertAddressesOutput(addressesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -154,7 +154,7 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.addresses().upsertAddressesOutput(addresses)
+            gateClient.addresses.upsertAddressesOutput(addresses)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -180,10 +180,10 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntity)
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+            gateClient.legalEntities.upsertLegalEntities(legalEntity)
+            gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntityOutput)
 
-            gateClient.addresses().upsertAddressesOutput(addresses)
+            gateClient.addresses.upsertAddressesOutput(addresses)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -238,18 +238,18 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         val pageValue = 0
         val contentSize = 4
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntity)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+        gateClient.legalEntities.upsertLegalEntities(legalEntity)
+        gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntityOutput)
 
-        gateClient.sites().upsertSites(site)
-        gateClient.sites().upsertSitesOutput(siteOutput)
+        gateClient.sites.upsertSites(site)
+        gateClient.sites.upsertSitesOutput(siteOutput)
 
-        gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().upsertAddressesOutput(addressesOutput)
+        gateClient.addresses.upsertAddresses(addresses)
+        gateClient.addresses.upsertAddressesOutput(addressesOutput)
 
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, emptyList())
+        val pageResponse = gateClient.addresses.getAddressesOutput(paginationValue, emptyList())
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*identifiers*").isEqualTo(
             PageDto(
@@ -308,17 +308,17 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         val pageValue = 0
         val contentSize = 2
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntity)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntityOutput)
+        gateClient.legalEntities.upsertLegalEntities(legalEntity)
+        gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntityOutput)
 
-        gateClient.sites().upsertSites(site)
-        gateClient.sites().upsertSitesOutput(siteOutput)
+        gateClient.sites.upsertSites(site)
+        gateClient.sites.upsertSitesOutput(siteOutput)
 
-        gateClient.addresses().upsertAddresses(addresses)
-        gateClient.addresses().upsertAddressesOutput(addressesOutput)
+        gateClient.addresses.upsertAddresses(addresses)
+        gateClient.addresses.upsertAddressesOutput(addressesOutput)
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.addresses().getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
+        val pageResponse = gateClient.addresses.getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*identifiers*").isEqualTo(
             PageDto(
