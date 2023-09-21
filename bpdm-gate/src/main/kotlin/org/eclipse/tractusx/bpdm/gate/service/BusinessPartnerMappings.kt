@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -70,9 +71,11 @@ class BusinessPartnerMappings {
             roles = entity.roles,
             postalAddress = toPostalAddressOutputDto(entity.postalAddress),
             isOwner = entity.isOwner,
-            bpnL = entity.bpnL ?: throw NullPointerException("bpnL is null"),
+            bpnL = entity.bpnL
+                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnL, entity.externalId),
             bpnS = entity.bpnS,
-            bpnA = entity.bpnA ?: throw NullPointerException("bpnA is null"),
+            bpnA = entity.bpnA
+                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnA, entity.externalId),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )

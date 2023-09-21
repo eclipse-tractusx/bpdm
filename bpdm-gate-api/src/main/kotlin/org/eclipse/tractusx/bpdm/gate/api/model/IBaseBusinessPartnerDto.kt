@@ -36,19 +36,19 @@ interface IBaseBusinessPartnerDto {
     @get:Schema(description = "Abbreviated name or shorthand.")
     val shortName: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates are removed."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates removed by the service."))
     val identifiers: Collection<BusinessPartnerIdentifierDto>
 
     @get:Schema(description = "Technical key of the legal form.")
     val legalForm: String?
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates are removed."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service."))
     val states: Collection<BusinessPartnerStateDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates are removed."))
+    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
     val classifications: Collection<ClassificationDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates are removed."))
+    @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>
 
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
