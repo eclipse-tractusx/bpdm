@@ -20,9 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
-
+import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 
 @Schema(
     description = "Generic business partner with external id",
@@ -43,4 +46,4 @@ data class BusinessPartnerInputRequest(
     override val bpnS: String? = null,
     override val bpnA: String? = null
 
-) : IBaseBusinessPartnerDto
+) : IBaseBusinessPartnerGateDto
