@@ -42,9 +42,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.*
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressType
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress

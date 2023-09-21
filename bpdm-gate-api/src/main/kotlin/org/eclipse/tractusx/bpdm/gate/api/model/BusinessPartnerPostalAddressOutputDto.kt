@@ -20,7 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
 
 @Schema(description = "Postal address of a output business partner", requiredProperties = ["physicalPostalAddress"])
 data class BusinessPartnerPostalAddressOutputDto(

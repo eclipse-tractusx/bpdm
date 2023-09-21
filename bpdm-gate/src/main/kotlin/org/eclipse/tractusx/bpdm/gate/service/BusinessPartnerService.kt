@@ -20,11 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto

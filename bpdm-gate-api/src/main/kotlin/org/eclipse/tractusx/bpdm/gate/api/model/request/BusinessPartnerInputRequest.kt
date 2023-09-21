@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
 
 
 @Schema(

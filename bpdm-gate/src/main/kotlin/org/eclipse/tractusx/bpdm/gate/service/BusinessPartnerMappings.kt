@@ -19,13 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
-import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
