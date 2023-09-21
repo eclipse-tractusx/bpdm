@@ -24,12 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 
 @Schema(
     description = "Generic business partner with external id",
-    requiredProperties = ["externalId", "postalAddress"]
+    requiredProperties = ["externalId"]
 )
 data class BusinessPartnerInputRequest(
     override val externalId: String,
@@ -40,7 +40,7 @@ data class BusinessPartnerInputRequest(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressInputDto,
+    override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
     override val isOwner: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,

@@ -119,9 +119,9 @@ internal class BusinessPartnerIT @Autowired constructor(
         assertEquals(savedAddress.id, foundAddress.id)
         assertEquals(AddressType.LegalAddress, foundAddress.addressType)
 
-        assertEquals(10.0f, foundPhysicalPostalAddress.geographicCoordinates?.altitude)
-        assertEquals(52.0f, foundPhysicalPostalAddress.geographicCoordinates?.latitude)
-        assertEquals("Berlin", foundPhysicalPostalAddress.city)
+        assertEquals(10.0f, foundPhysicalPostalAddress?.geographicCoordinates?.altitude)
+        assertEquals(52.0f, foundPhysicalPostalAddress?.geographicCoordinates?.latitude)
+        assertEquals("Berlin", foundPhysicalPostalAddress?.city)
     }
 
     @Test

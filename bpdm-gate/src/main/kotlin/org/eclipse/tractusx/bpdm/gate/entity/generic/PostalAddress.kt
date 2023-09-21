@@ -34,7 +34,7 @@ class PostalAddress(
     var addressType: AddressType?,
 
     @Embedded
-    var physicalPostalAddress: PhysicalPostalAddress,
+    var physicalPostalAddress: PhysicalPostalAddress?,
 
     @Embedded
     var alternativePostalAddress: AlternativePostalAddress?
