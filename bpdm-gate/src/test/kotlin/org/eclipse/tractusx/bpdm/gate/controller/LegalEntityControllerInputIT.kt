@@ -171,7 +171,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val legalEntity = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId1)
 
         assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
-            .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
+            .ignoringFieldsMatchingRegexes(".*legalAddress.legalEntityExternalId.*")
+            .isEqualTo(expectedLegalEntity)
 
     }
 
