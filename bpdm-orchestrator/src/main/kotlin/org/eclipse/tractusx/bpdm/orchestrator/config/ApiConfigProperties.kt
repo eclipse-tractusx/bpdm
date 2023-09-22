@@ -17,19 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+@ConfigurationProperties(prefix = "bpdm.api")
+data class ApiConfigProperties(
+    val upsertLimit: Int = 100,
+)

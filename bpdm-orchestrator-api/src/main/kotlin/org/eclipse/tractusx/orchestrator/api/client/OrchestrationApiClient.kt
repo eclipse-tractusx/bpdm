@@ -19,5 +19,10 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
+import org.eclipse.tractusx.orchestrator.api.CleaningTaskApi
+
 interface OrchestrationApiClient {
+
+    val cleaningTasks: CleaningTaskApi
+
 }

@@ -17,19 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
+data class PostalAddressDto(
+    override val addressType: AddressType? = null,
+    override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
 
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+) : IBaseBusinessPartnerPostalAddressDto

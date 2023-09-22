@@ -17,19 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import io.swagger.v3.oas.annotations.media.Schema
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
 
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+@Schema(description = "The cleaning task's processing state together with optional business partner data in case processing is done")
+data class TaskRequesterState(
+    @get:Schema(required = true)
+    val taskId: String,
+    val businessPartnerResult: BusinessPartnerDto?,
+    @get:Schema(required = true)
+    val processingState: TaskProcessingStateDto
+)

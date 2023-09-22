@@ -25,7 +25,7 @@
 
     <artifactId>bpdm-orchestrator</artifactId>
     <name>Business Partner Data Management Orchestrator</name>
-    <description>Orchestrator component acts as a passive component and offers for each processing steps individual endpoints </description>
+    <description>Orchestrator component acts as a passive component and offers for each processing steps individual endpoints</description>
     <packaging>jar</packaging>
 
     <parent>
@@ -38,6 +38,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>bpdm-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>bpdm-orchestrator-api</artifactId>
         </dependency>
 
         <dependency>

@@ -17,19 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
+data class AlternativePostalAddressDto(
+    override val geographicCoordinates: GeoCoordinateDto? = null,
+    override val country: CountryCode? = null,
+    override val administrativeAreaLevel1: String? = null,
+    override val postalCode: String? = null,
+    override val city: String? = null,
+    override val deliveryServiceType: DeliveryServiceType? = null,
+    override val deliveryServiceQualifier: String? = null,
+    override val deliveryServiceNumber: String? = null
 
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+) : IBaseAlternativePostalAddressDto

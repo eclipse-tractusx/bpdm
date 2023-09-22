@@ -17,19 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
-    }
-
+enum class TaskMode {
+    UpdateFromSharingMember,
+    UpdateFromPool
 }

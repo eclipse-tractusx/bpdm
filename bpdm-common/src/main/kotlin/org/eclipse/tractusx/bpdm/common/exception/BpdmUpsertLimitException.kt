@@ -17,19 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.bpdm.common.exception
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmUpsertLimitException(
+    actualSize: Int,
+    limit: Int
+) : RuntimeException("The number of upsertable items ($actualSize) surpasses the upsert limit of $limit")

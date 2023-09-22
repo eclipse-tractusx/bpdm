@@ -17,19 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import io.swagger.v3.oas.annotations.media.Schema
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
-    }
+@Schema(description = "Response object for giving a list of created cleaning tasks")
+data class TaskCreateResponse(
+    val createdTasks: List<TaskRequesterState>
+) {
 
 }
+
+
