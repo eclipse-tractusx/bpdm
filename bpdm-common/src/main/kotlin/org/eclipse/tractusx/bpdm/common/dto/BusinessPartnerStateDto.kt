@@ -17,18 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(description = "Postal address of a output business partner", requiredProperties = ["physicalPostalAddress"])
-data class BusinessPartnerPostalAddressOutputDto(
+@Schema(description = LegalEntityStateDescription.header, requiredProperties = ["type"])
+data class BusinessPartnerStateDto(
 
-    override val addressType: AddressType,
-    override val physicalPostalAddress: PhysicalPostalAddressGateDto,
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+    @get:Schema(description = "Date since when the status is/was valid.")
+    val validFrom: LocalDateTime?,
 
-) : IBaseBusinessPartnerPostalAddressDto
+    @get:Schema(description = "Date until the status was valid, if applicable.")
+    val validTo: LocalDateTime?,
+
+    @get:Schema(description = "The type of this specified status.")
+    val type: BusinessStateType,
+
+    @get:Schema(description = "Denotation of the status.")
+    val description: String?
+)

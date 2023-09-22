@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.api.model.AddressType
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
 

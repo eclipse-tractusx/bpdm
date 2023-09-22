@@ -20,11 +20,14 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import java.time.Instant
-
 
 @Schema(description = "Generic business partner output with external id", requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"])
 data class BusinessPartnerOutputDto(
@@ -36,12 +39,8 @@ data class BusinessPartnerOutputDto(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-
-    @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: BusinessPartnerPostalAddressOutputDto,
-
+    override val postalAddress: BusinessPartnerPostalAddressOutputDto,
     override val isOwner: Boolean,
-
     override val bpnL: String,
     override val bpnS: String?,
     override val bpnA: String,
@@ -52,4 +51,4 @@ data class BusinessPartnerOutputDto(
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant
 
-) : IBaseBusinessPartnerDto
+) : IBaseBusinessPartnerGateDto

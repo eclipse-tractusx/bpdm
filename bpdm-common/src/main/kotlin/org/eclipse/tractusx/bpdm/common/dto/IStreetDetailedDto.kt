@@ -17,18 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 
-@Schema(description = "Postal address of a output business partner", requiredProperties = ["physicalPostalAddress"])
-data class BusinessPartnerPostalAddressOutputDto(
+interface IStreetDetailedDto : IBaseStreetDto {
 
-    override val addressType: AddressType,
-    override val physicalPostalAddress: PhysicalPostalAddressGateDto,
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+    @get:Schema(description = StreetDescription.namePrefix)
+    val namePrefix: String?
 
-) : IBaseBusinessPartnerPostalAddressDto
+    @get:Schema(description = StreetDescription.additionalNamePrefix)
+    val additionalNamePrefix: String?
+
+    @get:Schema(description = StreetDescription.nameSuffix)
+    val nameSuffix: String?
+
+    @get:Schema(description = StreetDescription.additionalNameSuffix)
+    val additionalNameSuffix: String?
+}

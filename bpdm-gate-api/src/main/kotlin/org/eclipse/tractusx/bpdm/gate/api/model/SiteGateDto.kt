@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 

@@ -17,18 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-
 
 interface IBaseBusinessPartnerDto {
-
-    @get:Schema(description = CommonDescription.externalId)
-    val externalId: String
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of name parts to accommodate the different number of name fields in different systems."))
     val nameParts: List<String>
@@ -50,6 +44,9 @@ interface IBaseBusinessPartnerDto {
 
     @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>
+
+    @get:Schema(description = "Address of the official seat of this business partner.")
+    val postalAddress: IBaseBusinessPartnerPostalAddressDto
 
     @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
     val isOwner: Boolean

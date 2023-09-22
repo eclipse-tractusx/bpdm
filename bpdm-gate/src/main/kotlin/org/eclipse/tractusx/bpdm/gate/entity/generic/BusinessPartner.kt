@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerRole
 import java.util.*
 
 @Entity

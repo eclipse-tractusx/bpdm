@@ -17,9 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.openapidescription
+package org.eclipse.tractusx.bpdm.common.dto
 
-object BusinessPartnerAddressDescription {
+import io.swagger.v3.oas.annotations.media.Schema
 
-    const val addressType = "Type of the address"
-}
+@Schema(
+    description = "Identifier record for a business partner",
+    requiredProperties = ["type", "value"]
+)
+data class BusinessPartnerIdentifierDto(
+
+    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
+    val type: String,
+
+    @get:Schema(description = "Value of the identifier")
+    val value: String,
+
+    @get:Schema(description = "Body which issued the identifier")
+    val issuingBody: String?
+)

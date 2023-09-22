@@ -25,15 +25,9 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 @Schema(description = StreetDescription.header)
 data class StreetDto(
 
-    @get:Schema(description = StreetDescription.name)
-    val name: String? = null,
+    override val name: String? = null,
+    override val houseNumber: String? = null,
+    override val milestone: String? = null,
+    override val direction: String? = null
 
-    @get:Schema(description = StreetDescription.houseNumber)
-    val houseNumber: String? = null,
-
-    @get:Schema(description = StreetDescription.milestone)
-    val milestone: String? = null,
-
-    @get:Schema(description = StreetDescription.direction)
-    val direction: String? = null
-)
+) : IBaseStreetDto

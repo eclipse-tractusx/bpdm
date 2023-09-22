@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.AddressStateDto
 import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
 @Schema(description = LogisticAddressDescription.header)

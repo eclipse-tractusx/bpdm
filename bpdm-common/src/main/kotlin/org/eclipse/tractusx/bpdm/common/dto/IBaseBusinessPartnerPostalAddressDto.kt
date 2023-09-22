@@ -17,12 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
-enum class AddressType {
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-    LegalAndSiteMainAddress,
-    LegalAddress,
-    SiteMainAddress,
-    AdditionalAddress
+interface IBaseBusinessPartnerPostalAddressDto {
+
+    @get:Schema(description = "Type of the address")
+    val addressType: AddressType?
+
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
+    val physicalPostalAddress: IBasePhysicalPostalAddressDto?
+
+    // TODO OpenAPI description for complex field does not work!!
+    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
+    val alternativePostalAddress: IBaseAlternativePostalAddressDto?
 }

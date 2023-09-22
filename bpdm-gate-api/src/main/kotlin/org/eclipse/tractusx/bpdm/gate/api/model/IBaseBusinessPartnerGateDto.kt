@@ -20,15 +20,11 @@
 package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 
-@Schema(description = "Postal address of a output business partner", requiredProperties = ["physicalPostalAddress"])
-data class BusinessPartnerPostalAddressOutputDto(
+interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
 
-    override val addressType: AddressType,
-    override val physicalPostalAddress: PhysicalPostalAddressGateDto,
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
-
-) : IBaseBusinessPartnerPostalAddressDto
+    @get:Schema(description = CommonDescription.externalId)
+    val externalId: String
+}
