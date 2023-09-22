@@ -64,6 +64,11 @@ import org.springframework.web.service.invoker.HttpRequestValues
 import org.springframework.web.service.invoker.HttpServiceArgumentResolver
 import kotlin.reflect.full.memberProperties
 
+/**
+ * This handles complex parameters with ParameterObject annotation in API controller methods, e.g. PaginationRequest.
+ * For executing an API call we want all the parameter-object's properties added to the request as individual query parameters.
+ * This doesn't work out of the box, so we added this HttpServiceArgumentResolver that can be added to HttpServiceProxyFactory.
+ */
 class ParameterObjectArgumentResolver : HttpServiceArgumentResolver {
     val conversionService = DefaultFormattingConversionService()
     override fun resolve(argument: Any?, parameter: MethodParameter, requestValues: HttpRequestValues.Builder): Boolean {
@@ -76,8 +81,8 @@ class ParameterObjectArgumentResolver : HttpServiceArgumentResolver {
                     is String -> propValue
                     else -> conversionService.convert(propValue, String::class.java)
                 }
-                if(propValue != null ){
-                    requestValues.addRequestParameter (propName, propValueString)
+                if (propValue != null) {
+                    requestValues.addRequestParameter(propName, propValueString)
                 }
             }
             return true

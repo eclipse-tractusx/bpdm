@@ -26,10 +26,15 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 import java.time.Duration
 
+/**
+ * In a Spring configuration a bean of this class is instantiated passing a webClientProvider which configures the web client with e.g. OIDC configuration.
+ * A lazy HttpServiceProxyFactory private property is defined: On first access it creates a HttpServiceProxyFactory configured with the web client.
+ * Several lazy API clients are defined: On first access they are created from the HttpServiceProxyFactory for the specific API interface.
+ * All this has to be done lazily because during integration tests the web client URL may not be available yet on Spring initialization.
+ */
 class PoolClientImpl(
     private val webClientProvider: () -> WebClient
 ) : PoolApiClient {
-
 
     private val httpServiceProxyFactory: HttpServiceProxyFactory by lazy {
         HttpServiceProxyFactory
