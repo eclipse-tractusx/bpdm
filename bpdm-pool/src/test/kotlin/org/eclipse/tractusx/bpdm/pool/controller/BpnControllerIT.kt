@@ -85,7 +85,7 @@ class BpnControllerIT @Autowired constructor(
         val identifiersSearchRequest =
             IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, identifierValue2))
 
-        val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
+        val bpnIdentifierMappings = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1, identifierValue2)
     }
@@ -100,7 +100,7 @@ class BpnControllerIT @Autowired constructor(
         val identifiersSearchRequest =
             IdentifiersSearchRequest(IdentifierBusinessPartnerType.LEGAL_ENTITY, identifierType, listOf(identifierValue1, "someNonexistentSaasId"))
 
-        val bpnIdentifierMappings = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest).body
+        val bpnIdentifierMappings = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest).body
 
         assertThat(bpnIdentifierMappings!!.map { it.idValue }).containsExactlyInAnyOrder(identifierValue1)
     }

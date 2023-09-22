@@ -125,7 +125,7 @@ class AddressControllerIT @Autowired constructor(
 
         val searchRequest = AddressPartnerBpnSearchRequest(addresses = listOf(bpnA1, bpnA2))
         val searchResult =
-            poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
+            poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
             ResponseValues.addressPartner1,
@@ -158,7 +158,7 @@ class AddressControllerIT @Autowired constructor(
         val bpnL2 = createdStructures[1].legalEntity.legalEntity.bpnl
 
         val searchRequest = AddressPartnerBpnSearchRequest(legalEntities = listOf(bpnL2))
-        val searchResult = poolClient.addresses().searchAddresses(searchRequest, PaginationRequest())
+        val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
             ResponseValues.addressPartner2.copy(isLegalAddress = true),
@@ -203,7 +203,7 @@ class AddressControllerIT @Autowired constructor(
 
         // search for site1 -> main address and 2 regular addresses
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS1))
-            .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
+            .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
@@ -216,7 +216,7 @@ class AddressControllerIT @Autowired constructor(
 
         // search for site2 -> main address and 1 regular address
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS2))       // search for site2
-            .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
+            .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
@@ -228,7 +228,7 @@ class AddressControllerIT @Autowired constructor(
 
         // search for site1 and site2 -> 2 main addresses and 3 regular addresses
         AddressPartnerBpnSearchRequest(sites = listOf(bpnS2, bpnS1))    // search for site1 and site2
-            .let { poolClient.addresses().searchAddresses(it, PaginationRequest()) }
+            .let { poolClient.addresses.searchAddresses(it, PaginationRequest()) }
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
@@ -276,7 +276,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate3.copy(bpnParent = bpnS)
         )
 
-        val response = poolClient.addresses().createAddresses(toCreate)
+        val response = poolClient.addresses.createAddresses(toCreate)
 
         assertCreatedAddressesAreEqual(response.entities, expected)
 //        response.entities.forEach { assertThat(it.address.bpn).matches(testHelpers.bpnAPattern) }
@@ -294,7 +294,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `create new addresses and get duplicate error`() {
 
-        poolClient.metadata().createIdentifierType(
+        poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
@@ -316,7 +316,7 @@ class AddressControllerIT @Autowired constructor(
         val toCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL)
         val secondCreate = RequestValues.addressPartnerCreate5.copy(bpnParent = bpnL, index = CommonValues.index4)
 
-        val response = poolClient.addresses().createAddresses(listOf(toCreate, secondCreate))
+        val response = poolClient.addresses.createAddresses(listOf(toCreate, secondCreate))
 
 
         assertThat(response.errorCount).isEqualTo(2)
@@ -335,7 +335,7 @@ class AddressControllerIT @Autowired constructor(
     @Test
     fun `update address entities and get duplicate identifier error`() {
 
-        poolClient.metadata().createIdentifierType(
+        poolClient.metadata.createIdentifierType(
             IdentifierTypeDto(
                 technicalKey = addressIdentifier.type,
                 businessPartnerType = IdentifierBusinessPartnerType.ADDRESS, name = addressIdentifier.value
@@ -376,7 +376,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1, address = RequestValues.logisticAddress5)
         )
 
-        val response = poolClient.addresses().updateAddresses(toUpdate)
+        val response = poolClient.addresses.updateAddresses(toUpdate)
 
         assertThat(response.errorCount).isEqualTo(3)
         assertThat(response.entityCount).isEqualTo(0)
@@ -393,7 +393,7 @@ class AddressControllerIT @Autowired constructor(
      */
     @Test
     fun `don't create addresses with non-existent parent`() {
-        val bpnL = poolClient.legalEntities().createBusinessPartners(listOf(RequestValues.legalEntityCreate1))
+        val bpnL = poolClient.legalEntities.createBusinessPartners(listOf(RequestValues.legalEntityCreate1))
             .entities.single().legalEntity.bpnl
 
         val expected = listOf(
@@ -415,7 +415,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerCreate3.copy(bpnParent = completelyInvalidBpn),
         )
 
-        val response = poolClient.addresses().createAddresses(toCreate)
+        val response = poolClient.addresses.createAddresses(toCreate)
         assertCreatedAddressesAreEqual(response.entities, expected)
 //        response.entities.forEach { assertThat(it.address.bpn).matches(testHelpers.bpnAPattern) }
 //        testHelpers.assertRecursively(response.entities).ignoringFields(LogisticAddressResponse::bpn.name).isEqualTo(expected)
@@ -467,7 +467,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate3.copy(bpna = bpnA1)
         )
 
-        val response = poolClient.addresses().updateAddresses(toUpdate)
+        val response = poolClient.addresses.updateAddresses(toUpdate)
 
         assertAddressesAreEqual(response.entities, expected)
         assertThat(response.errorCount).isEqualTo(0)
@@ -508,7 +508,7 @@ class AddressControllerIT @Autowired constructor(
             RequestValues.addressPartnerUpdate3.copy(bpna = secondInvalidBpn)
         )
 
-        val response = poolClient.addresses().updateAddresses(toUpdate)
+        val response = poolClient.addresses.updateAddresses(toUpdate)
 
         assertAddressesAreEqual(response.entities, expected)
 
@@ -541,9 +541,9 @@ class AddressControllerIT @Autowired constructor(
             .isEqualTo(expected)
     }
 
-    private fun requestAddress(bpnAddress: String) = poolClient.addresses().getAddress(bpnAddress)
+    private fun requestAddress(bpnAddress: String) = poolClient.addresses.getAddress(bpnAddress)
 
     private fun requestAddressesOfLegalEntity(bpn: String) =
-        poolClient.legalEntities().getAddresses(bpn, PaginationRequest())
+        poolClient.legalEntities.getAddresses(bpn, PaginationRequest())
 
 }

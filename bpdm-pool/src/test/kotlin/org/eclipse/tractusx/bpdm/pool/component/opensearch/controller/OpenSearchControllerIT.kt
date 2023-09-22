@@ -144,7 +144,7 @@ class OpenSearchControllerIT @Autowired constructor(
         assertSearchableByNames(names)
 
         //clear the index
-        poolClient.opensearch().clear()
+        poolClient.opensearch.clear()
 
         //check that the partners can really not be searched anymore
         names.forEach { assertThat(searchBusinessPartnerByName(it)).matches { it.contentSize == 0 } }
@@ -163,7 +163,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
 
         //clear the index
-        poolClient.opensearch().clear()
+        poolClient.opensearch.clear()
 
 
         //export partners again
@@ -176,7 +176,7 @@ class OpenSearchControllerIT @Autowired constructor(
 
     private fun searchBusinessPartnerByName(name: String): PageDto<LegalEntityMatchVerboseDto> {
 
-        return poolClient.legalEntities().getLegalEntities(
+        return poolClient.legalEntities.getLegalEntities(
             LegalEntityPropertiesSearchRequest(name),
             PaginationRequest()
         )

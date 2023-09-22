@@ -23,19 +23,19 @@ import org.eclipse.tractusx.bpdm.pool.api.*
 
 interface PoolApiClient {
 
-    fun addresses(): PoolAddressApi
+    val addresses: PoolAddressApi
 
-    fun bpns(): PoolBpnApi
+    val bpns: PoolBpnApi
 
-    fun changelogs(): PoolChangelogApi
+    val changelogs: PoolChangelogApi
 
-    fun legalEntities(): PoolLegalEntityApi
+    val legalEntities: PoolLegalEntityApi
 
-    fun metadata(): PoolMetadataApi
+    val metadata: PoolMetadataApi
 
-    fun sites(): PoolSiteApi
+    val sites: PoolSiteApi
 
-    fun opensearch(): PoolOpenSearchApi
+    val opensearch: PoolOpenSearchApi
 
-    fun saas(): PoolSaasApi
+    val saas: PoolSaasApi
 }

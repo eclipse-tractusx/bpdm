@@ -83,7 +83,7 @@ class AddressControllerSearchIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
 
-        poolClient.opensearch().clear()
+        poolClient.opensearch.clear()
         testHelpers.createTestMetadata()
 
 
@@ -111,7 +111,7 @@ class AddressControllerSearchIT @Autowired constructor(
         val addressSearchRequest = AddressPartnerSearchRequest()
         addressSearchRequest.name = RequestValues.addressPartnerCreate4.address.name
 
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
+        val pageResponse = poolClient.addresses.getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
     }
@@ -131,7 +131,7 @@ class AddressControllerSearchIT @Autowired constructor(
         val addressSearchRequest = AddressPartnerSearchRequest()
         addressSearchRequest.name = "NONEXISTENT"
 
-        val pageResponse = poolClient.addresses().getAddresses(addressSearchRequest, PaginationRequest())
+        val pageResponse = poolClient.addresses.getAddresses(addressSearchRequest, PaginationRequest())
 
         assertPageEquals(pageResponse, expected)
     }

@@ -78,7 +78,7 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
 
-        poolClient.legalEntities().updateBusinessPartners(
+        poolClient.legalEntities.updateBusinessPartners(
             listOf(
                 RequestValues.legalEntityUpdate1.copy(bpnl = bpnL1),
                 RequestValues.legalEntityUpdate2.copy(bpnl = bpnL2)
@@ -101,7 +101,7 @@ class ChangelogControllerIT @Autowired constructor(
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
-        val actualChangelog = poolClient.changelogs().getChangelogEntries(
+        val actualChangelog = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(),
             PaginationRequest()
         )
@@ -137,7 +137,7 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnMainAddress1 = createdStructures[0].siteStructures[0].site.mainAddress.bpna
         val bpnMainAddress2 = createdStructures[0].siteStructures[1].site.mainAddress.bpna
 
-        poolClient.sites().updateSite(
+        poolClient.sites.updateSite(
             listOf(
                 RequestValues.siteUpdate1.copy(bpns = bpnS1),
                 RequestValues.siteUpdate2.copy(bpns = bpnS2)
@@ -162,7 +162,7 @@ class ChangelogControllerIT @Autowired constructor(
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
-        val actualChangelog = poolClient.changelogs().getChangelogEntries(
+        val actualChangelog = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(),
             PaginationRequest()
         )
@@ -196,7 +196,7 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].addresses[0].address.bpna
         val bpnA2 = createdStructures[0].siteStructures[0].addresses[0].address.bpna
 
-        poolClient.addresses().updateAddresses(
+        poolClient.addresses.updateAddresses(
             listOf(
                 RequestValues.addressPartnerUpdate1.copy(bpna = bpnA1),
                 RequestValues.addressPartnerUpdate2.copy(bpna = bpnA2)
@@ -221,7 +221,7 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
 
-        val actualChangelog = poolClient.changelogs().getChangelogEntries(
+        val actualChangelog = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(),
             PaginationRequest()
         )
@@ -266,12 +266,12 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedSecondPage = PageDto(3, 2, 1, expectedEntriesSecondPage.size, expectedEntriesSecondPage)
 
 
-        val actualFirstPage = poolClient.changelogs().getChangelogEntries(
+        val actualFirstPage = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)),
             PaginationRequest(page = 0, size = 2)
         )
 
-        val actualSecondPage = poolClient.changelogs().getChangelogEntries(
+        val actualSecondPage = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)),
             PaginationRequest(page = 1, size = 2)
         )
@@ -325,15 +325,15 @@ class ChangelogControllerIT @Autowired constructor(
         val expectedAddressesPage = PageDto(expectedAddressEntries.size.toLong(), 1, 0, expectedAddressEntries.size, expectedAddressEntries)
 
 
-        val actualLegalEntityPage = poolClient.changelogs().getChangelogEntries(
+        val actualLegalEntityPage = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)),
             PaginationRequest()
         )
-        val actualSitePage = poolClient.changelogs().getChangelogEntries(
+        val actualSitePage = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.SITE)),
             PaginationRequest()
         )
-        val actualAddressPage = poolClient.changelogs().getChangelogEntries(
+        val actualAddressPage = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(businessPartnerTypes = setOf(BusinessPartnerType.ADDRESS)),
             PaginationRequest()
         )
@@ -374,7 +374,7 @@ class ChangelogControllerIT @Autowired constructor(
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
-        val actualChangelog = poolClient.changelogs().getChangelogEntries(
+        val actualChangelog = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(bpns = setOf(bpnL1, bpnL2)),
             PaginationRequest()
         )
@@ -419,7 +419,7 @@ class ChangelogControllerIT @Autowired constructor(
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
 
-        val actualChangelog = poolClient.changelogs().getChangelogEntries(
+        val actualChangelog = poolClient.changelogs.getChangelogEntries(
             ChangelogSearchRequest(timestampAfter = timeAfterFirstInsert, businessPartnerTypes = setOf(BusinessPartnerType.LEGAL_ENTITY)),
             PaginationRequest()
         )

@@ -83,7 +83,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -129,7 +129,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -147,7 +147,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -167,8 +167,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest1
         )
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        val legalEntity = gateClient.legalEntities().getLegalEntityByExternalId(CommonValues.externalId1)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        val legalEntity = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
 
         assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
@@ -184,7 +184,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     fun `get legal entity by external id, not found`() {
 
         try {
-            gateClient.legalEntities().getLegalEntityByExternalId("nonexistent-externalid123")
+            gateClient.legalEntities.getLegalEntityByExternalId("nonexistent-externalid123")
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
         }
@@ -218,8 +218,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
 
         val paginationValue = PaginationRequest(page, size)
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        val pageResponse = gateClient.legalEntities().getLegalEntities(paginationValue)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        val pageResponse = gateClient.legalEntities.getLegalEntities(paginationValue)
 
         val expectedPage = PageDto(
             totalElements,
@@ -260,11 +260,11 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         val contentSize = 2
 
         val paginationValue = PaginationRequest(page, size)
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
 
         val listExternalIds = legalEntities.map { it.externalId }
 
-        val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
+        val pageResponse = gateClient.legalEntities.getLegalEntitiesByExternalIds(paginationValue, listExternalIds)
 
         val expectedPage = PageDto(
             totalElements,
@@ -289,7 +289,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
 
         try {
             val paginationValue = PaginationRequest(0, 999999)
-            gateClient.legalEntities().getLegalEntities(paginationValue)
+            gateClient.legalEntities.getLegalEntities(paginationValue)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -308,7 +308,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
         } catch (e: WebClientResponseException) {
             assertEquals(HttpStatus.OK, e.statusCode)
         }

@@ -101,7 +101,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchRequest = ChangelogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1))
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
             .ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
@@ -119,7 +119,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchRequest = ChangelogSearchRequest(externalIds = setOf("NONEXIST"))
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertThat(searchResult.content)
             .usingRecursiveComparison()
@@ -154,7 +154,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchRequest = ChangelogSearchRequest(externalIds = setOf(CommonValues.externalIdAddress1), timestampAfter = instant)
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(listOf(ChangelogGateDto(CommonValues.externalIdAddress1, businessPartnerTypeParamAddress, instant, ChangelogType.CREATE)))
@@ -170,7 +170,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress))
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
@@ -191,7 +191,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     fun `get changeLog by businessPartnerType not found`() {
         val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamNotFound))
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content)
             .isEqualTo(emptyList<ChangelogEntry>())
@@ -206,7 +206,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
     fun `get changeLog by businessPartnerType and timeStamp`() {
         val searchRequest = ChangelogSearchRequest(businessPartnerTypes = setOf(businessPartnerTypeParamAddress), timestampAfter = instant)
 
-        val searchResult = gateClient.changelog().getInputChangelog(PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
@@ -227,7 +227,7 @@ internal class ChangeLogControllerIT @Autowired constructor(
 
         val searchRequest = ChangelogSearchRequest(businessPartnerTypes = emptySet(), timestampAfter = instant)
 
-        val searchResult = gateClient.changelog().getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
+        val searchResult = gateClient.changelog.getInputChangelog(paginationRequest = PaginationRequest(), searchRequest)
 
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
@@ -261,8 +261,8 @@ internal class ChangeLogControllerIT @Autowired constructor(
             RequestValues.legalEntityGateInputRequest1
         )
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntity)
-        gateClient.addresses().upsertAddresses(addresses)
+        gateClient.legalEntities.upsertLegalEntities(legalEntity)
+        gateClient.addresses.upsertAddresses(addresses)
     }
 
 }

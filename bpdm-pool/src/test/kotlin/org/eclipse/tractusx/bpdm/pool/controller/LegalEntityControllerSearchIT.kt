@@ -76,7 +76,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
 
-        poolClient.opensearch().clear()
+        poolClient.opensearch.clear()
         testHelpers.createTestMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
@@ -168,7 +168,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)
 
-        return poolClient.legalEntities().getLegalEntities(
+        return poolClient.legalEntities.getLegalEntities(
             LegalEntityPropertiesSearchRequest.EmptySearchRequest,
             PaginationRequest(page, size)
         )

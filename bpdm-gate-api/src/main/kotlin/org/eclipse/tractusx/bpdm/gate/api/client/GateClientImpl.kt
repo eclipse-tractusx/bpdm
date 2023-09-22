@@ -26,6 +26,12 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory
 import java.time.Duration
 
+/**
+ * In a Spring configuration a bean of this class is instantiated passing a webClientProvider which configures the web client with e.g. OIDC configuration.
+ * A lazy HttpServiceProxyFactory private property is defined: On first access it creates a HttpServiceProxyFactory configured with the web client.
+ * Several lazy API clients are defined: On first access they are created from the HttpServiceProxyFactory for the specific API interface.
+ * All this has to be done lazily because during integration tests the web client URL may not be available yet on Spring initialization.
+ */
 class GateClientImpl(
     private val webClientProvider: () -> WebClient
 ) : GateClient {
@@ -38,26 +44,18 @@ class GateClientImpl(
             .build()
     }
 
-    private val gateClientBusinessPartner by lazy { httpServiceProxyFactory.createClient(GateBusinessPartnerApi::class.java) }
-    private val gateClientAddress by lazy { httpServiceProxyFactory.createClient(GateAddressApi::class.java) }
-    private val gateClientLegalEntity by lazy { httpServiceProxyFactory.createClient(GateLegalEntityApi::class.java) }
-    private val gateClientSite by lazy { httpServiceProxyFactory.createClient(GateSiteApi::class.java) }
-    private val gateClientChangelog by lazy { httpServiceProxyFactory.createClient(GateChangelogApi::class.java) }
-    private val gateClientSharingState by lazy { httpServiceProxyFactory.createClient(GateSharingStateApi::class.java) }
+    override val businessParters by lazy { createClient<GateBusinessPartnerApi>() }
 
-    override fun businessParters() = gateClientBusinessPartner
+    override val addresses by lazy { createClient<GateAddressApi>() }
 
-    override fun addresses() = gateClientAddress
+    override val legalEntities by lazy { createClient<GateLegalEntityApi>() }
 
-    override fun legalEntities() = gateClientLegalEntity
+    override val sites by lazy { createClient<GateSiteApi>() }
 
-    override fun sites() = gateClientSite
+    override val changelog by lazy { createClient<GateChangelogApi>() }
 
-    override fun changelog() = gateClientChangelog
+    override val sharingState by lazy { createClient<GateSharingStateApi>() }
 
-    override fun sharingState() = gateClientSharingState
-
+    private inline fun <reified T> createClient() =
+        httpServiceProxyFactory.createClient(T::class.java)
 }
-
-
-

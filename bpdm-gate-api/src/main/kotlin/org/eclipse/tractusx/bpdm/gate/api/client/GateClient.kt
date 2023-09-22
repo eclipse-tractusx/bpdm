@@ -23,16 +23,15 @@ import org.eclipse.tractusx.bpdm.gate.api.*
 
 interface GateClient {
 
-    fun businessParters(): GateBusinessPartnerApi
+    val businessParters: GateBusinessPartnerApi
 
-    fun addresses(): GateAddressApi
+    val addresses: GateAddressApi
 
-    fun legalEntities(): GateLegalEntityApi
+    val legalEntities: GateLegalEntityApi
 
-    fun sites(): GateSiteApi
+    val sites: GateSiteApi
 
-    fun changelog(): GateChangelogApi
+    val changelog: GateChangelogApi
 
-    fun sharingState(): GateSharingStateApi
-
+    val sharingState: GateSharingStateApi
 }

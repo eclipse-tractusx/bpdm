@@ -89,7 +89,7 @@ class TestHelpers(
         partnerStructures: List<LegalEntityStructureRequest>
     ): List<LegalEntityStructureResponse> {
 
-        val legalEntities = poolClient.legalEntities().createBusinessPartners(partnerStructures.map { it.legalEntity })
+        val legalEntities = poolClient.legalEntities.createBusinessPartners(partnerStructures.map { it.legalEntity })
         val indexedLegalEntities = legalEntities.entities.associateBy { it.index }
 
         val assignedSiteRequests =
@@ -98,7 +98,7 @@ class TestHelpers(
                     site.site.copy(bpnlParent = indexedLegalEntities[it.legalEntity.index]!!.legalEntity.bpnl)
                 }
             }
-        val sitesWithErrorsResponse = poolClient.sites().createSite(assignedSiteRequests)
+        val sitesWithErrorsResponse = poolClient.sites.createSite(assignedSiteRequests)
         val indexedSites = sitesWithErrorsResponse.entities.associateBy { it.index }
 
         val assignedSitelessAddresses =
@@ -114,7 +114,7 @@ class TestHelpers(
                     it.addresses.map { address -> address.copy(bpnParent = indexedSites[it.site.index]!!.site.bpns) }
                 }
 
-        val addresses = poolClient.addresses().createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
+        val addresses = poolClient.addresses.createAddresses(assignedSitelessAddresses + assignedSiteAddresses).entities
 
         val indexedAddresses = addresses.associateBy { it.index }
 
@@ -134,7 +134,7 @@ class TestHelpers(
 
     fun `get address by bpn-a, not found`(bpn: String) {
         try {
-            val result = poolClient.addresses().getAddress(bpn)
+            val result = poolClient.addresses.getAddress(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -143,7 +143,7 @@ class TestHelpers(
 
     fun `find bpns by identifiers, bpn request limit exceeded`(identifiersSearchRequest: IdentifiersSearchRequest) {
         try {
-            val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
+            val result = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest)
 
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
@@ -153,7 +153,7 @@ class TestHelpers(
 
     fun `find bpns by nonexistent identifier type`(identifiersSearchRequest: IdentifiersSearchRequest) {
         try {
-            val result = poolClient.bpns().findBpnsByIdentifiers(identifiersSearchRequest)
+            val result = poolClient.bpns.findBpnsByIdentifiers(identifiersSearchRequest)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -162,7 +162,7 @@ class TestHelpers(
 
     fun `set business partner currentness using nonexistent bpn`(bpn: String) {
         try {
-            val result = poolClient.legalEntities().setLegalEntityCurrentness(bpn)
+            val result = poolClient.legalEntities.setLegalEntityCurrentness(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -171,7 +171,7 @@ class TestHelpers(
 
     fun `get site by bpn-s, not found`(bpn: String) {
         try {
-            val result = poolClient.sites().getSite(bpn)
+            val result = poolClient.sites.getSite(bpn)
             assertThrows<WebClientResponseException> { result }
         } catch (e: WebClientResponseException) {
             Assert.assertEquals(HttpStatus.NOT_FOUND, e.statusCode)
@@ -184,13 +184,13 @@ class TestHelpers(
      */
     fun createTestMetadata() {
 
-        poolClient.metadata().createLegalForm(RequestValues.legalForm1)
-        poolClient.metadata().createLegalForm(RequestValues.legalForm2)
-        poolClient.metadata().createLegalForm(RequestValues.legalForm3)
+        poolClient.metadata.createLegalForm(RequestValues.legalForm1)
+        poolClient.metadata.createLegalForm(RequestValues.legalForm2)
+        poolClient.metadata.createLegalForm(RequestValues.legalForm3)
 
-        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto1)
-        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto2)
-        poolClient.metadata().createIdentifierType(RequestValues.identifierTypeDto3)
+        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto1)
+        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto2)
+        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto3)
     }
 
 

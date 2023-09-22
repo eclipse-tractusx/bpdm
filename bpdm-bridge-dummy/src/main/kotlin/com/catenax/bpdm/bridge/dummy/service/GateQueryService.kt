@@ -46,7 +46,7 @@ class GateQueryService(
         val content = mutableListOf<ChangelogGateDto>()
 
         do {
-            val pageResponse = gateClient.changelog().getInputChangelog(
+            val pageResponse = gateClient.changelog.getInputChangelog(
                 searchRequest = ChangelogSearchRequest(timestampAfter = modifiedAfter),
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
@@ -123,7 +123,7 @@ class GateQueryService(
         val content = mutableListOf<SharingStateDto>()
 
         do {
-            val pageResponse = gateClient.sharingState().getSharingStates(
+            val pageResponse = gateClient.sharingState.getSharingStates(
                 businessPartnerType = businessPartnerType,
                 externalIds = externalIds,
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
@@ -148,7 +148,7 @@ class GateQueryService(
         val validContent = mutableListOf<LegalEntityGateInputDto>()
 
         do {
-            val pageResponse = gateClient.legalEntities().getLegalEntitiesByExternalIds(
+            val pageResponse = gateClient.legalEntities.getLegalEntitiesByExternalIds(
                 externalIds = externalIds,
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
@@ -169,7 +169,7 @@ class GateQueryService(
         val validContent = mutableListOf<SiteGateInputDto>()
 
         do {
-            val pageResponse = gateClient.sites().getSitesByExternalIds(
+            val pageResponse = gateClient.sites.getSitesByExternalIds(
                 externalIds = externalIds,
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )
@@ -190,7 +190,7 @@ class GateQueryService(
         val validContent = mutableListOf<AddressGateInputDto>()
 
         do {
-            val pageResponse = gateClient.addresses().getAddressesByExternalIds(
+            val pageResponse = gateClient.addresses.getAddressesByExternalIds(
                 externalIds = externalIds,
                 paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
             )

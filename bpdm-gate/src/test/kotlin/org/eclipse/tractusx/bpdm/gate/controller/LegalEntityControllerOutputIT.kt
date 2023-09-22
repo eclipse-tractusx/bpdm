@@ -87,8 +87,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntities(legalEntities)
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+            gateClient.legalEntities.upsertLegalEntities(legalEntities)
+            gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.OK, e.statusCode)
         }
@@ -115,7 +115,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         )
 
         try {
-            gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+            gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
         } catch (e: WebClientResponseException) {
             Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
         }
@@ -154,10 +154,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
         val paginationValue = PaginationRequest(page, size)
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
 
-        val pageResponse = gateClient.legalEntities().getLegalEntitiesOutput(paginationValue, emptyList())
+        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, emptyList())
 
         val expectedPage = PageDto(
             totalElements,
@@ -204,10 +204,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
 
         val paginationValue = PaginationRequest(page, size)
 
-        gateClient.legalEntities().upsertLegalEntities(legalEntities)
-        gateClient.legalEntities().upsertLegalEntitiesOutput(legalEntitiesOutput)
+        gateClient.legalEntities.upsertLegalEntities(legalEntities)
+        gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
 
-        val pageResponse = gateClient.legalEntities().getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1, CommonValues.externalId2))
+        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1, CommonValues.externalId2))
 
         val expectedPage = PageDto(
             totalElements,

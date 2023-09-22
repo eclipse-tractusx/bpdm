@@ -73,10 +73,10 @@ class TestHelpers(
         val identifierTypeDto4 =
             IdentifierTypeDto(CommonValues.identifierTypeTechnicalKey4, IdentifierBusinessPartnerType.LEGAL_ENTITY, CommonValues.identifierTypeName4)
 
-        poolClient.metadata().createIdentifierType(identifierTypeDto1)
-        poolClient.metadata().createIdentifierType(identifierTypeDto2)
-        poolClient.metadata().createIdentifierType(identifierTypeDto3)
-        poolClient.metadata().createIdentifierType(identifierTypeDto4)
+        poolClient.metadata.createIdentifierType(identifierTypeDto1)
+        poolClient.metadata.createIdentifierType(identifierTypeDto2)
+        poolClient.metadata.createIdentifierType(identifierTypeDto3)
+        poolClient.metadata.createIdentifierType(identifierTypeDto4)
 
         val legalForm1 = LegalFormRequest(
             technicalKey = CommonValues.legalFormTechnicalKey1,
@@ -89,7 +89,7 @@ class TestHelpers(
             abbreviation = CommonValues.legalFormAbbreviation2,
         )
 
-        poolClient.metadata().createLegalForm(legalForm1)
-        poolClient.metadata().createLegalForm(legalForm2)
+        poolClient.metadata.createLegalForm(legalForm1)
+        poolClient.metadata.createLegalForm(legalForm2)
     }
 }
