@@ -19,11 +19,33 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
+import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 
 object RequestValues {
+
+    val bpIdentifier1 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey1,
+        value = CommonValues.identifierValue1,
+        issuingBody = CommonValues.identifierIssuingBody1
+    )
+
+    val bpIdentifier2 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey2,
+        value = CommonValues.identifierValue2,
+        issuingBody = CommonValues.identifierIssuingBody2
+    )
+
+    val bpIdentifier3 = BusinessPartnerIdentifierDto(
+        type = CommonValues.identifierTypeTechnicalKey3,
+        value = CommonValues.identifierValue3,
+        issuingBody = null
+    )
+
     val identifier1 =
         LegalEntityIdentifierDto(
             value = CommonValues.identifierValue1,
@@ -49,13 +71,19 @@ object RequestValues {
             issuingBody = CommonValues.identifierIssuingBodyName4,
         )
 
-    val genericIdentifier =
-        GenericIdentifierDto(
-            CommonValues.identifierValue1,
-            CommonValues.identifierTypeTechnicalKey1
-        )
+    val bpState1 = BusinessPartnerStateDto(
+        validFrom = CommonValues.businessStatusValidFrom1,
+        validTo = CommonValues.businessStatusValidUntil1,
+        type = BusinessStateType.ACTIVE,
+        description = CommonValues.businessStatusDescription1
+    )
 
-    val name1 = NameDto(value = CommonValues.name1, shortName = CommonValues.shortName1)
+    val bpState2 = BusinessPartnerStateDto(
+        validFrom = CommonValues.businessStatusValidFrom2,
+        validTo = CommonValues.businessStatusValidUntil2,
+        type = BusinessStateType.INACTIVE,
+        description = CommonValues.businessStatusDescription2
+    )
 
     val leBusinessStatus1 = LegalEntityStateDto(
         description = CommonValues.businessStatusDescription1,
@@ -109,11 +137,59 @@ object RequestValues {
         value = CommonValues.classificationValue4
     )
 
-    val geoCoordinate1 = GeoCoordinateDto(CommonValues.geoCoordinates1.first, CommonValues.geoCoordinates1.second)
-    val geoCoordinate2 = GeoCoordinateDto(CommonValues.geoCoordinates2.first, CommonValues.geoCoordinates2.second)
+    val classificationChina = ClassificationDto(
+        type = CommonValues.classificationType,
+        code = CommonValues.classificationCode3,
+        value = CommonValues.classificationValueChina
+    )
+
+    val physicalAddressMinimal = PhysicalPostalAddressGateDto(
+        country = CommonValues.country1,
+        city = CommonValues.city1,
+        geographicCoordinates = null,
+        postalCode = null,
+        administrativeAreaLevel1 = null,
+        administrativeAreaLevel2 = null,
+        administrativeAreaLevel3 = null,
+        district = null,
+        companyPostalCode = null,
+        industrialZone = null,
+        building = null,
+        floor = null,
+        door = null,
+        street = null,
+    )
+
+    val physicalAddressChina = PhysicalPostalAddressGateDto(
+        country = CountryCode.CH,
+        city = CommonValues.cityChina,
+        geographicCoordinates = null,
+        postalCode = null,
+        administrativeAreaLevel1 = CommonValues.adminAreaChina,
+        administrativeAreaLevel2 = null,
+        administrativeAreaLevel3 = null,
+        district = null,
+        companyPostalCode = null,
+        industrialZone = null,
+        building = null,
+        floor = null,
+        door = null,
+        street = null,
+    )
+
+    val alternativeAddressFull = AlternativePostalAddressDto(
+        country = CommonValues.country1,
+        city = CommonValues.city1,
+        deliveryServiceType = DeliveryServiceType.PO_BOX,
+        deliveryServiceQualifier = "DHL",
+        deliveryServiceNumber = "1234",
+        geographicCoordinates = CommonValues.geoCoordinates2,
+        postalCode = CommonValues.postCode2,
+        administrativeAreaLevel1 = CommonValues.adminAreaLevel1RegionCode_2,
+    )
 
     val postalAddress1 = PhysicalPostalAddressGateDto(
-        geographicCoordinates = geoCoordinate1,
+        geographicCoordinates = CommonValues.geoCoordinates1,
         country = CommonValues.country1,
         postalCode = CommonValues.postCode1,
         city = CommonValues.city1,
@@ -130,7 +206,7 @@ object RequestValues {
     )
 
     val postalAddress2 = PhysicalPostalAddressGateDto(
-        geographicCoordinates = geoCoordinate2,
+        geographicCoordinates = CommonValues.geoCoordinates2,
         country = CommonValues.country2,
         postalCode = CommonValues.postCode2,
         city = CommonValues.city2,
@@ -146,7 +222,7 @@ object RequestValues {
         street = StreetGateDto(name = CommonValues.street2, houseNumber = CommonValues.houseNumber2, direction = CommonValues.direction2),
     )
     val postalAddress3 = PhysicalPostalAddressGateDto(
-        geographicCoordinates = geoCoordinate1,
+        geographicCoordinates = CommonValues.geoCoordinates1,
         country = CommonValues.country1,
         postalCode = CommonValues.postCode1,
         city = CommonValues.city1,
@@ -164,7 +240,7 @@ object RequestValues {
 
     //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressGateDto(
-        geographicCoordinates = geoCoordinate1,
+        geographicCoordinates = CommonValues.geoCoordinates1,
         country = CommonValues.country1,
         postalCode = CommonValues.postCode1,
         city = CommonValues.city1,
@@ -181,7 +257,7 @@ object RequestValues {
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressGateDto(
-        geographicCoordinates = geoCoordinate2,
+        geographicCoordinates = CommonValues.geoCoordinates2,
         country = CommonValues.country2,
         postalCode = CommonValues.postCode2,
         city = CommonValues.city2,
@@ -218,6 +294,58 @@ object RequestValues {
         physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
+
+    val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressInputDto(
+        addressType = AddressType.LegalAddress,
+        physicalPostalAddress = postalAddress2,
+        alternativePostalAddress = alternativeAddressFull
+    )
+
+    val bpPostalAddressInputDtoMinimal = BusinessPartnerPostalAddressInputDto(
+        addressType = null,
+        physicalPostalAddress = physicalAddressMinimal
+    )
+
+    val bpPostalAddressInputDtoChina = BusinessPartnerPostalAddressInputDto(
+        addressType = AddressType.LegalAndSiteMainAddress,
+        physicalPostalAddress = physicalAddressChina
+    )
+
+    val bpInputRequestFull = BusinessPartnerInputRequest(
+        externalId = CommonValues.externalId1,
+        nameParts = listOf(CommonValues.name1, CommonValues.name2, CommonValues.name3, CommonValues.name4),
+        shortName = CommonValues.shortName1,
+        legalForm = CommonValues.legalFormName1,
+        isOwner = true,
+        identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
+        classifications = listOf(classification1, classification2, classification3),
+        states = listOf(bpState1, bpState2),
+        roles = listOf(BusinessPartnerRole.SUPPLIER),
+        postalAddress = bpPostalAddressInputDtoFull,
+        bpnL = CommonValues.bpn1,
+        bpnA = CommonValues.bpnAddress1
+    )
+
+    val bpInputRequestMinimal = BusinessPartnerInputRequest(
+        externalId = CommonValues.externalId2,
+        postalAddress = bpPostalAddressInputDtoMinimal
+    )
+
+    val bpInputRequestChina = BusinessPartnerInputRequest(
+        externalId = CommonValues.externalId3,
+        nameParts = listOf(CommonValues.nameChina),
+        shortName = CommonValues.shortName3,
+        legalForm = CommonValues.legalFormAbbreviationChina,
+        isOwner = true,
+        identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier1),          // duplicate, but they are elimnated
+        classifications = listOf(classificationChina, classification3, classificationChina),    // duplicate, but they are elimnated
+        states = listOf(bpState2, bpState1),
+        roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
+        postalAddress = bpPostalAddressInputDtoChina,
+        bpnL = CommonValues.bpn3,
+        bpnS = CommonValues.bpnSite3,
+        bpnA = CommonValues.bpnAddress1
+    )
 
     val legalEntity1 = LegalEntityDto(
         legalShortName = CommonValues.shortName1,
