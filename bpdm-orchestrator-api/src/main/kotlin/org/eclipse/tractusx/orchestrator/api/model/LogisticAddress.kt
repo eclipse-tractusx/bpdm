@@ -19,13 +19,25 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
-)
+data class LogisticAddress(
+    @get:Schema(description = "A reference to the BPNA of this address. Either by the BPN value itself or a BPN request identifier.")
+    val bpnAReference: BpnReference? = null,
+
+    @get:Schema(description = "Whether this address data is different from its golden record counterpart in the Pool")
+    val hasChanged: Boolean? = null,
+
+    @get:Schema(description = LogisticAddressDescription.name)
+    val name: String? = null,
+
+    override val states: Collection<AddressState> = emptyList(),
+
+    override val identifiers: Collection<AddressIdentifier> = emptyList(),
+
+    override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
+
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+) : IBaseLogisticAddressDto

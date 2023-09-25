@@ -21,91 +21,41 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.util.DummyValues
 import org.eclipse.tractusx.orchestrator.api.CleaningTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 
 @RestController
 class CleaningTaskController(
     val apiConfigProperties: ApiConfigProperties
 ) : CleaningTaskApi {
 
-    //While we don't have an implementation use a dummy response for the endpoints
-    val dummyResponseCreateTask =
-        TaskCreateResponse(
-            listOf(
-                TaskRequesterState(
-                    taskId = "0",
-                    businessPartnerResult = null,
-                    processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
-                        resultState = ResultState.Pending,
-                        errors = emptyList(),
-                        createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
-                ),
-                TaskRequesterState(
-                    taskId = "1",
-                    businessPartnerResult = null,
-                    processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
-                        resultState = ResultState.Pending,
-                        errors = emptyList(),
-                        createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
-                )
-            )
-        )
-
-    //While we don't have an implementation use a dummy response for the endpoints
-    val dummyResponseTaskState =
-        TaskStateResponse(
-            listOf(
-                TaskRequesterState(
-                    taskId = "0",
-                    businessPartnerResult = null,
-                    processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
-                        resultState = ResultState.Pending,
-                        errors = emptyList(),
-                        createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
-                ),
-                TaskRequesterState(
-                    taskId = "1",
-                    businessPartnerResult = null,
-                    processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.Clean,
-                        reservationState = ReservationState.Queued,
-                        resultState = ResultState.Pending,
-                        errors = emptyList(),
-                        createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
-                )
-            )
-        )
-
-
     override fun createCleaningTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         if (createRequest.businessPartners.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.businessPartners.size, apiConfigProperties.upsertLimit)
 
         //ToDo: Replace with service logic
-        return dummyResponseCreateTask
+        return DummyValues.dummyResponseCreateTask
+    }
+
+    override fun reserveCleaningTasks(reservationRequest: CleaningReservationRequest): CleaningReservationResponse {
+        if (reservationRequest.amount > apiConfigProperties.upsertLimit) {
+            throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
+        }
+
+        //ToDo: Replace with service logic
+        return when (reservationRequest.step) {
+            CleaningStep.CleanAndSync -> DummyValues.dummyCleaningReservationResponse
+            CleaningStep.PoolSync -> DummyValues.dummyPoolSyncResponse
+            CleaningStep.Clean -> DummyValues.dummyCleaningReservationResponse
+        }
     }
 
 
     override fun searchCleaningTaskState(searchTaskIdRequest: TaskStateRequest): TaskStateResponse {
         // ToDo: Replace with service logic
-        return dummyResponseTaskState
+        return DummyValues.dummyResponseTaskState
     }
 
 }

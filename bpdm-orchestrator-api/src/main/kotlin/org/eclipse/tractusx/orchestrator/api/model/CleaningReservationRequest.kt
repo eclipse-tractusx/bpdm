@@ -19,13 +19,12 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
+@Schema(description = "Request object for reserving a number of cleaning tasks waiting in a cleaning step.")
+data class CleaningReservationRequest(
+    @get:Schema(description = "The maximum number of cleaning tasks to reserve. Can be fewer if queue is not full enough.", required = true)
+    val amount: Int = 10,
+    @get:Schema(description = "The cleaning step queue to reserve from", required = true)
+    val step: CleaningStep
 )

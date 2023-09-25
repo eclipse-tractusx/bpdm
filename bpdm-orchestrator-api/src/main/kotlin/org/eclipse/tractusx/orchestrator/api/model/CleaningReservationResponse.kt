@@ -21,11 +21,12 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
+@Schema(description = "Response object for giving a list of reserved cleaning tasks")
+data class CleaningReservationResponse(
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved cleaning tasks with their business partner data to clean"))
+    val reservedTasks: List<CleaningReservation>,
+    @get:Schema(description = "The timestamp until the reservation is valid and accepts cleaning results")
+    val timeout: Instant
 )

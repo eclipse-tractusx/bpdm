@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.bpdm.orchestrator.controller
 
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.orchestrator.util.TestValues
+import org.eclipse.tractusx.bpdm.orchestrator.util.BusinessPartnerTestValues
+import org.eclipse.tractusx.bpdm.orchestrator.util.DummyValues
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.CleaningReservationRequest
+import org.eclipse.tractusx.orchestrator.api.model.CleaningStep
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
@@ -33,8 +36,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=3"])
 class CleaningTaskControllerIT @Autowired constructor(
-    val orchestratorClient: OrchestrationApiClient,
-    val cleaningTaskController: CleaningTaskController
+    val orchestratorClient: OrchestrationApiClient
 ) {
 
     /**
@@ -44,12 +46,63 @@ class CleaningTaskControllerIT @Autowired constructor(
     fun `request cleaning task and expect dummy response`() {
         val request = TaskCreateRequest(
             mode = TaskMode.UpdateFromSharingMember,
-            businessPartners = listOf(TestValues.businessPartner1, TestValues.businessPartner2)
+            businessPartners = listOf(BusinessPartnerTestValues.businessPartner1, BusinessPartnerTestValues.businessPartner2)
         )
 
-        val expected = cleaningTaskController.dummyResponseCreateTask
+        val expected = DummyValues.dummyResponseCreateTask
 
         val response = orchestratorClient.cleaningTasks.createCleaningTasks(request)
+
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * Validate reserve cleaning task endpoint is invokable with clean and sync step and returns dummy response
+     */
+    @Test
+    fun `request reservation for clean and sync and expect dummy response`() {
+        val request = CleaningReservationRequest(
+            amount = 2,
+            step = CleaningStep.CleanAndSync
+        )
+
+        val expected = DummyValues.dummyCleaningReservationResponse
+
+        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * Validate reserve cleaning task endpoint is invokable with pool sync step and returns dummy response
+     */
+    @Test
+    fun `request reservation for pool sync and expect dummy response`() {
+        val request = CleaningReservationRequest(
+            amount = 2,
+            step = CleaningStep.PoolSync
+        )
+
+        val expected = DummyValues.dummyPoolSyncResponse
+
+        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+
+        Assertions.assertThat(response).isEqualTo(expected)
+    }
+
+    /**
+     * Validate reserve cleaning task endpoint is invokable with cleaning step and returns dummy response
+     */
+    @Test
+    fun `request reservation for clean and expect dummy response`() {
+        val request = CleaningReservationRequest(
+            amount = 2,
+            step = CleaningStep.Clean
+        )
+
+        val expected = DummyValues.dummyCleaningReservationResponse
+
+        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -59,21 +112,39 @@ class CleaningTaskControllerIT @Autowired constructor(
      * Then throw exception
      */
     @Test
-    fun `expect exception on surpassing upsert limit`() {
+    fun `expect exception on requesting too many cleaning tasks`() {
 
         //Create entries above the upsert limit of 3
         val request = TaskCreateRequest(
             mode = TaskMode.UpdateFromPool,
             businessPartners = listOf(
-                TestValues.businessPartner1,
-                TestValues.businessPartner1,
-                TestValues.businessPartner1,
-                TestValues.businessPartner1
+                BusinessPartnerTestValues.businessPartner1,
+                BusinessPartnerTestValues.businessPartner1,
+                BusinessPartnerTestValues.businessPartner1,
+                BusinessPartnerTestValues.businessPartner1
             )
         )
 
         Assertions.assertThatThrownBy {
             orchestratorClient.cleaningTasks.createCleaningTasks(request)
+        }.isInstanceOf(WebClientResponseException::class.java)
+    }
+
+    /**
+     * When reserving too many cleaning tasks (over the upsert limit)
+     * Then throw exception
+     */
+    @Test
+    fun `expect exception on requesting too many reservations`() {
+
+        //Create entries above the upsert limit of 3
+        val request = CleaningReservationRequest(
+            amount = 200,
+            step = CleaningStep.CleanAndSync
+        )
+
+        Assertions.assertThatThrownBy {
+            orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
         }.isInstanceOf(WebClientResponseException::class.java)
     }
 
@@ -87,10 +158,10 @@ class CleaningTaskControllerIT @Autowired constructor(
         val request = TaskStateRequest(listOf("0", "1"))
 
 
-        val expected = cleaningTaskController.dummyResponseTaskState
+        val expected = DummyValues.dummyResponseTaskState
 
 
-        val response = cleaningTaskController.searchCleaningTaskState(request)
+        val response = orchestratorClient.cleaningTasks.searchCleaningTaskState(request)
 
         // Assert that the response matches the expected value
         Assertions.assertThat(response).isEqualTo(expected)

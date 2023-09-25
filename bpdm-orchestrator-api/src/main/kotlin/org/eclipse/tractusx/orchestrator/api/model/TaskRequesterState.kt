@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class TaskRequesterState(
     @get:Schema(required = true)
     val taskId: String,
-    val businessPartnerResult: BusinessPartnerDto?,
+    val businessPartnerResult: BusinessPartnerGeneric?,
     @get:Schema(required = true)
     val processingState: TaskProcessingStateDto
 )

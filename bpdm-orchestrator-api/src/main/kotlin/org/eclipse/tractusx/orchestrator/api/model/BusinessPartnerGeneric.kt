@@ -19,13 +19,22 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.*
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
-)
+
+data class BusinessPartnerGeneric(
+    override val nameParts: List<String> = emptyList(),
+    override val shortName: String? = null,
+    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
+    override val legalForm: String? = null,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val roles: Collection<BusinessPartnerRole> = emptyList(),
+    override val postalAddress: PostalAddressDto = PostalAddressDto(),
+    override val bpnL: String? = null,
+    override val bpnS: String? = null,
+    override val bpnA: String? = null,
+    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
+    val ownerBpnL: String? = null
+) : IBaseBusinessPartnerDto

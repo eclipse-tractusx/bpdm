@@ -31,13 +31,13 @@ import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
 /**
- * Contains complex test values that can be used as templates by the test classes
+ * Contains complex test values of business partners that can be used as templates by the test classes
  * Test values here should have as many unique values as possible to reduce the probability of finding matching errors
  */
-object TestValues {
+object BusinessPartnerTestValues {
 
     //Business Partner with two entries in every collection
-    val businessPartner1 = BusinessPartnerDto(
+    val businessPartner1 = BusinessPartnerGeneric(
         nameParts = listOf("NamePart1", "NamePart2"),
         shortName = "shortname",
         identifiers = listOf(
@@ -122,14 +122,14 @@ object TestValues {
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             )
         ),
-        ownerBpnl = null,
+        ownerBpnL = "BPNL_OWNER_TEST_1",
         bpnL = "BPNLTEST",
         bpnS = "BPNSTEST",
         bpnA = "BPNATEST"
     )
 
     //Business Partner with single entry in every collection
-    val businessPartner2 = BusinessPartnerDto(
+    val businessPartner2 = BusinessPartnerGeneric(
         nameParts = listOf("name-part-2"),
         shortName = "shortname-2",
         identifiers = listOf(
@@ -197,10 +197,9 @@ object TestValues {
                 deliveryServiceType = DeliveryServiceType.BOITE_POSTALE
             )
         ),
-        ownerBpnl = "BPNLTEST-2",
+        ownerBpnL = "BPNL_OWNER_TEST_2",
         bpnL = "BPNLTEST-2",
         bpnS = "BPNSTEST-2",
         bpnA = "BPNATEST-2"
     )
-
 }
