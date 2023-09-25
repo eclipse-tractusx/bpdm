@@ -44,25 +44,25 @@ class BpnControllerIT @Autowired constructor(
     val poolClient: PoolClientImpl
 ) {
 
-    val identifierType = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().type
-    val identifierValue1 = RequestValues.legalEntityCreate1.legalEntity.identifiers.first().value
-    val identifierValue2 = RequestValues.legalEntityCreate2.legalEntity.identifiers.first().value
-    val identifierValue3 = RequestValues.legalEntityCreate3.legalEntity.identifiers.first().value
+    val identifierType = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().type
+    val identifierValue1 = BusinessPartnerNonVerboseValues.legalEntityCreate1.legalEntity.identifiers.first().value
+    val identifierValue2 = BusinessPartnerNonVerboseValues.legalEntityCreate2.legalEntity.identifiers.first().value
+    val identifierValue3 = BusinessPartnerNonVerboseValues.legalEntityCreate3.legalEntity.identifiers.first().value
 
     @BeforeEach
     fun beforeEach() {
         // ensure LE1 and 2 have same identifierType
-        val legalEntityCreate1 = with(RequestValues.legalEntityCreate1) { copy(
+        val legalEntityCreate1 = with(BusinessPartnerNonVerboseValues.legalEntityCreate1) { copy(
             legalEntity = legalEntity.copy(
                 identifiers = listOf(LegalEntityIdentifierDto(identifierValue1, identifierType, null))
             )
         ) }
-        val legalEntityCreate2 = with(RequestValues.legalEntityCreate2) { copy(
+        val legalEntityCreate2 = with(BusinessPartnerNonVerboseValues.legalEntityCreate2) { copy(
             legalEntity = legalEntity.copy(
                 identifiers = listOf(LegalEntityIdentifierDto(identifierValue2, identifierType, null))
             )
         ) }
-        val legalEntityCreate3 = RequestValues.legalEntityCreate3
+        val legalEntityCreate3 = BusinessPartnerNonVerboseValues.legalEntityCreate3
 
         testHelpers.truncateDbTables()
         testHelpers.createTestMetadata()

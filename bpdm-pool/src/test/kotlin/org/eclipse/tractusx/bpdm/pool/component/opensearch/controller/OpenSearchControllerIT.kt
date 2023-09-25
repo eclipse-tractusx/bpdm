@@ -59,9 +59,9 @@ class OpenSearchControllerIT @Autowired constructor(
 
     // We import 3 legal entities which result in 6 OpenSearch records: 3 for the LEs itself and 3 for the corresponding legal addresses.
     val partnerDocs = listOf(
-        RequestValues.legalEntityCreate1,
-        RequestValues.legalEntityCreate2,
-        RequestValues.legalEntityCreate3
+        BusinessPartnerNonVerboseValues.legalEntityCreate1,
+        BusinessPartnerNonVerboseValues.legalEntityCreate2,
+        BusinessPartnerNonVerboseValues.legalEntityCreate3
     )
 
     @BeforeEach
@@ -81,13 +81,13 @@ class OpenSearchControllerIT @Autowired constructor(
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate3,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3,
                 )
             )
         )

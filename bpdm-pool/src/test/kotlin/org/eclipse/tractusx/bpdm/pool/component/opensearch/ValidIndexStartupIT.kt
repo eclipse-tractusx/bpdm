@@ -67,13 +67,13 @@ class ValidIndexStartupIT @Autowired constructor(
         testHelpers.createBusinessPartnerStructure(
             listOf(
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate1,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate2,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate2,
                 ),
                 LegalEntityStructureRequest(
-                    legalEntity = RequestValues.legalEntityCreate3,
+                    legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate3,
                 )
             )
         )

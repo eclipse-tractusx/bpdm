@@ -180,17 +180,17 @@ class TestHelpers(
 
 
     /**
-     * Creates metadata needed for test data defined in the [RequestValues]
+     * Creates metadata needed for test data defined in the [BusinessPartnerNonVerboseValues]
      */
     fun createTestMetadata() {
 
-        poolClient.metadata.createLegalForm(RequestValues.legalForm1)
-        poolClient.metadata.createLegalForm(RequestValues.legalForm2)
-        poolClient.metadata.createLegalForm(RequestValues.legalForm3)
+        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm1)
+        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm2)
+        poolClient.metadata.createLegalForm(BusinessPartnerNonVerboseValues.legalForm3)
 
-        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto1)
-        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto2)
-        poolClient.metadata.createIdentifierType(RequestValues.identifierTypeDto3)
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1)
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto2)
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto3)
     }
 
 
