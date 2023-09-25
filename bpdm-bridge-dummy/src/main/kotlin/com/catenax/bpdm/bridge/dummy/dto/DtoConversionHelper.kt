@@ -21,7 +21,9 @@ package com.catenax.bpdm.bridge.dummy.dto
 
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import kotlin.reflect.KProperty
 
 fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressDto {
     return LogisticAddressDto(
@@ -29,16 +31,41 @@ fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressD
         states = gateDto.states,
         identifiers = gateDto.identifiers,
         physicalPostalAddress = gateToPoolPhysicalAddress(gateDto.physicalPostalAddress),
-        alternativePostalAddress = gateDto.alternativePostalAddress
+        alternativePostalAddress = gateDto.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
+    )
+}
+
+fun gateToPoolAlternativeAddress(gateDto: AlternativePostalAddressGateDto): AlternativePostalAddressDto {
+    fun buildNullMappingException(nullField: KProperty<*>) =
+        BpdmNullMappingException(AlternativePostalAddressGateDto::class, AlternativePostalAddressDto::class, nullField)
+
+    return AlternativePostalAddressDto(
+        geographicCoordinates = gateDto.geographicCoordinates,
+        country = gateDto.country
+            ?: throw buildNullMappingException(AlternativePostalAddressGateDto::country),
+        administrativeAreaLevel1 = gateDto.administrativeAreaLevel1,
+        postalCode = gateDto.postalCode,
+        city = gateDto.city
+            ?: throw buildNullMappingException(AlternativePostalAddressGateDto::city),
+        deliveryServiceType = gateDto.deliveryServiceType
+            ?: throw buildNullMappingException(AlternativePostalAddressGateDto::deliveryServiceType),
+        deliveryServiceQualifier = gateDto.deliveryServiceQualifier,
+        deliveryServiceNumber = gateDto.deliveryServiceNumber
+            ?: throw buildNullMappingException(AlternativePostalAddressGateDto::deliveryServiceNumber)
     )
 }
 
 fun gateToPoolPhysicalAddress(gateDto: PhysicalPostalAddressGateDto): PhysicalPostalAddressDto {
+    fun buildNullMappingException(nullField: KProperty<*>) =
+        BpdmNullMappingException(PhysicalPostalAddressGateDto::class, PhysicalPostalAddressDto::class, nullField)
+
     return PhysicalPostalAddressDto(
         geographicCoordinates = gateDto.geographicCoordinates,
-        country = gateDto.country,
+        country = gateDto.country
+            ?: throw buildNullMappingException(PhysicalPostalAddressGateDto::country),
         postalCode = gateDto.postalCode,
-        city = gateDto.city,
+        city = gateDto.city
+            ?: throw buildNullMappingException(PhysicalPostalAddressGateDto::city),
         administrativeAreaLevel1 = gateDto.administrativeAreaLevel1,
         administrativeAreaLevel2 = gateDto.administrativeAreaLevel2,
         administrativeAreaLevel3 = gateDto.administrativeAreaLevel3,
@@ -132,7 +159,7 @@ fun poolToGateLogisticAddress(address: LogisticAddressVerboseDto): LogisticAddre
         states = states,
         identifiers = identifiers,
         physicalPostalAddress = poolToGatePhysicalAddress(address.physicalPostalAddress),
-        alternativePostalAddress = address.alternativePostalAddress?.let { poolToGateAlternativeAddress(it) }
+        alternativePostalAddress = address.alternativePostalAddress?.let(::poolToGateAlternativeAddress)
     )
 }
 
@@ -163,8 +190,8 @@ private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto):
     )
 }
 
-private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): AlternativePostalAddressDto {
-    return AlternativePostalAddressDto(
+private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): AlternativePostalAddressGateDto {
+    return AlternativePostalAddressGateDto(
         geographicCoordinates = address.geographicCoordinates,
         country = address.country.technicalKey,
         postalCode = address.postalCode,

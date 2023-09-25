@@ -141,7 +141,7 @@ class PoolUpdateService(
                             states = entry.address.states,
                             identifiers = entry.address.identifiers,
                             physicalPostalAddress = gateToPoolPhysicalAddress(entry.address.physicalPostalAddress),
-                            alternativePostalAddress = entry.address.alternativePostalAddress
+                            alternativePostalAddress = entry.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
                         ),
                         index = entry.externalId,
                         bpnParent = siteParentBpn
@@ -181,7 +181,7 @@ class PoolUpdateService(
                     states = it.address.states,
                     identifiers = it.address.identifiers,
                     physicalPostalAddress = gateToPoolPhysicalAddress(it.address.physicalPostalAddress),
-                    alternativePostalAddress = it.address.alternativePostalAddress
+                    alternativePostalAddress = it.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
                 ),
                 bpna = it.bpn!!
             )

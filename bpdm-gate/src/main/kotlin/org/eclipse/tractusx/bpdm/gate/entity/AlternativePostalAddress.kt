@@ -34,7 +34,7 @@ class AlternativePostalAddress(
 
     @Column(name = "alt_country")
     @Enumerated(EnumType.STRING)
-    val country: CountryCode,
+    val country: CountryCode?,
 
     /**
      * Region within the country
@@ -51,16 +51,15 @@ class AlternativePostalAddress(
     /**
      * The city of the address (Synonym: Town, village, municipality)
      */
-    // TODO Should it be optional?
     @Column(name = "alt_city")
-    val city: String,
+    val city: String?,
 
     /**
      * The type of this specified delivery
      */
     @Column(name = "alt_delivery_service_type")
     @Enumerated(EnumType.STRING)
-    val deliveryServiceType: DeliveryServiceType,
+    val deliveryServiceType: DeliveryServiceType?,
 
     /**
      * The qualifier uniquely identifies the delivery service endpoint in conjunction with the delivery service number
@@ -72,5 +71,5 @@ class AlternativePostalAddress(
      * Describes the PO Box or private Bag number the delivery should be placed at
      */
     @Column(name = "alt_delivery_service_number")
-    val deliveryServiceNumber: String
+    val deliveryServiceNumber: String?
 )

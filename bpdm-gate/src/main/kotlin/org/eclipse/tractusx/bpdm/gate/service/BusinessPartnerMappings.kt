@@ -19,12 +19,15 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -50,7 +53,7 @@ class BusinessPartnerMappings {
             states = entity.states.map(::toStateDto),
             classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
-            postalAddress = toPostalAddressInputDto(entity.postalAddress),
+            postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwner = entity.isOwner,
             bpnL = entity.bpnL,
             bpnS = entity.bpnS,
@@ -70,7 +73,7 @@ class BusinessPartnerMappings {
             states = entity.states.map(::toStateDto),
             classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
-            postalAddress = toPostalAddressOutputDto(entity.postalAddress),
+            postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwner = entity.isOwner,
             bpnL = entity.bpnL
                 ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnL, entity.externalId),
@@ -116,31 +119,24 @@ class BusinessPartnerMappings {
         updatePostalAddress(entity.postalAddress, dto.postalAddress)
     }
 
-    private fun toPostalAddressInputDto(entity: PostalAddress) =
-        BusinessPartnerPostalAddressInputDto(
+    private fun toPostalAddressDto(entity: PostalAddress) =
+        BusinessPartnerPostalAddressDto(
             addressType = entity.addressType,
-            physicalPostalAddress = entity.physicalPostalAddress.let(::toPhysicalPostalAddressDto),
+            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
             alternativePostalAddress = entity.alternativePostalAddress?.let(::toAlternativePostalAddressDto)
         )
 
-    private fun toPostalAddressOutputDto(entity: PostalAddress) =
-        BusinessPartnerPostalAddressOutputDto(
-            addressType = entity.addressType!!, //An entity of stage output is expected to have a non-null addressType
-            physicalPostalAddress = entity.physicalPostalAddress.let(::toPhysicalPostalAddressDto),
-            alternativePostalAddress = entity.alternativePostalAddress?.let(::toAlternativePostalAddressDto)
-        )
-
-    private fun toPostalAddress(dto: BusinessPartnerPostalAddressInputDto) =
+    private fun toPostalAddress(dto: BusinessPartnerPostalAddressDto) =
         PostalAddress(
             addressType = dto.addressType,
-            physicalPostalAddress = dto.physicalPostalAddress.let(::toPhysicalPostalAddress),
-            alternativePostalAddress = dto.alternativePostalAddress?.let(::toAlternativePostalAddress)
+            physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
+            alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
         )
 
-    private fun updatePostalAddress(entity: PostalAddress, dto: BusinessPartnerPostalAddressInputDto) {
-        entity.addressType = dto.addressType ?: AddressType.AdditionalAddress
-        entity.physicalPostalAddress = dto.physicalPostalAddress.let(::toPhysicalPostalAddress)
-        entity.alternativePostalAddress = dto.alternativePostalAddress?.let(::toAlternativePostalAddress)
+    private fun updatePostalAddress(entity: PostalAddress, dto: BusinessPartnerPostalAddressDto) {
+        entity.addressType = dto.addressType
+        entity.physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress)
+        entity.alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
     }
 
     private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddress) =
@@ -161,6 +157,15 @@ class BusinessPartnerMappings {
             door = entity.door
         )
 
+    // convert empty DTO to null
+    private fun normalize(dto: PhysicalPostalAddressGateDto?) =
+        if (dto != PhysicalPostalAddressGateDto()) dto
+        else null
+
+    private fun normalize(dto: AlternativePostalAddressGateDto?) =
+        if (dto != AlternativePostalAddressGateDto()) dto
+        else null
+
     private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressGateDto) =
         PhysicalPostalAddress(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
@@ -180,7 +185,7 @@ class BusinessPartnerMappings {
         )
 
     private fun toAlternativePostalAddressDto(entity: AlternativePostalAddress) =
-        AlternativePostalAddressDto(
+        AlternativePostalAddressGateDto(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
             country = entity.country,
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -191,7 +196,7 @@ class BusinessPartnerMappings {
             deliveryServiceNumber = entity.deliveryServiceNumber
         )
 
-    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
+    private fun toAlternativePostalAddress(dto: AlternativePostalAddressGateDto) =
         AlternativePostalAddress(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
             country = dto.country,

@@ -23,13 +23,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IBasePhysicalPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = PostalAddressDescription.headerPhysical)
-data class PhysicalPostalAddressGateDto(
+@Schema(description = PostalAddressDescription.headerAlternative)
+data class AlternativePostalAddressGateDto(
 
     override val geographicCoordinates: GeoCoordinateDto? = null,
 
@@ -37,26 +38,14 @@ data class PhysicalPostalAddressGateDto(
 
     override val administrativeAreaLevel1: String? = null,
 
-    override val administrativeAreaLevel2: String? = null,
-
-    override val administrativeAreaLevel3: String? = null,
-
     override val postalCode: String? = null,
 
     override val city: String? = null,
 
-    override val district: String? = null,
+    override val deliveryServiceType: DeliveryServiceType? = null,
 
-    override val street: StreetGateDto? = null,
+    override val deliveryServiceQualifier: String? = null,
 
-    override val companyPostalCode: String? = null,
+    override val deliveryServiceNumber: String? = null
 
-    override val industrialZone: String? = null,
-
-    override val building: String? = null,
-
-    override val floor: String? = null,
-
-    override val door: String? = null
-
-) : IBasePhysicalPostalAddressDto
+) : IBaseAlternativePostalAddressDto

@@ -33,7 +33,7 @@ class PhysicalPostalAddress(
 
     @Column(name = "phy_country")
     @Enumerated(EnumType.STRING)
-    val country: CountryCode,
+    val country: CountryCode?,
 
     /**
      * Region within the country
@@ -62,9 +62,8 @@ class PhysicalPostalAddress(
     /**
      * The city of the address (Synonym: Town, village, municipality)
      */
-    // TODO Should it be optional?
     @Column(name = "phy_city")
-    val city: String,
+    val city: String?,
 
     /**
      * Divides the city in several smaller areas

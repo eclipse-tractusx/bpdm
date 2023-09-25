@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.AddressStateDto
-import org.eclipse.tractusx.bpdm.common.dto.AlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
@@ -45,7 +44,7 @@ data class LogisticAddressGateDto(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
-    val alternativePostalAddress: AlternativePostalAddressDto? = null,
+    val alternativePostalAddress: AlternativePostalAddressGateDto? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList()

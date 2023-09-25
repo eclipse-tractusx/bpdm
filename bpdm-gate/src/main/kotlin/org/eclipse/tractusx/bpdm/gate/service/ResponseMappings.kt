@@ -73,7 +73,7 @@ fun toNameParts(namePartsValue: String, address: LogisticAddress?, site: Site?, 
     return NameParts(address, site, legalEntity, namePartsValue)
 }
 
-fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
+fun AlternativePostalAddressGateDto.toAlternativePostalAddressEntity() =
     AlternativePostalAddress(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
@@ -308,8 +308,8 @@ fun mapToDtoStates(states: MutableSet<AddressState>): Collection<AddressStateDto
     return states.map { AddressStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun AlternativePostalAddress.toAlternativePostalAddressDto(): AlternativePostalAddressDto =
-    AlternativePostalAddressDto(
+fun AlternativePostalAddress.toAlternativePostalAddressDto() =
+    AlternativePostalAddressGateDto(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier,
