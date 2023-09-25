@@ -177,7 +177,7 @@ object RequestValues {
         street = null,
     )
 
-    val alternativeAddressFull = AlternativePostalAddressDto(
+    val alternativeAddressFull = AlternativePostalAddressGateDto(
         country = CommonValues.country1,
         city = CommonValues.city1,
         deliveryServiceType = DeliveryServiceType.PO_BOX,
@@ -295,18 +295,18 @@ object RequestValues {
     )
 
 
-    val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressInputDto(
+    val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressDto(
         addressType = AddressType.LegalAddress,
         physicalPostalAddress = postalAddress2,
         alternativePostalAddress = alternativeAddressFull
     )
 
-    val bpPostalAddressInputDtoMinimal = BusinessPartnerPostalAddressInputDto(
+    val bpPostalAddressInputDtoMinimal = BusinessPartnerPostalAddressDto(
         addressType = null,
         physicalPostalAddress = physicalAddressMinimal
     )
 
-    val bpPostalAddressInputDtoChina = BusinessPartnerPostalAddressInputDto(
+    val bpPostalAddressInputDtoChina = BusinessPartnerPostalAddressDto(
         addressType = AddressType.LegalAndSiteMainAddress,
         physicalPostalAddress = physicalAddressChina
     )
