@@ -32,6 +32,8 @@ interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>, Crud
 
     fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>): Set<BusinessPartner>
 
+    fun findByStageAndExternalId(stage: StageType, externalId: String?): BusinessPartner?
+
     fun findByStageAndExternalIdIn(stage: StageType, externalId: Collection<String>, pageable: Pageable): Page<BusinessPartner>
 
     fun findByStage(stage: StageType, pageable: Pageable): Page<BusinessPartner>

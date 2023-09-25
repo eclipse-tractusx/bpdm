@@ -25,6 +25,8 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 
 @Schema(
@@ -44,6 +46,8 @@ data class BusinessPartnerInputRequest(
     override val isOwner: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,
-    override val bpnA: String? = null
+    override val bpnA: String? = null,
+    override val parentId: String? = null,
+    override val parentType: BusinessPartnerType? = null
 
 ) : IBaseBusinessPartnerGateDto

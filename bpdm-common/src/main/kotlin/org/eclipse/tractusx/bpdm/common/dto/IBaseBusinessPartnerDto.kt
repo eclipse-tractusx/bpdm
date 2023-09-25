@@ -59,4 +59,11 @@ interface IBaseBusinessPartnerDto {
 
     @get:Schema(description = "BPNA")
     val bpnA: String?
+
+    @get:Schema(description = "Parent ID used for association")
+    val parentId: String?
+
+    @get:Schema(description = "Parent Type (Legal Entity or Site)")
+    val parentType: BusinessPartnerType?
+
 }

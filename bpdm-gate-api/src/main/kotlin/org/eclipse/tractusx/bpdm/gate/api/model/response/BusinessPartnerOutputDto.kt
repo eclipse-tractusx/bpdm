@@ -20,10 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
@@ -47,6 +44,8 @@ data class BusinessPartnerOutputDto(
     override val bpnL: String,
     override val bpnS: String?,
     override val bpnA: String,
+    override val parentId: String? = null,
+    override val parentType: BusinessPartnerType? = null,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

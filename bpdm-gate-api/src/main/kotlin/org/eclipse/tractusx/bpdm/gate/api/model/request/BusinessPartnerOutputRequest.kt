@@ -17,41 +17,34 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
-import java.time.Instant
 
 
 @Schema(
     description = "Generic business partner with external id",
     requiredProperties = ["externalId", "postalAddress"]
 )
-data class BusinessPartnerInputDto(
+data class BusinessPartnerOutputRequest(
+
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
-    override val shortName: String?,
+    override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressDto,
-    override val isOwner: Boolean,
-    override val bpnL: String?,
-    override val bpnS: String?,
-    override val bpnA: String?,
+    override val postalAddress: BusinessPartnerPostalAddressInputDto,
+    override val isOwner: Boolean = false,
+    override val bpnL: String? = null,
+    override val bpnS: String? = null,
+    override val bpnA: String? = null,
     override val parentId: String? = null,
-    override val parentType: BusinessPartnerType? = null,
-
-    @get:Schema(description = CommonDescription.createdAt)
-    val createdAt: Instant,
-
-    @get:Schema(description = CommonDescription.updatedAt)
-    val updatedAt: Instant
+    override val parentType: BusinessPartnerType? = null
 
 ) : IBaseBusinessPartnerGateDto

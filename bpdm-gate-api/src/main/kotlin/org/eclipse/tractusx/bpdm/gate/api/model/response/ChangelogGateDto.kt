@@ -32,7 +32,7 @@ data class ChangelogGateDto(
     val externalId: String,
 
     @get:Schema(description = ChangelogDescription.businessPartnerType)
-    val businessPartnerType: BusinessPartnerType,
+    val businessPartnerType: BusinessPartnerType?,
 
     @get:Schema(description = ChangelogDescription.timestamp)
     val timestamp: Instant,
