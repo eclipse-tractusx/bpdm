@@ -76,23 +76,23 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert sites output`() {
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         val sitesOutput = listOf(
-            RequestValues.siteGateOutputRequest1,
-            RequestValues.siteGateOutputRequest2
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest2
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         try {
@@ -121,18 +121,18 @@ internal class SiteControllerOutputIT @Autowired constructor(
     fun `upsert sites output, no input persisted`() {
 
         val sitesOutput = listOf(
-            RequestValues.siteGateOutputRequest1,
-            RequestValues.siteGateOutputRequest2
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest2
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         try {
@@ -153,8 +153,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateOutputResponse1,
-            ResponseValues.persistencesiteGateOutputResponse2
+            BusinessPartnerVerboseValues.persistencesiteGateOutputResponse1,
+            BusinessPartnerVerboseValues.persistencesiteGateOutputResponse2
         )
 
         val page = 0
@@ -166,23 +166,23 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val contentSize = 2
 
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         val sitesOutput = listOf(
-            RequestValues.siteGateOutputRequest1,
-            RequestValues.siteGateOutputRequest2
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest2
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
@@ -212,8 +212,8 @@ internal class SiteControllerOutputIT @Autowired constructor(
     @Test
     fun `get sites, filter by external ids`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateOutputResponse1,
-            ResponseValues.persistencesiteGateOutputResponse2
+            BusinessPartnerVerboseValues.persistencesiteGateOutputResponse1,
+            BusinessPartnerVerboseValues.persistencesiteGateOutputResponse2
         )
 
         val page = 0
@@ -225,23 +225,23 @@ internal class SiteControllerOutputIT @Autowired constructor(
         val contentSize = 2
 
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         val sitesOutput = listOf(
-            RequestValues.siteGateOutputRequest1,
-            RequestValues.siteGateOutputRequest2
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest2
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
@@ -250,7 +250,7 @@ internal class SiteControllerOutputIT @Autowired constructor(
         gateClient.sites.upsertSitesOutput(sitesOutput)
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.sites.getSitesOutput(paginationValue, listOf(CommonValues.externalIdSite1, CommonValues.externalIdSite2))
+        val pageResponse = gateClient.sites.getSitesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalIdSite1, BusinessPartnerVerboseValues.externalIdSite2))
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*", ".*processStartedAt*").isEqualTo(
             PageDto(

@@ -78,8 +78,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
         )
 
         try {
@@ -104,7 +104,7 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, missing external id`() {
         val legalEntitiesJson: JsonNode = objectMapper.createArrayNode().add(
-            objectMapper.valueToTree<ObjectNode>(RequestValues.legalEntityGateInputRequest1)
+            objectMapper.valueToTree<ObjectNode>(BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1)
                 .apply { remove(LegalEntityGateInputRequest::externalId.name) }
         )
 
@@ -123,9 +123,9 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, legal entity limit exceeded`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest1.copy(externalId = "external-1"),
-            RequestValues.legalEntityGateInputRequest1.copy(externalId = "external-2")
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1.copy(externalId = "external-1"),
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1.copy(externalId = "external-2")
         )
 
         try {
@@ -142,8 +142,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert legal entities, duplicate external id`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest1.copy()
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1.copy()
         )
 
         try {
@@ -161,14 +161,14 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get legal entity by external id`() {
-        val expectedLegalEntity = ResponseValues.legalEntityGateInputResponse1
+        val expectedLegalEntity = BusinessPartnerVerboseValues.legalEntityGateInputResponse1
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
-        val legalEntity = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
+        val legalEntity = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId1)
 
         assertThat(legalEntity).usingRecursiveComparison().ignoringCollectionOrder().ignoringAllOverriddenEquals()
             .ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedLegalEntity)
@@ -200,13 +200,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entities`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateInputResponse1,
-            ResponseValues.legalEntityGateInputResponse2,
+            BusinessPartnerVerboseValues.legalEntityGateInputResponse1,
+            BusinessPartnerVerboseValues.legalEntityGateInputResponse2,
         )
 
         val page = 0
@@ -245,13 +245,13 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `get legal entity filter by external ids`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateInputResponse1,
-            ResponseValues.legalEntityGateInputResponse2,
+            BusinessPartnerVerboseValues.legalEntityGateInputResponse1,
+            BusinessPartnerVerboseValues.legalEntityGateInputResponse2,
         )
         val page = 0
         val size = 10
@@ -303,8 +303,8 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
     @Test
     fun `upsert and persist legal entities`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
         )
 
         try {

@@ -95,29 +95,29 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert output addresses`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
+            BusinessPartnerNonVerboseValues.addressGateInputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateInputRequest2
         )
 
         val addressesOutput = listOf(
-            RequestValues.addressGateOutputRequest1,
-            RequestValues.addressGateOutputRequest2
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest2
         )
 
         val legalEntity = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         val legalEntityOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
         )
 
         val site = listOf(
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         val siteOutput = listOf(
-            RequestValues.siteGateOutputRequest1
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1
         )
 
         try {
@@ -149,8 +149,8 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert output addresses, no input persisted`() {
         val addresses = listOf(
-            RequestValues.addressGateOutputRequest1,
-            RequestValues.addressGateOutputRequest2
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest2
         )
 
         try {
@@ -168,15 +168,15 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
     @Test
     fun `upsert output addresses, no parent legal entity found`() {
         val addresses = listOf(
-            RequestValues.addressGateOutputRequest1.copy(legalEntityExternalId = "NonExistent"),
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest1.copy(legalEntityExternalId = "NonExistent"),
         )
 
         val legalEntity = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         val legalEntityOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
         )
 
         try {
@@ -198,36 +198,36 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
     @Test
     fun `get output addresses`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
+            BusinessPartnerNonVerboseValues.addressGateInputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateInputRequest2
         )
 
         val addressesOutput = listOf(
-            RequestValues.addressGateOutputRequest1,
-            RequestValues.addressGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest2,
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.logisticAddressGateOutputResponse1,
-            ResponseValues.logisticAddressGateOutputResponse2,
-            ResponseValues.addressGateOutputResponseLegalEntity1,
-            ResponseValues.addressGateOutputResponseSite1
+            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1,
+            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2,
+            BusinessPartnerVerboseValues.addressGateOutputResponseLegalEntity1,
+            BusinessPartnerVerboseValues.addressGateOutputResponseSite1
         )
 
         val legalEntity = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         val legalEntityOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
         )
 
         val site = listOf(
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         val siteOutput = listOf(
-            RequestValues.siteGateOutputRequest1
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1
         )
 
         val page = 0
@@ -270,34 +270,34 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
     @Test
     fun `get addresses, filter by external ids`() {
         val addresses = listOf(
-            RequestValues.addressGateInputRequest1,
-            RequestValues.addressGateInputRequest2
+            BusinessPartnerNonVerboseValues.addressGateInputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateInputRequest2
         )
 
         val addressesOutput = listOf(
-            RequestValues.addressGateOutputRequest1,
-            RequestValues.addressGateOutputRequest2
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.addressGateOutputRequest2
         )
 
         val expectedAddresses = listOf(
-            ResponseValues.logisticAddressGateOutputResponse1,
-            ResponseValues.logisticAddressGateOutputResponse2,
+            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1,
+            BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2,
         )
 
         val legalEntity = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         val legalEntityOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
         )
 
         val site = listOf(
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         val siteOutput = listOf(
-            RequestValues.siteGateOutputRequest1
+            BusinessPartnerNonVerboseValues.siteGateOutputRequest1
         )
 
         val page = 0
@@ -318,7 +318,7 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         gateClient.addresses.upsertAddressesOutput(addressesOutput)
 
         val paginationValue = PaginationRequest(page, size)
-        val pageResponse = gateClient.addresses.getAddressesOutput(paginationValue, listOf(CommonValues.externalIdAddress1, CommonValues.externalIdAddress2))
+        val pageResponse = gateClient.addresses.getAddressesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerVerboseValues.externalIdAddress2))
 
         assertThat(pageResponse).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*processStartedAt*", ".*identifiers*").isEqualTo(
             PageDto(

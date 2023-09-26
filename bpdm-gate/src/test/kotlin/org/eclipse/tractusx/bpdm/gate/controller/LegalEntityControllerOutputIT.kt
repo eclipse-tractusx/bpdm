@@ -77,13 +77,13 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     fun `upsert output legal entities`() {
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         try {
@@ -94,10 +94,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val legalEntityExternal1 = gateLegalEntityRepository.findByExternalIdAndStage(CommonValues.externalId1, StageType.Output)
+        val legalEntityExternal1 = gateLegalEntityRepository.findByExternalIdAndStage(BusinessPartnerVerboseValues.externalId1, StageType.Output)
         Assertions.assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = gateLegalEntityRepository.findByExternalIdAndStage(CommonValues.externalId2, StageType.Output)
+        val legalEntityExternal2 = gateLegalEntityRepository.findByExternalIdAndStage(BusinessPartnerVerboseValues.externalId2, StageType.Output)
         Assertions.assertNotEquals(legalEntityExternal2, null)
 
     }
@@ -110,8 +110,8 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     fun `upsert output legal entities, no input persisted`() {
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         try {
@@ -130,18 +130,18 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entities output`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateOutputResponse1,
-            ResponseValues.legalEntityGateOutputResponse2,
+            BusinessPartnerVerboseValues.legalEntityGateOutputResponse1,
+            BusinessPartnerVerboseValues.legalEntityGateOutputResponse2,
         )
 
         val page = 0
@@ -180,18 +180,18 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
     @Test
     fun `get legal entities, filter by external ids`() {
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2,
         )
 
         val legalEntitiesOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1,
-            RequestValues.legalEntityGateOutputRequest2,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest2,
         )
 
         val expectedLegalEntities = listOf(
-            ResponseValues.legalEntityGateOutputResponse1,
-            ResponseValues.legalEntityGateOutputResponse2,
+            BusinessPartnerVerboseValues.legalEntityGateOutputResponse1,
+            BusinessPartnerVerboseValues.legalEntityGateOutputResponse2,
         )
 
         val page = 0
@@ -207,7 +207,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
         gateClient.legalEntities.upsertLegalEntitiesOutput(legalEntitiesOutput)
 
-        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1, CommonValues.externalId2))
+        val pageResponse = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId2))
 
         val expectedPage = PageDto(
             totalElements,
