@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.util.TestValues
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskMode
+import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -74,6 +75,25 @@ class CleaningTaskControllerIT @Autowired constructor(
         Assertions.assertThatThrownBy {
             orchestratorClient.cleaningTasks.createCleaningTasks(request)
         }.isInstanceOf(WebClientResponseException::class.java)
+    }
+
+    /**
+     * Search for taskId and get dummy response on the test
+     */
+
+    @Test
+    fun `search cleaning task state and expect dummy response`() {
+
+        val request = TaskStateRequest(listOf("0", "1"))
+
+
+        val expected = cleaningTaskController.dummyResponseTaskState
+
+
+        val response = cleaningTaskController.searchCleaningTaskState(request)
+
+        // Assert that the response matches the expected value
+        Assertions.assertThat(response).isEqualTo(expected)
     }
 
 }
