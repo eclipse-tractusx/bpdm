@@ -20,8 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
@@ -38,7 +39,7 @@ fun LegalEntityGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequ
         states = this.legalEntity.states.map(::toBusinessPartnerState),
         classifications = this.legalEntity.classifications,
         roles = roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = legalAddress.physicalPostalAddress,
             alternativePostalAddress = legalAddress.alternativePostalAddress
@@ -58,7 +59,7 @@ fun SiteGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequest {
         states = site.states.map(::toBusinessPartnerState),
         classifications = emptyList(),
         roles = site.roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.SiteMainAddress,
             physicalPostalAddress = mainAddress.physicalPostalAddress,
             alternativePostalAddress = mainAddress.alternativePostalAddress
@@ -80,7 +81,7 @@ fun AddressGateInputRequest.toBusinessPartnerDto(parentId: String?, parentType: 
         states = this.address.states.map(::toBusinessPartnerState),
         classifications = emptyList(),
         roles = this.address.roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = this.address.physicalPostalAddress,
             alternativePostalAddress = this.address.alternativePostalAddress
@@ -158,7 +159,7 @@ fun BusinessPartnerInputDto.toLegalEntityGateInputDto(): LegalEntityGateInputDto
 
         legalAddress = AddressGateInputDto(
             address = LogisticAddressGateDto(
-                physicalPostalAddress = postalAddress.physicalPostalAddress,
+                physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
                 alternativePostalAddress = postalAddress.alternativePostalAddress
             ),
             externalId = getLegalAddressExternalIdForLegalEntityExternalId(externalId),
@@ -178,7 +179,7 @@ fun BusinessPartnerInputDto.toSiteGateInputDto(): SiteGateInputDto {
         ),
         mainAddress = AddressGateInputDto(
             address = LogisticAddressGateDto(
-                physicalPostalAddress = postalAddress.physicalPostalAddress,
+                physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
                 alternativePostalAddress = postalAddress.alternativePostalAddress
             ),
             externalId = "",
@@ -194,10 +195,30 @@ fun BusinessPartnerInputDto.toAddressGateInputDto(): AddressGateInputDto {
             nameParts = nameParts,
             states = states.map(::toAddressStateDto),
             identifiers = identifiers.map(::toAddressIdentifierDto),
-            physicalPostalAddress = postalAddress.physicalPostalAddress,
+            physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
             alternativePostalAddress = postalAddress.alternativePostalAddress,
             roles = roles.toList(),
         ),
+    )
+}
+
+fun toPhysicalPostalAddressGateDto(dto: PhysicalPostalAddressGateDto?): PhysicalPostalAddressGateDto {
+
+    return PhysicalPostalAddressGateDto(
+        geographicCoordinates = dto?.geographicCoordinates,
+        country = dto?.country,
+        administrativeAreaLevel1 = dto?.administrativeAreaLevel1,
+        administrativeAreaLevel2 = dto?.administrativeAreaLevel2,
+        administrativeAreaLevel3 = dto?.administrativeAreaLevel3,
+        postalCode = dto?.postalCode,
+        city = dto?.city.toString(),
+        district = dto?.district,
+        street = dto?.street,
+        companyPostalCode = dto?.companyPostalCode,
+        industrialZone = dto?.industrialZone,
+        building = dto?.building,
+        floor = dto?.floor,
+        door = dto?.door
     )
 }
 
@@ -265,7 +286,7 @@ fun BusinessPartnerOutputDto.toLegalEntityGateOutputResponse(): LegalEntityGateO
         ),
         legalAddress = AddressGateOutputDto(
             address = LogisticAddressGateDto(
-                physicalPostalAddress = postalAddress.physicalPostalAddress,
+                physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
                 alternativePostalAddress = postalAddress.alternativePostalAddress
             ),
             externalId = "",
@@ -287,7 +308,7 @@ fun BusinessPartnerOutputDto.toSiteGateOutputResponse(): SiteGateOutputResponse 
         ),
         mainAddress = AddressGateOutputDto(
             address = LogisticAddressGateDto(
-                physicalPostalAddress = postalAddress.physicalPostalAddress,
+                physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
                 alternativePostalAddress = postalAddress.alternativePostalAddress
             ),
             externalId = "",
@@ -305,7 +326,7 @@ fun BusinessPartnerOutputDto.toAddressGateOutputDto(): AddressGateOutputDto {
             nameParts = nameParts,
             states = states.map(::toAddressStateDto),
             identifiers = identifiers.map(::toAddressIdentifierDto),
-            physicalPostalAddress = postalAddress.physicalPostalAddress,
+            physicalPostalAddress = toPhysicalPostalAddressGateDto(postalAddress.physicalPostalAddress),
             alternativePostalAddress = postalAddress.alternativePostalAddress,
             roles = roles.toList(),
         ),
@@ -325,7 +346,7 @@ fun LegalEntityGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOu
         states = this.legalEntity.states.map(::toBusinessPartnerState),
         classifications = this.legalEntity.classifications,
         roles = roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = legalAddress.address.physicalPostalAddress,
             alternativePostalAddress = legalAddress.address.alternativePostalAddress
@@ -347,7 +368,7 @@ fun SiteGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOutputReq
         states = site.states.map(::toBusinessPartnerState),
         classifications = emptyList(),
         roles = site.roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.SiteMainAddress,
             physicalPostalAddress = mainAddress.address.physicalPostalAddress,
             alternativePostalAddress = mainAddress.address.alternativePostalAddress
@@ -370,7 +391,7 @@ fun AddressGateOutputRequest.toBusinessPartnerOutputDto(parentId: String?, paren
         states = this.address.states.map(::toBusinessPartnerState),
         classifications = emptyList(),
         roles = this.address.roles,
-        postalAddress = BusinessPartnerPostalAddressInputDto(
+        postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = this.address.physicalPostalAddress,
             alternativePostalAddress = this.address.alternativePostalAddress
@@ -381,5 +402,6 @@ fun AddressGateOutputRequest.toBusinessPartnerOutputDto(parentId: String?, paren
         bpnA = bpn
     )
 }
+
 
 
