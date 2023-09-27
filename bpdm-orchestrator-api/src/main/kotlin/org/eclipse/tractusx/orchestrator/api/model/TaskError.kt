@@ -17,19 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import io.swagger.v3.oas.annotations.media.Schema
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
-    }
-
-}
+@Schema(description = "Describes an error that happened during processing of a cleaning task")
+data class TaskError(
+    @get:Schema(description = "The type of error that occurred", required = true)
+    val type: TaskErrorType,
+    @get:Schema(description = "The free text, detailed description of the error", required = true)
+    val description: String
+)

@@ -17,17 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
+import org.eclipse.tractusx.bpdm.common.dto.*
 
-interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
 
-    @get:Schema(description = CommonDescription.externalId)
-    val externalId: String
-
-    @get:Schema(name = "isOwner", description = "True if the sharing member declares itself as the owner of the business partner.")
-    val isOwner: Boolean
-}
+data class BusinessPartnerDto(
+    override val nameParts: List<String> = emptyList(),
+    override val shortName: String? = null,
+    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
+    override val legalForm: String? = null,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val roles: Collection<BusinessPartnerRole> = emptyList(),
+    override val postalAddress: PostalAddressDto = PostalAddressDto(),
+    override val bpnL: String? = null,
+    override val bpnS: String? = null,
+    override val bpnA: String? = null,
+    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
+    val ownerBpnl: String? = null
+) : IBaseBusinessPartnerDto

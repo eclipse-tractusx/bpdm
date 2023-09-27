@@ -17,14 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.orchestrator
+package org.eclipse.tractusx.bpdm.orchestrator
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 
-@SpringBootApplication(exclude=[DataSourceAutoConfiguration::class])
+
+@SpringBootApplication(exclude = [DataSourceAutoConfiguration::class])
 @ConfigurationPropertiesScan
 class Application
 

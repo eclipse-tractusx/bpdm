@@ -17,19 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator
+package org.eclipse.tractusx.bpdm.orchestrator.config
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.client.WebClient
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class ApplicationTests {
-
-    @Test
-    fun contextLoads() {
-
+@Configuration
+class OrchestratorClientConfig {
+    @Bean
+    fun orchestratorClient(webServerAppCtxt: ServletWebServerApplicationContext): OrchestrationApiClient {
+        return OrchestrationApiClientImpl { WebClient.create("http://localhost:${webServerAppCtxt.webServer.port}") }
     }
 
 }
