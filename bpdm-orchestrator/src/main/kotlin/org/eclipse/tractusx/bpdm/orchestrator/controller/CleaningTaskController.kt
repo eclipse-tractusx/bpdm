@@ -62,6 +62,37 @@ class CleaningTaskController(
             )
         )
 
+    //While we don't have an implementation use a dummy response for the endpoints
+    val dummyResponseTaskState =
+        TaskStateResponse(
+            listOf(
+                TaskRequesterState(
+                    taskId = "0",
+                    businessPartnerResult = null,
+                    processingState = TaskProcessingStateDto(
+                        cleaningStep = CleaningStep.CleanAndSync,
+                        reservationState = ReservationState.Queued,
+                        resultState = ResultState.Pending,
+                        errors = emptyList(),
+                        createdAt = Instant.now(),
+                        modifiedAt = Instant.now()
+                    )
+                ),
+                TaskRequesterState(
+                    taskId = "1",
+                    businessPartnerResult = null,
+                    processingState = TaskProcessingStateDto(
+                        cleaningStep = CleaningStep.Clean,
+                        reservationState = ReservationState.Queued,
+                        resultState = ResultState.Pending,
+                        errors = emptyList(),
+                        createdAt = Instant.now(),
+                        modifiedAt = Instant.now()
+                    )
+                )
+            )
+        )
+
 
     override fun createCleaningTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         if (createRequest.businessPartners.size > apiConfigProperties.upsertLimit)
@@ -70,4 +101,11 @@ class CleaningTaskController(
         //ToDo: Replace with service logic
         return dummyResponseCreateTask
     }
+
+
+    override fun searchCleaningTaskState(searchTaskIdRequest: TaskStateRequest): TaskStateResponse {
+        // ToDo: Replace with service logic
+        return dummyResponseTaskState
+    }
+
 }

@@ -26,6 +26,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
 import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskStateResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -59,5 +61,21 @@ interface CleaningTaskApi {
     @PostExchange
     fun createCleaningTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
 
+
+    @Operation(
+        summary = "Search for the state of cleaning tasks by task identifiers",
+        description = "Returns the state of finished cleaning tasks based on the provided task identifiers."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The state of the finished cleaning tasks for the provided task identifiers."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
+        ]
+    )
+    @PostMapping("/cleaning-tasks/state/search")
+    fun searchCleaningTaskState(@RequestBody searchTaskIdRequest: TaskStateRequest): TaskStateResponse
 
 }
