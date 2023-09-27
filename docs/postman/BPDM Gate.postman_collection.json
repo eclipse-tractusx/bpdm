@@ -1,9 +1,9 @@
 {
   "info": {
-    "_postman_id": "326ec7da-09af-411a-ae73-3612d9c592f7",
+    "_postman_id": "6930ca9a-a4cc-4f2b-9819-69406e4af7c7",
     "name": "BPDM Gate",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "26818013"
+    "_exporter_id": "26285948"
   },
   "item": [
     {
@@ -428,6 +428,70 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Generic Business Partner",
+          "item": [
+            {
+              "name": "Business Partners",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  {\n    \"externalId\": \"12044444\",\n    \"nameParts\": [\n      \"Name of Company\"\n    ],\n    \"shortName\": \"string\",\n    \"identifiers\": [\n      {\n           \"value\": \"123456789\",\n           \"type\": \"CUSTOM_ID_TYPE\",\n           \"issuingBody\": \"CUSTOM_ISSUE_BODY\"\n       }\n    ],\n    \"legalForm\": \"CUSTOM_FORM\",\n    \"states\": [\n      {\n        \"validFrom\": \"2023-09-29T08:57:22.999Z\",\n        \"validTo\": \"2023-09-29T08:57:22.999Z\",\n        \"type\": \"ACTIVE\",\n        \"description\": \"Active\"\n      }\n    ],\n    \"classifications\": [\n      {\n        \"type\": \"NACE\",\n        \"code\": \"01.21\",\n        \"value\": \"Farming of cattle, dairy farming\"\n      }\n    ],\n    \"roles\": [\n      \"SUPPLIER\"\n    ],\n    \"postalAddress\": {\n      \"addressType\": \"LegalAndSiteMainAddress\",\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg\",\n        \"administrativeAreaLevel2\": \"test1\",\n        \"administrativeAreaLevel3\": \"test2\",\n        \"postalCode\": \"70546\",\n        \"city\": \"Stuttgart\",\n        \"district\": \"Stuttgart\",\n        \"street\": {\n          \"namePrefix\": \"test prefix\",\n          \"additionalNamePrefix\": \"test1\",\n          \"name\": \"Stuttgarter Strasse\",\n          \"nameSuffix\": \"test\",\n          \"additionalNameSuffix\": \"test2\",\n          \"houseNumber\": \"1\",\n          \"milestone\": \"Stuttgarter Strasse 1\",\n          \"direction\": \"Stuttgarter Str.\"\n        },\n        \"companyPostalCode\": \"GM01\",\n        \"industrialZone\": \"HEADQUARTER\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"test\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg 1\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart 1\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test\",\n        \"deliveryServiceNumber\": \"1234\"\n      }\n    },\n    \"isOwner\": true\n  }\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/business-partners",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "business-partners"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Business Partners Search",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  \"12044444BP\"\n]",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{Gate-Host}}/api/catena/input/business-partners/search",
+                  "host": [
+                    "{{Gate-Host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "catena",
+                    "input",
+                    "business-partners",
+                    "search"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
@@ -624,6 +688,36 @@
                 "catena",
                 "output",
                 "addresses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Business Partners Search",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  \"12044444\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Gate-Host}}/api/catena/output/business-partners/search",
+              "host": [
+                "{{Gate-Host}}"
+              ],
+              "path": [
+                "api",
+                "catena",
+                "output",
+                "business-partners",
+                "search"
               ]
             }
           },
