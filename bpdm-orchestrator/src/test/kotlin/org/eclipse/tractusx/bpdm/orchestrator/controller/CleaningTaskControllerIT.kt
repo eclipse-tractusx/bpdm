@@ -23,11 +23,7 @@ import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.orchestrator.util.BusinessPartnerTestValues
 import org.eclipse.tractusx.bpdm.orchestrator.util.DummyValues
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.CleaningReservationRequest
-import org.eclipse.tractusx.orchestrator.api.model.CleaningStep
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskMode
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -108,6 +104,46 @@ class CleaningTaskControllerIT @Autowired constructor(
     }
 
     /**
+     * Validate post cleaning result endpoint is invokable
+     */
+    @Test
+    fun `post cleaning result is invokable`() {
+        val request = CleaningResultRequest(
+            results = listOf(
+                CleaningResultEntry(
+                    taskId = "0",
+                    result = BusinessPartnerFull(
+                        generic = BusinessPartnerTestValues.businessPartner1,
+                        legalEntity = BusinessPartnerTestValues.legalEntity1,
+                        site = BusinessPartnerTestValues.site1,
+                        address = BusinessPartnerTestValues.logisticAddress1
+                    ),
+                    errors = emptyList()
+                ),
+                CleaningResultEntry(
+                    taskId = "1",
+                    result = BusinessPartnerFull(
+                        generic = BusinessPartnerTestValues.businessPartner2,
+                        legalEntity = BusinessPartnerTestValues.legalEntity2,
+                        site = BusinessPartnerTestValues.site2,
+                        address = BusinessPartnerTestValues.logisticAddress2
+                    ),
+                    errors = emptyList()
+                ),
+                CleaningResultEntry(
+                    taskId = "2",
+                    result = null,
+                    errors = listOf(
+                        TaskError(type = TaskErrorType.Unspecified, "Error Description")
+                    )
+                ),
+            )
+        )
+
+        orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+    }
+
+    /**
      * When requesting cleaning of too many business partners (over the upsert limit)
      * Then throw exception
      */
@@ -149,6 +185,34 @@ class CleaningTaskControllerIT @Autowired constructor(
     }
 
     /**
+     * When posting too many cleaning results (over the upsert limit)
+     * Then throw exception
+     */
+    @Test
+    fun `expect exception on posting too many cleaning results`() {
+
+        val validCleaningResultEntry = CleaningResultEntry(
+            taskId = "0",
+            result = null,
+            errors = listOf(TaskError(type = TaskErrorType.Unspecified, description = "Description"))
+        )
+
+        //Create entries above the upsert limit of 3
+        val request = CleaningResultRequest(
+            results = listOf(
+                validCleaningResultEntry.copy(taskId = "0"),
+                validCleaningResultEntry.copy(taskId = "1"),
+                validCleaningResultEntry.copy(taskId = "2"),
+                validCleaningResultEntry.copy(taskId = "3"),
+            )
+        )
+
+        Assertions.assertThatThrownBy {
+            orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+        }.isInstanceOf(WebClientResponseException::class.java)
+    }
+
+    /**
      * Search for taskId and get dummy response on the test
      */
 
@@ -166,5 +230,27 @@ class CleaningTaskControllerIT @Autowired constructor(
         // Assert that the response matches the expected value
         Assertions.assertThat(response).isEqualTo(expected)
     }
+
+    /**
+     * When posting cleaning result without business partner data and no errors
+     * Then throw exception
+     */
+    @Test
+    fun `expect exception on posting empty cleaning result`() {
+        val request = CleaningResultRequest(
+            results = listOf(
+                CleaningResultEntry(
+                    taskId = "0",
+                    result = null,
+                    errors = emptyList()
+                )
+            )
+        )
+
+        Assertions.assertThatThrownBy {
+            orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+        }.isInstanceOf(WebClientResponseException::class.java)
+    }
+
 
 }

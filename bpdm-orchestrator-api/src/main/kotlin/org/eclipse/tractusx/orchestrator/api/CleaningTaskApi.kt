@@ -100,4 +100,26 @@ interface CleaningTaskApi {
     @PostMapping("/reservations")
     @PostExchange("/reservations")
     fun reserveCleaningTasks(@RequestBody reservationRequest: CleaningReservationRequest): CleaningReservationResponse
+
+    @Operation(
+        summary = "Post cleaning results for reserved cleaning tasks in given cleaning step",
+        description = "Post business partner cleaning results for the given cleaning tasks. " +
+                "In order to post a result for a cleaning task it needs to be reserved first, has to currently be in the given cleaning step and the time limit is not exceeded." +
+                "The number of results you can post at a time does not need to match the original number of reserved tasks." +
+                "Results are accepted via strategy 'all or nothing'." +
+                "For a single request, the maximum number of postable results is limited to \${bpdm.api.upsert-limit}."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "If the results could be processed"
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
+        ]
+    )
+    @Tag(name = "Cleaning Service")
+    @PostMapping("/results")
+    @PostExchange("/results")
+    fun resolveCleaningTasks(@RequestBody resultRequest: CleaningResultRequest)
 }
