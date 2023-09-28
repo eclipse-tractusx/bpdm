@@ -19,13 +19,21 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
-)
+data class Site(
+    @get:Schema(description = "A reference to the BPNS of this site. Either by the BPN value itself or a BPN request identifier.")
+    val bpnSReference: BpnReference? = null,
+
+    @get:Schema(description = "Whether this site data is different from its golden record counterpart in the Pool")
+    val hasChanged: Boolean? = null,
+
+    @get:Schema(description = SiteDescription.name)
+    val name: String? = null,
+
+    override val states: Collection<SiteState> = emptyList(),
+
+    override val mainAddress: LogisticAddress? = null,
+) : IBaseSiteDto

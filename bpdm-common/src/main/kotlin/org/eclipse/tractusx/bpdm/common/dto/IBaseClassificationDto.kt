@@ -17,15 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(description = "Request object to specify for which business partner data cleaning tasks should be created and in which mode")
-data class TaskCreateRequest(
-    @get:Schema(required = true, description = "The cleaning mode affecting which cleaning steps the business partner goes through")
-    val mode: TaskMode,
-    @get:ArraySchema(arraySchema = Schema(description = "The list of business partner data to be cleaned"))
-    val businessPartners: List<BusinessPartnerGeneric>
-)
+@Schema(description = ClassificationDescription.header)
+interface IBaseClassificationDto {
+    @get:Schema(description = ClassificationDescription.type)
+    val type: ClassificationType
+
+    @get:Schema(description = ClassificationDescription.code)
+    val code: String?
+
+    @get:Schema(description = ClassificationDescription.value)
+    val value: String?
+}

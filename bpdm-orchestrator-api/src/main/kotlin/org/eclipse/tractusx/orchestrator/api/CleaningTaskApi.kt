@@ -24,10 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateRequest
-import org.eclipse.tractusx.orchestrator.api.model.TaskStateResponse
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -75,7 +72,29 @@ interface CleaningTaskApi {
             ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
         ]
     )
+    @Tag(name = "Requester")
     @PostMapping("/cleaning-tasks/state/search")
+    @PostExchange("/cleaning-tasks/state/search")
     fun searchCleaningTaskState(@RequestBody searchTaskIdRequest: TaskStateRequest): TaskStateResponse
 
+    @Operation(
+        summary = "Reserve the next cleaning tasks waiting in the given cleaning step",
+        description = "Reserve up to a given number of cleaning tasks enqueued in the given cleaning step. " +
+                "The cleaning tasks contain the business partner to clean which consists of the generic and L/S/A data. " +
+                "For cleaning the business partners have a time limit which is returned with the reserved tasks." +
+                "For a single request, the maximum number of reservable tasks is limited to \${bpdm.api.upsert-limit}."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "The reserved cleaning tasks with their business partner data to clean."
+            ),
+            ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
+        ]
+    )
+    @Tag(name = "Cleaning Service")
+    @PostMapping("/reservations")
+    @PostExchange("/reservations")
+    fun reserveCleaningTasks(@RequestBody reservationRequest: CleaningReservationRequest): CleaningReservationResponse
 }

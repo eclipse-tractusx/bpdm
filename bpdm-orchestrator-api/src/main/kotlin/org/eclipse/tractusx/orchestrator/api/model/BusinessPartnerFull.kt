@@ -20,21 +20,15 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
 
-
-data class BusinessPartnerDto(
-    override val nameParts: List<String> = emptyList(),
-    override val shortName: String? = null,
-    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val legalForm: String? = null,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<ClassificationDto> = emptyList(),
-    override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: PostalAddressDto = PostalAddressDto(),
-    override val bpnL: String? = null,
-    override val bpnS: String? = null,
-    override val bpnA: String? = null,
-    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
-    val ownerBpnl: String? = null
-) : IBaseBusinessPartnerDto
+@Schema(description = "Business partner data in full representation, consisting of generic data as well as its L/S/A representation.")
+data class BusinessPartnerFull(
+    @get:Schema(description = "The business partner data in generic representation", required = true)
+    val generic: BusinessPartnerGeneric,
+    @get:Schema(description = "The legal entity part of this business partner data")
+    val legalEntity: LegalEntity? = null,
+    @get:Schema(description = "The site part of this business partner data")
+    val site: Site? = null,
+    @get:Schema(description = "The address part of this business partner data")
+    val address: LogisticAddress? = null
+)
