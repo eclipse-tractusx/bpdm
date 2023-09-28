@@ -21,11 +21,7 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Request object for giving a list of tasks to search")
+@Schema(description = "Request object for giving a list of task identifiers to search for the state of cleaning tasks")
 data class TaskStateRequest(
-    val taskList: List<String>
-) {
-
-}
-
-
+    val taskIds: List<String>
+)

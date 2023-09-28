@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
+const val TagRequester = "Requester"
+const val TagCleaningService = "Cleaning Service"
+
 @RequestMapping("/api/cleaning-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
 @HttpExchange("/api/cleaning-tasks")
 interface CleaningTaskApi {
@@ -53,7 +56,7 @@ interface CleaningTaskApi {
             ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
         ]
     )
-    @Tag(name = "Requester")
+    @Tag(name = TagRequester)
     @PostMapping
     @PostExchange
     fun createCleaningTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
@@ -72,9 +75,9 @@ interface CleaningTaskApi {
             ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
         ]
     )
-    @Tag(name = "Requester")
-    @PostMapping("/cleaning-tasks/state/search")
-    @PostExchange("/cleaning-tasks/state/search")
+    @Tag(name = TagRequester)
+    @PostMapping("/state/search")
+    @PostExchange("/state/search")
     fun searchCleaningTaskState(@RequestBody searchTaskIdRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
@@ -93,7 +96,7 @@ interface CleaningTaskApi {
             ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
         ]
     )
-    @Tag(name = "Cleaning Service")
+    @Tag(name = TagCleaningService)
     @PostMapping("/reservations")
     @PostExchange("/reservations")
     fun reserveCleaningTasks(@RequestBody reservationRequest: CleaningReservationRequest): CleaningReservationResponse
