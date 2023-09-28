@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.orchestrator.controller
 
 import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
+import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmEmptyResultException
 import org.eclipse.tractusx.bpdm.orchestrator.util.DummyValues
 import org.eclipse.tractusx.orchestrator.api.CleaningTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -49,6 +50,16 @@ class CleaningTaskController(
             CleaningStep.CleanAndSync -> DummyValues.dummyCleaningReservationResponse
             CleaningStep.PoolSync -> DummyValues.dummyPoolSyncResponse
             CleaningStep.Clean -> DummyValues.dummyCleaningReservationResponse
+        }
+    }
+
+    override fun resolveCleaningTasks(resultRequest: CleaningResultRequest) {
+        if (resultRequest.results.size > apiConfigProperties.upsertLimit)
+            throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
+
+        resultRequest.results.forEach { resultEntry ->
+            if (resultEntry.result == null && resultEntry.errors.isEmpty())
+                throw BpdmEmptyResultException(resultEntry.taskId)
         }
     }
 

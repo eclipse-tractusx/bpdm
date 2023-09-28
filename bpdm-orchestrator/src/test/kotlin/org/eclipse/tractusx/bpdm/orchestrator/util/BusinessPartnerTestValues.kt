@@ -202,4 +202,257 @@ object BusinessPartnerTestValues {
         bpnS = "BPNSTEST-2",
         bpnA = "BPNATEST-2"
     )
+
+    val logisticAddress1 = LogisticAddress(
+        name = "Address Name 1",
+        states = listOf(
+            AddressState(
+                description = "Address State 1",
+                validFrom = LocalDateTime.of(1970, 4, 4, 4, 4),
+                validTo = LocalDateTime.of(1975, 5, 5, 5, 5),
+                type = BusinessStateType.ACTIVE
+            ),
+            AddressState(
+                description = "Address State 2",
+                validFrom = LocalDateTime.of(1975, 5, 5, 5, 5),
+                validTo = null,
+                type = BusinessStateType.INACTIVE
+            ),
+        ),
+        identifiers = listOf(
+            AddressIdentifier(
+                value = "Address Identifier Value 1",
+                type = "Address Identifier Type 1"
+            ),
+            AddressIdentifier(
+                value = "Address Identifier Value 2",
+                type = "Address Identifier Type 2"
+            )
+        ),
+        physicalPostalAddress = PhysicalPostalAddressDto(
+            geographicCoordinates = GeoCoordinateDto(0.12f, 0.12f, 0.12f),
+            country = CountryCode.AD,
+            administrativeAreaLevel1 = "AD-07",
+            administrativeAreaLevel2 = "Admin-Level 2-1",
+            administrativeAreaLevel3 = "Admin-Level 3-1",
+            postalCode = "Postal Code 1",
+            city = "City 1",
+            district = "District 1",
+            street = StreetDto(
+                name = "Street Name 1",
+                houseNumber = "House Number 1",
+                milestone = "Milestone 1",
+                direction = "Direction 1",
+                namePrefix = "Name Prefix 1",
+                additionalNameSuffix = "Additional Name Suffix 1",
+                additionalNamePrefix = "Additional Name Prefix 1",
+                nameSuffix = "Name Suffix 1"
+            ),
+            companyPostalCode = "Company Postal Code 1",
+            industrialZone = "Industrial Zone 1",
+            building = "Building 1",
+            floor = "Floor 1",
+            door = "Door 1"
+        ),
+        alternativePostalAddress = AlternativePostalAddressDto(
+            geographicCoordinates = GeoCoordinateDto(0.23f, 0.23f, 0.23f),
+            country = CountryCode.AD,
+            administrativeAreaLevel1 = "AD-08",
+            postalCode = "Postal Code Alt 1",
+            city = "City Alt 1",
+            deliveryServiceType = DeliveryServiceType.PRIVATE_BAG,
+            deliveryServiceQualifier = "Delivery Service Qualifier 1",
+            deliveryServiceNumber = "Delivery Service Number 1"
+        ),
+        bpnAReference = BpnReference(
+            referenceType = BpnReferenceType.Bpn,
+            referenceValue = "BPNATEST-1"
+        ),
+        hasChanged = true
+    )
+
+    val logisticAddress2 = LogisticAddress(
+        name = "Address Name 2",
+        states = listOf(
+            AddressState(
+                description = "Address State 2",
+                validFrom = LocalDateTime.of(1971, 4, 4, 4, 4),
+                validTo = null,
+                type = BusinessStateType.ACTIVE
+            )
+        ),
+        identifiers = listOf(
+            AddressIdentifier(
+                value = "Address Identifier Value 2-1",
+                type = "Address Identifier Type 2-1"
+            )
+        ),
+        physicalPostalAddress = PhysicalPostalAddressDto(
+            geographicCoordinates = GeoCoordinateDto(0.45f, 0.46f, 0.47f),
+            country = CountryCode.AD,
+            administrativeAreaLevel1 = "AD-07",
+            administrativeAreaLevel2 = "Admin-Level 2-2",
+            administrativeAreaLevel3 = "Admin-Level 3-2",
+            postalCode = "Postal Code 2",
+            city = "City 2",
+            district = "District 2",
+            street = StreetDto(
+                name = "Street Name 2",
+                houseNumber = "House Number 2",
+                milestone = "Milestone 2",
+                direction = "Direction 2",
+                namePrefix = "Name Prefix 2",
+                additionalNameSuffix = "Additional Name Suffix 2",
+                additionalNamePrefix = "Additional Name Prefix 2",
+                nameSuffix = "Name Suffix 2"
+            ),
+            companyPostalCode = "Company Postal Code 2",
+            industrialZone = "Industrial Zone 2",
+            building = "Building 2",
+            floor = "Floor 2",
+            door = "Door 2"
+        ),
+        alternativePostalAddress = AlternativePostalAddressDto(
+            geographicCoordinates = GeoCoordinateDto(0.01f, 0.02f, 0.03f),
+            country = CountryCode.AD,
+            administrativeAreaLevel1 = "AD-08",
+            postalCode = "Postal Code Alt 2",
+            city = "City Alt 2",
+            deliveryServiceType = DeliveryServiceType.PO_BOX,
+            deliveryServiceQualifier = "Delivery Service Qualifier 2",
+            deliveryServiceNumber = "Delivery Service Number 2"
+        ),
+        bpnAReference = BpnReference(
+            referenceType = BpnReferenceType.BpnRequestIdentifier,
+            referenceValue = "BPN_REQUEST_ID_TEST"
+        ),
+        hasChanged = true
+    )
+
+    val legalEntity1 = LegalEntity(
+        legalName = "Legal Entity Name 1",
+        legalShortName = "Legal Short Name 1",
+        identifiers = listOf(
+            LegalEntityIdentifier(
+                value = "Legal Identifier Value 1",
+                type = "Legal Identifier Type 1",
+                issuingBody = "Legal Issuing Body 1"
+            ),
+            LegalEntityIdentifier(
+                value = "Legal Identifier Value 2",
+                type = "Legal Identifier Type 2",
+                issuingBody = "Legal Issuing Body 2"
+            ),
+        ),
+        legalForm = "Legal Form 1",
+        states = listOf(
+            LegalEntityState(
+                description = "Legal State Description 1",
+                validFrom = LocalDateTime.of(1995, 2, 2, 3, 3),
+                validTo = LocalDateTime.of(2000, 3, 3, 4, 4),
+                type = BusinessStateType.ACTIVE
+            ),
+            LegalEntityState(
+                description = "Legal State Description 2",
+                validFrom = LocalDateTime.of(2000, 3, 3, 4, 4),
+                validTo = null,
+                type = BusinessStateType.INACTIVE
+            ),
+        ),
+        classifications = listOf(
+            BusinessPartnerClassification(
+                type = ClassificationType.SIC,
+                code = "Classification Code 1",
+                value = "Classification Value 1"
+            ),
+            BusinessPartnerClassification(
+                type = ClassificationType.NACE,
+                code = "Classification Code 2",
+                value = "Classification Value 2"
+            )
+        ),
+        legalAddress = logisticAddress1,
+        bpnLReference = BpnReference(
+            referenceValue = "BPNL1-TEST",
+            referenceType = BpnReferenceType.Bpn
+        ),
+        hasChanged = false
+    )
+
+    val legalEntity2 = LegalEntity(
+        legalName = "Legal Entity Name 2",
+        legalShortName = "Legal Short Name 2",
+        identifiers = listOf(
+            LegalEntityIdentifier(
+                value = "Legal Identifier Value 2",
+                type = "Legal Identifier Type 2",
+                issuingBody = "Legal Issuing Body 2"
+            )
+        ),
+        legalForm = "Legal Form 2",
+        states = listOf(
+            LegalEntityState(
+                description = "Legal State Description 2",
+                validFrom = LocalDateTime.of(1900, 5, 5, 5, 5),
+                validTo = null,
+                type = BusinessStateType.ACTIVE
+            )
+        ),
+        classifications = listOf(
+            BusinessPartnerClassification(
+                type = ClassificationType.SIC,
+                code = "Classification Code 2",
+                value = "Classification Value 2"
+            )
+        ),
+        legalAddress = logisticAddress2,
+        bpnLReference = BpnReference(
+            referenceValue = "BPNL-REQUEST_ID_TEST",
+            referenceType = BpnReferenceType.BpnRequestIdentifier
+        ),
+        hasChanged = false
+    )
+
+    val site1 = Site(
+        name = "Site Name 1",
+        states = listOf(
+            SiteState(
+                description = "Site State Description 1",
+                validFrom = LocalDateTime.of(1991, 10, 10, 10, 10),
+                validTo = LocalDateTime.of(2001, 11, 11, 11, 11),
+                type = BusinessStateType.ACTIVE
+            ),
+            SiteState(
+                description = "Site State Description 2",
+                validFrom = LocalDateTime.of(2001, 11, 11, 11, 11),
+                validTo = null,
+                type = BusinessStateType.INACTIVE
+            )
+        ),
+        mainAddress = logisticAddress1,
+        bpnSReference = BpnReference(
+            referenceValue = "BPNS_TEST",
+            referenceType = BpnReferenceType.Bpn
+        ),
+        hasChanged = false
+    )
+
+    val site2 = Site(
+        name = "Site Name 2",
+        states = listOf(
+            SiteState(
+                description = "Site State Description 2",
+                validFrom = LocalDateTime.of(1997, 12, 12, 12, 12),
+                validTo = null,
+                type = BusinessStateType.ACTIVE
+            )
+        ),
+        mainAddress = logisticAddress2,
+        bpnSReference = BpnReference(
+            referenceValue = "BPNS_REQUEST_ID_TEST",
+            referenceType = BpnReferenceType.BpnRequestIdentifier
+        ),
+        hasChanged = true
+    )
+
 }
