@@ -20,9 +20,12 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
@@ -30,16 +33,21 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class SiteService(
     private val bpnConfigProperties: BpnConfigProperties,
     private val sitePersistenceService: SitePersistenceService,
     private val siteRepository: SiteRepository,
-    private val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService,
+    private val businessPartnerService: BusinessPartnerService,
+    private val businessPartnerRepository: BusinessPartnerRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -104,7 +112,29 @@ class SiteService(
      **/
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        sitePersistenceService.persistSitesBP(sites, StageType.Input)
+        val mappedGBP: MutableCollection<BusinessPartnerInputRequest> = mutableListOf()
+
+        sites.forEach { site ->
+            val mapBusinessPartner = site.toBusinessPartnerDto()
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.externalId)
+            if (mapBusinessPartner.parentId == null || mapBusinessPartner.parentType == null || duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.SiteMainAddress) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No parentID or Parent Type have correct values or there is already" +
+                            "a BP with same ID!"
+                )
+            }
+
+            val retrieveBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+
+            if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Legal Entity doesn't exist")
+            }
+
+            mappedGBP.add(mapBusinessPartner)
+        }
+
+        businessPartnerService.upsertBusinessPartnersInput(mappedGBP)
 
     }
 
@@ -113,7 +143,35 @@ class SiteService(
      **/
     fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>) {
 
-        sitePersistenceService.persistSitesOutputBP(sites, StageType.Output)
+        val mappedGBP: MutableCollection<BusinessPartnerOutputRequest> = mutableListOf()
+
+        sites.forEach { site ->
+            val mapBusinessPartner = site.toBusinessPartnerOutputDto()
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, site.externalId)
+            if (mapBusinessPartner.parentId == null || mapBusinessPartner.parentType == null || duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.SiteMainAddress) {
+                throw ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No parentID or Parent Type have correct values or there is already" +
+                            "a BP with same ID!"
+                )
+            }
+
+            val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Output, mapBusinessPartner.parentId)
+            if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Output Legal Entity doesn't exist")
+            }
+
+            val relatedSite = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.externalId)
+            if (relatedSite == null || relatedSite.postalAddress.addressType != AddressType.SiteMainAddress) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
+            }
+
+            mappedGBP.add(mapBusinessPartner)
+        }
+
+        businessPartnerService.upsertBusinessPartnersOutput(mappedGBP)
+
+        //sitePersistenceService.persistSitesOutputBP(sites, StageType.Output)
     }
 
 }

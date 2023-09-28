@@ -56,5 +56,4 @@ interface IBaseBusinessPartnerDto {
 
     @get:Schema(description = "BPNA")
     val bpnA: String?
-
 }

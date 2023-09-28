@@ -46,6 +46,6 @@ data class BusinessPartnerOutputRequest(
     override val isOwnCompanyData: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,
-    override val bpnA: String? = null,
+    override val bpnA: String? = null
 
 ) : IBaseBusinessPartnerGateDto

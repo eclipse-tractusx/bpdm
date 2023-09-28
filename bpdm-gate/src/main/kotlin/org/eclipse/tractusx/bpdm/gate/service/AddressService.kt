@@ -19,24 +19,33 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.entity.LogisticAddress
 import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AddressService(
     private val addressPersistenceService: AddressPersistenceService,
     private val addressRepository: GateAddressRepository,
-    private val sharingStateService: SharingStateService
+    private val sharingStateService: SharingStateService,
+    private val businessPartnerService: BusinessPartnerService,
+    private val businessPartnerRepository: BusinessPartnerRepository
 ) {
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
@@ -102,14 +111,103 @@ class AddressService(
      * Upsert addresses input to the database
      **/
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
-        addressPersistenceService.persistAddressBP(addresses, StageType.Input)
+
+        val mappedGBP: MutableCollection<BusinessPartnerInputRequest> = mutableListOf()
+
+        addresses.forEach { address ->
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.externalId)
+
+            if (duplicateBP != null && (duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress || duplicateBP.postalAddress.addressType != AddressType.LegalAndSiteMainAddress)) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
+            }
+
+            if (address.siteExternalId != null) {
+
+                val mapBusinessPartner = address.toBusinessPartnerDto(address.siteExternalId, BusinessPartnerType.SITE)
+
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.SiteMainAddress) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
+                }
+
+                mappedGBP.add(mapBusinessPartner)
+
+            } else if (address.legalEntityExternalId != null) {
+
+                val mapBusinessPartner = address.toBusinessPartnerDto(address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY)
+
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Legal Entity doesn't exist")
+                }
+
+                mappedGBP.add(mapBusinessPartner)
+
+            }
+        }
+
+        businessPartnerService.upsertBusinessPartnersInput(mappedGBP)
+
+
+        //addressPersistenceService.persistAddressBP(addresses, StageType.Input)
+
     }
 
     /**
      * Upsert addresses output to the database
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
-        addressPersistenceService.persistOutputAddressBP(addresses, StageType.Output)
+
+        val mappedGBP: MutableCollection<BusinessPartnerOutputRequest> = mutableListOf()
+
+        addresses.forEach { address ->
+
+            val relatedAddress = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.externalId)
+            if (relatedAddress == null || relatedAddress.postalAddress.addressType != AddressType.AdditionalAddress) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't exist")
+            }
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, address.externalId)
+            if (duplicateBP != null && (duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress || duplicateBP.postalAddress.addressType != AddressType.LegalAndSiteMainAddress)) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
+            }
+
+            if (address.siteExternalId != null) {
+
+                val mapBusinessPartner = address.toBusinessPartnerOutputDto(address.siteExternalId, BusinessPartnerType.SITE)
+
+                if (relatedAddress.parentType != mapBusinessPartner.parentType) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't have site relationship")
+                }
+
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.SiteMainAddress) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
+                }
+
+                mappedGBP.add(mapBusinessPartner)
+
+            } else if (address.legalEntityExternalId != null) {
+
+                val mapBusinessPartner = address.toBusinessPartnerOutputDto(address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY)
+
+                if (relatedAddress.parentType != mapBusinessPartner.parentType) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't have Legal Entity relationship")
+                }
+
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Legal Entity doesn't exist")
+                }
+
+                mappedGBP.add(mapBusinessPartner)
+
+            }
+        }
+
+        businessPartnerService.upsertBusinessPartnersOutput(mappedGBP)
+
     }
 
 }

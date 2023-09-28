@@ -20,23 +20,31 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class LegalEntityService(
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
-    private val legalEntityRepository: LegalEntityRepository
+    private val legalEntityRepository: LegalEntityRepository,
+    private val businessPartnerService: BusinessPartnerService,
+    private val businessPartnerRepository: BusinessPartnerRepository
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -46,7 +54,21 @@ class LegalEntityService(
      **/
     fun upsertLegalEntities(legalEntities: Collection<LegalEntityGateInputRequest>) {
 
-        legalEntityPersistenceService.persistLegalEntitiesBP(legalEntities, StageType.Input)
+        val mappedGBP: MutableCollection<BusinessPartnerInputRequest> = mutableListOf()
+
+        legalEntities.forEach { legalEntity ->
+
+            val mapBusinessPartner = legalEntity.toBusinessPartnerDto()
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
+            if (duplicateBP?.parentType != null) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
+            }
+
+            mappedGBP.add(mapBusinessPartner)
+        }
+
+        businessPartnerService.upsertBusinessPartnersInput(mappedGBP)
 
     }
 
@@ -55,7 +77,30 @@ class LegalEntityService(
      **/
     fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>) {
 
-        legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, StageType.Output)
+        //legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, StageType.Output)
+
+        val mappedGBP: MutableCollection<BusinessPartnerOutputRequest> = mutableListOf()
+
+        legalEntities.forEach { legalEntity ->
+
+            val mapBusinessPartner = legalEntity.toBusinessPartnerOutputDto()
+
+            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, legalEntity.externalId)
+            if (duplicateBP?.parentType != null) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
+            }
+
+            val retrieveBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
+
+            if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Output Legal Entity doesn't exist")
+            }
+
+            mappedGBP.add(mapBusinessPartner)
+        }
+
+        businessPartnerService.upsertBusinessPartnersOutput(mappedGBP)
+
     }
 
     fun getLegalEntityByExternalId(externalId: String): LegalEntityGateInputDto {
