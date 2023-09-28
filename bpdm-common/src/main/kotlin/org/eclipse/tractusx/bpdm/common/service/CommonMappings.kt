@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.model.NamedType
 import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 
 fun <T : NamedUrlType> T.toDto(): TypeKeyNameUrlDto<T> {
     return TypeKeyNameUrlDto(this, getTypeName(), getUrl())
@@ -46,8 +47,8 @@ fun CountryCode.toDto(): TypeKeyNameVerboseDto<CountryCode> {
     return TypeKeyNameVerboseDto(this, getName())
 }
 
-fun PaginationRequest.toPageRequest() =
-    PageRequest.of(page, size)
+fun PaginationRequest.toPageRequest(sort: Sort = Sort.unsorted()) =
+    PageRequest.of(page, size, sort)
 
 fun <T, R> Page<T>.toPageDto(contentMapper: (T) -> R): PageDto<R> =
     PageDto(

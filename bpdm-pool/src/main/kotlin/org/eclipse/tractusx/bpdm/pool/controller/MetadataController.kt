@@ -71,8 +71,13 @@ class MetadataController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
+    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<RegionDto> {
+        return metadataService.getRegions(paginationRequest)
+    }
+
+    @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
     override fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
-        return metadataService.getRegions(PageRequest.of(paginationRequest.page, paginationRequest.size))
+        return metadataService.getRegions(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getChangeMetaDataAsRole())")

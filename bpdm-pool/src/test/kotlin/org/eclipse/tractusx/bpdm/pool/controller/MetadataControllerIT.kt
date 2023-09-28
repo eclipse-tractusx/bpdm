@@ -61,7 +61,7 @@ private typealias GetFunction = (client: WebTestClient, page: Int, size: Int) ->
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class,OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class MetadataControllerIT @Autowired constructor(
     private val testHelpers: TestHelpers,
     private val webTestClient: WebTestClient,
@@ -71,7 +71,11 @@ class MetadataControllerIT @Autowired constructor(
 ) {
     companion object {
 
-        private val identifierTypeDtos = listOf(BusinessPartnerNonVerboseValues.identifierTypeDto1, BusinessPartnerNonVerboseValues.identifierTypeDto2, BusinessPartnerNonVerboseValues.identifierTypeDto3)
+        private val identifierTypeDtos = listOf(
+            BusinessPartnerNonVerboseValues.identifierTypeDto1,
+            BusinessPartnerNonVerboseValues.identifierTypeDto2,
+            BusinessPartnerNonVerboseValues.identifierTypeDto3
+        )
 
         private val legalFormRequests = listOf(
             BusinessPartnerNonVerboseValues.legalForm1,
@@ -322,14 +326,14 @@ class MetadataControllerIT @Autowired constructor(
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType2.name
         )
-        identifierType2.details.add(IdentifierTypeDetail(identifierType2, CountryCode.UK, false))
+        identifierType2.details.add(IdentifierTypeDetail(identifierType2, UK, false))
 
         val identifierType3 = IdentifierType(
             technicalKey = BusinessPartnerNonVerboseValues.identifierType3.technicalKey,
             businessPartnerType = IdentifierBusinessPartnerType.LEGAL_ENTITY,
             name = BusinessPartnerNonVerboseValues.identifierType3.name
         )
-        identifierType3.details.add(IdentifierTypeDetail(identifierType3, CountryCode.PL, false))
+        identifierType3.details.add(IdentifierTypeDetail(identifierType3, PL, false))
 
         val givenIdentifierTypes = listOf(identifierType1, identifierType2, identifierType3)
 
@@ -343,7 +347,7 @@ class MetadataControllerIT @Autowired constructor(
         val result = webTestClient.invokeGetEndpoint<PageDto<IdentifierTypeDto>>(
             EndpointValues.CATENA_METADATA_IDENTIFIER_TYPE_PATH,
             Pair("businessPartnerType", IdentifierBusinessPartnerType.LEGAL_ENTITY.name),
-            Pair("country", CountryCode.PL.alpha2)
+            Pair("country", PL.alpha2)
         )
 
         assertThat(result.content).containsExactlyInAnyOrderElementsOf(expected)
@@ -424,5 +428,32 @@ class MetadataControllerIT @Autowired constructor(
             qualityLevel = QualityLevel.OPTIONAL
         )
         return rule
+    }
+
+    @Test
+    fun `get all administrative-areas-level1`() {
+        val firstPage = poolClient.metadata.getAdminAreasLevel1(PaginationRequest())
+        assertThat(firstPage.totalElements).isEqualTo(3478L)
+        assertThat(firstPage.totalPages).isEqualTo(348)
+        assertThat(firstPage.content.size).isEqualTo(10)
+
+        // INSERT INTO bpdm.regions (country_code, region_code, region_name) VALUES ('AD', 'AD-02', 'Canillo');
+        with(firstPage.content.first()) {
+            assertThat(countryCode).isEqualTo(AD)
+            assertThat(regionCode).isEqualTo("AD-02")
+            assertThat(regionName).isEqualTo("Canillo")
+        }
+
+        val lastPage = poolClient.metadata.getAdminAreasLevel1(PaginationRequest(347))
+        assertThat(lastPage.totalElements).isEqualTo(3478L)
+        assertThat(lastPage.totalPages).isEqualTo(348)
+        assertThat(lastPage.content.size).isEqualTo(8)
+
+        // INSERT INTO bpdm.regions (country_code, region_code, region_name) VALUES ('ZW', 'ZW-MW', 'Mashonaland West');
+        with(lastPage.content.last()) {
+            assertThat(countryCode).isEqualTo(ZW)
+            assertThat(regionCode).isEqualTo("ZW-MW")
+            assertThat(regionName).isEqualTo("Mashonaland West")
+        }
     }
 }
