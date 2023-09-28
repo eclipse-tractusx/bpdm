@@ -40,7 +40,7 @@ class GateQueryService(
 
     private val logger = KotlinLogging.logger { }
 
-    fun getChangedExternalIdsByBusinessPartnerType(modifiedAfter: Instant?): Map<BusinessPartnerType, Set<String>> {
+    fun getChangedExternalIdsByBusinessPartnerType(modifiedAfter: Instant?): Map<BusinessPartnerType?, Set<String>> {
         var page = 0
         var totalPages: Int
         val content = mutableListOf<ChangelogGateDto>()

@@ -162,7 +162,9 @@ internal class BusinessPartnerIT @Autowired constructor(
             identifiers = sortedSetOf(createIdentifier()),
             states = sortedSetOf(createState()),
             classifications = sortedSetOf(createClassification()),
-            stage = StageType.Input
+            stage = StageType.Input,
+            parentId = null,
+            parentType = null
         )
     }
 

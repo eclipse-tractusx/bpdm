@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -26,6 +27,7 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
@@ -59,19 +61,60 @@ class BusinessPartnerService(
     }
 
     private fun insertBusinessPartnerInput(dto: BusinessPartnerInputRequest): BusinessPartner {
-        val newEntity = businessPartnerMappings.toBusinessPartner(dto, StageType.Input)
+        val newEntity = businessPartnerMappings.toBusinessPartner(dto, StageType.Input, null, null)
         return businessPartnerRepository.save(newEntity)
             .also {
-                saveChangelog(dto.externalId, ChangelogType.CREATE, StageType.Input)
+                saveChangelog(dto.externalId, ChangelogType.CREATE, StageType.Input, checkBusinessPartnerType(dto.postalAddress.addressType))
                 initSharingState(dto)
             }
     }
 
     private fun updateBusinessPartnerInput(existingEntity: BusinessPartner, dto: BusinessPartnerInputRequest): BusinessPartner {
-        businessPartnerMappings.updateBusinessPartner(existingEntity, dto)
+        businessPartnerMappings.updateBusinessPartner(existingEntity, dto, null, null)
         return businessPartnerRepository.save(existingEntity)
             .also {
-                saveChangelog(dto.externalId, ChangelogType.UPDATE, StageType.Input)
+                saveChangelog(dto.externalId, ChangelogType.UPDATE, StageType.Input, checkBusinessPartnerType(dto.postalAddress.addressType))
+            }
+    }
+
+    private fun checkBusinessPartnerType(type: AddressType?): List<BusinessPartnerType>? {
+        return when (type) {
+            AddressType.LegalAndSiteMainAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.SITE)
+            AddressType.AdditionalAddress -> listOf(BusinessPartnerType.ADDRESS)
+            AddressType.LegalAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY)
+            AddressType.SiteMainAddress -> listOf(BusinessPartnerType.SITE)
+            else -> null
+        }
+    }
+
+    //Output Logic
+    @Transactional
+    fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerInputDto> {
+        val existingEntitiesByExternalId = getExistingEntityByExternalId(dtos, StageType.Output)
+
+        val savedEntities = dtos.map { dto ->
+            existingEntitiesByExternalId[dto.externalId]
+                ?.let { existingEntity -> updateBusinessPartnerOutput(existingEntity, dto) }
+                ?: run { insertBusinessPartnerOutput(dto) }
+        }
+
+        return savedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
+    }
+
+    private fun insertBusinessPartnerOutput(dto: BusinessPartnerOutputRequest): BusinessPartner {
+        val newEntity = businessPartnerMappings.toBusinessPartnerOutput(dto, StageType.Output, null, null)
+        return businessPartnerRepository.save(newEntity)
+            .also {
+                saveChangelog(dto.externalId, ChangelogType.CREATE, StageType.Output, checkBusinessPartnerType(dto.postalAddress.addressType))
+                initSharingState(dto)
+            }
+    }
+
+    private fun updateBusinessPartnerOutput(existingEntity: BusinessPartner, dto: BusinessPartnerOutputRequest): BusinessPartner {
+        businessPartnerMappings.updateBusinessPartnerOutput(existingEntity, dto, null, null)
+        return businessPartnerRepository.save(existingEntity)
+            .also {
+                saveChangelog(dto.externalId, ChangelogType.UPDATE, StageType.Output, checkBusinessPartnerType(dto.postalAddress.addressType))
             }
     }
 
@@ -107,8 +150,9 @@ class BusinessPartnerService(
         sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId))
     }
 
-    private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType) {
-        // TODO make businessPartnerType optional
-        changelogRepository.save(ChangelogEntry(externalId, BusinessPartnerType.ADDRESS, changelogType, stage))
+    private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType, businessPartnerType: List<BusinessPartnerType>?) {
+        businessPartnerType?.forEach { type ->
+            changelogRepository.save(ChangelogEntry(externalId, type, changelogType, stage))
+        } ?: changelogRepository.save(ChangelogEntry(externalId, null, changelogType, stage))
     }
 }
