@@ -44,6 +44,6 @@ data class BusinessPartnerInputRequest(
     override val isOwner: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,
-    override val bpnA: String? = null
+    override val bpnA: String? = null,
 
 ) : IBaseBusinessPartnerGateDto

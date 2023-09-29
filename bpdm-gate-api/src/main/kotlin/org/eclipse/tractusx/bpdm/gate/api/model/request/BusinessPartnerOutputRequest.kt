@@ -17,13 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.gate.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
+import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 
 
-data class BusinessPartnerGeneric(
+@Schema(
+    description = "Generic business partner with external id",
+    requiredProperties = ["externalId", "postalAddress"]
+)
+data class BusinessPartnerOutputRequest(
+
+    override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
@@ -31,10 +42,10 @@ data class BusinessPartnerGeneric(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: PostalAddressDto = PostalAddressDto(),
+    override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
+    override val isOwner: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,
     override val bpnA: String? = null,
-    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
-    val ownerBpnL: String? = null,
-) : IBaseBusinessPartnerDto
+
+) : IBaseBusinessPartnerGateDto

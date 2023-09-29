@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.entity.generic
 
 import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import java.util.*
@@ -79,6 +80,13 @@ class BusinessPartner(
 
     @Column(name = "stage")
     @Enumerated(EnumType.STRING)
-    var stage: StageType
+    var stage: StageType,
+
+    @Column(name = "parent_id")
+    var parentId: String?,
+
+    @Column(name = "parent_type")
+    @Enumerated(EnumType.STRING)
+    var parentType: BusinessPartnerType?
 
 ) : BaseEntity()
