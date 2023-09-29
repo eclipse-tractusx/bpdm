@@ -27,10 +27,7 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.util.CommonValues
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
-import org.eclipse.tractusx.bpdm.gate.util.RequestValues
+import org.eclipse.tractusx.bpdm.gate.util.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,7 +57,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     @Test
     fun `insert minimal business partner`() {
-        val upsertRequests = listOf(RequestValues.bpInputRequestMinimal)
+        val upsertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestMinimal)
         val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
         assertUpsertResponsesMatchRequests(upsertResponses, upsertRequests)
 
@@ -71,7 +68,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     @Test
     fun `insert three business partners`() {
-        val upsertRequests = listOf(RequestValues.bpInputRequestFull, RequestValues.bpInputRequestMinimal, RequestValues.bpInputRequestChina)
+        val upsertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestFull, BusinessPartnerNonVerboseValues.bpInputRequestMinimal, BusinessPartnerNonVerboseValues.bpInputRequestChina)
         val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
         assertUpsertResponsesMatchRequests(upsertResponses, upsertRequests)
 
@@ -82,7 +79,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     @Test
     fun `insert and then update business partner`() {
-        val insertRequests = listOf(RequestValues.bpInputRequestMinimal)
+        val insertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestMinimal)
         val externalId = insertRequests.first().externalId
         val insertResponses = gateClient.businessParters.upsertBusinessPartnersInput(insertRequests).body!!
         assertUpsertResponsesMatchRequests(insertResponses, insertRequests)
@@ -91,7 +88,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResponse1Page.content).isEqualTo(insertResponses)
 
         val updateRequests = listOf(
-            RequestValues.bpInputRequestFull.copy(externalId = externalId)
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = externalId)
         )
         val updateResponses = gateClient.businessParters.upsertBusinessPartnersInput(updateRequests).body!!
         assertUpsertResponsesMatchRequests(updateResponses, updateRequests)
@@ -104,10 +101,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
     fun `insert too many business partners`() {
         // limit is 3
         val upsertRequests = listOf(
-            RequestValues.bpInputRequestFull,
-            RequestValues.bpInputRequestMinimal,
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId3),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId4)
+            BusinessPartnerNonVerboseValues.bpInputRequestFull,
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId4)
         )
         try {
             gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
@@ -119,8 +116,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `insert duplicate business partners`() {
         val upsertRequests = listOf(
-            RequestValues.bpInputRequestFull.copy(externalId = CommonValues.externalId3),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId3)
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId3),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3)
         )
         try {
             gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
@@ -132,36 +129,36 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `query business partners by externalId`() {
         val upsertRequests = listOf(
-            RequestValues.bpInputRequestFull.copy(externalId = CommonValues.externalId1, shortName = "1"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId2, shortName = "2"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(CommonValues.externalId1, CommonValues.externalId3))
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId1, BusinessPartnerVerboseValues.externalId3))
         assertUpsertResponsesMatchRequests(searchResponsePage.content, listOf(upsertRequests[0], upsertRequests[2]))
     }
 
     @Test
     fun `query business partners by missing externalId`() {
         val upsertRequests = listOf(
-            RequestValues.bpInputRequestFull.copy(externalId = CommonValues.externalId1, shortName = "1"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId2, shortName = "2"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 
         // missing externalIds are just ignored in the response
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(CommonValues.externalId2, CommonValues.externalId4))
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(listOf(BusinessPartnerVerboseValues.externalId2, BusinessPartnerVerboseValues.externalId4))
         assertUpsertResponsesMatchRequests(searchResponsePage.content, listOf(upsertRequests[1]))
     }
 
     @Test
     fun `query business partners using paging`() {
         val upsertRequests = listOf(
-            RequestValues.bpInputRequestFull.copy(externalId = CommonValues.externalId1, shortName = "1"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId2, shortName = "2"),
-            RequestValues.bpInputRequestMinimal.copy(externalId = CommonValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId, shortName = "1"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 

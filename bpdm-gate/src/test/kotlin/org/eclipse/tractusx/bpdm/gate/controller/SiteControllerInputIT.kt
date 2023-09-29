@@ -70,20 +70,20 @@ internal class SiteControllerInputIT @Autowired constructor(
      */
     @Test
     fun `get site by external id`() {
-        val expectedSite = ResponseValues.persistencesiteGateInputResponse1
+        val expectedSite = BusinessPartnerVerboseValues.persistencesiteGateInputResponse1
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1
         )
 
         val sites = listOf(
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
         gateClient.sites.upsertSites(sites)
 
-        val site = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite1)
+        val site = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite1)
 
         assertThat(site).usingRecursiveComparison().ignoringFieldsMatchingRegexes(".*administrativeAreaLevel1*").isEqualTo(expectedSite)
     }
@@ -113,8 +113,8 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateInputResponse1,
-            ResponseValues.persistenceSiteGateInputResponse2
+            BusinessPartnerVerboseValues.persistencesiteGateInputResponse1,
+            BusinessPartnerVerboseValues.persistenceSiteGateInputResponse2
         )
 
         val page = 0
@@ -126,13 +126,13 @@ internal class SiteControllerInputIT @Autowired constructor(
         val contentSize = 2
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
@@ -161,8 +161,8 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `get sites by external id`() {
         val expectedSites = listOf(
-            ResponseValues.persistencesiteGateInputResponse1,
-            ResponseValues.persistenceSiteGateInputResponse2
+            BusinessPartnerVerboseValues.persistencesiteGateInputResponse1,
+            BusinessPartnerVerboseValues.persistenceSiteGateInputResponse2
         )
 
         val page = 0
@@ -174,13 +174,13 @@ internal class SiteControllerInputIT @Autowired constructor(
         val contentSize = 2
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         gateClient.legalEntities.upsertLegalEntities(legalEntities)
@@ -246,13 +246,13 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `upsert sites`() {
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         try {
@@ -278,13 +278,13 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `upsert sites, same externalid`() {
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         val legalEntities = listOf(
-            RequestValues.legalEntityGateInputRequest1,
-            RequestValues.legalEntityGateInputRequest2
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest1,
+            BusinessPartnerNonVerboseValues.legalEntityGateInputRequest2
         )
 
         try {
@@ -303,8 +303,8 @@ internal class SiteControllerInputIT @Autowired constructor(
     @Test
     fun `upsert sites, legal entity parent not found`() {
         val sites = listOf(
-            RequestValues.siteGateInputRequest1,
-            RequestValues.siteGateInputRequest2
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1,
+            BusinessPartnerNonVerboseValues.siteGateInputRequest2
         )
 
         try {
