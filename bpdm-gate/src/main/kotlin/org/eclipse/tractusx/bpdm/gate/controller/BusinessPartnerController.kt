@@ -45,7 +45,7 @@ class BusinessPartnerController(
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners)
+        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners.toList())
         return ResponseEntity.ok(result)
     }
 

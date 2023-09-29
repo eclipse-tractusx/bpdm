@@ -25,7 +25,6 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.AddressState
@@ -75,9 +74,10 @@ class LegalEntityPersistenceService(
                 ?: run {
                     gateLegalEntityRepository.save(fullLegalEntity)
                     saveChangelog(legalEntity.externalId, ChangelogType.CREATE, datatype)
-                    sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO())
                 }
         }
+        val initRequests = legalEntities.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.LEGAL_ENTITY ) }
+        sharingStateService.setInitial(initRequests)
     }
 
     //Creates Changelog for both Legal Entity and Logistic Address when they are created or updated
@@ -156,8 +156,15 @@ class LegalEntityPersistenceService(
                         saveChangelog(legalEntity.externalId, ChangelogType.CREATE, datatype)
                     }
                 }
-            sharingStateService.upsertSharingState(legalEntity.toSharingStateDTO(SharingStateType.Success))
         }
+
+        val successRequests = legalEntities.map {
+            SharingStateService.SuccessRequest(
+                SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.LEGAL_ENTITY),
+                it.bpn
+            )
+        }
+        sharingStateService.setSuccess(successRequests)
     }
 
     private fun updateLegalEntityOutput(

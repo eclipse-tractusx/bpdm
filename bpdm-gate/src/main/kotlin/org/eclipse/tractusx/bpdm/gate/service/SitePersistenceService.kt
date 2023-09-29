@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.*
@@ -73,6 +72,9 @@ class SitePersistenceService(
                     sharingStateService.upsertSharingState(site.toSharingStateDTO())
                 }
         }
+
+        val initRequests = sites.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.SITE ) }
+        sharingStateService.setInitial(initRequests)
     }
 
     //Creates Changelog For both Site and Logistic Address when they are created or updated
@@ -149,8 +151,15 @@ class SitePersistenceService(
                         saveChangelog(site.externalId, ChangelogType.CREATE, datatype)
                     }
                 }
-            sharingStateService.upsertSharingState(site.toSharingStateDTO(SharingStateType.Success))
         }
+
+        val successRequests = sites.map {
+            SharingStateService.SuccessRequest(
+                SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.SITE),
+                it.bpn
+            )
+        }
+        sharingStateService.setSuccess(successRequests)
     }
 
     private fun updateSiteOutput(site: Site, updatedSite: SiteGateOutputRequest, legalEntityRecord: LegalEntity) {

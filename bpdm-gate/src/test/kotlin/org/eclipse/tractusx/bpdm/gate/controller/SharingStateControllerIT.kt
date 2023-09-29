@@ -20,21 +20,25 @@
 package org.eclipse.tractusx.bpdm.gate.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError.*
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError.SharingProcessError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.time.LocalDateTime
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -51,26 +55,419 @@ class SharingStateControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
     }
 
+    /**
+     * Sharing state in which all fields are filled
+     * Useful for streamlining tests
+     */
+    val fullSharingState = SharingStateDto(
+        businessPartnerType = BusinessPartnerType.ADDRESS,
+        externalId = "exIdAddress",
+        sharingStateType = SharingStateType.Error,
+        sharingErrorCode = SharingProcessError,
+        sharingErrorMessage = "Message",
+        bpn = "TEST_BPN",
+        sharingProcessStarted = LocalDateTime.of(1900, 1, 1, 1, 1)
+    )
+
+    val sharingProcessStartedTime = LocalDateTime.of(2000, 10, 9, 8, 7)
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert minimal initial sharing state accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+
+        val givenSharingState = SharingStateDto(businessPartnerType = bpType, externalId = givenExternalId)
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert initial sharing state with additional information ignored`(bpType: BusinessPartnerType) {
+        val externalId = "external-id"
+        val givenSharingState = fullSharingState.copy(
+            sharingStateType = SharingStateType.Initial,
+            businessPartnerType = bpType,
+            externalId = externalId
+        )
+
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expectedSharingState = SharingStateDto(businessPartnerType = bpType, externalId = externalId)
+        val expected = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(externalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert initial sharing state resets time`(bpType: BusinessPartnerType) {
+        val externalId = "external-id"
+        val givenBpn = "TEST_BPN"
+
+        val initialState = SharingStateDto(
+            sharingStateType = SharingStateType.Initial,
+            businessPartnerType = bpType,
+            externalId = externalId
+        )
+
+        val successState = initialState.copy(
+            sharingStateType = SharingStateType.Success,
+            bpn = givenBpn,
+            sharingProcessStarted = LocalDateTime.now()
+        )
+
+        gateClient.sharingState.upsertSharingState(successState)
+        gateClient.sharingState.upsertSharingState(initialState)
+
+        val expectedSharingState = initialState.copy(bpn = givenBpn)
+        val expected = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(externalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert minimal pending sharing state accepted`(bpType: BusinessPartnerType) {
+        val givenBeforeInsert = LocalDateTime.now()
+        val givenExternalId = "external-id"
+        val givenTaskId = "task-id"
+
+        val givenSharingState =
+            SharingStateDto(sharingStateType = SharingStateType.Pending, taskId = givenTaskId, businessPartnerType = bpType, externalId = givenExternalId)
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        val afterInsert = LocalDateTime.now()
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(expected)
+
+        assertThat(actual.content.single().sharingProcessStarted).isBetween(givenBeforeInsert, afterInsert)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert pending sharing state with sharingProcessStart accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenTaskId = "task-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Pending,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            taskId = givenTaskId,
+            sharingProcessStarted = givenSharingProcessStart
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert pending sharing state with additional fields ignored`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenTaskId = "task-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+
+        val givenSharingState = fullSharingState.copy(
+            sharingStateType = SharingStateType.Pending,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            taskId = givenTaskId,
+            sharingProcessStarted = givenSharingProcessStart
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expectedSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Pending,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            taskId = givenTaskId,
+            sharingProcessStarted = givenSharingProcessStart
+        )
+        val expected = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert minimal success sharing state accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenBpn = "BPN_TEST"
+        val beforeInsert = sharingProcessStartedTime
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Success,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            bpn = givenBpn
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        val afterInsert = LocalDateTime.now()
+
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(expected)
+
+        assertThat(actual.content.single().sharingProcessStarted).isBetween(beforeInsert, afterInsert)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert success sharing state with sharingProcessStart accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+        val givenBpn = "TEST_BPN"
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Success,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingProcessStarted = givenSharingProcessStart,
+            bpn = givenBpn
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert success sharing state with additional properties ignored`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+        val givenBpn = "TEST_BPN"
+
+        val givenSharingState = fullSharingState.copy(
+            sharingStateType = SharingStateType.Success,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingProcessStarted = givenSharingProcessStart,
+            bpn = givenBpn
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expectedSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Success,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingProcessStarted = givenSharingProcessStart,
+            bpn = givenBpn
+        )
+        val expected = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert success sharing state without BPN throws exception`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+
+        val sharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Success,
+            businessPartnerType = bpType,
+            externalId = givenExternalId
+        )
+
+        assertThatThrownBy {
+            gateClient.sharingState.upsertSharingState(sharingState)
+        }.isInstanceOf(WebClientResponseException::class.java)
+
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert minimal error sharing state accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val beforeInsert = LocalDateTime.now()
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Error,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingErrorCode = SharingProcessError
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        val afterInsert = LocalDateTime.now()
+
+        assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(expected)
+
+        assertThat(actual.content.single().sharingProcessStarted).isBetween(beforeInsert, afterInsert)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert error sharing state with sharingProcessStart accepted`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Error,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingProcessStarted = givenSharingProcessStart,
+            sharingErrorCode = SharingProcessError
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expected = PageDto(1, 1, 0, 1, listOf(givenSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert error sharing state with additional properties ignored`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenSharingProcessStart = sharingProcessStartedTime
+        val givenBpn = "TEST_BPN"
+        val givenErrorMessage = "test message"
+
+        val givenSharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Error,
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingProcessStarted = givenSharingProcessStart,
+            sharingErrorCode = SharingProcessError,
+            sharingErrorMessage = givenErrorMessage,
+            bpn = givenBpn
+        )
+        gateClient.sharingState.upsertSharingState(givenSharingState)
+
+        val expectedSharingState = givenSharingState.copy(bpn = null)
+        val expected = PageDto(1, 1, 0, 1, listOf(expectedSharingState))
+        val actual = gateClient.sharingState.getSharingStates(PaginationRequest(0, 1), bpType, listOf(givenExternalId))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `insert error sharing state without error code throws exception`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+
+        val sharingState = SharingStateDto(
+            sharingStateType = SharingStateType.Error,
+            businessPartnerType = bpType,
+            externalId = givenExternalId
+        )
+
+        assertThatThrownBy {
+            gateClient.sharingState.upsertSharingState(sharingState)
+        }.isInstanceOf(WebClientResponseException::class.java)
+
+    }
+
+    @ParameterizedTest
+    @EnumSource(BusinessPartnerType::class)
+    fun `keep BPN through sharing state lifecycle`(bpType: BusinessPartnerType) {
+        val givenExternalId = "external-id"
+        val givenBpn = "TEST_BPN"
+        val givenSharingProcessStart = sharingProcessStartedTime
+        val givenTaskId = "task-id"
+
+        val successState = SharingStateDto(
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingStateType = SharingStateType.Success,
+            bpn = givenBpn
+        )
+
+        val initialState = successState.copy(
+            sharingStateType = SharingStateType.Initial,
+            bpn = null
+        )
+
+        val pendingState = successState.copy(
+            sharingStateType = SharingStateType.Pending,
+            sharingProcessStarted = givenSharingProcessStart,
+            taskId = givenTaskId,
+            bpn = null
+        )
+
+        val errorState = successState.copy(
+            businessPartnerType = bpType,
+            externalId = givenExternalId,
+            sharingStateType = SharingStateType.Error,
+            sharingErrorCode = SharingProcessError,
+            bpn = null
+        )
+
+        gateClient.sharingState.upsertSharingState(successState)
+        gateClient.sharingState.upsertSharingState(initialState)
+        gateClient.sharingState.upsertSharingState(pendingState)
+        gateClient.sharingState.upsertSharingState(errorState)
+
+        val actual = gateClient.sharingState.getSharingStates(
+            businessPartnerType = bpType,
+            externalIds = listOf(givenExternalId),
+            paginationRequest = PaginationRequest()
+        )
+
+        val expectedSharingState = errorState.copy(bpn = givenBpn, taskId = givenTaskId, sharingProcessStarted = givenSharingProcessStart)
+        val expected = PageDto(1, 1, 0, 1, content = listOf(expectedSharingState))
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
     @Test
     fun `insert and get sharing states `() {
+        val stateAddress = insertSharingStateInitial(BusinessPartnerType.ADDRESS, externalId = "exIdAddress")
+        val stateSite = insertSharingStateInitial(BusinessPartnerType.SITE, externalId = "exIdSite")
+        val stateLegalEntity1 = insertSharingStateInitial(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity1")
+        val stateLegalEntity2 = insertSharingStateInitial(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity2")
+        val stateGeneric = insertSharingStateInitial(BusinessPartnerType.GENERIC, externalId = "exIdGeneric1")
+        insertSharingStateInitial(BusinessPartnerType.ADDRESS, externalId = "exIdMultiple")
+        insertSharingStateInitial(BusinessPartnerType.SITE, externalId = "exIdMultiple")
+        insertSharingStateInitial(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdMultiple")
+        insertSharingStateInitial(BusinessPartnerType.GENERIC, externalId = "exIdMultiple")
 
-        val stateAddress = insertSharingStateSuccess(BusinessPartnerType.ADDRESS, externalId = "exIdAddress")
-        val stateSite = insertSharingStateSuccess(BusinessPartnerType.SITE, externalId = "exIdSite")
-        val stateLegalEntity1 = insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity1")
-        val stateLegalEntity2 = insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity2")
-        val stateGeneric = insertSharingStateSuccess(BusinessPartnerType.GENERIC, externalId = "exIdGeneric1")
-        insertSharingStateSuccess(BusinessPartnerType.ADDRESS, externalId = "exIdMultiple")
-        insertSharingStateSuccess(BusinessPartnerType.SITE, externalId = "exIdMultiple")
-        insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdMultiple")
-        insertSharingStateSuccess(BusinessPartnerType.GENERIC, externalId = "exIdMultiple")
 
         val searchAddressById = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress")
         assertThat(searchAddressById).hasSize(1)
-        assertThat(searchAddressById.first()).isEqualTo(stateAddress)
+        assertThat(searchAddressById.single()).isEqualTo(stateAddress)
 
         val searchSitesById = readSharingStates(BusinessPartnerType.SITE, "exIdSite")
         assertThat(searchSitesById).hasSize(1)
-        assertThat(searchSitesById.first()).isEqualTo(stateSite)
+        assertThat(searchSitesById.single()).isEqualTo(stateSite)
 
         val searchAddressWrongId = readSharingStates(BusinessPartnerType.ADDRESS, "exIdEntity")
         assertThat(searchAddressWrongId).hasSize(0)
@@ -80,7 +477,7 @@ class SharingStateControllerIT @Autowired constructor(
 
         val searchEntitySingle = readSharingStates(BusinessPartnerType.LEGAL_ENTITY, "exIdEntity2")
         assertThat(searchEntitySingle).hasSize(1)
-        assertThat(searchEntitySingle.first()).isEqualTo(stateLegalEntity2)
+        assertThat(searchEntitySingle.single()).isEqualTo(stateLegalEntity2)
 
         val searchGenericSingle = readSharingStates(BusinessPartnerType.GENERIC, "exIdGeneric1")
         assertThat(searchGenericSingle).hasSize(1)
@@ -101,102 +498,22 @@ class SharingStateControllerIT @Autowired constructor(
 
     }
 
-    @Test
-    fun `insert and get sharing states with error code`() {
-
-        val stateAddress1 = insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress1", errorCode = SharingTimeout)
-        insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress2", errorCode = SharingProcessError)
-        insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress3", errorCode = BpnNotInPool)
-
-        val searchAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
-        assertThat(searchAddress).hasSize(1)
-        assertThat(searchAddress.first()).isEqualTo(stateAddress1)
-    }
-
-
-    @Test
-    fun `insert and update states`() {
-
-        val stateAddress1 = insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress1", errorCode = SharingTimeout)
-        insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress2", errorCode = SharingProcessError)
-        insertSharingStateError(BusinessPartnerType.ADDRESS, externalId = "exIdAddress3", errorCode = BpnNotInPool)
-
-        val searchAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
-        assertThat(searchAddress).hasSize(1)
-        assertThat(searchAddress.first()).isEqualTo(stateAddress1)
-
-        val updatedAddress1 = stateAddress1.copy(
-            sharingStateType = SharingStateType.Success,
-            sharingErrorCode = BpnNotInPool,
-            sharingProcessStarted = LocalDateTime.now().withNano(0),
-            sharingErrorMessage = "Changed ",
-            bpn = null
-        )
-
-        gateClient.sharingState.upsertSharingState(updatedAddress1)
-
-        val readUpdatedAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
-        assertThat(readUpdatedAddress).hasSize(1)
-        assertThat(readUpdatedAddress.first()).isEqualTo(updatedAddress1)
-    }
-
-    @Test
-    fun `insert and update states with sharingProcessStarted`() {
-
-        val startTime = LocalDateTime.now().withNano(0)
-        val stateAddress1 = insertSharingStateSuccess(
-            businessPartnerType = BusinessPartnerType.ADDRESS, externalId = "exIdAddress1",
-            sharingProcessStarted = startTime
-        )
-
-        val readInsertedAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
-        assertThat(readInsertedAddress.first().sharingProcessStarted).isEqualTo(startTime)
-
-        val updatedWithEmpyStarted = stateAddress1.copy(
-            sharingStateType = SharingStateType.Error,
-            sharingProcessStarted = null,
-            sharingErrorMessage = "Changed",
-        )
-        gateClient.sharingState.upsertSharingState(updatedWithEmpyStarted)
-
-        val readUpdatedAddress = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress1")
-        assertThat(readUpdatedAddress.first().sharingStateType).isEqualTo(SharingStateType.Error)
-        assertThat(readUpdatedAddress.first().sharingProcessStarted).isEqualTo(startTime).describedAs("Update with null - sharingProcessStarted not changed ")
-        assertThat(readUpdatedAddress.first().sharingErrorMessage).isEqualTo("Changed")
-
-    }
-
     /**
      * Insert Sharing State only with required fields filled
      */
-    fun insertSharingStateSuccess(businessPartnerType: BusinessPartnerType, externalId: String, sharingProcessStarted: LocalDateTime? = null): SharingStateDto {
+    fun insertSharingStateInitial(
+        businessPartnerType: BusinessPartnerType,
+        externalId: String
+    ): SharingStateDto {
 
         val newState = SharingStateDto(
             businessPartnerType = businessPartnerType,
             externalId = externalId,
-            sharingStateType = SharingStateType.Success,
+            sharingStateType = SharingStateType.Initial,
             sharingErrorCode = null,
-            sharingProcessStarted = sharingProcessStarted,
+            sharingProcessStarted = null,
             sharingErrorMessage = null,
             bpn = null
-        )
-        gateClient.sharingState.upsertSharingState(newState)
-        return newState
-    }
-
-    /**
-     * Insert Sharing State with all Fields Field
-     */
-    fun insertSharingStateError(businessPartnerType: BusinessPartnerType, externalId: String, errorCode: BusinessPartnerSharingError): SharingStateDto {
-
-        val newState = SharingStateDto(
-            businessPartnerType = businessPartnerType,
-            externalId = externalId,
-            sharingStateType = SharingStateType.Error,
-            sharingErrorCode = errorCode,
-            sharingProcessStarted = LocalDateTime.now().withNano(0),
-            sharingErrorMessage = "Error in $businessPartnerType with external id $externalId",
-            bpn = "BPN" + externalId
         )
         gateClient.sharingState.upsertSharingState(newState)
         return newState
@@ -206,6 +523,5 @@ class SharingStateControllerIT @Autowired constructor(
 
         return gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType, externalIds.asList()).content
     }
-
 
 }
