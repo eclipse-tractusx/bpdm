@@ -68,26 +68,6 @@ class GateQueryService(
             }
     }
 
-    fun getChangedExternalIds(modifiedAfter: Instant?): Set<String> {
-        var page = 0
-        var totalPages: Int
-        val content = mutableListOf<ChangelogGateDto>()
-
-        do {
-            val pageResponse = gateClient.changelog.getInputChangelog(
-                searchRequest = ChangelogSearchRequest(timestampAfter = modifiedAfter),
-                paginationRequest = PaginationRequest(page, bridgeConfigProperties.queryPageSize)
-            )
-            page++
-            totalPages = pageResponse.totalPages
-            content.addAll(pageResponse.content)
-        } while (page < totalPages)
-
-        return content
-            .map { it.externalId }
-            .toSet()
-    }
-
     fun getLegalEntityInfos(externalIds: Set<String>): Collection<GateLegalEntityInfo> {
         val entries = getLegalEntitiesInput(externalIds)
         val bpnByExternalId = getBpnByExternalId(BusinessPartnerType.LEGAL_ENTITY, externalIds)

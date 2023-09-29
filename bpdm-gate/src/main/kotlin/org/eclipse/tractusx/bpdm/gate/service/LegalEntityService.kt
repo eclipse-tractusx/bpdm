@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -41,8 +40,6 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class LegalEntityService(
-    private val legalEntityPersistenceService: LegalEntityPersistenceService,
-    private val legalEntityRepository: LegalEntityRepository,
     private val businessPartnerService: BusinessPartnerService,
     private val businessPartnerRepository: BusinessPartnerRepository
 ) {
@@ -60,11 +57,6 @@ class LegalEntityService(
 
             val mapBusinessPartner = legalEntity.toBusinessPartnerDto()
 
-//            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
-//            if (duplicateBP?.parentType != null) {
-//                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
-//            }
-
             mappedGBP.add(mapBusinessPartner)
         }
 
@@ -77,21 +69,13 @@ class LegalEntityService(
      **/
     fun upsertLegalEntitiesOutput(legalEntities: Collection<LegalEntityGateOutputRequest>) {
 
-        //legalEntityPersistenceService.persistLegalEntitiesOutputBP(legalEntities, StageType.Output)
-
         val mappedGBP: MutableCollection<BusinessPartnerOutputRequest> = mutableListOf()
 
         legalEntities.forEach { legalEntity ->
 
             val mapBusinessPartner = legalEntity.toBusinessPartnerOutputDto()
 
-            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, legalEntity.externalId)
-            if (duplicateBP?.parentType != null) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
-            }
-
             val retrieveBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, legalEntity.externalId)
-
             if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Output Legal Entity doesn't exist")
             }

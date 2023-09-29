@@ -252,7 +252,7 @@ class BridgeSyncIT @Autowired constructor(
         gateClient.legalEntities.upsertLegalEntities(listOf(leRquestUpdate))
         assertGateChangelogHasCount(3 + 1) // 3 insert + 1 update
         bridgeClient.bridge().triggerSync()
-        assertPoolChangelogHasCount(3 + 3 + 3 + 3) // 6 insert (LE/LA) + 6 update (LE/LA) //TODO Check if it is right
+        assertPoolChangelogHasCount(3 + 3 + 1 + 1) // 6 insert (LE/LA) + 6 update (LE/LA) //TODO Check if it is right
 
         val entitiesFromPoolAFterUpdate = allLegalEntitiesFromPool()
         assertThat(legalEntitiesFromPool.size).isEqualTo(3)

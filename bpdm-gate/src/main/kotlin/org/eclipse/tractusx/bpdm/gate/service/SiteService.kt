@@ -32,8 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
-import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -42,10 +40,6 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class SiteService(
-    private val bpnConfigProperties: BpnConfigProperties,
-    private val sitePersistenceService: SitePersistenceService,
-    private val siteRepository: SiteRepository,
-    private val sharingStateService: SharingStateService,
     private val businessPartnerService: BusinessPartnerService,
     private val businessPartnerRepository: BusinessPartnerRepository
 ) {
@@ -68,7 +62,10 @@ class SiteService(
 
     private fun toValidSiteGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<SiteGateInputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress }
+            .filter {
+                it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress
+                        && checkExistentRelation(StageType.Input, it.parentId)
+            }
             .map { it.toSiteGateInputDto() }
     }
 
@@ -103,8 +100,19 @@ class SiteService(
 
     private fun toValidOutputSitesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<SiteGateOutputResponse> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress }
+            .filter {
+                (it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                        && checkExistentRelation(StageType.Output, it.parentId)
+            }
             .map { it.toSiteGateOutputResponse() }
+    }
+
+    private fun checkExistentRelation(type: StageType, searchId: String?): Boolean {
+        val retrieveBP = businessPartnerRepository.findByStageAndExternalId(type, searchId)
+        if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
+            return false
+        }
+        return true
     }
 
     /**
@@ -117,16 +125,7 @@ class SiteService(
         sites.forEach { site ->
             val mapBusinessPartner = site.toBusinessPartnerDto()
 
-            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.externalId)
-            if (mapBusinessPartner.parentId == null || mapBusinessPartner.parentType == null || duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.SiteMainAddress) {
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No parentID or Parent Type have correct values or there is already" +
-                            "a BP with same ID!"
-                )
-            }
-
             val retrieveBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
-
             if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Legal Entity doesn't exist")
             }
@@ -153,14 +152,6 @@ class SiteService(
             }
 
             val mapBusinessPartner = site.toBusinessPartnerOutputDto()
-
-            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, site.externalId)
-            if (mapBusinessPartner.parentId == null || mapBusinessPartner.parentType == null || duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.SiteMainAddress) {
-                throw ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No parentID or Parent Type have correct values or there is already" +
-                            "a BP with same ID!"
-                )
-            }
 
             val relatedSite = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.externalId)
             if (relatedSite == null || relatedSite.postalAddress.addressType != AddressType.SiteMainAddress) {

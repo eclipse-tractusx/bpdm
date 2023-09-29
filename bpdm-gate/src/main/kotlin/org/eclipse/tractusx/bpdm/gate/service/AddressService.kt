@@ -32,7 +32,6 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
-import org.eclipse.tractusx.bpdm.gate.repository.GateAddressRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -41,9 +40,6 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class AddressService(
-    private val addressPersistenceService: AddressPersistenceService,
-    private val addressRepository: GateAddressRepository,
-    private val sharingStateService: SharingStateService,
     private val businessPartnerService: BusinessPartnerService,
     private val businessPartnerRepository: BusinessPartnerRepository
 ) {
@@ -63,7 +59,7 @@ class AddressService(
 
     private fun toValidLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<AddressGateInputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Input, it.parentId) }
             .map { it.toAddressGateInputDto() }
     }
 
@@ -97,10 +93,17 @@ class AddressService(
 
     private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<AddressGateOutputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress }
+            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Output, it.parentId) }
             .map { it.toAddressGateOutputDto() }
     }
 
+    private fun checkExistentRelation(type: StageType, searchId: String?): Boolean {
+        val retrieveBP = businessPartnerRepository.findByStageAndExternalId(type, searchId)
+        if (retrieveBP == null || (retrieveBP.postalAddress.addressType != AddressType.SiteMainAddress && retrieveBP.postalAddress.addressType != AddressType.LegalAddress)) {
+            return false
+        }
+        return true
+    }
 
     /**
      * Upsert addresses input to the database
@@ -158,11 +161,6 @@ class AddressService(
             val relatedAddress = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.externalId)
             if (relatedAddress == null || relatedAddress.postalAddress.addressType != AddressType.AdditionalAddress) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't exist")
-            }
-
-            val duplicateBP = businessPartnerRepository.findByStageAndExternalId(StageType.Output, address.externalId)
-            if (duplicateBP != null && duplicateBP.postalAddress.addressType != AddressType.AdditionalAddress) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "There is already a BP with same ID!")
             }
 
             if (address.siteExternalId != null) {
