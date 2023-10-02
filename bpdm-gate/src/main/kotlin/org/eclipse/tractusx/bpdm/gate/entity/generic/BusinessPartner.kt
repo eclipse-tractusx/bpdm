@@ -36,43 +36,43 @@ class BusinessPartner(
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_name_parts", joinColumns = [JoinColumn(name = "business_partner_id")])
     @OrderColumn(name = "name_parts_order")
-    var nameParts: MutableList<String> = mutableListOf(),
+    val nameParts: MutableList<String> = mutableListOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_roles", joinColumns = [JoinColumn(name = "business_partner_id")])
     @Enumerated(EnumType.STRING)
     @Column(name = "role_name")
-    var roles: SortedSet<BusinessPartnerRole> = sortedSetOf(),
+    val roles: SortedSet<BusinessPartnerRole> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_identifiers", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var identifiers: SortedSet<Identifier> = sortedSetOf(),
+    val identifiers: SortedSet<Identifier> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_states", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var states: SortedSet<State> = sortedSetOf(),
+    val states: SortedSet<State> = sortedSetOf(),
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "business_partners_classifications", joinColumns = [JoinColumn(name = "business_partner_id")])
-    var classifications: SortedSet<Classification> = sortedSetOf(),
+    val classifications: SortedSet<Classification> = sortedSetOf(),
 
     @Column(name = "short_name")
-    var shortName: String?,
+    var shortName: String? = null,
 
     @Column(name = "legal_form")
-    var legalForm: String?,
+    var legalForm: String? = null,
 
     @Column(name = "is_owner")
-    var isOwner: Boolean,
+    var isOwner: Boolean = false,
 
     @Column(name = "bpnl")
-    var bpnL: String?,
+    var bpnL: String? = null,
 
     @Column(name = "bpns")
-    var bpnS: String?,
+    var bpnS: String? = null,
 
     @Column(name = "bpna")
-    var bpnA: String?,
+    var bpnA: String? = null,
 
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "postal_address_id", unique = true)
@@ -83,10 +83,10 @@ class BusinessPartner(
     var stage: StageType,
 
     @Column(name = "parent_id")
-    var parentId: String?,
+    var parentId: String? = null,
 
     @Column(name = "parent_type")
     @Enumerated(EnumType.STRING)
-    var parentType: BusinessPartnerType?
+    var parentType: BusinessPartnerType? = null
 
 ) : BaseEntity()

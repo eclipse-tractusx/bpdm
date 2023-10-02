@@ -19,22 +19,24 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
+import org.eclipse.tractusx.bpdm.common.util.copyAndSync
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
+import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -49,110 +51,164 @@ class BusinessPartnerService(
 
     @Transactional
     fun upsertBusinessPartnersInput(dtos: Collection<BusinessPartnerInputRequest>): Collection<BusinessPartnerInputDto> {
-        val existingEntitiesByExternalId = getExistingEntityByExternalId(dtos, StageType.Input)
-
-        val savedEntities = dtos.map { dto ->
-            existingEntitiesByExternalId[dto.externalId]
-                ?.let { existingEntity -> updateBusinessPartnerInput(existingEntity, dto) }
-                ?: run { insertBusinessPartnerInput(dto) }
-        }
-
-        return savedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
+        val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerInput(dto) }
+        return upsertBusinessPartnersInput(entities).map(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
-    private fun insertBusinessPartnerInput(dto: BusinessPartnerInputRequest): BusinessPartner {
-        val newEntity = businessPartnerMappings.toBusinessPartner(dto, StageType.Input, null, null)
-        return businessPartnerRepository.save(newEntity)
-            .also {
-                saveChangelog(dto.externalId, ChangelogType.CREATE, StageType.Input, checkBusinessPartnerType(dto.postalAddress.addressType))
-                initSharingState(dto)
-            }
-    }
-
-    private fun updateBusinessPartnerInput(existingEntity: BusinessPartner, dto: BusinessPartnerInputRequest): BusinessPartner {
-        businessPartnerMappings.updateBusinessPartner(existingEntity, dto, null, null)
-        return businessPartnerRepository.save(existingEntity)
-            .also {
-                saveChangelog(dto.externalId, ChangelogType.UPDATE, StageType.Input, checkBusinessPartnerType(dto.postalAddress.addressType))
-            }
-    }
-
-    private fun checkBusinessPartnerType(type: AddressType?): List<BusinessPartnerType>? {
-        return when (type) {
-            AddressType.LegalAndSiteMainAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.SITE)
-            AddressType.AdditionalAddress -> listOf(BusinessPartnerType.ADDRESS)
-            AddressType.LegalAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY)
-            AddressType.SiteMainAddress -> listOf(BusinessPartnerType.SITE)
-            else -> null
-        }
-    }
-
-    //Output Logic
     @Transactional
-    fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerInputDto> {
-        val existingEntitiesByExternalId = getExistingEntityByExternalId(dtos, StageType.Output)
-
-        val savedEntities = dtos.map { dto ->
-            existingEntitiesByExternalId[dto.externalId]
-                ?.let { existingEntity -> updateBusinessPartnerOutput(existingEntity, dto) }
-                ?: run { insertBusinessPartnerOutput(dto) }
-        }
-
-        return savedEntities.map(businessPartnerMappings::toBusinessPartnerInputDto)
-    }
-
-    private fun insertBusinessPartnerOutput(dto: BusinessPartnerOutputRequest): BusinessPartner {
-        val newEntity = businessPartnerMappings.toBusinessPartnerOutput(dto, StageType.Output, null, null)
-        return businessPartnerRepository.save(newEntity)
-            .also {
-                saveChangelog(dto.externalId, ChangelogType.CREATE, StageType.Output, checkBusinessPartnerType(dto.postalAddress.addressType))
-                initSharingState(dto)
-            }
-    }
-
-    private fun updateBusinessPartnerOutput(existingEntity: BusinessPartner, dto: BusinessPartnerOutputRequest): BusinessPartner {
-        businessPartnerMappings.updateBusinessPartnerOutput(existingEntity, dto, null, null)
-        return businessPartnerRepository.save(existingEntity)
-            .also {
-                saveChangelog(dto.externalId, ChangelogType.UPDATE, StageType.Output, checkBusinessPartnerType(dto.postalAddress.addressType))
-            }
+    fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerOutputDto> {
+        val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerOutput(dto) }
+        return upsertBusinessPartnersOutput(entities).map(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
     fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDto> {
         val stage = StageType.Input
-        val page = when {
-            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
-            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
-        }
-        return page.toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
+        return getBusinessPartners(pageRequest, externalIds, stage)
+            .toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
     fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDto> {
         val stage = StageType.Output
-        val page = when {
+        return getBusinessPartners(pageRequest, externalIds, stage)
+            .toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
+    }
+
+    private fun upsertBusinessPartnersInput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+        val resolutionResults = resolveCandidatesForStage(entityCandidates, StageType.Input)
+
+        saveChangelog(resolutionResults)
+
+        val partners = resolutionResults.map { it.businessPartner }
+        partners.forEach { entity -> initSharingState(entity) }
+
+        return businessPartnerRepository.saveAll(partners)
+    }
+
+    private fun upsertBusinessPartnersOutput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+        val externalIds = entityCandidates.map { it.externalId }
+        assertInputStageExists(externalIds)
+
+        val resolutionResults = resolveCandidatesForStage(entityCandidates, StageType.Output)
+
+        saveChangelog(resolutionResults)
+
+        return businessPartnerRepository.saveAll(resolutionResults.map { it.businessPartner })
+    }
+
+    private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {
+        return when {
             externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
             else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
         }
-        return page.toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
-    private fun getExistingEntityByExternalId(
-        dtos: Collection<IBaseBusinessPartnerGateDto>,
-        stage: StageType
-    ): Map<String, BusinessPartner> {
-        val externalIds = dtos.map { it.externalId }.toSet()
-        return businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds)
-            .associateBy { it.externalId }
-    }
-
-    private fun initSharingState(dto: IBaseBusinessPartnerGateDto) {
+    private fun initSharingState(entity: BusinessPartner) {
         // TODO make businessPartnerType optional
-        sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId))
+        sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, entity.externalId))
     }
 
-    private fun saveChangelog(externalId: String, changelogType: ChangelogType, stage: StageType, businessPartnerType: List<BusinessPartnerType>?) {
-        businessPartnerType?.forEach { type ->
-            changelogRepository.save(ChangelogEntry(externalId, type, changelogType, stage))
-        } ?: changelogRepository.save(ChangelogEntry(externalId, null, changelogType, stage))
+    private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {
+        resolutionResults.forEach { result ->
+            if (result.wasResolved)
+                saveChangelog(result.businessPartner, ChangelogType.UPDATE)
+            else
+                saveChangelog(result.businessPartner, ChangelogType.CREATE)
+        }
     }
+
+    private fun saveChangelog(partner: BusinessPartner, changelogType: ChangelogType) {
+        val businessPartnerTypes = partner.postalAddress.addressType?.businessPartnerTypes ?: listOf(null)
+
+        businessPartnerTypes.forEach { type -> changelogRepository.save(ChangelogEntry(partner.externalId, type, changelogType, partner.stage)) }
+    }
+
+    private fun assertInputStageExists(externalIds: Collection<String>) {
+        val existingExternalIds = businessPartnerRepository.findByStageAndExternalIdIn(StageType.Input, externalIds)
+            .map { it.externalId }
+            .toSet()
+
+        externalIds.minus(existingExternalIds)
+            .takeIf { it.isNotEmpty() }
+            ?.let { throw BpdmMissingStageException(it, StageType.Input) }
+    }
+
+    /**
+     * Resolve all [entityCandidates] by looking for existing business partner data in the given [stage]
+     *
+     * Resolving a candidate means to exchange the candidate entity with the existing entity and copy from the candidate to that existing entity.
+     *
+     */
+    private fun resolveCandidatesForStage(entityCandidates: List<BusinessPartner>, stage: StageType): List<ResolutionResult> {
+        val existingPartnersByExternalId = businessPartnerRepository.findByStageAndExternalIdIn(stage, entityCandidates.map { it.externalId })
+            .associateBy { it.externalId }
+
+        return entityCandidates.map { candidate ->
+            val existingEntity = existingPartnersByExternalId[candidate.externalId]
+            if (existingEntity != null)
+                ResolutionResult(copyValues(candidate, existingEntity), true)
+            else
+                ResolutionResult(candidate, false)
+        }
+    }
+
+    data class ResolutionResult(
+        val businessPartner: BusinessPartner,
+        val wasResolved: Boolean
+    )
+
+    private fun copyValues(fromPartner: BusinessPartner, toPartner: BusinessPartner): BusinessPartner {
+        return toPartner.apply {
+            stage = fromPartner.stage
+            shortName = fromPartner.shortName
+            legalForm = fromPartner.legalForm
+            isOwner = fromPartner.isOwner
+            bpnL = fromPartner.bpnL
+            bpnS = fromPartner.bpnS
+            bpnA = fromPartner.bpnA
+            parentId = fromPartner.parentId
+            parentType = fromPartner.parentType
+
+            nameParts.replace(fromPartner.nameParts)
+            roles.replace(fromPartner.roles)
+
+            states.copyAndSync(fromPartner.states, ::copyValues)
+            classifications.copyAndSync(fromPartner.classifications, ::copyValues)
+            identifiers.copyAndSync(fromPartner.identifiers, ::copyValues)
+
+            copyValues(fromPartner.postalAddress, postalAddress)
+        }
+    }
+
+    private fun copyValues(fromState: State, toState: State) =
+        toState.apply {
+            validFrom = fromState.validFrom
+            validTo = fromState.validTo
+            description = fromState.description
+            type = fromState.type
+        }
+
+    private fun copyValues(fromClassification: Classification, toClassification: Classification) =
+        toClassification.apply {
+            value = fromClassification.value
+            type = fromClassification.type
+            code = fromClassification.code
+        }
+
+    private fun copyValues(fromIdentifier: Identifier, toIdentifier: Identifier) =
+        toIdentifier.apply {
+            type = fromIdentifier.type
+            value = fromIdentifier.value
+            issuingBody = fromIdentifier.issuingBody
+        }
+
+    private fun copyValues(fromPostalAddress: PostalAddress, toPostalAddress: PostalAddress) =
+        toPostalAddress.apply {
+            addressType = fromPostalAddress.addressType
+            physicalPostalAddress = fromPostalAddress.physicalPostalAddress
+            alternativePostalAddress = fromPostalAddress.alternativePostalAddress
+        }
+
+
+
+
 }

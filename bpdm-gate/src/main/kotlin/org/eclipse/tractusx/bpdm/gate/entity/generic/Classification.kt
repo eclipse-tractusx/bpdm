@@ -31,7 +31,7 @@ data class Classification(
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    val type: ClassificationType,
+    var type: ClassificationType,
 
     @Column(name = "code")
     var code: String?,

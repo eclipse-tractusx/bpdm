@@ -29,47 +29,47 @@ class PhysicalPostalAddress(
     @AttributeOverride(name = "latitude", column = Column(name = "phy_latitude"))
     @AttributeOverride(name = "longitude", column = Column(name = "phy_longitude"))
     @AttributeOverride(name = "altitude", column = Column(name = "phy_altitude"))
-    val geographicCoordinates: GeographicCoordinate?,
+    var geographicCoordinates: GeographicCoordinate?,
 
     @Column(name = "phy_country")
     @Enumerated(EnumType.STRING)
-    val country: CountryCode?,
+    var country: CountryCode?,
 
     /**
      * Region within the country
      */
     @Column(name = "phy_admin_area_l1_region")
-    val administrativeAreaLevel1: String?,
+    var administrativeAreaLevel1: String?,
 
     /**
      * Further possibility to describe the region/address(e.g. County)
      */
     @Column(name = "phy_admin_area_l2")
-    val administrativeAreaLevel2: String?,
+    var administrativeAreaLevel2: String?,
 
     /**
      * Further possibility to describe the region/address(e.g. Township)
      */
     @Column(name = "phy_admin_area_l3")
-    val administrativeAreaLevel3: String?,
+    var administrativeAreaLevel3: String?,
 
     /**
      * A postal code, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "phy_postcode")
-    val postalCode: String?,
+    var postalCode: String?,
 
     /**
      * The city of the address (Synonym: Town, village, municipality)
      */
     @Column(name = "phy_city")
-    val city: String?,
+    var city: String?,
 
     /**
      * Divides the city in several smaller areas
      */
     @Column(name = "phy_district_l1")
-    val district: String?,
+    var district: String?,
 
     @Embedded
     @AttributeOverride(name = "name", column = Column(name = "phy_street_name"))
@@ -80,7 +80,7 @@ class PhysicalPostalAddress(
     @AttributeOverride(name = "additionalNamePrefix", column = Column(name = "phy_additional_name_prefix"))
     @AttributeOverride(name = "nameSuffix", column = Column(name = "phy_name_suffix"))
     @AttributeOverride(name = "additionalNameSuffix", column = Column(name = "phy_additional_name_suffix"))
-    val street: Street?,
+    var street: Street?,
 
     // specific for PhysicalPostalAddress
 
@@ -88,29 +88,29 @@ class PhysicalPostalAddress(
      * A separate postal code for a company, also known as postcode, PIN or ZIP Code
      */
     @Column(name = "phy_company_postcode")
-    val companyPostalCode: String?,
+    var companyPostalCode: String?,
 
     /**
      * The practice of designating an area for industrial development
      */
     @Column(name = "phy_industrial_zone")
-    val industrialZone: String?,
+    var industrialZone: String?,
 
     /**
      * Describes a specific building within the address
      */
     @Column(name = "phy_building")
-    val building: String?,
+    var building: String?,
 
     /**
      * Describes the floor/level the delivery shall take place
      */
     @Column(name = "phy_floor")
-    val floor: String?,
+    var floor: String?,
 
     /**
      * Describes the door/room/suite on the respective floor the delivery shall take place
      */
     @Column(name = "phy_door")
-    val door: String?
+    var door: String?
 )

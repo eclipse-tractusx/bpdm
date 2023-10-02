@@ -37,7 +37,7 @@ data class State(
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    val type: BusinessStateType,
+    var type: BusinessStateType,
 
     @Column(name = "description")
     var description: String?

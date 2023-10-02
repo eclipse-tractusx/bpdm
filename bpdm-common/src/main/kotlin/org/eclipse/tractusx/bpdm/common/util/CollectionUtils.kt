@@ -24,6 +24,25 @@ fun <T> MutableCollection<T>.replace(elements: Collection<T>) {
     addAll(elements)
 }
 
+
+/**
+ * Copy overlapping elements by index from [elements] to [this] collection by applying the [copyFunction].
+ * Remove remaining elements in the original collection and add additional [elements] from given collection
+ */
+fun <T> MutableCollection<T>.copyAndSync(elements: Collection<T>, copyFunction: (T, T) -> T) {
+    // copy the overlap of the two collections
+    zip(elements).forEach { (fromState, toState) -> copyFunction(fromState, toState) }
+
+    val sizeDifference = size - elements.size
+    if (sizeDifference > 0) {
+        //Remove the remaining elements from the original collection
+        drop(elements.size).forEach { remove(it) }
+    } else {
+        //Add the additional elements to the original collection
+        addAll(elements.drop(size))
+    }
+}
+
 fun <T> Collection<T>.findDuplicates(): Set<T> =
     this.groupBy { it }
         .filter { it.value.size > 1 }
