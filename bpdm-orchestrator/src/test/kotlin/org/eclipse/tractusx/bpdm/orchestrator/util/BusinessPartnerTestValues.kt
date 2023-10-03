@@ -133,8 +133,6 @@ object BusinessPartnerTestValues {
         bpnL = "BPNLTEST",
         bpnS = "BPNSTEST",
         bpnA = "BPNATEST",
-        parentId = null,
-        parentType = null
     )
 
     //Business Partner with single entry in every collection
@@ -210,8 +208,6 @@ object BusinessPartnerTestValues {
         bpnL = "BPNLTEST-2",
         bpnS = "BPNSTEST-2",
         bpnA = "BPNATEST-2",
-        parentId = null,
-        parentType = null
     )
 
     val logisticAddress1 = LogisticAddressDto(

@@ -142,9 +142,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
 
         val expectedAddresses = listOf(
             BusinessPartnerVerboseValues.logisticAddressGateInputResponse1,
-            BusinessPartnerVerboseValues.logisticAddressGateInputResponse2,
-            BusinessPartnerVerboseValues.addressGateInputResponseLegalEntity1,
-            BusinessPartnerVerboseValues.addressGateInputResponseSite1
+            BusinessPartnerVerboseValues.logisticAddressGateInputResponse2
         )
 
         val addresses = listOf(
@@ -213,7 +211,7 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         )
 
         val site = listOf(
-            RequestValues.siteGateInputRequest1
+            BusinessPartnerNonVerboseValues.siteGateInputRequest1
         )
 
         val page = 0
@@ -295,10 +293,10 @@ internal class PostalAddressControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val addressExternal1 = gateClient.addresses.getAddressByExternalId(CommonValues.externalIdAddress1)
+        val addressExternal1 = gateClient.addresses.getAddressByExternalId(BusinessPartnerVerboseValues.externalIdAddress1)
         assertNotEquals(addressExternal1, null)
 
-        val addressExternal2 = gateClient.addresses.getAddressByExternalId(CommonValues.externalIdAddress2)
+        val addressExternal2 = gateClient.addresses.getAddressByExternalId(BusinessPartnerVerboseValues.externalIdAddress2)
         assertNotEquals(addressExternal2, null)
 
     }

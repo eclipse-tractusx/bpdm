@@ -277,10 +277,10 @@ internal class SiteControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted site data
-        val siteExternal1 = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite1)
+        val siteExternal1 = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite1)
         Assertions.assertNotEquals(siteExternal1, null)
 
-        val siteExternal2 = gateClient.sites.getSiteByExternalId(CommonValues.externalIdSite2)
+        val siteExternal2 = gateClient.sites.getSiteByExternalId(BusinessPartnerVerboseValues.externalIdSite2)
         Assertions.assertNotEquals(siteExternal2, null)
 
     }

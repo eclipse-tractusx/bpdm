@@ -173,7 +173,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
                     ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )
             )
@@ -209,7 +208,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
                     ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )
             )
@@ -230,7 +228,6 @@ internal class ChangeLogControllerIT @Autowired constructor(
         assertRecursively(searchResult.content).ignoringFieldsMatchingRegexes(".*${ChangelogGateDto::timestamp.name}")
             .isEqualTo(
                 listOf(
-                    ChangelogGateDto(BusinessPartnerVerboseValues.legalEntityAddressId, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE),
                     ChangelogGateDto(BusinessPartnerVerboseValues.externalId1, BusinessPartnerType.LEGAL_ENTITY, instant, ChangelogType.CREATE),
                     ChangelogGateDto(BusinessPartnerVerboseValues.externalIdAddress1, BusinessPartnerType.ADDRESS, instant, ChangelogType.CREATE)
                 )

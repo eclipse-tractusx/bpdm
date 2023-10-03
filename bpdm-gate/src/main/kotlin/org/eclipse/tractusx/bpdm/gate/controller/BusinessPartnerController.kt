@@ -26,6 +26,7 @@ import org.eclipse.tractusx.bpdm.gate.api.GateBusinessPartnerApi
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperInputRequest
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
@@ -45,7 +46,11 @@ class BusinessPartnerController(
         if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
-        val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners)
+
+        val toWrapper: MutableCollection<BusinessPartnerWrapperInputRequest> = mutableListOf()
+        businessPartners.forEach { toWrapper.add(BusinessPartnerWrapperInputRequest(it, null, null)) }
+
+        val result = businessPartnerService.upsertBusinessPartnersInput(toWrapper)
         return ResponseEntity.ok(result)
     }
 

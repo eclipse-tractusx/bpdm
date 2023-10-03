@@ -290,7 +290,7 @@ internal class PostalAddressControllerOutputIT @Autowired constructor(
         )
 
         val legalEntityOutput = listOf(
-            RequestValues.legalEntityGateOutputRequest1
+            BusinessPartnerNonVerboseValues.legalEntityGateOutputRequest1
         )
 
         val site = listOf(

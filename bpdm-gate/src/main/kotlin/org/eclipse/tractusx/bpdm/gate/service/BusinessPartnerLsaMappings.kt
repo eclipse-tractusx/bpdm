@@ -64,13 +64,11 @@ fun SiteGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequest {
             physicalPostalAddress = mainAddress.physicalPostalAddress,
             alternativePostalAddress = mainAddress.alternativePostalAddress
         ),
-        isOwner = false,
-        parentId = legalEntityExternalId,
-        parentType = BusinessPartnerType.LEGAL_ENTITY
+        isOwner = false
     )
 }
 
-fun AddressGateInputRequest.toBusinessPartnerDto(parentId: String?, parentType: BusinessPartnerType?): BusinessPartnerInputRequest {
+fun AddressGateInputRequest.toBusinessPartnerDto(): BusinessPartnerInputRequest {
 
     return BusinessPartnerInputRequest(
         externalId = this.externalId,
@@ -86,9 +84,7 @@ fun AddressGateInputRequest.toBusinessPartnerDto(parentId: String?, parentType: 
             physicalPostalAddress = this.address.physicalPostalAddress,
             alternativePostalAddress = this.address.alternativePostalAddress
         ),
-        isOwner = false,
-        parentId = parentId,
-        parentType = parentType
+        isOwner = false
     )
 }
 
@@ -167,7 +163,7 @@ fun BusinessPartnerInputDto.toLegalEntityGateInputDto(): LegalEntityGateInputDto
     )
 }
 
-fun BusinessPartnerInputDto.toSiteGateInputDto(): SiteGateInputDto {
+fun BusinessPartnerInputDto.toSiteGateInputDto(parentId: String?): SiteGateInputDto {
 
     return SiteGateInputDto(
         externalId = externalId,
@@ -187,7 +183,7 @@ fun BusinessPartnerInputDto.toSiteGateInputDto(): SiteGateInputDto {
     )
 }
 
-fun BusinessPartnerInputDto.toAddressGateInputDto(): AddressGateInputDto {
+fun BusinessPartnerInputDto.toAddressGateInputDto(parentId: String?, parentType: BusinessPartnerType?): AddressGateInputDto {
 
     val (legalEntityId, siteId) = when (parentType) {
         BusinessPartnerType.LEGAL_ENTITY -> parentId to null
@@ -303,7 +299,7 @@ fun BusinessPartnerOutputDto.toLegalEntityGateOutputResponse(): LegalEntityGateO
     )
 }
 
-fun BusinessPartnerOutputDto.toSiteGateOutputResponse(): SiteGateOutputResponse {
+fun BusinessPartnerOutputDto.toSiteGateOutputResponse(parentId: String?): SiteGateOutputResponse {
 
     return SiteGateOutputResponse(
         externalId = externalId,
@@ -325,7 +321,7 @@ fun BusinessPartnerOutputDto.toSiteGateOutputResponse(): SiteGateOutputResponse 
     )
 }
 
-fun BusinessPartnerOutputDto.toAddressGateOutputDto(): AddressGateOutputDto {
+fun BusinessPartnerOutputDto.toAddressGateOutputDto(parentId: String?, parentType: BusinessPartnerType?): AddressGateOutputDto {
 
     val (legalEntityId, siteId) = when (parentType) {
         BusinessPartnerType.LEGAL_ENTITY -> parentId to null
@@ -367,7 +363,7 @@ fun LegalEntityGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOu
             alternativePostalAddress = legalAddress.address.alternativePostalAddress
         ),
         isOwner = false,
-        bpnL = bpn, //TODO Not sure about BPN Mappings
+        bpnL = bpn,
         bpnA = legalAddress.bpn
     )
 }
@@ -389,15 +385,13 @@ fun SiteGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOutputReq
             alternativePostalAddress = mainAddress.address.alternativePostalAddress
         ),
         isOwner = false,
-        parentId = legalEntityExternalId,
-        parentType = BusinessPartnerType.LEGAL_ENTITY,
-        bpnA = mainAddress.bpn, //TODO Not sure about BPN Mappings
+        bpnA = mainAddress.bpn,
         bpnL = "NOVALUE",
         bpnS = bpn
     )
 }
 
-fun AddressGateOutputRequest.toBusinessPartnerOutputDto(parentId: String?, parentType: BusinessPartnerType?): BusinessPartnerOutputRequest {
+fun AddressGateOutputRequest.toBusinessPartnerOutputDto(): BusinessPartnerOutputRequest {
 
     return BusinessPartnerOutputRequest(
         externalId = this.externalId,
@@ -414,8 +408,6 @@ fun AddressGateOutputRequest.toBusinessPartnerOutputDto(parentId: String?, paren
             alternativePostalAddress = this.address.alternativePostalAddress
         ),
         isOwner = false,
-        parentId = parentId,
-        parentType = parentType,
         bpnS = "NOVALUE",
         bpnL = "NOVALUE",
         bpnA = bpn

@@ -30,8 +30,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerInputDtoWrapper
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerOutputDtoWrapper
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
@@ -62,6 +65,14 @@ class BusinessPartnerMappings {
         )
     }
 
+    fun toBusinessPartnerInputDtoWrapper(entity: BusinessPartner): BusinessPartnerInputDtoWrapper {
+        return BusinessPartnerInputDtoWrapper(
+            businessPartner = toBusinessPartnerInputDto(entity),
+            parentId = entity.parentId,
+            parentType = entity.parentType
+        )
+    }
+
     fun toBusinessPartnerOutputDto(entity: BusinessPartner): BusinessPartnerOutputDto {
         return BusinessPartnerOutputDto(
             externalId = entity.externalId,
@@ -81,6 +92,14 @@ class BusinessPartnerMappings {
                 ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnA, entity.externalId),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
+        )
+    }
+
+    fun toBusinessPartnerOutputDtoWrapper(entity: BusinessPartner): BusinessPartnerOutputDtoWrapper {
+        return BusinessPartnerOutputDtoWrapper(
+            businessPartner = toBusinessPartnerOutputDto(entity),
+            parentId = entity.parentId,
+            parentType = entity.parentType
         )
     }
 

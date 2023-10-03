@@ -89,10 +89,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
         }
 
         //Check if persisted Address data
-        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
+        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId1)
         assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId2)
+        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId2)
         assertNotEquals(legalEntityExternal2, null)
 
     }
@@ -317,10 +317,10 @@ internal class LegalEntityControllerInputIT @Autowired constructor(
             assertEquals(HttpStatus.OK, e.statusCode)
         }
 
-        val legalEntityRecordExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId1)
+        val legalEntityRecordExternal1 = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId1)
         assertNotEquals(legalEntityRecordExternal1, null)
 
-        val legalEntityRecordExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(CommonValues.externalId2)
+        val legalEntityRecordExternal2 = gateClient.legalEntities.getLegalEntityByExternalId(BusinessPartnerVerboseValues.externalId2)
         assertNotEquals(legalEntityRecordExternal2, null)
 
     }

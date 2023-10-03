@@ -26,12 +26,12 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerInputDtoWrapper
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerOutputDtoWrapper
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperOutputRequest
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
@@ -46,7 +46,7 @@ class AddressService(
 
     fun getAddresses(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<AddressGateInputDto> {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(page, size), externalIds)
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInputLSA(PageRequest.of(page, size), externalIds)
 
         return PageDto( //TODO totalElements and totalPages need change
             page = page,
@@ -57,20 +57,20 @@ class AddressService(
         )
     }
 
-    private fun toValidLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDto>): List<AddressGateInputDto> {
+    private fun toValidLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDtoWrapper>): List<AddressGateInputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Input, it.parentId) }
-            .map { it.toAddressGateInputDto() }
+            .filter { it.businessPartner.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Input, it.parentId) }
+            .map { it.businessPartner.toAddressGateInputDto(it.parentId, it.parentType) }
     }
 
     fun getAddressByExternalId(externalId: String): AddressGateInputDto {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersInput(PageRequest.of(0, 1), listOf(externalId))
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersInputLSA(PageRequest.of(0, 1), listOf(externalId))
 
-        val businessPartner = businessPartnerPage.content.firstOrNull { it.postalAddress.addressType == AddressType.AdditionalAddress }
+        val businessPartner = businessPartnerPage.content.firstOrNull { it.businessPartner.postalAddress.addressType == AddressType.AdditionalAddress }
             ?: throw BpdmNotFoundException(("Address does not exist"), externalId)
 
-        return businessPartner.toAddressGateInputDto()
+        return businessPartner.businessPartner.toAddressGateInputDto(businessPartner.parentId, businessPartner.parentType)
 
     }
 
@@ -79,7 +79,7 @@ class AddressService(
      */
     fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutput(PageRequest.of(page, size), externalIds)
+        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutputLSA(PageRequest.of(page, size), externalIds)
 
         return PageDto(
             page = page,
@@ -91,10 +91,10 @@ class AddressService(
 
     }
 
-    private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDto>): List<AddressGateOutputDto> {
+    private fun toValidOutputLogisticAddressesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDtoWrapper>): List<AddressGateOutputDto> {
         return businessPartnerPage.content
-            .filter { it.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Output, it.parentId) }
-            .map { it.toAddressGateOutputDto() }
+            .filter { it.businessPartner.postalAddress.addressType == AddressType.AdditionalAddress && checkExistentRelation(StageType.Output, it.parentId) }
+            .map { it.businessPartner.toAddressGateOutputDto(it.parentId, it.parentType) }
     }
 
     private fun checkExistentRelation(type: StageType, searchId: String?): Boolean {
@@ -110,7 +110,7 @@ class AddressService(
      **/
     fun upsertAddresses(addresses: Collection<AddressGateInputRequest>) {
 
-        val mappedGBP: MutableCollection<BusinessPartnerInputRequest> = mutableListOf()
+        val mappedGBP: MutableCollection<BusinessPartnerWrapperInputRequest> = mutableListOf()
 
         addresses.forEach { address ->
 
@@ -122,25 +122,25 @@ class AddressService(
 
             if (address.siteExternalId != null) {
 
-                val mapBusinessPartner = address.toBusinessPartnerDto(address.siteExternalId, BusinessPartnerType.SITE)
+                val mapBusinessPartner = address.toBusinessPartnerDto()
 
-                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.siteExternalId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.SiteMainAddress) {
                     throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Input Site doesn't exist")
                 }
 
-                mappedGBP.add(mapBusinessPartner)
+                mappedGBP.add(BusinessPartnerWrapperInputRequest(mapBusinessPartner, address.siteExternalId, BusinessPartnerType.SITE))
 
             } else if (address.legalEntityExternalId != null) {
 
-                val mapBusinessPartner = address.toBusinessPartnerDto(address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY)
+                val mapBusinessPartner = address.toBusinessPartnerDto()
 
-                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.legalEntityExternalId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
                     throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Input Legal Entity doesn't exist")
                 }
 
-                mappedGBP.add(mapBusinessPartner)
+                mappedGBP.add(BusinessPartnerWrapperInputRequest(mapBusinessPartner, address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY))
 
             }
         }
@@ -154,7 +154,7 @@ class AddressService(
      **/
     fun upsertOutputAddresses(addresses: Collection<AddressGateOutputRequest>) {
 
-        val mappedGBP: MutableCollection<BusinessPartnerOutputRequest> = mutableListOf()
+        val mappedGBP: MutableCollection<BusinessPartnerWrapperOutputRequest> = mutableListOf()
 
         addresses.forEach { address ->
 
@@ -165,33 +165,33 @@ class AddressService(
 
             if (address.siteExternalId != null) {
 
-                val mapBusinessPartner = address.toBusinessPartnerOutputDto(address.siteExternalId, BusinessPartnerType.SITE)
+                val mapBusinessPartner = address.toBusinessPartnerOutputDto()
 
-                if (relatedAddress.parentType != mapBusinessPartner.parentType) {
+                if (relatedAddress.parentType != BusinessPartnerType.SITE) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't have site relationship")
                 }
 
-                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.siteExternalId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.SiteMainAddress) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
                 }
 
-                mappedGBP.add(mapBusinessPartner)
+                mappedGBP.add(BusinessPartnerWrapperOutputRequest(mapBusinessPartner, address.siteExternalId, BusinessPartnerType.SITE))
 
             } else if (address.legalEntityExternalId != null) {
 
-                val mapBusinessPartner = address.toBusinessPartnerOutputDto(address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY)
+                val mapBusinessPartner = address.toBusinessPartnerOutputDto()
 
-                if (relatedAddress.parentType != mapBusinessPartner.parentType) {
+                if (relatedAddress.parentType != BusinessPartnerType.LEGAL_ENTITY) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Address doesn't have Legal Entity relationship")
                 }
 
-                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, mapBusinessPartner.parentId)
+                val relatedLE = businessPartnerRepository.findByStageAndExternalId(StageType.Input, address.legalEntityExternalId)
                 if (relatedLE == null || relatedLE.postalAddress.addressType != AddressType.LegalAddress) {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Legal Entity doesn't exist")
                 }
 
-                mappedGBP.add(mapBusinessPartner)
+                mappedGBP.add(BusinessPartnerWrapperOutputRequest(mapBusinessPartner, address.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY))
 
             }
         }

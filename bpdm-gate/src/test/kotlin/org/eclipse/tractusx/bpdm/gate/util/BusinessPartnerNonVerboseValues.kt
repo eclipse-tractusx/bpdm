@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
@@ -46,14 +46,14 @@ object BusinessPartnerNonVerboseValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity1,
         legalAddress = BusinessPartnerVerboseValues.physicalAddress1,
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse1.legalNameParts,
+        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse1.legalNameParts.toList(),
         externalId = BusinessPartnerVerboseValues.externalId1,
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity2,
         legalAddress = BusinessPartnerVerboseValues.physicalAddress2,
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse2.legalNameParts,
+        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse2.legalNameParts.toList(),
         externalId = BusinessPartnerVerboseValues.externalId2,
     )
 

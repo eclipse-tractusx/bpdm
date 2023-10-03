@@ -25,7 +25,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.junit.jupiter.api.Assertions
@@ -97,10 +96,10 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         val paginationValue = PaginationRequest(page, size)
 
         //Check if persisted Address data
-        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId1))
+        val legalEntityExternal1 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalId1))
         Assertions.assertNotEquals(legalEntityExternal1, null)
 
-        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(CommonValues.externalId2))
+        val legalEntityExternal2 = gateClient.legalEntities.getLegalEntitiesOutput(paginationValue, listOf(BusinessPartnerVerboseValues.externalId2))
         Assertions.assertNotEquals(legalEntityExternal2, null)
 
     }
