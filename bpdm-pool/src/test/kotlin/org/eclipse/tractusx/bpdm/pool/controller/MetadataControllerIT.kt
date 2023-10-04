@@ -437,11 +437,10 @@ class MetadataControllerIT @Autowired constructor(
         assertThat(firstPage.totalPages).isEqualTo(348)
         assertThat(firstPage.content.size).isEqualTo(10)
 
-        // INSERT INTO bpdm.regions (country_code, region_code, region_name) VALUES ('AD', 'AD-02', 'Canillo');
         with(firstPage.content.first()) {
             assertThat(countryCode).isEqualTo(AD)
-            assertThat(regionCode).isEqualTo("AD-02")
-            assertThat(regionName).isEqualTo("Canillo")
+            assertThat(code).isEqualTo("AD-02")
+            assertThat(name).isEqualTo("Canillo")
         }
 
         val lastPage = poolClient.metadata.getAdminAreasLevel1(PaginationRequest(347))
@@ -449,11 +448,10 @@ class MetadataControllerIT @Autowired constructor(
         assertThat(lastPage.totalPages).isEqualTo(348)
         assertThat(lastPage.content.size).isEqualTo(8)
 
-        // INSERT INTO bpdm.regions (country_code, region_code, region_name) VALUES ('ZW', 'ZW-MW', 'Mashonaland West');
         with(lastPage.content.last()) {
             assertThat(countryCode).isEqualTo(ZW)
-            assertThat(regionCode).isEqualTo("ZW-MW")
-            assertThat(regionName).isEqualTo("Mashonaland West")
+            assertThat(code).isEqualTo("ZW-MW")
+            assertThat(name).isEqualTo("Mashonaland West")
         }
     }
 }

@@ -22,15 +22,15 @@ package org.eclipse.tractusx.bpdm.common.dto.response
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Region within a country")
-data class RegionDto(
+@Schema(description = "Country subdivision")
+data class CountrySubdivisionDto(
 
     @get:Schema(description = "Country code")
     val countryCode: CountryCode,
 
-    @get:Schema(description = "Abbreviation or shorthand of the area")
-    val regionCode: String,
+    @get:Schema(description = "The country subdivision code according to ISO 3166-2")
+    val code: String,
 
-    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
-    val regionName: String
+    @get:Schema(description = "The name of the country subdivision according to ISO 3166-2")
+    val name: String
 )

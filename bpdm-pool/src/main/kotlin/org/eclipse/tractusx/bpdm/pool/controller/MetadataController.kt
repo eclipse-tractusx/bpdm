@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
@@ -71,8 +72,8 @@ class MetadataController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
-    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<RegionDto> {
-        return metadataService.getRegions(paginationRequest)
+    override fun getAdminAreasLevel1(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
+        return metadataService.getCountrySubdivisions(paginationRequest)
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadMetaDataAsRole())")
