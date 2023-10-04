@@ -138,7 +138,8 @@ interface PoolMetadataApi {
 
     @Operation(
         summary = "Create new Region",
-        description = "Create a new region which can be referenced by business partner records. "
+        description = "Create a new region which can be referenced by business partner records.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -153,7 +154,8 @@ interface PoolMetadataApi {
 
     @Operation(
         summary = "Get page of regions",
-        description = "Lists all currently known regions in a paginated result"
+        description = "Lists all currently known regions in a paginated result",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -165,5 +167,18 @@ interface PoolMetadataApi {
     @GetExchange("/regions")
     fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
 
+    @Operation(
+        summary = "Get page of regions suitable for the administrativeAreaLevel1 address property",
+        description = "Lists all currently known regions in a paginated result"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Page of existing regions, may be empty"),
+            ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
+        ]
+    )
+    @GetMapping("/administrative-areas-level1")
+    @GetExchange("/administrative-areas-level1")
+    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
 
 }

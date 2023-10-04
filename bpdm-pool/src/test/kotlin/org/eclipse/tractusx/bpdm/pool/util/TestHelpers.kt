@@ -68,7 +68,7 @@ class TestHelpers(
                 FOR table_names IN SELECT table_name
                     FROM information_schema.tables
                     WHERE table_schema='$BPDM_DB_SCHEMA_NAME'
-                    AND table_name NOT IN ('flyway_schema_history') 
+                    AND table_name NOT IN ('flyway_schema_history','regions') 
                 LOOP 
                     EXECUTE format('TRUNCATE TABLE $BPDM_DB_SCHEMA_NAME.%I CONTINUE IDENTITY CASCADE;', table_names.table_name);
                 END LOOP;
