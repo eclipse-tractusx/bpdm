@@ -21,14 +21,8 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Business partner data in full representation, consisting of generic data as well as its L/S/A representation.")
-data class BusinessPartnerFull(
-    @get:Schema(description = "The business partner data in generic representation", required = true)
-    val generic: BusinessPartnerGeneric,
-    @get:Schema(description = "The legal entity part of this business partner data")
-    val legalEntity: LegalEntity? = null,
-    @get:Schema(description = "The site part of this business partner data")
-    val site: Site? = null,
-    @get:Schema(description = "The address part of this business partner data")
-    val address: LogisticAddress? = null
+@Schema(description = "Request object for posting step results of previously reserved tasks")
+data class TaskStepResultRequest(
+
+    val results: List<TaskStepResultEntryDto>
 )

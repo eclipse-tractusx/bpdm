@@ -19,11 +19,20 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseClassificationDto
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class BusinessPartnerClassification(
-    override val type: ClassificationType,
-    override val code: String?,
-    override val value: String?
-) : IBaseClassificationDto
+@Schema(description = "Business partner data in full representation, consisting of generic data as well as its L/S/A representation.")
+data class BusinessPartnerFullDto(
+
+    @get:Schema(description = "The business partner data in generic representation", required = true)
+    val generic: BusinessPartnerGenericDto,
+
+    @get:Schema(description = "The legal entity part of this business partner data")
+    val legalEntity: LegalEntityDto? = null,
+
+    @get:Schema(description = "The site part of this business partner data")
+    val site: SiteDto? = null,
+
+    @get:Schema(description = "The address part of this business partner data")
+    val address: LogisticAddressDto? = null
+)

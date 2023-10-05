@@ -22,21 +22,28 @@ package org.eclipse.tractusx.orchestrator.api.model
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.Instant
 
-@Schema(description = "Contains detail information about the current processing state of a cleaning task")
+@Schema(description = "Contains detailed information about the current processing state of a golden record task")
 data class TaskProcessingStateDto(
-    @get:Schema(description = "The last cleaning step this cleaning task has entered", required = true)
-    val cleaningStep: CleaningStep,
-    @get:Schema(description = "Whether the cleaning task is queued or already reserved in the latest cleaning step", required = true)
-    val reservationState: ReservationState,
-    @get:Schema(description = "The processing result of the cleaning task, can also still be pending", required = true)
+
+    @get:Schema(description = "The processing result of the task, can also still be pending", required = true)
     val resultState: ResultState,
+
+    @get:Schema(description = "The last step this task has entered", required = true)
+    val step: TaskStep,
+
+    @get:Schema(description = "Whether the task is queued or already reserved for the latest step", required = true)
+    val stepState: StepState,
+
     @get:Schema(
-        description = "The actual errors that happened during processing if the cleaning task has an error result state. " +
-                "The errors refer to the latest cleaning step.", required = true
+        description = "The actual errors that happened during processing if the task has an error result state. " +
+                "The errors refer to the latest step.",
+        required = true
     )
-    val errors: List<TaskError> = emptyList(),
-    @get:Schema(description = "When the cleaning task has been created", required = true)
+    val errors: List<TaskErrorDto> = emptyList(),
+
+    @get:Schema(description = "When the task has been created", required = true)
     val createdAt: Instant,
-    @get:Schema(description = "When the cleaning task has last been modified", required = true)
+
+    @get:Schema(description = "When the task has last been modified", required = true)
     val modifiedAt: Instant
 )

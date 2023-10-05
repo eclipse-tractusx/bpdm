@@ -25,8 +25,15 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
 import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.SiteDto
+import org.eclipse.tractusx.orchestrator.api.model.SiteStateDto
 import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
@@ -37,7 +44,7 @@ import java.time.LocalDateTime
 object BusinessPartnerTestValues {
 
     //Business Partner with two entries in every collection
-    val businessPartner1 = BusinessPartnerGeneric(
+    val businessPartner1 = BusinessPartnerGenericDto(
         nameParts = listOf("NamePart1", "NamePart2"),
         shortName = "shortname",
         identifiers = listOf(
@@ -129,7 +136,7 @@ object BusinessPartnerTestValues {
     )
 
     //Business Partner with single entry in every collection
-    val businessPartner2 = BusinessPartnerGeneric(
+    val businessPartner2 = BusinessPartnerGenericDto(
         nameParts = listOf("name-part-2"),
         shortName = "shortname-2",
         identifiers = listOf(
@@ -203,16 +210,16 @@ object BusinessPartnerTestValues {
         bpnA = "BPNATEST-2"
     )
 
-    val logisticAddress1 = LogisticAddress(
+    val logisticAddress1 = LogisticAddressDto(
         name = "Address Name 1",
         states = listOf(
-            AddressState(
+            AddressStateDto(
                 description = "Address State 1",
                 validFrom = LocalDateTime.of(1970, 4, 4, 4, 4),
                 validTo = LocalDateTime.of(1975, 5, 5, 5, 5),
                 type = BusinessStateType.ACTIVE
             ),
-            AddressState(
+            AddressStateDto(
                 description = "Address State 2",
                 validFrom = LocalDateTime.of(1975, 5, 5, 5, 5),
                 validTo = null,
@@ -220,11 +227,11 @@ object BusinessPartnerTestValues {
             ),
         ),
         identifiers = listOf(
-            AddressIdentifier(
+            AddressIdentifierDto(
                 value = "Address Identifier Value 1",
                 type = "Address Identifier Type 1"
             ),
-            AddressIdentifier(
+            AddressIdentifierDto(
                 value = "Address Identifier Value 2",
                 type = "Address Identifier Type 2"
             )
@@ -264,17 +271,17 @@ object BusinessPartnerTestValues {
             deliveryServiceQualifier = "Delivery Service Qualifier 1",
             deliveryServiceNumber = "Delivery Service Number 1"
         ),
-        bpnAReference = BpnReference(
+        bpnAReference = BpnReferenceDto(
             referenceType = BpnReferenceType.Bpn,
             referenceValue = "BPNATEST-1"
         ),
         hasChanged = true
     )
 
-    val logisticAddress2 = LogisticAddress(
+    val logisticAddress2 = LogisticAddressDto(
         name = "Address Name 2",
         states = listOf(
-            AddressState(
+            AddressStateDto(
                 description = "Address State 2",
                 validFrom = LocalDateTime.of(1971, 4, 4, 4, 4),
                 validTo = null,
@@ -282,7 +289,7 @@ object BusinessPartnerTestValues {
             )
         ),
         identifiers = listOf(
-            AddressIdentifier(
+            AddressIdentifierDto(
                 value = "Address Identifier Value 2-1",
                 type = "Address Identifier Type 2-1"
             )
@@ -322,23 +329,23 @@ object BusinessPartnerTestValues {
             deliveryServiceQualifier = "Delivery Service Qualifier 2",
             deliveryServiceNumber = "Delivery Service Number 2"
         ),
-        bpnAReference = BpnReference(
+        bpnAReference = BpnReferenceDto(
             referenceType = BpnReferenceType.BpnRequestIdentifier,
             referenceValue = "BPN_REQUEST_ID_TEST"
         ),
         hasChanged = true
     )
 
-    val legalEntity1 = LegalEntity(
+    val legalEntity1 = LegalEntityDto(
         legalName = "Legal Entity Name 1",
         legalShortName = "Legal Short Name 1",
         identifiers = listOf(
-            LegalEntityIdentifier(
+            LegalEntityIdentifierDto(
                 value = "Legal Identifier Value 1",
                 type = "Legal Identifier Type 1",
                 issuingBody = "Legal Issuing Body 1"
             ),
-            LegalEntityIdentifier(
+            LegalEntityIdentifierDto(
                 value = "Legal Identifier Value 2",
                 type = "Legal Identifier Type 2",
                 issuingBody = "Legal Issuing Body 2"
@@ -360,30 +367,30 @@ object BusinessPartnerTestValues {
             ),
         ),
         classifications = listOf(
-            BusinessPartnerClassification(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 1",
                 value = "Classification Value 1"
             ),
-            BusinessPartnerClassification(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NACE,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
             )
         ),
         legalAddress = logisticAddress1,
-        bpnLReference = BpnReference(
+        bpnLReference = BpnReferenceDto(
             referenceValue = "BPNL1-TEST",
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false
     )
 
-    val legalEntity2 = LegalEntity(
+    val legalEntity2 = LegalEntityDto(
         legalName = "Legal Entity Name 2",
         legalShortName = "Legal Short Name 2",
         identifiers = listOf(
-            LegalEntityIdentifier(
+            LegalEntityIdentifierDto(
                 value = "Legal Identifier Value 2",
                 type = "Legal Identifier Type 2",
                 issuingBody = "Legal Issuing Body 2"
@@ -399,30 +406,30 @@ object BusinessPartnerTestValues {
             )
         ),
         classifications = listOf(
-            BusinessPartnerClassification(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
             )
         ),
         legalAddress = logisticAddress2,
-        bpnLReference = BpnReference(
+        bpnLReference = BpnReferenceDto(
             referenceValue = "BPNL-REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = false
     )
 
-    val site1 = Site(
+    val site1 = SiteDto(
         name = "Site Name 1",
         states = listOf(
-            SiteState(
+            SiteStateDto(
                 description = "Site State Description 1",
                 validFrom = LocalDateTime.of(1991, 10, 10, 10, 10),
                 validTo = LocalDateTime.of(2001, 11, 11, 11, 11),
                 type = BusinessStateType.ACTIVE
             ),
-            SiteState(
+            SiteStateDto(
                 description = "Site State Description 2",
                 validFrom = LocalDateTime.of(2001, 11, 11, 11, 11),
                 validTo = null,
@@ -430,17 +437,17 @@ object BusinessPartnerTestValues {
             )
         ),
         mainAddress = logisticAddress1,
-        bpnSReference = BpnReference(
+        bpnSReference = BpnReferenceDto(
             referenceValue = "BPNS_TEST",
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false
     )
 
-    val site2 = Site(
+    val site2 = SiteDto(
         name = "Site Name 2",
         states = listOf(
-            SiteState(
+            SiteStateDto(
                 description = "Site State Description 2",
                 validFrom = LocalDateTime.of(1997, 12, 12, 12, 12),
                 validTo = null,
@@ -448,7 +455,7 @@ object BusinessPartnerTestValues {
             )
         ),
         mainAddress = logisticAddress2,
-        bpnSReference = BpnReference(
+        bpnSReference = BpnReferenceDto(
             referenceValue = "BPNS_REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),

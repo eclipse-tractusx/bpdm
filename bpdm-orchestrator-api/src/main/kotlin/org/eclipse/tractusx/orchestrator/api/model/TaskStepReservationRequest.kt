@@ -21,10 +21,12 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Cleaning reservation entry")
-data class CleaningReservation(
-    @get:Schema(description = "The identifier of the reserved cleaning task")
-    val taskId: String,
-    @get:Schema(description = "The business partner data to clean")
-    val businessPartner: BusinessPartnerFull
+@Schema(description = "Request object for reserving a number of tasks waiting in a step queue.")
+data class TaskStepReservationRequest(
+
+    @get:Schema(description = "The maximum number of tasks to reserve. Can be fewer if queue is not full enough.", required = true)
+    val amount: Int = 10,
+
+    @get:Schema(description = "The step queue to reserve from", required = true)
+    val step: TaskStep
 )

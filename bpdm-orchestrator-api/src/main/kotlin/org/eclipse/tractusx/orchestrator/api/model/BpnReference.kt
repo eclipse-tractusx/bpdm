@@ -22,9 +22,11 @@ package org.eclipse.tractusx.orchestrator.api.model
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "A reference to the BPN of a business partner. Either by the BPN value itself or a BPN request identifier")
-data class BpnReference(
+data class BpnReferenceDto(
+
     @get:Schema(description = "The value by which the BPN is referenced")
     val referenceValue: String,
+
     @get:Schema(description = "The type by which to reference the BPN with")
     val referenceType: BpnReferenceType
 )

@@ -19,8 +19,16 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-enum class CleaningStep {
-    CleanAndSync,
-    PoolSync,
-    Clean
-}
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
+import java.time.Instant
+
+@Schema(description = "Response object for giving a list of reserved tasks")
+data class TaskStepReservationResponse(
+
+    @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
+    val reservedTasks: List<TaskStepReservationEntryDto>,
+
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted")
+    val timeout: Instant
+)

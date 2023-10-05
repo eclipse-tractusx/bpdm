@@ -19,10 +19,19 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseAddressIdentifierDto
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class AddressIdentifier(
-    override val value: String,
-    override val type: String
 
-) : IBaseAddressIdentifierDto
+@Schema(description = "A step result for a golden record task")
+data class TaskStepResultEntryDto(
+
+    @get:Schema(description = "The identifier of the task for which this is a result", required = true)
+    val taskId: String,
+
+    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during processing of this task.")
+    val businessPartner: BusinessPartnerFullDto? = null,
+
+    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during processing of this task"))
+    val errors: List<TaskErrorDto> = emptyList()
+)

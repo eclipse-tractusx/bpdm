@@ -23,16 +23,16 @@ import org.eclipse.tractusx.bpdm.common.exception.BpdmUpsertLimitException
 import org.eclipse.tractusx.bpdm.orchestrator.config.ApiConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmEmptyResultException
 import org.eclipse.tractusx.bpdm.orchestrator.util.DummyValues
-import org.eclipse.tractusx.orchestrator.api.CleaningTaskApi
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class CleaningTaskController(
+class GoldenRecordTaskController(
     val apiConfigProperties: ApiConfigProperties
-) : CleaningTaskApi {
+) : GoldenRecordTaskApi {
 
-    override fun createCleaningTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
+    override fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         if (createRequest.businessPartners.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.businessPartners.size, apiConfigProperties.upsertLimit)
 
@@ -40,31 +40,31 @@ class CleaningTaskController(
         return DummyValues.dummyResponseCreateTask
     }
 
-    override fun reserveCleaningTasks(reservationRequest: CleaningReservationRequest): CleaningReservationResponse {
+    override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit) {
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
         }
 
         //ToDo: Replace with service logic
         return when (reservationRequest.step) {
-            CleaningStep.CleanAndSync -> DummyValues.dummyCleaningReservationResponse
-            CleaningStep.PoolSync -> DummyValues.dummyPoolSyncResponse
-            CleaningStep.Clean -> DummyValues.dummyCleaningReservationResponse
+            TaskStep.CleanAndSync -> DummyValues.dummyStepReservationResponse
+            TaskStep.PoolSync -> DummyValues.dummyPoolSyncResponse
+            TaskStep.Clean -> DummyValues.dummyStepReservationResponse
         }
     }
 
-    override fun resolveCleaningTasks(resultRequest: CleaningResultRequest) {
+    override fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(resultRequest.results.size, apiConfigProperties.upsertLimit)
 
         resultRequest.results.forEach { resultEntry ->
-            if (resultEntry.result == null && resultEntry.errors.isEmpty())
+            if (resultEntry.businessPartner == null && resultEntry.errors.isEmpty())
                 throw BpdmEmptyResultException(resultEntry.taskId)
         }
     }
 
 
-    override fun searchCleaningTaskState(searchTaskIdRequest: TaskStateRequest): TaskStateResponse {
+    override fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
         // ToDo: Replace with service logic
         return DummyValues.dummyResponseTaskState
     }

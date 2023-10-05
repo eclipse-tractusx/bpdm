@@ -20,24 +20,22 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
-data class LogisticAddress(
-    @get:Schema(description = "A reference to the BPNA of this address. Either by the BPN value itself or a BPN request identifier.")
-    val bpnAReference: BpnReference? = null,
+data class SiteDto(
 
-    @get:Schema(description = "Whether this address data is different from its golden record counterpart in the Pool")
+    @get:Schema(description = "A reference to the BPNS of this site. Either by the BPN value itself or a BPN request identifier.")
+    val bpnSReference: BpnReferenceDto? = null,
+
+    @get:Schema(description = "Whether this site data is different from its golden record counterpart in the Pool")
     val hasChanged: Boolean? = null,
 
-    @get:Schema(description = LogisticAddressDescription.name)
+    @get:Schema(description = SiteDescription.name)
     val name: String? = null,
 
-    override val states: Collection<AddressState> = emptyList(),
+    override val states: Collection<SiteStateDto> = emptyList(),
 
-    override val identifiers: Collection<AddressIdentifier> = emptyList(),
+    override val mainAddress: LogisticAddressDto? = null
 
-    override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
-
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
-) : IBaseLogisticAddressDto
+) : IBaseSiteDto

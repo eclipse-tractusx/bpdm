@@ -19,14 +19,27 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.Instant
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-@Schema(description = "Response object for giving a list of reserved cleaning tasks")
-data class CleaningReservationResponse(
-    @get:ArraySchema(arraySchema = Schema(description = "The reserved cleaning tasks with their business partner data to clean"))
-    val reservedTasks: List<CleaningReservation>,
-    @get:Schema(description = "The timestamp until the reservation is valid and accepts cleaning results")
-    val timeout: Instant
-)
+data class LogisticAddressDto(
+
+    @get:Schema(description = "A reference to the BPNA of this address. Either by the BPN value itself or a BPN request identifier.")
+    val bpnAReference: BpnReferenceDto? = null,
+
+    @get:Schema(description = "Whether this address data is different from its golden record counterpart in the Pool")
+    val hasChanged: Boolean? = null,
+
+    @get:Schema(description = LogisticAddressDescription.name)
+    val name: String? = null,
+
+    override val states: Collection<AddressStateDto> = emptyList(),
+
+    override val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+
+    override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
+
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+
+) : IBaseLogisticAddressDto

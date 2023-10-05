@@ -19,16 +19,14 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
+@Schema(description = "Describes an error that happened during processing of a task")
+data class TaskErrorDto(
 
-@Schema(description = "A cleaning result for a cleaning task")
-data class CleaningResultEntry(
-    @get:Schema(description = "The identifier of the cleaning task for which this is a result", required = true)
-    val taskId: String,
-    @get:Schema(description = "The actual result in form of business partner data. Maybe null if an error occurred during cleaning of this task.")
-    val result: BusinessPartnerFull? = null,
-    @get:ArraySchema(arraySchema = Schema(description = "Errors that occurred during cleaning of this task"))
-    val errors: List<TaskError> = emptyList()
+    @get:Schema(description = "The type of error that occurred", required = true)
+    val type: TaskErrorType,
+
+    @get:Schema(description = "The free text, detailed description of the error", required = true)
+    val description: String
 )

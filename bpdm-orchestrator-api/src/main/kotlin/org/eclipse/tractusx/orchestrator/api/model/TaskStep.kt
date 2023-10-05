@@ -19,22 +19,8 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
-
-
-data class BusinessPartnerGeneric(
-    override val nameParts: List<String> = emptyList(),
-    override val shortName: String? = null,
-    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val legalForm: String? = null,
-    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<ClassificationDto> = emptyList(),
-    override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: PostalAddressDto = PostalAddressDto(),
-    override val bpnL: String? = null,
-    override val bpnS: String? = null,
-    override val bpnA: String? = null,
-    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
-    val ownerBpnL: String? = null,
-) : IBaseBusinessPartnerDto
+enum class TaskStep {
+    CleanAndSync,
+    PoolSync,
+    Clean
+}

@@ -19,14 +19,7 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-
-
-@Schema(description = "The cleaning task's processing state together with optional business partner data in case processing is done")
-data class TaskRequesterState(
-    @get:Schema(required = true)
-    val taskId: String,
-    val businessPartnerResult: BusinessPartnerGeneric?,
-    @get:Schema(required = true)
-    val processingState: TaskProcessingStateDto
-)
+enum class StepState {
+    Queued,
+    Reserved
+}

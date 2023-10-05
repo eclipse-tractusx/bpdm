@@ -20,20 +20,30 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
-data class Site(
-    @get:Schema(description = "A reference to the BPNS of this site. Either by the BPN value itself or a BPN request identifier.")
-    val bpnSReference: BpnReference? = null,
+data class LegalEntityDto(
 
-    @get:Schema(description = "Whether this site data is different from its golden record counterpart in the Pool")
+    @get:Schema(description = "A reference to the BPNL of this legal entity. Either by the BPN value itself or a BPN request identifier.")
+    val bpnLReference: BpnReferenceDto? = null,
+
+    @get:Schema(description = "Whether this legal entity data is different from its golden record counterpart in the Pool")
     val hasChanged: Boolean? = null,
 
-    @get:Schema(description = SiteDescription.name)
-    val name: String? = null,
+    @get:Schema(description = LegalEntityDescription.legalName)
+    val legalName: String? = null,
 
-    override val states: Collection<SiteState> = emptyList(),
+    override val legalShortName: String? = null,
 
-    override val mainAddress: LogisticAddress? = null,
-) : IBaseSiteDto
+    override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+
+    override val legalForm: String? = null,
+
+    override val states: Collection<LegalEntityState> = emptyList(),
+
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
+
+    override val legalAddress: LogisticAddressDto? = null
+
+) : IBaseLegalEntityDto

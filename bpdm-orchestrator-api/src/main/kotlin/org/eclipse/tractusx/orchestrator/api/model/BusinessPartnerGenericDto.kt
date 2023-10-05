@@ -20,28 +20,23 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.common.dto.*
 
-data class LegalEntity(
-    @get:Schema(description = "A reference to the BPNL of this legal entity. Either by the BPN value itself or a BPN request identifier.")
-    val bpnLReference: BpnReference? = null,
 
-    @get:Schema(description = "Whether this legal entity data is different from its golden record counterpart in the Pool")
-    val hasChanged: Boolean? = null,
-
-    @get:Schema(description = LegalEntityDescription.legalName)
-    val legalName: String? = null,
-
-    override val legalShortName: String? = null,
-
-    override val identifiers: Collection<LegalEntityIdentifier> = emptyList(),
-
+data class BusinessPartnerGenericDto(
+    override val nameParts: List<String> = emptyList(),
+    override val shortName: String? = null,
+    override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val legalForm: String? = null,
+    override val states: Collection<BusinessPartnerStateDto> = emptyList(),
+    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val roles: Collection<BusinessPartnerRole> = emptyList(),
+    override val postalAddress: PostalAddressDto = PostalAddressDto(),
+    override val bpnL: String? = null,
+    override val bpnS: String? = null,
+    override val bpnA: String? = null,
 
-    override val states: Collection<LegalEntityState> = emptyList(),
+    @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
+    val ownerBpnL: String? = null,
 
-    override val classifications: Collection<BusinessPartnerClassification> = emptyList(),
-
-    override val legalAddress: LogisticAddress? = null,
-) : IBaseLegalEntityDto
+    ) : IBaseBusinessPartnerDto
