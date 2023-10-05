@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=3"])
-class CleaningTaskControllerIT @Autowired constructor(
+class GoldenRecordTaskControllerIT @Autowired constructor(
     val orchestratorClient: OrchestrationApiClient
 ) {
 
