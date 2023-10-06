@@ -27,8 +27,11 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.util.*
-import org.junit.jupiter.api.Assertions.*
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerVerboseValues
+import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -198,7 +201,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             classifications = request.classifications.toSortedSet(classificationDtoComparator),
             roles = request.roles.toSortedSet(),
             postalAddress = request.postalAddress,
-            isOwner = request.isOwner,
+            isOwnCompanyData = request.isOwnCompanyData,
             bpnL = request.bpnL,
             bpnS = request.bpnS,
             bpnA = request.bpnA,

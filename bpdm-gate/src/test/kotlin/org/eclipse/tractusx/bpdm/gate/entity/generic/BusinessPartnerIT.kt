@@ -38,20 +38,25 @@
 
 package org.eclipse.tractusx.bpdm.gate.entity.generic
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.model.*
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.Street
-import org.eclipse.tractusx.bpdm.gate.repository.generic.*
-import org.eclipse.tractusx.bpdm.gate.util.*
-import org.junit.jupiter.api.Assertions.*
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
+import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
+import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -153,7 +158,7 @@ internal class BusinessPartnerIT @Autowired constructor(
             nameParts = mutableListOf("testNameParts", "testNameParts2", "testNameParts3", "testNameParts4", "testNameParts5"),
             shortName = "testShortName",
             legalForm = "testLegalForm",
-            isOwner = true,
+            isOwnCompanyData = true,
             bpnA = "testAddressBpn",
             bpnL = "testLegalEntityBpn",
             bpnS = "testSiteBpn",

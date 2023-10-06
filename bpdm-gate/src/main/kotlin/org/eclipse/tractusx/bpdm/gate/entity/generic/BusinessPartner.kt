@@ -62,8 +62,8 @@ class BusinessPartner(
     @Column(name = "legal_form")
     var legalForm: String? = null,
 
-    @Column(name = "is_owner")
-    var isOwner: Boolean = false,
+    @Column(name = "is_own_company_data", nullable = false)
+    var isOwnCompanyData: Boolean = false,
 
     @Column(name = "bpnl")
     var bpnL: String? = null,
