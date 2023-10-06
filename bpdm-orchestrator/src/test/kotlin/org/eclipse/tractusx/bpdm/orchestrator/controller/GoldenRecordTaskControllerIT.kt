@@ -31,7 +31,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=3"])
-class CleaningTaskControllerIT @Autowired constructor(
+class GoldenRecordTaskControllerIT @Autowired constructor(
     val orchestratorClient: OrchestrationApiClient
 ) {
 
@@ -47,7 +47,7 @@ class CleaningTaskControllerIT @Autowired constructor(
 
         val expected = DummyValues.dummyResponseCreateTask
 
-        val response = orchestratorClient.cleaningTasks.createCleaningTasks(request)
+        val response = orchestratorClient.goldenRecordTasks.createTasks(request)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -57,14 +57,14 @@ class CleaningTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `request reservation for clean and sync and expect dummy response`() {
-        val request = CleaningReservationRequest(
+        val request = TaskStepReservationRequest(
             amount = 2,
-            step = CleaningStep.CleanAndSync
+            step = TaskStep.CleanAndSync
         )
 
-        val expected = DummyValues.dummyCleaningReservationResponse
+        val expected = DummyValues.dummyStepReservationResponse
 
-        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+        val response = orchestratorClient.goldenRecordTasks.reserveTasksForStep(request)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -74,14 +74,14 @@ class CleaningTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `request reservation for pool sync and expect dummy response`() {
-        val request = CleaningReservationRequest(
+        val request = TaskStepReservationRequest(
             amount = 2,
-            step = CleaningStep.PoolSync
+            step = TaskStep.PoolSync
         )
 
         val expected = DummyValues.dummyPoolSyncResponse
 
-        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+        val response = orchestratorClient.goldenRecordTasks.reserveTasksForStep(request)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -91,14 +91,14 @@ class CleaningTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `request reservation for clean and expect dummy response`() {
-        val request = CleaningReservationRequest(
+        val request = TaskStepReservationRequest(
             amount = 2,
-            step = CleaningStep.Clean
+            step = TaskStep.Clean
         )
 
-        val expected = DummyValues.dummyCleaningReservationResponse
+        val expected = DummyValues.dummyStepReservationResponse
 
-        val response = orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+        val response = orchestratorClient.goldenRecordTasks.reserveTasksForStep(request)
 
         Assertions.assertThat(response).isEqualTo(expected)
     }
@@ -108,11 +108,11 @@ class CleaningTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `post cleaning result is invokable`() {
-        val request = CleaningResultRequest(
+        val request = TaskStepResultRequest(
             results = listOf(
-                CleaningResultEntry(
+                TaskStepResultEntryDto(
                     taskId = "0",
-                    result = BusinessPartnerFull(
+                    businessPartner = BusinessPartnerFullDto(
                         generic = BusinessPartnerTestValues.businessPartner1,
                         legalEntity = BusinessPartnerTestValues.legalEntity1,
                         site = BusinessPartnerTestValues.site1,
@@ -120,9 +120,9 @@ class CleaningTaskControllerIT @Autowired constructor(
                     ),
                     errors = emptyList()
                 ),
-                CleaningResultEntry(
+                TaskStepResultEntryDto(
                     taskId = "1",
-                    result = BusinessPartnerFull(
+                    businessPartner = BusinessPartnerFullDto(
                         generic = BusinessPartnerTestValues.businessPartner2,
                         legalEntity = BusinessPartnerTestValues.legalEntity2,
                         site = BusinessPartnerTestValues.site2,
@@ -130,17 +130,17 @@ class CleaningTaskControllerIT @Autowired constructor(
                     ),
                     errors = emptyList()
                 ),
-                CleaningResultEntry(
+                TaskStepResultEntryDto(
                     taskId = "2",
-                    result = null,
+                    businessPartner = null,
                     errors = listOf(
-                        TaskError(type = TaskErrorType.Unspecified, "Error Description")
+                        TaskErrorDto(type = TaskErrorType.Unspecified, "Error Description")
                     )
                 ),
             )
         )
 
-        orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+        orchestratorClient.goldenRecordTasks.resolveStepResults(request)
     }
 
     /**
@@ -162,7 +162,7 @@ class CleaningTaskControllerIT @Autowired constructor(
         )
 
         Assertions.assertThatThrownBy {
-            orchestratorClient.cleaningTasks.createCleaningTasks(request)
+            orchestratorClient.goldenRecordTasks.createTasks(request)
         }.isInstanceOf(WebClientResponseException::class.java)
     }
 
@@ -174,13 +174,13 @@ class CleaningTaskControllerIT @Autowired constructor(
     fun `expect exception on requesting too many reservations`() {
 
         //Create entries above the upsert limit of 3
-        val request = CleaningReservationRequest(
+        val request = TaskStepReservationRequest(
             amount = 200,
-            step = CleaningStep.CleanAndSync
+            step = TaskStep.CleanAndSync
         )
 
         Assertions.assertThatThrownBy {
-            orchestratorClient.cleaningTasks.reserveCleaningTasks(request)
+            orchestratorClient.goldenRecordTasks.reserveTasksForStep(request)
         }.isInstanceOf(WebClientResponseException::class.java)
     }
 
@@ -191,14 +191,14 @@ class CleaningTaskControllerIT @Autowired constructor(
     @Test
     fun `expect exception on posting too many cleaning results`() {
 
-        val validCleaningResultEntry = CleaningResultEntry(
+        val validCleaningResultEntry = TaskStepResultEntryDto(
             taskId = "0",
-            result = null,
-            errors = listOf(TaskError(type = TaskErrorType.Unspecified, description = "Description"))
+            businessPartner = null,
+            errors = listOf(TaskErrorDto(type = TaskErrorType.Unspecified, description = "Description"))
         )
 
         //Create entries above the upsert limit of 3
-        val request = CleaningResultRequest(
+        val request = TaskStepResultRequest(
             results = listOf(
                 validCleaningResultEntry.copy(taskId = "0"),
                 validCleaningResultEntry.copy(taskId = "1"),
@@ -208,7 +208,7 @@ class CleaningTaskControllerIT @Autowired constructor(
         )
 
         Assertions.assertThatThrownBy {
-            orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+            orchestratorClient.goldenRecordTasks.resolveStepResults(request)
         }.isInstanceOf(WebClientResponseException::class.java)
     }
 
@@ -225,7 +225,7 @@ class CleaningTaskControllerIT @Autowired constructor(
         val expected = DummyValues.dummyResponseTaskState
 
 
-        val response = orchestratorClient.cleaningTasks.searchCleaningTaskState(request)
+        val response = orchestratorClient.goldenRecordTasks.searchTaskStates(request)
 
         // Assert that the response matches the expected value
         Assertions.assertThat(response).isEqualTo(expected)
@@ -237,18 +237,18 @@ class CleaningTaskControllerIT @Autowired constructor(
      */
     @Test
     fun `expect exception on posting empty cleaning result`() {
-        val request = CleaningResultRequest(
+        val request = TaskStepResultRequest(
             results = listOf(
-                CleaningResultEntry(
+                TaskStepResultEntryDto(
                     taskId = "0",
-                    result = null,
+                    businessPartner = null,
                     errors = emptyList()
                 )
             )
         )
 
         Assertions.assertThatThrownBy {
-            orchestratorClient.cleaningTasks.resolveCleaningTasks(request)
+            orchestratorClient.goldenRecordTasks.resolveStepResults(request)
         }.isInstanceOf(WebClientResponseException::class.java)
     }
 

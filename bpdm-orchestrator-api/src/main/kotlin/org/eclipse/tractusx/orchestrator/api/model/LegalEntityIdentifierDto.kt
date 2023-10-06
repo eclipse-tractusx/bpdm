@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityIdentifierDto
 
-@Schema(description = "Request object for posting cleaning results")
-data class CleaningResultRequest(
-    @get:ArraySchema(arraySchema = Schema(description = "The cleaning results for previously reserved cleaning tasks"))
-    val results: List<CleaningResultEntry>
-)
+data class LegalEntityIdentifierDto(
+    override val value: String,
+    override val type: String,
+    override val issuingBody: String?
+
+) : IBaseLegalEntityIdentifierDto

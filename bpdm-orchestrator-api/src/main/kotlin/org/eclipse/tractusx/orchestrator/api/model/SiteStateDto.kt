@@ -19,7 +19,14 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-enum class ReservationState {
-    Queued,
-    Reserved
-}
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteStateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
+
+data class SiteStateDto(
+    override val description: String?,
+    override val validFrom: LocalDateTime?,
+    override val validTo: LocalDateTime?,
+    override val type: BusinessStateType
+
+) : IBaseSiteStateDto

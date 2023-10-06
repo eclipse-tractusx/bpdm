@@ -30,25 +30,25 @@ object DummyValues {
     val dummyResponseCreateTask =
         TaskCreateResponse(
             listOf(
-                TaskRequesterState(
+                TaskClientStateDto(
                     taskId = "0",
                     businessPartnerResult = null,
                     processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
                         resultState = ResultState.Pending,
+                        step = TaskStep.CleanAndSync,
+                        stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
                         modifiedAt = Instant.now()
                     )
                 ),
-                TaskRequesterState(
+                TaskClientStateDto(
                     taskId = "1",
                     businessPartnerResult = null,
                     processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
                         resultState = ResultState.Pending,
+                        step = TaskStep.CleanAndSync,
+                        stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
                         modifiedAt = Instant.now()
@@ -57,13 +57,13 @@ object DummyValues {
             )
         )
 
-    val dummyCleaningReservationResponse = CleaningReservationResponse(
+    val dummyStepReservationResponse = TaskStepReservationResponse(
         timeout = Instant.now().plusSeconds(300),
         reservedTasks = listOf(
-            CleaningReservation(
+            TaskStepReservationEntryDto(
                 taskId = "0",
-                businessPartner = BusinessPartnerFull(
-                    generic = BusinessPartnerGeneric(
+                businessPartner = BusinessPartnerFullDto(
+                    generic = BusinessPartnerGenericDto(
                         nameParts = listOf("Dummy", "Name"),
                         postalAddress = PostalAddressDto(
                             physicalPostalAddress = PhysicalPostalAddressDto(
@@ -74,10 +74,10 @@ object DummyValues {
                     )
                 )
             ),
-            CleaningReservation(
+            TaskStepReservationEntryDto(
                 taskId = "1",
-                businessPartner = BusinessPartnerFull(
-                    generic = BusinessPartnerGeneric(
+                businessPartner = BusinessPartnerFullDto(
+                    generic = BusinessPartnerGenericDto(
                         nameParts = listOf("Other", "Name"),
                         postalAddress = PostalAddressDto(
                             physicalPostalAddress = PhysicalPostalAddressDto(
@@ -92,8 +92,8 @@ object DummyValues {
     )
 
 
-    private val businessPartnerFull1 = BusinessPartnerFull(
-        generic = BusinessPartnerGeneric(
+    private val businessPartnerFull1 = BusinessPartnerFullDto(
+        generic = BusinessPartnerGenericDto(
             nameParts = listOf("Dummy", "Name"),
             postalAddress = PostalAddressDto(
                 addressType = AddressType.LegalAddress,
@@ -103,14 +103,14 @@ object DummyValues {
                 )
             )
         ),
-        legalEntity = LegalEntity(
+        legalEntity = LegalEntityDto(
             legalName = "Dummy Name",
-            bpnLReference = BpnReference(
+            bpnLReference = BpnReferenceDto(
                 referenceValue = "request-id-l-1",
                 referenceType = BpnReferenceType.BpnRequestIdentifier
             ),
-            legalAddress = LogisticAddress(
-                bpnAReference = BpnReference(
+            legalAddress = LogisticAddressDto(
+                bpnAReference = BpnReferenceDto(
                     referenceValue = "request-id-a-1",
                     referenceType = BpnReferenceType.BpnRequestIdentifier
                 ),
@@ -120,8 +120,8 @@ object DummyValues {
                 )
             ),
         ),
-        address = LogisticAddress(
-            bpnAReference = BpnReference(
+        address = LogisticAddressDto(
+            bpnAReference = BpnReferenceDto(
                 referenceValue = "request-id-a-1",
                 referenceType = BpnReferenceType.BpnRequestIdentifier
             ),
@@ -132,8 +132,8 @@ object DummyValues {
         )
     )
 
-    private val businessPartnerFull2 = BusinessPartnerFull(
-        generic = BusinessPartnerGeneric(
+    private val businessPartnerFull2 = BusinessPartnerFullDto(
+        generic = BusinessPartnerGenericDto(
             nameParts = listOf("Other", "Name"),
             postalAddress = PostalAddressDto(
                 addressType = AddressType.AdditionalAddress,
@@ -143,14 +143,14 @@ object DummyValues {
                 )
             )
         ),
-        legalEntity = LegalEntity(
+        legalEntity = LegalEntityDto(
             legalName = "Other Name",
-            bpnLReference = BpnReference(
+            bpnLReference = BpnReferenceDto(
                 referenceValue = "BPNL1",
                 referenceType = BpnReferenceType.Bpn
             ),
-            legalAddress = LogisticAddress(
-                bpnAReference = BpnReference(
+            legalAddress = LogisticAddressDto(
+                bpnAReference = BpnReferenceDto(
                     referenceValue = "BPNA1",
                     referenceType = BpnReferenceType.Bpn
                 ),
@@ -160,14 +160,14 @@ object DummyValues {
                 )
             )
         ),
-        site = Site(
+        site = SiteDto(
             name = "Other Site Name",
-            bpnSReference = BpnReference(
+            bpnSReference = BpnReferenceDto(
                 referenceValue = "BPNS1",
                 referenceType = BpnReferenceType.Bpn
             ),
-            mainAddress = LogisticAddress(
-                bpnAReference = BpnReference(
+            mainAddress = LogisticAddressDto(
+                bpnAReference = BpnReferenceDto(
                     referenceValue = "BPNA2",
                     referenceType = BpnReferenceType.Bpn
                 ),
@@ -177,8 +177,8 @@ object DummyValues {
                 )
             )
         ),
-        address = LogisticAddress(
-            bpnAReference = BpnReference(
+        address = LogisticAddressDto(
+            bpnAReference = BpnReferenceDto(
                 referenceValue = "BPNA3",
                 referenceType = BpnReferenceType.Bpn
             ),
@@ -189,14 +189,14 @@ object DummyValues {
         )
     )
 
-    val dummyPoolSyncResponse = CleaningReservationResponse(
+    val dummyPoolSyncResponse = TaskStepReservationResponse(
         timeout = Instant.now().plusSeconds(300),
         reservedTasks = listOf(
-            CleaningReservation(
+            TaskStepReservationEntryDto(
                 taskId = "0",
                 businessPartner = businessPartnerFull1
             ),
-            CleaningReservation(
+            TaskStepReservationEntryDto(
                 taskId = "1",
                 businessPartner = businessPartnerFull2
             )
@@ -206,25 +206,25 @@ object DummyValues {
     val dummyResponseTaskState =
         TaskStateResponse(
             listOf(
-                TaskRequesterState(
+                TaskClientStateDto(
                     taskId = "0",
                     businessPartnerResult = null,
                     processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.CleanAndSync,
-                        reservationState = ReservationState.Queued,
                         resultState = ResultState.Pending,
+                        step = TaskStep.CleanAndSync,
+                        stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
                         modifiedAt = Instant.now()
                     )
                 ),
-                TaskRequesterState(
+                TaskClientStateDto(
                     taskId = "1",
                     businessPartnerResult = null,
                     processingState = TaskProcessingStateDto(
-                        cleaningStep = CleaningStep.Clean,
-                        reservationState = ReservationState.Queued,
                         resultState = ResultState.Pending,
+                        step = TaskStep.Clean,
+                        stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
                         modifiedAt = Instant.now()

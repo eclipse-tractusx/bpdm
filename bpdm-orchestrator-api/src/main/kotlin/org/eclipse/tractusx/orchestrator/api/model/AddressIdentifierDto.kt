@@ -19,14 +19,10 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseAddressStateDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAddressIdentifierDto
 
-data class AddressState(
-    override val description: String?,
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
-    override val type: BusinessStateType
+data class AddressIdentifierDto(
+    override val value: String,
+    override val type: String
 
-) : IBaseAddressStateDto
+) : IBaseAddressIdentifierDto

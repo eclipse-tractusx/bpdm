@@ -21,10 +21,12 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Describes an error that happened during processing of a cleaning task")
-data class TaskError(
-    @get:Schema(description = "The type of error that occurred", required = true)
-    val type: TaskErrorType,
-    @get:Schema(description = "The free text, detailed description of the error", required = true)
-    val description: String
+@Schema(description = "Task reservation entry")
+data class TaskStepReservationEntryDto(
+
+    @get:Schema(description = "The identifier of the reserved task")
+    val taskId: String,
+
+    @get:Schema(description = "The business partner data to process")
+    val businessPartner: BusinessPartnerFullDto
 )

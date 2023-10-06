@@ -32,81 +32,80 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.HttpExchange
 import org.springframework.web.service.annotation.PostExchange
 
-const val TagRequester = "Requester"
-const val TagCleaningService = "Cleaning Service"
+const val TagClient = "Task Client"
+const val TagWorker = "Task Worker"
 
-@RequestMapping("/api/cleaning-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
-@HttpExchange("/api/cleaning-tasks")
-interface CleaningTaskApi {
+@RequestMapping("/api/golden-record-tasks", produces = [MediaType.APPLICATION_JSON_VALUE])
+@HttpExchange("/api/golden-record-tasks")
+interface GoldenRecordTaskApi {
 
     @Operation(
-        summary = "Create new cleaning tasks for given business partner data",
-        description = "Create cleaning tasks for given business partner data in given cleaning mode. " +
-                "The mode decides through which cleaning steps the given business partner data will go through. " +
-                "The response contains the states of the created cleaning tasks in the order of given business partner data." +
-                "If there is an error in the request no cleaning tasks are created (all or nothing). " +
+        summary = "Create new golden record tasks for given business partner data",
+        description = "Create golden record tasks for given business partner data in given mode. " +
+                "The mode decides through which processing steps the given business partner data will go through. " +
+                "The response contains the states of the created tasks in the order of given business partner data." +
+                "If there is an error in the request no tasks are created (all or nothing). " +
                 "For a single request, the maximum number of business partners in the request is limited to \${bpdm.api.upsert-limit} entries."
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "The states of successfully created cleaning tasks including the task identifier for tracking purposes."
+                description = "The states of successfully created tasks including the task identifier for tracking purposes."
             ),
             ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
         ]
     )
-    @Tag(name = TagRequester)
+    @Tag(name = TagClient)
     @PostMapping
     @PostExchange
-    fun createCleaningTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
-
+    fun createTasks(@RequestBody createRequest: TaskCreateRequest): TaskCreateResponse
 
     @Operation(
-        summary = "Search for the state of cleaning tasks by task identifiers",
-        description = "Returns the state of finished cleaning tasks based on the provided task identifiers."
+        summary = "Search for the state of golden record tasks by task identifiers",
+        description = "Returns the state of golden record tasks based on the provided task identifiers."
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "The state of the finished cleaning tasks for the provided task identifiers."
+                description = "The state of the tasks for the provided task identifiers."
             ),
             ApiResponse(responseCode = "400", description = "On malformed task search requests", content = [Content()]),
         ]
     )
-    @Tag(name = TagRequester)
+    @Tag(name = TagClient)
     @PostMapping("/state/search")
     @PostExchange("/state/search")
-    fun searchCleaningTaskState(@RequestBody searchTaskIdRequest: TaskStateRequest): TaskStateResponse
+    fun searchTaskStates(@RequestBody stateRequest: TaskStateRequest): TaskStateResponse
 
     @Operation(
-        summary = "Reserve the next cleaning tasks waiting in the given cleaning step",
-        description = "Reserve up to a given number of cleaning tasks enqueued in the given cleaning step. " +
-                "The cleaning tasks contain the business partner to clean which consists of the generic and L/S/A data. " +
-                "For cleaning the business partners have a time limit which is returned with the reserved tasks." +
+        summary = "Reserve the next golden record tasks waiting in the given step queue",
+        description = "Reserve up to a given number of golden record tasks in the given step queue. " +
+                "The response entries contain the business partner data to process which consists of the generic and L/S/A data. " +
+                "The reservation has a time limit which is returned. " +
                 "For a single request, the maximum number of reservable tasks is limited to \${bpdm.api.upsert-limit}."
     )
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "The reserved cleaning tasks with their business partner data to clean."
+                description = "The reserved tasks with their business partner data to process."
             ),
             ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
         ]
     )
-    @Tag(name = TagCleaningService)
-    @PostMapping("/reservations")
-    @PostExchange("/reservations")
-    fun reserveCleaningTasks(@RequestBody reservationRequest: CleaningReservationRequest): CleaningReservationResponse
+    @Tag(name = TagWorker)
+    @PostMapping("/step-reservations")
+    @PostExchange("/step-reservations")
+    fun reserveTasksForStep(@RequestBody reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse
 
     @Operation(
-        summary = "Post cleaning results for reserved cleaning tasks in given cleaning step",
-        description = "Post business partner cleaning results for the given cleaning tasks. " +
-                "In order to post a result for a cleaning task it needs to be reserved first, has to currently be in the given cleaning step and the time limit is not exceeded." +
-                "The number of results you can post at a time does not need to match the original number of reserved tasks." +
-                "Results are accepted via strategy 'all or nothing'." +
+        summary = "Post step results for reserved golden record tasks in the given step queue",
+        description = "Post business partner step results for the given tasks. " +
+                "In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. " +
+                "The number of results you can post at a time does not need to match the original number of reserved tasks. " +
+                "Results are accepted via strategy 'all or nothing'. " +
                 "For a single request, the maximum number of postable results is limited to \${bpdm.api.upsert-limit}."
     )
     @ApiResponses(
@@ -118,8 +117,8 @@ interface CleaningTaskApi {
             ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
         ]
     )
-    @Tag(name = "Cleaning Service")
-    @PostMapping("/results")
-    @PostExchange("/results")
-    fun resolveCleaningTasks(@RequestBody resultRequest: CleaningResultRequest)
+    @Tag(name = TagWorker)
+    @PostMapping("/step-results")
+    @PostExchange("/step-results")
+    fun resolveStepResults(@RequestBody resultRequest: TaskStepResultRequest)
 }

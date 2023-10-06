@@ -19,10 +19,9 @@
 
 package org.eclipse.tractusx.orchestrator.api.client
 
-import org.eclipse.tractusx.orchestrator.api.CleaningTaskApi
+import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 
 interface OrchestrationApiClient {
 
-    val cleaningTasks: CleaningTaskApi
-
+    val goldenRecordTasks: GoldenRecordTaskApi
 }

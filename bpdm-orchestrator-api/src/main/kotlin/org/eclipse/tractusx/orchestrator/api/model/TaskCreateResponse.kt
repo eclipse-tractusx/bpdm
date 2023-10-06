@@ -21,11 +21,8 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Response object for giving a list of created cleaning tasks")
+@Schema(description = "Response object for giving a list of created tasks")
 data class TaskCreateResponse(
-    val createdTasks: List<TaskRequesterState>
-) {
 
-}
-
-
+    val createdTasks: List<TaskClientStateDto>
+)
