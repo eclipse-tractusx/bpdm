@@ -17,26 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.entity.generic
+package org.eclipse.tractusx.bpdm.gate.exception
 
-import jakarta.persistence.*
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.model.BaseEntity
-import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
-import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
+import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@Entity
-@Table(name = "postal_addresses")
-class PostalAddress(
-
-    @Column(name = "address_type")
-    @Enumerated(EnumType.STRING)
-    var addressType: AddressType? = null,
-
-    @Embedded
-    var physicalPostalAddress: PhysicalPostalAddress? = null,
-
-    @Embedded
-    var alternativePostalAddress: AlternativePostalAddress? = null
-
-) : BaseEntity()
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmMissingStageException(
+    externalIds: Collection<String>,
+    stageType: StageType
+) : RuntimeException("Business Partner Stage $stageType does not exist for business partner with external identifiers: ${externalIds.joinToString()}.")

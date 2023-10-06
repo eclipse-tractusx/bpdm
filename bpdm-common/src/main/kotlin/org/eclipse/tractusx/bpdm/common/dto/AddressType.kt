@@ -19,10 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-enum class AddressType {
+enum class AddressType(val businessPartnerTypes: Collection<BusinessPartnerType>) {
 
-    LegalAndSiteMainAddress,
-    LegalAddress,
-    SiteMainAddress,
-    AdditionalAddress
+    LegalAndSiteMainAddress(listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.SITE)),
+    LegalAddress(listOf(BusinessPartnerType.LEGAL_ENTITY)),
+    SiteMainAddress(listOf(BusinessPartnerType.SITE)),
+    AdditionalAddress(listOf(BusinessPartnerType.ADDRESS))
 }

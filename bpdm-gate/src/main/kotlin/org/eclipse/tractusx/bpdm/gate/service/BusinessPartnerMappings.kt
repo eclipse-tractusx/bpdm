@@ -19,10 +19,12 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
@@ -83,9 +85,9 @@ class BusinessPartnerMappings {
         )
     }
 
-    fun toBusinessPartner(dto: BusinessPartnerInputRequest, stage: StageType, parentId: String?, parentType: BusinessPartnerType?): BusinessPartner {
+    fun toBusinessPartnerInput(dto: BusinessPartnerInputRequest): BusinessPartner {
         return BusinessPartner(
-            stage = stage,
+            stage = StageType.Input,
             externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
@@ -99,32 +101,15 @@ class BusinessPartnerMappings {
             bpnS = dto.bpnS,
             bpnA = dto.bpnA,
             postalAddress = toPostalAddress(dto.postalAddress),
-            parentId = parentId,
-            parentType = parentType,
+            parentId = null,
+            parentType = null,
         )
     }
 
-    fun updateBusinessPartner(entity: BusinessPartner, dto: BusinessPartnerInputRequest, parentId: String?, parentType: BusinessPartnerType?) {
-        entity.nameParts.replace(dto.nameParts)
-        entity.roles.replace(dto.roles)
-        entity.identifiers.replace(dto.identifiers.map(::toIdentifier))
-        entity.states.replace(dto.states.map(::toState))
-        entity.classifications.replace(dto.classifications.map(::toClassification))
-        entity.shortName = dto.shortName
-        entity.legalForm = dto.legalForm
-        entity.isOwner = dto.isOwner
-        entity.bpnL = dto.bpnL
-        entity.bpnS = dto.bpnS
-        entity.bpnA = dto.bpnA
-        entity.parentId = parentId
-        entity.parentType = parentType
-        updatePostalAddress(entity.postalAddress, dto.postalAddress)
-    }
-
     //Output
-    fun toBusinessPartnerOutput(dto: BusinessPartnerOutputRequest, stage: StageType, parentId: String?, parentType: BusinessPartnerType?): BusinessPartner {
+    fun toBusinessPartnerOutput(dto: BusinessPartnerOutputRequest): BusinessPartner {
         return BusinessPartner(
-            stage = stage,
+            stage = StageType.Output,
             externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
@@ -137,27 +122,10 @@ class BusinessPartnerMappings {
             bpnL = dto.bpnL,
             bpnS = dto.bpnS,
             bpnA = dto.bpnA,
-            parentId = parentId,
-            parentType = parentType,
+            parentId = null,
+            parentType = null,
             postalAddress = toPostalAddress(dto.postalAddress)
         )
-    }
-
-    fun updateBusinessPartnerOutput(entity: BusinessPartner, dto: BusinessPartnerOutputRequest, parentId: String?, parentType: BusinessPartnerType?) {
-        entity.nameParts.replace(dto.nameParts)
-        entity.roles.replace(dto.roles)
-        entity.identifiers.replace(dto.identifiers.map(::toIdentifier))
-        entity.states.replace(dto.states.map(::toState))
-        entity.classifications.replace(dto.classifications.map(::toClassification))
-        entity.shortName = dto.shortName
-        entity.legalForm = dto.legalForm
-        entity.isOwner = dto.isOwner
-        entity.bpnL = dto.bpnL
-        entity.bpnS = dto.bpnS
-        entity.bpnA = dto.bpnA
-        entity.parentId = parentId
-        entity.parentType = parentType
-        updatePostalAddress(entity.postalAddress, dto.postalAddress)
     }
 
     private fun toPostalAddressDto(entity: PostalAddress) =
@@ -173,12 +141,6 @@ class BusinessPartnerMappings {
             physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
             alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
         )
-
-    private fun updatePostalAddress(entity: PostalAddress, dto: BusinessPartnerPostalAddressDto) {
-        entity.addressType = dto.addressType
-        entity.physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress)
-        entity.alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
-    }
 
     private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddress) =
         PhysicalPostalAddressGateDto(
