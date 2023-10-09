@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -29,11 +28,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerInputDtoWrapper
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerOutputDtoWrapper
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperOutputRequest
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
@@ -48,7 +45,8 @@ class SiteService(
 
     fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersInputLSA(PageRequest.of(page, size), externalIds)
+        val businessPartnerPage =
+            businessPartnerService.getBusinessPartners(pageRequest = PageRequest.of(page, size), externalIds = externalIds, stage = StageType.Input)
 
         val validData = toValidSiteGeneric(businessPartnerPage)
 
@@ -61,23 +59,24 @@ class SiteService(
         )
     }
 
-    private fun toValidSiteGeneric(businessPartnerPage: PageDto<BusinessPartnerInputDtoWrapper>): List<SiteGateInputDto> {
+    private fun toValidSiteGeneric(businessPartnerPage: Page<BusinessPartner>): List<SiteGateInputDto> {
         return businessPartnerPage.content
             .filter {
-                it.businessPartner.postalAddress.addressType == AddressType.SiteMainAddress || it.businessPartner.postalAddress.addressType == AddressType.LegalAndSiteMainAddress
+                it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress
                         && checkExistentRelation(StageType.Input, it.parentId)
             }
-            .map { it.businessPartner.toSiteGateInputDto(it.parentId) }
+            .map { it.toSiteGateInputDto(it.parentId) }
     }
 
     fun getSiteByExternalId(externalId: String): SiteGateInputDto {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersInputLSA(PageRequest.of(0, 1), listOf(externalId))
+        val businessPartnerPage =
+            businessPartnerService.getBusinessPartners(pageRequest = PageRequest.of(0, 1), externalIds = listOf(externalId), stage = StageType.Input)
 
-        val businessPartner = businessPartnerPage.content.firstOrNull { it.businessPartner.postalAddress.addressType == AddressType.SiteMainAddress }
+        val businessPartner = businessPartnerPage.content.firstOrNull { it.postalAddress.addressType == AddressType.SiteMainAddress }
             ?: throw BpdmNotFoundException(("site does not exist"), externalId)
 
-        return businessPartner.businessPartner.toSiteGateInputDto(businessPartner.parentId)
+        return businessPartner.toSiteGateInputDto(businessPartner.parentId)
 
     }
 
@@ -86,7 +85,8 @@ class SiteService(
      */
     fun getSitesOutput(externalIds: Collection<String>?, page: Int, size: Int): PageDto<SiteGateOutputResponse> {
 
-        val businessPartnerPage = businessPartnerService.getBusinessPartnersOutputLSA(PageRequest.of(page, size), externalIds)
+        val businessPartnerPage =
+            businessPartnerService.getBusinessPartners(pageRequest = PageRequest.of(page, size), externalIds = externalIds, stage = StageType.Output)
 
         val validData = toValidOutputSitesGeneric(businessPartnerPage)
 
@@ -99,13 +99,13 @@ class SiteService(
         )
     }
 
-    private fun toValidOutputSitesGeneric(businessPartnerPage: PageDto<BusinessPartnerOutputDtoWrapper>): List<SiteGateOutputResponse> {
+    private fun toValidOutputSitesGeneric(businessPartnerPage: Page<BusinessPartner>): List<SiteGateOutputResponse> {
         return businessPartnerPage.content
             .filter {
-                (it.businessPartner.postalAddress.addressType == AddressType.SiteMainAddress || it.businessPartner.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                (it.postalAddress.addressType == AddressType.SiteMainAddress || it.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
                         && checkExistentRelation(StageType.Output, it.parentId)
             }
-            .map { it.businessPartner.toSiteGateOutputResponse(it.parentId) }
+            .map { it.toSiteGateOutputResponse(it.parentId) }
     }
 
     private fun checkExistentRelation(type: StageType, searchId: String?): Boolean {
@@ -121,17 +121,17 @@ class SiteService(
      **/
     fun upsertSites(sites: Collection<SiteGateInputRequest>) {
 
-        val mappedGBP: MutableCollection<BusinessPartnerWrapperInputRequest> = mutableListOf()
+        var mappedGBP: List<BusinessPartner> = emptyList()
 
         sites.forEach { site ->
-            val mapBusinessPartner = site.toBusinessPartnerDto()
+            val mapBusinessPartner = site.toBusinessPartnerDtoSite()
 
             val retrieveBP = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.legalEntityExternalId)
             if (retrieveBP == null || retrieveBP.postalAddress.addressType != AddressType.LegalAddress) {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Related Legal Entity doesn't exist")
             }
 
-            mappedGBP.add(BusinessPartnerWrapperInputRequest(mapBusinessPartner, site.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY))
+            mappedGBP = mappedGBP.plus(mapBusinessPartner)
         }
 
         businessPartnerService.upsertBusinessPartnersInput(mappedGBP)
@@ -143,7 +143,7 @@ class SiteService(
      **/
     fun upsertSitesOutput(sites: Collection<SiteGateOutputRequest>) {
 
-        val mappedGBP: MutableCollection<BusinessPartnerWrapperOutputRequest> = mutableListOf()
+        var mappedGBP: List<BusinessPartner> = emptyList()
 
         sites.forEach { site ->
 
@@ -152,14 +152,14 @@ class SiteService(
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Output Legal Entity doesn't exist")
             }
 
-            val mapBusinessPartner = site.toBusinessPartnerOutputDto()
+            val mapBusinessPartner = site.toBusinessPartnerOutputDtoSite()
 
             val relatedSite = businessPartnerRepository.findByStageAndExternalId(StageType.Input, site.externalId)
             if (relatedSite == null || relatedSite.postalAddress.addressType != AddressType.SiteMainAddress) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Related Input Site doesn't exist")
             }
 
-            mappedGBP.add(BusinessPartnerWrapperOutputRequest(mapBusinessPartner, site.legalEntityExternalId, BusinessPartnerType.LEGAL_ENTITY))
+            mappedGBP = mappedGBP.plus(mapBusinessPartner)
         }
 
         businessPartnerService.upsertBusinessPartnersOutput(mappedGBP)

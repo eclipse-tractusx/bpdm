@@ -27,17 +27,12 @@ import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerInputDtoWrapper
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerOutputDtoWrapper
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.wrapper.BusinessPartnerWrapperOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
@@ -62,16 +57,6 @@ class BusinessPartnerService(
         return upsertBusinessPartnersInput(entities).map(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
-    private fun checkBusinessPartnerType(type: AddressType?): List<BusinessPartnerType>? {
-        return when (type) {
-            AddressType.LegalAndSiteMainAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY, BusinessPartnerType.SITE)
-            AddressType.AdditionalAddress -> listOf(BusinessPartnerType.ADDRESS)
-            AddressType.LegalAddress -> listOf(BusinessPartnerType.LEGAL_ENTITY)
-            AddressType.SiteMainAddress -> listOf(BusinessPartnerType.SITE)
-            else -> null
-        }
-    }
-
     //Output Logic
     @Transactional
     fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerOutputDto> {
@@ -91,18 +76,22 @@ class BusinessPartnerService(
             .toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
-    private fun upsertBusinessPartnersInput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+    fun upsertBusinessPartnersInput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
         val resolutionResults = resolveCandidatesForStage(entityCandidates, StageType.Input)
 
         saveChangelog(resolutionResults)
 
         val partners = resolutionResults.map { it.businessPartner }
-        partners.forEach { entity -> initSharingState(entity) }
+
+        resolutionResults.forEach { result ->
+            if (!result.wasResolved)
+                initSharingState(result.businessPartner)
+        }
 
         return businessPartnerRepository.saveAll(partners)
     }
 
-    private fun upsertBusinessPartnersOutput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+    fun upsertBusinessPartnersOutput(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
         val externalIds = entityCandidates.map { it.externalId }
         assertInputStageExists(externalIds)
 
@@ -110,51 +99,25 @@ class BusinessPartnerService(
 
         saveChangelog(resolutionResults)
 
+        val partners = resolutionResults.map { it.businessPartner }
+        partners.forEach { entity -> updateSharingStateStatus(entity) }
+
         return businessPartnerRepository.saveAll(resolutionResults.map { it.businessPartner })
     }
 
-    private fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {
+    fun getBusinessPartners(pageRequest: PageRequest, externalIds: Collection<String>?, stage: StageType): Page<BusinessPartner> {
         return when {
             externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
             else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
         }
-        return page.toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
-    fun getBusinessPartnersInputLSA(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDtoWrapper> {
-        val stage = StageType.Input
-        val page = when {
-            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
-            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
-        }
-        return page.toPageDto(businessPartnerMappings::toBusinessPartnerInputDtoWrapper)
+    private fun initSharingState(dto: BusinessPartner) {
+        val businessPartnerTypes = dto.postalAddress.addressType?.businessPartnerTypes ?: listOf(BusinessPartnerType.ADDRESS)
+        businessPartnerTypes.forEach { type -> sharingStateService.upsertSharingState(SharingStateDto(type, dto.externalId)) }
     }
 
-    fun getBusinessPartnersOutputLSA(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDtoWrapper> {
-        val stage = StageType.Output
-        val page = when {
-            externalIds.isNullOrEmpty() -> businessPartnerRepository.findByStage(stage, pageRequest)
-            else -> businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds, pageRequest)
-        }
-        return page.toPageDto(businessPartnerMappings::toBusinessPartnerOutputDtoWrapper)
-    }
-
-    private fun getExistingEntityByExternalId(
-        dtos: Collection<IBaseBusinessPartnerGateDto>,
-        stage: StageType
-    ): Map<String, BusinessPartner> {
-        val externalIds = dtos.map { it.externalId }.toSet()
-        return businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds)
-            .associateBy { it.externalId }
-    }
-
-    private fun initSharingState(dto: IBaseBusinessPartnerGateDto, businessPartnerType: List<BusinessPartnerType>?) {
-        businessPartnerType?.forEach { type ->
-            sharingStateService.upsertSharingState(SharingStateDto(type, dto.externalId))
-        } ?: sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId)) //TODO ADDRESS Type if Type is NULL
-    }
-
-    private fun updateSharingStateStatus(dto: IBaseBusinessPartnerGateDto, businessPartnerType: List<BusinessPartnerType>?) {
+    private fun updateSharingStateStatus(dto: BusinessPartner) {
 
         val bpn = when (dto.postalAddress.addressType) {
             AddressType.LegalAddress -> dto.bpnL
@@ -163,9 +126,18 @@ class BusinessPartnerService(
             else -> null
         }
 
-        businessPartnerType?.forEach { type ->
-            sharingStateService.upsertSharingState(SharingStateDto(type, dto.externalId, SharingStateType.Success, bpn = bpn))
-        } ?: sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, dto.externalId, SharingStateType.Success, bpn = bpn))
+        val businessPartnerTypes = dto.postalAddress.addressType?.businessPartnerTypes ?: listOf(BusinessPartnerType.ADDRESS)
+        businessPartnerTypes.forEach { type ->
+            sharingStateService.upsertSharingState(
+                SharingStateDto(
+                    type,
+                    dto.externalId,
+                    SharingStateType.Success,
+                    bpn = bpn
+                )
+            )
+        }
+
     }
 
     private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {
