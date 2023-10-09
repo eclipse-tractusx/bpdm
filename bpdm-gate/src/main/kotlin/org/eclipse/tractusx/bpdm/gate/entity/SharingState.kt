@@ -53,7 +53,10 @@ class SharingState(
     var bpn: String? = null,
 
     @Column(name = "sharing_process_started", nullable = true)
-    var sharingProcessStarted: LocalDateTime? = null
+    var sharingProcessStarted: LocalDateTime? = null,
+
+    @Column(name = "task_id", nullable = true)
+    var taskId: String? = null
 
 ) : BaseEntity()
 

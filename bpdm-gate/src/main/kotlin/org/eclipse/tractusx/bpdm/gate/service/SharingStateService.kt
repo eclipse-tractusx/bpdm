@@ -54,7 +54,8 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
                 sharingErrorCode = dto.sharingErrorCode,
                 sharingErrorMessage = dto.sharingErrorMessage,
                 bpn = dto.bpn,
-                sharingProcessStarted = dto.sharingProcessStarted
+                sharingProcessStarted = dto.sharingProcessStarted,
+                taskId = dto.taskId
             )
         )
     }
@@ -65,10 +66,10 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
         entity.sharingErrorCode = dto.sharingErrorCode
         entity.sharingErrorMessage = dto.sharingErrorMessage
         entity.bpn = dto.bpn
+        entity.taskId = dto.taskId
         if (dto.sharingProcessStarted != null) {
             entity.sharingProcessStarted = dto.sharingProcessStarted
         }
-
         this.stateRepository.save(entity)
     }
 
@@ -90,7 +91,8 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
                 sharingErrorCode = it.sharingErrorCode,
                 sharingErrorMessage = it.sharingErrorMessage,
                 bpn = it.bpn,
-                sharingProcessStarted = it.sharingProcessStarted
+                sharingProcessStarted = it.sharingProcessStarted,
+                taskId = it.taskId
             )
         })
 

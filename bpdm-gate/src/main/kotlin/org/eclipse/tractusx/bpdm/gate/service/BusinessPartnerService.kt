@@ -36,6 +36,8 @@ import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
+import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -46,7 +48,9 @@ class BusinessPartnerService(
     private val businessPartnerRepository: BusinessPartnerRepository,
     private val businessPartnerMappings: BusinessPartnerMappings,
     private val sharingStateService: SharingStateService,
-    private val changelogRepository: ChangelogRepository
+    private val changelogRepository: ChangelogRepository,
+    private val orchestrationApiClient: OrchestrationApiClient,
+    private val orchestratorMappings: OrchestratorMappings
 ) {
 
     @Transactional
@@ -79,7 +83,16 @@ class BusinessPartnerService(
         saveChangelog(resolutionResults)
 
         val partners = resolutionResults.map { it.businessPartner }
-        partners.forEach { entity -> initSharingState(entity) }
+        val orchestratorBusinessPartnersDto = resolutionResults.map { orchestratorMappings.toBusinessPartnerGenericDto(it.businessPartner) }
+        partners.forEach { entity ->
+            initSharingState(entity)
+        }
+
+        val taskCreateResponse = createGoldenRecordTasks(orchestratorBusinessPartnersDto)
+
+        for (i in partners.indices) {
+            updateSharingState(partners[i], taskCreateResponse.createdTasks[i])
+        }
 
         return businessPartnerRepository.saveAll(partners)
     }
@@ -209,6 +222,24 @@ class BusinessPartnerService(
         }
 
 
+    private fun createGoldenRecordTasks(orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): TaskCreateResponse {
+        return orchestrationApiClient.goldenRecordTasks.createTasks(
+            TaskCreateRequest(
+                TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto
+            )
+        )
+    }
 
+    private fun updateSharingState(entity: BusinessPartner, stateDto: TaskClientStateDto) {
+        sharingStateService.upsertSharingState(
+            SharingStateDto(
+                BusinessPartnerType.ADDRESS,
+                entity.externalId,
+                sharingStateType = orchestratorMappings.toSharingStateType(stateDto.processingState.resultState),
+                taskId = stateDto.taskId
+            )
+        )
+
+    }
 
 }

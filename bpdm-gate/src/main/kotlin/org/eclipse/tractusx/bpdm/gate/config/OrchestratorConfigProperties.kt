@@ -22,10 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.bpn")
-data class BpnConfigProperties(
-    val agencyName: String = "Catena-X",
-    var name: String = "Business Partner Number",
-    val id: String = "CX_BPN",
-    val ownerBpnL: String? = null
+@ConfigurationProperties(prefix = "bpdm.orchestrator")
+data class OrchestratorConfigProperties(
+    val baseUrl: String = "http://localhost:8085",
 )
