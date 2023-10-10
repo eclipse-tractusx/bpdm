@@ -339,7 +339,7 @@ object BusinessPartnerVerboseValues {
         nameParts = listOf("Business Partner Name", "Company ABC AG", "Another Organisation Corp", "Catena Test Name"),
         shortName = "short1",
         legalForm = "Limited Liability Company",
-        isOwner = true,
+        isOwnCompanyData = true,
         identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
         classifications = listOf(bpClassification1, bpClassification2, bpClassification3),
         states = listOf(bpState1, bpState2),
@@ -732,7 +732,7 @@ object BusinessPartnerVerboseValues {
         nameParts = listOf("好公司  合伙制企业"),
         shortName = "short3",
         legalForm = "股份有限",
-        isOwner = true,
+        isOwnCompanyData = true,
         identifiers = listOf(
             bpIdentifier1, bpIdentifier2, bpIdentifier1
         ),          // duplicate, but they are elimnated

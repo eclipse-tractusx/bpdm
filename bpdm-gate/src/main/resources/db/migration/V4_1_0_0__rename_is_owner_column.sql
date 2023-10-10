@@ -1,0 +1,1 @@
+ALTER TABLE business_partners RENAME COLUMN is_owner TO is_own_company_data;

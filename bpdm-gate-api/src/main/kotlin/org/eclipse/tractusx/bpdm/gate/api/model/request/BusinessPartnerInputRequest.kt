@@ -41,7 +41,7 @@ data class BusinessPartnerInputRequest(
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
-    override val isOwner: Boolean = false,
+    override val isOwnCompanyData: Boolean = false,
     override val bpnL: String? = null,
     override val bpnS: String? = null,
     override val bpnA: String? = null,

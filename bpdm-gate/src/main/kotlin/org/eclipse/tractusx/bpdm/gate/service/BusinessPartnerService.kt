@@ -161,7 +161,7 @@ class BusinessPartnerService(
             stage = fromPartner.stage
             shortName = fromPartner.shortName
             legalForm = fromPartner.legalForm
-            isOwner = fromPartner.isOwner
+            isOwnCompanyData = fromPartner.isOwnCompanyData
             bpnL = fromPartner.bpnL
             bpnS = fromPartner.bpnS
             bpnA = fromPartner.bpnA
