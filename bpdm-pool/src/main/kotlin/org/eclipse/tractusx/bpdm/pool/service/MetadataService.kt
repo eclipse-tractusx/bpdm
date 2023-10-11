@@ -23,6 +23,7 @@ import com.neovisionaries.i18n.CountryCode
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
@@ -178,7 +179,6 @@ class MetadataService(
 
     @Transactional
     fun createRegion(request: RegionDto): RegionDto {
-
         logger.info { "Create new Region with key ${request.regionCode} and name ${request.regionName}" }
 
         val region = Region(
@@ -187,13 +187,18 @@ class MetadataService(
             regionName = request.regionName
         )
 
-        return regionRepository.save(region).toDto()
+        return regionRepository.save(region).toRegionDto()
     }
 
     fun getRegions(paginationRequest: PaginationRequest): PageDto<RegionDto> {
         val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
         val page = regionRepository.findAll(pageRequest)
-        return page.toDto(page.content.map { it.toDto() })
+        return page.toDto(page.content.map { it.toRegionDto() })
     }
 
+    fun getCountrySubdivisions(paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto> {
+        val pageRequest = paginationRequest.toPageRequest(RegionRepository.DEFAULT_SORTING)
+        val page = regionRepository.findAll(pageRequest)
+        return page.toDto(page.content.map { it.toCountrySubdivisionDto() })
+    }
 }

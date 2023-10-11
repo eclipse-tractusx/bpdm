@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.CountrySubdivisionDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
@@ -168,17 +169,17 @@ interface PoolMetadataApi {
     fun getRegions(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
 
     @Operation(
-        summary = "Get page of regions suitable for the administrativeAreaLevel1 address property",
-        description = "Lists all currently known regions in a paginated result"
+        summary = "Get page of country subdivisions suitable for the administrativeAreaLevel1 address property",
+        description = "Lists all currently known country subdivisions according to ISO 3166-2 in a paginated result"
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Page of existing regions, may be empty"),
+            ApiResponse(responseCode = "200", description = "Page of existing country subdivisions, may be empty"),
             ApiResponse(responseCode = "400", description = "On malformed request parameters", content = [Content()])
         ]
     )
     @GetMapping("/administrative-areas-level1")
     @GetExchange("/administrative-areas-level1")
-    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<RegionDto>
+    fun getAdminAreasLevel1(@ParameterObject paginationRequest: PaginationRequest): PageDto<CountrySubdivisionDto>
 
 }

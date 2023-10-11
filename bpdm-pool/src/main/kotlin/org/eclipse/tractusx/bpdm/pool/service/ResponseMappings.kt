@@ -277,6 +277,10 @@ fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
     return ChangelogEntryVerboseDto(bpn, businessPartnerType, createdAt, changelogType)
 }
 
-fun Region.toDto(): RegionDto {
-    return RegionDto(countryCode, regionCode, regionName)
+fun Region.toRegionDto(): RegionDto {
+    return RegionDto(countryCode = countryCode, regionCode = regionCode, regionName = regionName)
+}
+
+fun Region.toCountrySubdivisionDto(): CountrySubdivisionDto {
+    return CountrySubdivisionDto(countryCode = countryCode, code = regionCode, name = regionName)
 }
