@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.web.reactive.function.client.WebClientResponseException
 
 
+// TODO fix tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = ["bpdm.api.upsert-limit=3"])
 class GoldenRecordTaskControllerIT @Autowired constructor(
     val orchestratorClient: OrchestrationApiClient

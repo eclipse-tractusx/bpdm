@@ -22,10 +22,14 @@ package org.eclipse.tractusx.bpdm.orchestrator.util
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.model.*
+import java.time.Duration
 import java.time.Instant
 
+// TODO migrate to test scope
 //While we don't have a service logic implementation of the API  use a dummy response for the endpoints
 object DummyValues {
+
+    val taskTimeout: Duration = Duration.ofHours(24)
 
     val dummyResponseCreateTask =
         TaskCreateResponse(
@@ -39,8 +43,9 @@ object DummyValues {
                         stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
+                        modifiedAt = Instant.now(),
+                        timeout = Instant.now().plus(taskTimeout)
+                    ),
                 ),
                 TaskClientStateDto(
                     taskId = "1",
@@ -51,8 +56,9 @@ object DummyValues {
                         stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
+                        modifiedAt = Instant.now(),
+                        timeout = Instant.now().plus(taskTimeout)
+                    ),
                 )
             )
         )
@@ -215,8 +221,9 @@ object DummyValues {
                         stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
+                        modifiedAt = Instant.now(),
+                        timeout = Instant.now().plus(taskTimeout)
+                    ),
                 ),
                 TaskClientStateDto(
                     taskId = "1",
@@ -227,8 +234,9 @@ object DummyValues {
                         stepState = StepState.Queued,
                         errors = emptyList(),
                         createdAt = Instant.now(),
-                        modifiedAt = Instant.now()
-                    )
+                        modifiedAt = Instant.now(),
+                        timeout = Instant.now().plus(taskTimeout)
+                    ),
                 )
             )
         )

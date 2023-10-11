@@ -17,11 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.config
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@ConfigurationProperties(prefix = "bpdm.api")
-data class ApiConfigProperties(
-    val upsertLimit: Int = 100
-)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmDuplicateTaskIdException(
+    taskId: String
+) : RuntimeException("Duplicate task ID '$taskId'.")
