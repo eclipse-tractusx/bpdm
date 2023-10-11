@@ -65,7 +65,7 @@ class CleaningServiceDummy(
         }
     }
 
-    private fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
+    fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
         val businessPartner = reservedTask.businessPartner
         val addressPartner = createAddressRepresentation(businessPartner.generic)
 
