@@ -40,7 +40,4 @@ interface IBaseLegalEntityDto {
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
     val classifications: Collection<IBaseClassificationDto>
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: IBaseLogisticAddressDto?
 }

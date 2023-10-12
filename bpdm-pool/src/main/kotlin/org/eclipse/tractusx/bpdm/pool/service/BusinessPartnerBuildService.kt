@@ -61,9 +61,12 @@ class BusinessPartnerBuildService(
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+
+        val errorsByRequest = requestValidationService.validateLegalEntityCreatesPool(requests.associateWith { it.legalEntity })
+        val errorsByRequestAddress = requestValidationService.validateLegalEntityCreatesAddressesPool(requests.associateWith { it.legalAddress })
+
+        val errors = errorsByRequest.flatMap { it.value } + errorsByRequestAddress.flatMap { it.value }
+        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) || errorsByRequestAddress.containsKey(it) }
 
         val legalEntityMetadataMap = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
         val addressMetadataMap = metadataService.getMetadata(requests.map { it.legalAddress }).toMapping()
@@ -410,8 +413,8 @@ class BusinessPartnerBuildService(
             bpn = bpn,
             legalEntity = null,
             site = null,
-            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap),
-            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) },
+            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
+            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
             name = dto.name
         )
 
@@ -422,12 +425,12 @@ class BusinessPartnerBuildService(
 
     private fun updateLogisticAddress(address: LogisticAddress, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
         address.name = dto.name
-        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap)
-        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
+        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
+        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
 
         address.identifiers.apply {
             clear()
-            addAll(dto.identifiers.map { toEntity(it, metadataMap, address) })
+            addAll(dto.identifiers.map { toEntity(it, metadataMap.idTypes, address) })
         }
         address.states.apply {
             clear()
@@ -435,11 +438,11 @@ class BusinessPartnerBuildService(
         }
     }
 
-    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMapping): PhysicalPostalAddress {
+    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
         return PhysicalPostalAddress(
             geographicCoordinates = physicalAddress.geographicCoordinates?.let { toEntity(it) },
             country = physicalAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[physicalAddress.administrativeAreaLevel1],
+            administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
             administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
             postCode = physicalAddress.postalCode,
@@ -454,11 +457,11 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMapping): AlternativePostalAddress {
+    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto,  regions: Map<String, Region>): AlternativePostalAddress {
         return AlternativePostalAddress(
             geographicCoordinates = alternativeAddress.geographicCoordinates?.let { toEntity(it) },
             country = alternativeAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[alternativeAddress.administrativeAreaLevel1],
+            administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
             postCode = alternativeAddress.postalCode,
             city = alternativeAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
@@ -530,12 +533,12 @@ class BusinessPartnerBuildService(
 
     private fun toEntity(
         dto: AddressIdentifierDto,
-        metadataMap: AddressMetadataMapping,
+        idTypes: Map<String, IdentifierType>,
         partner: LogisticAddress
     ): AddressIdentifier {
         return AddressIdentifier(
             value = dto.value,
-            type = metadataMap.idTypes[dto.type]!!,
+            type = idTypes[dto.type]!!,
             address = partner
         )
     }
@@ -561,13 +564,14 @@ class BusinessPartnerBuildService(
         )
 
 
-    private data class LegalEntityMetadataMapping(
+    data class LegalEntityMetadataMapping(
         val idTypes: Map<String, IdentifierType>,
         val legalForms: Map<String, LegalForm>
     )
 
-    private data class AddressMetadataMapping(
+    data class AddressMetadataMapping(
         val idTypes: Map<String, IdentifierType>,
         val regions: Map<String, Region>
     )
+
 }

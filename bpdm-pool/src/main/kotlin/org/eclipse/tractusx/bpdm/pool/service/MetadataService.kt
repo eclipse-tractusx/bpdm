@@ -37,6 +37,7 @@ import org.eclipse.tractusx.bpdm.pool.repository.FieldQualityRuleRepository
 import org.eclipse.tractusx.bpdm.pool.repository.IdentifierTypeRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LegalFormRepository
 import org.eclipse.tractusx.bpdm.pool.repository.RegionRepository
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
@@ -142,7 +143,7 @@ class MetadataService(
         return resultList
     }
 
-    fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto {
+    fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
 
@@ -152,7 +153,19 @@ class MetadataService(
         return LegalEntityMetadataDto(idTypes, legalForms)
     }
 
-    fun getMetadata(requests: Collection<LogisticAddressDto>): AddressMetadataDto {
+    fun getMetadataOrchestrator(requests: Collection<LogisticAddressDto>): AddressMetadataDto {
+        val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
+        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
+
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
+            .toSet()
+        val regions = regionRepository.findByRegionCodeIn(regionKeys)
+
+        return AddressMetadataDto(idTypes, regions)
+    }
+
+    fun getMetadata(requests: Collection<org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto>): AddressMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 

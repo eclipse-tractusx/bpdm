@@ -26,8 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifier
 data class AddressIdentifierDto(
 
     @get:Schema(description = AddressIdentifierDescription.value)
-    val value: String,
+    override val value: String,
 
     @get:Schema(description = AddressIdentifierDescription.type)
-    val type: String,
-)
+    override val type: String,
+) : IBaseAddressIdentifierDto
