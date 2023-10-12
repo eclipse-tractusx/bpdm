@@ -31,6 +31,11 @@ class GoldenRecordTaskStorage {
 
     private val tasks: MutableList<GoldenRecordTask> = mutableListOf()
 
+    // Needed for testing
+    fun clear() {
+        tasks.clear()
+    }
+
     fun addTask(task: GoldenRecordTask): GoldenRecordTask {
         return task.also {
             if (getTask(it.taskId) != null) {
