@@ -4,6 +4,7 @@ import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.OpenSearchContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
@@ -24,6 +25,7 @@ import org.springframework.test.context.ContextConfiguration
 @ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
 class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     val cleaningStepService: TaskStepFetchAndReserveService,
+    val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl
 ) {
@@ -73,13 +75,65 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(resultSteps[0].taskId).isEqualTo("TASK_1")
         assertThat(resultSteps[0].errors.size).isEqualTo(0)
 
+        val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf("123","222" ))
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(resultSteps[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
+        assertThat(bpnMappings.size).isEqualTo(2)
+        assertThat(resultSteps[0].businessPartner?.generic?.bpnL).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+    }
+
+    @Test
+    fun `upsert Golden Record into pool with same legal entity referenceValue to create`() {
+
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val resultSteps1 = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(resultSteps1[0].taskId).isEqualTo("TASK_1")
+        assertThat(resultSteps1[0].errors.size).isEqualTo(0)
+        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(resultSteps1[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+
+        val resultSteps2 = cleanStep(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity)
+        assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
+        assertThat(resultSteps2[0].errors.size).isEqualTo(0)
+        assertThat(createdLegalEntity1.legalEntity.bpnl).isEqualTo(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+    }
+
+    @Test
+    fun `upsert Golden Record into pool with differrent legal entity referenceValue to create`() {
+
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val resultSteps1 = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(resultSteps1[0].taskId).isEqualTo("TASK_1")
+        assertThat(resultSteps1[0].errors.size).isEqualTo(0)
+        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(resultSteps1[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+
+        val fullBpWithLegalEntity2 = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "diffenrentBpnL", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "diffenrentBpnA", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val resultSteps2 = cleanStep(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity2)
+        assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
+        assertThat(resultSteps2[0].errors.size).isEqualTo(0)
+        assertThat(createdLegalEntity1.legalEntity.bpnl).isNotEqualTo(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        val createdLegalEntity2 = poolClient.legalEntities.getLegalEntity(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        assertThat(resultSteps2[0].businessPartner?.generic?.bpnL).isEqualTo(createdLegalEntity2.legalEntity.bpnl)
+
     }
 
     fun cleanStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepResultEntryDto> {
 
-        val steps = singleTaskStep(taskId = "TASK_1", businessPartner = businessPartner)
+        val steps = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
         return cleaningStepService.upsertGoldenRecordIntoPool(steps)
     }
 
