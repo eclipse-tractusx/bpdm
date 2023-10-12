@@ -28,14 +28,14 @@ import java.time.LocalDateTime
 data class LegalEntityStateDto(
 
     @get:Schema(description = LegalEntityStateDescription.description)
-    val description: String?,
+    override val description: String?,
 
     @get:Schema(description = LegalEntityStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
+    override val validFrom: LocalDateTime?,
 
     @get:Schema(description = LegalEntityStateDescription.validTo)
-    val validTo: LocalDateTime?,
+    override val validTo: LocalDateTime?,
 
     @get:Schema(description = LegalEntityStateDescription.type)
-    val type: BusinessStateType
-)
+    override val type: BusinessStateType
+) : IBaseLegalEntityStateDto

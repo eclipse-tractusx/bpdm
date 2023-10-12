@@ -30,16 +30,12 @@ data class LogisticAddressDto(
     val name: String? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    val states: Collection<AddressStateDto> = emptyList(),
+    override val states: Collection<AddressStateDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+    override val identifiers: Collection<AddressIdentifierDto> = emptyList(),
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
-    val physicalPostalAddress: PhysicalPostalAddressDto,
+    override val physicalPostalAddress: PhysicalPostalAddressDto,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
-    val alternativePostalAddress: AlternativePostalAddressDto? = null
-)
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+) : IBaseLogisticAddressDto

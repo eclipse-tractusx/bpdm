@@ -61,9 +61,13 @@ class BusinessPartnerBuildService(
     fun createLegalEntities(requests: Collection<LegalEntityPartnerCreateRequest>): LegalEntityPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new legal entities" }
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests)
-        val errors = errorsByRequest.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
+
+        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests.associateWith { it.legalEntity }) { theRequest -> theRequest.index }
+        val errorsByRequestAddress =
+            requestValidationService.validateLegalEntityCreatesAddresses(requests.associateWith { it.legalAddress }) { theRequest -> theRequest.index }
+
+        val errors = errorsByRequest.flatMap { it.value } + errorsByRequestAddress.flatMap { it.value }
+        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) || errorsByRequestAddress.containsKey(it) }
 
         val legalEntityMetadataMap = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
         val addressMetadataMap = metadataService.getMetadata(requests.map { it.legalAddress }).toMapping()
@@ -347,7 +351,7 @@ class BusinessPartnerBuildService(
             legalEntity = partner,
         )
 
-        site.states.addAll(request.states.map { toEntity(it, site) })
+        site.states.addAll(request.states.map { toSiteState(it, site) })
 
         return site
     }
@@ -373,16 +377,16 @@ class BusinessPartnerBuildService(
         partner.states.clear()
         partner.classifications.clear()
 
-        partner.states.addAll(request.states.map { toEntity(it, partner) })
-        partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
-        partner.classifications.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
+        partner.states.addAll(request.states.map { toLegalEntityState(it, partner) })
+        partner.identifiers.addAll(request.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, partner) })
+        partner.classifications.addAll(request.classifications.map { toLegalEntityClassification(it, partner) }.toSet())
     }
 
     private fun updateSite(site: Site, request: SiteDto) {
         site.name = request.name
 
         site.states.clear()
-        site.states.addAll(request.states.map { toEntity(it, site) })
+        site.states.addAll(request.states.map { toSiteState(it, site) })
     }
 
     private fun createLogisticAddress(
@@ -410,8 +414,8 @@ class BusinessPartnerBuildService(
             bpn = bpn,
             legalEntity = null,
             site = null,
-            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap),
-            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) },
+            physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
+            alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
             name = dto.name
         )
 
@@ -422,24 +426,24 @@ class BusinessPartnerBuildService(
 
     private fun updateLogisticAddress(address: LogisticAddress, dto: LogisticAddressDto, metadataMap: AddressMetadataMapping) {
         address.name = dto.name
-        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap)
-        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap) }
+        address.physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions)
+        address.alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) }
 
         address.identifiers.apply {
             clear()
-            addAll(dto.identifiers.map { toEntity(it, metadataMap, address) })
+            addAll(dto.identifiers.map { toAddressIdentifier(it, metadataMap.idTypes, address) })
         }
         address.states.apply {
             clear()
-            addAll(dto.states.map { toEntity(it, address) })
+            addAll(dto.states.map { toAddressState(it, address) })
         }
     }
 
-    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, metadataMap: AddressMetadataMapping): PhysicalPostalAddress {
+    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
         return PhysicalPostalAddress(
             geographicCoordinates = physicalAddress.geographicCoordinates?.let { toEntity(it) },
             country = physicalAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[physicalAddress.administrativeAreaLevel1],
+            administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
             administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
             administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
             postCode = physicalAddress.postalCode,
@@ -454,11 +458,11 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, metadataMap: AddressMetadataMapping): AlternativePostalAddress {
+    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, regions: Map<String, Region>): AlternativePostalAddress {
         return AlternativePostalAddress(
             geographicCoordinates = alternativeAddress.geographicCoordinates?.let { toEntity(it) },
             country = alternativeAddress.country,
-            administrativeAreaLevel1 = metadataMap.regions[alternativeAddress.administrativeAreaLevel1],
+            administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
             postCode = alternativeAddress.postalCode,
             city = alternativeAddress.city,
             deliveryServiceType = alternativeAddress.deliveryServiceType,
@@ -467,86 +471,10 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun createStreet(dto: StreetDto): Street {
-        return Street(
-            name = dto.name,
-            houseNumber = dto.houseNumber,
-            milestone = dto.milestone,
-            direction = dto.direction
-        )
-    }
-
-    private fun toEntity(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
-        return LegalEntityState(
-            description = dto.description,
-            validFrom = dto.validFrom,
-            validTo = dto.validTo,
-            type = dto.type,
-            legalEntity = legalEntity
-        )
-    }
-
-    private fun toEntity(dto: SiteStateDto, site: Site): SiteState {
-        return SiteState(
-            description = dto.description,
-            validFrom = dto.validFrom,
-            validTo = dto.validTo,
-            type = dto.type,
-            site = site
-        )
-    }
-
-    private fun toEntity(dto: AddressStateDto, address: LogisticAddress): AddressState {
-        return AddressState(
-            description = dto.description,
-            validFrom = dto.validFrom,
-            validTo = dto.validTo,
-            type = dto.type,
-            address = address
-        )
-    }
-
-    private fun toEntity(dto: ClassificationDto, partner: LegalEntity): LegalEntityClassification {
-        return LegalEntityClassification(
-            value = dto.value,
-            code = dto.code,
-            type = dto.type,
-            legalEntity = partner
-        )
-    }
-
-    private fun toEntity(
-        dto: LegalEntityIdentifierDto,
-        metadataMap: LegalEntityMetadataMapping,
-        partner: LegalEntity
-    ): LegalEntityIdentifier {
-        return LegalEntityIdentifier(
-            value = dto.value,
-            type = metadataMap.idTypes[dto.type]!!,
-            issuingBody = dto.issuingBody,
-            legalEntity = partner
-        )
-    }
-
-    private fun toEntity(
-        dto: AddressIdentifierDto,
-        metadataMap: AddressMetadataMapping,
-        partner: LogisticAddress
-    ): AddressIdentifier {
-        return AddressIdentifier(
-            value = dto.value,
-            type = metadataMap.idTypes[dto.type]!!,
-            address = partner
-        )
-    }
-
-    private fun toEntity(dto: GeoCoordinateDto): GeographicCoordinate {
+    fun toEntity(dto: GeoCoordinateDto): GeographicCoordinate {
         return GeographicCoordinate(dto.latitude, dto.longitude, dto.altitude)
     }
 
-    private fun createCurrentnessTimestamp(): Instant {
-        return Instant.now().truncatedTo(ChronoUnit.MICROS)
-    }
 
     private fun LegalEntityMetadataDto.toMapping() =
         LegalEntityMetadataMapping(
@@ -561,13 +489,95 @@ class BusinessPartnerBuildService(
         )
 
 
-    private data class LegalEntityMetadataMapping(
+    data class LegalEntityMetadataMapping(
         val idTypes: Map<String, IdentifierType>,
         val legalForms: Map<String, LegalForm>
     )
 
-    private data class AddressMetadataMapping(
+    data class AddressMetadataMapping(
         val idTypes: Map<String, IdentifierType>,
         val regions: Map<String, Region>
     )
+
+    companion object {
+
+        fun createCurrentnessTimestamp(): Instant {
+            return Instant.now().truncatedTo(ChronoUnit.MICROS)
+        }
+
+        fun createStreet(dto: IBaseStreetDto): Street {
+            return Street(
+                name = dto.name,
+                houseNumber = dto.houseNumber,
+                milestone = dto.milestone,
+                direction = dto.direction
+            )
+        }
+
+        fun toLegalEntityState(dto: IBaseLegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+            return LegalEntityState(
+                description = dto.description,
+                validFrom = dto.validFrom,
+                validTo = dto.validTo,
+                type = dto.type,
+                legalEntity = legalEntity
+            )
+        }
+
+        fun toSiteState(dto: IBaseSiteStateDto, site: Site): SiteState {
+            return SiteState(
+                description = dto.description,
+                validFrom = dto.validFrom,
+                validTo = dto.validTo,
+                type = dto.type,
+                site = site
+            )
+        }
+
+        fun toAddressState(dto: IBaseAddressStateDto, address: LogisticAddress): AddressState {
+            return AddressState(
+                description = dto.description,
+                validFrom = dto.validFrom,
+                validTo = dto.validTo,
+                type = dto.type,
+                address = address
+            )
+        }
+
+        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntity): LegalEntityClassification {
+            return LegalEntityClassification(
+                value = dto.value,
+                code = dto.code,
+                type = dto.type,
+                legalEntity = partner
+            )
+        }
+
+        fun toLegalEntityIdentifier(
+            dto: IBaseLegalEntityIdentifierDto,
+            idTypes: Map<String, IdentifierType>,
+            partner: LegalEntity
+        ): LegalEntityIdentifier {
+            return LegalEntityIdentifier(
+                value = dto.value,
+                type = idTypes[dto.type]!!,
+                issuingBody = dto.issuingBody,
+                legalEntity = partner
+            )
+        }
+
+        fun toAddressIdentifier(
+            dto: IBaseAddressIdentifierDto,
+            idTypes: Map<String, IdentifierType>,
+            partner: LogisticAddress
+        ): AddressIdentifier {
+            return AddressIdentifier(
+                value = dto.value,
+                type = idTypes[dto.type]!!,
+                address = partner
+            )
+        }
+
+    }
+
 }

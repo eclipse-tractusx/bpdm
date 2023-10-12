@@ -28,14 +28,14 @@ import java.time.LocalDateTime
 data class AddressStateDto(
 
     @get:Schema(description = AddressStateDescription.description)
-    val description: String?,
+    override val description: String?,
 
     @get:Schema(description = AddressStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
+    override val validFrom: LocalDateTime?,
 
     @get:Schema(description = AddressStateDescription.validTo)
-    val validTo: LocalDateTime?,
+    override val validTo: LocalDateTime?,
 
     @get:Schema(description = AddressStateDescription.type)
-    val type: BusinessStateType
-)
+    override val type: BusinessStateType
+): IBaseAddressStateDto

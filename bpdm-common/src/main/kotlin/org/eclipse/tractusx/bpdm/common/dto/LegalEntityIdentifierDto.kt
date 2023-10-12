@@ -22,15 +22,10 @@ package org.eclipse.tractusx.bpdm.common.dto
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 
-@Schema(description = LegalEntityIdentifierDescription.header)
+
 data class LegalEntityIdentifierDto(
 
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: String,
-
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String?
-)
+    override val value: String,
+    override val type: String,
+    override val issuingBody: String?
+) : IBaseLegalEntityIdentifierDto
