@@ -19,10 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
+
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
-
-
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
@@ -37,7 +36,8 @@ class CleaningServiceDummy(
 
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(fixedRate = 60000) // Adjust the rate as needed
+
+    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
     fun pollForCleaningTasks() {
         try {
             logger.info { "Starting polling for cleaning tasks from Orchestrator..." }
@@ -48,8 +48,9 @@ class CleaningServiceDummy(
 
             val cleaningTasks = cleaningRequest.reservedTasks
 
+            logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
+
             if (cleaningTasks.isNotEmpty()) {
-                logger.info { "${cleaningTasks.size} tasks found for cleaning. Proceeding with cleaning..." }
 
                 val cleaningResults = cleaningTasks.mapNotNull { reservedTask ->
                     // Step 2: Generate dummy cleaning results
@@ -67,52 +68,64 @@ class CleaningServiceDummy(
 
     fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
         val businessPartner = reservedTask.businessPartner
+
         val addressPartner = createAddressRepresentation(businessPartner.generic)
 
-        val legalAddressBpnReference = when (businessPartner.generic.postalAddress.addressType) {
-            AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress -> addressPartner.bpnAReference
-            else -> generateNewBpnReference()
-        }
+        val addressType = businessPartner.generic.postalAddress.addressType
 
-        val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
-        val legalEntityDto = createLegalEntityRepresentation(businessPartner.generic, legalAddress)
+        val legalEntityDto = createLegalEntityRepresentation(addressPartner, addressType!!, businessPartner.generic)
 
-        val siteDto = when {
-            shouldCreateSite(businessPartner.generic) -> {
-                val siteAddressReference = when (businessPartner.generic.postalAddress.addressType) {
-                    AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress -> addressPartner.bpnAReference
-                    else -> generateNewBpnReference()
-                }
-                val siteMainAddress = addressPartner.copy(bpnAReference = siteAddressReference)
-                createSiteRepresentation(businessPartner.generic, siteMainAddress)
-            }
-
-            else -> null
-        }
+        val siteDto = createSiteDtoIfNeeded(businessPartner.generic, addressPartner)
 
         return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(businessPartner.generic, legalEntityDto, siteDto, addressPartner))
     }
 
-    fun createLegalEntityRepresentation(genericPartner: BusinessPartnerGenericDto, legalAddress: LogisticAddressDto): LegalEntityDto {
+    fun createSiteDtoIfNeeded(businessPartner: BusinessPartnerGenericDto, addressPartner: LogisticAddressDto): SiteDto? {
+        if (!shouldCreateSite(businessPartner)) return null
+
+        val siteAddressReference = when (businessPartner.postalAddress.addressType) {
+            AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress -> addressPartner.bpnAReference
+            else -> generateNewBpnReference()
+        }
+
+        val siteMainAddress = addressPartner.copy(bpnAReference = siteAddressReference)
+        return createSiteRepresentation(businessPartner, siteMainAddress)
+    }
+
+    fun createLegalEntityRepresentation(
+        addressPartner: LogisticAddressDto,
+        addressType: AddressType,
+        genericPartner: BusinessPartnerGenericDto
+    ): LegalEntityDto {
+        val legalAddressBpnReference = if (addressType == AddressType.LegalAddress || addressType == AddressType.LegalAndSiteMainAddress) {
+            addressPartner.bpnAReference
+        } else {
+            generateNewBpnReference()
+        }
+
+        val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
+
         val legalName = genericPartner.nameParts.joinToString(" ")
-        val bpnReferenceDto = validateBpn(genericPartner.bpnL)
+
+        val bpnReferenceDto = createBpnReference(genericPartner.bpnL)
+
         return genericPartner.toLegalEntityDto(bpnReferenceDto, legalName, legalAddress)
 
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
         val legalName = genericPartner.nameParts.joinToString(" ")
-        val bpnReferenceDto = validateBpn(genericPartner.bpnA)
+        val bpnReferenceDto = createBpnReference(genericPartner.bpnA)
         return genericPartner.postalAddress.toLogisticAddressDto(bpnReferenceDto, legalName)
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
         val legalName = genericPartner.nameParts.joinToString(" ")
-        val bpnReferenceDto = validateBpn(genericPartner.bpnS)
+        val bpnReferenceDto = createBpnReference(genericPartner.bpnS)
         return genericPartner.toSiteDto(bpnReferenceDto, legalName, siteAddressReference)
     }
 
-    fun validateBpn(bpn: String?): BpnReferenceDto {
+    fun createBpnReference(bpn: String?): BpnReferenceDto {
         return if (bpn != null) {
             BpnReferenceDto(bpn, BpnReferenceType.Bpn)
         } else {
