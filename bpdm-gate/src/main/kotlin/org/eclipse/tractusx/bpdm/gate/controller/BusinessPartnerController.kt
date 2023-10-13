@@ -42,7 +42,8 @@ class BusinessPartnerController(
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyInputDataAsRole())")
     override fun upsertBusinessPartnersInput(businessPartners: Collection<BusinessPartnerInputRequest>): ResponseEntity<Collection<BusinessPartnerInputDto>> {
-        if (businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }.containsDuplicates()) {
+        if (businessPartners.any { it.externalId.isEmpty() } || businessPartners.size > apiConfigProperties.upsertLimit || businessPartners.map { it.externalId }
+                .containsDuplicates()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         val result = businessPartnerService.upsertBusinessPartnersInput(businessPartners)

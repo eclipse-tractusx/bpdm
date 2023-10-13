@@ -92,8 +92,8 @@ class BusinessPartnerMappings {
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.map(::toIdentifier).toSortedSet(),
-            states = dto.states.map(::toState).toSortedSet(),
-            classifications = dto.classifications.map(::toClassification).toSortedSet(),
+            states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
+            classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.shortName,
             legalForm = dto.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
@@ -114,8 +114,8 @@ class BusinessPartnerMappings {
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.map(::toIdentifier).toSortedSet(),
-            states = dto.states.map(::toState).toSortedSet(),
-            classifications = dto.classifications.map(::toClassification).toSortedSet(),
+            states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
+            classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.shortName,
             legalForm = dto.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
@@ -239,19 +239,19 @@ class BusinessPartnerMappings {
         BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
 
     private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
-        Identifier(type = dto.type, value = dto.value, issuingBody = dto.issuingBody)
+        Identifier(type = dto.type.toString(), value = dto.value.toString(), issuingBody = dto.issuingBody)
 
     private fun toStateDto(entity: State) =
         BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo, description = entity.description)
 
     private fun toState(dto: BusinessPartnerStateDto) =
-        State(type = dto.type, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description)
+        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
 
     private fun toClassificationDto(entity: Classification) =
         ClassificationDto(type = entity.type, code = entity.code, value = entity.value)
 
     private fun toClassification(dto: ClassificationDto) =
-        Classification(type = dto.type, code = dto.code, value = dto.value)
+        dto.type?.let { Classification(type = it, code = dto.code, value = dto.value) }
 
     private fun toGeoCoordinateDto(entity: GeographicCoordinate) =
         GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)

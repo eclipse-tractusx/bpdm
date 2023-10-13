@@ -206,7 +206,7 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: StageType): LegalEntity 
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.mapNotNull { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
@@ -234,7 +234,7 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: StageType): LegalEntity
     )
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
-    legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+    legalEntity.classifications.addAll(this.legalEntity.classifications.mapNotNull { toEntityClassification(it, legalEntity) })
     legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
     legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
@@ -256,8 +256,8 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
     return LegalEntityState(dto.description, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
-fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): LegalEntityClassification {
-    return LegalEntityClassification(dto.value, dto.code, dto.type, legalEntity)
+fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): LegalEntityClassification? {
+    return dto.type?.let { LegalEntityClassification(dto.value, dto.code, it, legalEntity) }
 }
 
 fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {

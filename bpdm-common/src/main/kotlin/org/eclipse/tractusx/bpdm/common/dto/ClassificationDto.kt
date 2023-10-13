@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 data class ClassificationDto(
 
     @get:Schema(description = ClassificationDescription.type)
-    val type: ClassificationType,
+    val type: ClassificationType?,
 
     @get:Schema(description = ClassificationDescription.code)
     val code: String?,

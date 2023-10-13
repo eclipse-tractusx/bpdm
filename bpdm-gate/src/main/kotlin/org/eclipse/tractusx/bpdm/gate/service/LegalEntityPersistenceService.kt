@@ -97,7 +97,7 @@ class LegalEntityPersistenceService(
         legalEntity.shortName = legalEntityRequest.legalEntity.legalShortName
 
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.mapNotNull { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
         legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
         legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })
@@ -171,7 +171,7 @@ class LegalEntityPersistenceService(
         legalEntity.shortName = legalEntityRequest.legalEntity.legalShortName
 
         legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.mapNotNull { toEntityClassification(it, legalEntity) })
         legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
         legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
         legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })

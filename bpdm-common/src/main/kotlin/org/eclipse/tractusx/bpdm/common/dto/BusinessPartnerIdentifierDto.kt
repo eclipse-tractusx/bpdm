@@ -28,10 +28,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class BusinessPartnerIdentifierDto(
 
     @get:Schema(description = "Technical key of the type to which this identifier belongs to")
-    val type: String,
+    val type: String? = null,
 
     @get:Schema(description = "Value of the identifier")
-    val value: String,
+    val value: String? = null,
 
     @get:Schema(description = "Body which issued the identifier")
     val issuingBody: String?
