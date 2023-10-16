@@ -6,7 +6,10 @@ This file contains information on how to configure and run the BPDM applications
 
 BPDM Pool is a SpringBoot Kotlin software project managed by Maven.
 
-To run the project first you need to install it from the parent pom, go to the root folder and run `mvn clean install`
+To run the project first you need to install it from the parent pom. For that go to the root folder and then there are two options to run the project:
+
+1. `mvn clean install -DskipTests` - This will install all the dependencies without need for test execution.
+2. Install missing docker images used by the bridge-dummy tests `docker compose -f docker-compose.build.yml build`. After that run `mvn clean install`.
 
 Then depending on which module you want to start go to the module subfolder you like to run and use the following command: `mvn spring-boot:run`
 
