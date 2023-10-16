@@ -34,6 +34,7 @@ class GoldenRecordTaskService(
     val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine
 ) {
 
+    @Synchronized
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         return createRequest.businessPartners
             .map { businessPartnerGeneric -> taskStorage.addTask(initTask(createRequest, businessPartnerGeneric)) }
@@ -41,6 +42,7 @@ class GoldenRecordTaskService(
             .let { TaskCreateResponse(createdTasks = it) }
     }
 
+    @Synchronized
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
         return stateRequest.taskIds
             .mapNotNull { taskId -> taskStorage.getTask(taskId) }       // skip missing tasks
@@ -48,6 +50,7 @@ class GoldenRecordTaskService(
             .let { TaskStateResponse(tasks = it) }
     }
 
+    @Synchronized
     fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
         val now = Instant.now()
 
@@ -72,6 +75,7 @@ class GoldenRecordTaskService(
         )
     }
 
+    @Synchronized
     fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         resultRequest.results
             .forEach { resultEntry ->
