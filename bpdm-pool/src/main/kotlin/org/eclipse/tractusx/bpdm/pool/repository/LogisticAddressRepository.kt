@@ -43,6 +43,9 @@ interface LogisticAddressRepository : PagingAndSortingRepository<LogisticAddress
         pageable: Pageable
     ): Page<LogisticAddress>
 
+    @Query("SELECT a FROM LogisticAddress a WHERE LOWER(a.name) LIKE :addressName ORDER BY LENGTH(a.name)")
+    fun findByName(addressName: String, pageable: Pageable): Page<LogisticAddress>
+
     @Query("SELECT DISTINCT a FROM LogisticAddress a LEFT JOIN FETCH a.legalEntity LEFT JOIN FETCH a.legalEntity.legalAddress WHERE a IN :addresses")
     fun joinLegalEntities(addresses: Set<LogisticAddress>): Set<LogisticAddress>
 
