@@ -32,12 +32,13 @@ spec:
       {{- include "bpdm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations}}
+      {{- toYaml . | nindent 8}}
+      {{- end}}
       labels:
-        {{- include "bpdm.selectorLabels" . | nindent 8 }}
+        {{- include "bpdm.selectorLabels" . | nindent 8}}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

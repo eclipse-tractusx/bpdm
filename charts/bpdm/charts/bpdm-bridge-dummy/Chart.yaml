@@ -22,7 +22,7 @@ apiVersion: v2
 type: application
 name: bpdm-bridge-dummy
 appVersion: "4.1.0-alpha.3"
-version: 1.1.0-alpha.2
+version: 1.1.0-alpha.3
 description: A Helm chart for deploying the BPDM bridge dummy service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
