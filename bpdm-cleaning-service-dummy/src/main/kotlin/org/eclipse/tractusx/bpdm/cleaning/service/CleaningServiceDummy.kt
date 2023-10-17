@@ -77,7 +77,21 @@ class CleaningServiceDummy(
 
         val siteDto = createSiteDtoIfNeeded(businessPartner.generic, addressPartner)
 
-        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(businessPartner.generic, legalEntityDto, siteDto, addressPartner))
+        val addressDto = shouldCreateAddress(addressType, addressPartner)
+
+        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(businessPartner.generic, legalEntityDto, siteDto, addressDto))
+    }
+
+    private fun shouldCreateAddress(
+        addressType: AddressType?,
+        addressPartner: LogisticAddressDto
+    ): LogisticAddressDto? {
+        val addressDto = if (addressType == AddressType.AdditionalAddress) {
+            addressPartner
+        } else {
+            null
+        }
+        return addressDto
     }
 
     fun createSiteDtoIfNeeded(businessPartner: BusinessPartnerGenericDto, addressPartner: LogisticAddressDto): SiteDto? {
