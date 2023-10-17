@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.util
+package org.eclipse.tractusx.bpdm.orchestrator.testdata
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.*
@@ -460,6 +460,20 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = true
+    )
+
+    val businessPartner1Full = BusinessPartnerFullDto(
+        generic = businessPartner1,
+        legalEntity = legalEntity1,
+        site = site1,
+        address = logisticAddress1
+    )
+
+    val businessPartner2Full = BusinessPartnerFullDto(
+        generic = businessPartner2,
+        legalEntity = legalEntity2,
+        site = site2,
+        address = logisticAddress2
     )
 
 }

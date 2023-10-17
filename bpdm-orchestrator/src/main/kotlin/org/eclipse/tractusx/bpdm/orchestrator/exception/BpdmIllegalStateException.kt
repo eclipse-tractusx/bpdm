@@ -17,11 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.config
+package org.eclipse.tractusx.bpdm.orchestrator.exception
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
-@ConfigurationProperties(prefix = "bpdm.api")
-data class ApiConfigProperties(
-    val upsertLimit: Int = 100
-)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmIllegalStateException(
+    taskId: String,
+    state: TaskProcessingState
+) : RuntimeException("Task with ID '$taskId' is in illegal state for transition: resultState=${state.resultState}, step=${state.step}, stepState=${state.stepState}")

@@ -63,7 +63,7 @@ interface GoldenRecordTaskApi {
 
     @Operation(
         summary = "Search for the state of golden record tasks by task identifiers",
-        description = "Returns the state of golden record tasks based on the provided task identifiers."
+        description = "Returns the state of golden record tasks based on the provided task identifiers. Unknown task identifiers are ignored."
     )
     @ApiResponses(
         value = [

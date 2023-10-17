@@ -17,11 +17,21 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.config
+package org.eclipse.tractusx.bpdm.orchestrator.model
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.eclipse.tractusx.orchestrator.api.model.*
+import java.time.Instant
 
-@ConfigurationProperties(prefix = "bpdm.api")
-data class ApiConfigProperties(
-    val upsertLimit: Int = 100
+data class TaskProcessingState(
+    val mode: TaskMode,
+    var resultState: ResultState,
+    var errors: List<TaskErrorDto> = emptyList(),
+
+    var step: TaskStep,
+    var stepState: StepState,
+    var reservationTimeout: Instant?,
+
+    val taskCreatedAt: Instant,
+    var taskModifiedAt: Instant,
+    val taskTimeout: Instant,
 )

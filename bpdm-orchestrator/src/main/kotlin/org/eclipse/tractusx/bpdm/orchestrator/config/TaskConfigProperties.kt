@@ -20,8 +20,12 @@
 package org.eclipse.tractusx.bpdm.orchestrator.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.time.Duration
 
-@ConfigurationProperties(prefix = "bpdm.api")
-data class ApiConfigProperties(
-    val upsertLimit: Int = 100
+@ConfigurationProperties(prefix = "bpdm.task")
+data class TaskConfigProperties(
+    // Duration after which a task is removed from the Orchestrator after creation
+    val taskTimeout: Duration = Duration.ofHours(3 * 24),
+    // Duration for which a reservation is valid and results are accepted
+    val taskReservationTimeout: Duration = Duration.ofHours(24)
 )

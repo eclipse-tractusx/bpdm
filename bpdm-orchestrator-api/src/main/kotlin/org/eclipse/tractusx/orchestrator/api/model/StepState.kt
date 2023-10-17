@@ -21,5 +21,7 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 enum class StepState {
     Queued,
-    Reserved
+    Reserved,
+    Success,
+    Error
 }

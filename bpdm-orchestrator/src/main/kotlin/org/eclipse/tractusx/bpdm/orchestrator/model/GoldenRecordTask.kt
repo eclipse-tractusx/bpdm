@@ -17,11 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.orchestrator.config
+package org.eclipse.tractusx.bpdm.orchestrator.model
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFullDto
 
-@ConfigurationProperties(prefix = "bpdm.api")
-data class ApiConfigProperties(
-    val upsertLimit: Int = 100
+data class GoldenRecordTask(
+    val taskId: String,
+    var businessPartner: BusinessPartnerFullDto,
+    val processingState: TaskProcessingState
 )
