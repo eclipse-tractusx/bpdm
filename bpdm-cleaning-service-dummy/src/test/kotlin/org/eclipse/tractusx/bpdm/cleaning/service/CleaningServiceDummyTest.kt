@@ -19,16 +19,20 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
+import com.github.tomakehurst.wiremock.client.WireMock.*
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnLAndBpnAAndLegalAddressType
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType
-
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithEmptyBpnAndSiteMainAddressType
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithEmptyBpnLAndAdditionalAddressType
+import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLegalEntityDto
+import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLogisticAddressDto
+import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedSiteDto
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -39,7 +43,7 @@ import java.util.*
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class CleaningServiceDummyTest @Autowired constructor(
-    val cleaningServiceDummy: CleaningServiceDummy,
+    val cleaningServiceDummy: CleaningServiceDummy
 ) {
 
 
@@ -61,6 +65,17 @@ class CleaningServiceDummyTest @Autowired constructor(
         assertEquals(expectedBpnA, resultedAddress?.bpnAReference?.referenceValue)
 
         assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedLegalEntity?.bpnLReference?.referenceType)
+
+        val expectedAddress = expectedLogisticAddressDto.copy(bpnAReference = BpnReferenceDto(expectedBpnA.toString(), BpnReferenceType.Bpn))
+
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto)
+
+        assertRecursively(resultedAddress).isEqualTo(expectedAddress)
+
+        // ignoring bpnLReference and bpnAReference since they are generated
+        assertRecursively(resultedLegalEntity).ignoringFields("bpnLReference", "legalAddress.bpnAReference").isEqualTo(expectedLegalEntity)
+
+
     }
 
     @Test
@@ -81,6 +96,16 @@ class CleaningServiceDummyTest @Autowired constructor(
         assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedLegalEntity?.bpnLReference?.referenceType)
 
         assertNotEquals(resultedAddress?.bpnAReference?.referenceValue, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
+
+        val expectedAddress = expectedLogisticAddressDto.copy()
+
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto)
+
+        // bpnAReference since they are generated
+        assertRecursively(resultedAddress).ignoringFields("bpnAReference").isEqualTo(expectedAddress)
+
+        // ignoring bpnLReference and bpnAReference since they are generated
+        assertRecursively(resultedLegalEntity).ignoringFields("bpnAReference", "bpnLReference", "legalAddress.bpnAReference").isEqualTo(expectedLegalEntity)
     }
 
     @Test
@@ -98,13 +123,24 @@ class CleaningServiceDummyTest @Autowired constructor(
         val resultedLegalEntity = result.businessPartner?.legalEntity
 
         // legalEntity should use passed bpnL and legalAddress should use passed bpnA since address type is LegalAddressType
-        // addressPartner should use passed bpnA, and it will be the same from legalAddress since type is LegalAddressType
+        // addressPartner should use null, since it does not create when type is LegalAddressType
 
-        assertEquals(expectedBpnA, resultedAddress?.bpnAReference?.referenceValue)
+        assertNull(resultedAddress?.bpnAReference?.referenceValue)
         assertEquals(expectedBpnL, resultedLegalEntity?.bpnLReference?.referenceValue)
         assertEquals(expectedBpnA, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
-    }
 
+
+        val expectedLegalEntity = expectedLegalEntityDto.copy(
+            legalAddress = expectedLogisticAddressDto.copy(
+                bpnAReference = BpnReferenceDto(
+                    expectedBpnA.toString(),
+                    BpnReferenceType.Bpn
+                )
+            ), bpnLReference = BpnReferenceDto(expectedBpnL.toString(), BpnReferenceType.Bpn)
+        )
+
+        assertRecursively(resultedLegalEntity).isEqualTo(expectedLegalEntity)
+    }
 
     @Test
     fun `test processCleaningTask with BpnS and BpnA present and legal and site main address type`() {
@@ -124,11 +160,11 @@ class CleaningServiceDummyTest @Autowired constructor(
 
 
         // legalEntity should Generate new bpnL and legalAddress should use passed bpnA since address type is LegalAndSiteMainAddress
-        // addressPartner should use passed bpnA, and it will be the same from legalAddress since type is LegalAndSiteMainAddress
+        // addressPartner should use null, since it does not create when type is LegalAndSiteMainAddress
         // Site should use passed bpnS, and it will be the same MainAddress as legalAddress and addressPartner since address type is LegalAndSiteMainAddress
 
 
-        assertEquals(expectedBpnA, resultedAddress?.bpnAReference?.referenceValue)
+        assertNull(resultedAddress?.bpnAReference?.referenceValue)
 
         assertEquals(expectedBpnA, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
 
@@ -136,15 +172,31 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedLegalEntity?.bpnLReference?.referenceType)
 
-        assertEquals(resultedAddress?.bpnAReference?.referenceValue, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
-
-        assertEquals(resultedAddress?.bpnAReference?.referenceValue, resultedSite?.mainAddress?.bpnAReference?.referenceValue)
-
         assertEquals(expectedBpnS, resultedSite?.bpnSReference?.referenceValue)
 
 
-    }
+        val expectedLegalEntity = expectedLegalEntityDto.copy(
+            legalAddress = expectedLogisticAddressDto.copy(
+                bpnAReference = BpnReferenceDto(
+                    expectedBpnA.toString(),
+                    BpnReferenceType.Bpn
+                )
+            )
+        )
 
+        val expectedSite = expectedSiteDto.copy(
+            mainAddress = expectedLogisticAddressDto.copy(bpnAReference = BpnReferenceDto(expectedBpnA.toString(), BpnReferenceType.Bpn)),
+            bpnSReference = BpnReferenceDto(expectedBpnS.toString(), BpnReferenceType.Bpn)
+        )
+
+
+        // ignoring bpnLReference since they are generated
+        assertRecursively(resultedLegalEntity).ignoringFields("bpnLReference").isEqualTo(expectedLegalEntity)
+
+        assertRecursively(resultedSite).isEqualTo(expectedSite)
+
+
+    }
     @Test
     fun `test processCleaningTask with empty Bpn and site main address type`() {
         val taskStepReservationResponse = createSampleTaskStepReservationResponse(businessPartnerWithEmptyBpnAndSiteMainAddressType).reservedTasks[0]
@@ -159,19 +211,29 @@ class CleaningServiceDummyTest @Autowired constructor(
 
 
         // legalEntity should Generate new bpnL and legalAddress should Generate new bpnA since address type is SiteMainAddress
-        // addressPartner should Generate new bpnA, and it will be different from legalAddress since type is SiteMainAddress
-        // Site should Generate new bpnS, and it will be the same MainAddress as addressPartner since address type is SiteMainAddress
+        // addressPartner should use null, since it does not create when type is SiteMainAddress
+        // Site should Generate new bpnS
 
 
         assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedLegalEntity?.bpnLReference?.referenceType)
 
-        assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedAddress?.bpnAReference?.referenceType)
+        assertNull(resultedAddress?.bpnAReference?.referenceType)
 
         assertEquals(BpnReferenceType.BpnRequestIdentifier, resultedSite?.bpnSReference?.referenceType)
 
         assertNotEquals(resultedAddress?.bpnAReference?.referenceValue, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
+        assertNotEquals(resultedAddress?.bpnAReference?.referenceValue, resultedSite?.mainAddress?.bpnAReference?.referenceValue)
 
-        assertEquals(resultedSite?.mainAddress?.bpnAReference?.referenceValue, resultedAddress?.bpnAReference?.referenceValue)
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto.copy())
+
+        val expectedSite = expectedSiteDto.copy(mainAddress = expectedLogisticAddressDto.copy())
+
+
+        // ignoring bpnLReference and legalAddress.bpnAReference since they are generated
+        assertRecursively(resultedLegalEntity).ignoringFields("bpnLReference", "legalAddress.bpnAReference").isEqualTo(expectedLegalEntity)
+
+        // ignoring bpnSReference and mainAddress.bpnAReference since they are generated
+        assertRecursively(resultedSite).ignoringFields("bpnSReference", "mainAddress.bpnAReference").isEqualTo(expectedSite)
 
     }
 
@@ -181,5 +243,12 @@ class CleaningServiceDummyTest @Autowired constructor(
         return TaskStepReservationResponse(listOf(TaskStepReservationEntryDto(UUID.randomUUID().toString(), fullDto)), Instant.MIN)
     }
 
+    fun <T> assertRecursively(actual: T): RecursiveComparisonAssert<*> {
+        return Assertions.assertThat(actual)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringAllOverriddenEquals()
+            .ignoringFieldsOfTypes(Instant::class.java)
+    }
 
 }

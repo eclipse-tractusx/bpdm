@@ -44,7 +44,7 @@ class CleaningServiceDummy(
 
             // Step 1: Fetch and reserve the next cleaning request
             val cleaningRequest = orchestrationApiClient.goldenRecordTasks
-                .reserveTasksForStep(TaskStepReservationRequest(amount = 10, TaskStep.Clean))
+                .reserveTasksForStep(TaskStepReservationRequest(amount = 10, TaskStep.CleanAndSync))
 
             val cleaningTasks = cleaningRequest.reservedTasks
 
@@ -52,7 +52,7 @@ class CleaningServiceDummy(
 
             if (cleaningTasks.isNotEmpty()) {
 
-                val cleaningResults = cleaningTasks.mapNotNull { reservedTask ->
+                val cleaningResults = cleaningTasks.map { reservedTask ->
                     // Step 2: Generate dummy cleaning results
                     processCleaningTask(reservedTask)
                 }
@@ -67,23 +67,23 @@ class CleaningServiceDummy(
     }
 
     fun processCleaningTask(reservedTask: TaskStepReservationEntryDto): TaskStepResultEntryDto {
-        val businessPartner = reservedTask.businessPartner
+        val genericBusinessPartner = reservedTask.businessPartner.generic
 
-        val addressPartner = createAddressRepresentation(businessPartner.generic)
+        val addressPartner = createAddressRepresentation(genericBusinessPartner)
 
-        val addressType = businessPartner.generic.postalAddress.addressType
+        val addressType = genericBusinessPartner.postalAddress.addressType ?: AddressType.AdditionalAddress
 
-        val legalEntityDto = createLegalEntityRepresentation(addressPartner, addressType!!, businessPartner.generic)
+        val legalEntityDto = createLegalEntityRepresentation(addressPartner, addressType, genericBusinessPartner)
 
-        val siteDto = createSiteDtoIfNeeded(businessPartner.generic, addressPartner)
+        val siteDto = createSiteDtoIfNeeded(genericBusinessPartner, addressPartner)
 
         val addressDto = shouldCreateAddress(addressType, addressPartner)
 
-        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(businessPartner.generic, legalEntityDto, siteDto, addressDto))
+        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(genericBusinessPartner, legalEntityDto, siteDto, addressDto))
     }
 
     private fun shouldCreateAddress(
-        addressType: AddressType?,
+        addressType: AddressType,
         addressPartner: LogisticAddressDto
     ): LogisticAddressDto? {
         val addressDto = if (addressType == AddressType.AdditionalAddress) {
@@ -99,7 +99,7 @@ class CleaningServiceDummy(
 
         val siteAddressReference = when (businessPartner.postalAddress.addressType) {
             AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress -> addressPartner.bpnAReference
-            else -> generateNewBpnReference()
+            else -> generateNewBpnRequestIdentifier()
         }
 
         val siteMainAddress = addressPartner.copy(bpnAReference = siteAddressReference)
@@ -114,23 +114,20 @@ class CleaningServiceDummy(
         val legalAddressBpnReference = if (addressType == AddressType.LegalAddress || addressType == AddressType.LegalAndSiteMainAddress) {
             addressPartner.bpnAReference
         } else {
-            generateNewBpnReference()
+            generateNewBpnRequestIdentifier()
         }
 
         val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
 
-        val legalName = genericPartner.nameParts.joinToString(" ")
-
         val bpnReferenceDto = createBpnReference(genericPartner.bpnL)
 
-        return genericPartner.toLegalEntityDto(bpnReferenceDto, legalName, legalAddress)
+        return genericPartner.toLegalEntityDto(bpnReferenceDto, legalAddress)
 
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
-        val legalName = genericPartner.nameParts.joinToString(" ")
         val bpnReferenceDto = createBpnReference(genericPartner.bpnA)
-        return genericPartner.postalAddress.toLogisticAddressDto(bpnReferenceDto, legalName)
+        return genericPartner.toLogisticAddressDto(bpnReferenceDto)
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
@@ -144,11 +141,11 @@ class CleaningServiceDummy(
             BpnReferenceDto(bpn, BpnReferenceType.Bpn)
         } else {
             // Generate a new UUID and create a BpnReferenceDto object if bpnL/bpnS/bpnA is null
-            generateNewBpnReference()
+            generateNewBpnRequestIdentifier()
         }
     }
 
-    private fun generateNewBpnReference() = BpnReferenceDto(UUID.randomUUID().toString(), BpnReferenceType.BpnRequestIdentifier)
+    private fun generateNewBpnRequestIdentifier() = BpnReferenceDto(UUID.randomUUID().toString(), BpnReferenceType.BpnRequestIdentifier)
 
     fun shouldCreateSite(genericPartner: BusinessPartnerGenericDto): Boolean {
         return genericPartner.postalAddress.addressType == AddressType.SiteMainAddress ||

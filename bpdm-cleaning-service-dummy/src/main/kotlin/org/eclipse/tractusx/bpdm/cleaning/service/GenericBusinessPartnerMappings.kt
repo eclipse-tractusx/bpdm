@@ -26,13 +26,12 @@ import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.orchestrator.api.model.*
 
 
-fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto, legalName: String, legalAddress: LogisticAddressDto): LegalEntityDto {
-
+fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto, legalAddress: LogisticAddressDto): LegalEntityDto {
 
     return LegalEntityDto(
         bpnLReference = bpnReferenceDto,
         hasChanged = true,
-        legalName = legalName,
+        legalName = nameParts.joinToString(" "),
         legalShortName = shortName,
         identifiers = identifiers.map { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
@@ -63,17 +62,16 @@ fun BusinessPartnerStateDto.toSiteState(): SiteStateDto {
     return SiteStateDto(description, validFrom, validTo, type)
 }
 
-fun PostalAddressDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto, name: String):
+fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):
         LogisticAddressDto {
-
     return LogisticAddressDto(
         bpnAReference = bpnReferenceDto,
         hasChanged = true,
-        name = name,
+        name = nameParts.joinToString(" "),
         states = emptyList(),
         identifiers = emptyList(),
-        physicalPostalAddress = physicalPostalAddress,
-        alternativePostalAddress = alternativePostalAddress
+        physicalPostalAddress = postalAddress.physicalPostalAddress,
+        alternativePostalAddress = postalAddress.alternativePostalAddress
     )
 }
 

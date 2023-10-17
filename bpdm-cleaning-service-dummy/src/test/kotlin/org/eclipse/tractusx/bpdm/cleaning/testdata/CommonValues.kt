@@ -20,12 +20,18 @@
 package org.eclipse.tractusx.bpdm.cleaning.testdata
 
 import com.neovisionaries.i18n.CountryCode
+import org.eclipse.tractusx.bpdm.cleaning.service.toBusinessPartnerClassificationDto
+import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityState
+import org.eclipse.tractusx.bpdm.cleaning.service.toSiteState
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
+import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PostalAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.SiteDto
 import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
@@ -33,6 +39,8 @@ import java.time.LocalDateTime
  * Contains simple test values used to create more complex test values such as DTOs
  */
 object CommonValues {
+
+    val fixedTaskId = "taskid-123123"
 
     val nameParts = listOf("Part1", "Part2")
     const val shortName = "ShortName"
@@ -130,6 +138,31 @@ object CommonValues {
 
     val businessPartnerWithEmptyBpnAndSiteMainAddressType = businessPartnerWithEmptyBpns.copy(
         postalAddress = postalAddressForSite
+    )
+
+    val expectedLegalEntityDto = LegalEntityDto(
+        hasChanged = true,
+        legalName = nameParts.joinToString(" "),
+        legalShortName = shortName,
+        identifiers = identifiers.map { it.toLegalEntityIdentifierDto() },
+        legalForm = legalForm,
+        states = states.map { it.toLegalEntityState() },
+        classifications = classifications.map { it.toBusinessPartnerClassificationDto() }
+    )
+
+    val expectedSiteDto = SiteDto(
+        hasChanged = true,
+        name = nameParts.joinToString(" "),
+        states = states.map { it.toSiteState() },
+    )
+
+    val expectedLogisticAddressDto = LogisticAddressDto(
+
+        hasChanged = true,
+        name = nameParts.joinToString(" "),
+        states = emptyList(),
+        identifiers = emptyList(),
+        physicalPostalAddress = physicalPostalAddress
     )
 
 
