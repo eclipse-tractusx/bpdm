@@ -187,6 +187,7 @@ class BusinessPartnerMappings {
             door = dto.door
         )
 
+
     private fun toAlternativePostalAddressDto(entity: AlternativePostalAddress) =
         AlternativePostalAddressGateDto(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
@@ -211,6 +212,7 @@ class BusinessPartnerMappings {
             deliveryServiceNumber = dto.deliveryServiceNumber
         )
 
+
     private fun toStreetDto(entity: Street) =
         StreetGateDto(
             name = entity.name,
@@ -222,6 +224,7 @@ class BusinessPartnerMappings {
             nameSuffix = entity.nameSuffix,
             additionalNameSuffix = entity.additionalNameSuffix
         )
+
 
     private fun toStreet(dto: StreetGateDto) =
         Street(
@@ -256,6 +259,9 @@ class BusinessPartnerMappings {
     private fun toGeoCoordinateDto(entity: GeographicCoordinate) =
         GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
 
+
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinate(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
+
+
 }

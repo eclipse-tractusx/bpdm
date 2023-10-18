@@ -54,5 +54,8 @@ data class SharingStateDto(
     val bpn: String? = null,
 
     @get:Schema(description = "The date and time when the sharing process was started.")
-    val sharingProcessStarted: LocalDateTime? = null
+    val sharingProcessStarted: LocalDateTime? = null,
+
+    @get:Schema(description = "The orchestrator task identifier that was created")
+    val taskId: String? = null,
 )

@@ -152,6 +152,10 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.tractusx</groupId>
+            <artifactId>bpdm-orchestrator-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
