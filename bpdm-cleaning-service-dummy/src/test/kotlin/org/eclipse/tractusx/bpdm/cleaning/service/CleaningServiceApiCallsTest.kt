@@ -78,7 +78,6 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     @Test
     fun `pollForCleaningTasks should reserve and resolve tasks from orchestrator`() {
-
         // Call the method under test
         cleaningServiceDummy.pollForCleaningTasks()
 
@@ -91,10 +90,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
 
     @Test
     fun `reserveTasksForStep should return expected response`() {
-
-
         val expectedResponse = jacksonObjectMapper.writeValueAsString(createSampleTaskStepReservationResponse(businessPartnerWithBpnA))
-
 
         val result = orchestrationApiClient.goldenRecordTasks.reserveTasksForStep(
             TaskStepReservationRequest(amount = 10, TaskStep.Clean)
@@ -105,14 +101,12 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         assertEquals(expectedResult, result)
 
         orchestrationApiClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(emptyList())
+            TaskStepResultRequest(TaskStep.Clean, emptyList())
         )
-
     }
 
 
     fun mockOrchestratorReserveApi() {
-
         // Orchestrator reserve
         orchestratorMockApi.stubFor(
             post(urlPathEqualTo(ORCHESTRATOR_RESERVE_TASKS_URL))
