@@ -17,19 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.cleaning
+package org.eclipse.tractusx.bpdm.cleaning.config
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
-import org.springframework.boot.runApplication
-import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@SpringBootApplication(exclude=[DataSourceAutoConfiguration::class])
-@ConfigurationPropertiesScan
-@EnableScheduling
-class Application
 
-fun main(args: Array<String>) {
-    runApplication<Application>(*args)
-}
+@ConfigurationProperties(prefix = "bpdm.orchestrator")
+data class OrchestratorConfigProperties(
+    val baseUrl: String = "http://localhost:8085/",
+    val securityEnabled: Boolean = false,
+    val oauth2ClientRegistration: String?
+)
