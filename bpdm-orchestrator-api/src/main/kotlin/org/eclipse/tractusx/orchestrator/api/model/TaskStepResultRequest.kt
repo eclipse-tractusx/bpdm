@@ -24,5 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 @Schema(description = "Request object for posting step results of previously reserved tasks")
 data class TaskStepResultRequest(
 
+    @get:Schema(description = "The step queue containing the tasks for which results are posted", required = true)
+    val step: TaskStep,
+
     val results: List<TaskStepResultEntryDto>
 )

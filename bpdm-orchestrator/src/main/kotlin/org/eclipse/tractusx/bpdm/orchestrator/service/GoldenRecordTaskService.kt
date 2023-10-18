@@ -81,13 +81,14 @@ class GoldenRecordTaskService(
             .forEach { resultEntry ->
                 val task = taskStorage.getTask(resultEntry.taskId)
                     ?: throw BpdmTaskNotFoundException(resultEntry.taskId)
-
+                val step = resultRequest.step
                 val errors = resultEntry.errors
                 val resultBusinessPartner = resultEntry.businessPartner
+
                 if (errors.isNotEmpty()) {
-                    goldenRecordTaskStateMachine.doResolveFailed(task, errors)
+                    goldenRecordTaskStateMachine.doResolveFailed(task, step, errors)
                 } else if (resultBusinessPartner != null) {
-                    goldenRecordTaskStateMachine.doResolveSuccessful(task, resultBusinessPartner)
+                    goldenRecordTaskStateMachine.doResolveSuccessful(task, step, resultBusinessPartner)
                 } else {
                     throw BpdmEmptyResultException(resultEntry.taskId)
                 }

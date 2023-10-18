@@ -65,11 +65,11 @@ class GoldenRecordTaskStateMachine(
         state.taskModifiedAt = now
     }
 
-    fun doResolveSuccessful(task: GoldenRecordTask, resultBusinessPartner: BusinessPartnerFullDto) {
+    fun doResolveSuccessful(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
         val state = task.processingState
         val now = Instant.now()
 
-        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved) {
+        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
             throw BpdmIllegalStateException(task.taskId, state)
         }
 
@@ -92,11 +92,11 @@ class GoldenRecordTaskStateMachine(
         task.businessPartner = resultBusinessPartner
     }
 
-    fun doResolveFailed(task: GoldenRecordTask, errors: List<TaskErrorDto>) {
+    fun doResolveFailed(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
         val state = task.processingState
         val now = Instant.now()
 
-        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved) {
+        if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
             throw BpdmIllegalStateException(task.taskId, state)
         }
 
