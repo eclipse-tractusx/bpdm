@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "fad56a92-3d35-427f-b6df-0a2f6b2e7c5b",
+		"_postman_id": "478bfefa-0ab2-4299-993e-1800562484f5",
 		"name": "EDC-BPDM Automated Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "26818013"
+		"_exporter_id": "29584075"
 	},
 	"item": [
 		{
@@ -105,7 +105,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"{{OFFERID_GET_SHARING_STATE}}\",\n\t\t\"assetId\": \"{{ASSET_GET_SHARING_STATE}}\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"{{ASSET_GET_SHARING_STATE}}\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"{{POLICY_BPN}}\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"{{ASSET_GET_SHARING_STATE}}\"\n\t\t}\n\t}\n}",
+													"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"QlBETV9HQVRFX0FQSV9DT05UUkFDVA==:QlBETV9HQVRFX0FQSV8y:YTQ2NjM5ZjUtYjdmYy00MjUyLTlmMGQtZWU5ZTU3NDljYjY1\",\n\t\t\"assetId\": \"BPDM_GATE_API_2\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"BPDM_GATE_API_2\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"BPNL00000003CUFH\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"BPDM_GATE_API_2\"\n\t\t}\n\t}\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -181,7 +181,7 @@
 													}
 												},
 												"url": {
-													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId={{ASSET_GET_SHARING_STATE}}",
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId=BPDM_GATE_API_2",
 													"host": [
 														"{{CONSUMER_ADAPTER_URL}}"
 													],
@@ -191,7 +191,7 @@
 													"query": [
 														{
 															"key": "assetId",
-															"value": "{{ASSET_GET_SHARING_STATE}}"
+															"value": "BPDM_GATE_API_2"
 														}
 													]
 												}
@@ -2430,6 +2430,441 @@
 											]
 										}
 									]
+								},
+								{
+									"name": "Generic",
+									"item": [
+										{
+											"name": "PUT Generic Input",
+											"item": [
+												{
+													"name": "Initiate EDR Negotation",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"{{OFFERID_PUT_GENERIC_INPUT}}\",\n\t\t\"assetId\": \"{{ASSET_PUT_GENERIC_INPUT}}\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"{{ASSET_PUT_GENERIC_INPUT}}\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"{{POLICY_BPN}}\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"{{ASSET_PUT_GENERIC_INPUT}}\"\n\t\t}\n\t}\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Query EDRs Cached",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});",
+																	"// Parse the JSON response",
+																	"var responseBody = pm.response.json();",
+																	"",
+																	"// Check if the response is an array and has elements",
+																	"if (Array.isArray(responseBody) && responseBody.length > 0) {",
+																	"    // Get the last object in the array",
+																	"    var lastObject = responseBody[responseBody.length - 1];",
+																	"",
+																	"    // Check if the last object has the \"edc:transferProcessId\" property",
+																	"    if (lastObject.hasOwnProperty(\"edc:transferProcessId\")) {",
+																	"        // Copy the value of \"edc:transferProcessId\" to a variable",
+																	"        var transferProcessId = lastObject[\"edc:transferProcessId\"];",
+																	"",
+																	"        // Log the value to the Postman console",
+																	"        console.log(\"Transfer Process ID: \" + transferProcessId);",
+																	"",
+																	"        // You can also use the value of transferProcessId as needed",
+																	"        // For example, you can set it as an environment variable",
+																	"        pm.collectionVariables.set(\"TRANSFERID_AUTOTEST\", transferProcessId);",
+																	"    } else {",
+																	"        console.log(\"The last object does not have 'edc:transferProcessId' property.\");",
+																	"    }",
+																	"} else {",
+																	"    console.log(\"Response is not an array or it has no elements.\");",
+																	"}",
+																	""
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"protocolProfileBehavior": {
+														"disableBodyPruning": true
+													},
+													"request": {
+														"method": "GET",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId={{ASSET_PUT_GENERIC_INPUT}}",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs"
+															],
+															"query": [
+																{
+																	"key": "assetId",
+																	"value": "{{ASSET_PUT_GENERIC_INPUT}}"
+																}
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Get EDR by tp ID",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});",
+																	"// Parse the JSON response",
+																	"var responseBody = pm.response.json();",
+																	"",
+																	"// Check if the response contains the \"edc:authCode\" property",
+																	"if (responseBody.hasOwnProperty(\"edc:authCode\")) {",
+																	"    // Get the value of \"edc:authCode\"",
+																	"    var authCode = responseBody[\"edc:authCode\"];",
+																	"",
+																	"    // Set the collection variable with the value of \"edc:authCode\"",
+																	"    pm.collectionVariables.set(\"AUTH_CODE\", authCode);",
+																	"",
+																	"    // Log the value to the Postman console",
+																	"    console.log(\"edc:authCode: \" + authCode);",
+																	"} else {",
+																	"    console.log(\"Response does not contain 'edc:authCode' property.\");",
+																	"}"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"protocolProfileBehavior": {
+														"disableBodyPruning": true
+													},
+													"request": {
+														"method": "GET",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs/{{TRANSFERID_AUTOTEST}}",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs",
+																"{{TRANSFERID_AUTOTEST}}"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Public API PUT",
+													"request": {
+														"auth": {
+															"type": "apikey",
+															"apikey": [
+																{
+																	"key": "value",
+																	"value": "{{AUTH_CODE}}",
+																	"type": "string"
+																},
+																{
+																	"key": "key",
+																	"value": "Authorization",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PUT",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "[\n  {\n    \"externalId\": \"generic_test\",\n    \"nameParts\": [\n      \"Name of Company 1\",\n      \"Name of Company 2\",\n      \"Name of Company 3\",\n      \"Name of Company 4\",\n      \"Name of Company 5\"    \n    ],\n    \"shortName\": \"string\",\n    \"identifiers\": [\n      {\n           \"value\": \"123456789\",\n           \"type\": \"CUSTOM_ID_TYPE\",\n           \"issuingBody\": \"CUSTOM_ISSUE_BODY\"\n       }\n    ],\n    \"legalForm\": \"CUSTOM_FORM\",\n    \"states\": [\n      {\n        \"validFrom\": \"2023-09-29T08:57:22.999Z\",\n        \"validTo\": \"2023-09-29T08:57:22.999Z\",\n        \"type\": \"ACTIVE\",\n        \"description\": \"Active\"\n      }\n    ],\n    \"classifications\": [\n      {\n        \"type\": \"NACE\",\n        \"code\": \"01.21\",\n        \"value\": \"Farming of cattle, dairy farming\"\n      }\n    ],\n    \"roles\": [\n      \"SUPPLIER\"\n    ],\n    \"postalAddress\": {\n      \"addressType\": null,\n      \"physicalPostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg\",\n        \"administrativeAreaLevel2\": \"test1\",\n        \"administrativeAreaLevel3\": \"test2\",\n        \"postalCode\": \"70546\",\n        \"city\": \"Stuttgart\",\n        \"district\": \"Stuttgart\",\n        \"street\": {\n          \"namePrefix\": \"test prefix\",\n          \"additionalNamePrefix\": \"test1\",\n          \"name\": \"Stuttgarter Strasse\",\n          \"nameSuffix\": \"test\",\n          \"additionalNameSuffix\": \"test2\",\n          \"houseNumber\": \"1\",\n          \"milestone\": \"Stuttgarter Strasse 1\",\n          \"direction\": \"Stuttgarter Str.\"\n        },\n        \"companyPostalCode\": \"GM01\",\n        \"industrialZone\": \"HEADQUARTER\",\n        \"building\": \"Building A\",\n        \"floor\": \"A\",\n        \"door\": \"test\"\n      },\n      \"alternativePostalAddress\": {\n        \"geographicCoordinates\": {\n          \"longitude\": 0,\n          \"latitude\": 0,\n          \"altitude\": 0\n        },\n        \"country\": \"DE\",\n        \"administrativeAreaLevel1\": \"Baden-Wuerttemberg 1\",\n        \"postalCode\": \"1234\",\n        \"city\": \"Stuttgart 1\",\n        \"deliveryServiceType\": \"PO_BOX\",\n        \"deliveryServiceQualifier\": \"test\",\n        \"deliveryServiceNumber\": \"1234\"\n      }\n    },\n    \"isOwner\": true\n  }\n]",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{PROVIDER_PUBLIC_API}}",
+															"host": [
+																"{{PROVIDER_PUBLIC_API}}"
+															]
+														}
+													},
+													"response": []
+												}
+											]
+										},
+										{
+											"name": "POST Address Input Search",
+											"item": [
+												{
+													"name": "Initiate EDR Negotation",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"{{OFFERID_POST_GENERIC_INPUT_SEARCH}}\",\n\t\t\"assetId\": \"{{ASSET_POST_GENERIC_INPUT_SEARCH}}\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"{{ASSET_POST_GENERIC_INPUT_SEARCH}}\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"{{POLICY_BPN}}\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"{{ASSET_POST_GENERIC_INPUT_SEARCH}}\"\n\t\t}\n\t}\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Query EDRs Cached",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});",
+																	"// Parse the JSON response",
+																	"var responseBody = pm.response.json();",
+																	"",
+																	"// Check if the response is an array and has elements",
+																	"if (Array.isArray(responseBody) && responseBody.length > 0) {",
+																	"    // Get the last object in the array",
+																	"    var lastObject = responseBody[responseBody.length - 1];",
+																	"",
+																	"    // Check if the last object has the \"edc:transferProcessId\" property",
+																	"    if (lastObject.hasOwnProperty(\"edc:transferProcessId\")) {",
+																	"        // Copy the value of \"edc:transferProcessId\" to a variable",
+																	"        var transferProcessId = lastObject[\"edc:transferProcessId\"];",
+																	"",
+																	"        // Log the value to the Postman console",
+																	"        console.log(\"Transfer Process ID: \" + transferProcessId);",
+																	"",
+																	"        // You can also use the value of transferProcessId as needed",
+																	"        // For example, you can set it as an environment variable",
+																	"        pm.collectionVariables.set(\"TRANSFERID_AUTOTEST\", transferProcessId);",
+																	"    } else {",
+																	"        console.log(\"The last object does not have 'edc:transferProcessId' property.\");",
+																	"    }",
+																	"} else {",
+																	"    console.log(\"Response is not an array or it has no elements.\");",
+																	"}",
+																	""
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"protocolProfileBehavior": {
+														"disableBodyPruning": true
+													},
+													"request": {
+														"method": "GET",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId={{ASSET_POST_GENERIC_INPUT_SEARCH}}",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs"
+															],
+															"query": [
+																{
+																	"key": "assetId",
+																	"value": "{{ASSET_POST_GENERIC_INPUT_SEARCH}}"
+																}
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Get EDR by tp ID",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Status code is 200\", function () {",
+																	"    pm.response.to.have.status(200);",
+																	"});",
+																	"// Parse the JSON response",
+																	"var responseBody = pm.response.json();",
+																	"",
+																	"// Check if the response contains the \"edc:authCode\" property",
+																	"if (responseBody.hasOwnProperty(\"edc:authCode\")) {",
+																	"    // Get the value of \"edc:authCode\"",
+																	"    var authCode = responseBody[\"edc:authCode\"];",
+																	"",
+																	"    // Set the collection variable with the value of \"edc:authCode\"",
+																	"    pm.collectionVariables.set(\"AUTH_CODE\", authCode);",
+																	"",
+																	"    // Log the value to the Postman console",
+																	"    console.log(\"edc:authCode: \" + authCode);",
+																	"} else {",
+																	"    console.log(\"Response does not contain 'edc:authCode' property.\");",
+																	"}"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"protocolProfileBehavior": {
+														"disableBodyPruning": true
+													},
+													"request": {
+														"method": "GET",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{CONSUMER_ADAPTER_URL}}/edrs/{{TRANSFERID_AUTOTEST}}",
+															"host": [
+																"{{CONSUMER_ADAPTER_URL}}"
+															],
+															"path": [
+																"edrs",
+																"{{TRANSFERID_AUTOTEST}}"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Public API POST",
+													"request": {
+														"auth": {
+															"type": "apikey",
+															"apikey": [
+																{
+																	"key": "value",
+																	"value": "{{AUTH_CODE}}",
+																	"type": "string"
+																},
+																{
+																	"key": "key",
+																	"value": "Authorization",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "[\n    \"12044444_legalAddress\"\n]",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{PROVIDER_PUBLIC_API}}",
+															"host": [
+																"{{PROVIDER_PUBLIC_API}}"
+															]
+														}
+													},
+													"response": []
+												}
+											]
+										}
+									]
 								}
 							]
 						},
@@ -3043,6 +3478,221 @@
 										},
 										{
 											"name": "Public API GET",
+											"request": {
+												"auth": {
+													"type": "apikey",
+													"apikey": [
+														{
+															"key": "value",
+															"value": "{{AUTH_CODE}}",
+															"type": "string"
+														},
+														{
+															"key": "key",
+															"value": "Authorization",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "[\n    \"12044444_legalAddress\"\n]",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{PROVIDER_PUBLIC_API}}",
+													"host": [
+														"{{PROVIDER_PUBLIC_API}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "POST Generic Output Search",
+									"item": [
+										{
+											"name": "Initiate EDR Negotation",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"{{OFFERID_POST_GENERIC_OUTPUT_SEARCH}}\",\n\t\t\"assetId\": \"{{ASSET_POST_GENERIC_OUTPUT_SEARCH}}\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"{{ASSET_POST_GENERIC_OUTPUT_SEARCH}}\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"{{POLICY_BPN}}\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"{{ASSET_POST_GENERIC_OUTPUT_SEARCH}}\"\n\t\t}\n\t}\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Query EDRs Cached",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"// Parse the JSON response",
+															"var responseBody = pm.response.json();",
+															"",
+															"// Check if the response is an array and has elements",
+															"if (Array.isArray(responseBody) && responseBody.length > 0) {",
+															"    // Get the last object in the array",
+															"    var lastObject = responseBody[responseBody.length - 1];",
+															"",
+															"    // Check if the last object has the \"edc:transferProcessId\" property",
+															"    if (lastObject.hasOwnProperty(\"edc:transferProcessId\")) {",
+															"        // Copy the value of \"edc:transferProcessId\" to a variable",
+															"        var transferProcessId = lastObject[\"edc:transferProcessId\"];",
+															"",
+															"        // Log the value to the Postman console",
+															"        console.log(\"Transfer Process ID: \" + transferProcessId);",
+															"",
+															"        // You can also use the value of transferProcessId as needed",
+															"        // For example, you can set it as an environment variable",
+															"        pm.collectionVariables.set(\"TRANSFERID_AUTOTEST\", transferProcessId);",
+															"    } else {",
+															"        console.log(\"The last object does not have 'edc:transferProcessId' property.\");",
+															"    }",
+															"} else {",
+															"    console.log(\"Response is not an array or it has no elements.\");",
+															"}",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId={{ASSET_POST_GENERIC_OUTPUT_SEARCH}}",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs"
+													],
+													"query": [
+														{
+															"key": "assetId",
+															"value": "{{ASSET_POST_GENERIC_OUTPUT_SEARCH}}"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get EDR by tp ID",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"// Parse the JSON response",
+															"var responseBody = pm.response.json();",
+															"",
+															"// Check if the response contains the \"edc:authCode\" property",
+															"if (responseBody.hasOwnProperty(\"edc:authCode\")) {",
+															"    // Get the value of \"edc:authCode\"",
+															"    var authCode = responseBody[\"edc:authCode\"];",
+															"",
+															"    // Set the collection variable with the value of \"edc:authCode\"",
+															"    pm.collectionVariables.set(\"AUTH_CODE\", authCode);",
+															"",
+															"    // Log the value to the Postman console",
+															"    console.log(\"edc:authCode: \" + authCode);",
+															"} else {",
+															"    console.log(\"Response does not contain 'edc:authCode' property.\");",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs/{{TRANSFERID_AUTOTEST}}",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs",
+														"{{TRANSFERID_AUTOTEST}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Public API POST",
 											"request": {
 												"auth": {
 													"type": "apikey",
@@ -5686,31 +6336,36 @@
 	],
 	"variable": [
 		{
+			"key": "SHARING_MEMBER_EDC_BASE_URL",
+			"value": "https://sharing-member-edc.net",
+			"type": "string"
+		},
+		{
+			"key": "GATE_EDC_BASE_URL",
+			"value": "https://gate-edc.net.net",
+			"type": "string"
+		},
+		{
 			"key": "CONSUMER_MANAGEMENT_URL",
-			"value": "https://sharing-member-edc.int.demo.catena-x.net/management/v2",
+			"value": "{{SHARING_MEMBER_EDC_BASE_URL}}/management/v2",
 			"type": "string"
 		},
 		{
 			"key": "PROVIDER_PROTOCOL_URL",
-			"value": "https://gate-edc.int.demo.catena-x.net/api/v1/dsp"
+			"value": "{{GATE_EDC_BASE_URL}}/api/v1/dsp"
 		},
 		{
 			"key": "PROVIDER_MANAGEMENT_URL",
-			"value": "https://gate-edc.int.demo.catena-x.net/management/v2"
+			"value": "{{GATE_EDC_BASE_URL}}/management/v2"
 		},
 		{
 			"key": "CONSUMER_ADAPTER_URL",
-			"value": "https://sharing-member-edc.int.demo.catena-x.net/management",
+			"value": "{{SHARING_MEMBER_EDC_BASE_URL}}/management",
 			"type": "string"
 		},
 		{
 			"key": "PROVIDER_PUBLIC_API",
-			"value": "https://gate-edc.int.demo.catena-x.net/api/public",
-			"type": "string"
-		},
-		{
-			"key": "ASSET_ID",
-			"value": "GET_BPL_INPUT_KEY",
+			"value": "{{GATE_EDC_BASE_URL}}/api/public",
 			"type": "string"
 		},
 		{
@@ -5735,12 +6390,12 @@
 		},
 		{
 			"key": "POLICY_BPN",
-			"value": "BPNL00000003CUFH",
+			"value": "BPNL Sharing Member",
 			"type": "default"
 		},
 		{
 			"key": "PROVIDER_ID",
-			"value": "BPNL00000007D968",
+			"value": "BPNL Gate Provider",
 			"type": "string"
 		},
 		{
@@ -5751,31 +6406,6 @@
 		{
 			"key": "API-KEY",
 			"value": "api-key",
-			"type": "string"
-		},
-		{
-			"key": "ASSET_TOKEN_URL",
-			"value": "https://centralidp.int.demo.catena-x.net/auth/realms/CX-Central/protocol/openid-connect/token",
-			"type": "string"
-		},
-		{
-			"key": "ASSET_CLIENT_ID",
-			"value": "sa-cl7-cx-7",
-			"type": "string"
-		},
-		{
-			"key": "ASSET_CLIENT_SECRET",
-			"value": "dev/edc/gate/asset-client-secret",
-			"type": "string"
-		},
-		{
-			"key": "BPDM_POOL_URL",
-			"value": "https://business-partners.int.demo.catena-x.net/pool",
-			"type": "string"
-		},
-		{
-			"key": "BPDM_GATE_URL",
-			"value": "https://business-partners.int.demo.catena-x.net/companies/test-company",
 			"type": "string"
 		},
 		{
@@ -5909,11 +6539,173 @@
 			"type": "string"
 		},
 		{
+			"key": "ASSET_POST_GENERIC_INPUT_SEARCH",
+			"value": "POST_GENERIC_INPUT_SEARCH",
+			"type": "string"
+		},
+		{
+			"key": "ASSET_PUT_GENERIC_INPUT",
+			"value": "PUT_GENERIC_INPUT",
+			"type": "string"
+		},
+		{
+			"key": "ASSET_POST_GENERIC_OUTPUT_SEARCH",
+			"value": "POST_GENERIC_OUTPUT_SEARCH",
+			"type": "string"
+		},
+		{
 			"key": "TRANSFERID_AUTOTEST",
 			"value": ""
 		},
 		{
 			"key": "AUTH_CODE",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_SHARING_STATE",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPL_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_PUT_BPL_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPL_INPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPS_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_PUT_BPS_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPS_INPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPA_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_PUT_BPA_INPUT",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPA_INPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPL_OUTPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPS_OUTPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPA_OUTPUT_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_INPUT_CHANGELOG_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_OUTPUT_CHANGELOG_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_LEGAL_FORMS",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_IDENTIFIER_TYPES",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_FIELD_QUALITY_RULES",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPL_POOL",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPL_POOL_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPS_POOL",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPS_POOL_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_BPA_POOL",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_BPA_POOL_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_CHANGELOG_POOL_SEARCH",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_POST_GENERIC_INPUT_SEARCH",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "OFFERID_PUT_GENERIC_INPUT",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "OFFERID_POST_GENERIC_OUTPUT_SEARCH",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ASSET_BPDM_GATE_API_2",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_BPDM_GATE_API_2",
+			"value": ""
+		},
+		{
+			"key": "ASSET_assetId",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_assetId",
+			"value": ""
+		},
+		{
+			"key": "ASSET_test-gate-api-asset",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_test-gate-api-asset",
+			"value": ""
+		},
+		{
+			"key": "ASSET_test-gate-api-asset-2",
+			"value": ""
+		},
+		{
+			"key": "OFFERID_test-gate-api-asset-2",
 			"value": ""
 		}
 	]
