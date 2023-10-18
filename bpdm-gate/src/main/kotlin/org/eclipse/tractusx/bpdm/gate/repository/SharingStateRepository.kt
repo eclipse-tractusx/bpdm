@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.repository
 
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
@@ -51,5 +52,7 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
     }
 
     fun findByExternalIdAndBusinessPartnerType(externalId: String, businessPartnerType: BusinessPartnerType): SharingState?
+
+    fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingState>
 
 }

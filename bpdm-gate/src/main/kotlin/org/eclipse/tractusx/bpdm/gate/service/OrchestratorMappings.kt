@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
@@ -127,4 +128,82 @@ class OrchestratorMappings(
         ResultState.Success -> SharingStateType.Success
         ResultState.Error -> SharingStateType.Error
     }
+
+    //Mapping BusinessPartnerGenericDto from to BusinessPartner
+    fun toBusinessPartner(entity: BusinessPartnerGenericDto, externalId: String) = BusinessPartner(
+        externalId = externalId,
+        nameParts = entity.nameParts.toMutableList(),
+        shortName = entity.shortName,
+        identifiers = entity.identifiers.map { toIdentifier(it) }.toSortedSet(),
+        legalForm = entity.legalForm,
+        states = entity.states.map { toState(it) }.toSortedSet(),
+        classifications = entity.classifications.map { toClassification(it) }.toSortedSet(),
+        roles = entity.roles.toSortedSet(),
+        postalAddress = toPostalAddress(entity.postalAddress),
+        bpnL = entity.bpnL,
+        bpnS = entity.bpnS,
+        bpnA = entity.bpnA,
+        stage = StageType.Output
+    )
+
+    private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
+        Identifier(type = dto.type, value = dto.value, issuingBody = dto.issuingBody)
+
+    private fun toState(dto: BusinessPartnerStateDto) =
+        State(type = dto.type, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description)
+
+    private fun toClassification(dto: ClassificationDto) =
+        Classification(type = dto.type, code = dto.code, value = dto.value)
+
+    private fun toPostalAddress(entity: PostalAddressDto) =
+        PostalAddress(
+            addressType = entity.addressType,
+            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddress),
+            alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddress)
+        )
+
+    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =
+        PhysicalPostalAddress(
+            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
+            country = dto.country,
+            administrativeAreaLevel1 = dto.administrativeAreaLevel1,
+            administrativeAreaLevel2 = dto.administrativeAreaLevel2,
+            administrativeAreaLevel3 = dto.administrativeAreaLevel3,
+            postalCode = dto.postalCode,
+            city = dto.city,
+            district = dto.district,
+            street = dto.street?.let(::toStreet),
+            companyPostalCode = dto.companyPostalCode,
+            industrialZone = dto.industrialZone,
+            building = dto.building,
+            floor = dto.floor,
+            door = dto.door
+        )
+
+    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
+        AlternativePostalAddress(
+            geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
+            country = dto.country,
+            administrativeAreaLevel1 = dto.administrativeAreaLevel1,
+            postalCode = dto.postalCode,
+            city = dto.city,
+            deliveryServiceType = dto.deliveryServiceType,
+            deliveryServiceQualifier = dto.deliveryServiceQualifier,
+            deliveryServiceNumber = dto.deliveryServiceNumber
+        )
+
+    private fun toStreet(dto: StreetDto) =
+        Street(
+            name = dto.name,
+            houseNumber = dto.houseNumber,
+            milestone = dto.milestone,
+            direction = dto.direction,
+            namePrefix = dto.namePrefix,
+            additionalNamePrefix = dto.additionalNamePrefix,
+            nameSuffix = dto.nameSuffix,
+            additionalNameSuffix = dto.additionalNameSuffix
+        )
+
+    private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
+        GeographicCoordinate(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
 }
