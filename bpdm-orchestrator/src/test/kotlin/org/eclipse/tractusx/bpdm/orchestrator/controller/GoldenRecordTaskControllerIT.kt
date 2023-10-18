@@ -204,7 +204,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             taskId = taskId,
             businessPartner = businessPartnerFull1
         )
-        resolveTasks(listOf(resultEntry1))
+        resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry1))
 
         // now in next step and stepState==Queued
         assertProcessingStateDto(
@@ -235,7 +235,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             taskId = taskId,
             businessPartner = businessPartnerFull2
         )
-        resolveTasks(listOf(resultEntry2))
+        resolveTasks(TaskStep.PoolSync, listOf(resultEntry2))
 
         // final step -> now in stepState==Success
         val finalStateDto = searchTaskStates(listOf(taskId)).tasks.single()
@@ -270,7 +270,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             taskId = taskId,
             errors = listOf(errorDto)
         )
-        resolveTasks(listOf(resultEntry))
+        resolveTasks(TaskStep.CleanAndSync, listOf(resultEntry))
 
         // now in error state
         val stateDto = searchTaskStates(listOf(taskId)).tasks.single()
@@ -335,7 +335,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         )
 
         assertBadRequestException {
-            resolveTasks(resultEntries)
+            resolveTasks(TaskStep.CleanAndSync, resultEntries)
         }
     }
 
@@ -360,6 +360,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // post wrong task ids
         assertBadRequestException {
             resolveTasks(
+                TaskStep.CleanAndSync,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = "WRONG-ID"
@@ -368,9 +369,10 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         }
 
-        // post correct task id but neither empty content
+        // post correct task id but empty content
         assertBadRequestException {
             resolveTasks(
+                TaskStep.CleanAndSync,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0]
@@ -379,8 +381,22 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         }
 
+        // post correct task id but wrong step (Clean)
+        assertBadRequestException {
+            resolveTasks(
+                TaskStep.Clean,
+                listOf(
+                    TaskStepResultEntryDto(
+                        taskId = tasksIds[0],
+                        businessPartner = BusinessPartnerTestValues.businessPartner1Full
+                    )
+                )
+            )
+        }
+
         // post correct task id with business partner content
         resolveTasks(
+            TaskStep.CleanAndSync,
             listOf(
                 TaskStepResultEntryDto(
                     taskId = tasksIds[0],
@@ -392,6 +408,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // post task twice
         assertBadRequestException {
             resolveTasks(
+                TaskStep.CleanAndSync,
                 listOf(
                     TaskStepResultEntryDto(
                         taskId = tasksIds[0],
@@ -404,6 +421,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // post correct task id with error content
         resolveTasks(
+            TaskStep.CleanAndSync,
             listOf(
                 TaskStepResultEntryDto(
                     tasksIds[1], errors = listOf(
@@ -430,11 +448,9 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         )
 
-    private fun resolveTasks(results: List<TaskStepResultEntryDto>) =
+    private fun resolveTasks(step: TaskStep, results: List<TaskStepResultEntryDto>) =
         orchestratorClient.goldenRecordTasks.resolveStepResults(
-            TaskStepResultRequest(
-                results = results
-            )
+            TaskStepResultRequest(step, results)
         )
 
     private fun searchTaskStates(taskIds: List<String>) =

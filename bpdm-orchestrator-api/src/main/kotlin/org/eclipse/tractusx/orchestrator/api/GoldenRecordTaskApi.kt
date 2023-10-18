@@ -102,7 +102,7 @@ interface GoldenRecordTaskApi {
 
     @Operation(
         summary = "Post step results for reserved golden record tasks in the given step queue",
-        description = "Post business partner step results for the given tasks. " +
+        description = "Post business partner step results for the given tasks in the given step queue. " +
                 "In order to post a result for a task it needs to be reserved first, has to currently be in the given step queue and the time limit is not exceeded. " +
                 "The number of results you can post at a time does not need to match the original number of reserved tasks. " +
                 "Results are accepted via strategy 'all or nothing'. " +
@@ -114,7 +114,11 @@ interface GoldenRecordTaskApi {
                 responseCode = "204",
                 description = "If the results could be processed"
             ),
-            ApiResponse(responseCode = "400", description = "On malformed task create requests or reaching upsert limit", content = [Content()]),
+            ApiResponse(
+                responseCode = "400",
+                description = "On malformed requests, reaching upsert limit or posting results for tasks which are missing or in the wrong step queue",
+                content = [Content()]
+            ),
         ]
     )
     @Tag(name = TagWorker)

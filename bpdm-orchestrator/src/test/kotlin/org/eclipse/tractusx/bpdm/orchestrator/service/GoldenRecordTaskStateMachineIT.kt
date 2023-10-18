@@ -91,26 +91,31 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
         // 1st resolve
-        goldenRecordTaskStateMachine.doResolveSuccessful(task, BusinessPartnerTestValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.CleanAndSync, BusinessPartnerTestValues.businessPartner1Full)
         assertProcessingStateDto(task.processingState, ResultState.Pending, TaskStep.PoolSync, StepState.Queued)
         assertThat(task.processingState.reservationTimeout).isNull()
 
         // Can't resolve again!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveSuccessful(task, BusinessPartnerTestValues.businessPartner1Full)
+            goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.CleanAndSync, BusinessPartnerTestValues.businessPartner1Full)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
         // 2nd reserve
         goldenRecordTaskStateMachine.doReserve(task)
         assertProcessingStateDto(task.processingState, ResultState.Pending, TaskStep.PoolSync, StepState.Reserved)
 
+        // Can't resolve with wrong step (CleanAndSync)!
+        assertThatThrownBy {
+            goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.CleanAndSync, BusinessPartnerTestValues.businessPartner1Full)
+        }.isInstanceOf(BpdmIllegalStateException::class.java)
+
         // 2nd resolve
-        goldenRecordTaskStateMachine.doResolveSuccessful(task, BusinessPartnerTestValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.PoolSync, BusinessPartnerTestValues.businessPartner1Full)
         assertProcessingStateDto(task.processingState, ResultState.Success, TaskStep.PoolSync, StepState.Success)
 
         // Can't resolve again!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveFailed(task, listOf(TaskErrorDto(TaskErrorType.Unspecified, "error")))
+            goldenRecordTaskStateMachine.doResolveFailed(task, TaskStep.PoolSync, listOf(TaskErrorDto(TaskErrorType.Unspecified, "error")))
         }.isInstanceOf(BpdmIllegalStateException::class.java)
     }
 
@@ -140,7 +145,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
         Thread.sleep(10)
 
         // resolve
-        goldenRecordTaskStateMachine.doResolveSuccessful(task, BusinessPartnerTestValues.businessPartner1Full)
+        goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.Clean, BusinessPartnerTestValues.businessPartner1Full)
         assertProcessingStateDto(task.processingState, ResultState.Success, TaskStep.Clean, StepState.Success)
         val modified2 = task.processingState.taskModifiedAt
         assertThat(modified2).isAfter(modified1)
@@ -167,7 +172,7 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
             TaskErrorDto(TaskErrorType.Unspecified, "Unspecific error"),
             TaskErrorDto(TaskErrorType.Timeout, "Timeout")
         )
-        goldenRecordTaskStateMachine.doResolveFailed(task, errors)
+        goldenRecordTaskStateMachine.doResolveFailed(task, TaskStep.Clean, errors)
         assertProcessingStateDto(task.processingState, ResultState.Error, TaskStep.Clean, StepState.Error)
         assertThat(task.processingState.errors).isEqualTo(errors)
 
@@ -176,9 +181,9 @@ class GoldenRecordTaskStateMachineIT @Autowired constructor(
             goldenRecordTaskStateMachine.doReserve(task)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
 
-        // Can't reserve now!
+        // Can't resolve now!
         assertThatThrownBy {
-            goldenRecordTaskStateMachine.doResolveSuccessful(task, BusinessPartnerTestValues.businessPartner1Full)
+            goldenRecordTaskStateMachine.doResolveSuccessful(task, TaskStep.Clean, BusinessPartnerTestValues.businessPartner1Full)
         }.isInstanceOf(BpdmIllegalStateException::class.java)
     }
 
