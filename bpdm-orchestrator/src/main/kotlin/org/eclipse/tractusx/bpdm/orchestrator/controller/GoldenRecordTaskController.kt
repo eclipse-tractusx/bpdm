@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.orchestrator.service.GoldenRecordTaskService
 import org.eclipse.tractusx.orchestrator.api.GoldenRecordTaskApi
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -34,6 +35,7 @@ class GoldenRecordTaskController(
     val goldenRecordTaskService: GoldenRecordTaskService
 ) : GoldenRecordTaskApi {
 
+    @PreAuthorize("hasAuthority(@orchestratorConfigProperties.roleCreateTask())")
     override fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
         if (createRequest.businessPartners.size > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(createRequest.businessPartners.size, apiConfigProperties.upsertLimit)
@@ -41,6 +43,7 @@ class GoldenRecordTaskController(
         return goldenRecordTaskService.createTasks(createRequest)
     }
 
+    @PreAuthorize("hasAuthority(@orchestratorConfigProperties.roleProcessTask(#reservationRequest.step))")
     override fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
         if (reservationRequest.amount > apiConfigProperties.upsertLimit)
             throw BpdmUpsertLimitException(reservationRequest.amount, apiConfigProperties.upsertLimit)
@@ -48,6 +51,7 @@ class GoldenRecordTaskController(
         return goldenRecordTaskService.reserveTasksForStep(reservationRequest)
     }
 
+    @PreAuthorize("hasAuthority(@orchestratorConfigProperties.roleProcessTask(#resultRequest.step))")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     override fun resolveStepResults(resultRequest: TaskStepResultRequest) {
         if (resultRequest.results.size > apiConfigProperties.upsertLimit)
@@ -56,6 +60,7 @@ class GoldenRecordTaskController(
         goldenRecordTaskService.resolveStepResults(resultRequest)
     }
 
+    @PreAuthorize("hasAuthority(@orchestratorConfigProperties.roleViewTask())")
     override fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
         return goldenRecordTaskService.searchTaskStates(stateRequest)
     }
