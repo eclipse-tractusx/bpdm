@@ -22,5 +22,6 @@ package org.eclipse.tractusx.bpdm.common.dto
 enum class BusinessPartnerType {
     LEGAL_ENTITY,
     SITE,
-    ADDRESS
+    ADDRESS,
+    GENERIC
 }
