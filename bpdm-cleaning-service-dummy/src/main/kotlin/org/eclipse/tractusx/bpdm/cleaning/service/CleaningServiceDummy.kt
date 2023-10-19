@@ -36,14 +36,17 @@ class CleaningServiceDummy(
 
     private val logger = KotlinLogging.logger { }
 
-
     @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
     fun pollForCleaningTasks() {
-        try {
-            logger.info { "Starting polling for cleaning tasks from Orchestrator..." }
-            val step = TaskStep.CleanAndSync
+        processPollingTasks(TaskStep.CleanAndSync)
+        processPollingTasks(TaskStep.Clean)
+    }
 
-            // Step 1: Fetch and reserve the next cleaning request
+
+    private fun processPollingTasks(step: TaskStep) {
+        try {
+            logger.info { "Starting polling for cleaning tasks from Orchestrator... TaskStep ${step.name}" }
+
             val cleaningRequest = orchestrationApiClient.goldenRecordTasks
                 .reserveTasksForStep(TaskStepReservationRequest(amount = 10, step))
 
@@ -53,11 +56,9 @@ class CleaningServiceDummy(
 
             if (cleaningTasks.isNotEmpty()) {
                 val cleaningResults = cleaningTasks.map { reservedTask ->
-                    // Step 2: Generate dummy cleaning results
                     processCleaningTask(reservedTask)
                 }
 
-                // Step 3: Send the cleaning result back to the Orchestrator
                 orchestrationApiClient.goldenRecordTasks.resolveStepResults(TaskStepResultRequest(step, cleaningResults))
                 logger.info { "Cleaning tasks processing completed for this iteration." }
             }
