@@ -29,6 +29,7 @@ on:
       - bpdm-gate-api/**
       - bpdm-bridge-dummy/**
       - bpdm-cleaning-service-dummy/**
+      - bpdm-orchestrator/**
       - .github/workflows/**
     tags:
       - 'v*.*.*'
