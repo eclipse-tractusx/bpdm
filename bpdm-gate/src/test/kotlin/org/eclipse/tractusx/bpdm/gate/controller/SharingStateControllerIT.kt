@@ -58,9 +58,11 @@ class SharingStateControllerIT @Autowired constructor(
         val stateSite = insertSharingStateSuccess(BusinessPartnerType.SITE, externalId = "exIdSite")
         val stateLegalEntity1 = insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity1")
         val stateLegalEntity2 = insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdEntity2")
+        val stateGeneric = insertSharingStateSuccess(BusinessPartnerType.GENERIC, externalId = "exIdGeneric1")
         insertSharingStateSuccess(BusinessPartnerType.ADDRESS, externalId = "exIdMultiple")
         insertSharingStateSuccess(BusinessPartnerType.SITE, externalId = "exIdMultiple")
         insertSharingStateSuccess(BusinessPartnerType.LEGAL_ENTITY, externalId = "exIdMultiple")
+        insertSharingStateSuccess(BusinessPartnerType.GENERIC, externalId = "exIdMultiple")
 
         val searchAddressById = readSharingStates(BusinessPartnerType.ADDRESS, "exIdAddress")
         assertThat(searchAddressById).hasSize(1)
@@ -80,8 +82,12 @@ class SharingStateControllerIT @Autowired constructor(
         assertThat(searchEntitySingle).hasSize(1)
         assertThat(searchEntitySingle.first()).isEqualTo(stateLegalEntity2)
 
+        val searchGenericSingle = readSharingStates(BusinessPartnerType.GENERIC, "exIdGeneric1")
+        assertThat(searchGenericSingle).hasSize(1)
+        assertThat(searchGenericSingle.first()).isEqualTo(stateGeneric)
+
         val searchAll = readSharingStates(null)
-        assertThat(searchAll).hasSize(7)
+        assertThat(searchAll).hasSize(9)
 
         val searchEntityAllLegalEntities = readSharingStates(BusinessPartnerType.LEGAL_ENTITY)
         assertThat(searchEntityAllLegalEntities).hasSize(3)
@@ -89,7 +95,7 @@ class SharingStateControllerIT @Autowired constructor(
             .contains(stateLegalEntity1.externalId, stateLegalEntity2.externalId, "exIdMultiple")
 
         val searchAllWithSameId = readSharingStates(null, "exIdMultiple")
-        assertThat(searchAllWithSameId).hasSize(3)
+        assertThat(searchAllWithSameId).hasSize(4)
         assertThat(searchAllWithSameId).extracting(SharingStateDto::externalId.name)
             .containsOnly("exIdMultiple")
 
@@ -106,6 +112,7 @@ class SharingStateControllerIT @Autowired constructor(
         assertThat(searchAddress).hasSize(1)
         assertThat(searchAddress.first()).isEqualTo(stateAddress1)
     }
+
 
     @Test
     fun `insert and update states`() {

@@ -122,7 +122,7 @@ class BusinessPartnerService(
 
     private fun initSharingState(entity: BusinessPartner) {
         // TODO make businessPartnerType optional
-        sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.ADDRESS, entity.externalId))
+        sharingStateService.upsertSharingState(SharingStateDto(BusinessPartnerType.GENERIC, entity.externalId))
     }
 
     private fun saveChangelog(resolutionResults: Collection<ResolutionResult>) {
@@ -135,9 +135,7 @@ class BusinessPartnerService(
     }
 
     private fun saveChangelog(partner: BusinessPartner, changelogType: ChangelogType) {
-        val businessPartnerTypes = partner.postalAddress.addressType?.businessPartnerTypes ?: listOf(null)
-
-        businessPartnerTypes.forEach { type -> changelogRepository.save(ChangelogEntry(partner.externalId, type, changelogType, partner.stage)) }
+        changelogRepository.save(ChangelogEntry(partner.externalId, BusinessPartnerType.GENERIC, changelogType, partner.stage))
     }
 
     private fun assertInputStageExists(externalIds: Collection<String>) {
