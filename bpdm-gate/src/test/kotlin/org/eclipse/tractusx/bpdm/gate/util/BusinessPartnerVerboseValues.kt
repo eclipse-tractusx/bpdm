@@ -29,6 +29,7 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import java.time.Instant
 import java.time.LocalDateTime
@@ -745,6 +746,137 @@ object BusinessPartnerVerboseValues {
         bpnL = "BPNL0000000002XY",
         bpnS = "BPNS0000000003X9",
         bpnA = "BPNA0000000001XY"
+    )
+
+    val bpInputRequestCleaned = BusinessPartnerInputRequest(
+        externalId = externalId4,
+        nameParts = listOf("Name Part Value"),
+        shortName = "Random Short Name",
+        legalForm = "Random Form Value",
+        isOwnCompanyData = true,
+        identifiers = listOf(
+            bpIdentifier1, bpIdentifier2, bpIdentifier1
+        ),
+        classifications = listOf(
+            bpClassification1, bpClassification3
+        ),
+        states = listOf(bpState2, bpState1),
+        roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
+        postalAddress = bpPostalAddressInputDtoFull,
+        bpnL = "BPNL0000000002XY",
+        bpnS = "BPNS0000000003X9",
+        bpnA = "BPNA0000000001XY"
+    )
+
+    val bpInputRequestError = BusinessPartnerInputRequest(
+        externalId = externalId5,
+        nameParts = listOf("Name Part Value"),
+        shortName = "Random Short Name",
+        legalForm = "Random Form Value",
+        isOwnCompanyData = true,
+        identifiers = listOf(
+            bpIdentifier1, bpIdentifier2, bpIdentifier1
+        ),
+        classifications = listOf(
+            bpClassification1, bpClassification3
+        ),
+        states = listOf(bpState2, bpState1),
+        roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
+        postalAddress = bpPostalAddressInputDtoFull,
+        bpnL = "BPNL0000000002XY",
+        bpnS = "BPNS0000000003X9",
+        bpnA = "BPNA0000000001XY"
+    )
+
+    val bpOutputRequestCleaned = BusinessPartnerOutputRequest(
+        externalId = externalId4,
+        nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
+        shortName = "shot-name-cleaned",
+        legalForm = "legal-form-cleaned",
+        identifiers = listOf(
+            BusinessPartnerIdentifierDto(
+                type = "identifier-type-1-cleaned",
+                value = "identifier-value-1-cleaned",
+                issuingBody = "issuingBody-1-cleaned"
+            ),
+            BusinessPartnerIdentifierDto(
+                type = "identifier-type-2-cleaned",
+                value = "identifier-value-2-cleaned",
+                issuingBody = "issuingBody-2-cleaned"
+            ),
+        ),
+        classifications = listOf(
+            ClassificationDto(
+                type = ClassificationType.NACE,
+                code = "code-1-cleaned",
+                value = "value-1-cleaned"
+            ),
+            ClassificationDto(
+                type = ClassificationType.NAF,
+                code = "code-2-cleaned",
+                value = "value-2-cleaned"
+            ),
+        ),
+        states = listOf(
+            BusinessPartnerStateDto(
+                validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
+                validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
+                type = BusinessStateType.INACTIVE,
+                description = "business-state-description-1"
+            ),
+            BusinessPartnerStateDto(
+                validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
+                validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
+                type = BusinessStateType.ACTIVE,
+                description = "business-state-description-2"
+            )
+        ),
+        roles = listOf(
+            BusinessPartnerRole.CUSTOMER,
+            BusinessPartnerRole.SUPPLIER
+        ),
+        postalAddress = BusinessPartnerPostalAddressDto(
+            addressType = AddressType.AdditionalAddress,
+            physicalPostalAddress = PhysicalPostalAddressGateDto(
+                geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
+                country = CountryCode.PT,
+                administrativeAreaLevel1 = "PT-PT",
+                administrativeAreaLevel2 = "pt-admin-level-2-cleaned",
+                administrativeAreaLevel3 = "pt-admin-level-3-cleaned",
+                postalCode = "phys-postal-code-cleaned",
+                city = "city",
+                district = "district",
+                street = StreetGateDto(
+                    name = "name",
+                    houseNumber = "house-number",
+                    milestone = "milestone",
+                    direction = "direction",
+                    namePrefix = "name-prefix",
+                    additionalNamePrefix = "add-name-prefix",
+                    nameSuffix = "name-suffix",
+                    additionalNameSuffix = "add-name-suffix"
+
+                ),
+                companyPostalCode = "comp-postal-code",
+                industrialZone = "industrial-zone",
+                building = "building",
+                floor = "floor",
+                door = "door"
+            ),
+            alternativePostalAddress = AlternativePostalAddressGateDto(
+                geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
+                country = CountryCode.PT,
+                administrativeAreaLevel1 = "PT-PT",
+                postalCode = "postal-code-cleaned",
+                city = "alt-city-cleaned",
+                deliveryServiceNumber = "delivery-service-number-cleaned",
+                deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
+                deliveryServiceType = DeliveryServiceType.PO_BOX
+            )
+        ),
+        bpnL = "000000123AAA123",
+        bpnS = "000000123BBB222",
+        bpnA = "000000123CCC333"
     )
 
 }

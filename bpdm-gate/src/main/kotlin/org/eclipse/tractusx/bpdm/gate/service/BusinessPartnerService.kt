@@ -25,7 +25,9 @@ import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -35,11 +37,13 @@ import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
+import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -50,7 +54,8 @@ class BusinessPartnerService(
     private val sharingStateService: SharingStateService,
     private val changelogRepository: ChangelogRepository,
     private val orchestrationApiClient: OrchestrationApiClient,
-    private val orchestratorMappings: OrchestratorMappings
+    private val orchestratorMappings: OrchestratorMappings,
+    private val sharingStateRepository: SharingStateRepository
 ) {
 
     @Transactional
@@ -91,7 +96,7 @@ class BusinessPartnerService(
         val taskCreateResponse = createGoldenRecordTasks(orchestratorBusinessPartnersDto)
 
         for (i in partners.indices) {
-            updateSharingState(partners[i], taskCreateResponse.createdTasks[i])
+            updateSharingState(partners[i].externalId, taskCreateResponse.createdTasks[i])
         }
 
         return businessPartnerRepository.saveAll(partners)
@@ -230,16 +235,59 @@ class BusinessPartnerService(
         )
     }
 
-    private fun updateSharingState(entity: BusinessPartner, stateDto: TaskClientStateDto) {
+    private fun updateSharingState(externalId: String, stateDto: TaskClientStateDto) {
+
+        val errorMessage = if (stateDto.processingState.errors.isNotEmpty()) stateDto.processingState.errors.joinToString(" // ") { it.description } else null
+        val errorCode = if (stateDto.processingState.errors.isNotEmpty()) BusinessPartnerSharingError.SharingProcessError else null
+
         sharingStateService.upsertSharingState(
             SharingStateDto(
                 BusinessPartnerType.ADDRESS,
-                entity.externalId,
+                externalId,
                 sharingStateType = orchestratorMappings.toSharingStateType(stateDto.processingState.resultState),
+                sharingErrorCode = errorCode,
+                sharingErrorMessage = errorMessage,
                 taskId = stateDto.taskId
             )
         )
+    }
 
+    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
+    fun finishCleaningTask() {
+
+        var validBusinessPartner: List<BusinessPartner> = emptyList()
+
+        val sharingStates = sharingStateRepository.findBySharingStateType(SharingStateType.Pending)
+        val nonNullTaskIds = sharingStates.mapNotNull { it.taskId }
+
+        val taskStates = orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(nonNullTaskIds))
+
+        val sharingStateMap = sharingStates.associateBy { it.taskId }
+
+        //Task verification and map
+        taskStates.tasks.forEach { task ->
+
+            val relatedSharingState = sharingStateMap[task.taskId]
+
+            // Check if relatedSharingState exists
+            if (relatedSharingState != null) {
+                if (task.processingState.resultState == ResultState.Success) {
+                    val businessPartner = orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, relatedSharingState.externalId)
+                    validBusinessPartner = validBusinessPartner.plus(businessPartner)
+
+                    // Set Sharing State to Success
+                    updateSharingState(businessPartner.externalId, task)
+                } else if (task.processingState.resultState == ResultState.Error) {
+                    // Set related Sharing State Type as Error
+                    updateSharingState(relatedSharingState.externalId, task)
+                }
+            }
+        }
+
+        //If it is cleaned, upsert Output
+        if (validBusinessPartner.isNotEmpty()) {
+            upsertBusinessPartnersOutput(validBusinessPartner)
+        }
     }
 
 }

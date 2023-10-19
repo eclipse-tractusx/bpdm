@@ -29,15 +29,18 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
+import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerVerboseValues
-import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
-import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
+import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
+import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -62,10 +65,12 @@ import java.time.Instant
 class BusinessPartnerControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val gateClient: GateClient,
-    val objectMapper: ObjectMapper
+    val objectMapper: ObjectMapper,
+    val businessPartnerService: BusinessPartnerService
 ) {
     companion object {
         const val ORCHESTRATOR_CREATE_TASKS_URL = "/api/golden-record-tasks"
+        const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/api/golden-record-tasks/state/search"
 
         @JvmField
         @RegisterExtension
@@ -85,6 +90,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         testHelpers.truncateDbTables()
         gateWireMockServer.resetAll()
         this.mockOrchestratorApi()
+        this.mockOrchestratorApiCleaned()
     }
 
     @Test
@@ -286,6 +292,13 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(requests.map(::toExpectedResponse))
     }
 
+    private fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputRequest>) {
+        Assertions.assertThat(responses)
+            .usingRecursiveComparison()
+            .ignoringFieldsOfTypes(Instant::class.java)
+            .isEqualTo(requests.map(::toExpectedResponseOutput))
+    }
+
     private fun toExpectedResponse(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         // same sorting order as defined for entity
         return BusinessPartnerInputDto(
@@ -302,6 +315,37 @@ class BusinessPartnerControllerIT @Autowired constructor(
             bpnL = request.bpnL,
             bpnS = request.bpnS,
             bpnA = request.bpnA,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
+        )
+    }
+
+    private fun toExpectedResponseOutput(request: BusinessPartnerOutputRequest): BusinessPartnerOutputDto {
+        // same sorting order as defined for entity
+        return BusinessPartnerOutputDto(
+            externalId = request.externalId,
+            nameParts = request.nameParts,
+            shortName = request.shortName,
+            identifiers = request.identifiers.toSortedSet(identifierDtoComparator),
+            legalForm = request.legalForm,
+            states = request.states.toSortedSet(stateDtoComparator),
+            classifications = request.classifications.toSortedSet(classificationDtoComparator),
+            roles = request.roles.toSortedSet(),
+            postalAddress = request.postalAddress,
+            isOwnCompanyData = request.isOwnCompanyData,
+            bpnL = request.bpnL ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                BusinessPartnerOutputDto::class,
+                BusinessPartner::bpnL,
+                request.externalId
+            ),
+            bpnS = request.bpnS,
+            bpnA = request.bpnA ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                BusinessPartnerOutputDto::class,
+                BusinessPartner::bpnA,
+                request.externalId
+            ),
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -390,9 +434,134 @@ class BusinessPartnerControllerIT @Autowired constructor(
         )
     }
 
+    private fun mockOrchestratorApiCleaned() {
+        val TaskStateResponse =
+            TaskStateResponse(
+                listOf(
+                    TaskClientStateDto(
+                        taskId = "0",
+                        businessPartnerResult = BusinessPartnerGenericMockValues.businessPartner1,
+                        processingState = TaskProcessingStateDto(
+                            resultState = ResultState.Success,
+                            step = TaskStep.CleanAndSync,
+                            stepState = StepState.Queued,
+                            errors = emptyList(),
+                            createdAt = Instant.now(),
+                            modifiedAt = Instant.now(),
+                            timeout = Instant.now()
+                        )
+                    ),
+                    TaskClientStateDto(
+                        taskId = "1",
+                        businessPartnerResult = null,
+                        processingState = TaskProcessingStateDto(
+                            resultState = ResultState.Error,
+                            step = TaskStep.CleanAndSync,
+                            stepState = StepState.Queued,
+                            errors = listOf(
+                                TaskErrorDto(TaskErrorType.Timeout, "Major Error"),
+                                TaskErrorDto(TaskErrorType.Unspecified, "Minor Error")
+                            ),
+                            createdAt = Instant.now(),
+                            modifiedAt = Instant.now(),
+                            timeout = Instant.now()
+                        )
+                    )
+                )
+            )
+
+        gateWireMockServer.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL))
+                .willReturn(
+                    WireMock.okJson(objectMapper.writeValueAsString(TaskStateResponse))
+                )
+        )
+    }
+
     fun readSharingStates(businessPartnerType: BusinessPartnerType?, externalIds: Collection<String>?): Collection<SharingStateDto> {
 
         return gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType, externalIds).content
     }
+
+    @Test
+    fun `insert one business partners and finalize cleaning task without error`() {
+
+        val outputBusinessPartners = listOf(
+            BusinessPartnerNonVerboseValues.bpOutputRequestCleaned
+        )
+
+        val upsertRequests = listOf(
+            BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
+            BusinessPartnerNonVerboseValues.bpInputRequestError
+        )
+        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+
+        val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
+        val externalId5 = BusinessPartnerNonVerboseValues.bpInputRequestError.externalId
+
+        val createdSharingState = listOf(
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.ADDRESS,
+                externalId = externalId4,
+                sharingStateType = SharingStateType.Pending,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "0"
+            ),
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.ADDRESS,
+                externalId = externalId5,
+                sharingStateType = SharingStateType.Pending,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "1"
+            )
+        )
+
+        //Firstly verifies if the Sharing States was created for new Business Partners
+        val externalIds = listOf(externalId4, externalId5)
+        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.ADDRESS, externalIds)
+        testHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(createdSharingState)
+
+        // Call Finish Cleaning Method
+        businessPartnerService.finishCleaningTask()
+
+        val cleanedSharingState = listOf(
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.ADDRESS,
+                externalId = externalId4,
+                sharingStateType = SharingStateType.Success,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "0"
+            ),
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.ADDRESS,
+                externalId = externalId5,
+                sharingStateType = SharingStateType.Error,
+                sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
+                sharingErrorMessage = "Major Error // Minor Error",
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "1"
+            )
+        )
+
+        //Check for both Sharing State changes (Error and Success)
+        val readCleanedSharingState = readSharingStates(BusinessPartnerType.ADDRESS, externalIds)
+        testHelpers.assertRecursively(readCleanedSharingState).isEqualTo(cleanedSharingState)
+
+        //Assert that Cleaned Golden Record is persisted in the Output correctly
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId4))
+        assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
+
+    }
+
 
 }
