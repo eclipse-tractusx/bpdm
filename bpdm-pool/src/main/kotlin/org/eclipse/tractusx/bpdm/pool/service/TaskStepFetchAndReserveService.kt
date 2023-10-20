@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
+import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.scheduling.annotation.Scheduled
@@ -35,6 +36,7 @@ class TaskStepFetchAndReserveService(
     private val orchestrationClient: OrchestrationApiClient,
     private val taskStepBuildService: TaskStepBuildService,
     private val requestValidationService: RequestValidationService,
+    private val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -60,20 +62,23 @@ class TaskStepFetchAndReserveService(
 
     fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
 
+        val taskEntryBpnMapping = TaskEntryBpnMapping(taskEntries, bpnRequestIdentifierRepository)
         //TODO Implement validation for sites, ...
         val validationStepErrorsByEntry = validateLegalEntityCreateTasks(taskEntries)
 
-        return taskEntries.map {
+        val taksResults = taskEntries.map {
 
             val existingEntryError = validationStepErrorsByEntry.get(it)
-            existingEntryError ?: businessPartnerTaskResult(it)
+            existingEntryError ?: businessPartnerTaskResult(it, taskEntryBpnMapping)
         }
+        taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)
+        return taksResults
     }
 
-    fun businessPartnerTaskResult(taskStep: TaskStepReservationEntryDto): TaskStepResultEntryDto {
+    private fun businessPartnerTaskResult(taskStep: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
 
         return try {
-            taskStepBuildService.upsertBusinessPartner(taskStep)
+            taskStepBuildService.upsertBusinessPartner(taskStep, taskEntryBpnMapping)
         } catch (ex: BpdmValidationException) {
             TaskStepResultEntryDto(
                 taskId = taskStep.taskId,

@@ -65,32 +65,40 @@ class TaskStepBuildService(
     }
 
     @Transactional
-    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto): TaskStepResultEntryDto {
+    fun upsertBusinessPartner(taskEntry: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
 
-        // TODO associate generated BPN with BPN request identifier
         val businessPartnerDto = taskEntry.businessPartner
         var siteResult: SiteDto? = null
         var addressResult: LogisticAddressDto? = null
 
-        val legalEntity = upsertLegalEntity(businessPartnerDto.legalEntity)
+        val legalEntity = upsertLegalEntity(businessPartnerDto.legalEntity, taskEntryBpnMapping)
+        var genericBpnA= legalEntity.legalAddress.bpn
+
         var siteEntity: Site? = null
         if (businessPartnerDto.site != null) {
-            siteEntity = upsertSite(businessPartnerDto.site, legalEntity)
+            siteEntity = upsertSite(businessPartnerDto.site, legalEntity, taskEntryBpnMapping)
             siteResult = businessPartnerDto.site!!.copy(
                 bpnSReference = BpnReferenceDto(referenceValue = siteEntity.bpn, referenceType = BpnReferenceType.Bpn)
             )
+            genericBpnA = siteEntity.mainAddress.bpn
         }
+        var addressEntity: LogisticAddress? = null
         if (businessPartnerDto.address != null) {
-            val addressEntity = upsertLogisticAddress(businessPartnerDto.address, legalEntity, siteEntity)
+            addressEntity = upsertLogisticAddress(businessPartnerDto.address, legalEntity, siteEntity, taskEntryBpnMapping)
             addressResult = businessPartnerDto.address!!.copy(
                 bpnAReference = BpnReferenceDto(referenceValue = addressEntity.bpn, referenceType = BpnReferenceType.Bpn)
             )
+            genericBpnA = addressEntity.bpn
         }
 
         return TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
             businessPartner = BusinessPartnerFullDto(
-                generic = businessPartnerDto.generic,
+                generic = businessPartnerDto.generic.copy(
+                    bpnL = legalEntity.bpn,
+                    bpnS = siteEntity?.bpn,
+                    bpnA = genericBpnA
+                ),
                 legalEntity = businessPartnerDto.legalEntity!!.copy(
                     bpnLReference = BpnReferenceDto(referenceValue = legalEntity.bpn, referenceType = BpnReferenceType.Bpn)
                 ),
@@ -103,21 +111,20 @@ class TaskStepBuildService(
     private fun upsertLogisticAddress(
         addressDto: LogisticAddressDto?,
         legalEntity: LegalEntity,
-        siteEntity: Site?
+        siteEntity: Site?,
+        taskEntryBpnMapping: TaskEntryBpnMapping
     ): LogisticAddress {
 
         val bpnAReference = addressDto?.bpnAReference ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
 
-        val isCreate = bpnAReference.referenceType == BpnReferenceType.BpnRequestIdentifier
-        val changelogType =
-            if (isCreate) ChangelogType.CREATE else ChangelogType.UPDATE
+        val bpn = taskEntryBpnMapping.getBpn(bpnAReference)
 
-        val upsertAddress = if (isCreate) {
-            val bpnLA = bpnIssuingService.issueAddressBpns(1).single()
-            createLogisticAddressInternal(addressDto, bpnLA)
+        val upsertAddress = if (bpn == null) {
+            val bpnA = bpnIssuingService.issueAddressBpns(1).single()
+            taskEntryBpnMapping.addMapping(bpnAReference, bpnA)
+            createLogisticAddressInternal(addressDto, bpnA)
         } else {
             val addressMetadataMap = metadataService.getMetadata(listOf(addressDto)).toMapping()
-
             val updateAddress = logisticAddressRepository.findByBpn(bpnAReference.referenceValue)
             if (updateAddress != null) {
                 updateLogisticAddress(updateAddress, addressDto, addressMetadataMap)
@@ -132,6 +139,9 @@ class TaskStepBuildService(
             upsertAddress.legalEntity = legalEntity
         }
         logisticAddressRepository.save(upsertAddress)
+
+        val changelogType =
+            if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
         changelogService.createChangelogEntries(
             listOf(
                 ChangelogEntryCreateRequest(upsertAddress.bpn, changelogType, BusinessPartnerType.ADDRESS)
@@ -141,12 +151,15 @@ class TaskStepBuildService(
         return upsertAddress
     }
 
-    private fun createLogisticAddress(
-        addressDto: LogisticAddressDto?
-    ): LogisticAddress {
+    private fun createLogisticAddress(addressDto: LogisticAddressDto?, taskEntryBpnMapping: TaskEntryBpnMapping): LogisticAddress {
 
-        val bpnLA = bpnIssuingService.issueAddressBpns(1)
-        val newAddress = createLogisticAddressInternal(addressDto, bpnLA[0])
+        val bpnAReference = addressDto?.bpnAReference
+        val bpnL = bpnIssuingService.issueAddressBpns(1).single()
+
+        if (bpnAReference != null && bpnAReference.referenceType == BpnReferenceType.BpnRequestIdentifier) {
+            taskEntryBpnMapping.addMapping(bpnAReference, bpnL)
+        }
+        val newAddress = createLogisticAddressInternal(addressDto, bpnL)
         changelogService.createChangelogEntries(
             listOf(
                 ChangelogEntryCreateRequest(newAddress.bpn, ChangelogType.CREATE, BusinessPartnerType.ADDRESS)
@@ -323,28 +336,26 @@ class TaskStepBuildService(
 
 
     fun upsertLegalEntity(
-        legalEntityDto: LegalEntityDto?
+        legalEntityDto: LegalEntityDto?, taskEntryBpnMapping: TaskEntryBpnMapping
     ): LegalEntity {
 
         val bpnLReference = legalEntityDto?.bpnLReference ?: throw BpdmValidationException(CleaningError.LEGAL_ENTITY_IS_NULL.message)
         val legalAddress = legalEntityDto.legalAddress ?: throw BpdmValidationException(CleaningError.LEGAL_ADDRESS_IS_NULL.message)
-
-        val isCreate = bpnLReference.referenceType == BpnReferenceType.BpnRequestIdentifier
-        val changelogType =
-            if (isCreate) ChangelogType.CREATE else ChangelogType.UPDATE
-
         val legalEntityMetadataMap = metadataService.getMetadata(listOf(legalEntityDto)).toMapping()
 
-        val upsertLe = if (isCreate) {
+        val bpn = taskEntryBpnMapping.getBpn(bpnLReference)
+
+        val upsertLe = if (bpn == null) {
             val bpnL = bpnIssuingService.issueLegalEntityBpns(1).single()
-            val createdLe = createLegalEntity(legalEntityDto, bpnL, legalEntityMetadataMap)
-            val address = createLogisticAddress(legalAddress)
+            taskEntryBpnMapping.addMapping(bpnLReference, bpnL)
+            val createdLe = createLegalEntity(legalEntityDto,  bpnL, legalEntityMetadataMap)
+            val address = createLogisticAddress(legalAddress, taskEntryBpnMapping)
             createdLe.legalAddress = address
             address.legalEntity = createdLe
             createdLe
         } else {
 
-            val updateLe = legalEntityRepository.findByBpn(bpnLReference.referenceValue)
+            val updateLe = legalEntityRepository.findByBpn(bpn)
             if (updateLe != null) {
                 if (legalEntityDto.hasChanged == false) {
                     updateLegalEntity(updateLe, legalEntityDto,
@@ -358,6 +369,8 @@ class TaskStepBuildService(
             updateLe
         }
         legalEntityRepository.save(upsertLe)
+        val changelogType =
+            if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
         changelogService.createChangelogEntries(
             listOf(
                 ChangelogEntryCreateRequest(upsertLe.bpn, changelogType, BusinessPartnerType.LEGAL_ENTITY)
@@ -367,20 +380,19 @@ class TaskStepBuildService(
         return upsertLe
     }
 
-    private fun upsertSite(
-        siteDto: SiteDto?,
-        legalEntity: LegalEntity
-    ): Site {
+    private fun upsertSite(siteDto: SiteDto?, legalEntity: LegalEntity, taskEntryBpnMapping: TaskEntryBpnMapping): Site {
+
         val bpnSReference = siteDto?.bpnSReference ?: throw BpdmValidationException(CleaningError.BPNS_IS_NULL.message)
         val mainAddress = siteDto.mainAddress ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
 
-        val isCreate = bpnSReference.referenceType == BpnReferenceType.BpnRequestIdentifier
-        val changelogType = if (isCreate) ChangelogType.CREATE else ChangelogType.UPDATE
+        val bpn = taskEntryBpnMapping.getBpn(bpnSReference)
+        val changelogType = if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
 
-        val upsertSite = if (isCreate) {
+        val upsertSite = if (bpn == null) {
             val bpnS = bpnIssuingService.issueSiteBpns(1).single()
             val createSite = createSite(siteDto, bpnS, legalEntity)
-            val address = createLogisticAddress(mainAddress)
+            taskEntryBpnMapping.addMapping(bpnSReference, bpnS)
+            val address = createLogisticAddress(mainAddress, taskEntryBpnMapping)
             createSite.mainAddress = address
             address.site = createSite
             createSite
