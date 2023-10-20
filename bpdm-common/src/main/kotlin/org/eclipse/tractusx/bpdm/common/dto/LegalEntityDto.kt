@@ -38,5 +38,5 @@ data class LegalEntityDto(
     val states: Collection<LegalEntityStateDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
-    val classifications: Collection<ClassificationDto> = emptyList(),
+    val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
 )

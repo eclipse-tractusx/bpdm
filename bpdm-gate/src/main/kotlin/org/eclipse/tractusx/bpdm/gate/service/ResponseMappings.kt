@@ -256,8 +256,8 @@ fun toEntityState(dto: LegalEntityStateDto, legalEntity: LegalEntity): LegalEnti
     return LegalEntityState(dto.description, dto.validFrom, dto.validTo, dto.type, legalEntity)
 }
 
-fun toEntityClassification(dto: ClassificationDto, legalEntity: LegalEntity): LegalEntityClassification? {
-    return dto.type?.let { LegalEntityClassification(dto.value, dto.code, it, legalEntity) }
+fun toEntityClassification(dto: LegalEntityClassificationDto, legalEntity: LegalEntity): LegalEntityClassification {
+    return LegalEntityClassification(dto.value, dto.code, dto.type, legalEntity)
 }
 
 fun toEntityIdentifiers(dto: LegalEntityIdentifierDto, legalEntity: LegalEntity): LegalEntityIdentifier {
@@ -372,8 +372,8 @@ fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<L
     return states.map { LegalEntityStateDto(it.description, it.validFrom, it.validTo, it.type) }
 }
 
-fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<ClassificationDto> {
-    return classification.map { ClassificationDto(it.type, it.code, it.value) }
+fun mapToLegalEntityClassificationsDto(classification: MutableSet<LegalEntityClassification>): Collection<LegalEntityClassificationDto> {
+    return classification.map { LegalEntityClassificationDto(it.type, it.code, it.value) }
 }
 
 fun mapToLegalEntityIdentifiersDto(identifiers: MutableSet<LegalEntityIdentifier>): Collection<LegalEntityIdentifierDto> {

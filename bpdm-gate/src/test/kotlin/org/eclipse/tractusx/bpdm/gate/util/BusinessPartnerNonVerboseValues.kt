@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.util
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*

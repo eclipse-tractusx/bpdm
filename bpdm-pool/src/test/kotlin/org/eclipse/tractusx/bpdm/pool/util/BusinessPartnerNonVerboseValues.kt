@@ -113,15 +113,35 @@ object BusinessPartnerNonVerboseValues {
     )
 
     private val classification1 =
-        ClassificationDto(BusinessPartnerVerboseValues.classificationType.technicalKey, BusinessPartnerVerboseValues.classification1.code, BusinessPartnerVerboseValues.classification1.value)
+        LegalEntityClassificationDto(
+            BusinessPartnerVerboseValues.classificationType.technicalKey,
+            BusinessPartnerVerboseValues.classification1.code,
+            BusinessPartnerVerboseValues.classification1.value
+        )
     private val classification2 =
-        ClassificationDto(BusinessPartnerVerboseValues.classificationType.technicalKey, BusinessPartnerVerboseValues.classification2.code, BusinessPartnerVerboseValues.classification2.value)
+        LegalEntityClassificationDto(
+            BusinessPartnerVerboseValues.classificationType.technicalKey,
+            BusinessPartnerVerboseValues.classification2.code,
+            BusinessPartnerVerboseValues.classification2.value
+        )
     private val classification3 =
-        ClassificationDto(BusinessPartnerVerboseValues.classificationType.technicalKey, BusinessPartnerVerboseValues.classification3.code, BusinessPartnerVerboseValues.classification3.value)
+        LegalEntityClassificationDto(
+            BusinessPartnerVerboseValues.classificationType.technicalKey,
+            BusinessPartnerVerboseValues.classification3.code,
+            BusinessPartnerVerboseValues.classification3.value
+        )
     private val classification4 =
-        ClassificationDto(BusinessPartnerVerboseValues.classificationType.technicalKey, BusinessPartnerVerboseValues.classification4.code, BusinessPartnerVerboseValues.classification4.value)
+        LegalEntityClassificationDto(
+            BusinessPartnerVerboseValues.classificationType.technicalKey,
+            BusinessPartnerVerboseValues.classification4.code,
+            BusinessPartnerVerboseValues.classification4.value
+        )
     private val classification5 =
-        ClassificationDto(BusinessPartnerVerboseValues.classificationType.technicalKey, BusinessPartnerVerboseValues.classification5.code, BusinessPartnerVerboseValues.classification5.value)
+        LegalEntityClassificationDto(
+            BusinessPartnerVerboseValues.classificationType.technicalKey,
+            BusinessPartnerVerboseValues.classification5.code,
+            BusinessPartnerVerboseValues.classification5.value
+        )
 
 
     private val postalAddress1 = PhysicalPostalAddressDto(

@@ -91,7 +91,7 @@ class BusinessPartnerMappings {
             externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
-            identifiers = dto.identifiers.map(::toIdentifier).toSortedSet(),
+            identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
             states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
             classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.shortName,
@@ -113,7 +113,7 @@ class BusinessPartnerMappings {
             externalId = dto.externalId,
             nameParts = dto.nameParts.toMutableList(),
             roles = dto.roles.toSortedSet(),
-            identifiers = dto.identifiers.map(::toIdentifier).toSortedSet(),
+            identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
             states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
             classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.shortName,
@@ -239,7 +239,11 @@ class BusinessPartnerMappings {
         BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
 
     private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
-        Identifier(type = dto.type.toString(), value = dto.value.toString(), issuingBody = dto.issuingBody)
+        dto.type?.let { type ->
+            dto.value?.let { value ->
+                Identifier(type = type, value = value, issuingBody = dto.issuingBody)
+            }
+        }
 
     private fun toStateDto(entity: State) =
         BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo, description = entity.description)

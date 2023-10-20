@@ -102,7 +102,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): LegalEntityDto {
         )
     }
     val classifications = legalEntity.classifications.map {
-        ClassificationDto(
+        LegalEntityClassificationDto(
             type = it.type.technicalKey,
             code = it.code,
             value = it.value

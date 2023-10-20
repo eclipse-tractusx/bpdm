@@ -90,25 +90,25 @@ object GateRequestValues {
         type = CommonValues.businessStateType2
     )
 
-    val classification1 = ClassificationDto(
+    val classification1 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode1,
         value = CommonValues.classificationValue1
     )
 
-    val classification2 = ClassificationDto(
+    val classification2 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode2,
         value = CommonValues.classificationValue2
     )
 
-    val classification3 = ClassificationDto(
+    val classification3 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode3,
         value = CommonValues.classificationValue3
     )
 
-    val classification4 = ClassificationDto(
+    val classification4 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode4,
         value = CommonValues.classificationValue4

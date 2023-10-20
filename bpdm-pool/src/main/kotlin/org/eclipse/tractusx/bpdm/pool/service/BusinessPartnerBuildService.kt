@@ -375,7 +375,7 @@ class BusinessPartnerBuildService(
 
         partner.states.addAll(request.states.map { toEntity(it, partner) })
         partner.identifiers.addAll(request.identifiers.map { toEntity(it, metadataMap, partner) })
-        partner.classifications.addAll(request.classifications.mapNotNull { toEntity(it, partner) }.toSet())
+        partner.classifications.addAll(request.classifications.map { toEntity(it, partner) }.toSet())
     }
 
     private fun updateSite(site: Site, request: SiteDto) {
@@ -506,15 +506,13 @@ class BusinessPartnerBuildService(
         )
     }
 
-    private fun toEntity(dto: ClassificationDto, partner: LegalEntity): LegalEntityClassification? {
-        return dto.type?.let {
-            LegalEntityClassification(
-                value = dto.value,
-                code = dto.code,
-                type = it,
-                legalEntity = partner
-            )
-        }
+    private fun toEntity(dto: LegalEntityClassificationDto, partner: LegalEntity): LegalEntityClassification {
+        return LegalEntityClassification(
+            value = dto.value,
+            code = dto.code,
+            type = dto.type,
+            legalEntity = partner
+        )
     }
 
     private fun toEntity(
