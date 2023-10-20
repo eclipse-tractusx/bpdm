@@ -77,7 +77,7 @@ class BpnIssuingService(
         val counterEntry = getOrCreateCounter(bpnCounterKey)
         val startCounter = counterEntry.value.toLongOrNull() ?: throw BpnInvalidCounterValueException(counterEntry.value)
 
-        val createdBpns = (0..count)
+        val createdBpns = (0 until count)
             .map {
                 createBpn(startCounter + it, bpnChar)
             }
