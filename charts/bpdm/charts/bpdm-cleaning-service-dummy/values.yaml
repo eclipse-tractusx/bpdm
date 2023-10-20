@@ -54,12 +54,6 @@ service:
 autoscaling:
   enabled: false
 
-ingress:
-  enabled: false
-  annotations: {}
-  hosts: []
-  tls: []
-
 resources:
   limits:
     cpu: 500m
