@@ -27,15 +27,11 @@ import java.time.LocalDateTime
 @Schema(description = SiteStateDescription.header)
 data class SiteStateDto(
 
-    @get:Schema(description = SiteStateDescription.description)
-    val description: String?,
+    override val description: String?,
 
-    @get:Schema(description = SiteStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
+    override val validFrom: LocalDateTime?,
 
-    @get:Schema(description = SiteStateDescription.validTo)
-    val validTo: LocalDateTime?,
+    override val validTo: LocalDateTime?,
 
-    @get:Schema(description = SiteStateDescription.type)
-    val type: BusinessStateType
-)
+    override val type: BusinessStateType
+) : IBaseSiteStateDto

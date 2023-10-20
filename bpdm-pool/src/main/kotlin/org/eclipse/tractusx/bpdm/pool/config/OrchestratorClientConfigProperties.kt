@@ -17,17 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.config
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@Schema(description = AddressIdentifierDescription.header)
-data class AddressIdentifierDto(
 
-    @get:Schema(description = AddressIdentifierDescription.value)
-    override val value: String,
-
-    @get:Schema(description = AddressIdentifierDescription.type)
-    override val type: String,
-) : IBaseAddressIdentifierDto
+@ConfigurationProperties(prefix = "bpdm.pool-orchestrator")
+data class OrchestratorClientConfigProperties(
+    val baseUrl: String = "http://localhost:8085/"
+)

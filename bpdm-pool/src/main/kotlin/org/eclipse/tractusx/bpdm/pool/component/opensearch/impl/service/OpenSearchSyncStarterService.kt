@@ -122,7 +122,7 @@ class OpenSearchSyncStarterService(
      * @return true if index mapping changed, false otherwise
      */
     private fun updateOnInit(indexDefinition: IndexDefinition): Boolean {
-        val indexAlreadyExists = openSearchClient.indices().exists { it.index(indexDefinition.indexName) }.value()
+/*        val indexAlreadyExists = openSearchClient.indices().exists { it.index(indexDefinition.indexName) }.value()
 
         return if (!indexAlreadyExists) {
             true
@@ -137,7 +137,8 @@ class OpenSearchSyncStarterService(
             deleteIndexIfExists(tempIndexName)
 
             requiredMappingMetadata != existingMappingMetadata
-        }
+        }*/
+        return true
     }
 
     private fun getIndexMappings(indexName: String): MappingMetadata {

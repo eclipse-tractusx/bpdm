@@ -142,7 +142,7 @@ class MetadataService(
         return resultList
     }
 
-    fun getMetadata(requests: Collection<LegalEntityDto>): LegalEntityMetadataDto {
+    fun getMetadata(requests: Collection<IBaseLegalEntityDto>): LegalEntityMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.LEGAL_ENTITY, idTypeKeys)
 
@@ -152,16 +152,33 @@ class MetadataService(
         return LegalEntityMetadataDto(idTypes, legalForms)
     }
 
-    fun getMetadata(requests: Collection<LogisticAddressDto>): AddressMetadataDto {
+    fun getMetadata(requests: Collection<IBaseLogisticAddressDto>): AddressMetadataDto {
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
-        val regionKeys = requests.mapNotNull { it.physicalPostalAddress.administrativeAreaLevel1 }
-            .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
+        val regionKeys = requests.mapNotNull { administrativeAreaLevel1ToString(it.physicalPostalAddress?.administrativeAreaLevel1) }
+            .plus(requests.mapNotNull { administrativeAreaLevel1ToString(it.alternativePostalAddress?.administrativeAreaLevel1) })
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
 
         return AddressMetadataDto(idTypes, regions)
+    }
+
+    private fun administrativeAreaLevel1ToString(administrativeAreaLevel1: Any?): String? {
+
+        return when (administrativeAreaLevel1) {
+            is RegionDto -> {
+                administrativeAreaLevel1.regionCode
+            }
+
+            is String -> {
+                administrativeAreaLevel1
+            }
+
+            else -> {
+                null;
+            }
+        }
     }
 
     /**

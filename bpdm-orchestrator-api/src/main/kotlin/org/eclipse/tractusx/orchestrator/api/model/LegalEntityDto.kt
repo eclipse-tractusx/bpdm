@@ -44,6 +44,6 @@ data class LegalEntityDto(
 
     override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
 
-    override val legalAddress: LogisticAddressDto? = null
+    val legalAddress: LogisticAddressDto? = null
 
 ) : IBaseLegalEntityDto
