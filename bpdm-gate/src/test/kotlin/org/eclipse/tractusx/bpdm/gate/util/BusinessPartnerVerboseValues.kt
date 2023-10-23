@@ -156,31 +156,31 @@ object BusinessPartnerVerboseValues {
         name = CountryCode.US.getName()
     )
 
-    val bpClassification1 = ClassificationDto(
+    val bpClassification1 = ClassificationBusinessPartnerDto(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2 = ClassificationDto(
+    val bpClassification2 = ClassificationBusinessPartnerDto(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3 = ClassificationDto(
+    val bpClassification3 = ClassificationBusinessPartnerDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4 = ClassificationDto(
+    val bpClassification4 = ClassificationBusinessPartnerDto(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"
     )
 
-    val bpClassificationChina = ClassificationDto(
+    val bpClassificationChina = ClassificationBusinessPartnerDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "北京市"
@@ -200,25 +200,49 @@ object BusinessPartnerVerboseValues {
         type = businessStateType2
     )
 
+    val bpClassification1Dto = ClassificationDto(
+        type = ClassificationType.NACE,
+        code = "code1",
+        value = "Sale of motor vehicles"
+    )
+
+    val bpClassification2Dto = ClassificationDto(
+        type = ClassificationType.NACE,
+        code = "code2",
+        value = "Data processing, hosting and related activities"
+    )
+
+    val bpClassification3Dto = ClassificationDto(
+        type = ClassificationType.NACE,
+        code = "code3",
+        value = "Other information service activities"
+    )
+
+    val bpClassification4Dto = ClassificationDto(
+        type = ClassificationType.NACE,
+        code = "code4",
+        value = "Financial and insurance activities"
+    )
+
     val legalEntity1 = LegalEntityDto(
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
-        classifications = listOf(bpClassification1, bpClassification2),
+        classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
     val legalEntity2 = LegalEntityDto(
         legalShortName = "short3",
         legalForm = "LF2",
         states = listOf(legalEntityBusinessStatus2),
-        classifications = listOf(bpClassification3, bpClassification4),
+        classifications = listOf(bpClassification3Dto, bpClassification4Dto),
     )
 
     val legalEntity3 = LegalEntityDto(
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
-        classifications = listOf(bpClassification1, bpClassification2),
+        classifications = listOf(bpClassification1Dto, bpClassification2Dto),
     )
 
     val leBusinessStatus1 = LegalEntityStateVerboseDto(

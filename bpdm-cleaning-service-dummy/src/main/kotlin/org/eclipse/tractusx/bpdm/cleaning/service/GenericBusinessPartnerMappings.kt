@@ -33,33 +33,38 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
         hasChanged = true,
         legalName = nameParts.joinToString(" "),
         legalShortName = shortName,
-        identifiers = identifiers.map { it.toLegalEntityIdentifierDto() },
+        identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
-        states = states.map { it.toLegalEntityState() },
+        states = states.mapNotNull { it.toLegalEntityState() },
         classifications = classifications.map { it.toBusinessPartnerClassificationDto() },
         legalAddress = legalAddress
 
     )
 }
 
-fun ClassificationDto.toBusinessPartnerClassificationDto(): BusinessPartnerClassificationDto {
+fun ClassificationDto.toBusinessPartnerClassificationDto(): ClassificationDto {
 
-    return BusinessPartnerClassificationDto(code = code, type = type, value = value)
+    return ClassificationDto(code = code, type = type, value = value)
 }
 
-fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdentifierDto {
+fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdentifierDto? {
 
-    return LegalEntityIdentifierDto(value = value, type = type, issuingBody = issuingBody)
+    return value?.let { value ->
+        type?.let { type ->
+            LegalEntityIdentifierDto(value = value, type = type, issuingBody = issuingBody)
+        }
+    }
+
 }
 
-fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityState {
+fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityState? {
 
-    return LegalEntityState(description, validFrom, validTo, type)
+    return type?.let { LegalEntityState(description, validFrom, validTo, it) }
 }
 
-fun BusinessPartnerStateDto.toSiteState(): SiteStateDto {
+fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {
 
-    return SiteStateDto(description, validFrom, validTo, type)
+    return type?.let { SiteStateDto(description, validFrom, validTo, it) }
 }
 
 fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):
@@ -82,7 +87,7 @@ fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, legalN
         bpnSReference = bpnReferenceDto,
         hasChanged = true,
         name = legalName,
-        states = states.map { it.toSiteState() },
+        states = states.mapNotNull { it.toSiteState() },
         mainAddress = siteAddressReference
 
     )

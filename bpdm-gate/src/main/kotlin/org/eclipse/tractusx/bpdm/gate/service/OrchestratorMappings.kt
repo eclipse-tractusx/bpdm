@@ -134,9 +134,9 @@ class OrchestratorMappings(
         externalId = externalId,
         nameParts = entity.nameParts.toMutableList(),
         shortName = entity.shortName,
-        identifiers = entity.identifiers.map { toIdentifier(it) }.toSortedSet(),
+        identifiers = entity.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
         legalForm = entity.legalForm,
-        states = entity.states.map { toState(it) }.toSortedSet(),
+        states = entity.states.mapNotNull { toState(it) }.toSortedSet(),
         classifications = entity.classifications.map { toClassification(it) }.toSortedSet(),
         roles = entity.roles.toSortedSet(),
         postalAddress = toPostalAddress(entity.postalAddress),
@@ -147,10 +147,14 @@ class OrchestratorMappings(
     )
 
     private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
-        Identifier(type = dto.type, value = dto.value, issuingBody = dto.issuingBody)
+        dto.type?.let { type ->
+            dto.value?.let { value ->
+                Identifier(type = type, value = value, issuingBody = dto.issuingBody)
+            }
+        }
 
     private fun toState(dto: BusinessPartnerStateDto) =
-        State(type = dto.type, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description)
+        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
 
     private fun toClassification(dto: ClassificationDto) =
         Classification(type = dto.type, code = dto.code, value = dto.value)

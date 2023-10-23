@@ -144,16 +144,16 @@ object CommonValues {
         hasChanged = true,
         legalName = nameParts.joinToString(" "),
         legalShortName = shortName,
-        identifiers = identifiers.map { it.toLegalEntityIdentifierDto() },
+        identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
-        states = states.map { it.toLegalEntityState() },
+        states = states.mapNotNull { it.toLegalEntityState() },
         classifications = classifications.map { it.toBusinessPartnerClassificationDto() }
     )
 
     val expectedSiteDto = SiteDto(
         hasChanged = true,
         name = nameParts.joinToString(" "),
-        states = states.map { it.toSiteState() },
+        states = states.mapNotNull { it.toSiteState() },
     )
 
     val expectedLogisticAddressDto = LogisticAddressDto(
