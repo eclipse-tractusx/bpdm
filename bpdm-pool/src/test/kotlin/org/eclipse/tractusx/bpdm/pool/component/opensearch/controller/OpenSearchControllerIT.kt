@@ -26,9 +26,11 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.OpenSearchSyncStarterService
+import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.service.SearchServiceImpl
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,7 +54,8 @@ class OpenSearchControllerIT @Autowired constructor(
     private val openSearchSyncService: OpenSearchSyncStarterService,
     private val objectMapper: ObjectMapper,
     private val testHelpers: TestHelpers,
-    private val poolClient: PoolClientImpl
+    private val poolClient: PoolClientImpl,
+    private val searchService: SearchServiceImpl
 ) {
 
 
@@ -176,8 +179,8 @@ class OpenSearchControllerIT @Autowired constructor(
 
     private fun searchBusinessPartnerByName(name: String): PageDto<LegalEntityMatchVerboseDto> {
 
-        return poolClient.legalEntities.getLegalEntities(
-            LegalEntityPropertiesSearchRequest(name),
+        return searchService.searchLegalEntities(
+            BusinessPartnerSearchRequest(LegalEntityPropertiesSearchRequest(name)),
             PaginationRequest()
         )
     }

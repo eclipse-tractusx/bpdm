@@ -27,7 +27,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.component.opensearch.SearchService
+import org.eclipse.tractusx.bpdm.pool.service.SearchService
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.AddressDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.component.opensearch.impl.repository.LegalEntityDocSearchRepository
 import org.eclipse.tractusx.bpdm.pool.config.OpenSearchConfigProperties
@@ -39,16 +39,15 @@ import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
 import org.eclipse.tractusx.bpdm.pool.service.*
-import org.springframework.context.annotation.Primary
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import kotlin.math.ceil
 
 /**
  * Implements search functionality by using OpenSearch
  */
 @Service
-@Primary
 class SearchServiceImpl(
     val legalEntityDocSearchRepository: LegalEntityDocSearchRepository,
     val addressDocSearchRepository: AddressDocSearchRepository,
@@ -71,6 +70,7 @@ class SearchServiceImpl(
      * adapted accordingly from the OpenSearch page information
      *
      */
+    @Transactional
     override fun searchLegalEntities(
         searchRequest: BusinessPartnerSearchRequest,
         paginationRequest: PaginationRequest
@@ -88,6 +88,7 @@ class SearchServiceImpl(
     /**
      * @see SearchServiceImpl.searchLegalEntities
      */
+    @Transactional
     override fun searchAddresses(searchRequest: AddressPartnerSearchRequest, paginationRequest: PaginationRequest): PageDto<AddressMatchVerboseDto> {
         val addressPage = searchAndPreparePage(searchRequest, paginationRequest)
 
@@ -99,6 +100,7 @@ class SearchServiceImpl(
         }
     }
 
+    @Transactional
     override fun searchSites(paginationRequest: PaginationRequest): PageDto<SiteMatchVerboseDto> {
         val sitePage = searchAndPreparePageSite(paginationRequest)
 

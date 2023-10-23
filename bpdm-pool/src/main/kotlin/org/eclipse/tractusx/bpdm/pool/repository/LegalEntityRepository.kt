@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.data.repository.query.Param
 import java.time.Instant
 
 interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>, CrudRepository<LegalEntity, Long> {
@@ -36,6 +37,9 @@ interface LegalEntityRepository : PagingAndSortingRepository<LegalEntity, Long>,
     fun findDistinctByBpnIn(bpns: Collection<String>): Set<LegalEntity>
 
     fun findByUpdatedAtAfter(updatedAt: Instant, pageable: Pageable): Page<LegalEntity>
+
+    @Query("SELECT p FROM LegalEntity p WHERE LOWER(p.legalName.value) LIKE :value ORDER BY LENGTH(p.legalName.value)")
+    fun findByLegalNameValue(value: String, pageable: Pageable): Page<LegalEntity>
 
     @Query("SELECT DISTINCT i.legalEntity FROM LegalEntityIdentifier i WHERE i.type = :type AND upper(i.value) = upper(:idValue)")
     fun findByIdentifierTypeAndValueIgnoreCase(type: IdentifierType, idValue: String): LegalEntity?
