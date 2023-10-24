@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 
@@ -68,4 +69,8 @@ interface IBasePhysicalPostalAddressDto {
 
     @get:Schema(description = PostalAddressDescription.door)
     val door: String?
+
+    fun adminLevel1Key(): String?
+
+    fun countryCode(): CountryCode?
 }

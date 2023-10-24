@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -29,6 +30,7 @@ import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.entity.*
+import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.LegalEntityRepository
 import org.eclipse.tractusx.bpdm.pool.repository.LogisticAddressRepository
 import org.eclipse.tractusx.bpdm.pool.repository.SiteRepository
@@ -62,9 +64,9 @@ class BusinessPartnerBuildService(
         logger.info { "Create ${requests.size} new legal entities" }
 
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests.associateWith { it.legalEntity }) { theRequest -> theRequest.index }
+        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests.associateWith { it.legalEntity })
         val errorsByRequestAddress =
-            requestValidationService.validateLegalEntityCreatesAddresses(requests.associateWith { it.legalAddress }) { theRequest -> theRequest.index }
+            requestValidationService.validateLegalEntityCreatesAddresses(requests.associateWith { it.legalAddress })
 
         val errors = errorsByRequest.flatMap { it.value } + errorsByRequestAddress.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) || errorsByRequestAddress.containsKey(it) }
@@ -316,78 +318,6 @@ class BusinessPartnerBuildService(
         return addressesWithIndex.map { (address, index) -> address.toCreateResponse(index) }
     }
 
-    private fun createLegalEntity(
-        request: LegalEntityDto,
-        bpnL: String,
-        legalNameValue: String,
-        metadataMap: LegalEntityMetadataMapping
-    ): LegalEntity {
-        val legalName = Name(
-            value = legalNameValue,
-            shortName = request.legalShortName
-        )
-        val legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
-
-        val partner = LegalEntity(
-            bpn = bpnL,
-            legalName = legalName,
-            legalForm = legalForm,
-            currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
-        )
-
-        updateLegalEntity(partner, request, legalNameValue, metadataMap)
-
-        return partner
-    }
-
-    private fun createSite(
-        request: SiteDto,
-        bpnS: String,
-        partner: LegalEntity
-    ): Site {
-        val site = Site(
-            bpn = bpnS,
-            name = request.name,
-            legalEntity = partner,
-        )
-
-        site.states.addAll(request.states.map { toSiteState(it, site) })
-
-        return site
-    }
-
-
-    private fun updateLegalEntity(
-        partner: LegalEntity,
-        request: LegalEntityDto,
-        legalName: String,
-        metadataMap: LegalEntityMetadataMapping
-    ) {
-
-        partner.currentness = createCurrentnessTimestamp()
-
-        partner.legalName = Name(
-            value = legalName,
-            shortName = request.legalShortName
-        )
-
-        partner.legalForm = request.legalForm?.let { metadataMap.legalForms[it]!! }
-
-        partner.identifiers.clear()
-        partner.states.clear()
-        partner.classifications.clear()
-
-        partner.states.addAll(request.states.map { toLegalEntityState(it, partner) })
-        partner.identifiers.addAll(request.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, partner) })
-        partner.classifications.addAll(request.classifications.map { toLegalEntityClassification(it, partner) }.toSet())
-    }
-
-    private fun updateSite(site: Site, request: SiteDto) {
-        site.name = request.name
-
-        site.states.clear()
-        site.states.addAll(request.states.map { toSiteState(it, site) })
-    }
 
     private fun createLogisticAddress(
         dto: LogisticAddressDto,
@@ -439,43 +369,6 @@ class BusinessPartnerBuildService(
         }
     }
 
-    private fun createPhysicalAddress(physicalAddress: PhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
-        return PhysicalPostalAddress(
-            geographicCoordinates = physicalAddress.geographicCoordinates?.let { toEntity(it) },
-            country = physicalAddress.country,
-            administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
-            administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
-            administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
-            postCode = physicalAddress.postalCode,
-            city = physicalAddress.city,
-            districtLevel1 = physicalAddress.district,
-            street = physicalAddress.street?.let { createStreet(it) },
-            companyPostCode = physicalAddress.companyPostalCode,
-            industrialZone = physicalAddress.industrialZone,
-            building = physicalAddress.building,
-            floor = physicalAddress.floor,
-            door = physicalAddress.door
-        )
-    }
-
-    private fun createAlternativeAddress(alternativeAddress: AlternativePostalAddressDto, regions: Map<String, Region>): AlternativePostalAddress {
-        return AlternativePostalAddress(
-            geographicCoordinates = alternativeAddress.geographicCoordinates?.let { toEntity(it) },
-            country = alternativeAddress.country,
-            administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
-            postCode = alternativeAddress.postalCode,
-            city = alternativeAddress.city,
-            deliveryServiceType = alternativeAddress.deliveryServiceType,
-            deliveryServiceNumber = alternativeAddress.deliveryServiceNumber,
-            deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier
-        )
-    }
-
-    fun toEntity(dto: GeoCoordinateDto): GeographicCoordinate {
-        return GeographicCoordinate(dto.latitude, dto.longitude, dto.altitude)
-    }
-
-
     private fun LegalEntityMetadataDto.toMapping() =
         LegalEntityMetadataMapping(
             idTypes = idTypes.associateBy { it.technicalKey },
@@ -503,15 +396,6 @@ class BusinessPartnerBuildService(
 
         fun createCurrentnessTimestamp(): Instant {
             return Instant.now().truncatedTo(ChronoUnit.MICROS)
-        }
-
-        fun createStreet(dto: IBaseStreetDto): Street {
-            return Street(
-                name = dto.name,
-                houseNumber = dto.houseNumber,
-                milestone = dto.milestone,
-                direction = dto.direction
-            )
         }
 
         fun toLegalEntityState(dto: IBaseLegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
@@ -544,11 +428,14 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toLegalEntityClassification(dto: ClassificationDto, partner: LegalEntity): LegalEntityClassification {
+        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntity): LegalEntityClassification {
+
+            val dtoType = dto.type ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.CLASSIFICATION_TYPE_IS_NULL.message)
+
             return LegalEntityClassification(
                 value = dto.value,
                 code = dto.code,
-                type = dto.type,
+                type = dtoType,
                 legalEntity = partner
             )
         }
@@ -578,6 +465,132 @@ class BusinessPartnerBuildService(
             )
         }
 
+        fun updateSite(site: Site, siteDto: IBaseSiteDto) {
+
+            val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
+
+            site.name = name
+
+            site.states.clear()
+            site.states.addAll(siteDto.states
+                .map { toSiteState(it, site) })
+        }
+
+        fun createSite(
+            siteDto: IBaseSiteDto,
+            bpnS: String,
+            partner: LegalEntity
+        ): Site {
+
+            val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
+
+            val site = Site( bpn = bpnS, name = name,  legalEntity = partner)
+
+            site.states.addAll(siteDto.states
+                .map { toSiteState(it, site) })
+
+            return site
+        }
+
+        fun createLegalEntity(
+            legalEntityDto: IBaseLegalEntityDto,
+            bpnL: String,
+            legalNameValue: String?,
+            metadataMap: BusinessPartnerBuildService.LegalEntityMetadataMapping
+        ): LegalEntity {
+
+            if (legalNameValue == null) {
+                throw BpdmValidationException(TaskStepBuildService.CleaningError.LEGAL_NAME_IS_NULL.message)
+            }
+
+            // it has to be validated that the legalForm exits
+            val legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
+            val legalName = Name(value = legalNameValue, shortName = legalEntityDto.legalShortName)
+            val newLegalEntity = LegalEntity(
+                bpn = bpnL,
+                legalName = legalName,
+                legalForm = legalForm,
+                currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
+            )
+            BusinessPartnerBuildService.updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
+
+            return newLegalEntity
+        }
+        fun updateLegalEntity(
+            legalEntity: LegalEntity,
+            legalEntityDto: IBaseLegalEntityDto,
+            legalName: String?,
+            metadataMap: LegalEntityMetadataMapping
+        ) {
+            if(legalName == null) {
+                throw BpdmValidationException(TaskStepBuildService.CleaningError.LEGAL_NAME_IS_NULL.message)
+            }
+
+            legalEntity.currentness = createCurrentnessTimestamp()
+
+            legalEntity.legalName = Name(value = legalName, shortName = legalEntityDto.legalShortName)
+
+            legalEntity.legalForm = legalEntityDto.legalForm?.let { metadataMap.legalForms[it]!! }
+
+            legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
+            legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
+            legalEntity.classifications.replace( legalEntityDto.classifications.map { toLegalEntityClassification(it, legalEntity) }.toSet()
+            )
+        }
+
+        fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
+
+            if (physicalAddress.countryCode() == null || physicalAddress.city == null) {
+                throw BpdmValidationException(TaskStepBuildService.CleaningError.COUNTRY_CITY_IS_NULL.message)
+            }
+
+            return PhysicalPostalAddress(
+                geographicCoordinates = physicalAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
+                country = physicalAddress.countryCode()!!,
+                administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
+                administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
+                administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
+                postCode = physicalAddress.postalCode,
+                city = physicalAddress.city!!,
+                districtLevel1 = physicalAddress.district,
+                street = physicalAddress.street?.let {
+                    Street(
+                        name = it.name,
+                        houseNumber = it.houseNumber,
+                        milestone = it.milestone,
+                        direction = it.direction
+                    )
+                },
+                companyPostCode = physicalAddress.companyPostalCode,
+                industrialZone = physicalAddress.industrialZone,
+                building = physicalAddress.building,
+                floor = physicalAddress.floor,
+                door = physicalAddress.door
+            )
+        }
+
+        fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, Region>): AlternativePostalAddress {
+
+            if (alternativeAddress.countryCode() == null || alternativeAddress.city == null ||
+                alternativeAddress.deliveryServiceType == null || alternativeAddress.deliveryServiceNumber == null
+            ) {
+
+                throw BpdmValidationException(TaskStepBuildService.CleaningError.ALTERNATIVE_ADDRESS_DATA_IS_NULL.message)
+            }
+
+            return AlternativePostalAddress(
+                geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
+                country = alternativeAddress.countryCode()!!,
+                administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
+                postCode = alternativeAddress.postalCode,
+                city = alternativeAddress.city!!,
+                deliveryServiceType = alternativeAddress.deliveryServiceType!!,
+                deliveryServiceNumber = alternativeAddress.deliveryServiceNumber!!,
+                deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier
+            )
+        }
     }
+
+
 
 }

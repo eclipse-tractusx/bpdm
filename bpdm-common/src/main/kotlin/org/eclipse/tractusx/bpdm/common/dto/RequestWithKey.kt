@@ -19,16 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+interface RequestWithKey {
 
-@Schema(description = SiteDescription.header)
-data class SiteDto(
-
-    override val name: String,
-
-    override val states: Collection<SiteStateDto> = emptyList(),
-
-    override val mainAddress: LogisticAddressDto
-) : IBaseSiteDto
+    fun getRequestKey(): String?
+}

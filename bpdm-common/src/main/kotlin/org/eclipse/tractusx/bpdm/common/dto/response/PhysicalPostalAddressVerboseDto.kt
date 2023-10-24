@@ -63,4 +63,12 @@ data class PhysicalPostalAddressVerboseDto(
 
     override val door: String?
 
-) : IBasePhysicalPostalAddressDto
+) : IBasePhysicalPostalAddressDto {
+    override fun adminLevel1Key(): String? {
+        return administrativeAreaLevel1?.regionCode
+    }
+
+    override fun countryCode(): CountryCode {
+        return country.technicalKey
+    }
+}

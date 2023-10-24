@@ -26,6 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 @Schema(description = SiteDescription.header)
 interface IBaseSiteDto {
 
+    @get:Schema(description = SiteDescription.name)
+    val name: String?
+
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.states))
     val states: Collection<IBaseSiteStateDto>
 
