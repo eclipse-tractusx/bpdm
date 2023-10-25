@@ -138,7 +138,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         val upsertSharingStatesRequests = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId1,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
@@ -148,7 +148,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId2,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
@@ -158,7 +158,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 taskId = "1"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
@@ -169,7 +169,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             )
         )
 
-        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.ADDRESS, externalIds)
+        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
 
 
         testHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(upsertSharingStatesRequests)
@@ -501,7 +501,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         val createdSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
@@ -511,7 +511,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Pending,
                 sharingErrorCode = null,
@@ -524,25 +524,28 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
         //Firstly verifies if the Sharing States was created for new Business Partners
         val externalIds = listOf(externalId4, externalId5)
-        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.ADDRESS, externalIds)
-        testHelpers.assertRecursively(upsertSharingStateResponses).isEqualTo(createdSharingState)
+        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        testHelpers
+            .assertRecursively(upsertSharingStateResponses)
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
         businessPartnerService.finishCleaningTask()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId4,
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = null,
+                bpn = BusinessPartnerGenericMockValues.businessPartner1.bpnA,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
             SharingStateDto(
-                businessPartnerType = BusinessPartnerType.ADDRESS,
+                businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId5,
                 sharingStateType = SharingStateType.Error,
                 sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
@@ -554,8 +557,10 @@ class BusinessPartnerControllerIT @Autowired constructor(
         )
 
         //Check for both Sharing State changes (Error and Success)
-        val readCleanedSharingState = readSharingStates(BusinessPartnerType.ADDRESS, externalIds)
-        testHelpers.assertRecursively(readCleanedSharingState).isEqualTo(cleanedSharingState)
+        val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        testHelpers.assertRecursively(readCleanedSharingState)
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(cleanedSharingState)
 
         //Assert that Cleaned Golden Record is persisted in the Output correctly
         val searchResponsePage = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId4))

@@ -24,7 +24,6 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
-import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
@@ -75,10 +74,12 @@ class AddressPersistenceService(
                 }
                 ?: run {
                     gateAddressRepository.save(fullAddress)
-                    sharingStateService.upsertSharingState(address.toSharingStateDTO())
                     saveChangelog(address.externalId, ChangelogType.CREATE, dataType)
                 }
         }
+
+        val initRequests = addresses.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.ADDRESS ) }
+        sharingStateService.setInitial(initRequests)
     }
 
     private fun updateAddress(address: LogisticAddress, changeAddress: AddressGateInputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {
@@ -127,8 +128,15 @@ class AddressPersistenceService(
                         saveChangelog(address.externalId, ChangelogType.CREATE, dataType)
                     }
                 }
-            sharingStateService.upsertSharingState(address.toSharingStateDTO(SharingStateType.Success))
         }
+
+        val successRequests = addresses.map {
+            SharingStateService.SuccessRequest(
+                SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.ADDRESS),
+                it.bpn
+            )
+        }
+        sharingStateService.setSuccess(successRequests)
     }
 
     private fun updateAddressOutput(address: LogisticAddress, changeAddress: AddressGateOutputRequest, legalEntityRecord: LegalEntity?, siteRecord: Site?) {

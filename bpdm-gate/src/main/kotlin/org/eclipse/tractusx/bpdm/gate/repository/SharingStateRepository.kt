@@ -51,8 +51,9 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
             }
     }
 
-    fun findByExternalIdAndBusinessPartnerType(externalId: String, businessPartnerType: BusinessPartnerType): SharingState?
+    fun findByExternalIdInAndBusinessPartnerType(externalId: Collection<String>, businessPartnerType: BusinessPartnerType): Collection<SharingState>
 
     fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingState>
 
+    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType): Set<SharingState>
 }
