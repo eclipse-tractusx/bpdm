@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
@@ -42,7 +43,7 @@ data class LegalEntityDto(
 
     override val states: Collection<LegalEntityState> = emptyList(),
 
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
+    override val classifications: Collection<ClassificationDto> = emptyList(),
 
     val legalAddress: LogisticAddressDto? = null
 

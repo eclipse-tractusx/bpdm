@@ -34,7 +34,7 @@ data class BusinessPartnerStateDto(
     val validTo: LocalDateTime?,
 
     @get:Schema(description = "The type of this specified status.")
-    val type: BusinessStateType,
+    val type: BusinessStateType?,
 
     @get:Schema(description = "Denotation of the status.")
     val description: String?

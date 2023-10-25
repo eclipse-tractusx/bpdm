@@ -24,13 +24,14 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDes
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(description = ClassificationDescription.header)
-interface IBaseClassificationDto {
+data class ClassificationBusinessPartnerDto(
+
     @get:Schema(description = ClassificationDescription.type)
-    val type: ClassificationType?
+    override val type: ClassificationType?,
 
     @get:Schema(description = ClassificationDescription.code)
-    val code: String?
+    override val code: String?,
 
     @get:Schema(description = ClassificationDescription.value)
-    val value: String?
-}
+    override val value: String?
+) : IBaseClassificationDto

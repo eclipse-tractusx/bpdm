@@ -367,12 +367,12 @@ object BusinessPartnerTestValues {
             ),
         ),
         classifications = listOf(
-            BusinessPartnerClassificationDto(
+            ClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 1",
                 value = "Classification Value 1"
             ),
-            BusinessPartnerClassificationDto(
+            ClassificationDto(
                 type = ClassificationType.NACE,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
@@ -406,7 +406,7 @@ object BusinessPartnerTestValues {
             )
         ),
         classifications = listOf(
-            BusinessPartnerClassificationDto(
+            ClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 2",
                 value = "Classification Value 2"

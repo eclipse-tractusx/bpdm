@@ -24,10 +24,7 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
@@ -329,7 +326,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             identifiers = request.identifiers.toSortedSet(identifierDtoComparator),
             legalForm = request.legalForm,
             states = request.states.toSortedSet(stateDtoComparator),
-            classifications = request.classifications.toSortedSet(classificationDtoComparator),
+            classifications = request.classifications.toSortedSet(classificationDtoOutputComparator),
             roles = request.roles.toSortedSet(),
             postalAddress = request.postalAddress,
             isOwnCompanyData = request.isOwnCompanyData,
@@ -360,7 +357,14 @@ class BusinessPartnerControllerIT @Autowired constructor(
         .thenBy(nullsLast(), BusinessPartnerStateDto::validTo)        // here null means MAX
         .thenBy(BusinessPartnerStateDto::type)
         .thenBy(BusinessPartnerStateDto::description)
+
     val classificationDtoComparator = compareBy(
+        ClassificationBusinessPartnerDto::type,
+        ClassificationBusinessPartnerDto::code,
+        ClassificationBusinessPartnerDto::value
+    )
+
+    val classificationDtoOutputComparator = compareBy(
         ClassificationDto::type,
         ClassificationDto::code,
         ClassificationDto::value

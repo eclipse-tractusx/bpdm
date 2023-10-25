@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationBusinessPartnerDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
 
@@ -38,7 +38,7 @@ data class BusinessPartnerInputRequest(
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val classifications: Collection<ClassificationBusinessPartnerDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
     override val isOwnCompanyData: Boolean = false,
@@ -46,4 +46,4 @@ data class BusinessPartnerInputRequest(
     override val bpnS: String? = null,
     override val bpnA: String? = null,
 
-) : IBaseBusinessPartnerGateDto
+    ) : IBaseBusinessPartnerGateDto

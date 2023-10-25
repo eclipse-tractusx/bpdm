@@ -40,7 +40,7 @@ interface IBaseBusinessPartnerDto {
     val states: Collection<BusinessPartnerStateDto>
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
-    val classifications: Collection<ClassificationDto>
+    val classifications: Collection<IBaseClassificationDto>
 
     @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>

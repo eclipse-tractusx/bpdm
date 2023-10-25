@@ -544,7 +544,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toLegalEntityClassification(dto: IBaseClassificationDto, partner: LegalEntity): LegalEntityClassification {
+        fun toLegalEntityClassification(dto: ClassificationDto, partner: LegalEntity): LegalEntityClassification {
             return LegalEntityClassification(
                 value = dto.value,
                 code = dto.code,
