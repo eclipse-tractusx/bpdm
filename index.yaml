@@ -3,6 +3,58 @@ entries:
   bpdm:
   - apiVersion: v2
     appVersion: 4.1.0-alpha.3
+    created: "2023-10-25T07:41:04.324239581Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 4.1.0-alpha.2
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 5.1.0-alpha.2
+    - alias: bpdm-bridge-dummy
+      condition: bpdm-bridge-dummy.enabled
+      name: bpdm-bridge-dummy
+      repository: ""
+      version: 1.1.0-alpha.2
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 1.0.0-alpha.3
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 1.0.0-alpha.2
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.12.2
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.13
+    description: A Helm chart for Kubernetes that deploys the gate and pool applications
+    digest: f9a58b180b738a76529eb2a3eacae9f5c0bc9f62e854c145007a8639e4ef2973
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Fabio D. Mota
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-3.1.0-alpha.6/bpdm-3.1.0-alpha.6.tgz
+    version: 3.1.0-alpha.6
+  - apiVersion: v2
+    appVersion: 4.1.0-alpha.3
     created: "2023-10-20T14:36:23.899777788Z"
     dependencies:
     - alias: bpdm-gate
@@ -1612,4 +1664,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-10-20T14:36:23.900031188Z"
+generated: "2023-10-25T07:41:04.324795485Z"
