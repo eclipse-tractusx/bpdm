@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate
+package org.eclipse.tractusx.bpdm.gate.util
 
 fun <T> List<T>.containsDuplicates(): Boolean = size != distinct().size
 

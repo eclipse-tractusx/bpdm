@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.AddressService
+import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
