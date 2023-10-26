@@ -45,7 +45,7 @@ bpdm:
             base-url: http://localhost:8085
             security-enabled: false
         pool:
-            base-url: http://localhost:8080/api/catena
+            base-url: http://localhost:8080
             security-enabled: false
 
     # No security on default

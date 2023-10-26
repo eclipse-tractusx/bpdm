@@ -92,14 +92,14 @@ abstract class BaseSyncRecordService<SYNC_TYPE : Enum<*>, SYNC_RECORD : BaseSync
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    open fun setSynchronizationSuccess(type: SYNC_TYPE): SYNC_RECORD {
+    open fun setSynchronizationSuccess(type: SYNC_TYPE, finishedAt: Instant? = null): SYNC_RECORD {
         val record = getOrCreateRecord(type)
         if (record.status != SyncStatus.RUNNING)
             throw BpdmSyncStateException("Synchronization of type ${record.type} can't switch from state ${record.status} to ${SyncStatus.SUCCESS}.")
 
         logger.debug { "Set sync of type ${record.type} to status ${SyncStatus.SUCCESS}" }
 
-        record.finishedAt = Instant.now().truncatedTo(ChronoUnit.MICROS)
+        record.finishedAt = finishedAt ?: Instant.now().truncatedTo(ChronoUnit.MICROS)
         record.progress = 1f
         record.status = SyncStatus.SUCCESS
         record.errorDetails = null

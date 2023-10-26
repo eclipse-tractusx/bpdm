@@ -17,15 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.gate.repository
 
-import org.springframework.boot.context.properties.ConfigurationProperties
+import org.eclipse.tractusx.bpdm.gate.entity.SyncRecord
+import org.eclipse.tractusx.bpdm.gate.entity.SyncType
+import org.springframework.data.repository.CrudRepository
 
+interface SyncRecordRepository : CrudRepository<SyncRecord, Long> {
 
-@ConfigurationProperties(prefix = "bpdm.client.pool")
-data class PoolConfigProperties(
-    val baseUrl: String = "http://localhost:8080",
-    val searchChangelogPageSize: Int = 100,
-    val securityEnabled: Boolean = false,
-    val oauth2ClientRegistration: String?
-)
+    fun findByType(type: SyncType): SyncRecord?
+}
