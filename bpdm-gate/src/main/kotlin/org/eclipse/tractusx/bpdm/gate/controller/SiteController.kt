@@ -27,8 +27,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
 import org.eclipse.tractusx.bpdm.gate.config.ApiConfigProperties
-import org.eclipse.tractusx.bpdm.gate.containsDuplicates
 import org.eclipse.tractusx.bpdm.gate.service.SiteService
+import org.eclipse.tractusx.bpdm.gate.util.containsDuplicates
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
