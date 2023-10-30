@@ -33,6 +33,9 @@ interface IBaseBusinessPartnerDto {
     @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates removed by the service."))
     val identifiers: Collection<BusinessPartnerIdentifierDto>
 
+    @get:Schema(description = "") //TODO Add Description
+    val legalName: String?
+
     @get:Schema(description = "Technical key of the legal form.")
     val legalForm: String?
 

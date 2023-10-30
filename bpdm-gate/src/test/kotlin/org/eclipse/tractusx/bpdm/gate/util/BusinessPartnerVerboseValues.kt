@@ -363,6 +363,7 @@ object BusinessPartnerVerboseValues {
         externalId = BusinessPartnerVerboseValues.externalId1,
         nameParts = listOf("Business Partner Name", "Company ABC AG", "Another Organisation Corp", "Catena Test Name"),
         shortName = "short1",
+        legalName = "Limited Liability Company Name",
         legalForm = "Limited Liability Company",
         isOwnCompanyData = true,
         identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
@@ -756,6 +757,7 @@ object BusinessPartnerVerboseValues {
         externalId = externalId3,
         nameParts = listOf("好公司  合伙制企业"),
         shortName = "short3",
+        legalName = "姓名测试",
         legalForm = "股份有限",
         isOwnCompanyData = true,
         identifiers = listOf(
@@ -776,6 +778,7 @@ object BusinessPartnerVerboseValues {
         externalId = externalId4,
         nameParts = listOf("Name Part Value"),
         shortName = "Random Short Name",
+        legalName = "Random Name Value",
         legalForm = "Random Form Value",
         isOwnCompanyData = true,
         identifiers = listOf(
@@ -796,6 +799,7 @@ object BusinessPartnerVerboseValues {
         externalId = externalId5,
         nameParts = listOf("Name Part Value"),
         shortName = "Random Short Name",
+        legalName = "Random Name Value",
         legalForm = "Random Form Value",
         isOwnCompanyData = true,
         identifiers = listOf(
@@ -816,6 +820,7 @@ object BusinessPartnerVerboseValues {
         externalId = externalId4,
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
         shortName = "shot-name-cleaned",
+        legalName = "legal-name-cleaned",
         legalForm = "legal-form-cleaned",
         identifiers = listOf(
             BusinessPartnerIdentifierDto(

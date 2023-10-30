@@ -59,6 +59,7 @@ object BusinessPartnerTestValues {
                 issuingBody = "issuingBody-2"
             ),
         ),
+        legalName = "legal-name",
         legalForm = "legal-form",
         states = listOf(
             BusinessPartnerStateDto(
@@ -146,6 +147,7 @@ object BusinessPartnerTestValues {
                 issuingBody = "issuingBody-2"
             )
         ),
+        legalName = "legal-name-2",
         legalForm = "legal-form-2",
         states = listOf(
             BusinessPartnerStateDto(

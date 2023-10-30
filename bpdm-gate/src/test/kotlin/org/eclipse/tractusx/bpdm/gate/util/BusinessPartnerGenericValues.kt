@@ -48,6 +48,7 @@ object BusinessPartnerGenericMockValues {
                 issuingBody = "issuingBody-2-cleaned"
             ),
         ),
+        legalName = "legal-name-cleaned",
         legalForm = "legal-form-cleaned",
         states = listOf(
             BusinessPartnerStateDto(
