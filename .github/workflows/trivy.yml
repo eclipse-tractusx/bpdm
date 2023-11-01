@@ -59,7 +59,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-pool:latest"
+          image-ref: "docker.io/tractusx/bpdm-pool:latest-alpha"
           format: "sarif"
           output: "trivy-results2.sarif"
           exit-code: "1"
@@ -92,7 +92,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-gate:latest"
+          image-ref: "docker.io/tractusx/bpdm-gate:latest-alpha"
           format: "sarif"
           output: "trivy-results3.sarif"
           exit-code: "1"
@@ -125,7 +125,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-bridge-dummy:latest"
+          image-ref: "docker.io/tractusx/bpdm-bridge-dummy:latest-alpha"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "1"
@@ -158,7 +158,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-cleaning-service-dummy:latest"
+          image-ref: "docker.io/tractusx/bpdm-cleaning-service-dummy:latest-alpha"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "1"
@@ -191,7 +191,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           # Path to Docker image
-          image-ref: "docker.io/tractusx/bpdm-orchestrator:latest"
+          image-ref: "docker.io/tractusx/bpdm-orchestrator:latest-alpha"
           format: "sarif"
           output: "trivy-results4.sarif"
           exit-code: "1"
