@@ -76,7 +76,15 @@ class OpenApiConfig(
                         )
                     )
                 )
+                .addSecuritySchemes(
+                    "bearer_scheme",
+                    SecurityScheme().type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                )
         )
             .addSecurityItem(SecurityRequirement().addList("open_id_scheme", emptyList()))
+            .addSecurityItem(SecurityRequirement().addList("bearer_scheme", emptyList()))
     }
+
 }
