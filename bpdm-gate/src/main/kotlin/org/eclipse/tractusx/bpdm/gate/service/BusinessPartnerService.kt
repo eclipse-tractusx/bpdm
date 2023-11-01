@@ -185,6 +185,7 @@ class BusinessPartnerService(
         return toPartner.apply {
             stage = fromPartner.stage
             shortName = fromPartner.shortName
+            legalName = fromPartner.legalName
             legalForm = fromPartner.legalForm
             isOwnCompanyData = fromPartner.isOwnCompanyData
             bpnL = fromPartner.bpnL

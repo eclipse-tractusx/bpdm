@@ -36,6 +36,7 @@ data class BusinessPartnerInputRequest(
     override val nameParts: List<String> = emptyList(),
     override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
+    override val legalName: String? = null,
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val classifications: Collection<ClassificationBusinessPartnerDto> = emptyList(),
