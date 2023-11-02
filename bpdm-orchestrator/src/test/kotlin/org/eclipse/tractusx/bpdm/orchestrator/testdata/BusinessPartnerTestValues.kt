@@ -131,9 +131,9 @@ object BusinessPartnerTestValues {
             )
         ),
         ownerBpnL = "BPNL_OWNER_TEST_1",
-        bpnL = "BPNLTEST",
-        bpnS = "BPNSTEST",
-        bpnA = "BPNATEST"
+        legalEntityBpn = "BPNLTEST",
+        siteBpn = "BPNSTEST",
+        addressBpn = "BPNATEST"
     )
 
     //Business Partner with single entry in every collection
@@ -207,9 +207,9 @@ object BusinessPartnerTestValues {
             )
         ),
         ownerBpnL = "BPNL_OWNER_TEST_2",
-        bpnL = "BPNLTEST-2",
-        bpnS = "BPNSTEST-2",
-        bpnA = "BPNATEST-2"
+        legalEntityBpn = "BPNLTEST-2",
+        siteBpn = "BPNSTEST-2",
+        addressBpn = "BPNATEST-2"
     )
 
     val logisticAddress1 = LogisticAddressDto(

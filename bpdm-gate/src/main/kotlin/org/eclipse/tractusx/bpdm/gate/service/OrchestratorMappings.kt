@@ -50,9 +50,9 @@ class OrchestratorMappings(
         classifications = entity.classifications.map { toClassificationDto(it) },
         roles = entity.roles,
         postalAddress = toPostalAddressDto(entity.postalAddress),
-        bpnL = entity.bpnL,
-        bpnS = entity.bpnS,
-        bpnA = entity.bpnA,
+        legalEntityBpn = entity.bpnL,
+        siteBpn = entity.bpnS,
+        addressBpn = entity.bpnA,
         ownerBpnL = getOwnerBpnL(entity)
     )
 
@@ -142,9 +142,9 @@ class OrchestratorMappings(
         classifications = entity.classifications.map { toClassification(it) }.toSortedSet(),
         roles = entity.roles.toSortedSet(),
         postalAddress = toPostalAddress(entity.postalAddress),
-        bpnL = entity.bpnL,
-        bpnS = entity.bpnS,
-        bpnA = entity.bpnA,
+        bpnL = entity.legalEntityBpn,
+        bpnS = entity.siteBpn,
+        bpnA = entity.addressBpn,
         stage = StageType.Output
     )
 

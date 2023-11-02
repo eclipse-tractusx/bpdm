@@ -121,20 +121,20 @@ class CleaningServiceDummy(
 
         val legalAddress = addressPartner.copy(bpnAReference = legalAddressBpnReference)
 
-        val bpnReferenceDto = createBpnReference(genericPartner.bpnL)
+        val bpnReferenceDto = createBpnReference(genericPartner.legalEntityBpn)
 
         return genericPartner.toLegalEntityDto(bpnReferenceDto, legalAddress)
 
     }
 
     fun createAddressRepresentation(genericPartner: BusinessPartnerGenericDto): LogisticAddressDto {
-        val bpnReferenceDto = createBpnReference(genericPartner.bpnA)
+        val bpnReferenceDto = createBpnReference(genericPartner.addressBpn)
         return genericPartner.toLogisticAddressDto(bpnReferenceDto)
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
         val legalName = genericPartner.nameParts.joinToString(" ")
-        val bpnReferenceDto = createBpnReference(genericPartner.bpnS)
+        val bpnReferenceDto = createBpnReference(genericPartner.siteBpn)
         return genericPartner.toSiteDto(bpnReferenceDto, legalName, siteAddressReference)
     }
 
@@ -152,7 +152,7 @@ class CleaningServiceDummy(
     fun shouldCreateSite(genericPartner: BusinessPartnerGenericDto): Boolean {
         return genericPartner.postalAddress.addressType == AddressType.SiteMainAddress ||
                 genericPartner.postalAddress.addressType == AddressType.LegalAndSiteMainAddress ||
-                genericPartner.bpnS != null
+                genericPartner.siteBpn != null
     }
 
 

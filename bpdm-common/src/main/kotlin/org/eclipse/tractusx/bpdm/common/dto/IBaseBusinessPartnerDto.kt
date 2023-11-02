@@ -51,13 +51,13 @@ interface IBaseBusinessPartnerDto {
     @get:Schema(description = "Address of the official seat of this business partner.")
     val postalAddress: IBaseBusinessPartnerPostalAddressDto
 
-    @get:Schema(description = "BPNL")
-    val bpnL: String?
+    @get:Schema(description = "BPNL of the golden record legal entity this business partner refers to")
+    val legalEntityBpn: String?
 
-    @get:Schema(description = "BPNS")
-    val bpnS: String?
+    @get:Schema(description = "BPNS of the golden record site this business partner refers to")
+    val siteBpn: String?
 
-    @get:Schema(description = "BPNA")
-    val bpnA: String?
+    @get:Schema(description = "BPNA of the golden record address this business partner refers to")
+    val addressBpn: String?
 
 }

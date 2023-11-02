@@ -53,9 +53,9 @@ class BusinessPartnerMappings {
             roles = entity.roles,
             postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwnCompanyData = entity.isOwnCompanyData,
-            bpnL = entity.bpnL,
-            bpnS = entity.bpnS,
-            bpnA = entity.bpnA,
+            legalEntityBpn = entity.bpnL,
+            siteBpn = entity.bpnS,
+            addressBpn = entity.bpnA,
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -74,10 +74,10 @@ class BusinessPartnerMappings {
             roles = entity.roles,
             postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwnCompanyData = entity.isOwnCompanyData,
-            bpnL = entity.bpnL
+            legalEntityBpn = entity.bpnL
                 ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnL, entity.externalId),
-            bpnS = entity.bpnS,
-            bpnA = entity.bpnA
+            siteBpn = entity.bpnS,
+            addressBpn = entity.bpnA
                 ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnA, entity.externalId),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
@@ -97,9 +97,9 @@ class BusinessPartnerMappings {
             legalName = dto.legalName,
             legalForm = dto.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.bpnL,
-            bpnS = dto.bpnS,
-            bpnA = dto.bpnA,
+            bpnL = dto.legalEntityBpn,
+            bpnS = dto.siteBpn,
+            bpnA = dto.addressBpn,
             postalAddress = toPostalAddress(dto.postalAddress),
             parentId = null,
             parentType = null,
@@ -120,9 +120,9 @@ class BusinessPartnerMappings {
             legalName = dto.legalName,
             legalForm = dto.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.bpnL,
-            bpnS = dto.bpnS,
-            bpnA = dto.bpnA,
+            bpnL = dto.legalEntityBpn,
+            bpnS = dto.siteBpn,
+            bpnA = dto.addressBpn,
             parentId = null,
             parentType = null,
             postalAddress = toPostalAddress(dto.postalAddress)

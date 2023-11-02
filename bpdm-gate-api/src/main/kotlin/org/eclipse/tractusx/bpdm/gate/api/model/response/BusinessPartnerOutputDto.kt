@@ -45,9 +45,9 @@ data class BusinessPartnerOutputDto(
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: BusinessPartnerPostalAddressDto,
     override val isOwnCompanyData: Boolean,
-    override val bpnL: String,
-    override val bpnS: String?,
-    override val bpnA: String,
+    override val legalEntityBpn: String,
+    override val siteBpn: String?,
+    override val addressBpn: String,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,

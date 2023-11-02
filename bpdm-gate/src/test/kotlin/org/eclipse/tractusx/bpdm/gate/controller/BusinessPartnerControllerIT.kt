@@ -310,9 +310,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
             roles = request.roles.toSortedSet(),
             postalAddress = request.postalAddress,
             isOwnCompanyData = request.isOwnCompanyData,
-            bpnL = request.bpnL,
-            bpnS = request.bpnS,
-            bpnA = request.bpnA,
+            legalEntityBpn = request.legalEntityBpn,
+            siteBpn = request.siteBpn,
+            addressBpn = request.addressBpn,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -332,14 +332,14 @@ class BusinessPartnerControllerIT @Autowired constructor(
             roles = request.roles.toSortedSet(),
             postalAddress = request.postalAddress,
             isOwnCompanyData = request.isOwnCompanyData,
-            bpnL = request.bpnL ?: throw BpdmNullMappingException(
+            legalEntityBpn = request.legalEntityBpn ?: throw BpdmNullMappingException(
                 BusinessPartner::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartner::bpnL,
                 request.externalId
             ),
-            bpnS = request.bpnS,
-            bpnA = request.bpnA ?: throw BpdmNullMappingException(
+            siteBpn = request.siteBpn,
+            addressBpn = request.addressBpn ?: throw BpdmNullMappingException(
                 BusinessPartner::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartner::bpnA,
@@ -546,7 +546,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericMockValues.businessPartner1.bpnA,
+                bpn = BusinessPartnerGenericMockValues.businessPartner1.addressBpn,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),

@@ -33,9 +33,9 @@ data class BusinessPartnerGenericDto(
     override val classifications: Collection<ClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: PostalAddressDto = PostalAddressDto(),
-    override val bpnL: String? = null,
-    override val bpnS: String? = null,
-    override val bpnA: String? = null,
+    override val legalEntityBpn: String? = null,
+    override val siteBpn: String? = null,
+    override val addressBpn: String? = null,
 
     @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
     val ownerBpnL: String? = null,
