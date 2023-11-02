@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test
 
 class DataClassUnwrappedJsonDeserializerTest {
 
-    val objectMapper = buildObjectMapper()
+    private val objectMapper: ObjectMapper = buildObjectMapper()
 
     @Test
     fun `test standard cases`() {

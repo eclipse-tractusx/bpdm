@@ -70,7 +70,7 @@ import kotlin.reflect.full.memberProperties
  * This doesn't work out of the box, so we added this HttpServiceArgumentResolver that can be added to HttpServiceProxyFactory.
  */
 class ParameterObjectArgumentResolver : HttpServiceArgumentResolver {
-    val conversionService = DefaultFormattingConversionService()
+    private val conversionService = DefaultFormattingConversionService()
     override fun resolve(argument: Any?, parameter: MethodParameter, requestValues: HttpRequestValues.Builder): Boolean {
         val annot = parameter.getParameterAnnotation(ParameterObject::class.java)
         if (annot != null && argument != null) {

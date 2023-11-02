@@ -69,7 +69,7 @@ class TaskStepFetchAndReserveService(
 
         val taksResults = taskEntries.map {
 
-            val existingEntryError = validationStepErrorsByEntry.get(it)
+            val existingEntryError = validationStepErrorsByEntry[it]
             existingEntryError ?: businessPartnerTaskResult(it, taskEntryBpnMapping)
         }
         taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)

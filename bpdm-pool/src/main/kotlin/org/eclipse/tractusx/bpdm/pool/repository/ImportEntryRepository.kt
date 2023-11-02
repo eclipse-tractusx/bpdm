@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import org.eclipse.tractusx.bpdm.pool.entity.ImportEntry
-import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 

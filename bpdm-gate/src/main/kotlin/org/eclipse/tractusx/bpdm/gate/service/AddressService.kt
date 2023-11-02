@@ -76,7 +76,7 @@ class AddressService(
      */
     fun getAddressesOutput(externalIds: Collection<String>? = null, page: Int, size: Int): PageDto<AddressGateOutputDto> {
 
-        val logisticAddressPage = if (externalIds != null && externalIds.isNotEmpty()) {
+        val logisticAddressPage = if (!externalIds.isNullOrEmpty()) {
             addressRepository.findByExternalIdInAndStage(externalIds, StageType.Output, PageRequest.of(page, size))
         } else {
             addressRepository.findByStage(StageType.Output, PageRequest.of(page, size))

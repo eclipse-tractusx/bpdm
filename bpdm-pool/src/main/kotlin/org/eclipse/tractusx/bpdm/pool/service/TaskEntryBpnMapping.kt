@@ -52,7 +52,7 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
     fun getBpn(bpnLReference: BpnReferenceDto): String? {
 
         return if (bpnLReference.referenceType == BpnReferenceType.BpnRequestIdentifier) {
-            bpnByRequestIdentifier.get(bpnLReference.referenceValue)
+            bpnByRequestIdentifier[bpnLReference.referenceValue]
         } else {
             bpnLReference.referenceValue
         }

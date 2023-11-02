@@ -68,7 +68,7 @@ class CreateSQLScriptToInsertRegions {
  * Second main conflicts with spring boot repackage. Uncomment to start generation.
  */
 /*
-fun main() {
+fun generate() {
 
     val regionsCsvStream = CreateSQLScriptToInsertRegions::class.java.getResourceAsStream("/regions/IP2LOCATION-ISO3166-2.CSV")
     if (regionsCsvStream != null) {

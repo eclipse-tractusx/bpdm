@@ -40,7 +40,7 @@ import java.time.ZoneOffset
  */
 object BusinessPartnerVerboseValues {
 
-    val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
+    private val createdTime1 = LocalDateTime.of(2020, 1, 1, 1, 1)
     val language0 = TypeKeyNameVerboseDto(LanguageCode.undefined, LanguageCode.undefined.getName())
     val language1 = TypeKeyNameVerboseDto(LanguageCode.en, LanguageCode.en.getName())
     val language2 = TypeKeyNameVerboseDto(LanguageCode.de, LanguageCode.de.getName())

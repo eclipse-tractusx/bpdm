@@ -217,24 +217,6 @@ class GateUpdateService(
         )
     }
 
-    private fun buildSuccessSharingStateDto(
-        businessPartnerType: BusinessPartnerType,
-        externalId: String?,
-        bpn: String,
-        processStarted: Boolean
-    ): SharingStateDto? {
-        if (externalId == null) {
-            logger.warn { "Encountered externalId=null in Pool response for $bpn, can't update the Gate sharing state" }
-            return null
-        }
-        return SharingStateDto(
-            businessPartnerType = businessPartnerType,
-            externalId = externalId,
-            sharingStateType = SharingStateType.Success,
-            bpn = bpn,
-            sharingProcessStarted = if (processStarted) LocalDateTime.now() else null
-        )
-    }
 
     private fun buildErrorSharingStateDto(
         businessPartnerType: BusinessPartnerType,

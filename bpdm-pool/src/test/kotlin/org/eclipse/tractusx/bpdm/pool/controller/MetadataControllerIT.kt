@@ -401,33 +401,30 @@ class MetadataControllerIT @Autowired constructor(
 
 
     private fun addressRuleMandatory(country: CountryCode?, field: String): FieldQualityRule {
-        val rule = FieldQualityRule(
+        return FieldQualityRule(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
             qualityLevel = QualityLevel.MANDATORY
         )
-        return rule
     }
 
     private fun addressRuleForbidden(country: CountryCode?, field: String): FieldQualityRule {
-        val rule = FieldQualityRule(
+        return FieldQualityRule(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
             qualityLevel = QualityLevel.FORBIDDEN
         )
-        return rule
     }
 
     private fun addressRuleOptional(country: CountryCode?, field: String): FieldQualityRule {
-        val rule = FieldQualityRule(
+        return FieldQualityRule(
             countryCode = country,
             fieldPath = field,
             schemaName = "address",
             qualityLevel = QualityLevel.OPTIONAL
         )
-        return rule
     }
 
     @Test

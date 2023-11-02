@@ -19,9 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-
 
 data class LegalEntityIdentifierDto(
 
