@@ -25,4 +25,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties(prefix = "bpdm.orchestrator")
 data class OrchestratorConfigProperties(
     val baseUrl: String = "http://localhost:8085",
+    val securityEnabled: Boolean = false,
+    val oauth2ClientRegistration: String?
 )
