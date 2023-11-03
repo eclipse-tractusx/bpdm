@@ -38,6 +38,8 @@ podAnnotations: {}
 springProfiles: []
 
 securityContext:
+  seccompProfile:
+    type: RuntimeDefault
   allowPrivilegeEscalation: false
   runAsNonRoot: true
   runAsUser: 10001
@@ -110,7 +112,7 @@ startupProbe:
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
 #  bpdm:
-#    pool:
+#    orchestrator:
 #      base-url: ...
 
 # Used to overwrite the secret property values of the application configuration
