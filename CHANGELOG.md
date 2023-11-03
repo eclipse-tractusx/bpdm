@@ -4,17 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
-## [4.1.0] - tbd
+## [4.1.0] - 2023-11-03
 
 ### Added
 
-- BPDM Gate API: Endpoints for creating and querying generic business partners
-- Docs: Postman collection for API tests
-- BPDM Pool: Load initial set of regions according to ISO-3166-2
+- Golden record sharing process with dummy cleaning (see points below for details)
+- BPDM Orchestrator: New BPDM application managing golden record tasks
+- BPDM Cleaning Service Dummy: New BPDM application creating dummy cleaning results from golden record tasks
+- BPDM Gate: Endpoints for sharing generic business partner input
+- BPDM Gate: Endpoints for querying generic business partner output
+- BPDM Gate: Service logic for creating golden record tasks from business partner input and writing result in output
+- BPDM Pool: Service Logic for creating golden records from tasks
+- BPDM Pool: Service logic for assigning BPNs to golden record tasks
+- BPDM Pool: Search for name on address and legal entity level
+- Swagger: Bearer token authorization flow
+- Workflows: latest-alpha tag for Docker images
+- Docker: Healthcheck for images
 
-### Fixed
+### Changed
 
-- BPDM Pool: Validation for duplicate legal entity and address identifiers
+- Apps: Increase Spring Boot version to 3.1.5
+- BPDM Gate: New business partner type 'GENERIC' for changelog
+- BPDM Gate: New business partner type 'GENERIC' for sharing state
+- Workflows: Trivy now targets the latest alpha Docker image instead of the latest release version
+
 
 ## [4.0.1] - 2023-08-28
 
