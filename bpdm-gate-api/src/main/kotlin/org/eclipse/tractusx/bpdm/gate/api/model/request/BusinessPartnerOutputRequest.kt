@@ -45,8 +45,8 @@ data class BusinessPartnerOutputRequest(
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
     override val isOwnCompanyData: Boolean = false,
-    override val bpnL: String? = null,
-    override val bpnS: String? = null,
-    override val bpnA: String? = null,
+    override val legalEntityBpn: String? = null,
+    override val siteBpn: String? = null,
+    override val addressBpn: String? = null,
 
-) : IBaseBusinessPartnerGateDto
+    ) : IBaseBusinessPartnerGateDto

@@ -120,9 +120,9 @@ object BusinessPartnerGenericMockValues {
             )
         ),
         ownerBpnL = "BPNL_CLEANED_VALUES",
-        bpnL = "000000123AAA123",
-        bpnS = "000000123BBB222",
-        bpnA = "000000123CCC333"
+        legalEntityBpn = "000000123AAA123",
+        siteBpn = "000000123BBB222",
+        addressBpn = "000000123CCC333"
     )
 
 }

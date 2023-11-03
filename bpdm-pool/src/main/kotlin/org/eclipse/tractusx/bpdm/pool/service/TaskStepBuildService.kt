@@ -95,9 +95,9 @@ class TaskStepBuildService(
             taskId = taskEntry.taskId,
             businessPartner = BusinessPartnerFullDto(
                 generic = businessPartnerDto.generic.copy(
-                    bpnL = legalEntity.bpn,
-                    bpnS = siteEntity?.bpn,
-                    bpnA = genericBpnA
+                    legalEntityBpn = legalEntity.bpn,
+                    siteBpn = siteEntity?.bpn,
+                    addressBpn = genericBpnA
                 ),
                 legalEntity = businessPartnerDto.legalEntity!!.copy(
                     bpnLReference = BpnReferenceDto(referenceValue = legalEntity.bpn, referenceType = BpnReferenceType.Bpn)

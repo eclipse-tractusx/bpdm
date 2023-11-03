@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.cleaning.service
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.RecursiveComparisonAssert
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerWithBpnA
@@ -30,7 +29,6 @@ import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.businessPartnerW
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLegalEntityDto
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedLogisticAddressDto
 import org.eclipse.tractusx.bpdm.cleaning.testdata.CommonValues.expectedSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -53,7 +51,7 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val result = cleaningServiceDummy.processCleaningTask(taskStepReservationEntryDto)
 
-        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.bpnA
+        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.addressBpn
 
         val resultedAddress = result.businessPartner?.address
 
@@ -114,9 +112,9 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val result = cleaningServiceDummy.processCleaningTask(taskStepReservationEntryDto)
 
-        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.bpnA
+        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.addressBpn
 
-        val expectedBpnL = taskStepReservationEntryDto.businessPartner.generic.bpnL
+        val expectedBpnL = taskStepReservationEntryDto.businessPartner.generic.legalEntityBpn
 
         val resultedAddress = result.businessPartner?.address
 
@@ -154,9 +152,9 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val resultedSite = result.businessPartner?.site
 
-        val expectedBpnA = taskStepReservationResponse.businessPartner.generic.bpnA
+        val expectedBpnA = taskStepReservationResponse.businessPartner.generic.addressBpn
 
-        val expectedBpnS = taskStepReservationResponse.businessPartner.generic.bpnS
+        val expectedBpnS = taskStepReservationResponse.businessPartner.generic.siteBpn
 
 
         // legalEntity should Generate new bpnL and legalAddress should use passed bpnA since address type is LegalAndSiteMainAddress

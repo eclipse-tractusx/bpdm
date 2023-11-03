@@ -116,14 +116,14 @@ object CommonValues {
 
     val businessPartnerWithBpnA = businessPartnerWithEmptyBpns.copy(
         postalAddress = postalAddressForAdditional,
-        bpnA = "FixedBPNA"
+        addressBpn = "FixedBPNA"
     )
 
 
     val businessPartnerWithBpnLAndBpnAAndLegalAddressType = businessPartnerWithEmptyBpns.copy(
         postalAddress = postalAddressForLegal,
-        bpnA = "FixedBPNA",
-        bpnL = "FixedBPNL"
+        addressBpn = "FixedBPNA",
+        legalEntityBpn = "FixedBPNL"
     )
 
     val businessPartnerWithEmptyBpnLAndAdditionalAddressType = businessPartnerWithEmptyBpns.copy(
@@ -132,8 +132,8 @@ object CommonValues {
 
     val businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType = businessPartnerWithEmptyBpns.copy(
         postalAddress = postalAddressForLegalAndSite,
-        bpnA = "FixedBPNA",
-        bpnS = "FixedBPNS"
+        addressBpn = "FixedBPNA",
+        siteBpn = "FixedBPNS"
     )
 
     val businessPartnerWithEmptyBpnAndSiteMainAddressType = businessPartnerWithEmptyBpns.copy(

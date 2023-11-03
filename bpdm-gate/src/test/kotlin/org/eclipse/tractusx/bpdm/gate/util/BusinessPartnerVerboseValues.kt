@@ -371,8 +371,8 @@ object BusinessPartnerVerboseValues {
         states = listOf(bpState1, bpState2),
         roles = listOf(BusinessPartnerRole.SUPPLIER),
         postalAddress = bpPostalAddressInputDtoFull,
-        bpnL = "BPNL0000000000XY",
-        bpnA = "BPNA0000000001XY"
+        legalEntityBpn = "BPNL0000000000XY",
+        addressBpn = "BPNA0000000001XY"
     )
 
     val address1 = PhysicalPostalAddressVerboseDto(
@@ -769,9 +769,9 @@ object BusinessPartnerVerboseValues {
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
         postalAddress = bpPostalAddressInputDtoChina,
-        bpnL = "BPNL0000000002XY",
-        bpnS = "BPNS0000000003X9",
-        bpnA = "BPNA0000000001XY"
+        legalEntityBpn = "BPNL0000000002XY",
+        siteBpn = "BPNS0000000003X9",
+        addressBpn = "BPNA0000000001XY"
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
@@ -790,9 +790,9 @@ object BusinessPartnerVerboseValues {
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
         postalAddress = bpPostalAddressInputDtoFull,
-        bpnL = "BPNL0000000002XY",
-        bpnS = "BPNS0000000003X9",
-        bpnA = "BPNA0000000001XY"
+        legalEntityBpn = "BPNL0000000002XY",
+        siteBpn = "BPNS0000000003X9",
+        addressBpn = "BPNA0000000001XY"
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
@@ -811,9 +811,9 @@ object BusinessPartnerVerboseValues {
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
         postalAddress = bpPostalAddressInputDtoFull,
-        bpnL = "BPNL0000000002XY",
-        bpnS = "BPNS0000000003X9",
-        bpnA = "BPNA0000000001XY"
+        legalEntityBpn = "BPNL0000000002XY",
+        siteBpn = "BPNS0000000003X9",
+        addressBpn = "BPNA0000000001XY"
     )
 
     val bpOutputRequestCleaned = BusinessPartnerOutputRequest(
@@ -903,9 +903,9 @@ object BusinessPartnerVerboseValues {
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             )
         ),
-        bpnL = "000000123AAA123",
-        bpnS = "000000123BBB222",
-        bpnA = "000000123CCC333"
+        legalEntityBpn = "000000123AAA123",
+        siteBpn = "000000123BBB222",
+        addressBpn = "000000123CCC333"
     )
 
 }
