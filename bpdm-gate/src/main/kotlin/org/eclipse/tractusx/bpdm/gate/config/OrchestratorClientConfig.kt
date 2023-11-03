@@ -26,7 +26,14 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction
 import org.springframework.web.reactive.function.client.WebClient
+import java.util.function.Consumer
 
 
 @Configuration
@@ -44,9 +51,52 @@ class OrchestratorClientConfig {
         return OrchestrationApiClientImpl { webClientBuilder(url).build() }
     }
 
+
+    @Bean
+    @ConditionalOnProperty(
+        value = ["bpdm.orchestrator.security-enabled"],
+        havingValue = "true"
+    )
+    fun orchestratorClientWithAuth(
+        orchestratorConfigProperties: OrchestratorConfigProperties,
+        clientRegistrationRepository: ClientRegistrationRepository,
+        authorizedClientService: OAuth2AuthorizedClientService
+    ): OrchestrationApiClient {
+        val url = orchestratorConfigProperties.baseUrl
+        val clientRegistrationId = orchestratorConfigProperties.oauth2ClientRegistration
+            ?: throw IllegalArgumentException("bpdm.orchestrator.oauth2-client-registration is required if bpdm.orchestrator.security-enabled is set")
+        return OrchestrationApiClientImpl {
+            webClientBuilder(url)
+                .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))
+                .build()
+        }
+    }
+
+
     private fun webClientBuilder(url: String) =
         WebClient.builder()
             .baseUrl(url)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+
+    private fun oauth2Configuration(
+        clientRegistrationRepository: ClientRegistrationRepository,
+        authorizedClientService: OAuth2AuthorizedClientService,
+        clientRegistrationId: String
+    ): Consumer<WebClient.Builder> {
+        val authorizedClientManager = authorizedClientManager(clientRegistrationRepository, authorizedClientService)
+        val oauth = ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager)
+        oauth.setDefaultClientRegistrationId(clientRegistrationId)
+        return oauth.oauth2Configuration()
+    }
+
+    private fun authorizedClientManager(
+        clientRegistrationRepository: ClientRegistrationRepository,
+        authorizedClientService: OAuth2AuthorizedClientService
+    ): OAuth2AuthorizedClientManager {
+        val authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build()
+        val authorizedClientManager = AuthorizedClientServiceOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientService)
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider)
+        return authorizedClientManager
+    }
 
 }

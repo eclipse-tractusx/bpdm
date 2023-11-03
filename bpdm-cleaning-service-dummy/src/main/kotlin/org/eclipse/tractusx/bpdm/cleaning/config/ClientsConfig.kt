@@ -47,8 +47,8 @@ class ClientsConfig {
         havingValue = "false",
         matchIfMissing = true
     )
-    fun orchestratorClientNoAuth(poolConfigProperties: OrchestratorConfigProperties): OrchestrationApiClient {
-        val url = poolConfigProperties.baseUrl
+    fun orchestratorClientNoAuth(orchestratorConfigProperties: OrchestratorConfigProperties): OrchestrationApiClient {
+        val url = orchestratorConfigProperties.baseUrl
         return OrchestrationApiClientImpl { webClientBuilder(url).build() }
     }
 
@@ -59,12 +59,12 @@ class ClientsConfig {
         havingValue = "true"
     )
     fun orchestratorClientWithAuth(
-        poolConfigProperties: OrchestratorConfigProperties,
+        orchestratorConfigProperties: OrchestratorConfigProperties,
         clientRegistrationRepository: ClientRegistrationRepository,
         authorizedClientService: OAuth2AuthorizedClientService
     ): OrchestrationApiClient {
-        val url = poolConfigProperties.baseUrl
-        val clientRegistrationId = poolConfigProperties.oauth2ClientRegistration
+        val url = orchestratorConfigProperties.baseUrl
+        val clientRegistrationId = orchestratorConfigProperties.oauth2ClientRegistration
             ?: throw IllegalArgumentException("bpdm.orchestrator.oauth2-client-registration is required if bpdm.orchestrator.security-enabled is set")
         return OrchestrationApiClientImpl {
             webClientBuilder(url)
