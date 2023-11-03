@@ -33,9 +33,9 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
+        checksum/config: {{include (print $.Template.BasePath "/configMap.yaml") . | sha256sum}}
       {{- with .Values.podAnnotations}}
-        {{- toYaml . | nindent 8}}
+      {{- toYaml . | nindent 8}}
       {{- end}}
       labels:
         {{- include "bpdm.selectorLabels" . | nindent 8}}
@@ -59,40 +59,40 @@ spec:
               value: {{.Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
-          ports:
-            - name: http
-              containerPort: 8085
-              protocol: TCP
-          # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12}}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12}}
-          startupProbe:
-            {{- toYaml .Values.startupProbe | nindent 12}}
-          resources:
-            {{- toYaml .Values.resources | nindent 12}}
-          volumeMounts:
-            - mountPath: /etc/conf
-              name: config
-              readOnly: true
-      {{- with .Values.nodeSelector}}
-      nodeSelector:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.affinity}}
-      affinity:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.tolerations}}
-      tolerations:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      volumes:
-        - name: config
-          projected:
-            sources:
-              - configMap:
-                  name: {{include "bpdm.fullname" .}}
-              - secret:
-                  name: {{include "bpdm.fullname" .}}
+                ports:
+                  - name: http
+                    containerPort: 8085
+                    protocol: TCP
+                  # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
+                  livenessProbe:
+                    {{- toYaml .Values.livenessProbe | nindent 12}}
+                  readinessProbe:
+                    {{- toYaml .Values.readinessProbe | nindent 12}}
+                  startupProbe:
+                    {{- toYaml .Values.startupProbe | nindent 12}}
+                  resources:
+                    {{- toYaml .Values.resources | nindent 12}}
+                  volumeMounts:
+                    - mountPath: /etc/conf
+                      name: config
+                      readOnly: true
+                  {{- with .Values.nodeSelector}}
+                  nodeSelector:
+                    {{- toYaml . | nindent 8}}
+                  {{- end}}
+                  {{- with .Values.affinity}}
+                  affinity:
+                    {{- toYaml . | nindent 8}}
+                  {{- end}}
+                  {{- with .Values.tolerations}}
+                  tolerations:
+                    {{- toYaml . | nindent 8}}
+                  {{- end}}
+                  volumes:
+                    - name: config
+                      projected:
+                        sources:
+                          - configMap:
+                              name: {{include "bpdm.fullname" .}}
+                          - secret:
+                              name: {{include "bpdm.fullname" .}}
