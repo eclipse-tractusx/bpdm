@@ -48,10 +48,6 @@ dependencies:
     version: 1.0.0
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
-  - name: bpdm-orchestrator
-    version: 1.0.0
-    alias: bpdm-orchestrator
-    condition: bpdm-orchestrator.enabled
   - name: opensearch
     version: 2.12.2
     repository: https://opensearch-project.github.io/helm-charts/
