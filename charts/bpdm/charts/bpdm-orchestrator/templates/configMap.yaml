@@ -28,6 +28,13 @@ data:
   deployment.yml: |-
     # Place for putting standard deployment configuration
     # which can be overwritten by external.yml
+    bpdm:
+      datasource:
+        host: {{ include "bpdm.postgresDependency" . }}
+      pool:
+        base-url: {{include "bpdm-bridge.poolServiceName" .}}
+      gate:
+        base-url: {{include "bpdm-bridge.gateServiceName" .}}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}
