@@ -1,6 +1,6 @@
-# BPDM Orchestrator Helm Chart
+# BPDM Bridge Dummy Helm Chart
 
-This Helm Chart deploys the BPDM service to a Kubernetes environment.
+This Helm Chart deploys the BPDM Gate service to a Kubernetes environment.
 
 ## Prerequisites
 
@@ -10,19 +10,19 @@ This Helm Chart deploys the BPDM service to a Kubernetes environment.
 In an existing Kubernetes cluster the application can be deployed with the following command:
 
 ```bash
-helm install release_name ./charts/bpdm-orchestrator --namespace your_namespace -f /path/to/my_release-values.yaml
+helm install release_name ./charts/bpdm-bridge-dummy --namespace your_namespace -f /path/to/my_release-values.yaml
 ```
 
-This will install a new release of the BPDM Orchestrator Service in the given namespace.
+This will install a new release of the BPDM Bridge Dummy in the given namespace.
 On default values this release deploys the latest image tagged as `main` from the repository's GitHub Container Registry.
 
-By giving your own values file you can configure the Helm deployment of the BPDM Orchestrator Service freely.
+By giving your own values file you can configure the Helm deployment of the BPDM Bridge Dummy freely.
 In the following sections you can have a look at the most important configuration options.
 
 ## Image Tag
 
-Per default, the Helm deployment references the latest BPDM Orchestrator Service release tagged as `main`.
-This tag follows the latest version of the Orchestrator Service and contains the newest features and bug fixes.
+Per default, the Helm deployment references the latest BPDM Bridge Dummy release tagged as `main`.
+This tag follows the latest version of the Bridge Dummy and contains the newest features and bug fixes.
 You might want to switch to a more stable release tag instead for your deployment.
 In your values file you can overwrite the default tag:
 
@@ -33,8 +33,8 @@ image:
 
 ## Profiles
 
-You can also activate Spring profiles in which the BPDM Orchestrator Service should be run.
-In case you want to run the Orchestrator Service with authorization enabled you can write the following:
+You can also activate Spring profiles in which the BPDM Bridge Dummy should be run.
+In case you want to run the Bridge Dummy with authorization enabled you can write the following:
 
 ```yaml
 springProfiles:
@@ -43,10 +43,10 @@ springProfiles:
 
 ## Ingress
 
-You can specify your own ingress configuration for the Helm deployment to make the BPDM Orchestrator Service available over Ingress.
+You can specify your own ingress configuration for the Helm deployment to make the BPDM Bridge Dummy available over Ingress.
 Note that you need to have the appropriate Ingress controller installed in your cluster first.
 For example, consider a Kubernetes cluster with an [Ingress-Nginx](https://kubernetes.github.io/ingress-nginx/) installed.
-An Ingress configuration for the Orchestrator Service deployment could somehow look like this:
+An Ingress configuration for the Bridge Dummy deployment could somehow look like this:
 
 ```yaml
 ingress:
@@ -57,17 +57,27 @@ ingress:
   hosts:
     - host: business-partners.your-domain.net
       paths:
-        - path: /orchestrator
+        - path: /bridge
           pathType: Prefix
 ```
 
-## Orchestrator Service Configuration
+## Bridge Dummy Configuration
 
 For the default deployment you already need to overwrite the configuration properties of the application.
-The Helm deployment comes with the ability to configure the BPDM Orchestrator Service application directly over the values file.
+The Helm deployment comes with the ability to configure the BPDM Bridge Dummy application directly over the values file.
 This way you are able to overwrite any configuration property of the `application.properties` and `application-auth.properties` files.
 Consider that you would need to turn on `auth` profile first before overwriting any property in the corresponding properties file could take
 effect.
+Overwriting configuration properties can be useful for connecting to a remotely hosted BPDM Gate and Pool instance:
+
+```yaml
+applicationConfig:
+  bpdm:
+    pool:
+      base-url: http://remote.domain.net/api/catena
+    gate:
+      base-url: http://remote.domain.net/api/catena
+```
 
 Entries in the "applicationConfig" value are written directly to a configMap that is part of the Helm deployment.
 This can be a problem if you want to overwrite configuration properties with secrets.
