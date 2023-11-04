@@ -20,43 +20,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{include "bpdm.fullname" .}}
+  name: {{ include "bpdm.fullname" . }}
   labels:
-    {{- include "bpdm.labels" . | nindent 4}}
+    {{- include "bpdm.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled}}
-  replicas: {{.Values.replicaCount}}
-  {{- end}}
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      {{- include "bpdm.selectorLabels" . | nindent 6}}
+      {{- include "bpdm.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/config: {{include (print $.Template.BasePath "/configMap.yaml") . | sha256sum}}
+        checksum/config: {{ include (print $.Template.BasePath "/configMap.yaml") . | sha256sum }}
       {{- with .Values.podAnnotations}}
       {{- toYaml . | nindent 8}}
       {{- end}}
       labels:
         {{- include "bpdm.selectorLabels" . | nindent 8}}
     spec:
-      {{- with .Values.imagePullSecrets}}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       # @url: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
       automountServiceAccountToken: false
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8}}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{.Chart.Name}}
+        - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12}}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{.Values.image.pullPolicy}}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: {{.Values.springProfiles | join ","  }}
+              value: {{ .Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
           ports:
@@ -65,34 +65,34 @@ spec:
               protocol: TCP
           # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
           livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12}}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12}}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           startupProbe:
-            {{- toYaml .Values.startupProbe | nindent 12}}
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.resources | nindent 12}}
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /etc/conf
               name: config
               readOnly: true
-      {{- with .Values.nodeSelector}}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.affinity}}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
-      {{- with .Values.tolerations}}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8}}
-      {{- end}}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: config
           projected:
             sources:
               - configMap:
-                  name: {{include "bpdm.fullname" .}}
+                  name: {{ include "bpdm.fullname" . }}
               - secret:
-                  name: {{include "bpdm.fullname" .}}
+                  name: {{ include "bpdm.fullname" . }}

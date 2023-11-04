@@ -110,7 +110,7 @@ startupProbe:
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
 #  bpdm:
-#    pool:
+#    orchestrator:
 #      base-url: ...
 
 # Used to overwrite the secret property values of the application configuration
