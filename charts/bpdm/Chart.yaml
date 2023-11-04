@@ -48,8 +48,8 @@ dependencies:
     version: 1.0.0
     alias: bpdm-cleaning-service-dummy
     condition: bpdm-cleaning-service-dummy.enabled
-  - name: bpdm-bridge-dummy
-    version: 1.1.0
+  - name: bpdm-orchestrator
+    version: 1.0.0
     alias: bpdm-orchestrator
     condition: bpdm-orchestrator.enabled
   - name: opensearch

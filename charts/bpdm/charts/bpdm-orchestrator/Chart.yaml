@@ -20,19 +20,13 @@
 
 apiVersion: v2
 type: application
-name: bpdm-bridge-dummy
+name: bpdm-orchestrator
 appVersion: "4.1.0"
-version: 1.1.0
-description: A Helm chart for deploying the BPDM bridge dummy service
+version: 1.0.0
+description: A Helm chart for deploying the BPDM Orchestrator service
 home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
-dependencies:
-  - name: postgresql
-    version: 11.9.13
-    repository: https://charts.bitnami.com/bitnami
-    alias: postgres
-    condition: postgres.enabled
 maintainers:
   - name: Nico Koprowski
   - name: Fabio D. Mota

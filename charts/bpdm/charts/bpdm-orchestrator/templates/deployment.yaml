@@ -56,17 +56,12 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.springProfiles | join ","  }}
+              value: {{.Values.springProfiles | join ","  }}
             - name: SPRING_CONFIG_IMPORT
               value: "/etc/conf/deployment.yml,/etc/conf/external.yml,/etc/conf/secrets.yml"
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name:  {{ include "bpdm.postgresDependency" . }}
-                  key: password
           ports:
             - name: http
-              containerPort: 8083
+              containerPort: 8085
               protocol: TCP
           # @url: https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-setting-up-health-checks-with-readiness-and-liveness-probes
           livenessProbe:
