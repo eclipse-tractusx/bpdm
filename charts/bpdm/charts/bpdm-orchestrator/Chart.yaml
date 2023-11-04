@@ -19,46 +19,14 @@
 ################################################################################
 
 apiVersion: v2
-name: bpdm
 type: application
-description: A Helm chart for Kubernetes that deploys the BPDM applications
-version: 3.1.1
+name: bpdm-orchestrator
 appVersion: "4.1.0"
-home: https://github.com/eclipse-tractusx/bpdm
+version: 1.0.0
+description: A Helm chart for deploying the BPDM Orchestrator service
+home: https://eclipse-tractusx.github.io/docs/kits/Business%20Partner%20Kit/Adoption%20View
 sources:
   - https://github.com/eclipse-tractusx/bpdm
 maintainers:
   - name: Nico Koprowski
   - name: Fabio D. Mota
-
-dependencies:
-  - name: bpdm-gate
-    version: 4.1.0
-    alias: bpdm-gate
-    condition: bpdm-gate.enabled
-  - name: bpdm-pool
-    version: 5.1.0
-    alias: bpdm-pool
-    condition: bpdm-pool.enabled
-  - name: bpdm-bridge-dummy
-    version: 1.1.0
-    alias: bpdm-bridge-dummy
-    condition: bpdm-bridge-dummy.enabled
-  - name: bpdm-cleaning-service-dummy
-    version: 1.0.0
-    alias: bpdm-cleaning-service-dummy
-    condition: bpdm-cleaning-service-dummy.enabled
-  - name: bpdm-orchestrator
-    version: 1.0.0
-    alias: bpdm-orchestrator
-    condition: bpdm-orchestrator.enabled
-  - name: opensearch
-    version: 2.12.2
-    repository: https://opensearch-project.github.io/helm-charts/
-    alias: opensearch
-    condition: opensearch.enabled
-  - name: postgresql
-    version: 11.9.13
-    repository: https://charts.bitnami.com/bitnami
-    alias: postgres
-    condition: postgres.enabled
