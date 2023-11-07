@@ -41,7 +41,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class])
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class AddressControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
@@ -83,19 +83,16 @@ class AddressControllerSearchIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
 
-        poolClient.opensearch.clear()
         testHelpers.createTestMetadata()
 
 
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure3))
         givenAddress1 = givenStructure[0].addresses[0].address                      // addressPartnerCreate1
-
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
 
 
     /**
-     * Given addresses in OpenSearch
+     * Given addresses
      * When searching an address by name of BPN search criteria
      * Then the matching address is returned
      */
@@ -117,7 +114,7 @@ class AddressControllerSearchIT @Autowired constructor(
     }
 
     /**
-     * Given addresses in OpenSearch
+     * Given addresses
      * When searching an address by name of BPN that not exists in search criteria
      * Then the matching address is not found
      */

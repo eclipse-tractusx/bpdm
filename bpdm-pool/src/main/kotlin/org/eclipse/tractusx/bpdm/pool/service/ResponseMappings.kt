@@ -269,10 +269,6 @@ fun Relation.toDto(): RelationVerboseDto {
     )
 }
 
-fun SyncRecord.toDto(): SyncDto {
-    return SyncDto(type, status, count, progress, errorDetails, startedAt, finishedAt)
-}
-
 fun PartnerChangelogEntry.toDto(): ChangelogEntryVerboseDto {
     return ChangelogEntryVerboseDto(bpn, businessPartnerType, createdAt, changelogType)
 }

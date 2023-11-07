@@ -27,9 +27,17 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.pool.api.model.request.*
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -47,8 +55,7 @@ interface PoolLegalEntityApi {
         summary = "Returns legal entities by different search parameters",
         description = "This endpoint tries to find matches among all existing business partners of type legal entity, " +
                 "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
-                "The match of a partner is better the higher its relevancy score. " +
-                "Note that when using search parameters the max page is \${bpdm.opensearch.max-page}."
+                "The match of a partner is better the higher its relevancy score. "
     )
     @ApiResponses(
         value = [

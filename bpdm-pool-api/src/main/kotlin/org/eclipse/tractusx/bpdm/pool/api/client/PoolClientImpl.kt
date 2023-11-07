@@ -56,8 +56,6 @@ class PoolClientImpl(
 
     override val sites by lazy { createClient<PoolSiteApi>() }
 
-    override val opensearch by lazy { createClient<PoolOpenSearchApi>() }
-
     override val saas by lazy { createClient<PoolSaasApi>() }
 
     private inline fun <reified T> createClient() =

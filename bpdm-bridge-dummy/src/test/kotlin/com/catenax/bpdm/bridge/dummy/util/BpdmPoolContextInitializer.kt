@@ -20,7 +20,6 @@
 package com.catenax.bpdm.bridge.dummy.util
 
 
-import com.catenax.bpdm.bridge.dummy.util.OpenSearchContextInitializer.Companion.openSearchContainer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import mu.KotlinLogging
 import org.springframework.boot.test.util.TestPropertyValues
@@ -48,8 +47,8 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
         val bpdmPoolContainer: GenericContainer<*> =
             GenericContainer(IMAGE)
-                .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer))
-                .withNetwork(postgreSQLContainer.getNetwork())
+                .dependsOn(listOf<Startable>(postgreSQLContainer))
+                .withNetwork(postgreSQLContainer.network)
                 .withExposedPorts(BPDM_PORT, DEBUG_PORT)
                 .withEnv(
                     "JAVA_OPTIONS",
@@ -60,7 +59,6 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val postgresNetworkAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
-        val openSearchNetworkAlias = applicationContext.environment.getProperty("bpdm.opensearch.alias")
         val dataBase = postgreSQLContainer.getDatabaseName()
         val bpdmAlias = applicationContext.environment.getProperty("bpdm.pool.alias")
         bpdmPoolContainer.withNetworkAliases(bpdmAlias)
@@ -74,12 +72,6 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
         bpdmPoolContainer.withEnv(
             "spring.datasource.url", "jdbc:postgresql://${postgresNetworkAlias}:5432/${dataBase}?loggerLevel=OFF"
         )
-            .withEnv("bpdm.opensearch.host", openSearchNetworkAlias)
-            .withEnv(
-                "pdm.opensearch.port",
-                OpenSearchContextInitializer.OPENSEARCH_PORT.toString()
-            )
-            .withEnv("bpdm.opensearch.scheme", "http")
             .withEnv(
                 "spring.datasource.username", postgreSQLContainer.username
             )

@@ -66,8 +66,6 @@
         <sonar.version>3.9.1.2184</sonar.version>
         <jacoco.version>0.8.7</jacoco.version>
         <testcontainers.version>1.18.3</testcontainers.version>
-        <opensearch.version>2.5.0</opensearch.version>
-        <opensearch-java.version>2.0.0</opensearch-java.version>
     </properties>
 
     <pluginRepositories>
@@ -150,21 +148,6 @@
                 <groupId>io.github.microutils</groupId>
                 <artifactId>kotlin-logging-jvm</artifactId>
                 <version>${kotlinlogging.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensearch.client</groupId>
-                <artifactId>opensearch-rest-high-level-client</artifactId>
-                <version>${opensearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensearch.client</groupId>
-                <artifactId>opensearch-rest-client</artifactId>
-                <version>${opensearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.opensearch.client</groupId>
-                <artifactId>opensearch-java</artifactId>
-                <version>${opensearch-java.version}</version>
             </dependency>
 
             <!-- Test -->

@@ -44,7 +44,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles(value = ["test"])
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerSearchIT @Autowired constructor(
     val webTestClient: WebTestClient,
     val testHelpers: TestHelpers,
@@ -76,7 +76,6 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
 
-        poolClient.opensearch.clear()
         testHelpers.createTestMetadata()
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
@@ -85,11 +84,10 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         legalName2 = givenStructure[1].legalEntity.legalName
         legalAddress1 = givenStructure[0].legalEntity.legalAddress
         legalAddress2 = givenStructure[1].legalEntity.legalAddress
-        testHelpers.startSyncAndAwaitSuccess(webTestClient, EndpointValues.OPENSEARCH_SYNC_PATH)
     }
 
     /**
-     * Given partners with same siteName in OpenSearch
+     * Given partners with same siteName
      * When searching by site name and requesting page with multiple items
      * Then response contains correct pagination values
      */
@@ -110,7 +108,7 @@ class LegalEntityControllerSearchIT @Autowired constructor(
     }
 
     /**
-     * Given partners with same siteName in OpenSearch
+     * Given partners with same siteName
      * When searching by site name and requesting multiple pages
      * Then responses contains correct pagination values
      */
@@ -134,36 +132,6 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         assertPageEquals(firstPage, expectedFirstPage)
         assertPageEquals(secondPage, expectedSecondPage)
     }
-
-//    /**
-//     * Given partners in OpenSearch
-//     * When searching by site name
-//     * Then business partner is found
-//     */
-//    @Test
-//    fun `search business partner by site name, result found`() {
-//
-//        val expected = PageResponse(
-//            1, 1, 0, 1, listOf(
-//                LegalEntityMatchResponse(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
-//            )
-//        )
-//
-//        val pageResponse = searchBusinessPartnerBySiteName(RequestValues.siteCreate2.site.name, 0, 10)
-//
-//        assertPageEquals(pageResponse, expected)
-//    }
-
-    /**
-     * Given partners in OpenSearch
-     * When searching by nonexistent site name
-     * Then no business partner is found
-     */
-//    @Test
-//    fun `search business partner by site name, no result found`() {
-//        val foundPartners = searchBusinessPartnerBySiteName("nonexistent name", 0, 10).content
-//        assertThat(foundPartners).isEmpty()
-//    }
 
     private fun searchBusinessPartnerBySiteName(siteName: String, page: Int, size: Int): PageDto<LegalEntityMatchVerboseDto> {
         val sitePropertiesSearchRequest = SitePropertiesSearchRequest(siteName)

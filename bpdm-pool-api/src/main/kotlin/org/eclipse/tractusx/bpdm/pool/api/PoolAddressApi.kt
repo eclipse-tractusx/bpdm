@@ -31,7 +31,9 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerUpdateRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressMatchVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerUpdateResponseWrapper
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
@@ -49,8 +51,7 @@ interface PoolAddressApi {
         summary = "Returns addresses by different search parameters",
         description = "This endpoint tries to find matches among all existing business partners of type address, " +
                 "filtering out partners which entirely do not match and ranking the remaining partners according to the accuracy of the match. " +
-                "The match of a partner is better the higher its relevancy score. " +
-                "Note that when using search parameters the max page is \${bpdm.opensearch.max-page}."
+                "The match of a partner is better the higher its relevancy score. "
     )
     @ApiResponses(
         value = [

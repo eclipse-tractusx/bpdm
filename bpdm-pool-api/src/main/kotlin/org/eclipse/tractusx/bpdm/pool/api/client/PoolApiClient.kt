@@ -35,7 +35,5 @@ interface PoolApiClient {
 
     val sites: PoolSiteApi
 
-    val opensearch: PoolOpenSearchApi
-
     val saas: PoolSaasApi
 }
