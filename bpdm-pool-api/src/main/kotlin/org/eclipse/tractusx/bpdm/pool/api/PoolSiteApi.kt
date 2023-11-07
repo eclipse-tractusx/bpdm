@@ -134,8 +134,7 @@ interface PoolSiteApi {
 
     @Operation(
         summary = "Get page of sites matching the pagination search criteria",
-        description = "This endpoint retrieves all existing business partners of type sites." +
-                "Note that when using search parameters the max page is \${bpdm.opensearch.max-page}."
+        description = "This endpoint retrieves all existing business partners of type sites."
     )
     @ApiResponses(
         value = [

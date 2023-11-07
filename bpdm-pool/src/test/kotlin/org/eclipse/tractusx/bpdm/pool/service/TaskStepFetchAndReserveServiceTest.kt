@@ -6,7 +6,6 @@ import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
-import org.eclipse.tractusx.bpdm.pool.util.OpenSearchContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
@@ -22,7 +21,7 @@ import org.springframework.test.context.ContextConfiguration
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     val cleaningStepService: TaskStepFetchAndReserveService,
     val bpnRequestIdentifierRepository: BpnRequestIdentifierRepository,

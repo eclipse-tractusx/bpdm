@@ -20,6 +20,5 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 enum class SyncType{
-    OPENSEARCH,
     SAAS_IMPORT
 }

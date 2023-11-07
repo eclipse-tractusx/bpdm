@@ -23,7 +23,10 @@ import com.catenax.bpdm.bridge.dummy.client.BridgeClient
 import com.catenax.bpdm.bridge.dummy.testdata.CommonValues
 import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues
 import com.catenax.bpdm.bridge.dummy.testdata.GateRequestValues.addressGateInputRequest1
-import com.catenax.bpdm.bridge.dummy.util.*
+import com.catenax.bpdm.bridge.dummy.util.BpdmGateContextInitializer
+import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
+import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
+import com.catenax.bpdm.bridge.dummy.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
@@ -52,7 +55,7 @@ private val DEFAULT_PAGINATION_REQUEST = PaginationRequest(0, 100)
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class, BpdmPoolContextInitializer::class, BpdmGateContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, BpdmPoolContextInitializer::class, BpdmGateContextInitializer::class])
 class BridgeSyncIT @Autowired constructor(
     val bridgeClient: BridgeClient,
     val gateClient: GateClient,

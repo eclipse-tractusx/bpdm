@@ -28,8 +28,7 @@ data class PoolSecurityConfigProperties(
     var readPoolPartnerData: String = "read_pool_partner_data",
     var changePoolPartnerData: String = "change_pool_partner_data",
     var readMetaData: String = "read_meta_data",
-    var changeMetaData: String = "change_meta_data",
-    var manageOpensearch: String = "manage_opensearch"
+    var changeMetaData: String = "change_meta_data"
 ) {
 
     fun getReadPoolPartnerDataAsRole(): String {
@@ -46,9 +45,5 @@ data class PoolSecurityConfigProperties(
 
     fun getChangeMetaDataAsRole(): String {
         return "ROLE_$changeMetaData"
-    }
-
-    fun getManageOpensearchAsRole(): String {
-        return "ROLE_$manageOpensearch"
     }
 }

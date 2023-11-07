@@ -20,7 +20,8 @@ Then depending on which module you want to start go to the module subfolder you 
 * Docker and Docker Compose
 * Keycloak 17.0.0 (with enabled `auth` profile)
 
-When running, the project requires a PostgreSQL database and an OpenSearch instance to be available to connect to. You can set up these dependencies manually, or you can use the provided `docker-compose` file which will start the necessary dependencies for you.
+When running, the project requires a PostgreSQL database instance to be available to connect to. You can set up these dependencies manually, or you can use the
+provided `docker-compose` file which will start the necessary dependencies for you.
 
 To use Docker Compose, navigate to the project directory and run the following command:
 
@@ -29,7 +30,6 @@ docker-compose up
 ```
 
 Per default configuration the application expects postgres to run on `localhost` on port `5432`.
-Opensearch needs to run on `localhost` on port `9200` on default.
 
 You can find and edit the default configuration for the Pool in the `application.properties`,  `application-auth.properties`
 files in the `resources` folder.
@@ -40,7 +40,7 @@ The REST API documentation can be accessed at <http://localhost:8080/ui/swagger-
 
 The default configuration of the application is determined by the `application.properties` file.
 Here you can find core application configuration such as Swagger documentation, BPN generation and Actuator.
-Furthermore, here you can find the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL) and Opensearch.
+Furthermore, here you can find the configuration for the connection to the Spring datasource (currently, developed against PostgreSQL).
 
 You can also run the project with Spring profiles to enable additional components on top of the default configuration.
 Currently, the BPDM Pool offers the profile `auth`.
@@ -54,7 +54,7 @@ The following sections detail the configuration properties for each profile.
 
 `application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
 The application expects the Keycloak to run on `localhost` on port `8180`.
-However, as with the Spring datasource and Opensearch connections, the connection to the Keycloak can be freely configured.
+However, as with the Spring datasource connection, the connection to the Keycloak can be freely configured.
 The application uses the configured auth server URL to validate incoming tokens.
 
 For authorization purposes the application checks incoming token's permissions:

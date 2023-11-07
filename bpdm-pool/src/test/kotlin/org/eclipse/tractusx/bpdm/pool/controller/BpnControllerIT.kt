@@ -25,7 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.request.IdentifiersSearchRequest
-import org.eclipse.tractusx.bpdm.pool.util.*
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues
+import org.eclipse.tractusx.bpdm.pool.util.LegalEntityStructureRequest
+import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
+import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +41,7 @@ import org.springframework.test.context.ContextConfiguration
     properties = ["bpdm.controller.search-request-limit=2"]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class BpnControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val poolClient: PoolClientImpl

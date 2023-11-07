@@ -21,7 +21,6 @@ package com.catenax.bpdm.bridge.dummy.util
 
 
 import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer.Companion.bpdmPoolContainer
-import com.catenax.bpdm.bridge.dummy.util.OpenSearchContextInitializer.Companion.openSearchContainer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer.Companion.postgreSQLContainer
 import mu.KotlinLogging
 import org.springframework.boot.test.util.TestPropertyValues
@@ -49,7 +48,7 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
         private val bpdmGateContainer: GenericContainer<*> =
             GenericContainer(IMAGE)
-                .dependsOn(listOf<Startable>(postgreSQLContainer, openSearchContainer, bpdmPoolContainer))
+                .dependsOn(listOf<Startable>(postgreSQLContainer, bpdmPoolContainer))
                 .withNetwork(postgreSQLContainer.getNetwork())
                 .withExposedPorts(BPDM_PORT, DEBUG_PORT)
                 .withEnv(

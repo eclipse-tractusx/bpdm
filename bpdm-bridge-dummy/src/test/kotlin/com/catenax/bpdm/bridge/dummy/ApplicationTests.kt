@@ -21,7 +21,6 @@ package com.catenax.bpdm.bridge.dummy
 
 import com.catenax.bpdm.bridge.dummy.util.BpdmGateContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
-import com.catenax.bpdm.bridge.dummy.util.OpenSearchContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -30,7 +29,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class, BpdmPoolContextInitializer::class, BpdmGateContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, BpdmPoolContextInitializer::class, BpdmGateContextInitializer::class])
 class ApplicationTests {
 
 	@Test

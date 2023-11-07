@@ -25,9 +25,6 @@ object EndpointValues {
 
     const val CATENA_LEGAL_ENTITY_PATH = "$CATENA_PATH/legal-entities"
 
-
-    const val OPENSEARCH_SYNC_PATH = "api/opensearch/business-partner"
-
     const val CATENA_METADATA_IDENTIFIER_TYPE_PATH = "$CATENA_PATH/identifier-types"
     const val CATENA_METADATA_LEGAL_FORM_PATH = "$CATENA_PATH/legal-forms"
 

@@ -1,8 +1,0 @@
-{
-  "dynamic": "strict",
-  "properties": {
-    "name": {
-      "type": "search_as_you_type"
-    }
-  }
-}

@@ -27,7 +27,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityUpdateError
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.logisticAddress3
@@ -46,7 +49,7 @@ import java.time.Instant
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [Application::class, TestHelpers::class]
 )
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class, OpenSearchContextInitializer::class])
+@ContextConfiguration(initializers = [PostgreSQLContextInitializer::class])
 class LegalEntityControllerIT @Autowired constructor(
     val testHelpers: TestHelpers,
     val webTestClient: WebTestClient,
