@@ -29,6 +29,6 @@ data class TaskStepReservationResponse(
     @get:ArraySchema(arraySchema = Schema(description = "The reserved tasks with their business partner data to process"))
     val reservedTasks: List<TaskStepReservationEntryDto>,
 
-    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted")
+    @get:Schema(description = "The timestamp until the reservation is valid and results are accepted", deprecated = true)
     val timeout: Instant
 )

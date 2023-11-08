@@ -47,6 +47,6 @@ data class TaskProcessingStateDto(
     @get:Schema(description = "When the task has last been modified", required = true)
     val modifiedAt: Instant,
 
-    @get:Schema(description = "The timestamp until the task is removed from the Orchestrator")
+    @get:Schema(description = "The timestamp until the task is removed from the Orchestrator", deprecated = true)
     val timeout: Instant
 )
