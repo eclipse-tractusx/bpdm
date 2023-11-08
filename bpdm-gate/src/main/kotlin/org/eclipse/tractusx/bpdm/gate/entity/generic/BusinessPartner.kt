@@ -93,3 +93,4 @@ class BusinessPartner(
     var parentType: BusinessPartnerType? = null
 
 ) : BaseEntity()
+

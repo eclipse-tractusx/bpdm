@@ -24,7 +24,7 @@ import jakarta.persistence.*
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
 @Embeddable
-class AlternativePostalAddress(
+data class AlternativePostalAddress(
 
     @Embedded
     @AttributeOverride(name = "latitude", column = Column(name = "alt_latitude"))

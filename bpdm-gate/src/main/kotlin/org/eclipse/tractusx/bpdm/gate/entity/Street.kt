@@ -23,7 +23,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-class Street(
+data class Street(
     @Column
     val name: String? = null,
 
