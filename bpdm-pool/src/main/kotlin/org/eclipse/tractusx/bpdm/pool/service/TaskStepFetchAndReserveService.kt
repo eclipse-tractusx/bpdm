@@ -103,38 +103,27 @@ class TaskStepFetchAndReserveService(
         val legalEntitiesToCreateSteps = tasks
             .filter { isTaskCreateLegalEntity(it) }
 
-        val legalEntityByTask = legalEntitiesToCreateSteps
-            .associateWith { it.businessPartner.legalEntity as IBaseLegalEntityDto }
-            .toMap()
-        val addressByTask = legalEntitiesToCreateSteps
-            .filter { it.businessPartner.legalEntity?.legalAddress != null }
-            .associateWith { it.businessPartner.legalEntity?.legalAddress as IBaseLogisticAddressDto }
-            .toMap()
+        val errorsByRequest = requestValidationService.validateLegalEntityCreatesOrchestrator(legalEntitiesToCreateSteps)
 
-        val errorsByRequest =
-            requestValidationService.validateLegalEntityCreates(legalEntityByTask)
-        val errorsByRequestAddress =
-            requestValidationService.validateLegalEntityCreatesAddresses(addressByTask)
 
         val legalEntityCreateTaskResults = legalEntitiesToCreateSteps
             .map { taskStep ->
-                taskStep to taskStepResultEntryDto(taskStep, errorsByRequest, errorsByRequestAddress)
+                taskStep to taskStepResultEntryDto(taskStep, errorsByRequest)
             }.toMap()
             .filterValues { it != null }
         return legalEntityCreateTaskResults
     }
 
-    private fun taskStepResultEntryDto(
-        taskStep: TaskStepReservationEntryDto,
-        errorsByRequest: Map<RequestWithKey, List<ErrorInfo<LegalEntityCreateError>>>,
-        errorsByRequestAddress: Map<RequestWithKey, List<ErrorInfo<LegalEntityCreateError>>>
-    ) = if (errorsByRequest.containsKey(taskStep) || errorsByRequestAddress.containsKey(taskStep)) {
-        taskResultsForErrors(
-            taskStep.taskId,
-            errorsByRequest.getOrDefault(taskStep, mutableListOf()) + errorsByRequestAddress.getOrDefault(taskStep, mutableListOf())
-        )
-    } else {
-        null
+    private fun taskStepResultEntryDto(taskStep: TaskStepReservationEntryDto,
+        errorsByRequest: Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>>
+    ) : TaskStepResultEntryDto? {
+
+        val errors = errorsByRequest.get(taskStep)
+        return if (errors != null) {
+            taskResultsForErrors(taskStep.taskId, errors)
+        } else  {
+            null
+        }
     }
 
     private fun taskResultsForErrors(taskId: String, errors: Collection<ErrorInfo<LegalEntityCreateError>>): TaskStepResultEntryDto {
