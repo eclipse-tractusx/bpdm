@@ -59,4 +59,12 @@ data class PhysicalPostalAddressGateDto(
 
     override val door: String? = null
 
-) : IBasePhysicalPostalAddressDto
+) : IBasePhysicalPostalAddressDto {
+    override fun adminLevel1Key(): String? {
+        return administrativeAreaLevel1
+    }
+
+    override fun countryCode(): CountryCode? {
+        return country
+    }
+}

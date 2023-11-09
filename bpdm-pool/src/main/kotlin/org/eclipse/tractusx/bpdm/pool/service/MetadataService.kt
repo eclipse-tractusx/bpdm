@@ -156,29 +156,12 @@ class MetadataService(
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
-        val regionKeys = requests.mapNotNull { administrativeAreaLevel1ToString(it.physicalPostalAddress?.administrativeAreaLevel1) }
-            .plus(requests.mapNotNull { administrativeAreaLevel1ToString(it.alternativePostalAddress?.administrativeAreaLevel1) })
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.adminLevel1Key() }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.adminLevel1Key() })
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
 
         return AddressMetadataDto(idTypes, regions)
-    }
-
-    private fun administrativeAreaLevel1ToString(administrativeAreaLevel1: Any?): String? {
-
-        return when (administrativeAreaLevel1) {
-            is RegionDto -> {
-                administrativeAreaLevel1.regionCode
-            }
-
-            is String -> {
-                administrativeAreaLevel1
-            }
-
-            else -> {
-                null;
-            }
-        }
     }
 
     /**

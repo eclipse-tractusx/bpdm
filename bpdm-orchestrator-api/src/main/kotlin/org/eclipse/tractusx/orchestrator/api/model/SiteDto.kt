@@ -31,8 +31,7 @@ data class SiteDto(
     @get:Schema(description = "Whether this site data is different from its golden record counterpart in the Pool")
     val hasChanged: Boolean? = null,
 
-    @get:Schema(description = SiteDescription.name)
-    val name: String? = null,
+    override val name: String? = null,
 
     override val states: Collection<SiteStateDto> = emptyList(),
 

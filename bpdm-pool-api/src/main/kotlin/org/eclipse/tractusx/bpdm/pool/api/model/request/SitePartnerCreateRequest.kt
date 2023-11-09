@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
@@ -39,4 +40,8 @@ data class SitePartnerCreateRequest(
 
     @Schema(description = CommonDescription.index)
     val index: String?
-)
+) : RequestWithKey {
+    override fun getRequestKey(): String? {
+        return index
+    }
+}

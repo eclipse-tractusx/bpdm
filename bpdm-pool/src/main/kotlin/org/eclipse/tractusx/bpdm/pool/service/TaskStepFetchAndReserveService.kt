@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
@@ -105,15 +106,15 @@ class TaskStepFetchAndReserveService(
         val legalEntityByTask = legalEntitiesToCreateSteps
             .associateWith { it.businessPartner.legalEntity as IBaseLegalEntityDto }
             .toMap()
-        val addressByTask = tasks
+        val addressByTask = legalEntitiesToCreateSteps
             .filter { it.businessPartner.legalEntity?.legalAddress != null }
             .associateWith { it.businessPartner.legalEntity?.legalAddress as IBaseLogisticAddressDto }
             .toMap()
 
         val errorsByRequest =
-            requestValidationService.validateLegalEntityCreates(legalEntityByTask) { task -> task.businessPartner.legalEntity?.bpnLReference?.referenceValue }
+            requestValidationService.validateLegalEntityCreates(legalEntityByTask)
         val errorsByRequestAddress =
-            requestValidationService.validateLegalEntityCreatesAddresses(addressByTask) { task -> task.businessPartner.legalEntity?.bpnLReference?.referenceValue }
+            requestValidationService.validateLegalEntityCreatesAddresses(addressByTask)
 
         val legalEntityCreateTaskResults = legalEntitiesToCreateSteps
             .map { taskStep ->
@@ -125,8 +126,8 @@ class TaskStepFetchAndReserveService(
 
     private fun taskStepResultEntryDto(
         taskStep: TaskStepReservationEntryDto,
-        errorsByRequest: Map<TaskStepReservationEntryDto, List<ErrorInfo<LegalEntityCreateError>>>,
-        errorsByRequestAddress: Map<TaskStepReservationEntryDto, List<ErrorInfo<LegalEntityCreateError>>>
+        errorsByRequest: Map<RequestWithKey, List<ErrorInfo<LegalEntityCreateError>>>,
+        errorsByRequestAddress: Map<RequestWithKey, List<ErrorInfo<LegalEntityCreateError>>>
     ) = if (errorsByRequest.containsKey(taskStep) || errorsByRequestAddress.containsKey(taskStep)) {
         taskResultsForErrors(
             taskStep.taskId,

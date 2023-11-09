@@ -51,4 +51,11 @@ data class AlternativePostalAddressVerboseDto(
 
     override val deliveryServiceNumber: String
 
-) : IBaseAlternativePostalAddressDto
+) : IBaseAlternativePostalAddressDto {
+    override fun adminLevel1Key(): String? {
+        return administrativeAreaLevel1?.regionCode
+    }
+    override fun countryCode(): CountryCode {
+        return country.technicalKey
+    }
+}
