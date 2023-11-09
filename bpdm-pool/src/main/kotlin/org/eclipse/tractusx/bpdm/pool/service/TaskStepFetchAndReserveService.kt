@@ -20,11 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorCode
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ErrorInfo
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityCreateError
 import org.eclipse.tractusx.bpdm.pool.exception.BpdmValidationException
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
@@ -64,16 +62,16 @@ class TaskStepFetchAndReserveService(
     fun upsertGoldenRecordIntoPool(taskEntries: List<TaskStepReservationEntryDto>): List<TaskStepResultEntryDto> {
 
         val taskEntryBpnMapping = TaskEntryBpnMapping(taskEntries, bpnRequestIdentifierRepository)
-        //TODO Implement validation for sites, ...
-        val validationStepErrorsByEntry = validateLegalEntityCreateTasks(taskEntries)
 
-        val taksResults = taskEntries.map {
+        val invalidTaskResultsByTaskEntry = validateTasks(taskEntries)
 
-            val existingEntryError = validationStepErrorsByEntry[it]
-            existingEntryError ?: businessPartnerTaskResult(it, taskEntryBpnMapping)
+        val taskResults = taskEntries.map {
+
+            val invalidTaskResult = invalidTaskResultsByTaskEntry[it]
+            invalidTaskResult ?: businessPartnerTaskResult(it, taskEntryBpnMapping)
         }
         taskEntryBpnMapping.writeCreatedMappingsToDb(bpnRequestIdentifierRepository)
-        return taksResults
+        return taskResults
     }
 
     private fun businessPartnerTaskResult(taskStep: TaskStepReservationEntryDto, taskEntryBpnMapping: TaskEntryBpnMapping): TaskStepResultEntryDto {
@@ -93,40 +91,46 @@ class TaskStepFetchAndReserveService(
         }
     }
 
-    private fun validateLegalEntityCreateTasks(
-        tasks: List<TaskStepReservationEntryDto>
+    private fun validateTasks(
+        taskEntries: List<TaskStepReservationEntryDto>
     ): Map<TaskStepReservationEntryDto, TaskStepResultEntryDto?> {
 
-        val isTaskCreateLegalEntity =
-            { task: TaskStepReservationEntryDto -> task.businessPartner.legalEntity?.bpnLReference?.referenceType == BpnReferenceType.BpnRequestIdentifier }
+        val legalEntitiesToCreate = taskEntries
+            .filter { it.businessPartner.legalEntity?.bpnLReference?.referenceType == BpnReferenceType.BpnRequestIdentifier }
+        val legalEntitiesToUpdate = taskEntries
+            .filter { it.businessPartner.legalEntity?.bpnLReference?.referenceType == BpnReferenceType.Bpn }
+        val sitesToCreate = taskEntries
+            .filter { it.businessPartner.site?.bpnSReference?.referenceType == BpnReferenceType.BpnRequestIdentifier }
+        val sitesToUpdate = taskEntries
+            .filter { it.businessPartner.site?.bpnSReference?.referenceType == BpnReferenceType.Bpn }
 
-        val legalEntitiesToCreateSteps = tasks
-            .filter { isTaskCreateLegalEntity(it) }
+        val validationErrorsByTaskEntry = requestValidationService.validateLegalEntitiesToCreateFromOrchestrator(legalEntitiesToCreate) +
+            requestValidationService.validateLegalEntitiesToUpdateFromOrchestrator(legalEntitiesToUpdate)+
+            requestValidationService.validateSitesToCreateFromOrchestrator(sitesToCreate) +
+            requestValidationService.validateSitesToUpdateFromOrchestrator(sitesToUpdate)
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreatesOrchestrator(legalEntitiesToCreateSteps)
-
-
-        val legalEntityCreateTaskResults = legalEntitiesToCreateSteps
-            .map { taskStep ->
-                taskStep to taskStepResultEntryDto(taskStep, errorsByRequest)
-            }.toMap()
+        val taskResultsByTaskEntry = taskEntries
+            .associateWith { taskEntry ->
+                taskStepResultEntryDtoOnExistingError(taskEntry, validationErrorsByTaskEntry)
+            }
             .filterValues { it != null }
-        return legalEntityCreateTaskResults
+        return taskResultsByTaskEntry
     }
 
-    private fun taskStepResultEntryDto(taskStep: TaskStepReservationEntryDto,
-        errorsByRequest: Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>>
-    ) : TaskStepResultEntryDto? {
+    private fun taskStepResultEntryDtoOnExistingError(
+        taskEntry: TaskStepReservationEntryDto,
+        validationErrorsByTaskEntry: Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>>
+    ): TaskStepResultEntryDto? {
 
-        val errors = errorsByRequest.get(taskStep)
+        val errors = validationErrorsByTaskEntry[taskEntry]
         return if (errors != null) {
-            taskResultsForErrors(taskStep.taskId, errors)
-        } else  {
+            taskStepResultEntryDto(taskEntry.taskId, errors)
+        } else {
             null
         }
     }
 
-    private fun taskResultsForErrors(taskId: String, errors: Collection<ErrorInfo<LegalEntityCreateError>>): TaskStepResultEntryDto {
+    private fun taskStepResultEntryDto(taskId: String, errors: Collection<ErrorInfo<ErrorCode>>): TaskStepResultEntryDto {
 
         return TaskStepResultEntryDto(taskId = taskId, errors = errors.map { TaskErrorDto(type = TaskErrorType.Unspecified, description = it.message) })
     }

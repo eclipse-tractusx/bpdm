@@ -29,6 +29,8 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier1
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifier2
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.logisticAddress3
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -238,6 +240,93 @@ class LegalEntityControllerIT @Autowired constructor(
         val errors = response.errors.toList()
         testHelpers.assertErrorResponse(errors[0], LegalEntityUpdateError.LegalEntityDuplicateIdentifier, toUpdate1.bpnl)
         testHelpers.assertErrorResponse(errors[1], LegalEntityUpdateError.LegalEntityDuplicateIdentifier, toUpdate2.bpnl)
+    }
+
+
+    /**
+     */
+    @Test
+    fun `update legal entities  and get duplicate address identifiers error `() {
+
+        val toCreate1 = listOf(
+            BusinessPartnerNonVerboseValues.legalEntityCreate1
+            , BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
+                legalAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
+                    identifiers = listOf(addressIdentifier1, addressIdentifier2))
+            ))
+        val response1 = poolClient.legalEntities.createBusinessPartners(toCreate1)
+
+        assertThat(response1.errorCount).isEqualTo(0)
+        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+
+        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
+        val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
+            issuingBody = BusinessPartnerNonVerboseValues.identifier1.issuingBody
+        )
+
+        // 3 requests using these equivalent identifiers & 1 different request
+        val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
+            copy(
+                bpnl = bpnList[0],
+                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+            )
+        }
+
+        // address has same identifier as toUpdate1
+        val toUpdate2 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) {
+            copy(
+                bpnl = bpnList[1],
+                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+            )
+        }
+
+        val response = poolClient.legalEntities.updateBusinessPartners(
+            listOf(toUpdate1, toUpdate2)
+        )
+        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.entityCount).isEqualTo(1)
+    }
+
+    @Test
+    fun `update legal entities and with legal address identifiers`() {
+
+
+        val toCreate1 = listOf(
+            BusinessPartnerNonVerboseValues.legalEntityCreate1
+            , BusinessPartnerNonVerboseValues.legalEntityCreate2.copy(
+                legalAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
+                    identifiers = listOf(addressIdentifier1, addressIdentifier2))
+            ))
+        val response1 = poolClient.legalEntities.createBusinessPartners(toCreate1)
+
+        assertThat(response1.errorCount).isEqualTo(0)
+        val bpnList = response1.entities.map { it.legalEntity.bpnl }
+
+        // 2 equivalent identifiers (in regard to fields type and value) but different from the identifiers in the DB
+        val referenceIdentifier = BusinessPartnerNonVerboseValues.identifier3.copy(
+            issuingBody = BusinessPartnerNonVerboseValues.identifier1.issuingBody
+        )
+
+        // 3 requests using these equivalent identifiers & 1 different request
+        val toUpdate1 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate1) {
+            copy(
+                bpnl = bpnList[0],
+                legalEntity = legalEntity.copy(identifiers = listOf(referenceIdentifier))
+            )
+        }
+
+        val toUpdate2 = with(BusinessPartnerNonVerboseValues.legalEntityUpdate2) {
+            copy(
+                bpnl = bpnList[1],
+                legalAddress = legalAddress.copy( identifiers = listOf(addressIdentifier1, addressIdentifier2))
+            )
+        }
+
+        val response = poolClient.legalEntities.updateBusinessPartners(
+            listOf(toUpdate1, toUpdate2)
+        )
+        assertThat(response.errorCount).isEqualTo(0)
+        assertThat(response.entityCount).isEqualTo(2)
     }
 
     /**

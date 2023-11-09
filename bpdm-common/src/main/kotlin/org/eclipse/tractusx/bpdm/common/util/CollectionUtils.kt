@@ -47,3 +47,18 @@ fun <T> Collection<T>.findDuplicates(): Set<T> =
     this.groupBy { it }
         .filter { it.value.size > 1 }
         .keys
+
+/**
+ * Merge Maps with collections as values.
+ * The collections with the same key in the different maps are concatenated
+ */
+fun <KEY, VALUE> mergeMapsWithCollectionInValue(
+    vararg inputMaps: Map<out KEY, Collection<VALUE>>
+): Map<KEY, Collection<VALUE>> {
+    return inputMaps
+        .map { inputMap ->
+            inputMap.flatMap { (key, values) -> values.map { value -> Pair(key, value) } }
+        }
+        .reduce { entries1, entries2 -> entries1 + entries2 }
+        .groupBy({ it.first }, { it.second })
+}
