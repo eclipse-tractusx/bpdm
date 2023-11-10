@@ -502,7 +502,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpnl }
-        val response = poolClient.legalEntities.searchSites(bpnsToSearch).body?.map { it.legalEntity }
+        val response = poolClient.legalEntities.searchLegalEntitys(bpnsToSearch).body?.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -646,7 +646,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .take(2) // only search for a subset of the existing legal entities
 
         val bpnsToSearch = expected.map { it.bpnl }.plus("NONEXISTENT") // also search for nonexistent BPN
-        val response = poolClient.legalEntities.searchSites(bpnsToSearch).body?.map { it.legalEntity }
+        val response = poolClient.legalEntities.searchLegalEntitys(bpnsToSearch).body?.map { it.legalEntity }
 
         assertThat(response)
             .usingRecursiveComparison()

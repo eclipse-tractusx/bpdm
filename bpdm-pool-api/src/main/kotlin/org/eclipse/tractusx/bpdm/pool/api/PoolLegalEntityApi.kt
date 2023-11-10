@@ -133,7 +133,7 @@ interface PoolLegalEntityApi {
     )
     @PostMapping("/search")
     @PostExchange("/search")
-    fun searchSites(
+    fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
     ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>>
 
