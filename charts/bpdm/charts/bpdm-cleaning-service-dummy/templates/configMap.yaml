@@ -23,11 +23,14 @@ kind: ConfigMap
 metadata:
   name: {{include "bpdm.fullname" .}}
   labels:
-    {{- include "bpdm.labels" . | nindent 4}}
+    {{- include "bpdm.labels" . | nindent 4 }}
 data:
   deployment.yml: |-
     # Place for putting standard deployment configuration
     # which can be overwritten by external.yml
+    bpdm:
+      orchestrator:
+        base-url: {{include "bpdm-cleaning-service-dummy.orchestratorServiceName" .}}
   external.yml: |-
     # External properties for overwriting application config
     {{- if .Values.applicationConfig }}

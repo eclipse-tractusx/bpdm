@@ -61,41 +61,23 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{- define "bpdm-cleaning-service-dummy.poolServiceName" -}}
-{{- $config := .Values.applicationConfig -}}
-{{- if and $config (not (empty $config.bpdm)) -}}
-    {{- $bpdm := $config.bpdm -}}
-    {{- if and $bpdm (not (empty $bpdm.pool)) -}}
-        {{- $pool := $bpdm.pool -}}
-        {{- if and $pool (not (empty (index $pool "base-url"))) -}}
-            {{- index $pool "base-url" -}}
-        {{- else -}}
-            {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-        {{- end -}}
-    {{- else -}}
-        {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-    {{- end -}}
-{{- else -}}
-    {{- print "http://" (printf "%s-bpdm-pool" .Release.Name) ":8080" -}}
-{{- end -}}
-{{- end }}
 
-{{- define "bpdm-cleaning-service-dummy.gateServiceName" -}}
+{{- define "bpdm-cleaning-service-dummy.orchestratorServiceName" -}}
 {{- $config := .Values.applicationConfig -}}
 {{- if and $config (not (empty $config.bpdm)) -}}
     {{- $bpdm := $config.bpdm -}}
-    {{- if and $bpdm (not (empty $bpdm.gate)) -}}
-        {{- $gate := $bpdm.gate -}}
-        {{- if and $gate (not (empty (index $gate "base-url"))) -}}
-            {{- index $gate "base-url" -}}
+    {{- if and $bpdm (not (empty $bpdm.orchestrator)) -}}
+        {{- $orchestrator := $bpdm.orchestrator -}}
+        {{- if and $orchestrator (not (empty (index $orchestrator "base-url"))) -}}
+            {{- index $orchestrator "base-url" -}}
         {{- else -}}
-            {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
+            {{- print "http://" (printf "%s-bpdm-orchestrator" .Release.Name) ":8080" -}}
         {{- end -}}
     {{- else -}}
-        {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
+        {{- print "http://" (printf "%s-bpdm-orchestrator" .Release.Name) ":8080" -}}
     {{- end -}}
 {{- else -}}
-    {{- print "http://" (printf "%s-bpdm-gate" .Release.Name) ":8080" -}}
+    {{- print "http://" (printf "%s-bpdm-orchestrator" .Release.Name) ":8080" -}}
 {{- end -}}
 {{- end }}
 

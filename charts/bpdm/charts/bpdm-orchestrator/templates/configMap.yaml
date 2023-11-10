@@ -23,7 +23,7 @@ kind: ConfigMap
 metadata:
   name: {{include "bpdm.fullname" .}}
   labels:
-    {{- include "bpdm.labels" . | nindent 4}}
+    {{- include "bpdm.labels" . | nindent 4 }}
 data:
   deployment.yml: |-
     # Place for putting standard deployment configuration

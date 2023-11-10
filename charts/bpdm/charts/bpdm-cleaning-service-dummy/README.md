@@ -10,7 +10,7 @@ This Helm Chart deploys the BPDM service to a Kubernetes environment.
 In an existing Kubernetes cluster the application can be deployed with the following command:
 
 ```bash
-helm install release_name ./charts/bpdm-bridge-dummy --namespace your_namespace -f /path/to/my_release-values.yaml
+helm install release_name ./charts/bpdm-cleanning-service-dummy --namespace your_namespace -f /path/to/my_release-values.yaml
 ```
 
 This will install a new release of the BPDM Cleaning Service in the given namespace.
@@ -57,7 +57,7 @@ ingress:
   hosts:
     - host: business-partners.your-domain.net
       paths:
-        - path: /bridge
+        - path: /cleaning-service
           pathType: Prefix
 ```
 
@@ -73,9 +73,7 @@ effect.
 ```yaml
 applicationConfig:
   bpdm:
-    pool:
-      base-url: http://remote.domain.net/api/catena
-    gate:
+    orchestrator:
       base-url: http://remote.domain.net/api/catena
 ```
 -->
