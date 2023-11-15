@@ -178,6 +178,79 @@ The Swagger login uses the client specified in the property `springdoc.swagger-u
 This repository contains Helm files for deploying the BPDM Bridge Dummy to a Kubernetes environment.
 See the [BPDM Bridge Dummy Helm README](/charts/bpdm/charts/bpdm-bridge-dummy/README.md) for details.
 
+## BPDM Cleaning Service Dummy
+
+BPDM Cleaning Service Dummy is a SpringBoot Kotlin software project managed by Maven and can be run with the following command: `mvn clean spring-boot:run`
+
+### Prerequisites
+
+* Maven
+* JDK17
+
+You can find and edit the default configuration for the Cleaning Service dummy in the `application.properties` files in the `resources` folder.
+
+The REST API documentation can be accessed at <http://localhost:8084/ui/swagger-ui/index.html>.
+
+### Profiles
+
+The default configuration of the application is determined by the `application.properties` file.
+Here you can find core application configuration such as Swagger documentation.
+
+You can also run the project with Spring profiles to enable additional components on top of the default configuration.
+Currently, the BPDM Cleaning Service dummy offers without the profiles.
+In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
+
+For example, the command `mvn clean spring-boot:run -Dspring.profiles.active=auth` starts the application with additional `auth` configuration enabled.
+
+The following sections detail the configuration properties for each profile.
+
+### Helm Deployment
+
+This repository contains Helm files for deploying the BPDM Cleaning Service Dummy to a Kubernetes environment.
+See the [BPDM Cleaning Service Dummy Helm README](/charts/bpdm/charts/bpdm-cleaning-service-dummy/README.md) for details.
+
+## BPDM Orchestrator
+
+BPDM Orchestrator is a SpringBoot Kotlin software project managed by Maven and can be run with the following command: `mvn clean spring-boot:run`
+
+### Prerequisites
+
+* Maven
+* JDK17
+* Keycloak 17.0.0 (with enabled `auth` profile)
+
+You can find and edit the default configuration for the Orchestrator in the `application.properties`,  `application-auth.properties` files in the `resources` folder.
+
+The REST API documentation can be accessed at <http://localhost:8085/ui/swagger-ui/index.html>.
+
+### Profiles
+
+The default configuration of the application is determined by the `application.properties` file.
+Here you can find core application configuration such as Swagger documentation.
+
+You can also run the project with Spring profiles to enable additional components on top of the default configuration.
+Currently, the BPDM Orchestrator offers the profiles `auth`.
+In order to run the application with a specific profile you can use the appropriate maven flag `Dspring.profiles.active`.
+
+For example, the command `mvn clean spring-boot:run -Dspring.profiles.active=auth` starts the application with additional `auth` configuration enabled.
+
+The following sections detail the configuration properties for each profile.
+
+### Auth
+
+`application-auth.properties` enables authorization of endpoints and configures the connection to a Keycloak instance on which the authorization relies on.
+The application expects the Keycloak to run on `localhost` on port `8180` and needs a client secret has to be submitted via environment variable `BPDM_KEYCLOAK_SECRET`.
+But keep in mind that the connection to the Keycloak can be freely configured.
+The application uses the configured auth server URL to validate incoming tokens.
+
+This profile also enables/disables the login form in the auto-generated Swagger documentation.
+The Swagger login uses the client specified in the property `springdoc.swagger-ui.oauth.client-id`.
+
+### Helm Deployment
+
+This repository contains Helm files for deploying the BPDM Bridge Dummy to a Kubernetes environment.
+See the [BPDM Orchestrator Helm README](/charts/bpdm/charts/bpdm-orchestrator/README.md) for details.
+
 ## NOTICE
 
 This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
