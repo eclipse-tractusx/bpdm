@@ -66,6 +66,7 @@
         <sonar.version>3.9.1.2184</sonar.version>
         <jacoco.version>0.8.7</jacoco.version>
         <testcontainers.version>1.18.3</testcontainers.version>
+        <io.projectreactor.netty>1.1.13</io.projectreactor.netty>
     </properties>
 
     <pluginRepositories>
@@ -176,6 +177,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>io.projectreactor.netty</groupId>
+                <artifactId>reactor-netty-http</artifactId>
+                <version>${io.projectreactor.netty}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

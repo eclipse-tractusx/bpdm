@@ -7,7 +7,7 @@ FROM eclipse-temurin:17-jre-alpine
 # Adding wget for the health check
 RUN apk --no-cache add wget
 COPY --from=build /home/app/bpdm-orchestrator/target/bpdm-orchestrator.jar /usr/local/lib/bpdm/app.jar
-RUN apk update && apk upgrade libssl3 libcrypto3
+RUN apk update && apk upgrade --no-cache libssl3 libcrypto3
 ARG USERNAME=bpdm
 ARG USERID=10001
 ARG GID=3000
