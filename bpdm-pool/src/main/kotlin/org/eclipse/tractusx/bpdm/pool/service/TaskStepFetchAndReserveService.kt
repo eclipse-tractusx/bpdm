@@ -41,7 +41,7 @@ class TaskStepFetchAndReserveService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(cron = "\${bpdm.pool-orchestrator.golden-record-scheduler-cron-expr:-}", zone = "UTC")
+    @Scheduled(cron = "\${bpdm.client.pool-orchestrator.golden-record-scheduler-cron-expr:-}", zone = "UTC")
     fun fetchAndReserve() {
         try {
             logger.info { "Starting polling for cleaning tasks from Orchestrator..." }

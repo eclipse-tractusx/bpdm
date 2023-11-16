@@ -44,7 +44,7 @@ class ClientsConfig {
     // Pool-Client without authentication
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.pool.security-enabled"],
+        value = ["bpdm.client.pool.security-enabled"],
         havingValue = "false",
         matchIfMissing = true
     )
@@ -56,7 +56,7 @@ class ClientsConfig {
     // Gate-Client without authentication
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.gate.security-enabled"],
+        value = ["bpdm.client.gate.security-enabled"],
         havingValue = "false",
         matchIfMissing = true
     )
@@ -68,7 +68,7 @@ class ClientsConfig {
     // Pool-Client with OAuth2 authentication
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.pool.security-enabled"],
+        value = ["bpdm.client.pool.security-enabled"],
         havingValue = "true"
     )
     fun poolClientWithAuth(
@@ -78,7 +78,7 @@ class ClientsConfig {
     ): PoolApiClient {
         val url = poolConfigProperties.baseUrl
         val clientRegistrationId = poolConfigProperties.oauth2ClientRegistration
-            ?: throw IllegalArgumentException("bpdm.pool.oauth2-client-registration is required if bpdm.pool.security-enabled is set")
+            ?: throw IllegalArgumentException("bpdm.client.pool.oauth2-client-registration is required if bpdm.client.pool.security-enabled is set")
         return PoolClientImpl {
             webClientBuilder(url)
                 .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))
@@ -89,7 +89,7 @@ class ClientsConfig {
     // Gate-Client with OAuth2 authentication
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.gate.security-enabled"],
+        value = ["bpdm.client.gate.security-enabled"],
         havingValue = "true"
     )
     fun gateClientWithAuth(
@@ -99,7 +99,7 @@ class ClientsConfig {
     ): GateClient {
         val url = gateConfigProperties.baseUrl
         val clientRegistrationId = gateConfigProperties.oauth2ClientRegistration
-            ?: throw IllegalArgumentException("bpdm.gate.oauth2-client-registration is required if bpdm.gate.security-enabled is set")
+            ?: throw IllegalArgumentException("bpdm.client.gate.oauth2-client-registration is required if bpdm.client.gate.security-enabled is set")
         return GateClientImpl {
             webClientBuilder(url)
                 .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))

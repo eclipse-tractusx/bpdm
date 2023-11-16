@@ -1,0 +1,44 @@
+# Default port
+server:
+    port: 8085
+
+bpdm:
+    name: '@project.name@'
+    version: '@project.version@'
+    description: '@project.description@'
+
+    # Api Request Restrictions
+    api:
+        upsert-limit: 100
+
+    # Logging Configuration
+    logging:
+        unknown-user: Anonymous
+
+    task:
+        task-reservation-timeout: 1d
+        task-timeout: 3d
+
+# Enable actuator endpoints
+management:
+    endpoint:
+        health:
+            probes:
+                enabled: true
+    health:
+        livenessState:
+            enabled: true
+        readinessState:
+            enabled: true
+
+# Springdoc swagger configuration
+springdoc:
+    api-docs:
+        enabled: true
+        path: /docs/api-docs
+    swagger-ui:
+        csrf:
+            enabled: true
+        disable-swagger-default-url: true
+        path: /ui/swagger-ui
+        show-common-extensions: true

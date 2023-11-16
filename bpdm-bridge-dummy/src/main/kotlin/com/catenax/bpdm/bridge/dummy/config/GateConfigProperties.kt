@@ -22,7 +22,7 @@ package com.catenax.bpdm.bridge.dummy.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.gate")
+@ConfigurationProperties(prefix = "bpdm.client.gate")
 data class GateConfigProperties(
     val baseUrl: String = "http://localhost:8081/",
     val securityEnabled: Boolean = false,

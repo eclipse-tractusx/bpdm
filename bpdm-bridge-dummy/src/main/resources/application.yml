@@ -1,0 +1,73 @@
+# Change default port
+server:
+  port: 8081
+
+bpdm:
+  name: '@project.name@'
+  version: '@project.version@'
+  description: '@project.description@'
+
+  # Page size for querying Gate
+  bridge:
+    query-page-size: 100
+
+  # Connection to Pool and Gate
+  client:
+    gate:
+      base-url: http://localhost:8081/
+    pool:
+      base-url: http://localhost:8080/
+
+  # Datasource host and schema
+  datasource:
+    host: localhost
+    schema: bpdm-bridge-dummy
+
+  # Logging Configuration
+  logging:
+    unknown-user: Anonymous
+
+#Enable actuator endpoints
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+spring:
+  # Datasource configuration
+  datasource:
+    driverClassName: org.postgresql.Driver
+    password: ''
+    url: jdbc:postgresql://${bpdm.datasource.host}:5432/bpdm
+    username: bpdm
+  flyway:
+    enabled: true
+    schemas: ${bpdm.datasource.schema}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      # Send updates and inserts out in batches to decrease network connections to the database
+      hibernate:
+        default_schema: ${bpdm.datasource.schema}
+        jdbc:
+          batch_size: 16
+        order_inserts: true
+        order_updates: true
+
+# Springdoc swagger configuration
+springdoc:
+  api-docs:
+    enabled: true
+    path: /docs/api-docs
+  swagger-ui:
+    csrf:
+      enabled: true
+    disable-swagger-default-url: true
+    path: /ui/swagger-ui
+    show-common-extensions: true

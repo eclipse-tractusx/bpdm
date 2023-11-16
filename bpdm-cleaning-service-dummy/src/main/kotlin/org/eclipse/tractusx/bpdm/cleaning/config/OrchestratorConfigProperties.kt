@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.cleaning.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.orchestrator")
+@ConfigurationProperties(prefix = "bpdm.client.orchestrator")
 data class OrchestratorConfigProperties(
     val baseUrl: String = "http://localhost:8085/",
     val securityEnabled: Boolean = false,

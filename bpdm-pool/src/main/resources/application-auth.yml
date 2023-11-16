@@ -16,30 +16,27 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
-bpdm.name=@project.name@
-bpdm.description=@project.description@
-bpdm.version=@project.version@
-##
-# Change default port
-server.port=8085
-##
-# Logging Configuration
-bpdm.logging.unknown-user=Anonymous
-##
-# Api Request Restrictions
-bpdm.api.upsert-limit=100
-##
-#Springdoc swagger configuration
-springdoc.api-docs.enabled=true
-springdoc.api-docs.path=/docs/api-docs
-springdoc.swagger-ui.disable-swagger-default-url=true
-springdoc.swagger-ui.path=/ui/swagger-ui
-springdoc.swagger-ui.show-common-extensions=true
-springdoc.swagger-ui.csrf.enabled=true
-##
-#Enable actuator endpoints
-management.endpoint.health.probes.enabled=true
-management.health.livenessState.enabled=true
-management.health.readinessState.enabled=true
-bpdm.task.task-timeout=3d
-bpdm.task.task-reservation-timeout=1d
+
+bpdm:
+  pool-security:
+    changeMetaData: change_meta_data
+    changePoolPartnerData: change_pool_partner_data
+    readMetaData: read_meta_data
+    readPoolPartnerData: read_pool_partner_data
+  security:
+    auth-server-url: http://localhost:8180
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    client-id: BPDM_Client
+    cors-origins: '*'
+    enabled: true
+    realm: master
+    refresh-url: ${bpdm.security.token-url}
+    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs

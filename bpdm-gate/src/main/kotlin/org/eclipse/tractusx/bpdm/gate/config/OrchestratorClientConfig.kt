@@ -42,7 +42,7 @@ class OrchestratorClientConfig {
     // Orchestrator-Client without authentication
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.orchestrator.security-enabled"],
+        value = ["bpdm.client.orchestrator.security-enabled"],
         havingValue = "false",
         matchIfMissing = true
     )
@@ -54,7 +54,7 @@ class OrchestratorClientConfig {
 
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.orchestrator.security-enabled"],
+        value = ["bpdm.client.orchestrator.security-enabled"],
         havingValue = "true"
     )
     fun orchestratorClientWithAuth(
@@ -64,7 +64,7 @@ class OrchestratorClientConfig {
     ): OrchestrationApiClient {
         val url = orchestratorConfigProperties.baseUrl
         val clientRegistrationId = orchestratorConfigProperties.oauth2ClientRegistration
-            ?: throw IllegalArgumentException("bpdm.orchestrator.oauth2-client-registration is required if bpdm.orchestrator.security-enabled is set")
+            ?: throw IllegalArgumentException("bpdm.orchestrator.oauth2-client-registration is required if bpdm.client.orchestrator.security-enabled is set")
         return OrchestrationApiClientImpl {
             webClientBuilder(url)
                 .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))

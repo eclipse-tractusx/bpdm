@@ -16,6 +16,3 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
-logging.level.root=INFO
-# limit db connection pool size since connection pools are only closed when spring context is deleted
-spring.datasource.hikari.maximum-pool-size=2
