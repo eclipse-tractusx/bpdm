@@ -615,7 +615,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 businessPartnerType = BusinessPartnerType.GENERIC,
                 externalId = externalId3,
                 sharingStateType = SharingStateType.Error,
-                sharingErrorCode = BusinessPartnerSharingError.SharingProcessError,
+                sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
                 sharingErrorMessage = "Missing Task in Orchestrator",
                 bpn = null,
                 sharingProcessStarted = null,

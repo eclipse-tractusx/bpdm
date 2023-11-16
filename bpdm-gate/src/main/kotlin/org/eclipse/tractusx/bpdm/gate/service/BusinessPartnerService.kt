@@ -273,7 +273,7 @@ class BusinessPartnerService(
         errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
             SharingStateService.ErrorRequest(
                 SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
-                BusinessPartnerSharingError.SharingProcessError,
+                BusinessPartnerSharingError.MissingTaskID,
                 errorMessage = "Missing Task in Orchestrator"
             )
         })
