@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher
 
 @Configuration
 class BpdmSecurityConfigurerAdapterImpl(
@@ -38,17 +38,17 @@ class BpdmSecurityConfigurerAdapterImpl(
         http.cors {}
         http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
         http.authorizeHttpRequests {
-            it.requestMatchers(AntPathRequestMatcher("/api/**", HttpMethod.OPTIONS.name())).permitAll()
-            it.requestMatchers(AntPathRequestMatcher("/")).permitAll() // forwards to swagger
-            it.requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher("/error")).permitAll()
-            it.requestMatchers(AntPathRequestMatcher("/api/**")).authenticated()
+            it.requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
+            it.requestMatchers(antMatcher("/")).permitAll() // forwards to swagger
+            it.requestMatchers(antMatcher("/docs/api-docs/**")).permitAll()
+            it.requestMatchers(antMatcher("/ui/swagger-ui/**")).permitAll()
+            it.requestMatchers(antMatcher("/actuator/health/**")).permitAll()
+            it.requestMatchers(antMatcher("/error")).permitAll()
+            it.requestMatchers(antMatcher("/api/**")).authenticated()
         }
         http.oauth2ResourceServer {
-            it.jwt {
-                it.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
+            it.jwt { jwt ->
+                jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
             }
         }
     }

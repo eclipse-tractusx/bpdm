@@ -26,34 +26,30 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher
 
 @Configuration
 class BpdmSecurityConfigurerAdapterImpl(
     val securityConfigProperties: SecurityConfigProperties
 ) : BpdmSecurityConfigurerAdapter {
 
-    companion object {
-        const val ALL_API_PATHS = "/api/**"
-    }
-
     override fun configure(http: HttpSecurity) {
-        http.csrf().disable()
-            .cors()
-            .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().authorizeHttpRequests()
-            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS, HttpMethod.OPTIONS.name())).permitAll()
-            .requestMatchers(AntPathRequestMatcher("/")).permitAll() // forwards to swagger
-            .requestMatchers(AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
-            .requestMatchers(AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
-            .requestMatchers(AntPathRequestMatcher("/actuator/health/**")).permitAll()
-            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS, HttpMethod.GET.name())).authenticated()
-            .requestMatchers(AntPathRequestMatcher("/api/catena/**/search", HttpMethod.POST.name())).authenticated()
-            .requestMatchers(AntPathRequestMatcher("/api/catena/**/filter", HttpMethod.POST.name())).authenticated()
-            .requestMatchers(AntPathRequestMatcher("/error")).permitAll()
-            .requestMatchers(AntPathRequestMatcher(ALL_API_PATHS)).hasRole("add_company_data")
-            .and().oauth2ResourceServer()
-            .jwt()
-            .jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
+        http.csrf { it.disable() }
+        http.cors {}
+        http.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+        http.authorizeHttpRequests {
+            it.requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll()
+            it.requestMatchers(antMatcher("/")).permitAll() // forwards to swagger
+            it.requestMatchers(antMatcher("/docs/api-docs/**")).permitAll()
+            it.requestMatchers(antMatcher("/ui/swagger-ui/**")).permitAll()
+            it.requestMatchers(antMatcher("/actuator/health/**")).permitAll()
+            it.requestMatchers(antMatcher("/error")).permitAll()
+            it.requestMatchers(antMatcher("/api/**")).authenticated()
+        }
+        http.oauth2ResourceServer {
+            it.jwt { jwt ->
+                jwt.jwtAuthenticationConverter(CustomJwtAuthenticationConverter(securityConfigProperties.clientId))
+            }
+        }
     }
 }
