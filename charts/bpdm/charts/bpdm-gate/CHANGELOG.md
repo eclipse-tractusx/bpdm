@@ -1,26 +1,32 @@
-# Changelog
+^# Changelog
 
 All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [5.0.0] - tbd
+
+### Changed
+
+- Update application version to 5.0.0
+
 ## [4.1.0] - 2023-11-03
 
 ### Changed
 
-- increase to app version 4.1.0
+- Update application version to 4.1.0
 
 ## [4.0.1] - 2023-08-28
 
 ### Changed
 
-- increase to app version 4.0.1
+- Update application version to 4.0.1
 
 ## [4.0.0] - 2023-08-18
 
 ### Changed
 
-- increase to app version 4.0.0
+- Update application version to 4.0.0
 - add missing license headers to ingress templates
 - change default registry for image to dockerhub
 
@@ -32,7 +38,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- increase to app version 3.2.0
+- Update application version to 3.2.0
 
 ## [3.2.0] - 2023-03-16
 
@@ -44,19 +50,19 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- increase to app version 3.1.0
+- Update application version to 3.1.0
 
 ## [3.0.6] - 2023-02-24
 
 ### Changed
 
-- increase to app version 3.0.3
+- Update application version to 3.0.3
 
 ## [3.0.5] - 2023-02-16
 
 ### Changed
 
-- support app version 3.0.2
+- Update application version to 3.0.2
 
 ### Fixed
 
@@ -77,7 +83,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- AppVersion to 3.0.1
+- Update application version to 3.0.1
 
 ## [3.0.2] - 2022-01-23
 
@@ -89,4 +95,4 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ## Changed
 
-- AppVersion to 3.0.0
+- Update application version to 3.0.0
