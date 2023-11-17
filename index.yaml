@@ -3,6 +3,58 @@ entries:
   bpdm:
   - apiVersion: v2
     appVersion: 4.1.0
+    created: "2023-11-17T04:47:54.633764934Z"
+    dependencies:
+    - alias: bpdm-gate
+      condition: bpdm-gate.enabled
+      name: bpdm-gate
+      repository: ""
+      version: 4.1.0
+    - alias: bpdm-pool
+      condition: bpdm-pool.enabled
+      name: bpdm-pool
+      repository: ""
+      version: 5.1.0
+    - alias: bpdm-bridge-dummy
+      condition: bpdm-bridge-dummy.enabled
+      name: bpdm-bridge-dummy
+      repository: ""
+      version: 1.1.0
+    - alias: bpdm-cleaning-service-dummy
+      condition: bpdm-cleaning-service-dummy.enabled
+      name: bpdm-cleaning-service-dummy
+      repository: ""
+      version: 1.0.2
+    - alias: bpdm-orchestrator
+      condition: bpdm-orchestrator.enabled
+      name: bpdm-orchestrator
+      repository: ""
+      version: 1.0.1
+    - alias: opensearch
+      condition: opensearch.enabled
+      name: opensearch
+      repository: https://opensearch-project.github.io/helm-charts/
+      version: 2.12.2
+    - alias: postgres
+      condition: postgres.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.13
+    description: A Helm chart for Kubernetes that deploys the BPDM applications
+    digest: 72ddbe38cbde8d0bca5a7e8b9a6d9ea247cc54b34b30ece42ee6e16f238ac04c
+    home: https://github.com/eclipse-tractusx/bpdm
+    maintainers:
+    - name: Nico Koprowski
+    - name: Fabio D. Mota
+    name: bpdm
+    sources:
+    - https://github.com/eclipse-tractusx/bpdm
+    type: application
+    urls:
+    - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-3.1.2/bpdm-3.1.2.tgz
+    version: 3.1.2
+  - apiVersion: v2
+    appVersion: 4.1.0
     created: "2023-11-10T12:14:13.923947562Z"
     dependencies:
     - alias: bpdm-gate
@@ -1820,4 +1872,4 @@ entries:
     urls:
     - https://github.com/eclipse-tractusx/bpdm/releases/download/bpdm-pool-4.0.0/bpdm-pool-4.0.0.tgz
     version: 4.0.0
-generated: "2023-11-10T12:14:13.92448831Z"
+generated: "2023-11-17T04:47:54.634017246Z"
