@@ -27,6 +27,7 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 - BPDM Gate: New business partner type 'GENERIC' for changelog
 - BPDM Gate: New business partner type 'GENERIC' for sharing state
 - Workflows: Trivy now targets the latest alpha Docker image instead of the latest release version
+- Apps: Increase projectreactor.netty version to fix Trivy vulnerability 
 
 
 ## [4.0.1] - 2023-08-28
