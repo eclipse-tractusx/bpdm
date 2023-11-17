@@ -36,6 +36,14 @@ The BPDM Bridge Dummy offers an API for Eclipse Tractus-X
 members to sync between Gate and Pool. It is nothing but Bridge between Gate and Pool as a simple replacement for a dedicated sharing service.
 Via Bridge dummy service they can sync their added business partner records through the sharing process end up in the BPDM Pool.
 
+## BPDM Cleaning Service Dummy
+
+The BPDM Cleaning Service Dummy will offers provider to figure out how to connect the BPDM Pool and the Gate applications to form the golden record process: The process on how a record in the Gate becomes a golden record in the Pool which, in turn, gets distributed back to all Gates.
+
+## BPDM Orchestrator
+
+The BPDM Orchestrator is a passive component that offers standardized APIs for the BPDM Gate, BPDM Pool and Data Curation and Enrichment Services to orchestrate the process of Golden Record Creation and handling the different states a business partner record can have during this process.
+
 ## Installation
 
 For installation instructions for the BPDM applications please refer to the [INSTALL](INSTALL.md) file.

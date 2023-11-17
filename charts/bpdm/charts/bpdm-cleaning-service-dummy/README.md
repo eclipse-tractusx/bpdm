@@ -1,4 +1,4 @@
-# BPDM Bridge Dummy Helm Chart
+# BPDM Cleaning Service Dummy Helm Chart
 
 This Helm Chart deploys the BPDM service to a Kubernetes environment.
 

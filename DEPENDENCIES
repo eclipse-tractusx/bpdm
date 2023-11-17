@@ -63,11 +63,11 @@ maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-core/10.1.15, Apache-2.0
 maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-el/10.1.15, Apache-2.0, approved, #6997
 maven/mavencentral/org.apache.tomcat.embed/tomcat-embed-websocket/10.1.15, Apache-2.0, approved, #7920
 maven/mavencentral/org.aspectj/aspectjweaver/1.9.20, EPL-1.0, approved, tools.aspectj
-maven/mavencentral/org.eclipse.tractusx/bpdm-common/4.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/4.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/4.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/4.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
-maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/4.1.0-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-common/4.1.1-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-gate-api/4.1.1-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator-api/4.1.1-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-orchestrator/4.1.1-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
+maven/mavencentral/org.eclipse.tractusx/bpdm-pool-api/4.1.1-SNAPSHOT, Apache-2.0, approved, automotive.tractusx
 maven/mavencentral/org.flywaydb/flyway-core/9.16.3, Apache-2.0, approved, #7935
 maven/mavencentral/org.hibernate.orm/hibernate-core/6.2.13.Final, LGPL-2.1-only AND Apache-2.0 AND MIT AND CC-PDDC AND (EPL-2.0 OR BSD-3-Clause), approved, #9121
 maven/mavencentral/org.hibernate.validator/hibernate-validator/8.0.1.Final, Apache-2.0, approved, clearlydefined
