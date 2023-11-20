@@ -57,7 +57,8 @@ interface GateSharingStateApi {
     ): PageDto<SharingStateDto>
 
     @Operation(
-        summary = "Creates or updates a sharing state of a business partner"
+        summary = "Creates or updates a sharing state of a business partner",
+        deprecated = true
     )
     @ApiResponses(
         value = [
