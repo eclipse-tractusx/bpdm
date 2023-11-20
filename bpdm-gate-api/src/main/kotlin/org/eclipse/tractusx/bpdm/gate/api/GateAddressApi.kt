@@ -49,7 +49,8 @@ interface GateAddressApi {
         description = "Create or update addresses. " +
                 "Updates instead of creating a new address if an already existing external ID is used. " +
                 "The same external ID may not occur more than once in a single request. " +
-                "For a single request, the maximum number of addresses in the request is limited to \${bpdm.api.upsert-limit} entries."
+                "For a single request, the maximum number of addresses in the request is limited to \${bpdm.api.upsert-limit} entries.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -63,7 +64,8 @@ interface GateAddressApi {
 
     @Operation(
         summary = "Returns address by external ID from the input stage",
-        description = "Returns address by external ID from the input stage."
+        description = "Returns address by external ID from the input stage.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -77,7 +79,8 @@ interface GateAddressApi {
 
     @Operation(
         summary = "Returns addresses by an array of external IDs from the input stage",
-        description = "Returns page of addresses from the input stage. Can optionally be filtered by external IDs."
+        description = "Returns page of addresses from the input stage. Can optionally be filtered by external IDs.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -94,7 +97,8 @@ interface GateAddressApi {
 
     @Operation(
         summary = "Returns addresses from the input stage",
-        description = "Returns page of addresses from the input stage."
+        description = "Returns page of addresses from the input stage.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -108,7 +112,8 @@ interface GateAddressApi {
 
     @Operation(
         summary = "Returns addresses by an array of external IDs from the output stage",
-        description = "Get page of addresses from the output stage. Can optionally be filtered by external IDs."
+        description = "Get page of addresses from the output stage. Can optionally be filtered by external IDs.",
+        deprecated = true
     )
     @ApiResponses(
         value = [
@@ -128,7 +133,8 @@ interface GateAddressApi {
         description = "Create or update addresses (Output). " +
                 "Updates instead of creating a new address if an already existing external ID is used. " +
                 "The same external ID may not occur more than once in a single request. " +
-                "For a single request, the maximum number of addresses in the request is limited to \${bpdm.api.upsert-limit} entries."
+                "For a single request, the maximum number of addresses in the request is limited to \${bpdm.api.upsert-limit} entries.",
+        deprecated = true
 
     )
     @ApiResponses(
