@@ -23,6 +23,7 @@ bpdm:
     createTask: create_task
     processTaskPrefix: process_task_step
     viewTask: view_task
+
   # OAuth configuration
   security:
     cors-origins: '*'

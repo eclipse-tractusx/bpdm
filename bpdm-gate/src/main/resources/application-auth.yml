@@ -41,6 +41,7 @@ bpdm:
     refresh-url: ${bpdm.security.token-url}
     token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
 
+
 #Spring OAuth configuration
 spring:
   security:

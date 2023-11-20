@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
@@ -37,7 +38,10 @@ class SiteService(
     private val legalEntityRepository: LegalEntityRepository,
     private val addressService: AddressService
 ) {
+    private val logger = KotlinLogging.logger { }
+
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<SiteVerboseDto> {
+        logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -48,6 +52,7 @@ class SiteService(
     }
 
     fun findByPartnerBpns(siteSearchRequest: SiteBpnSearchRequest, paginationRequest: PaginationRequest): PageDto<SitePoolVerboseDto> {
+        logger.debug { "Executing findByPartnerBpns() with parameters $siteSearchRequest // $paginationRequest" }
         val partners =
             if (siteSearchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(siteSearchRequest.legalEntities) else emptyList()
         val sitePage =
@@ -57,6 +62,7 @@ class SiteService(
     }
 
     fun findByBpn(bpn: String): SitePoolVerboseDto {
+        logger.debug { "Executing findByBpn() with parameters $bpn " }
         val site = siteRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Site", bpn)
         return site.toPoolDto()
     }

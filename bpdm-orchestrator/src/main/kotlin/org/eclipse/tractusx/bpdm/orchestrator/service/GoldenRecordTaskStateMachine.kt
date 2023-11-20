@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmIllegalStateException
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
@@ -32,7 +33,10 @@ class GoldenRecordTaskStateMachine(
     val taskConfigProperties: TaskConfigProperties
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     fun initProcessingState(mode: TaskMode): TaskProcessingState {
+        logger.debug { "Executing initProcessingState() with parameters $mode" }
         val now = Instant.now()
 
         val initialStep = getInitialStep(mode)
@@ -53,6 +57,7 @@ class GoldenRecordTaskStateMachine(
     }
 
     fun doReserve(task: GoldenRecordTask) {
+        logger.debug { "Executing doReserve() with parameters $task" }
         val state = task.processingState
         val now = Instant.now()
 
@@ -66,6 +71,7 @@ class GoldenRecordTaskStateMachine(
     }
 
     fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
+        logger.debug { "Executing doResolveTaskToSuccess() with parameters $task // $step and $resultBusinessPartner" }
         val state = task.processingState
         val now = Instant.now()
 
@@ -89,6 +95,7 @@ class GoldenRecordTaskStateMachine(
     }
 
     fun doResolveTaskToError(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
+        logger.debug { "Executing doResolveTaskToError() with parameters $task // $step and $errors" }
         val state = task.processingState
 
         if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {

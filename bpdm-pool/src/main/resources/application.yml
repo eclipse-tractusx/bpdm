@@ -38,10 +38,6 @@ bpdm:
   controller:
     search-request-limit: 100
 
-  # Logging Configuration
-  logging:
-    unknown-user: Anonymous
-
   # Orchestrator Client
   client:
     pool-orchestrator:
@@ -59,6 +55,19 @@ bpdm:
   # Datasource Host
   datasource:
     host: localhost
+
+# Logging Configuration
+logging:
+  unknown-user: Anonymous
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %green([%-10.10X{user:-System}]) %magenta([%-10.10X{request:-No Request}]) %yellow([%-15.15t]) %cyan(%-40.40logger{39}) : %m%n%wEx"
+  level:
+    root: INFO
+    org:
+      eclipse:
+        tractusx:
+          bpdm:
+            pool: DEBUG
 
 # Enable actuator endpoints
 management:

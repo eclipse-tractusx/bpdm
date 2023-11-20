@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
@@ -40,7 +41,10 @@ class AddressService(
     private val legalEntityRepository: LegalEntityRepository,
     private val siteRepository: SiteRepository,
 ) {
+    private val logger = KotlinLogging.logger { }
+
     fun findByPartnerBpn(bpn: String, pageIndex: Int, pageSize: Int): PageDto<LogisticAddressVerboseDto> {
+        logger.debug { "Executing findByPartnerBpn() with parameters $bpn // $pageIndex // $pageSize" }
         if (!legalEntityRepository.existsByBpn(bpn)) {
             throw BpdmNotFoundException("Business Partner", bpn)
         }
@@ -51,6 +55,7 @@ class AddressService(
     }
 
     fun findByBpn(bpn: String): LogisticAddressVerboseDto {
+        logger.debug { "Executing findByBpn() with parameters $bpn" }
         val address = logisticAddressRepository.findByBpn(bpn) ?: throw BpdmNotFoundException("Address", bpn)
         return address.toDto()
     }
@@ -60,6 +65,8 @@ class AddressService(
         searchRequest: AddressPartnerBpnSearchRequest,
         paginationRequest: PaginationRequest
     ): PageDto<LogisticAddressVerboseDto> {
+        logger.debug { "Executing findByPartnerAndSiteBpns() with parameters $searchRequest and $paginationRequest" }
+
         val partners = if (searchRequest.legalEntities.isNotEmpty()) legalEntityRepository.findDistinctByBpnIn(searchRequest.legalEntities) else emptyList()
         val sites = if (searchRequest.sites.isNotEmpty()) siteRepository.findDistinctByBpnIn(searchRequest.sites) else emptyList()
 
@@ -74,6 +81,7 @@ class AddressService(
     }
 
     fun findLegalAddresses(bpnLs: Collection<String>): Collection<LegalAddressVerboseDto> {
+        logger.debug { "Executing findLegalAddresses() with parameters $bpnLs" }
         val legalEntities = legalEntityRepository.findDistinctByBpnIn(bpnLs)
         legalEntityRepository.joinLegalAddresses(legalEntities)
         val addresses = legalEntities.map { it.legalAddress }
@@ -82,6 +90,7 @@ class AddressService(
     }
 
     fun findMainAddresses(bpnS: Collection<String>): Collection<MainAddressVerboseDto> {
+        logger.debug { "Executing findMainAddresses() with parameters $bpnS" }
         val sites = siteRepository.findDistinctByBpnIn(bpnS)
         siteRepository.joinAddresses(sites)
         val addresses = sites.map { it.mainAddress }

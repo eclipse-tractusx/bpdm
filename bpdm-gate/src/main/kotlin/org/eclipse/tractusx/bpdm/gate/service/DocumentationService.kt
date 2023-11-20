@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import jakarta.persistence.EntityManager
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.util.JpaMermaidCreator
 import org.eclipse.tractusx.bpdm.common.util.JpaMetaModelReader
 import org.springframework.stereotype.Service
@@ -32,8 +33,10 @@ class DocumentationService(
     val entityManager: EntityManager
 ) {
 
-    fun getMermaidGatePersistence(): String {
+    private val logger = KotlinLogging.logger { }
 
+    fun getMermaidGatePersistence(): String {
+        logger.info { "Executing getMermaidGatePersistence()" }
         val allClassInfos = JpaMetaModelReader().createJpaClassInfos(this.entityManager.metamodel)
         return JpaMermaidCreator().getMermaid(allClassInfos, "Gate persistence")
     }
