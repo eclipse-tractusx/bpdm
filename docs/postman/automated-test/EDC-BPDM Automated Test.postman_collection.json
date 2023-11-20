@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "478bfefa-0ab2-4299-993e-1800562484f5",
+		"_postman_id": "fbdc004d-e141-4531-9425-4d61be61c990",
 		"name": "EDC-BPDM Automated Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "29584075"
@@ -4793,6 +4793,212 @@
 											"response": []
 										}
 									]
+								},
+								{
+									"name": "GET Administrative Level 1",
+									"item": [
+										{
+											"name": "Initiate EDR Negotation",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"@context\": {\n\t\t\"odrl\": \"http://www.w3.org/ns/odrl/2/\"\n\t},\n\t\"@type\": \"NegotiationInitiateRequestDto\",\n\t\"connectorAddress\": \"{{PROVIDER_PROTOCOL_URL}}\",\n\t\"protocol\": \"dataspace-protocol-http\",\n\t\"connectorId\": \"{{PROVIDER_ID}}\",\n\t\"providerId\": \"{{PROVIDER_ID}}\",\n\t\"offer\": {\n\t\t\"offerId\": \"{{OFFERID_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}\",\n\t\t\"assetId\": \"{{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}\",\n\t\t\"policy\": {\n\t\t\t\"@type\": \"odrl:Set\",\n\t\t\t\"odrl:permission\": {\n\t\t\t\t\"odrl:target\": \"{{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}\",\n\t\t\t\t\"odrl:action\": {\n\t\t\t\t\t\"odrl:type\": \"USE\"\n\t\t\t\t},\n\t\t\t\t\"odrl:constraint\": {\n\t\t\t\t\t\"odrl:or\": {\n\t\t\t\t\t\t\"odrl:leftOperand\": \"BusinessPartnerNumber\",\n\t\t\t\t\t\t\"odrl:operator\": {\n                            \"@id\": \"odrl:eq\"\n                        },\n\t\t\t\t\t\t\"odrl:rightOperand\": \"{{POLICY_BPN}}\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"odrl:prohibition\": [],\n\t\t\t\"odrl:obligation\": [],\n\t\t\t\"odrl:target\": \"{{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}\"\n\t\t}\n\t}\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Query EDRs Cached",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"// Parse the JSON response",
+															"var responseBody = pm.response.json();",
+															"",
+															"// Check if the response is an array and has elements",
+															"if (Array.isArray(responseBody) && responseBody.length > 0) {",
+															"    // Get the last object in the array",
+															"    var lastObject = responseBody[responseBody.length - 1];",
+															"",
+															"    // Check if the last object has the \"edc:transferProcessId\" property",
+															"    if (lastObject.hasOwnProperty(\"edc:transferProcessId\")) {",
+															"        // Copy the value of \"edc:transferProcessId\" to a variable",
+															"        var transferProcessId = lastObject[\"edc:transferProcessId\"];",
+															"",
+															"        // Log the value to the Postman console",
+															"        console.log(\"Transfer Process ID: \" + transferProcessId);",
+															"",
+															"        // You can also use the value of transferProcessId as needed",
+															"        // For example, you can set it as an environment variable",
+															"        pm.collectionVariables.set(\"TRANSFERID_AUTOTEST\", transferProcessId);",
+															"    } else {",
+															"        console.log(\"The last object does not have 'edc:transferProcessId' property.\");",
+															"    }",
+															"} else {",
+															"    console.log(\"Response is not an array or it has no elements.\");",
+															"}",
+															""
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs?assetId={{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs"
+													],
+													"query": [
+														{
+															"key": "assetId",
+															"value": "{{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}"
+														}
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get EDR by tp ID",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Status code is 200\", function () {",
+															"    pm.response.to.have.status(200);",
+															"});",
+															"// Parse the JSON response",
+															"var responseBody = pm.response.json();",
+															"",
+															"// Check if the response contains the \"edc:authCode\" property",
+															"if (responseBody.hasOwnProperty(\"edc:authCode\")) {",
+															"    // Get the value of \"edc:authCode\"",
+															"    var authCode = responseBody[\"edc:authCode\"];",
+															"",
+															"    // Set the collection variable with the value of \"edc:authCode\"",
+															"    pm.collectionVariables.set(\"AUTH_CODE\", authCode);",
+															"",
+															"    // Log the value to the Postman console",
+															"    console.log(\"edc:authCode: \" + authCode);",
+															"} else {",
+															"    console.log(\"Response does not contain 'edc:authCode' property.\");",
+															"}"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{CONSUMER_ADAPTER_URL}}/edrs/{{TRANSFERID_AUTOTEST}}",
+													"host": [
+														"{{CONSUMER_ADAPTER_URL}}"
+													],
+													"path": [
+														"edrs",
+														"{{TRANSFERID_AUTOTEST}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Public API GET",
+											"request": {
+												"auth": {
+													"type": "apikey",
+													"apikey": [
+														{
+															"key": "value",
+															"value": "{{AUTH_CODE}}",
+															"type": "string"
+														},
+														{
+															"key": "key",
+															"value": "Authorization",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{PROVIDER_PUBLIC_API}}",
+													"host": [
+														"{{PROVIDER_PUBLIC_API}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
 								}
 							]
 						},
@@ -6554,6 +6760,11 @@
 			"type": "string"
 		},
 		{
+			"key": "ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1",
+			"value": "GET_ADMINISTRATIVE_AREAS_LEVEL_1",
+			"type": "string"
+		},
+		{
 			"key": "TRANSFERID_AUTOTEST",
 			"value": ""
 		},
@@ -6707,6 +6918,11 @@
 		{
 			"key": "OFFERID_test-gate-api-asset-2",
 			"value": ""
+		},
+		{
+			"key": "OFFERID_GET_ADMINISTRATIVE_AREAS_LEVEL_1",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
