@@ -75,10 +75,11 @@ private class DataClassUnwrappedJsonDeserializerForType(destinationJavaType: Jav
 
         val constructorValues = constructorParameters.map { param ->
             val jacksonType = ctxt.typeFactory.constructType(param.type.javaType)
-            val node = if (param.jsonUnwrapped) rootNode else rootNode.get(param.name)
+            val node = if (param.jsonUnwrapped) rootNode else rootNode[param.name]
             val value = readTreeAsValue(ctxt, node, jacksonType)
-            if (value == null && !param.type.isMarkedNullable)
-                throw IllegalArgumentException("Field '${param.name}' of '$destinationClass' is required")
+            require(value != null || param.type.isMarkedNullable) {
+                "Field '${param.name}' of '$destinationClass' is required"
+            }
             value
         }
 

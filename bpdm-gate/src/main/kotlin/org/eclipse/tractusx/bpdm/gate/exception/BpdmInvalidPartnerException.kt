@@ -26,5 +26,4 @@ import org.springframework.web.bind.annotation.ResponseStatus
 class BpdmInvalidPartnerException(
     partnerId: String,
     reason: String
-) : RuntimeException("Partner with ID '$partnerId' is invalid: $reason") {
-}
+) : RuntimeException("Partner with ID '$partnerId' is invalid: $reason")

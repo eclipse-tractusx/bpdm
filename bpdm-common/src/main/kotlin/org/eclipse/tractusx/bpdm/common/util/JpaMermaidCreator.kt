@@ -21,7 +21,7 @@ package org.eclipse.tractusx.bpdm.common.util
 
 class JpaMermaidCreator {
 
-    val MAX_ENUM_VALUES = 15
+    private val MAX_ENUM_VALUES = 15
 
     fun getMermaid(allClassInfos: MutableCollection<JpaClassInfo>, title: String): String {
 
@@ -30,7 +30,7 @@ class JpaMermaidCreator {
 
         appendHeader(mermaid, title)
         appendEnums(mermaid, allClassInfos)
-
+        val whiteSpace = "        "
         allClassInfos
             .sortedBy { it.entityName }
             .forEach { classInfo ->
@@ -43,11 +43,11 @@ class JpaMermaidCreator {
                         if (attrInfo.primitiveType is JpaStringType && attrInfo.primitiveType.typeHint == TypeHint.ENUM) {
                             mermaid.append("        ").append(attrInfo.primitiveType.domValueType?.simpleName)
                         } else {
-                            mermaid.append("        ").append(attrInfo.primitiveType.getTypeName())
+                            mermaid.append(whiteSpace).append(attrInfo.primitiveType.getTypeName())
                         }
                     }
                     if (attrInfo is JdyObjectReferenceInfo) {
-                        mermaid.append("        ").append(attrInfo.referencedClass.entityName)
+                        mermaid.append(whiteSpace).append(attrInfo.referencedClass.entityName)
                         if (attrInfo.embedded) {
                             mermaidRelationship.append("   ").append(classInfo.entityName).append(" ..> ").append(attrInfo.referencedClass.entityName)
                                 .appendLine()
@@ -77,14 +77,16 @@ class JpaMermaidCreator {
 
         allClassInfos.forEach { classInfo ->
             classInfo.attributeList.forEach { attrInfo ->
-
-                if (attrInfo is JpaPrimitiveAttributeInfo && attrInfo.primitiveType is JpaStringType && attrInfo.primitiveType.typeHint == TypeHint.ENUM) {
-
-                    if (attrInfo.primitiveType.domValueType != null && !allEnums.contains(attrInfo.primitiveType.domValueType)) {
-                        appendEnum(mermaid, attrInfo.primitiveType.domValueType, attrInfo.primitiveType.domValues)
-                        allEnums.add(attrInfo.primitiveType.domValueType)
-                    }
+                if (attrInfo is JpaPrimitiveAttributeInfo
+                    && attrInfo.primitiveType is JpaStringType
+                    && attrInfo.primitiveType.typeHint == TypeHint.ENUM
+                    && attrInfo.primitiveType.domValueType != null
+                    && !allEnums.contains(attrInfo.primitiveType.domValueType)
+                ) {
+                    appendEnum(mermaid, attrInfo.primitiveType.domValueType, attrInfo.primitiveType.domValues)
+                    allEnums.add(attrInfo.primitiveType.domValueType)
                 }
+
             }
         }
 

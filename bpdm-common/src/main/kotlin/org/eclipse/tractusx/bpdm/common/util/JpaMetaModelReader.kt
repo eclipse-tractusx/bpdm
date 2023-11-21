@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.common.util
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Temporal
+import jakarta.persistence.TemporalType
 import jakarta.persistence.metamodel.*
 import jakarta.persistence.metamodel.Attribute.PersistentAttributeType.*
 import jakarta.validation.constraints.DecimalMax
@@ -95,21 +98,18 @@ class JpaMetaModelReader {
         jpaEntity.attributes.forEach { attr ->
             if (!attr.isCollection) {
                 if (attr.persistentAttributeType === Attribute.PersistentAttributeType.BASIC) {
-
                     createPrimitiveField(attr)?.let {
                         classInfo.attributeList.add(it)
                     }
-                } else if (attr.persistentAttributeType === ONE_TO_ONE || attr.persistentAttributeType === MANY_TO_ONE) {
-
-                    createObjectReference(attr, className2InfoMap)?.let {
-                        classInfo.attributeList.add(it)
-                    }
-                } else if (attr.persistentAttributeType === EMBEDDED) {
-
+                } else if (attr.persistentAttributeType === ONE_TO_ONE
+                    || attr.persistentAttributeType === MANY_TO_ONE
+                    || attr.persistentAttributeType === EMBEDDED
+                ) {
                     createObjectReference(attr, className2InfoMap)?.let {
                         classInfo.attributeList.add(it)
                     }
                 }
+
             }
         }
     }
@@ -118,16 +118,13 @@ class JpaMetaModelReader {
     private fun buildAssociationsForClassInfo(classInfo: JpaClassInfo, jpaEntity: EntityType<*>, className2InfoMap: MutableMap<String, JpaClassInfo>) {
 
         jpaEntity.attributes.forEach {
-            if (it.isCollection) {
-                if (it.persistentAttributeType === Attribute.PersistentAttributeType.ONE_TO_MANY) {
-                    val wrapper = JpaCollectionWrapper(it)
-                    val metaDetailClass = className2InfoMap[wrapper.referencedType?.name]
-                    val mapping = wrapper.getAnnotationInfo(OneToMany::class.java)
-                    val joinColumn = wrapper.getAnnotationInfo(JoinColumn::class.java)
-                    val metaAssocName = it.name
-                    val metaAssoc = metaDetailClass?.let { it1 -> JpaAssociationInfo(assocName = metaAssocName, detailClass = it1) }
-                    metaAssoc?.let { it1 -> classInfo.associationList.add(it1) }
-                }
+            if (it.isCollection && it.persistentAttributeType === Attribute.PersistentAttributeType.ONE_TO_MANY) {
+                val wrapper = JpaCollectionWrapper(it)
+                val metaDetailClass = className2InfoMap[wrapper.referencedType?.name]
+
+                val metaAssocName = it.name
+                val metaAssoc = metaDetailClass?.let { it1 -> JpaAssociationInfo(assocName = metaAssocName, detailClass = it1) }
+                metaAssoc?.let { it1 -> classInfo.associationList.add(it1) }
             }
         }
     }
@@ -140,7 +137,7 @@ class JpaMetaModelReader {
         val wrapper = JpaFieldWrapper(curAttr)
         val isKey = (curAttr as SingularAttribute).isId
         val isNotNull = !curAttr.isOptional || !wrapper.isNullable()
-        val isGenerated = wrapper.getGeneratedInfo() != null
+
         val refTypeName = wrapper.getRefTypeName()
         val referenceType = className2InfoMap[refTypeName]
         val metaAttr = referenceType?.let {
@@ -209,10 +206,10 @@ class JpaMetaModelReader {
         } else if (aTypeClass.isAssignableFrom(BigDecimal::class.java)) {
             val column = wrapper.getAnnotationInfo(Column::class.java)
             var scale = 0
-            var precision = 0
+
             if (column != null) {
                 scale = column.scale
-                precision = column.precision
+
             }
             val decMin: DecimalMin? = wrapper.getAnnotationInfo(DecimalMin::class.java)
             val decMax: DecimalMax? = wrapper.getAnnotationInfo(DecimalMax::class.java)

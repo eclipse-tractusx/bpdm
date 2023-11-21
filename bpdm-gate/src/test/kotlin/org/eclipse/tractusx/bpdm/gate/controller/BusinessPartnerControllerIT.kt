@@ -441,7 +441,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     }
 
     private fun mockOrchestratorApiCleaned() {
-        val TaskStateResponse =
+        val taskStateResponse =
             TaskStateResponse(
                 listOf(
                     TaskClientStateDto(
@@ -479,7 +479,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         gateWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL))
                 .willReturn(
-                    WireMock.okJson(objectMapper.writeValueAsString(TaskStateResponse))
+                    WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
                 )
         )
     }

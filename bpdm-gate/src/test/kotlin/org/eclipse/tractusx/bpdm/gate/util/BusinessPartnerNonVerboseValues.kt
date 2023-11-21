@@ -107,7 +107,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress1.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse1.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1!!, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress1,
@@ -118,7 +118,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress2.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse2.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1!!, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress2,
@@ -130,7 +130,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress1.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse1.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1!!, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress1,
@@ -142,7 +142,7 @@ object BusinessPartnerNonVerboseValues {
         address = BusinessPartnerVerboseValues.physicalAddress2.copy(
             nameParts = BusinessPartnerVerboseValues.logisticAddressGateOutputResponse2.address.nameParts,
             identifiers = listOf(
-                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1!!, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(BusinessPartnerVerboseValues.identifierValue1, BusinessPartnerVerboseValues.identifierTypeTechnicalKey1)
             )
         ),
         externalId = BusinessPartnerVerboseValues.externalIdAddress2,

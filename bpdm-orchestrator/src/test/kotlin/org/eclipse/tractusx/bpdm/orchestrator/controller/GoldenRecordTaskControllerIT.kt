@@ -297,7 +297,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             BusinessPartnerTestValues.businessPartner1
         )
 
-        assertBadRequestException() {
+        assertBadRequestException {
             createTasks(businessPartners = businessPartners)
         }
     }

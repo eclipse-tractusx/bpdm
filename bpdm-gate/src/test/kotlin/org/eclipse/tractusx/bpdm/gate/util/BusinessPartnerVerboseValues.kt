@@ -360,7 +360,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val bpInputRequestFull = BusinessPartnerInputRequest(
-        externalId = BusinessPartnerVerboseValues.externalId1,
+        externalId = externalId1,
         nameParts = listOf("Business Partner Name", "Company ABC AG", "Another Organisation Corp", "Catena Test Name"),
         shortName = "short1",
         legalName = "Limited Liability Company Name",
@@ -538,7 +538,7 @@ object BusinessPartnerVerboseValues {
         address = logisticAddress1.copy(
             nameParts = listOf("Business Partner Name"),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1!!, identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
             ),
             states = emptyList()
         ),
@@ -550,7 +550,7 @@ object BusinessPartnerVerboseValues {
         address = logisticAddress2.copy(
             nameParts = listOf("Company ABC AG"),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1!!, identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
             ),
             states = emptyList()
         ),
@@ -694,7 +694,7 @@ object BusinessPartnerVerboseValues {
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1!!, identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
             )
         ),
         externalId = legalEntityAddressId,
@@ -706,7 +706,7 @@ object BusinessPartnerVerboseValues {
         address = physicalAddress1.copy(
             nameParts = emptyList(),
             identifiers = listOf(
-                AddressIdentifierDto(identifierValue1!!, identifierTypeTechnicalKey1!!)
+                AddressIdentifierDto(identifierValue1, identifierTypeTechnicalKey1)
             )
         ),
         externalId = siteAddressId,

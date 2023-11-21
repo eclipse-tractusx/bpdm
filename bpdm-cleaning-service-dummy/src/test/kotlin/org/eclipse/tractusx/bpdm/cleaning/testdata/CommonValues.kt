@@ -40,19 +40,19 @@ import java.time.LocalDateTime
  */
 object CommonValues {
 
-    val fixedTaskId = "taskid-123123"
+    const val fixedTaskId = "taskid-123123"
 
-    val nameParts = listOf("Part1", "Part2")
-    const val shortName = "ShortName"
-    val identifiers = listOf(
+    private val nameParts = listOf("Part1", "Part2")
+    private const val shortName = "ShortName"
+    private val identifiers = listOf(
         BusinessPartnerIdentifierDto(
             type = "Type1",
             value = "Value1",
             issuingBody = "IssuingBody1"
         )
     )
-    const val legalForm = "LegalForm"
-    val states = listOf(
+    private const val legalForm = "LegalForm"
+    private val states = listOf(
         BusinessPartnerStateDto(
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(10),
@@ -60,15 +60,15 @@ object CommonValues {
             description = "ActiveState"
         )
     )
-    val classifications = listOf(
+    private val classifications = listOf(
         ClassificationDto(
             type = ClassificationType.NACE,
             code = "Code1",
             value = "Value1"
         )
     )
-    val roles = listOf(BusinessPartnerRole.SUPPLIER, BusinessPartnerRole.CUSTOMER)
-    val physicalPostalAddress = PhysicalPostalAddressDto(
+    private val roles = listOf(BusinessPartnerRole.SUPPLIER, BusinessPartnerRole.CUSTOMER)
+    private val physicalPostalAddress = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(longitude = 12.34f, latitude = 56.78f),
         country = CountryCode.PT,
         administrativeAreaLevel1 = "AdminArea1",
@@ -85,24 +85,24 @@ object CommonValues {
         door = "Door"
     )
 
-    val postalAddressForLegalAndSite = PostalAddressDto(
+    private val postalAddressForLegalAndSite = PostalAddressDto(
         addressType = AddressType.LegalAndSiteMainAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    val postalAddressForLegal = PostalAddressDto(
+    private val postalAddressForLegal = PostalAddressDto(
         addressType = AddressType.LegalAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    val postalAddressForSite = PostalAddressDto(
+    private val postalAddressForSite = PostalAddressDto(
         addressType = AddressType.SiteMainAddress,
         physicalPostalAddress = physicalPostalAddress
     )
-    val postalAddressForAdditional = PostalAddressDto(
+    private val postalAddressForAdditional = PostalAddressDto(
         addressType = AddressType.AdditionalAddress,
         physicalPostalAddress = physicalPostalAddress
     )
 
-    val businessPartnerWithEmptyBpns = BusinessPartnerGenericDto(
+    private val businessPartnerWithEmptyBpns = BusinessPartnerGenericDto(
         nameParts = nameParts,
         shortName = shortName,
         identifiers = identifiers,

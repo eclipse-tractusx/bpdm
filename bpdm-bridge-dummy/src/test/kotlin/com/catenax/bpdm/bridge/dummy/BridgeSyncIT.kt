@@ -442,9 +442,8 @@ class BridgeSyncIT @Autowired constructor(
             businessPartnerType = null,
             externalIds = null
         )
-        val sharingStatesOkay = sharingStates.content
+        return sharingStates.content
             .filter { it.sharingStateType == SharingStateType.Success && it.bpn != null }
-        return sharingStatesOkay
     }
 
     private fun assertEqualLegalEntity(gateVersion: LegalEntityGateInputRequest, poolVersion: LegalEntityMatchVerboseDto) {
