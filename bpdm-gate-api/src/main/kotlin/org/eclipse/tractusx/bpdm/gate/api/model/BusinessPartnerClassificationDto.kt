@@ -17,21 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.dto.IBaseClassificationDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(description = ClassificationDescription.header)
-data class ClassificationBusinessPartnerDto(
+data class BusinessPartnerClassificationDto(
 
-    @get:Schema(description = ClassificationDescription.type)
     override val type: ClassificationType?,
-
-    @get:Schema(description = ClassificationDescription.code)
     override val code: String?,
-
-    @get:Schema(description = ClassificationDescription.value)
     override val value: String?
+
 ) : IBaseClassificationDto

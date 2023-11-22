@@ -20,19 +20,20 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(
-    description = "Identifier record for a business partner",
-    requiredProperties = ["type", "value"]
-)
-data class BusinessPartnerIdentifierDto(
+interface IBaseStateDto {
 
-    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
-    val type: String? = null,
+    @get:Schema(description = "Date since when the status is/was valid.")
+    val validFrom: LocalDateTime?
 
-    @get:Schema(description = "Value of the identifier")
-    val value: String? = null,
+    @get:Schema(description = "Date until the status was valid, if applicable.")
+    val validTo: LocalDateTime?
 
-    @get:Schema(description = "Body which issued the identifier")
-    val issuingBody: String?
-)
+    @get:Schema(description = "The type of this specified status.")
+    val type: BusinessStateType?
+
+    @get:Schema(description = "Denotation of the status.")
+    val description: String?
+}

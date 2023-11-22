@@ -17,26 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.orchestrator.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteStateDescription
+import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(description = SiteDescription.header)
-interface IBaseSiteStateDto : IBaseStateDto {
+data class BusinessPartnerStateDto(
 
-    @get:Schema(description = SiteStateDescription.description)
+    override val validFrom: LocalDateTime?,
+    override val validTo: LocalDateTime?,
+    override val type: BusinessStateType?,
     override val description: String?
 
-    @get:Schema(description = SiteStateDescription.validFrom)
-    override val validFrom: LocalDateTime?
-
-    @get:Schema(description = SiteStateDescription.validTo)
-    override val validTo: LocalDateTime?
-
-    @get:Schema(description = SiteStateDescription.type)
-    override val type: BusinessStateType
-}
+) : IBaseStateDto

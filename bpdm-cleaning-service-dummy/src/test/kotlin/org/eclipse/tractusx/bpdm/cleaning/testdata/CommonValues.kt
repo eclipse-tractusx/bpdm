@@ -20,19 +20,16 @@
 package org.eclipse.tractusx.bpdm.cleaning.testdata
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.cleaning.service.toBusinessPartnerClassificationDto
+import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityState
 import org.eclipse.tractusx.bpdm.cleaning.service.toSiteState
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
 /**
@@ -61,7 +58,7 @@ object CommonValues {
         )
     )
     private val classifications = listOf(
-        ClassificationDto(
+        BusinessPartnerClassificationDto(
             type = ClassificationType.NACE,
             code = "Code1",
             value = "Value1"
@@ -147,7 +144,7 @@ object CommonValues {
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
-        classifications = classifications.map { it.toBusinessPartnerClassificationDto() }
+        classifications = classifications.map { it.toLegalEntityClassificationDto() }
     )
 
     val expectedSiteDto = SiteDto(

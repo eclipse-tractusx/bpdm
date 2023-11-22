@@ -20,9 +20,6 @@
 package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -40,6 +37,7 @@ class OrchestratorMappings(
     private val bpnConfigProperties: BpnConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
+
     fun toBusinessPartnerGenericDto(entity: BusinessPartner) = BusinessPartnerGenericDto(
         nameParts = entity.nameParts,
         shortName = entity.shortName,
@@ -57,7 +55,7 @@ class OrchestratorMappings(
     )
 
     private fun toClassificationDto(entity: Classification) =
-        ClassificationDto(type = entity.type, code = entity.code, value = entity.value)
+        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
 
     private fun toPostalAddressDto(entity: PostalAddress) =
         PostalAddressDto(
@@ -131,20 +129,20 @@ class OrchestratorMappings(
     }
 
     //Mapping BusinessPartnerGenericDto from to BusinessPartner
-    fun toBusinessPartner(entity: BusinessPartnerGenericDto, externalId: String) = BusinessPartner(
+    fun toBusinessPartner(dto: BusinessPartnerGenericDto, externalId: String) = BusinessPartner(
         externalId = externalId,
-        nameParts = entity.nameParts.toMutableList(),
-        shortName = entity.shortName,
-        identifiers = entity.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
-        legalName = entity.legalName,
-        legalForm = entity.legalForm,
-        states = entity.states.mapNotNull { toState(it) }.toSortedSet(),
-        classifications = entity.classifications.map { toClassification(it) }.toSortedSet(),
-        roles = entity.roles.toSortedSet(),
-        postalAddress = toPostalAddress(entity.postalAddress),
-        bpnL = entity.legalEntityBpn,
-        bpnS = entity.siteBpn,
-        bpnA = entity.addressBpn,
+        nameParts = dto.nameParts.toMutableList(),
+        shortName = dto.shortName,
+        identifiers = dto.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
+        legalName = dto.legalName,
+        legalForm = dto.legalForm,
+        states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
+        classifications = dto.classifications.map { toClassification(it) }.toSortedSet(),
+        roles = dto.roles.toSortedSet(),
+        postalAddress = toPostalAddress(dto.postalAddress),
+        bpnL = dto.legalEntityBpn,
+        bpnS = dto.siteBpn,
+        bpnA = dto.addressBpn,
         stage = StageType.Output
     )
 
@@ -158,14 +156,14 @@ class OrchestratorMappings(
     private fun toState(dto: BusinessPartnerStateDto) =
         dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
 
-    private fun toClassification(dto: ClassificationDto) =
+    private fun toClassification(dto: BusinessPartnerClassificationDto) =
         Classification(type = dto.type, code = dto.code, value = dto.value)
 
-    private fun toPostalAddress(entity: PostalAddressDto) =
+    private fun toPostalAddress(dto: PostalAddressDto) =
         PostalAddress(
-            addressType = entity.addressType,
-            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddress),
-            alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddress)
+            addressType = dto.addressType,
+            physicalPostalAddress = dto.physicalPostalAddress?.let(::toPhysicalPostalAddress),
+            alternativePostalAddress = dto.alternativePostalAddress?.let(this::toAlternativePostalAddress)
         )
 
     private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =

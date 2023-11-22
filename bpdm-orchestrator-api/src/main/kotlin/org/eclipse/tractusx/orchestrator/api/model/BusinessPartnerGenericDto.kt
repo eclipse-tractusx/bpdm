@@ -20,17 +20,22 @@
 package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerDto
 
 
+@Schema(
+    description = "Generic business partner with external id"
+)
 data class BusinessPartnerGenericDto(
+
     override val nameParts: List<String> = emptyList(),
     override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val legalName: String? = null,
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: PostalAddressDto = PostalAddressDto(),
     override val legalEntityBpn: String? = null,
@@ -38,6 +43,6 @@ data class BusinessPartnerGenericDto(
     override val addressBpn: String? = null,
 
     @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
-    val ownerBpnL: String? = null,
+    val ownerBpnL: String? = null
 
-    ) : IBaseBusinessPartnerDto
+) : IBaseBusinessPartnerDto
