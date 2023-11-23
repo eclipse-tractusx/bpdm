@@ -164,6 +164,22 @@ class MetadataService(
         return AddressMetadataDto(idTypes, regions)
     }
 
+    fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<Region> {
+
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.adminLevel1Key() }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.adminLevel1Key() })
+            .toSet()
+        val regions = regionRepository.findByRegionCodeIn(regionKeys)
+        return regions
+    }
+
+    fun getIdentifiers(requests: Collection<IBaseLogisticAddressDto>): Set<IdentifierType> {
+        val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
+        val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
+        return idTypes
+    }
+
+
     /**
      * If no country rule exists use default rules
      */

@@ -64,12 +64,9 @@ class BusinessPartnerBuildService(
         logger.info { "Create ${requests.size} new legal entities" }
 
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests.associateWith { it.legalEntity })
-        val errorsByRequestAddress =
-            requestValidationService.validateLegalEntityCreatesAddresses(requests.associateWith { it.legalAddress })
-
-        val errors = errorsByRequest.flatMap { it.value } + errorsByRequestAddress.flatMap { it.value }
-        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) || errorsByRequestAddress.containsKey(it) }
+        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests)
+        val errors = errorsByRequest.flatMap { it.value }
+        val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
         val legalEntityMetadataMap = metadataService.getMetadata(requests.map { it.legalEntity }).toMapping()
         val addressMetadataMap = metadataService.getMetadata(requests.map { it.legalAddress }).toMapping()
