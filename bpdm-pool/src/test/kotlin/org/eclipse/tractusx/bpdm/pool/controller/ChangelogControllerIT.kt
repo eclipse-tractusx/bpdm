@@ -76,12 +76,12 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].legalEntity.legalAddress.bpna
         val bpnA2 = createdStructures[1].legalEntity.legalAddress.bpna
 
-
+        val toUpdate = listOf(
+            BusinessPartnerNonVerboseValues.legalEntityUpdate1.copy(bpnl = bpnL1),
+            BusinessPartnerNonVerboseValues.legalEntityUpdate2.copy(bpnl = bpnL2)
+        )
         poolClient.legalEntities.updateBusinessPartners(
-            listOf(
-                BusinessPartnerNonVerboseValues.legalEntityUpdate1.copy(bpnl = bpnL1),
-                BusinessPartnerNonVerboseValues.legalEntityUpdate2.copy(bpnl = bpnL2)
-            )
+            toUpdate
         )
 
         val timeAfterUpdate = Instant.now()
@@ -136,9 +136,14 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnMainAddress1 = createdStructures[0].siteStructures[0].site.mainAddress.bpna
         val bpnMainAddress2 = createdStructures[0].siteStructures[1].site.mainAddress.bpna
 
+        val name1 = BusinessPartnerNonVerboseValues.siteUpdate3.site.name
+
         poolClient.sites.updateSite(
             listOf(
-                BusinessPartnerNonVerboseValues.siteUpdate1.copy(bpns = bpnS1),
+                BusinessPartnerNonVerboseValues.siteUpdate1.copy(
+                    bpns = bpnS1, site =
+                    BusinessPartnerNonVerboseValues.siteUpdate1.site.copy(name = name1)
+                ),
                 BusinessPartnerNonVerboseValues.siteUpdate2.copy(bpns = bpnS2)
             )
         )
@@ -154,9 +159,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnMainAddress2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnS1, BusinessPartnerType.SITE, timeAfterUpdate, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(bpnS2, BusinessPartnerType.SITE, timeAfterUpdate, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(bpnMainAddress2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
         )
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
@@ -184,7 +187,12 @@ class ChangelogControllerIT @Autowired constructor(
                 LegalEntityStructureRequest(
                     legalEntity = BusinessPartnerNonVerboseValues.legalEntityCreate1,
                     addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate1),
-                    siteStructures = listOf(SiteStructureRequest(site = BusinessPartnerNonVerboseValues.siteCreate1, addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)))
+                    siteStructures = listOf(
+                        SiteStructureRequest(
+                            site = BusinessPartnerNonVerboseValues.siteCreate1,
+                            addresses = listOf(BusinessPartnerNonVerboseValues.addressPartnerCreate2)
+                        )
+                    )
                 )
             )
         )
@@ -195,9 +203,13 @@ class ChangelogControllerIT @Autowired constructor(
         val bpnA1 = createdStructures[0].addresses[0].address.bpna
         val bpnA2 = createdStructures[0].siteStructures[0].addresses[0].address.bpna
 
+        val nameUpdate = "nameUpdate"
         poolClient.addresses.updateAddresses(
             listOf(
-                BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(bpna = bpnA1),
+                BusinessPartnerNonVerboseValues.addressPartnerUpdate1.copy(
+                    bpna = bpnA1,
+                    address = BusinessPartnerNonVerboseValues.addressPartnerUpdate1.address.copy(name = nameUpdate)
+                ),
                 BusinessPartnerNonVerboseValues.addressPartnerUpdate2.copy(bpna = bpnA2)
             )
         )
@@ -213,7 +225,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnA1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnA1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
+            //ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
         )
 
 
@@ -460,6 +472,5 @@ class ChangelogControllerIT @Autowired constructor(
             .also(checkTimestampAscending())
             .also(checkTimestampsInBetween(timeBeforeInsert, timeAfterInsert))
     }
-
 
 }
