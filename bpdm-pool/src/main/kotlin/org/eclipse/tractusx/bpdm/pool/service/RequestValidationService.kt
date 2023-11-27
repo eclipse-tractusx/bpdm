@@ -103,7 +103,8 @@ class RequestValidationService(
             .map {
                 AddressBridge(address = it.businessPartner.site?.mainAddress!!, request = it, bpnA = null)
             }
-        val additionalAddressBridges = requestsWithMainAddressNotNull.filter { it.businessPartner.site != null && it.businessPartner.address != null }
+        val additionalAddressBridges = requestsWithMainAddressNotNull
+            .filter { it.businessPartner.site != null && it.businessPartner.address != null }
             .map {
                 AddressBridge(address = it.businessPartner.address!!, request = it, bpnA = null)
             }
@@ -223,15 +224,26 @@ class RequestValidationService(
         val identifiersValidator = ValidateIdentifierTypesExists(addressDtos, messages.identifierNotFound)
         val identifiersDuplicateValidator = ValidateAddressIdentifiersDuplicated(addressDtos, messages.duplicateIdentifier)
 
-        return addressBridges.associate { bridge ->
-            val addressDto = bridge.address
-            val request = bridge.request
+        val result: MutableMap<RequestWithKey, List<ErrorInfo<ERROR>>> = mutableMapOf()
+        // there could be second bridge for the same request, e.g. main address and additional address
+            addressBridges.forEach{ bridge ->
+            val legalAddressDto = bridge.address
+            val request: RequestWithKey = bridge.request
             val validationErrors =
-                regionValidator.validate(addressDto, request) +
-                        identifiersValidator.validate(addressDto, request) +
-                        identifiersDuplicateValidator.validate(addressDto, request, bridge.bpnA)
-            request to validationErrors
-        }.filterValues { it.isNotEmpty() }
+                regionValidator.validate(legalAddressDto, request) +
+                        identifiersValidator.validate(legalAddressDto, request) +
+                        identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA)
+
+                if(validationErrors.isNotEmpty()) {
+                val existing = result[request];
+                if (existing == null) {
+                    result[request]  = validationErrors
+                } else {
+                    result[request]  = existing + validationErrors
+                }
+            }
+        }
+        return result;
     }
 
     fun validateSitesToCreateFromController(
