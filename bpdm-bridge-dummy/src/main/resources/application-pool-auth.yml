@@ -18,26 +18,21 @@
 ################################################################################
 
 bpdm:
-  pool-security:
-    changeMetaData: change_meta_data
-    changePoolPartnerData: change_pool_partner_data
-    readMetaData: read_meta_data
-    readPoolPartnerData: read_pool_partner_data
-
-  security:
-    auth-server-url: http://localhost:8180
-    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
-    client-id: BPDM_Client
-    cors-origins: '*'
-    enabled: true
-    realm: master
-    refresh-url: ${bpdm.security.token-url}
-    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+  client:
+    pool:
+      oauth2-client-registration: pool-client
+      security-enabled: true
 
 spring:
   security:
     oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
-          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs
+      client:
+        provider:
+          pool-oauth2-provider:
+            issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+        registration:
+          pool-client:
+            authorization-grant-type: client_credentials
+            client-id: ${bpdm.security.client-id}
+            client-secret: ${bpdm.security.credentials.secret}
+            provider: pool-oauth2-provider
