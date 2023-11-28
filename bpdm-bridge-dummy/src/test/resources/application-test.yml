@@ -16,3 +16,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
+
+bpdm:
+  datasource:
+    alias: bpdm-postgres
+
+  client:
+    pool:
+      alias: bpdm-pool
+
+logging:
+  level:
+    root: INFO
+
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 2

@@ -16,7 +16,29 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
-bpdm.datasource.alias=bpdm-postgres
-bpdm.pool.alias=bpdm-pool
-logging.level.root=INFO
-spring.datasource.hikari.maximum-pool-size=2
+
+bpdm:
+  # Orchestrator roles
+  orchestrator-security:
+    createTask: create_task
+    processTaskPrefix: process_task_step
+    viewTask: view_task
+  # OAuth configuration
+  security:
+    cors-origins: '*'
+    enabled: true
+    auth-server-url: http://localhost:8180
+    auth-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/auth
+    client-id: BPDM_ORCHESTRATOR
+    realm: master
+    refresh-url: ${bpdm.security.token-url}
+    token-url: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/token
+
+# Spring security
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}
+          jwk-set-uri: ${bpdm.security.auth-server-url}/realms/${bpdm.security.realm}/protocol/openid-connect/certs

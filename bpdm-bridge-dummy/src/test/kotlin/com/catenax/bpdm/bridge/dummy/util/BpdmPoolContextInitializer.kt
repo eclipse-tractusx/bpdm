@@ -60,7 +60,7 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val postgresNetworkAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
         val dataBase = postgreSQLContainer.getDatabaseName()
-        val bpdmAlias = applicationContext.environment.getProperty("bpdm.pool.alias")
+        val bpdmAlias = applicationContext.environment.getProperty("bpdm.client.pool.alias")
         bpdmPoolContainer.withNetworkAliases(bpdmAlias)
             .waitingFor(
                 HttpWaitStrategy()
@@ -81,7 +81,7 @@ class BpdmPoolContextInitializer : ApplicationContextInitializer<ConfigurableApp
             .start()
 
         TestPropertyValues.of(
-            "bpdm.pool.base-url=http://localhost:${bpdmPoolContainer.getMappedPort(BPDM_PORT)}",
+            "bpdm.client.pool.base-url=http://localhost:${bpdmPoolContainer.getMappedPort(BPDM_PORT)}",
         ).applyTo(applicationContext.environment)
 
         logger.info { "[!!!] Pool can be remote-debugged on port ${bpdmPoolContainer.getMappedPort(DEBUG_PORT)} " }

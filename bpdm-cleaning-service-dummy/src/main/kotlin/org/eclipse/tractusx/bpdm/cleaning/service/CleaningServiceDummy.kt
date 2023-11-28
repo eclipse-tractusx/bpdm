@@ -36,7 +36,7 @@ class CleaningServiceDummy(
 
     private val logger = KotlinLogging.logger { }
 
-    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
+    @Scheduled(cron = "\${bpdm.cleaningService.pollingCron:-}", zone = "UTC")
     fun pollForCleaningTasks() {
         processPollingTasks(TaskStep.CleanAndSync)
         processPollingTasks(TaskStep.Clean)

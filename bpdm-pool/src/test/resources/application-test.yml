@@ -16,12 +16,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
-# oauth2 client configuration for connecting with the pool
-bpdm.gate-security.pool-security-enabled=true
-# note that the oauth2-client-registration property is NOT the client id of the gate in keycloak
-bpdm.gate-security.oauth2-client-registration=gate-client
-spring.security.oauth2.client.registration.gate-client.client-id=${bpdm.security.client-id}
-spring.security.oauth2.client.registration.gate-client.client-secret=${bpdm.security.credentials.secret}
-spring.security.oauth2.client.registration.gate-client.authorization-grant-type=client_credentials
-spring.security.oauth2.client.registration.gate-client.provider=catena-keycloak-provider
-spring.security.oauth2.client.provider.catena-keycloak-provider.issuer-uri=${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+
+logging:
+  level:
+    root: INFO
+
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 2

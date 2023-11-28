@@ -29,7 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
 @ConditionalOnProperty(
-    value = ["bpdm.gate-security.pool-security-enabled"],
+    value = ["bpdm.client.pool.security-enabled"],
     havingValue = "false",
     matchIfMissing = true
 )

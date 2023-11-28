@@ -243,7 +243,7 @@ class BusinessPartnerService(
         )
     }
 
-    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
+    @Scheduled(cron = "\${bpdm.cleaningService.pollingCron:-}", zone = "UTC")
     @Transactional
     fun finishCleaningTask() {
         val sharingStates = sharingStateRepository.findBySharingStateTypeAndTaskIdNotNull(SharingStateType.Pending)

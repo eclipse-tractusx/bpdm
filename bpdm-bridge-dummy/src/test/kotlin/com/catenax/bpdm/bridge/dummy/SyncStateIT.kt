@@ -70,7 +70,7 @@ class SyncStateIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.gate.base-url") { gateWireMockServer.baseUrl() }
+            registry.add("bpdm.client.gate.base-url") { gateWireMockServer.baseUrl() }
         }
     }
 

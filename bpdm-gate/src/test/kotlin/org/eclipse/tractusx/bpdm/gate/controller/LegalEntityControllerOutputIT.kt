@@ -60,7 +60,7 @@ internal class LegalEntityControllerOutputIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
+            registry.add("bpdm.client.pool.base-url") { wireMockServerBpdmPool.baseUrl() }
         }
     }
 

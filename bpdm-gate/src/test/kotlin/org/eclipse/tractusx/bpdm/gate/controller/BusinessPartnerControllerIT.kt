@@ -78,7 +78,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.orchestrator.base-url") { gateWireMockServer.baseUrl() }
+            registry.add("bpdm.client.orchestrator.base-url") { gateWireMockServer.baseUrl() }
         }
     }
 

@@ -60,7 +60,7 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
     override fun initialize(applicationContext: ConfigurableApplicationContext) {
         val postgresNetworkAlias = applicationContext.environment.getProperty("bpdm.datasource.alias")
-        val bpdmPoolAlias = applicationContext.environment.getProperty("bpdm.pool.alias")
+        val bpdmPoolAlias = applicationContext.environment.getProperty("bpdm.client.pool.alias")
         val dataBase = postgreSQLContainer.getDatabaseName()
         bpdmGateContainer.waitingFor(
             HttpWaitStrategy()
@@ -71,7 +71,7 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
         bpdmGateContainer.withEnv(
             "spring.datasource.url", "jdbc:postgresql://${postgresNetworkAlias}:5432/${dataBase}?loggerLevel=OFF"
         )
-            .withEnv("bpdm.pool.base-url", "http://$bpdmPoolAlias:8080/api/catena")
+            .withEnv("bpdm.client.pool.base-url", "http://$bpdmPoolAlias:8080/api/catena")
 
             .withEnv(
                 "spring.datasource.username", postgreSQLContainer.username
@@ -83,7 +83,7 @@ class BpdmGateContextInitializer : ApplicationContextInitializer<ConfigurableApp
 
 
         TestPropertyValues.of(
-            "bpdm.gate.base-url=http://localhost:${bpdmGateContainer.getMappedPort(BPDM_PORT)}",
+            "bpdm.client.gate.base-url=http://localhost:${bpdmGateContainer.getMappedPort(BPDM_PORT)}",
         ).applyTo(applicationContext.environment)
 
         logger.info { "[!!!] Gate can be remote-debugged on port ${bpdmGateContainer.getMappedPort(DEBUG_PORT)} " }

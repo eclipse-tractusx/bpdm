@@ -63,7 +63,7 @@ class CleaningServiceApiCallsTest @Autowired constructor(
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            registry.add("bpdm.orchestrator.base-url") { orchestratorMockApi.baseUrl() }
+            registry.add("bpdm.client.orchestrator.base-url") { orchestratorMockApi.baseUrl() }
 
         }
     }

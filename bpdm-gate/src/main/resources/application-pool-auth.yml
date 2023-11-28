@@ -16,31 +16,24 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 ################################################################################
-bpdm.name=@project.name@
-bpdm.description=@project.description@
-bpdm.version=@project.version@
-##
-# Change default port
-server.port=8084
-##
-# Logging Configuration
-bpdm.logging.unknown-user=Anonymous
 
-##
-#Springdoc swagger configuration
-springdoc.api-docs.enabled=true
-springdoc.api-docs.path=/docs/api-docs
-springdoc.swagger-ui.disable-swagger-default-url=true
-springdoc.swagger-ui.path=/ui/swagger-ui
-springdoc.swagger-ui.show-common-extensions=true
-springdoc.swagger-ui.csrf.enabled=true
-##
-#Enable actuator endpoints
-management.endpoint.health.probes.enabled=true
-management.health.livenessState.enabled=true
-management.health.readinessState.enabled=true
-#Connection to Orchestrator
-bpdm.orchestrator.base-url=http://localhost:8085/
-##
-#Cleaning Service Configurations
-cleaningService.pollingCron=-
+bpdm:
+  client:
+    pool:
+      security-enabled: true
+  gate-security:
+    oauth2-client-registration: gate-client
+
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          catena-keycloak-provider:
+            issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
+        registration: # Note that the oauth2-client-registration property is NOT the client id of the gate in keycloak
+          gate-client:
+            authorization-grant-type: client_credentials
+            client-id: ${bpdm.security.client-id}
+            client-secret: ${bpdm.security.credentials.secret}
+            provider: catena-keycloak-provider

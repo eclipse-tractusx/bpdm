@@ -43,7 +43,7 @@ class ClientsConfig {
 
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.orchestrator.security-enabled"],
+        value = ["bpdm.client.orchestrator.security-enabled"],
         havingValue = "false",
         matchIfMissing = true
     )
@@ -55,7 +55,7 @@ class ClientsConfig {
 
     @Bean
     @ConditionalOnProperty(
-        value = ["bpdm.orchestrator.security-enabled"],
+        value = ["bpdm.client.orchestrator.security-enabled"],
         havingValue = "true"
     )
     fun orchestratorClientWithAuth(

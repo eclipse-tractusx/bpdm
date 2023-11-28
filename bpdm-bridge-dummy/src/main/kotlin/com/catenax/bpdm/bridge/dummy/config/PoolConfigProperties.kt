@@ -22,7 +22,7 @@ package com.catenax.bpdm.bridge.dummy.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.pool")
+@ConfigurationProperties(prefix = "bpdm.client.pool")
 data class PoolConfigProperties(
     val baseUrl: String = "http://localhost:8080/",
     val securityEnabled: Boolean = false,
