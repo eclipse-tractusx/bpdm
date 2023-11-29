@@ -1,6 +1,6 @@
 ## Notice for Docker image
 
-DockerHub: [https://hub.docker.com/r/tractusx/bpdm](https://hub.docker.com/r/tractusx/bpdm)
+DockerHub: [https://hub.docker.com/r/tractusx/bpdm-bridge-dummy](https://hub.docker.com/r/tractusx/bpdm-bridge-dummy)
 
 Eclipse Tractus-X product(s) installed within the image:
 
