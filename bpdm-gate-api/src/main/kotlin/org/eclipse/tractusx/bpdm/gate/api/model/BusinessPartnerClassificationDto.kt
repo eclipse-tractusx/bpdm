@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerClassificationDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 data class BusinessPartnerClassificationDto(
@@ -28,4 +28,4 @@ data class BusinessPartnerClassificationDto(
     override val code: String?,
     override val value: String?
 
-) : IBaseClassificationDto
+) : IBusinessPartnerClassificationDto

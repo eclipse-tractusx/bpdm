@@ -200,25 +200,25 @@ object BusinessPartnerVerboseValues {
         type = businessStateType2
     )
 
-    val bpClassification1Dto = ClassificationDto(
+    val bpClassification1Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2Dto = ClassificationDto(
+    val bpClassification2Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3Dto = ClassificationDto(
+    val bpClassification3Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4Dto = ClassificationDto(
+    val bpClassification4Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"

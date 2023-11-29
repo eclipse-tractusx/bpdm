@@ -395,7 +395,7 @@ class BusinessPartnerBuildService(
             return Instant.now().truncatedTo(ChronoUnit.MICROS)
         }
 
-        fun toLegalEntityState(dto: IBaseLegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
             return LegalEntityState(
                 description = dto.description,
                 validFrom = dto.validFrom,
@@ -438,7 +438,7 @@ class BusinessPartnerBuildService(
         }
 
         fun toLegalEntityIdentifier(
-            dto: IBaseLegalEntityIdentifierDto,
+            dto: ILegalEntityIdentifierDto,
             idTypes: Map<String, IdentifierType>,
             partner: LegalEntity
         ): LegalEntityIdentifier {
@@ -493,7 +493,7 @@ class BusinessPartnerBuildService(
             legalEntityDto: IBaseLegalEntityDto,
             bpnL: String,
             legalNameValue: String?,
-            metadataMap: BusinessPartnerBuildService.LegalEntityMetadataMapping
+            metadataMap: LegalEntityMetadataMapping
         ): LegalEntity {
 
             if (legalNameValue == null) {
@@ -509,7 +509,7 @@ class BusinessPartnerBuildService(
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
             )
-            BusinessPartnerBuildService.updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
+            updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
 
             return newLegalEntity
         }

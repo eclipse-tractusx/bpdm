@@ -40,7 +40,7 @@ class PoolUpdateService(
     fun createLegalEntitiesInPool(entriesToCreate: Collection<GateLegalEntityInfo>): LegalEntityPartnerCreateResponseWrapper {
         val createRequests = entriesToCreate.map {
             LegalEntityPartnerCreateRequest(
-                legalEntity = it.legalEntity,
+                legalEntity = gateToPoolLegalEntity(it.legalEntity),
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 index = it.externalId,
                 legalName = it.legalNameParts.firstOrNull() ?: ""
@@ -54,7 +54,7 @@ class PoolUpdateService(
     fun updateLegalEntitiesInPool(entriesToUpdate: Collection<GateLegalEntityInfo>): LegalEntityPartnerUpdateResponseWrapper {
         val updateRequests = entriesToUpdate.map {
             LegalEntityPartnerUpdateRequest(
-                legalEntity = it.legalEntity,
+                legalEntity = gateToPoolLegalEntity(it.legalEntity),
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
                 bpnl = it.bpn!!,
                 legalName = it.legalNameParts.firstOrNull() ?: ""

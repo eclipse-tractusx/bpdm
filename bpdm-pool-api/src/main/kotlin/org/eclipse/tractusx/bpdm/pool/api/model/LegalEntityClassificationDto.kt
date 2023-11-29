@@ -17,16 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(name = "NameRegioncodeDto", description = "Region within a country")
-data class NameRegioncodeVerboseDto(
+@Schema(description = ClassificationDescription.header)
+data class LegalEntityClassificationDto(
 
-    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
-    val name: String,
+    override val type: ClassificationType,
+    override val code: String?,
+    override val value: String?
 
-    @get:Schema(description = "Abbreviation or shorthand of the area")
-    val regionCode: String,
-)
+) : ILegalEntityClassificationDto

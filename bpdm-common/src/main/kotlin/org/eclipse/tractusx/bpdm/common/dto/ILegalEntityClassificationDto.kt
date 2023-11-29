@@ -20,12 +20,11 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(name = "Name", description = "Name record for a business partner")
-data class NameDto(
-    @get:Schema(description = "Full name")
-    val value: String,
+interface ILegalEntityClassificationDto : IBaseClassificationDto {
 
-    @get:Schema(description = "Abbreviated name or shorthand")
-    val shortName: String?
-)
+    @get:Schema(description = ClassificationDescription.type, required = true)
+    override val type: ClassificationType
+}

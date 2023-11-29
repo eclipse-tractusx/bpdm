@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LegalEntityDescription.headerUpdateRequest)
@@ -43,9 +43,11 @@ data class LegalEntityPartnerUpdateRequest(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressDto,
+    val legalAddress: LogisticAddressDto
+
 ): RequestWithKey {
-    override fun getRequestKey(): String? {
+
+    override fun getRequestKey(): String {
         return bpnl
     }
 }

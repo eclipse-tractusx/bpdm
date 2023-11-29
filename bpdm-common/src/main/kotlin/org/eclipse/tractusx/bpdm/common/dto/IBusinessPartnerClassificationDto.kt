@@ -19,19 +19,4 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
-
-@Schema(description = ClassificationDescription.header)
-data class ClassificationDto(
-
-    @get:Schema(description = ClassificationDescription.type)
-    override val type: ClassificationType,
-
-    @get:Schema(description = ClassificationDescription.code)
-    override val code: String?,
-
-    @get:Schema(description = ClassificationDescription.value)
-    override val value: String?
-) : IBaseClassificationDto
+interface IBusinessPartnerClassificationDto : IBaseClassificationDto

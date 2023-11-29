@@ -17,15 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package com.catenax.bpdm.bridge.dummy.dto
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressGateInputDto
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-data class GateLegalEntityInfo(
-    val legalNameParts: Collection<String>,
-    val legalEntity: LegalEntityDto,
-    val legalAddress: AddressGateInputDto,
-    val externalId: String,
-    val bpn: String?
-)
+data class LegalEntityStateDto(
+
+    override val description: String?,
+    override val validFrom: LocalDateTime?,
+    override val validTo: LocalDateTime?,
+    override val type: BusinessStateType
+
+) : ILegalEntityStateDto

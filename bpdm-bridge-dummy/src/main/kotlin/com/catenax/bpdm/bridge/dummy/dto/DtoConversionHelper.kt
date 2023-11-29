@@ -24,6 +24,49 @@ import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import kotlin.reflect.KProperty
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassificationDto as Gate_LegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto as Gate_LegalEntityDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityIdentifierDto as Gate_LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityStateDto as Gate_LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationDto as Pool_LegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto as Pool_LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto as Pool_LegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto as Pool_LegalEntityStateDto
+
+fun gateToPoolLegalEntity(gateDto: Gate_LegalEntityDto): Pool_LegalEntityDto {
+    return Pool_LegalEntityDto(
+        identifiers = gateDto.identifiers.map(::gateToPoolLegalEntityIdentifier),
+        legalShortName = gateDto.legalShortName,
+        legalForm = gateDto.legalForm,
+        states = gateDto.states.map(::gateToPoolLegalEntityState),
+        classifications = gateDto.classifications.map(::gateToPoolLegalEntityClassification)
+    )
+}
+
+fun gateToPoolLegalEntityIdentifier(gateDto: Gate_LegalEntityIdentifierDto): Pool_LegalEntityIdentifierDto {
+    return Pool_LegalEntityIdentifierDto(
+        type = gateDto.type,
+        value = gateDto.value,
+        issuingBody = gateDto.issuingBody
+    )
+}
+
+fun gateToPoolLegalEntityState(gateDto: Gate_LegalEntityStateDto): Pool_LegalEntityStateDto {
+    return Pool_LegalEntityStateDto(
+        validFrom = gateDto.validFrom,
+        validTo = gateDto.validTo,
+        type = gateDto.type,
+        description = gateDto.description
+    )
+}
+
+fun gateToPoolLegalEntityClassification(gateDto: Gate_LegalEntityClassificationDto): Pool_LegalEntityClassificationDto {
+    return Pool_LegalEntityClassificationDto(
+        type = gateDto.type,
+        code = gateDto.code,
+        value = gateDto.value
+    )
+}
 
 fun gateToPoolLogisticAddress(gateDto: LogisticAddressGateDto): LogisticAddressDto {
     return LogisticAddressDto(
@@ -85,16 +128,16 @@ fun gateToPoolPhysicalAddress(gateDto: PhysicalPostalAddressGateDto): PhysicalPo
 }
 
 
-fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): LegalEntityDto {
+fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityDto {
     val identifiers = legalEntity.identifiers.map {
-        LegalEntityIdentifierDto(
+        Gate_LegalEntityIdentifierDto(
             value = it.value,
             type = it.type.technicalKey,
             issuingBody = it.issuingBody
         )
     }
     val states = legalEntity.states.map {
-        LegalEntityStateDto(
+        Gate_LegalEntityStateDto(
             description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,
@@ -102,13 +145,13 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): LegalEntityDto {
         )
     }
     val classifications = legalEntity.classifications.map {
-        ClassificationDto(
+        Gate_LegalEntityClassificationDto(
             type = it.type.technicalKey,
             code = it.code,
             value = it.value
         )
     }
-    return LegalEntityDto(
+    return Gate_LegalEntityDto(
         identifiers = identifiers,
         legalShortName = legalEntity.legalShortName,
         legalForm = legalEntity.legalForm?.technicalKey,
