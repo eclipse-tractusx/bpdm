@@ -20,9 +20,13 @@
 package com.catenax.bpdm.bridge.dummy.dto
 
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityVerboseDto
 import kotlin.reflect.KProperty
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassificationDto as Gate_LegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto as Gate_LegalEntityDto

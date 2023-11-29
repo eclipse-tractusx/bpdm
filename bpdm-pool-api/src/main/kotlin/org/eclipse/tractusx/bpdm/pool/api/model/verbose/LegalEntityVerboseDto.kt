@@ -17,12 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model.verbose
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import java.time.Instant
 
 
@@ -46,7 +47,7 @@ data class LegalEntityVerboseDto(
     val states: Collection<LegalEntityStateVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications))
-    val classifications: Collection<ClassificationVerboseDto> = emptyList(),
+    val classifications: Collection<LegalEntityClassificationVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.relations))
     val relations: Collection<RelationVerboseDto> = emptyList(),

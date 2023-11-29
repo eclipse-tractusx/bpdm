@@ -22,14 +22,19 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
-import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteStateVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -91,11 +96,11 @@ object BusinessPartnerVerboseValues {
 
     val classificationType = TypeKeyNameVerboseDto(ClassificationType.NACE, ClassificationType.NACE.name)
 
-    val classification1 = ClassificationVerboseDto("Sale of motor vehicles", null, classificationType)
-    val classification2 = ClassificationVerboseDto("Data processing, hosting and related activities", null, classificationType)
-    val classification3 = ClassificationVerboseDto("Other information service activities", null, classificationType)
-    val classification4 = ClassificationVerboseDto("Financial and insurance activities", null, classificationType)
-    val classification5 = ClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
+    val classification1 = LegalEntityClassificationVerboseDto("Sale of motor vehicles", null, classificationType)
+    val classification2 = LegalEntityClassificationVerboseDto("Data processing, hosting and related activities", null, classificationType)
+    val classification3 = LegalEntityClassificationVerboseDto("Other information service activities", null, classificationType)
+    val classification4 = LegalEntityClassificationVerboseDto("Financial and insurance activities", null, classificationType)
+    val classification5 = LegalEntityClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
 
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,

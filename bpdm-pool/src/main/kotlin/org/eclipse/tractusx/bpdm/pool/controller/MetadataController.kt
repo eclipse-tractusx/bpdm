@@ -25,10 +25,10 @@ import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalFormDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.RegionDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolMetadataApi
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.eclipse.tractusx.bpdm.pool.service.MetadataService
 import org.springframework.data.domain.PageRequest

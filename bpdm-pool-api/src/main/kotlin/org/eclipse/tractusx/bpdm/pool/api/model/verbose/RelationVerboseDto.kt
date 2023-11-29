@@ -17,20 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model.verbose
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.model.RelationType
+import java.time.LocalDateTime
 
-@Schema(description = LegalFormDescription.header)
-data class LegalFormDto(
+@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
+data class RelationVerboseDto(
 
-    @get:Schema(description = LegalFormDescription.technicalKey)
-    val technicalKey: String,
+    @get:Schema(description = "Type of relation like predecessor or ownership relation")
+    val type: TypeKeyNameVerboseDto<RelationType>,
 
-    @get:Schema(description = LegalFormDescription.name)
-    val name: String,
+    @get:Schema(description = "BPN of partner which is the source of the relation")
+    val startBpnl: String,
 
-    @get:Schema(description = LegalFormDescription.abbreviation)
-    val abbreviation: String? = null,
+    @get:Schema(description = "BPN of partner which is the target of the relation")
+    val endBpnl: String,
+
+    @get:Schema(description = "Time when the relation started")
+    val validFrom: LocalDateTime? = null,
+
+    @get:Schema(description = "Time when the relation ended")
+    val validTo: LocalDateTime? = null
 )

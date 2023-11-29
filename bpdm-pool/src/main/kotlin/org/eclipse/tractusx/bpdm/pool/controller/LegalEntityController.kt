@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.pool.controller
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
@@ -33,7 +32,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.service.SearchService
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PoolSecurityConfigProperties

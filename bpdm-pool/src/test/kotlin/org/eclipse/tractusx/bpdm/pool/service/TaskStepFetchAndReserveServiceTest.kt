@@ -13,6 +13,10 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityClassificationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityIdentifierVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityStateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
@@ -614,7 +618,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         }
     }
 
-    fun compareClassifications(classificationsVerbose: Collection<ClassificationVerboseDto>, classifications: Collection<LegalEntityClassificationDto>?) {
+    fun compareClassifications(
+        classificationsVerbose: Collection<LegalEntityClassificationVerboseDto>,
+        classifications: Collection<LegalEntityClassificationDto>?
+    ) {
 
         assertThat(classificationsVerbose.size).isEqualTo(classifications?.size ?: 0)
         val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.type.name }

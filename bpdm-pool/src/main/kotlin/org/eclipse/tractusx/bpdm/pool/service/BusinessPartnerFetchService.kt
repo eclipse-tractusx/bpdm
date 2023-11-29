@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier

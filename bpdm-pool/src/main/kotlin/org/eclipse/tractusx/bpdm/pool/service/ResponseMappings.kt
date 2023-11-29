@@ -26,7 +26,9 @@ import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
+import org.eclipse.tractusx.bpdm.pool.api.model.verbose.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
@@ -255,8 +257,8 @@ fun GeographicCoordinate.toDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-fun LegalEntityClassification.toDto(): ClassificationVerboseDto {
-    return ClassificationVerboseDto(value, code, type.toDto())
+fun LegalEntityClassification.toDto(): LegalEntityClassificationVerboseDto {
+    return LegalEntityClassificationVerboseDto(value, code, type.toDto())
 }
 
 fun Relation.toDto(): RelationVerboseDto {
