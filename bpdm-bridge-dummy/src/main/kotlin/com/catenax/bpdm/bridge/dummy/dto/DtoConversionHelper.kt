@@ -26,7 +26,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerbos
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import kotlin.reflect.KProperty
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassificationDto as Gate_LegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto as Gate_LegalEntityDto
@@ -40,6 +40,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto as Pool_Lega
 fun gateToPoolLegalEntity(gateDto: Gate_LegalEntityDto): Pool_LegalEntityDto {
     return Pool_LegalEntityDto(
         identifiers = gateDto.identifiers.map(::gateToPoolLegalEntityIdentifier),
+        legalName = gateDto.legalNameParts.firstOrNull() ?: "",
         legalShortName = gateDto.legalShortName,
         legalForm = gateDto.legalForm,
         states = gateDto.states.map(::gateToPoolLegalEntityState),
@@ -156,9 +157,10 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
         )
     }
     return Gate_LegalEntityDto(
-        identifiers = identifiers,
+        legalNameParts = listOfNotNull(legalEntity.legalName),
         legalShortName = legalEntity.legalShortName,
         legalForm = legalEntity.legalForm?.technicalKey,
+        identifiers = identifiers,
         states = states,
         classifications = classifications
     )

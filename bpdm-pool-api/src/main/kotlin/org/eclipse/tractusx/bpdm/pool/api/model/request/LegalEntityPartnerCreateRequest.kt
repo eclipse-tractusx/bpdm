@@ -33,9 +33,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
 @Schema(description = LegalEntityDescription.headerCreateRequest)
 data class LegalEntityPartnerCreateRequest(
 
-    @get:Schema(description = LegalEntityDescription.legalName)
-    val legalName: String,
-
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 
@@ -45,6 +42,7 @@ data class LegalEntityPartnerCreateRequest(
 
     @get:Schema(description = CommonDescription.index)
     val index: String?
+
 ): RequestWithKey {
     override fun getRequestKey(): String? {
         return index

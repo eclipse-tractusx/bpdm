@@ -26,9 +26,8 @@ import org.eclipse.tractusx.bpdm.common.dto.StreetDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.*
 import org.eclipse.tractusx.bpdm.pool.entity.*
 import org.springframework.data.domain.Page
 
@@ -41,7 +40,6 @@ fun LegalEntity.toMatchDto(score: Float): LegalEntityMatchVerboseDto {
     return LegalEntityMatchVerboseDto(
         score = score,
         legalEntity = this.toDto(),
-        legalName = this.legalName.value,
         legalAddress = legalAddress.toDto(),
     )
 }
@@ -50,36 +48,24 @@ fun LegalEntity.toUpsertDto(entryId: String?): LegalEntityPartnerCreateVerboseDt
     return LegalEntityPartnerCreateVerboseDto(
         legalEntity = toDto(),
         legalAddress = legalAddress.toDto(),
-        index = entryId,
-        legalName = legalName.value,
+        index = entryId
     )
 }
 
-fun LegalEntity.toPoolLegalEntity(): PoolLegalEntityVerboseDto {
-    return PoolLegalEntityVerboseDto(
-        legalName = legalName.value,
+fun LegalEntity.toLegalEntityWithLegalAddress(): LegalEntityWithLegalAddressVerboseDto {
+    return LegalEntityWithLegalAddressVerboseDto(
         legalAddress = legalAddress.toDto(),
-        legalEntity = LegalEntityVerboseDto(
-            bpnl = bpn,
-            identifiers = identifiers.map { it.toDto() },
-            legalShortName = legalName.shortName,
-            legalForm = legalForm?.toDto(),
-            states = states.map { it.toDto() },
-            classifications = classifications.map { it.toDto() },
-            relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
-            currentness = currentness,
-            createdAt = createdAt,
-            updatedAt = updatedAt,
-        )
+        legalEntity = toDto()
     )
 }
 
 fun LegalEntity.toDto(): LegalEntityVerboseDto {
     return LegalEntityVerboseDto(
         bpnl = bpn,
-        identifiers = identifiers.map { it.toDto() },
+        legalName = legalName.value,
         legalShortName = legalName.shortName,
         legalForm = legalForm?.toDto(),
+        identifiers = identifiers.map { it.toDto() },
         states = states.map { it.toDto() },
         classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },

@@ -17,27 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.verbose
+package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 
-@Schema(description = LegalEntityStateDescription.header)
-data class LegalEntityStateVerboseDto(
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(description = LegalEntityDescription.header)
+data class LegalEntityWithLegalAddressVerboseDto(
 
-    @get:Schema(description = LegalEntityStateDescription.description)
-    val description: String?,
-
-    @get:Schema(description = LegalEntityStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = LegalEntityStateDescription.validTo)
-    val validTo: LocalDateTime?,
+    @field:JsonUnwrapped
+    val legalEntity: LegalEntityVerboseDto,
 
     // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityStateDescription.type)
-    val type: TypeKeyNameVerboseDto<BusinessStateType>
+    @get:Schema(description = LegalEntityDescription.legalAddress)
+    val legalAddress: LogisticAddressVerboseDto,
 )

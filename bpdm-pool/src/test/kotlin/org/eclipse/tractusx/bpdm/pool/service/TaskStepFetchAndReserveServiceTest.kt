@@ -12,11 +12,11 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityClassificationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityIdentifierVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityStateVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
@@ -500,7 +500,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     }
 
-    fun compareLegalEntity(verboseRequest: PoolLegalEntityVerboseDto, legalEntity: LegalEntityDto?) {
+    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
 
         val verboseLegalEntity = verboseRequest.legalEntity
 

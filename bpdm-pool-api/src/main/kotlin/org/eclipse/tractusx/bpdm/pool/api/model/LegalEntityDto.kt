@@ -26,9 +26,12 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescri
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityDto(
 
-    override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+    @get:Schema(description = LegalEntityDescription.legalName)
+    val legalName: String,
+
     override val legalShortName: String?,
     override val legalForm: String? = null,
+    override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
     override val states: Collection<LegalEntityStateDto> = emptyList(),
     override val classifications: Collection<LegalEntityClassificationDto> = emptyList()
 

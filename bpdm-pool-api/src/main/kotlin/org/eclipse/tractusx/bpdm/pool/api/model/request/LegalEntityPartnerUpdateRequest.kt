@@ -35,9 +35,6 @@ data class LegalEntityPartnerUpdateRequest(
     @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String,
 
-    @get:Schema(description = LegalEntityDescription.legalName)
-    val legalName: String,
-
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
 

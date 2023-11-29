@@ -42,8 +42,7 @@ class PoolUpdateService(
             LegalEntityPartnerCreateRequest(
                 legalEntity = gateToPoolLegalEntity(it.legalEntity),
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                index = it.externalId,
-                legalName = it.legalNameParts.firstOrNull() ?: ""
+                index = it.externalId
             )
         }
 
@@ -56,8 +55,7 @@ class PoolUpdateService(
             LegalEntityPartnerUpdateRequest(
                 legalEntity = gateToPoolLegalEntity(it.legalEntity),
                 legalAddress = gateToPoolLogisticAddress(it.legalAddress.address),
-                bpnl = it.bpn!!,
-                legalName = it.legalNameParts.firstOrNull() ?: ""
+                bpnl = it.bpn!!
             )
         }
 

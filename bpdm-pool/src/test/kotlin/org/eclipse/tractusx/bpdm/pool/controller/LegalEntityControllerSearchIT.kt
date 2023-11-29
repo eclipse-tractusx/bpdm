@@ -24,10 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -80,8 +80,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val givenStructure = testHelpers.createBusinessPartnerStructure(listOf(partnerStructure1, partnerStructure2))
         givenPartner1 = with(givenStructure[0].legalEntity) { legalEntity }
         givenPartner2 = with(givenStructure[1].legalEntity) { legalEntity }
-        legalName1 = givenStructure[0].legalEntity.legalName
-        legalName2 = givenStructure[1].legalEntity.legalName
+        legalName1 = givenStructure[0].legalEntity.legalEntity.legalName
+        legalName2 = givenStructure[1].legalEntity.legalEntity.legalName
         legalAddress1 = givenStructure[0].legalEntity.legalAddress
         legalAddress2 = givenStructure[1].legalEntity.legalAddress
     }
@@ -97,8 +97,8 @@ class LegalEntityControllerSearchIT @Autowired constructor(
         val expected = PageDto(
             2, 1, 0, 2,
             listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1),
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1),
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 
@@ -117,12 +117,12 @@ class LegalEntityControllerSearchIT @Autowired constructor(
 
         val expectedFirstPage = PageDto(
             2, 2, 0, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalName = legalName1, legalAddress = legalAddress1)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner1, legalAddress = legalAddress1)
             )
         )
         val expectedSecondPage = PageDto(
             2, 2, 1, 1, listOf(
-                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalName = legalName2, legalAddress = legalAddress2)
+                LegalEntityMatchVerboseDto(score = 0f, legalEntity = givenPartner2, legalAddress = legalAddress2)
             )
         )
 

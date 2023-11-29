@@ -181,7 +181,6 @@ class GateUpdateService(
             return null
         }
         return LegalEntityGateOutputRequest(
-            legalNameParts = listOfNotNull(poolResponse.legalName),
             legalEntity = poolToGateLegalEntity(poolResponse.legalEntity),
             legalAddress = poolToGateAddressChild(poolResponse.legalAddress),
             externalId = requestEntry.externalId,

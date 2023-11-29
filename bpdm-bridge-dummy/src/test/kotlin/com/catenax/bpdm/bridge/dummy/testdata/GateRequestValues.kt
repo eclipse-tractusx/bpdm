@@ -224,6 +224,7 @@ object GateRequestValues {
 
     val legalEntity1 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
+        legalNameParts = listOf(CommonValues.name1),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -232,6 +233,7 @@ object GateRequestValues {
 
     val legalEntity2 = LegalEntityDto(
         identifiers = listOf(identifier3, identifier4),
+        legalNameParts = listOf(CommonValues.name3),
         legalShortName = CommonValues.shortName3,
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
@@ -240,6 +242,7 @@ object GateRequestValues {
 
     val legalEntity3 = LegalEntityDto(
         identifiers = listOf(identifier5),
+        legalNameParts = listOf(CommonValues.name1),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -249,21 +252,18 @@ object GateRequestValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         legalAddress = address1,
-        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
         legalAddress = address2,
-        legalNameParts = listOf(CommonValues.name3),
         externalId = CommonValues.externalId2,
     )
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
         legalAddress = address3,
-        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
     )
 

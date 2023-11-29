@@ -76,7 +76,7 @@ class BusinessPartnerBuildService(
 
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
-                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], request.legalName, legalEntityMetadataMap)
+                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], request.legalEntity.legalName, legalEntityMetadataMap)
                 val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
@@ -198,7 +198,7 @@ class BusinessPartnerBuildService(
         val requestsByBpn = validRequests.associateBy { it.bpnl }
         val updatedLegalEntities = legalEntities.map { legalEntity ->
             val request = requestsByBpn[legalEntity.bpn]!!
-            updateLegalEntity(legalEntity, request.legalEntity, request.legalName, legalEntityMetadataMap)
+            updateLegalEntity(legalEntity, request.legalEntity, request.legalEntity.legalName, legalEntityMetadataMap)
             updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
             legalEntityRepository.save(legalEntity)
         }

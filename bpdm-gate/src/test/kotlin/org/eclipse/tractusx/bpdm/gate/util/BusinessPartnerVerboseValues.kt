@@ -187,6 +187,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntity1 = LegalEntityDto(
+        legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
@@ -194,6 +195,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntity2 = LegalEntityDto(
+        legalNameParts = listOf("Company ABC AG"),
         legalShortName = "short3",
         legalForm = "LF2",
         states = listOf(legalEntityBusinessStatus2),
@@ -201,6 +203,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntity3 = LegalEntityDto(
+        legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
@@ -457,7 +460,6 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
         legalEntity = legalEntity1,
-        legalNameParts = listOf("Business Partner Name"),
         legalAddress = AddressGateInputDto(
             address = logisticAddress1,
             externalId = "${externalId1}_legalAddress",
@@ -469,7 +471,6 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
         legalEntity = legalEntity2,
-        legalNameParts = listOf("Company ABC AG"),
         legalAddress = AddressGateInputDto(
             address = logisticAddress2,
             externalId = "${externalId2}_legalAddress",
@@ -492,7 +493,6 @@ object BusinessPartnerVerboseValues {
     //Gate Output Legal Entities Response
     val legalEntityGateOutputResponse1 = LegalEntityGateOutputResponse(
         legalEntity = legalEntity1,
-        legalNameParts = listOf("Business Partner Name"),
         externalId = externalId1,
         bpnl = "BPNL0000000000XY",
         legalAddress = AddressGateOutputDto(
@@ -508,7 +508,6 @@ object BusinessPartnerVerboseValues {
     val legalEntityGateOutputResponse2 = LegalEntityGateOutputResponse(
         legalEntity = legalEntity2,
         externalId = externalId2,
-        legalNameParts = listOf("Company ABC AG"),
         bpnl = "BPNL0000000001XZ",
         legalAddress = AddressGateOutputDto(
             address = physicalAddress2,

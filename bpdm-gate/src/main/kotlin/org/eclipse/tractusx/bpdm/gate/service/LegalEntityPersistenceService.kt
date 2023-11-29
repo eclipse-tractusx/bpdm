@@ -92,15 +92,17 @@ class LegalEntityPersistenceService(
         legalEntityRequest: LegalEntityGateInputRequest,
         logisticAddressRecord: LogisticAddress
     ): LegalEntity {
-        legalEntity.externalId = legalEntityRequest.externalId
-        legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
-        legalEntity.shortName = legalEntityRequest.legalEntity.legalShortName
+        val legalEntityDto = legalEntityRequest.legalEntity
 
-        legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-        legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
-        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })
+        legalEntity.externalId = legalEntityRequest.externalId
+        legalEntity.legalForm = legalEntityDto.legalForm
+        legalEntity.shortName = legalEntityDto.legalShortName
+
+        legalEntity.states.replace(legalEntityDto.states.map { toEntityState(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityDto.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.nameParts.replace(legalEntityDto.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
+        legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toEntityIdentifiers(it, legalEntity) })
+        legalEntity.roles.replace(legalEntityDto.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity
@@ -172,16 +174,18 @@ class LegalEntityPersistenceService(
         legalEntityRequest: LegalEntityGateOutputRequest,
         logisticAddressRecord: LogisticAddress
     ): LegalEntity {
+        val legalEntityDto = legalEntityRequest.legalEntity
+
         legalEntity.bpn = legalEntityRequest.bpn
         legalEntity.externalId = legalEntityRequest.externalId
-        legalEntity.legalForm = legalEntityRequest.legalEntity.legalForm
-        legalEntity.shortName = legalEntityRequest.legalEntity.legalShortName
+        legalEntity.legalForm = legalEntityDto.legalForm
+        legalEntity.shortName = legalEntityDto.legalShortName
 
-        legalEntity.states.replace(legalEntityRequest.legalEntity.states.map { toEntityState(it, legalEntity) })
-        legalEntity.classifications.replace(legalEntityRequest.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-        legalEntity.nameParts.replace(legalEntityRequest.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-        legalEntity.identifiers.replace(legalEntityRequest.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
-        legalEntity.roles.replace(legalEntityRequest.roles.distinct().map { toRoles(it, legalEntity, null, null) })
+        legalEntity.states.replace(legalEntityDto.states.map { toEntityState(it, legalEntity) })
+        legalEntity.classifications.replace(legalEntityDto.classifications.map { toEntityClassification(it, legalEntity) })
+        legalEntity.nameParts.replace(legalEntityDto.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
+        legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toEntityIdentifiers(it, legalEntity) })
+        legalEntity.roles.replace(legalEntityDto.roles.distinct().map { toRoles(it, legalEntity, null, null) })
 
         legalEntity.legalAddress = logisticAddressRecord
         legalEntity.legalAddress.legalEntity = legalEntity

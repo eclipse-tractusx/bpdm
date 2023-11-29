@@ -207,13 +207,12 @@ fun LegalEntityGateInputRequest.toLegalEntity(datatype: StageType): LegalEntity 
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-    legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
+    legalEntity.nameParts.addAll(this.legalEntity.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
+    legalEntity.roles.addAll(this.legalEntity.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
     legalEntity.legalAddress = addressInputRequest.toAddressGate(legalEntity, null, datatype)
 
     return legalEntity
-
 }
 
 fun LegalEntityGateOutputRequest.toLegalEntity(datatype: StageType): LegalEntity {
@@ -235,13 +234,12 @@ fun LegalEntityGateOutputRequest.toLegalEntity(datatype: StageType): LegalEntity
 
     legalEntity.states.addAll(this.legalEntity.states.map { toEntityState(it, legalEntity) })
     legalEntity.classifications.addAll(this.legalEntity.classifications.map { toEntityClassification(it, legalEntity) })
-    legalEntity.nameParts.addAll(this.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
-    legalEntity.roles.addAll(this.roles.distinct().map { toRoles(it, legalEntity, null, null) })
+    legalEntity.nameParts.addAll(this.legalEntity.legalNameParts.map { toNameParts(it, null, null, legalEntity) })
+    legalEntity.roles.addAll(this.legalEntity.roles.distinct().map { toRoles(it, legalEntity, null, null) })
     legalEntity.identifiers.addAll(this.legalEntity.identifiers.map { toEntityIdentifiers(it, legalEntity) })
     legalEntity.legalAddress = addressOutputRequest.toAddressGateOutput(legalEntity, null, datatype)
 
     return legalEntity
-
 }
 
 fun toRoles(role: BusinessPartnerRole, legalEntity: LegalEntity?, site: Site?, address: LogisticAddress?): Roles {
@@ -355,13 +353,14 @@ private fun Street.toStreetDto(): StreetGateDto {
 fun LegalEntity.toLegalEntityDto(): LegalEntityDto {
 
     return LegalEntityDto(
+        legalNameParts = getNamePartValues(nameParts),
         legalForm = legalForm,
         legalShortName = shortName,
         states = mapToLegalEntityStateDto(states),
         classifications = mapToLegalEntityClassificationsDto(classifications),
-        identifiers = mapToLegalEntityIdentifiersDto(identifiers)
+        identifiers = mapToLegalEntityIdentifiersDto(identifiers),
+        roles = roles.map { it.roleName },
     )
-
 }
 
 fun mapToLegalEntityStateDto(states: MutableSet<LegalEntityState>): Collection<LegalEntityStateDto> {
@@ -385,20 +384,16 @@ fun AddressIdentifier.mapToAddressIdentifiersDto(): AddressIdentifierDto {
 }
 
 //LegalEntity mapping to LegalEntityGateInputResponse
-fun LegalEntity.toLegalEntityGateInputResponse(legalEntity: LegalEntity): LegalEntityGateInputDto {
-
+fun LegalEntity.toLegalEntityGateInputResponse(): LegalEntityGateInputDto {
     return LegalEntityGateInputDto(
-        legalEntity = legalEntity.toLegalEntityDto(),
+        legalEntity = toLegalEntityDto(),
         legalAddress = legalAddress.toAddressGateInputResponse(legalAddress),
-        roles = roles.map { it.roleName },
-        externalId = legalEntity.externalId,
-        legalNameParts = getNamePartValues(nameParts)
+        externalId = externalId,
     )
 }
 
 //Site mapping to SiteDto
 fun Site.toSiteDto(): SiteGateDto {
-
     return SiteGateDto(
         roles = roles.map { it.roleName },
         nameParts = getNamePartValues(nameParts),
@@ -412,7 +407,6 @@ fun mapToDtoSitesStates(states: MutableSet<SiteState>): Collection<SiteStateDto>
 
 //Site mapping to SiteGateInputResponse
 fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputDto {
-
     return SiteGateInputDto(
         site = sitePage.toSiteDto(),
         externalId = externalId,
@@ -424,7 +418,6 @@ fun Site.toSiteGateInputResponse(sitePage: Site): SiteGateInputDto {
 
 //Logistic Address mapping to AddressGateOutputResponse
 fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAddress): AddressGateOutputDto {
-
     return AddressGateOutputDto(
         address = logisticAddressPage.toLogisticAddressDto(),
         externalId = externalId,
@@ -436,7 +429,6 @@ fun LogisticAddress.toAddressGateOutputResponse(logisticAddressPage: LogisticAdd
 
 //Site mapping to SiteGateOutputResponse
 fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputResponse {
-
     return SiteGateOutputResponse(
         site = sitePage.toSiteDto(),
         externalId = externalId,
@@ -447,14 +439,11 @@ fun Site.toSiteGateOutputResponse(sitePage: Site): SiteGateOutputResponse {
 }
 
 //LegalEntity mapping to LegalEntityGateOutputResponse
-fun LegalEntity.toLegalEntityGateOutputResponse(legalEntity: LegalEntity): LegalEntityGateOutputResponse {
-
+fun LegalEntity.toLegalEntityGateOutputResponse(): LegalEntityGateOutputResponse {
     return LegalEntityGateOutputResponse(
-        legalEntity = legalEntity.toLegalEntityDto(),
-        legalNameParts = getNamePartValues(legalEntity.nameParts),
-        externalId = legalEntity.externalId,
-        bpnl = legalEntity.bpn!!,
-        roles = roles.map { it.roleName },
+        legalEntity = toLegalEntityDto(),
+        externalId = externalId,
+        bpnl = bpn!!,
         legalAddress = legalAddress.toAddressGateOutputResponse(legalAddress)
     )
 }

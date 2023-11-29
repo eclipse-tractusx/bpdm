@@ -19,17 +19,26 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityDto(
 
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))
+    val legalNameParts: Collection<String> = emptyList(),
+
     override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
     override val legalShortName: String?,
     override val legalForm: String? = null,
     override val states: Collection<LegalEntityStateDto> = emptyList(),
-    override val classifications: Collection<LegalEntityClassificationDto> = emptyList()
+    override val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
+
+    @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
+    val roles: Collection<BusinessPartnerRole> = emptyList()
 
 ) : IBaseLegalEntityDto

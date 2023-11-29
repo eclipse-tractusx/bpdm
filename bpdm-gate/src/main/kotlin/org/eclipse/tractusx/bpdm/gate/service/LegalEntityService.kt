@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -38,8 +37,6 @@ class LegalEntityService(
     private val legalEntityPersistenceService: LegalEntityPersistenceService,
     private val legalEntityRepository: LegalEntityRepository
 ) {
-
-    private val logger = KotlinLogging.logger { }
 
     /**
      * Upsert legal entities input to the database
@@ -105,26 +102,21 @@ class LegalEntityService(
 
     private fun toValidOutputLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateOutputResponse> {
         return legalEntityPage.content.map { legalEntity ->
-            legalEntity.toLegalEntityGateOutputResponse(legalEntity)
+            legalEntity.toLegalEntityGateOutputResponse()
         }
     }
 
     private fun toValidLegalEntities(legalEntityPage: Page<LegalEntity>): List<LegalEntityGateInputDto> {
         return legalEntityPage.content.map { legalEntity ->
-            legalEntity.toLegalEntityGateInputResponse(legalEntity)
+            legalEntity.toLegalEntityGateInputResponse()
         }
     }
 
-}
-
-private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
-
-    return LegalEntityGateInputDto(
-        legalEntity = legalEntity.toLegalEntityDto(),
-        legalNameParts = getNamePartValues(legalEntity.nameParts),
-        roles = legalEntity.roles.map { it.roleName },
-        legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
-        externalId = legalEntity.externalId
-    )
-
+    private fun toValidSingleLegalEntity(legalEntity: LegalEntity): LegalEntityGateInputDto {
+        return LegalEntityGateInputDto(
+            legalEntity = legalEntity.toLegalEntityDto(),
+            legalAddress = legalEntity.legalAddress.toAddressGateInputResponse(legalEntity.legalAddress),
+            externalId = legalEntity.externalId
+        )
+    }
 }

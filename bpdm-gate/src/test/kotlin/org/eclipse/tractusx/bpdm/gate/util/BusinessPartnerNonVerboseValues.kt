@@ -53,21 +53,18 @@ object BusinessPartnerNonVerboseValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity1,
         legalAddress = BusinessPartnerVerboseValues.physicalAddress1,
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse1.legalNameParts,
         externalId = BusinessPartnerVerboseValues.externalId1,
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity2,
         legalAddress = BusinessPartnerVerboseValues.physicalAddress2,
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateInputResponse2.legalNameParts,
         externalId = BusinessPartnerVerboseValues.externalId2,
     )
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity3,
         legalAddress = BusinessPartnerVerboseValues.physicalAddress3,
-        legalNameParts = BusinessPartnerVerboseValues.logisticAddressGateInputResponse1.address.nameParts,
         externalId = BusinessPartnerVerboseValues.externalId3,
     )
 
@@ -154,7 +151,6 @@ object BusinessPartnerNonVerboseValues {
     val legalEntityGateOutputRequest1 = LegalEntityGateOutputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity1,
         legalAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress1, BusinessPartnerVerboseValues.legalEntityGateOutputResponse1.legalAddress.bpna),
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateOutputResponse1.legalNameParts,
         externalId = BusinessPartnerVerboseValues.externalId1,
         bpn = BusinessPartnerVerboseValues.legalEntityGateOutputResponse1.bpnl
     )
@@ -162,7 +158,6 @@ object BusinessPartnerNonVerboseValues {
     val legalEntityGateOutputRequest2 = LegalEntityGateOutputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity2,
         legalAddress = AddressGateOutputChildRequest(BusinessPartnerVerboseValues.physicalAddress2, BusinessPartnerVerboseValues.legalEntityGateOutputResponse2.legalAddress.bpna),
-        legalNameParts = BusinessPartnerVerboseValues.legalEntityGateOutputResponse2.legalNameParts,
         externalId = BusinessPartnerVerboseValues.externalId2,
         bpn = BusinessPartnerVerboseValues.legalEntityGateOutputResponse2.bpnl
     )

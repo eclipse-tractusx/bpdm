@@ -28,11 +28,7 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchReq
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.verbose.PoolLegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.PoolSecurityConfigProperties
@@ -66,7 +62,7 @@ class LegalEntityController(
     }
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
-    override fun getLegalEntity(idValue: String, idType: String?): PoolLegalEntityVerboseDto {
+    override fun getLegalEntity(idValue: String, idType: String?): LegalEntityWithLegalAddressVerboseDto {
         val actualType = idType ?: bpnConfigProperties.id
         return if (actualType == bpnConfigProperties.id) businessPartnerFetchService.findLegalEntityIgnoreCase(idValue.uppercase())
         else businessPartnerFetchService.findLegalEntityIgnoreCase(actualType, idValue)
@@ -80,7 +76,7 @@ class LegalEntityController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun searchLegalEntitys(
         bpnLs: Collection<String>
-    ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>> {
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>> {
         if (bpnLs.size > controllerConfigProperties.searchRequestLimit) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }

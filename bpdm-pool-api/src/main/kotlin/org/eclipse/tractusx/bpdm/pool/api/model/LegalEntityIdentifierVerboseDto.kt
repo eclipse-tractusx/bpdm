@@ -17,23 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.verbose
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(description = ClassificationDescription.header)
-data class LegalEntityClassificationVerboseDto(
+@Schema(description = LegalEntityIdentifierDescription.header)
+data class LegalEntityIdentifierVerboseDto(
 
-    @get:Schema(description = ClassificationDescription.value)
-    val value: String? = null,
-
-    @get:Schema(description = ClassificationDescription.code)
-    val code: String? = null,
+    @get:Schema(description = LegalEntityIdentifierDescription.value)
+    val value: String,
 
     // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = ClassificationDescription.type)
-    val type: TypeKeyNameVerboseDto<ClassificationType>
+    @get:Schema(description = LegalEntityIdentifierDescription.type)
+    val type: TypeKeyNameVerboseDto<String>,
+
+    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
+    val issuingBody: String? = null
 )

@@ -211,7 +211,7 @@ object BusinessPartnerNonVerboseValues {
         physicalPostalAddress = postalAddress3,
     )
     private val logisticAddress4 = LogisticAddressDto(
-        physicalPostalAddress = postalAddress1, name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalName
+        physicalPostalAddress = postalAddress1, name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName
     )
 
     val logisticAddress5 = LogisticAddressDto(
@@ -220,81 +220,77 @@ object BusinessPartnerNonVerboseValues {
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName,
             legalShortName = null,
-            identifiers = listOf(identifier1),
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
+            identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
         ),
         legalAddress = logisticAddress1,
-        legalName = BusinessPartnerVerboseValues.legalEntityUpsert1.legalName,
         index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
     )
 
     val legalEntityCreate2 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.legalName,
             legalShortName = null,
-            identifiers = listOf(identifier2),
             legalForm = BusinessPartnerVerboseValues.legalForm2.technicalKey,
+            identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
         ),
         legalAddress = logisticAddress2,
-        legalName = BusinessPartnerVerboseValues.legalEntityUpsert2.legalName,
         index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
     )
 
     val legalEntityCreate3 = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.legalName,
             legalShortName = null,
-            identifiers = listOf(identifier3),
             legalForm = BusinessPartnerVerboseValues.legalForm3.technicalKey,
+            identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
         ),
         legalAddress = logisticAddress3,
-        legalName = BusinessPartnerVerboseValues.legalEntityUpsert3.legalName,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
     )
 
     val legalEntityCreateMultipleIdentifier = LegalEntityPartnerCreateRequest(
         legalEntity = LegalEntityDto(
+            legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.legalName,
             legalShortName = null,
-            identifiers = listOf(identifier1, identifier2),
             legalForm = BusinessPartnerVerboseValues.legalForm1.technicalKey,
+            identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
         ),
         legalAddress = logisticAddress1,
-        legalName = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalName,
         index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index
     )
 
 
     val legalEntityUpdate1 = LegalEntityPartnerUpdateRequest(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.bpnl,
-        legalName = legalEntityCreate1.legalName,
         legalEntity = legalEntityCreate1.legalEntity,
         legalAddress = legalEntityCreate1.legalAddress,
     )
 
     val legalEntityUpdate2 = LegalEntityPartnerUpdateRequest(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert2.legalEntity.bpnl,
-        legalName = legalEntityCreate2.legalName,
         legalEntity = legalEntityCreate2.legalEntity,
         legalAddress = legalEntityCreate2.legalAddress,
     )
 
     val legalEntityUpdate3 = LegalEntityPartnerUpdateRequest(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsert3.legalEntity.bpnl,
-        legalName = legalEntityCreate3.legalName,
         legalEntity = legalEntityCreate3.legalEntity,
         legalAddress = legalEntityCreate3.legalAddress,
     )
 
     val legalEntityUpdateMultipleIdentifier = LegalEntityPartnerUpdateRequest(
         bpnl = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.legalEntity.bpnl,
-        legalName = legalEntityCreateMultipleIdentifier.legalName,
         legalEntity = legalEntityCreateMultipleIdentifier.legalEntity,
         legalAddress = legalEntityCreateMultipleIdentifier.legalAddress,
     )

@@ -21,9 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
@@ -33,14 +31,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityGateOutputResponse(
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.legalNameParts))
-    val legalNameParts: Collection<String>,
-
     @field:JsonUnwrapped
     val legalEntity: LegalEntityDto,
-
-    @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList(),
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalAddress)
