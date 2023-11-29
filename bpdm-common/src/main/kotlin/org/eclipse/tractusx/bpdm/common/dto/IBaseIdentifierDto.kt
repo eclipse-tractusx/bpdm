@@ -19,8 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-interface IBaseIdentifierDto {
-    val value: String
+import io.swagger.v3.oas.annotations.media.Schema
 
-    val type: String
+interface IBaseIdentifierDto {
+
+    @get:Schema(description = "Technical key of the type to which this identifier belongs to")
+    val type: String?
+
+    @get:Schema(description = "Value of the identifier")
+    val value: String?
 }

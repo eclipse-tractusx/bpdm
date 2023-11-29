@@ -25,7 +25,8 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
 @Schema(description = LegalEntityStateDescription.header)
-interface IBaseLegalEntityStateDto : IBusinessPartnerStateDto {
+interface IBaseLegalEntityStateDto : IBaseStateDto {
+
     @get:Schema(description = LegalEntityStateDescription.description)
     override val description: String?
 

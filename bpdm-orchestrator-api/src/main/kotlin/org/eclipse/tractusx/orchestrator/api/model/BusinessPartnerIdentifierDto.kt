@@ -17,14 +17,14 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerIdentifierDto
 
-interface IBusinessPartnerStateDto {
-    val description: String?
-    val validFrom: LocalDateTime?
-    val validTo: LocalDateTime?
-    val type: BusinessStateType
-}
+data class BusinessPartnerIdentifierDto(
+
+    override val type: String?,
+    override val value: String?,
+    override val issuingBody: String?
+
+) : IBusinessPartnerIdentifierDto

@@ -20,14 +20,13 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
 object BusinessPartnerGenericMockValues {
@@ -65,12 +64,12 @@ object BusinessPartnerGenericMockValues {
             )
         ),
         classifications = listOf(
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NACE,
                 code = "code-1-cleaned",
                 value = "value-1-cleaned"
             ),
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NAF,
                 code = "code-2-cleaned",
                 value = "value-2-cleaned"

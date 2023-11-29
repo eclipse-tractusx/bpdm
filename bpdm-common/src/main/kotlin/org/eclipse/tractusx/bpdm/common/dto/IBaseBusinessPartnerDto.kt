@@ -31,16 +31,16 @@ interface IBaseBusinessPartnerDto {
     val shortName: String?
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates removed by the service."))
-    val identifiers: Collection<BusinessPartnerIdentifierDto>
+    val identifiers: Collection<IBusinessPartnerIdentifierDto>
 
-    @get:Schema(description = "") //TODO Add Description
+    @get:Schema(description = "The name according to official registers.")
     val legalName: String?
 
     @get:Schema(description = "Technical key of the legal form.")
     val legalForm: String?
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service."))
-    val states: Collection<BusinessPartnerStateDto>
+    val states: Collection<IBaseStateDto>
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
     val classifications: Collection<IBaseClassificationDto>
@@ -51,6 +51,7 @@ interface IBaseBusinessPartnerDto {
     @get:Schema(description = "Address of the official seat of this business partner.")
     val postalAddress: IBaseBusinessPartnerPostalAddressDto
 
+    // TODO: rename to bpnL, bpnS, bpnA (breaking change!)
     @get:Schema(description = "BPNL of the golden record legal entity this business partner refers to")
     val legalEntityBpn: String?
 
@@ -59,5 +60,4 @@ interface IBaseBusinessPartnerDto {
 
     @get:Schema(description = "BPNA of the golden record address this business partner refers to")
     val addressBpn: String?
-
 }

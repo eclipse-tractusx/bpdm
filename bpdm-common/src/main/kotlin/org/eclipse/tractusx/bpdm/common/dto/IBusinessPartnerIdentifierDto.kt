@@ -20,22 +20,9 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
 
-@Schema(description = LegalEntityStateDescription.header, requiredProperties = ["type"])
-data class BusinessPartnerStateDto(
+interface IBusinessPartnerIdentifierDto : IBaseIdentifierDto {
 
-    @get:Schema(description = "Date since when the status is/was valid.")
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = "Date until the status was valid, if applicable.")
-    val validTo: LocalDateTime?,
-
-    @get:Schema(description = "The type of this specified status.")
-    val type: BusinessStateType?,
-
-    @get:Schema(description = "Denotation of the status.")
-    val description: String?
-)
+    @get:Schema(description = "Body which issued the identifier")
+    val issuingBody: String?
+}

@@ -19,13 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
@@ -49,7 +46,7 @@ class BusinessPartnerMappings {
             legalName = entity.legalName,
             legalForm = entity.legalForm,
             states = entity.states.map(::toStateDto),
-            classifications = entity.classifications.map(::toClassificationNullableDto),
+            classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
             postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwnCompanyData = entity.isOwnCompanyData,
@@ -115,7 +112,7 @@ class BusinessPartnerMappings {
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
             states = dto.states.mapNotNull(::toState).toSortedSet(),
-            classifications = dto.classifications.map(::toClassificationOutput).toSortedSet(),
+            classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.shortName,
             legalName = dto.legalName,
             legalForm = dto.legalForm,
@@ -255,25 +252,15 @@ class BusinessPartnerMappings {
     private fun toState(dto: BusinessPartnerStateDto) =
         dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
 
-    private fun toClassificationNullableDto(entity: Classification) =
-        ClassificationBusinessPartnerDto(type = entity.type, code = entity.code, value = entity.value)
-
     private fun toClassificationDto(entity: Classification) =
-        ClassificationDto(type = entity.type, code = entity.code, value = entity.value)
+        BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)
 
-
-    private fun toClassification(dto: ClassificationBusinessPartnerDto) =
+    private fun toClassification(dto: BusinessPartnerClassificationDto) =
         dto.type?.let { Classification(type = it, code = dto.code, value = dto.value) }
-
-    private fun toClassificationOutput(dto: ClassificationDto) =
-        Classification(type = dto.type, code = dto.code, value = dto.value)
 
     private fun toGeoCoordinateDto(entity: GeographicCoordinate) =
         GeoCoordinateDto(latitude = entity.latitude, longitude = entity.longitude, altitude = entity.altitude)
 
-
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinate(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
-
-
 }

@@ -20,13 +20,9 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerStateDto
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
-import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import java.time.Instant
 
 @Schema(
@@ -34,6 +30,7 @@ import java.time.Instant
     requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"]
 )
 data class BusinessPartnerOutputDto(
+
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
     override val shortName: String?,
@@ -41,7 +38,7 @@ data class BusinessPartnerOutputDto(
     override val legalName: String? = null,
     override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<ClassificationDto> = emptyList(),
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val postalAddress: BusinessPartnerPostalAddressDto,
     override val isOwnCompanyData: Boolean,

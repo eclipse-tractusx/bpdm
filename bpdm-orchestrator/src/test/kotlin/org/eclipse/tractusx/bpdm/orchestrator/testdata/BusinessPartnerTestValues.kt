@@ -20,21 +20,14 @@
 package org.eclipse.tractusx.bpdm.orchestrator.testdata
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
-import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
-import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
-import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
-import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteDto
-import org.eclipse.tractusx.orchestrator.api.model.SiteStateDto
-import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import java.time.LocalDateTime
 
 /**
@@ -76,12 +69,12 @@ object BusinessPartnerTestValues {
             )
         ),
         classifications = listOf(
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NACE,
                 code = "code-1",
                 value = "value-1"
             ),
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NAF,
                 code = "code-2",
                 value = "value-2"
@@ -158,7 +151,7 @@ object BusinessPartnerTestValues {
             )
         ),
         classifications = listOf(
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.SIC,
                 code = "code-2",
                 value = "value-2"

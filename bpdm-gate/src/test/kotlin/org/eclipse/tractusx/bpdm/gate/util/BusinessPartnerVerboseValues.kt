@@ -156,31 +156,31 @@ object BusinessPartnerVerboseValues {
         name = CountryCode.US.getName()
     )
 
-    val bpClassification1 = ClassificationBusinessPartnerDto(
+    val bpClassification1 = BusinessPartnerClassificationDto(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2 = ClassificationBusinessPartnerDto(
+    val bpClassification2 = BusinessPartnerClassificationDto(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3 = ClassificationBusinessPartnerDto(
+    val bpClassification3 = BusinessPartnerClassificationDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4 = ClassificationBusinessPartnerDto(
+    val bpClassification4 = BusinessPartnerClassificationDto(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"
     )
 
-    val bpClassificationChina = ClassificationBusinessPartnerDto(
+    val bpClassificationChina = BusinessPartnerClassificationDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "北京市"
@@ -835,12 +835,12 @@ object BusinessPartnerVerboseValues {
             ),
         ),
         classifications = listOf(
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NACE,
                 code = "code-1-cleaned",
                 value = "value-1-cleaned"
             ),
-            ClassificationDto(
+            BusinessPartnerClassificationDto(
                 type = ClassificationType.NAF,
                 code = "code-2-cleaned",
                 value = "value-2-cleaned"

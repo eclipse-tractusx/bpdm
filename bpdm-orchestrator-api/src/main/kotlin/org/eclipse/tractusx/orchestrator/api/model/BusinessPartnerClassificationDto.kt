@@ -19,10 +19,13 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseClassificationDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
+@Schema(requiredProperties = ["type"])
 data class BusinessPartnerClassificationDto(
+
     override val type: ClassificationType,
     override val code: String?,
     override val value: String?

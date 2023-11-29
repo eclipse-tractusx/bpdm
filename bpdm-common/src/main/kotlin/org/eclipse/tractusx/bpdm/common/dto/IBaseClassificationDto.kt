@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-@Schema(description = ClassificationDescription.header)
 interface IBaseClassificationDto {
+
     @get:Schema(description = ClassificationDescription.type)
     val type: ClassificationType?
 

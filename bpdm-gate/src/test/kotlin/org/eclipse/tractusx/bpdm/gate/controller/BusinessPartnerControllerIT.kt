@@ -29,6 +29,9 @@ import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassificationDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
+import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
@@ -328,7 +331,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             legalName = request.legalName,
             legalForm = request.legalForm,
             states = request.states.toSortedSet(stateDtoComparator),
-            classifications = request.classifications.toSortedSet(classificationDtoOutputComparator),
+            classifications = request.classifications.toSortedSet(classificationDtoComparator),
             roles = request.roles.toSortedSet(),
             postalAddress = request.postalAddress,
             isOwnCompanyData = request.isOwnCompanyData,
@@ -355,21 +358,16 @@ class BusinessPartnerControllerIT @Autowired constructor(
         BusinessPartnerIdentifierDto::value,
         BusinessPartnerIdentifierDto::issuingBody
     )
+
     val stateDtoComparator = compareBy(nullsFirst(), BusinessPartnerStateDto::validFrom)       // here null means MIN
         .thenBy(nullsLast(), BusinessPartnerStateDto::validTo)        // here null means MAX
         .thenBy(BusinessPartnerStateDto::type)
         .thenBy(BusinessPartnerStateDto::description)
 
     val classificationDtoComparator = compareBy(
-        ClassificationBusinessPartnerDto::type,
-        ClassificationBusinessPartnerDto::code,
-        ClassificationBusinessPartnerDto::value
-    )
-
-    val classificationDtoOutputComparator = compareBy(
-        ClassificationDto::type,
-        ClassificationDto::code,
-        ClassificationDto::value
+        BusinessPartnerClassificationDto::type,
+        BusinessPartnerClassificationDto::code,
+        BusinessPartnerClassificationDto::value
     )
 
     private fun mockOrchestratorApi() {
