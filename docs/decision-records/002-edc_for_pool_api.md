@@ -27,3 +27,15 @@ In case of BPDM Pool provides no confidential data about Business Partners. It's
 
 ### Implications
 It must be ensured that only Catena-X Member have access to the BPDM Pool API. In Fact an Identity and Access Management is required in the Pool Backend which checks the technical users based on its associated roles and rights.
+
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
+- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
+- Source URL: https://github.com/eclipse-tractusx/bpdm

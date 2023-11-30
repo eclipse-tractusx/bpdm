@@ -240,3 +240,16 @@ asset and finally send that access token over your own EDC to the BPDM EDC in or
    invoke BPDM API endpoint directly. The gate EDC's URL can be invoked with the method's GET, POST and PUT. Use the method that matches original BPDM
    API endpoint the accessed asset covers. The response equals the original BPDM API endpoint response.
 
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
+- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
+- Source URL: https://github.com/eclipse-tractusx/bpdm
+
+
