@@ -122,3 +122,15 @@ Orchestration logic can basically be realized via an API and service based appro
 (Further/Next Steps to be discussed)
 
 Having in mind that a pushing mechanism might become required for a more efficient process orchestration or some other cases, it is not excluded to introduce an event queuing technology. We are open minded to this. But from current perspective we don't see hard requirements for this, so we want to focus on a minimal viable solution focusing on simplicity based on the KISS principle.
+
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
+- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
+- Source URL: https://github.com/eclipse-tractusx/bpdm

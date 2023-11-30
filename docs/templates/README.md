@@ -27,3 +27,15 @@ The use case document should include the following information:
 2. What is the problem to solve or goal to achieve
 3. What are the steps necessary to reach that goal with the BPDM API
 4. Example requests for these steps
+
+## NOTICE
+
+This work is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+- SPDX-License-Identifier: Apache-2.0
+- SPDX-FileCopyrightText: 2023,2023 ZF Friedrichshafen AG
+- SPDX-FileCopyrightText: 2023,2023 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+- SPDX-FileCopyrightText: 2023,2023 Mercedes Benz Group
+- SPDX-FileCopyrightText: 2023,2023 Schaeffler AG
+- SPDX-FileCopyrightText: 2023,2023 Contributors to the Eclipse Foundation
+- Source URL: https://github.com/eclipse-tractusx/bpdm
