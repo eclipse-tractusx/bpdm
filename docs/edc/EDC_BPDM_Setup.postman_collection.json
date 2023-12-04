@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "aab9dc22-2777-4429-8e0e-e72311c54d6b",
+		"_postman_id": "f7afefd6-5d06-49ea-8d77-76fba406e904",
 		"name": "EDC BPDM Setup",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "29584075"
@@ -917,6 +917,45 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "GET Administrative Areas Level 1",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Status code is 201\", function () {",
+													"    pm.response.to.have.status(201);",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"@context\": {},\n    \"asset\": {\n        \"@type\": \"Asset\",\n        \"@id\": \"{{ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1}}\",\n        \"properties\": {\n            \"description\": \"GET Administrative Areas Level 1 ({{BPDM_POOL_URL}}/ui/swagger-ui/index.html#/metadata-controller/getAdminAreasLevel1)\",\n            \"company\": \"{{COMPANY_ID}}\"\n        }\n    },\n    \"dataAddress\": {\n        \"@type\": \"DataAddress\",\n        \"type\": \"HttpData\",\n        \"baseUrl\": \"{{BPDM_POOL_URL}}/api/catena/administrative-areas-level1\",\n        \"oauth2:tokenUrl\": \"{{ASSET_TOKEN_URL}}\",\n        \"oauth2:clientId\": \"{{ASSET_CLIENT_ID}}\",\n        \"oauth2:clientSecretKey\": \"{{ASSET_CLIENT_SECRET}}\",\n        \"proxyQueryParams\": \"true\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{PROVIDER_MANAGEMENT_URL}}/assets",
+											"host": [
+												"{{PROVIDER_MANAGEMENT_URL}}"
+											],
+											"path": [
+												"assets"
+											]
+										}
+									},
+									"response": []
 								}
 							]
 						},
@@ -1518,6 +1557,11 @@
 		{
 			"key": "ASSET_POST_GENERIC_OUTPUT_SEARCH",
 			"value": "POST_GENERIC_OUTPUT_SEARCH",
+			"type": "string"
+		},
+		{
+			"key": "ASSET_GET_ADMINISTRATIVE_AREAS_LEVEL_1",
+			"value": "GET_ADMINISTRATIVE_AREAS_LEVEL_1",
 			"type": "string"
 		}
 	]
