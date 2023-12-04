@@ -34,8 +34,8 @@ import java.time.Instant
 
 @Service
 class GateQueryService(
-    val gateClient: GateClient,
-    val bridgeConfigProperties: BridgeConfigProperties
+    private val gateClient: GateClient,
+    private val bridgeConfigProperties: BridgeConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }

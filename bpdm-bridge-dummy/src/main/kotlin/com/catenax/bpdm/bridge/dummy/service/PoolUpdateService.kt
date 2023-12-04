@@ -24,6 +24,7 @@ import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.SiteDto
+import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -31,8 +32,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class PoolUpdateService(
-    val gateQueryService: GateQueryService,
-    val poolClient: PoolApiClient
+    private val gateQueryService: GateQueryService,
+    private val poolClient: PoolApiClient,
+    private val gateClient: GateClient
 ) {
 
     private val logger = KotlinLogging.logger { }
@@ -160,14 +162,14 @@ class PoolUpdateService(
 
     private fun isSiteMainAddress(it: GateAddressInfo): Boolean {
 
-        val mainAdressExternalId = it.siteExternalId?.let { it1 -> gateQueryService.gateClient.sites.getSiteByExternalId(it1).mainAddress.externalId }
+        val mainAdressExternalId = it.siteExternalId?.let { it1 -> gateClient.sites.getSiteByExternalId(it1).mainAddress.externalId }
         return it.externalId == mainAdressExternalId
     }
 
     private fun isLegalAddress(it: GateAddressInfo): Boolean {
 
         val legalAdressExternalId =
-            it.legalEntityExternalId?.let { it1 -> gateQueryService.gateClient.legalEntities.getLegalEntityByExternalId(it1).legalAddress.externalId }
+            it.legalEntityExternalId?.let { it1 -> gateClient.legalEntities.getLegalEntityByExternalId(it1).legalAddress.externalId }
         return it.externalId == legalAdressExternalId
     }
 
