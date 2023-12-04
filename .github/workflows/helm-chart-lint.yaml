@@ -69,5 +69,5 @@ jobs:
           helm repo add opensearch https://opensearch-project.github.io/helm-charts
           helm install bpdm-test tractusx-dev/bpdm --version ${{ github.event.inputs.upgrade_from || '3.1.2' }}
           helm dependency update charts/bpdm
-          helm upgrade bpdm-test charts/bdpm
+          helm upgrade bpdm-test charts/bpdm
         if: github.event_name != 'pull_request' || steps.list-changed.outputs.changed == 'true'
