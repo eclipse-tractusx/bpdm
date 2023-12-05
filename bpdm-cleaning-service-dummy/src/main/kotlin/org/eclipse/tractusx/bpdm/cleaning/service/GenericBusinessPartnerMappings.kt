@@ -20,7 +20,6 @@
 package org.eclipse.tractusx.bpdm.cleaning.service
 
 
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.orchestrator.api.model.*
 
 
@@ -40,9 +39,9 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
     )
 }
 
-fun BusinessPartnerClassificationDto.toLegalEntityClassificationDto(): ClassificationDto {
+fun BusinessPartnerClassificationDto.toLegalEntityClassificationDto(): LegalEntityClassificationDto {
 
-    return ClassificationDto(code = code, type = type, value = value)
+    return LegalEntityClassificationDto(code = code, type = type, value = value)
 }
 
 fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdentifierDto? {
@@ -55,9 +54,9 @@ fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdenti
 
 }
 
-fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityState? {
+fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityStateDto? {
 
-    return type?.let { LegalEntityState(description, validFrom, validTo, it) }
+    return type?.let { LegalEntityStateDto(description, validFrom, validTo, it) }
 }
 
 fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {

@@ -22,13 +22,18 @@ package org.eclipse.tractusx.bpdm.pool.util
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
 import org.eclipse.tractusx.bpdm.common.dto.StreetDto
-import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteStateVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.service.toDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.AddressPartnerCreateVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePartnerCreateVerboseDto
 import java.time.Instant
 import java.time.LocalDateTime
@@ -91,11 +96,11 @@ object BusinessPartnerVerboseValues {
 
     val classificationType = TypeKeyNameVerboseDto(ClassificationType.NACE, ClassificationType.NACE.name)
 
-    val classification1 = ClassificationVerboseDto("Sale of motor vehicles", null, classificationType)
-    val classification2 = ClassificationVerboseDto("Data processing, hosting and related activities", null, classificationType)
-    val classification3 = ClassificationVerboseDto("Other information service activities", null, classificationType)
-    val classification4 = ClassificationVerboseDto("Financial and insurance activities", null, classificationType)
-    val classification5 = ClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
+    val classification1 = LegalEntityClassificationVerboseDto("Sale of motor vehicles", null, classificationType)
+    val classification2 = LegalEntityClassificationVerboseDto("Data processing, hosting and related activities", null, classificationType)
+    val classification3 = LegalEntityClassificationVerboseDto("Other information service activities", null, classificationType)
+    val classification4 = LegalEntityClassificationVerboseDto("Financial and insurance activities", null, classificationType)
+    val classification5 = LegalEntityClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
 
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
@@ -245,12 +250,12 @@ object BusinessPartnerVerboseValues {
     )
 
 
-    val legalEntity1 = PoolLegalEntityVerboseDto(
-        legalName = "Business Partner Name",
+    val legalEntity1 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
-            identifiers = listOf(identifier1),
+            legalName = "Business Partner Name",
             legalForm = legalForm1,
+            identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
@@ -282,12 +287,12 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val legalEntity2 = PoolLegalEntityVerboseDto(
-        legalName = "Another Organisation Corp",
+    val legalEntity2 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
-            identifiers = listOf(identifier2),
+            legalName = "Another Organisation Corp",
             legalForm = legalForm2,
+            identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
@@ -319,12 +324,12 @@ object BusinessPartnerVerboseValues {
         )
     )
 
-    val legalEntity3 = PoolLegalEntityVerboseDto(
-        legalName = "好公司  合伙制企业",
+    val legalEntity3 = LegalEntityWithLegalAddressVerboseDto(
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
-            identifiers = listOf(identifier3),
+            legalName = "好公司  合伙制企业",
             legalForm = legalForm3,
+            identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
@@ -357,18 +362,17 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntityUpsert1 = LegalEntityPartnerCreateVerboseDto(
-        legalName = "Business Partner Name",
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
-            identifiers = listOf(LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")),
+            legalName = "Business Partner Name",
             legalForm = legalForm1,
+            identifiers = listOf(LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = Instant.now(),
-            updatedAt = Instant.now(),
-
-            ),
+            updatedAt = Instant.now()
+        ),
         legalAddress = addressPartner1.copy(
             bpnLegalEntity = legalEntity1.legalEntity.bpnl,
             isLegalAddress = true
@@ -377,16 +381,16 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntityUpsert2 = LegalEntityPartnerCreateVerboseDto(
-        legalName = "Another Organisation Corp",
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
-            identifiers = listOf(LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")),
+            legalName = "Another Organisation Corp",
             legalForm = legalForm2,
+            identifiers = listOf(LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = Instant.now(),
-            updatedAt = Instant.now(),
+            updatedAt = Instant.now()
         ),
         legalAddress = addressPartner2.copy(
             bpnLegalEntity = legalEntity2.legalEntity.bpnl,
@@ -396,16 +400,16 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntityUpsert3 = LegalEntityPartnerCreateVerboseDto(
-        legalName = "好公司  合伙制企业",
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
-            identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
+            legalName = "好公司  合伙制企业",
             legalForm = legalForm3,
+            identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = Instant.now(),
-            updatedAt = Instant.now(),
+            updatedAt = Instant.now()
         ),
         legalAddress = addressPartner3.copy(
             bpnLegalEntity = legalEntity3.legalEntity.bpnl,
@@ -415,21 +419,20 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntityUpsertMultipleIdentifier = LegalEntityPartnerCreateVerboseDto(
-        legalName = "Business Partner Name",
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
+            legalName = "Business Partner Name",
+            legalForm = legalForm1,
             identifiers = listOf(
                 LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X"),
                 LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")
             ),
-            legalForm = legalForm1,
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
             createdAt = Instant.now(),
-            updatedAt = Instant.now(),
-
-            ),
+            updatedAt = Instant.now()
+        ),
         legalAddress = addressPartner1.copy(
             bpnLegalEntity = legalEntity1.legalEntity.bpnl,
             isLegalAddress = true

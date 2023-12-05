@@ -29,15 +29,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerCreateResponseWrapper
-import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityPartnerUpdateResponseWrapper
+import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -95,7 +91,7 @@ interface PoolLegalEntityApi {
         @Parameter(description = "Identifier value") @PathVariable idValue: String,
         @Parameter(description = "Type of identifier to use, defaults to BPN when omitted", schema = Schema(defaultValue = "BPN"))
         @RequestParam idType: String? = "BPN"
-    ): PoolLegalEntityVerboseDto
+    ): LegalEntityWithLegalAddressVerboseDto
 
     @Operation(
         summary = "Confirms that the data of a legal entity business partner is still up to date.",
@@ -135,7 +131,7 @@ interface PoolLegalEntityApi {
     @PostExchange("/search")
     fun searchLegalEntitys(
         @RequestBody bpnLs: Collection<String>
-    ): ResponseEntity<Collection<PoolLegalEntityVerboseDto>>
+    ): ResponseEntity<Collection<LegalEntityWithLegalAddressVerboseDto>>
 
     @Operation(
         summary = "Returns all sites of a legal entity with a specific BPNL",

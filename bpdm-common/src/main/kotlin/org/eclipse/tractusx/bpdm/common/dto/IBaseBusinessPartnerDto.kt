@@ -40,10 +40,10 @@ interface IBaseBusinessPartnerDto {
     val legalForm: String?
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service."))
-    val states: Collection<IBaseStateDto>
+    val states: Collection<IBusinessPartnerStateDto>
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
-    val classifications: Collection<IBaseClassificationDto>
+    val classifications: Collection<IBusinessPartnerClassificationDto>
 
     @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>

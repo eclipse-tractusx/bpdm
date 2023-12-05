@@ -17,21 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
-import org.eclipse.tractusx.bpdm.common.model.ClassificationType
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalFormDescription
 
-@Schema(description = ClassificationDescription.header)
-data class ClassificationDto(
+@Schema(description = LegalFormDescription.header)
+data class LegalFormDto(
 
-    @get:Schema(description = ClassificationDescription.type)
-    override val type: ClassificationType,
+    @get:Schema(description = LegalFormDescription.technicalKey)
+    val technicalKey: String,
 
-    @get:Schema(description = ClassificationDescription.code)
-    override val code: String?,
+    @get:Schema(description = LegalFormDescription.name)
+    val name: String,
 
-    @get:Schema(description = ClassificationDescription.value)
-    override val value: String?
-) : IBaseClassificationDto
+    @get:Schema(description = LegalFormDescription.abbreviation)
+    val abbreviation: String? = null,
+)

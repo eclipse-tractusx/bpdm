@@ -19,10 +19,4 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-
-data class LegalEntityIdentifierDto(
-
-    override val value: String,
-    override val type: String,
-    override val issuingBody: String?
-) : IBaseLegalEntityIdentifierDto
+interface IBusinessPartnerClassificationDto : IBaseClassificationDto

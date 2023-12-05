@@ -17,27 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
 
-@Schema(description = LegalEntityStateDescription.header)
-data class LegalEntityStateVerboseDto(
+@Schema(description = LegalEntityIdentifierDescription.header)
+data class LegalEntityIdentifierVerboseDto(
 
-    @get:Schema(description = LegalEntityStateDescription.description)
-    val description: String?,
-
-    @get:Schema(description = LegalEntityStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = LegalEntityStateDescription.validTo)
-    val validTo: LocalDateTime?,
+    @get:Schema(description = LegalEntityIdentifierDescription.value)
+    val value: String,
 
     // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityStateDescription.type)
-    val type: TypeKeyNameVerboseDto<BusinessStateType>
+    @get:Schema(description = LegalEntityIdentifierDescription.type)
+    val type: TypeKeyNameVerboseDto<String>,
+
+    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
+    val issuingBody: String? = null
 )

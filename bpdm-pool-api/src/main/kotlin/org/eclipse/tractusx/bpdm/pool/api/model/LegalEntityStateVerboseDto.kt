@@ -17,28 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-// TODO rename to LegalEntityGateInputResponse
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = LegalEntityDescription.header)
-data class LegalEntityGateInputDto(
+@Schema(description = LegalEntityStateDescription.header)
+data class LegalEntityStateVerboseDto(
 
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityDto,
+    @get:Schema(description = LegalEntityStateDescription.description)
+    val description: String?,
+
+    @get:Schema(description = LegalEntityStateDescription.validFrom)
+    val validFrom: LocalDateTime?,
+
+    @get:Schema(description = LegalEntityStateDescription.validTo)
+    val validTo: LocalDateTime?,
 
     // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: AddressGateInputDto,
-
-    @get:Schema(description = CommonDescription.externalId, required = true)
-    val externalId: String,
+    @get:Schema(description = LegalEntityStateDescription.type)
+    val type: TypeKeyNameVerboseDto<BusinessStateType>
 )

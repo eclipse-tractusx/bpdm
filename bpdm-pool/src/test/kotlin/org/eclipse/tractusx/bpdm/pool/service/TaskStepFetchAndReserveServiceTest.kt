@@ -2,10 +2,9 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityStateDto
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteStateDto
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.*
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
@@ -13,6 +12,10 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
@@ -384,9 +387,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
-    fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityState {
+    fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
 
-        return LegalEntityState(
+        return LegalEntityStateDto(
             description = "description_" + name + "_" + id,
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
@@ -405,9 +408,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
 
-    fun classificationDto(name: String, id: Long, type: ClassificationType): ClassificationDto {
+    fun classificationDto(name: String, id: Long, type: ClassificationType): LegalEntityClassificationDto {
 
-        return ClassificationDto(
+        return LegalEntityClassificationDto(
             code = "code_" + name + "_" + id,
             value = "value_" + name + "_" + id,
             type = type
@@ -497,7 +500,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
     }
 
-    fun compareLegalEntity(verboseRequest: PoolLegalEntityVerboseDto, legalEntity: LegalEntityDto?) {
+    fun compareLegalEntity(verboseRequest: LegalEntityWithLegalAddressVerboseDto, legalEntity: LegalEntityDto?) {
 
         val verboseLegalEntity = verboseRequest.legalEntity
 
@@ -576,7 +579,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         }
     }
 
-    fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>, states: Collection<IBaseLegalEntityStateDto>?) {
+    fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>, states: Collection<ILegalEntityStateDto>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
         val sortedVerboseStates = statesVerbose.sortedBy { it.description }
@@ -615,7 +618,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         }
     }
 
-    fun compareClassifications(classificationsVerbose: Collection<ClassificationVerboseDto>, classifications: Collection<ClassificationDto>?) {
+    fun compareClassifications(
+        classificationsVerbose: Collection<LegalEntityClassificationVerboseDto>,
+        classifications: Collection<LegalEntityClassificationDto>?
+    ) {
 
         assertThat(classificationsVerbose.size).isEqualTo(classifications?.size ?: 0)
         val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.type.name }

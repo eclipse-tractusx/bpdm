@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 
 @Schema(description = LegalEntityIdentifierDescription.header)
-interface IBaseLegalEntityIdentifierDto : IBaseIdentifierDto {
+interface ILegalEntityIdentifierDto : IBaseIdentifierDto {
+
     @get:Schema(description = LegalEntityIdentifierDescription.value)
     override val value: String
 

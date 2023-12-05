@@ -21,17 +21,15 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
-import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
-import java.time.Instant
 import java.time.LocalDateTime
 
 object BusinessPartnerVerboseValues {
@@ -78,18 +76,6 @@ object BusinessPartnerVerboseValues {
     val businessStateType1 = BusinessStateType.ACTIVE
     val businessStateType2 = BusinessStateType.INACTIVE
 
-    val legalForm1 = LegalFormDto(
-        technicalKey = "LF1",
-        name = "Limited Liability Company",
-        abbreviation = "LLC",
-    )
-
-    val legalForm2 = LegalFormDto(
-        technicalKey = "LF2",
-        name = "Gemeinschaft mit beschränkter Haftung",
-        abbreviation = "GmbH",
-    )
-
     val bpState1 = BusinessPartnerStateDto(
         validFrom = businessStatusValidFrom1,
         validTo = businessStatusValidUntil1,
@@ -120,30 +106,6 @@ object BusinessPartnerVerboseValues {
         type = identifierTypeTechnicalKey3,
         value = identifierValue3,
         issuingBody = null
-    )
-
-    val classification1 = ClassificationVerboseDto(
-        value = "Sale of motor vehicles",
-        code = "code1",
-        type = ClassificationType.NACE.toDto()
-    )
-
-    val classification2 = ClassificationVerboseDto(
-        value = "Data processing, hosting and related activities",
-        code = "code2",
-        type = ClassificationType.NACE.toDto()
-    )
-
-    val classification3 = ClassificationVerboseDto(
-        value = "Other information service activities",
-        code = "code3",
-        type = ClassificationType.NACE.toDto()
-    )
-
-    val classification4 = ClassificationVerboseDto(
-        value = "Financial and insurance activities",
-        code = "code4",
-        type = ClassificationType.NACE.toDto()
     )
 
 
@@ -200,31 +162,32 @@ object BusinessPartnerVerboseValues {
         type = businessStateType2
     )
 
-    val bpClassification1Dto = ClassificationDto(
+    val bpClassification1Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code1",
         value = "Sale of motor vehicles"
     )
 
-    val bpClassification2Dto = ClassificationDto(
+    val bpClassification2Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code2",
         value = "Data processing, hosting and related activities"
     )
 
-    val bpClassification3Dto = ClassificationDto(
+    val bpClassification3Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code3",
         value = "Other information service activities"
     )
 
-    val bpClassification4Dto = ClassificationDto(
+    val bpClassification4Dto = LegalEntityClassificationDto(
         type = ClassificationType.NACE,
         code = "code4",
         value = "Financial and insurance activities"
     )
 
     val legalEntity1 = LegalEntityDto(
+        legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
@@ -232,6 +195,7 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntity2 = LegalEntityDto(
+        legalNameParts = listOf("Company ABC AG"),
         legalShortName = "short3",
         legalForm = "LF2",
         states = listOf(legalEntityBusinessStatus2),
@@ -239,30 +203,11 @@ object BusinessPartnerVerboseValues {
     )
 
     val legalEntity3 = LegalEntityDto(
+        legalNameParts = listOf("Business Partner Name"),
         legalShortName = "short1",
         legalForm = "LF1",
         states = listOf(legalEntityBusinessStatus1),
         classifications = listOf(bpClassification1Dto, bpClassification2Dto),
-    )
-
-    val leBusinessStatus1 = LegalEntityStateVerboseDto(
-        description = "Active",
-        validFrom = LocalDateTime.of(2020, 1, 1, 0, 0),
-        validTo = LocalDateTime.of(2021, 1, 1, 0, 0),
-        type = TypeKeyNameVerboseDto(
-            technicalKey = BusinessStateType.ACTIVE,
-            name = BusinessStateType.ACTIVE.getTypeName(),
-        )
-    )
-
-    val leBusinessStatus2 = LegalEntityStateVerboseDto(
-        description = "Insolvent",
-        validFrom = LocalDateTime.of(2019, 1, 1, 0, 0),
-        validTo = LocalDateTime.of(2022, 1, 1, 0, 0),
-        type = TypeKeyNameVerboseDto(
-            technicalKey = BusinessStateType.INACTIVE,
-            name = BusinessStateType.INACTIVE.getTypeName(),
-        )
     )
 
     val siteBusinessStatus1 = SiteStateDto(
@@ -409,70 +354,6 @@ object BusinessPartnerVerboseValues {
         street = StreetDto("TODO", ""),
     )
 
-    val legalEntityResponsePool1 = PoolLegalEntityVerboseDto(
-        legalName = "Business Partner Name",
-        legalAddress = LogisticAddressVerboseDto(
-            bpna = "BPNA0000000001XY",
-            physicalPostalAddress = address1,
-            bpnLegalEntity = "BPNL0000000000XY",
-            bpnSite = "BPNS0000000001XY",
-            createdAt = Instant.now(),
-            updatedAt = Instant.now()
-        ), legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL0000000000XY",
-            legalShortName = "short1",
-            legalForm = legalForm1,
-            states = listOf(leBusinessStatus1),
-            classifications = listOf(classification1, classification2),
-            currentness = Instant.now(),
-            createdAt = Instant.now(),
-            updatedAt = Instant.now(),
-        )
-
-    )
-
-    val legalEntityResponsePool2 = PoolLegalEntityVerboseDto(
-        legalName = "Another Organisation Corp", legalAddress = LogisticAddressVerboseDto(
-            bpna = "BPNA0000000002XY",
-            physicalPostalAddress = address2,
-            bpnLegalEntity = "BPNL0000000001XZ",
-            bpnSite = "BPNS0000000002XY",
-            createdAt = Instant.now(),
-            updatedAt = Instant.now()
-        ), legalEntity = LegalEntityVerboseDto(
-            bpnl = "BPNL0000000001XZ",
-            legalShortName = "short3",
-            legalForm = legalForm2,
-            states = listOf(leBusinessStatus2),
-            classifications = listOf(classification3, classification4),
-            currentness = Instant.now(),
-            createdAt = Instant.now(),
-            updatedAt = Instant.now(),
-        )
-    )
-
-    val legalEntityResponseGate1 = LegalEntityVerboseDto(
-        bpnl = "BPNL0000000000XY",
-        legalShortName = "short1",
-        legalForm = legalForm1,
-        states = listOf(leBusinessStatus1),
-        classifications = listOf(classification1, classification2),
-        currentness = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now(),
-    )
-
-    val legalEntityResponseGate2 = LegalEntityVerboseDto(
-        bpnl = "BPNL0000000001XZ",
-        legalShortName = "short3",
-        legalForm = legalForm2,
-        states = listOf(leBusinessStatus2),
-        classifications = listOf(classification3, classification4),
-        currentness = Instant.now(),
-        createdAt = Instant.now(),
-        updatedAt = Instant.now(),
-    )
-
     //New Values for Logistic Addresses Tests
     val postalAddressLogisticAddress1 = PhysicalPostalAddressGateDto(
         geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
@@ -579,7 +460,6 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityGateInputResponse1 = LegalEntityGateInputDto(
         legalEntity = legalEntity1,
-        legalNameParts = listOf("Business Partner Name"),
         legalAddress = AddressGateInputDto(
             address = logisticAddress1,
             externalId = "${externalId1}_legalAddress",
@@ -591,7 +471,6 @@ object BusinessPartnerVerboseValues {
 
     val legalEntityGateInputResponse2 = LegalEntityGateInputDto(
         legalEntity = legalEntity2,
-        legalNameParts = listOf("Company ABC AG"),
         legalAddress = AddressGateInputDto(
             address = logisticAddress2,
             externalId = "${externalId2}_legalAddress",
@@ -614,7 +493,6 @@ object BusinessPartnerVerboseValues {
     //Gate Output Legal Entities Response
     val legalEntityGateOutputResponse1 = LegalEntityGateOutputResponse(
         legalEntity = legalEntity1,
-        legalNameParts = listOf("Business Partner Name"),
         externalId = externalId1,
         bpnl = "BPNL0000000000XY",
         legalAddress = AddressGateOutputDto(
@@ -630,7 +508,6 @@ object BusinessPartnerVerboseValues {
     val legalEntityGateOutputResponse2 = LegalEntityGateOutputResponse(
         legalEntity = legalEntity2,
         externalId = externalId2,
-        legalNameParts = listOf("Company ABC AG"),
         bpnl = "BPNL0000000001XZ",
         legalAddress = AddressGateOutputDto(
             address = physicalAddress2,

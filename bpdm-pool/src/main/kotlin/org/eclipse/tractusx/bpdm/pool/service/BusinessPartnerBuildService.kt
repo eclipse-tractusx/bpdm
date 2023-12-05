@@ -76,7 +76,7 @@ class BusinessPartnerBuildService(
 
         val requestsByLegalEntities = validRequests
             .mapIndexed { bpnIndex, request ->
-                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], request.legalName, legalEntityMetadataMap)
+                val legalEntity = createLegalEntity(request.legalEntity, bpnLs[bpnIndex], request.legalEntity.legalName, legalEntityMetadataMap)
                 val legalAddress = createLogisticAddress(request.legalAddress, bpnAs[bpnIndex], legalEntity, addressMetadataMap)
                 legalEntity.legalAddress = legalAddress
                 Pair(legalEntity, request)
@@ -198,7 +198,7 @@ class BusinessPartnerBuildService(
         val requestsByBpn = validRequests.associateBy { it.bpnl }
         val updatedLegalEntities = legalEntities.map { legalEntity ->
             val request = requestsByBpn[legalEntity.bpn]!!
-            updateLegalEntity(legalEntity, request.legalEntity, request.legalName, legalEntityMetadataMap)
+            updateLegalEntity(legalEntity, request.legalEntity, request.legalEntity.legalName, legalEntityMetadataMap)
             updateLogisticAddress(legalEntity.legalAddress, request.legalAddress, addressMetadataMap)
             legalEntityRepository.save(legalEntity)
         }
@@ -395,7 +395,7 @@ class BusinessPartnerBuildService(
             return Instant.now().truncatedTo(ChronoUnit.MICROS)
         }
 
-        fun toLegalEntityState(dto: IBaseLegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
+        fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
             return LegalEntityState(
                 description = dto.description,
                 validFrom = dto.validFrom,
@@ -438,7 +438,7 @@ class BusinessPartnerBuildService(
         }
 
         fun toLegalEntityIdentifier(
-            dto: IBaseLegalEntityIdentifierDto,
+            dto: ILegalEntityIdentifierDto,
             idTypes: Map<String, IdentifierType>,
             partner: LegalEntity
         ): LegalEntityIdentifier {
@@ -493,7 +493,7 @@ class BusinessPartnerBuildService(
             legalEntityDto: IBaseLegalEntityDto,
             bpnL: String,
             legalNameValue: String?,
-            metadataMap: BusinessPartnerBuildService.LegalEntityMetadataMapping
+            metadataMap: LegalEntityMetadataMapping
         ): LegalEntity {
 
             if (legalNameValue == null) {
@@ -509,7 +509,7 @@ class BusinessPartnerBuildService(
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
             )
-            BusinessPartnerBuildService.updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
+            updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
 
             return newLegalEntity
         }

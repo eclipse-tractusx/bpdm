@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.LegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LegalEntityDescription.headerMatchResponse)
@@ -34,9 +34,6 @@ data class LegalEntityMatchVerboseDto(
 
     @get:Schema(description = CommonDescription.score)
     val score: Float,
-
-    @get:Schema(description = LegalEntityDescription.legalName)
-    val legalName: String,
 
     @field:JsonUnwrapped
     val legalEntity: LegalEntityVerboseDto,

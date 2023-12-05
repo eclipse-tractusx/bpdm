@@ -20,9 +20,9 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.response.PoolLegalEntityVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntity
 import org.eclipse.tractusx.bpdm.pool.entity.LegalEntityIdentifier
@@ -46,19 +46,19 @@ class BusinessPartnerFetchService(
 ) {
 
     /**
-     * Fetch a business partner by [bpn] and return as [PoolLegalEntityVerboseDto]
+     * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
      */
-    fun findLegalEntityIgnoreCase(bpn: String): PoolLegalEntityVerboseDto {
-        return findLegalEntityOrThrow(bpn).toPoolLegalEntity()
+    fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
+        return findLegalEntityOrThrow(bpn).toLegalEntityWithLegalAddress()
     }
 
 
     /**
-     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [PoolLegalEntityVerboseDto]
+     * Fetch a business partner by [identifierValue] (ignoring case) of [identifierType] and return as [LegalEntityWithLegalAddressVerboseDto]
      */
     @Transactional
-    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): PoolLegalEntityVerboseDto {
-        return findLegalEntityOrThrow(identifierType, identifierValue).toPoolLegalEntity()
+    fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
+        return findLegalEntityOrThrow(identifierType, identifierValue).toLegalEntityWithLegalAddress()
     }
 
     /**
@@ -73,8 +73,8 @@ class BusinessPartnerFetchService(
      * Fetch business partners by BPN in [bpns] and map to dtos
      */
     @Transactional
-    fun fetchDtosByBpns(bpns: Collection<String>): Collection<PoolLegalEntityVerboseDto> {
-        return fetchByBpns(bpns).map { it.toPoolLegalEntity() }
+    fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
+        return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
     }
 
     /**

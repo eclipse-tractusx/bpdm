@@ -19,11 +19,12 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityIdentifierDto
 
 data class LegalEntityIdentifierDto(
+
     override val value: String,
     override val type: String,
     override val issuingBody: String?
 
-) : IBaseLegalEntityIdentifierDto
+) : ILegalEntityIdentifierDto

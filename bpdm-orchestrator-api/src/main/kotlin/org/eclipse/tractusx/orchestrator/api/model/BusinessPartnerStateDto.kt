@@ -19,7 +19,7 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseStateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
@@ -30,4 +30,4 @@ data class BusinessPartnerStateDto(
     override val type: BusinessStateType?,
     override val description: String?
 
-) : IBaseStateDto
+) : IBusinessPartnerStateDto

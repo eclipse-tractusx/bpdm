@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
@@ -25,28 +25,30 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import java.time.Instant
 
-
 @Schema(description = LegalEntityDescription.header)
 data class LegalEntityVerboseDto(
 
     @get:Schema(description = LegalEntityDescription.bpnl)
     val bpnl: String,
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers))
-    val identifiers: Collection<LegalEntityIdentifierVerboseDto> = emptyList(),
+    @get:Schema(description = LegalEntityDescription.legalName)
+    val legalName: String,
 
     @get:Schema(description = LegalEntityDescription.legalShortName)
     val legalShortName: String? = null,
 
-    // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LegalEntityDescription.legalForm)
     val legalForm: LegalFormDto? = null,
+
+    // TODO OpenAPI description for complex field does not work!!
+    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers))
+    val identifiers: Collection<LegalEntityIdentifierVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
     val states: Collection<LegalEntityStateVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications))
-    val classifications: Collection<ClassificationVerboseDto> = emptyList(),
+    val classifications: Collection<LegalEntityClassificationVerboseDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.relations))
     val relations: Collection<RelationVerboseDto> = emptyList(),

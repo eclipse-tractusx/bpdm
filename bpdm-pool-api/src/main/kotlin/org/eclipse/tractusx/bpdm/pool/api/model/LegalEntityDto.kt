@@ -17,27 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 
 @Schema(description = LegalEntityDescription.header)
-interface IBaseLegalEntityDto {
+data class LegalEntityDto(
 
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.identifiers, required = false))
-    val identifiers: Collection<ILegalEntityIdentifierDto>
+    @get:Schema(description = LegalEntityDescription.legalName)
+    val legalName: String,
 
-    @get:Schema(description = LegalEntityDescription.legalShortName)
-    val legalShortName: String?
+    override val legalShortName: String?,
+    override val legalForm: String? = null,
+    override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
+    override val states: Collection<LegalEntityStateDto> = emptyList(),
+    override val classifications: Collection<LegalEntityClassificationDto> = emptyList()
 
-    @get:Schema(description = LegalEntityDescription.legalForm)
-    val legalForm: String?
-
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.states))
-    val states: Collection<ILegalEntityStateDto>
-
-    @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
-    val classifications: Collection<ILegalEntityClassificationDto>
-}
+) : IBaseLegalEntityDto

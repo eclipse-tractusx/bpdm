@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
 @Schema(description = ClassificationDescription.header)
-data class ClassificationVerboseDto(
+data class LegalEntityClassificationVerboseDto(
 
     @get:Schema(description = ClassificationDescription.value)
     val value: String? = null,

@@ -17,16 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseLegalEntityStateDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityClassificationDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.ClassificationDescription
+import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 
-data class LegalEntityState(
-    override val description: String?,
-    override val validFrom: LocalDateTime?,
-    override val validTo: LocalDateTime?,
-    override val type: BusinessStateType
+@Schema(description = ClassificationDescription.header)
+data class LegalEntityClassificationDto(
 
-) : IBaseLegalEntityStateDto
+    override val type: ClassificationType,
+    override val code: String?,
+    override val value: String?
+
+) : ILegalEntityClassificationDto

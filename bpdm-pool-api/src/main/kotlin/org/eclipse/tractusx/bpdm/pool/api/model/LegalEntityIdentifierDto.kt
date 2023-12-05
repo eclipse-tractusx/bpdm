@@ -17,15 +17,17 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 
-@Schema(name = "Name", description = "Name record for a business partner")
-data class NameDto(
-    @get:Schema(description = "Full name")
-    val value: String,
+@Schema(description = LegalEntityIdentifierDescription.header)
+data class LegalEntityIdentifierDto(
 
-    @get:Schema(description = "Abbreviated name or shorthand")
-    val shortName: String?
-)
+    override val value: String,
+    override val type: String,
+    override val issuingBody: String?
+
+) : ILegalEntityIdentifierDto

@@ -17,28 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.RelationType
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
-@Schema(name = "RelationVerboseDto", description = "Directed relation between two business partners")
-data class RelationVerboseDto(
+@Schema(description = LegalEntityStateDescription.header)
+interface ILegalEntityStateDto : IBaseStateDto {
 
-    @get:Schema(description = "Type of relation like predecessor or ownership relation")
-    val type: TypeKeyNameVerboseDto<RelationType>,
+    @get:Schema(description = LegalEntityStateDescription.description)
+    override val description: String?
 
-    @get:Schema(description = "BPN of partner which is the source of the relation")
-    val startBpnl: String,
+    @get:Schema(description = LegalEntityStateDescription.validFrom)
+    override val validFrom: LocalDateTime?
 
-    @get:Schema(description = "BPN of partner which is the target of the relation")
-    val endBpnl: String,
+    @get:Schema(description = LegalEntityStateDescription.validTo)
+    override val validTo: LocalDateTime?
 
-    @get:Schema(description = "Time when the relation started")
-    val validFrom: LocalDateTime? = null,
-
-    @get:Schema(description = "Time when the relation ended")
-    val validTo: LocalDateTime? = null
-)
+    @get:Schema(description = LegalEntityStateDescription.type)
+    override val type: BusinessStateType
+}

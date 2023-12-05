@@ -22,7 +22,6 @@ package org.eclipse.tractusx.bpdm.orchestrator.testdata
 import com.neovisionaries.i18n.CountryCode
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
-import org.eclipse.tractusx.bpdm.common.dto.ClassificationDto
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
@@ -348,13 +347,13 @@ object BusinessPartnerTestValues {
         ),
         legalForm = "Legal Form 1",
         states = listOf(
-            LegalEntityState(
+            LegalEntityStateDto(
                 description = "Legal State Description 1",
                 validFrom = LocalDateTime.of(1995, 2, 2, 3, 3),
                 validTo = LocalDateTime.of(2000, 3, 3, 4, 4),
                 type = BusinessStateType.ACTIVE
             ),
-            LegalEntityState(
+            LegalEntityStateDto(
                 description = "Legal State Description 2",
                 validFrom = LocalDateTime.of(2000, 3, 3, 4, 4),
                 validTo = null,
@@ -362,12 +361,12 @@ object BusinessPartnerTestValues {
             ),
         ),
         classifications = listOf(
-            ClassificationDto(
+            LegalEntityClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 1",
                 value = "Classification Value 1"
             ),
-            ClassificationDto(
+            LegalEntityClassificationDto(
                 type = ClassificationType.NACE,
                 code = "Classification Code 2",
                 value = "Classification Value 2"
@@ -393,7 +392,7 @@ object BusinessPartnerTestValues {
         ),
         legalForm = "Legal Form 2",
         states = listOf(
-            LegalEntityState(
+            LegalEntityStateDto(
                 description = "Legal State Description 2",
                 validFrom = LocalDateTime.of(1900, 5, 5, 5, 5),
                 validTo = null,
@@ -401,7 +400,7 @@ object BusinessPartnerTestValues {
             )
         ),
         classifications = listOf(
-            ClassificationDto(
+            LegalEntityClassificationDto(
                 type = ClassificationType.SIC,
                 code = "Classification Code 2",
                 value = "Classification Value 2"

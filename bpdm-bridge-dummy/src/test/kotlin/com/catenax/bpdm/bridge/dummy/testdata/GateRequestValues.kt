@@ -19,11 +19,9 @@
 
 package com.catenax.bpdm.bridge.dummy.testdata
 
-import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.PhysicalPostalAddressGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.SiteStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
@@ -90,25 +88,25 @@ object GateRequestValues {
         type = CommonValues.businessStateType2
     )
 
-    val classification1 = ClassificationDto(
+    val classification1 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode1,
         value = CommonValues.classificationValue1
     )
 
-    val classification2 = ClassificationDto(
+    val classification2 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode2,
         value = CommonValues.classificationValue2
     )
 
-    val classification3 = ClassificationDto(
+    val classification3 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode3,
         value = CommonValues.classificationValue3
     )
 
-    val classification4 = ClassificationDto(
+    val classification4 = LegalEntityClassificationDto(
         type = CommonValues.classificationType,
         code = CommonValues.classificationCode4,
         value = CommonValues.classificationValue4
@@ -226,6 +224,7 @@ object GateRequestValues {
 
     val legalEntity1 = LegalEntityDto(
         identifiers = listOf(identifier1, identifier2),
+        legalNameParts = listOf(CommonValues.name1),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -234,6 +233,7 @@ object GateRequestValues {
 
     val legalEntity2 = LegalEntityDto(
         identifiers = listOf(identifier3, identifier4),
+        legalNameParts = listOf(CommonValues.name3),
         legalShortName = CommonValues.shortName3,
         legalForm = CommonValues.legalFormTechnicalKey2,
         states = listOf(leBusinessStatus2),
@@ -242,6 +242,7 @@ object GateRequestValues {
 
     val legalEntity3 = LegalEntityDto(
         identifiers = listOf(identifier5),
+        legalNameParts = listOf(CommonValues.name1),
         legalShortName = CommonValues.shortName1,
         legalForm = CommonValues.legalFormTechnicalKey1,
         states = listOf(leBusinessStatus1),
@@ -251,21 +252,18 @@ object GateRequestValues {
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = legalEntity1,
         legalAddress = address1,
-        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId1,
     )
 
     val legalEntityGateInputRequest2 = LegalEntityGateInputRequest(
         legalEntity = legalEntity2,
         legalAddress = address2,
-        legalNameParts = listOf(CommonValues.name3),
         externalId = CommonValues.externalId2,
     )
 
     val legalEntityGateInputRequest3 = LegalEntityGateInputRequest(
         legalEntity = legalEntity3,
         legalAddress = address3,
-        legalNameParts = listOf(CommonValues.name1),
         externalId = CommonValues.externalId3,
     )
 
