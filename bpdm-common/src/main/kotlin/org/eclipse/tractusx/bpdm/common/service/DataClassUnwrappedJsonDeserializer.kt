@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.service
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.*
@@ -58,7 +59,7 @@ private class DataClassUnwrappedJsonDeserializerForType(destinationJavaType: Jav
         this.primaryConstructor = destinationClass.primaryConstructor
             ?: throw IllegalStateException("Primary constructor required for '$destinationClass'")
 
-        // Annotation @field:JsonUnwrapped is stored on the Java field, not the constructor parameter.
+        // Annotations @field:JsonUnwrapped and @field:JsonProperty are stored on the Java field, not the constructor parameter.
         val propertiesByName = destinationClass.memberProperties.associateBy { it.name }
 
         this.constructorParameters = primaryConstructor.parameters.map { param ->
@@ -66,7 +67,9 @@ private class DataClassUnwrappedJsonDeserializerForType(destinationJavaType: Jav
                 ?: throw IllegalStateException("Some primary constructor parameter of '$destinationClass' doesn't have a name")
             val type = param.type
             val jsonUnwrapped = propertiesByName[name]?.javaField?.getAnnotation(JsonUnwrapped::class.java) != null
-            ConstructorParameter(name, type, jsonUnwrapped)
+            val altName = propertiesByName[name]?.javaField?.getAnnotation(JsonProperty::class.java)?.value
+            val finalName = if (altName.isNullOrEmpty()) name else altName
+            ConstructorParameter(finalName, type, jsonUnwrapped)
         }
     }
 

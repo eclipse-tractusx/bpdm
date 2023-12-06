@@ -538,13 +538,13 @@ class BusinessPartnerBuildService(
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
 
-            if (physicalAddress.countryCode() == null || physicalAddress.city == null) {
+            if (physicalAddress.country == null || physicalAddress.city == null) {
                 throw BpdmValidationException(TaskStepBuildService.CleaningError.COUNTRY_CITY_IS_NULL.message)
             }
 
             return PhysicalPostalAddress(
                 geographicCoordinates = physicalAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
-                country = physicalAddress.countryCode()!!,
+                country = physicalAddress.country!!,
                 administrativeAreaLevel1 = regions[physicalAddress.administrativeAreaLevel1],
                 administrativeAreaLevel2 = physicalAddress.administrativeAreaLevel2,
                 administrativeAreaLevel3 = physicalAddress.administrativeAreaLevel3,
@@ -569,7 +569,7 @@ class BusinessPartnerBuildService(
 
         fun createAlternativeAddress(alternativeAddress: IBaseAlternativePostalAddressDto, regions: Map<String, Region>): AlternativePostalAddress {
 
-            if (alternativeAddress.countryCode() == null || alternativeAddress.city == null ||
+            if (alternativeAddress.country == null || alternativeAddress.city == null ||
                 alternativeAddress.deliveryServiceType == null || alternativeAddress.deliveryServiceNumber == null
             ) {
 
@@ -578,7 +578,7 @@ class BusinessPartnerBuildService(
 
             return AlternativePostalAddress(
                 geographicCoordinates = alternativeAddress.geographicCoordinates?.let { GeographicCoordinate(it.latitude, it.longitude, it.altitude) },
-                country = alternativeAddress.countryCode()!!,
+                country = alternativeAddress.country!!,
                 administrativeAreaLevel1 = regions[alternativeAddress.administrativeAreaLevel1],
                 postCode = alternativeAddress.postalCode,
                 city = alternativeAddress.city!!,

@@ -99,10 +99,10 @@ object BusinessPartnerVerboseValues {
 
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country1,
+        countryVerbose = country1,
         postalCode = "71059 ",
         city = "Böblingen",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = "Böblingen",
         administrativeAreaLevel3 = null,
         district = "Sindelfingen-Ost",
@@ -116,10 +116,10 @@ object BusinessPartnerVerboseValues {
 
     val address2 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country2,
+        countryVerbose = country2,
         postalCode = "70547",
         city = "Atlanta",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = " Fulton County",
         administrativeAreaLevel3 = null,
         district = "District Level 1",
@@ -133,10 +133,10 @@ object BusinessPartnerVerboseValues {
 
     val address3 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country3,
+        countryVerbose = country3,
         postalCode = "30346",
         city = "Atlanta",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = " Fulton County",
         administrativeAreaLevel3 = null,
         district = "DL 1",
@@ -261,10 +261,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country1,
+                countryVerbose = country1,
                 postalCode = null,
                 city = "Stuttgart",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,
@@ -298,10 +298,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country2,
+                countryVerbose = country2,
                 postalCode = null,
                 city = "5th Congressional District",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,
@@ -335,10 +335,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country3,
+                countryVerbose = country3,
                 postalCode = null,
                 city = "北京市",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,

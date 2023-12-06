@@ -32,10 +32,10 @@ interface IBasePhysicalPostalAddressDto {
     val geographicCoordinates: GeoCoordinateDto?
 
     @get:Schema(description = PostalAddressDescription.country)
-    val country: Any?
+    val country: CountryCode?
 
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
-    val administrativeAreaLevel1: Any?
+    val administrativeAreaLevel1: String?
 
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel2)
     val administrativeAreaLevel2: String?
@@ -69,8 +69,4 @@ interface IBasePhysicalPostalAddressDto {
 
     @get:Schema(description = PostalAddressDescription.door)
     val door: String?
-
-    fun adminLevel1Key(): String?
-
-    fun countryCode(): CountryCode?
 }

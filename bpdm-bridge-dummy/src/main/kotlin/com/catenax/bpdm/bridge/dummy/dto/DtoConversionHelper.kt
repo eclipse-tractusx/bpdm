@@ -226,13 +226,13 @@ fun poolToGateLogisticAddress(address: Pool_LogisticAddressVerboseDto): Gate_Log
             description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,
-            type = it.type.technicalKey
+            type = it.typeVerbose.technicalKey
         )
     }
     val identifiers = address.identifiers.map {
         Gate_AddressIdentifierDto(
             value = it.value,
-            type = it.type.technicalKey
+            type = it.typeVerbose.technicalKey
         )
     }
     return Gate_LogisticAddressDto(
@@ -255,10 +255,10 @@ private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto):
     }
     return Gate_PhysicalPostalAddressDto(
         geographicCoordinates = address.geographicCoordinates,
-        country = address.country.technicalKey,
+        country = address.country,
         postalCode = address.postalCode,
         city = address.city,
-        administrativeAreaLevel1 = address.administrativeAreaLevel1?.regionCode,
+        administrativeAreaLevel1 = address.administrativeAreaLevel1,
         administrativeAreaLevel2 = address.administrativeAreaLevel2,
         administrativeAreaLevel3 = address.administrativeAreaLevel3,
         district = address.district,
@@ -274,10 +274,10 @@ private fun poolToGatePhysicalAddress(address: PhysicalPostalAddressVerboseDto):
 private fun poolToGateAlternativeAddress(address: AlternativePostalAddressVerboseDto): org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto {
     return org.eclipse.tractusx.bpdm.gate.api.model.AlternativePostalAddressDto(
         geographicCoordinates = address.geographicCoordinates,
-        country = address.country.technicalKey,
+        country = address.country,
         postalCode = address.postalCode,
         city = address.city,
-        administrativeAreaLevel1 = address.administrativeAreaLevel1?.regionCode,
+        administrativeAreaLevel1 = address.administrativeAreaLevel1,
         deliveryServiceNumber = address.deliveryServiceNumber,
         deliveryServiceType = address.deliveryServiceType,
         deliveryServiceQualifier = address.deliveryServiceQualifier

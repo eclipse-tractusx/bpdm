@@ -165,7 +165,7 @@ object BusinessPartnerNonVerboseValues {
 
     private val postalAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = BusinessPartnerVerboseValues.address1.geographicCoordinates,
-        country = BusinessPartnerVerboseValues.address1.country.technicalKey,
+        country = BusinessPartnerVerboseValues.address1.country,
         postalCode = BusinessPartnerVerboseValues.address1.postalCode,
         city = BusinessPartnerVerboseValues.address1.city,
         administrativeAreaLevel1 = BusinessPartnerVerboseValues.address1.administrativeAreaLevel1?.toString(),
@@ -182,7 +182,7 @@ object BusinessPartnerNonVerboseValues {
 
     private val postalAddress2 = PhysicalPostalAddressDto(
         geographicCoordinates = BusinessPartnerVerboseValues.address2.geographicCoordinates,
-        country = BusinessPartnerVerboseValues.address2.country.technicalKey,
+        country = BusinessPartnerVerboseValues.address2.country,
         postalCode = BusinessPartnerVerboseValues.address2.postalCode,
         city = BusinessPartnerVerboseValues.address2.city,
         administrativeAreaLevel1 = BusinessPartnerVerboseValues.address2.administrativeAreaLevel1?.toString(),
@@ -199,7 +199,7 @@ object BusinessPartnerNonVerboseValues {
 
     private val postalAddress3 = PhysicalPostalAddressDto(
         geographicCoordinates = BusinessPartnerVerboseValues.address3.geographicCoordinates,
-        country = BusinessPartnerVerboseValues.address3.country.technicalKey,
+        country = BusinessPartnerVerboseValues.address3.country,
         postalCode = BusinessPartnerVerboseValues.address3.postalCode,
         city = BusinessPartnerVerboseValues.address3.city,
         administrativeAreaLevel1 = BusinessPartnerVerboseValues.address3.administrativeAreaLevel1?.toString(),

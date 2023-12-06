@@ -1241,7 +1241,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val verboseLegalEntity = verboseRequest.legalEntity
 
         assertThat(verboseLegalEntity.legalShortName).isEqualTo(legalEntity?.legalShortName)
-        assertThat(verboseLegalEntity.legalForm?.technicalKey).isEqualTo(legalEntity?.legalForm)
+        assertThat(verboseLegalEntity.legalFormVerbose?.technicalKey).isEqualTo(legalEntity?.legalForm)
         compareStates(verboseLegalEntity.states, legalEntity?.states)
         compareClassifications(verboseLegalEntity.classifications, legalEntity?.classifications)
         compareIdentifiers(verboseLegalEntity.identifiers, legalEntity?.identifiers)
@@ -1277,17 +1277,17 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val verbosePhysicalAddress = verboseAddress.physicalPostalAddress
         val physicalAddress = address?.physicalPostalAddress
         assertThat(verbosePhysicalAddress).usingRecursiveComparison()
-            .ignoringFields(PhysicalPostalAddressVerboseDto::country.name, PhysicalPostalAddressVerboseDto::administrativeAreaLevel1.name)
+            .ignoringFields(PhysicalPostalAddressVerboseDto::countryVerbose.name, PhysicalPostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
             .isEqualTo(physicalAddress)
-        assertThat(verbosePhysicalAddress.country.technicalKey.name).isEqualTo(physicalAddress?.country?.name)
-        assertThat(verbosePhysicalAddress.administrativeAreaLevel1?.regionCode).isEqualTo(physicalAddress?.administrativeAreaLevel1)
+        assertThat(verbosePhysicalAddress.country.name).isEqualTo(physicalAddress?.country?.name)
+        assertThat(verbosePhysicalAddress.administrativeAreaLevel1).isEqualTo(physicalAddress?.administrativeAreaLevel1)
         val verboseAlternAddress = verboseAddress.alternativePostalAddress
         val alternAddress = address?.alternativePostalAddress
         assertThat(verboseAlternAddress).usingRecursiveComparison()
-            .ignoringFields(AlternativePostalAddressDto::country.name , AlternativePostalAddressDto::administrativeAreaLevel1.name)
+            .ignoringFields(AlternativePostalAddressVerboseDto::countryVerbose.name, AlternativePostalAddressVerboseDto::administrativeAreaLevel1Verbose.name)
             .isEqualTo(alternAddress)
-        assertThat(verboseAlternAddress?.country?.technicalKey?.name).isEqualTo(alternAddress?.country?.name)
-        assertThat(verboseAlternAddress?.administrativeAreaLevel1?.regionCode).isEqualTo(alternAddress?.administrativeAreaLevel1)
+        assertThat(verboseAlternAddress?.country?.name).isEqualTo(alternAddress?.country?.name)
+        assertThat(verboseAlternAddress?.administrativeAreaLevel1).isEqualTo(alternAddress?.administrativeAreaLevel1)
     }
 
     fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, states: Collection<AddressStateDto>?) {
@@ -1296,23 +1296,23 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val sortedVerboseStates = statesVerbose.sortedBy { it.description }
         val sortedStates = states?.sortedBy { it.description }
         sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
+            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateDto::validTo.name )
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(),  AddressStateDto::validFrom.name )
-                .ignoringFields(AddressStateDto::type.name).isEqualTo(sortedStates[it])
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateVerboseDto::validFrom.name)
+                .ignoringFields(AddressStateVerboseDto::typeVerbose.name).isEqualTo(sortedStates[it])
         }
     }
 
     fun compareAddressIdentifiers(identifiersVerbose: Collection<AddressIdentifierVerboseDto>, identifiers: Collection<AddressIdentifierDto>?) {
 
         assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
-        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.type.name }
+        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
         val sortedIdentifiers = identifiers!!.sortedBy { it.type }
         sortedVerboseIdentifiers.indices.forEach {
-            assertThat(sortedVerboseIdentifiers[it].type.technicalKey).isEqualTo(sortedIdentifiers[it].type)
+            assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields("type")
+                .ignoringFields(AddressIdentifierVerboseDto::typeVerbose.name)
                 .isEqualTo(sortedIdentifiers[it])
         }
     }
@@ -1323,7 +1323,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val sortedVerboseStates = statesVerbose.sortedBy { it.description }
         val sortedStates = states!!.sortedBy { it.description }
         sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
+            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
                 .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validTo.name )
                 .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validFrom.name)
@@ -1338,7 +1338,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val sortedVerboseStates = statesVerbose.sortedBy { it.description }
         val sortedStates = states!!.sortedBy { it.description }
         sortedVerboseStates.indices.forEach {
-            assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
+            assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
                 .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validTo.name)
                 .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validFrom.name)
@@ -1365,7 +1365,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.type.name }
         val sortedClassifications = classifications!!.sortedBy { it.type.name }
         sortedVerboseClassifications.indices.forEach {
-            assertThat(sortedVerboseClassifications[it].type.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
+            assertThat(sortedVerboseClassifications[it].typeVerbose.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
             assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
                 .ignoringFields(LegalEntityClassificationVerboseDto::type.name)
                 .isEqualTo(sortedClassifications[it])
@@ -1375,10 +1375,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun compareIdentifiers(identifiersVerbose: Collection<LegalEntityIdentifierVerboseDto>, identifiers: Collection<LegalEntityIdentifierDto>?) {
 
         assertThat(identifiersVerbose.size).isEqualTo(identifiers?.size ?: 0)
-        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.type.name }
+        val sortedVerboseIdentifiers = identifiersVerbose.sortedBy { it.typeVerbose.name }
         val sortedIdentifiers = identifiers!!.sortedBy { it.type }
         sortedVerboseIdentifiers.indices.forEach {
-            assertThat(sortedVerboseIdentifiers[it].type.technicalKey).isEqualTo(sortedIdentifiers[it].type)
+            assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
                 .ignoringFields(LegalEntityIdentifierVerboseDto::type.name).isEqualTo(sortedIdentifiers[it])
         }

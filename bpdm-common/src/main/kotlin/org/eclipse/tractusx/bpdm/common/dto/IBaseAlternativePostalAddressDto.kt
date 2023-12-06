@@ -33,10 +33,10 @@ interface IBaseAlternativePostalAddressDto {
     val geographicCoordinates: GeoCoordinateDto?
 
     @get:Schema(description = PostalAddressDescription.country)
-    val country: Any?
+    val country: CountryCode?
 
     @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
-    val administrativeAreaLevel1: Any?
+    val administrativeAreaLevel1: String?
 
     @get:Schema(description = PostalAddressDescription.postalCode)
     val postalCode: String?
@@ -52,8 +52,4 @@ interface IBaseAlternativePostalAddressDto {
 
     @get:Schema(description = PostalAddressDescription.deliveryServiceNumber)
     val deliveryServiceNumber: String?
-
-    fun adminLevel1Key(): String?
-
-    fun countryCode(): CountryCode?
 }

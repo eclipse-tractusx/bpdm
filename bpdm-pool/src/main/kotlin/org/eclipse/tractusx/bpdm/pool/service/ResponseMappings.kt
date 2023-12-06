@@ -145,10 +145,10 @@ fun LogisticAddress.toMainAddressResponse(): MainAddressVerboseDto {
 fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
     return PhysicalPostalAddressVerboseDto(
         geographicCoordinates = geographicCoordinates?.toDto(),
-        country = country.toDto(),
+        countryVerbose = country.toDto(),
         postalCode = postCode,
         city = city,
-        administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
+        administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
         administrativeAreaLevel2 = administrativeAreaLevel2,
         administrativeAreaLevel3 = administrativeAreaLevel3,
         district = districtLevel1,
@@ -164,10 +164,10 @@ fun PhysicalPostalAddress.toDto(): PhysicalPostalAddressVerboseDto {
 fun AlternativePostalAddress.toDto(): AlternativePostalAddressVerboseDto {
     return AlternativePostalAddressVerboseDto(
         geographicCoordinates = geographicCoordinates?.toDto(),
-        country = country.toDto(),
+        countryVerbose = country.toDto(),
         postalCode = postCode,
         city = city,
-        administrativeAreaLevel1 = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
+        administrativeAreaLevel1Verbose = administrativeAreaLevel1?.let { RegionDto(it.countryCode, it.regionCode, it.regionName) },
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier
