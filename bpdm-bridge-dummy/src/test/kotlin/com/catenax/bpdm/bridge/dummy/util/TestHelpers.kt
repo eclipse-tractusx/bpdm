@@ -22,9 +22,9 @@ package com.catenax.bpdm.bridge.dummy.util
 import com.catenax.bpdm.bridge.dummy.testdata.CommonValues
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityManagerFactory
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springframework.stereotype.Component
 

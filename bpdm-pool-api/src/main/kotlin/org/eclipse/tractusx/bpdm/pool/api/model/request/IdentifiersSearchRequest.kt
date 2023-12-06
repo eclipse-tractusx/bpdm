@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.request
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 
 @Schema(name = "IdentifiersSearchRequest", description = "Contains identifiers to search legal entities by")
 data class IdentifiersSearchRequest(

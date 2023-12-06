@@ -21,19 +21,13 @@ package org.eclipse.tractusx.bpdm.common.service
 
 import com.neovisionaries.i18n.CountryCode
 import com.neovisionaries.i18n.LanguageCode
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameUrlDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.NamedType
-import org.eclipse.tractusx.bpdm.common.model.NamedUrlType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-
-fun <T : NamedUrlType> T.toDto(): TypeKeyNameUrlDto<T> {
-    return TypeKeyNameUrlDto(this, getTypeName(), getUrl())
-}
 
 fun <T : NamedType> T.toDto(): TypeKeyNameVerboseDto<T> {
     return TypeKeyNameVerboseDto(this, getTypeName())

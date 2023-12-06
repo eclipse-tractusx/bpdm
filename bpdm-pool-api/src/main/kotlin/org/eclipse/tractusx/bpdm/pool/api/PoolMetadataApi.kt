@@ -25,14 +25,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.FieldQualityRuleDto
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.pool.api.model.CountrySubdivisionDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalFormDto
-import org.eclipse.tractusx.bpdm.pool.api.model.RegionDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalFormRequest
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType

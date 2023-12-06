@@ -17,25 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDescription
 
-@Schema(description = "Paginated collection of results")
-data class PageDto<T>(
+@Schema(description = IdentifierTypeDescription.header)
+data class IdentifierTypeDto(
 
-    @get:Schema(description = "Total number of all results in all pages")
-    val totalElements: Long,
+    @get:Schema(description = IdentifierTypeDescription.technicalKey)
+    val technicalKey: String,
 
-    @get:Schema(description = "Total number pages")
-    val totalPages: Int,
+    @get:Schema(description = IdentifierTypeDescription.businessPartnerType)
+    val businessPartnerType: IdentifierBusinessPartnerType,
 
-    @get:Schema(description = "Current page number")
-    val page: Int,
+    @get:Schema(description = IdentifierTypeDescription.name)
+    val name: String,
 
-    @get:Schema(description = "Number of results in the page")
-    val contentSize: Int,
-
-    @get:Schema(description = "Collection of results in the page")
-    val content: Collection<T>
+    @get:Schema(description = IdentifierTypeDescription.details)
+    val details: Collection<IdentifierTypeDetailDto> = listOf()
 )

@@ -21,7 +21,8 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.bpdm.pool.dto.ChangelogEntryCreateRequest
 import org.eclipse.tractusx.bpdm.pool.entity.PartnerChangelogEntry
 import org.eclipse.tractusx.bpdm.pool.repository.PartnerChangelogEntryRepository
@@ -74,7 +75,7 @@ class PartnerChangelogService(
         fromTime: Instant?,
         pageIndex: Int,
         pageSize: Int
-    ): PageDto<org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto> {
+    ): PageDto<ChangelogEntryVerboseDto> {
         val spec = Specification.allOf(byBpnsIn(bpns), byBusinessPartnerTypesIn(businessPartnerTypes), byUpdatedGreaterThan(fromTime))
         val pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(PartnerChangelogEntry::updatedAt.name).ascending())
         val page = partnerChangelogEntryRepository.findAll(spec, pageRequest)

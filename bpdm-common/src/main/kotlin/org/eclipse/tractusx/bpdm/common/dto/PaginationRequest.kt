@@ -17,16 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response.type
+package org.eclipse.tractusx.bpdm.common.dto
 
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.PositiveOrZero
 
-@Schema(description = "Named type uniquely identified by its technical key")
-data class TypeKeyNameVerboseDto<T>(
+@Schema(description = "Defines pagination information for requesting collection results")
+data class PaginationRequest (
 
-    @get:Schema(description = "Unique key of this type for reference")
-    val technicalKey: T,
+    @field:Parameter(
+        description = "Number of page to get results from", schema =
+        Schema(defaultValue = "0"))
+    @field:PositiveOrZero
+    val page: Int=0,
 
-    @get:Schema(description = "Name or denotation of this type")
-    val name: String,
+    @field:Parameter(description = "Size of each page", schema =
+    Schema(defaultValue = "10"))
+    @field:Min(0)
+    @field:Max(100)
+    val size: Int=10
 )

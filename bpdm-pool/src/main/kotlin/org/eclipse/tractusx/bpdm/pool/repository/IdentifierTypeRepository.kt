@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.repository
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierType
 import org.eclipse.tractusx.bpdm.pool.entity.IdentifierTypeDetail
 import org.springframework.data.jpa.domain.Specification

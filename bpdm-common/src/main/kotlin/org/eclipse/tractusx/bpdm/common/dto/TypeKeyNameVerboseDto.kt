@@ -15,14 +15,18 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- */
+ ******************************************************************************/
+
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Defines the quality of an entity field.")
-enum class QualityLevel {
-    MANDATORY,
-    OPTIONAL,
-    FORBIDDEN
-}
+@Schema(description = "Named type uniquely identified by its technical key")
+data class TypeKeyNameVerboseDto<T>(
+
+    @get:Schema(description = "Unique key of this type for reference")
+    val technicalKey: T,
+
+    @get:Schema(description = "Name or denotation of this type")
+    val name: String,
+)

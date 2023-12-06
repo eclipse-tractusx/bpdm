@@ -15,25 +15,14 @@
  * under the License.
  *
  * SPDX-License-Identifier: Apache-2.0
- ******************************************************************************/
+ */
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-package org.eclipse.tractusx.bpdm.common.dto
-
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(name = "FieldQualityRuleDto", description = "Rule for the quality level of an entity field ")
-data class FieldQualityRuleDto(
-
-    @get:Schema(description = "Path to the field")
-    val fieldPath: String,
-
-    @get:Schema(description = "Schema name of the entity the field belongs to")
-    val schemaName: String?,
-
-    @get:Schema(description = "Country for wich the rule is valid")
-    val country: CountryCode,
-
-    @get:Schema(description = "Quality level of the field")
-    val qualityLevel: QualityLevel
-)
+@Schema(description = "Defines the quality of an entity field.")
+enum class QualityLevel {
+    MANDATORY,
+    OPTIONAL,
+    FORBIDDEN
+}

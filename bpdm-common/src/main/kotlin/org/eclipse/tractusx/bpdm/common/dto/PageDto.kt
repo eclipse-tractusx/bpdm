@@ -17,18 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response.type
+package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class TypeKeyNameUrlDto<T>(
+@Schema(description = "Paginated collection of results")
+data class PageDto<T>(
 
-    @get:Schema(description = "Unique key of this type for reference")
-    val technicalKey: T,
+    @get:Schema(description = "Total number of all results in all pages")
+    val totalElements: Long,
 
-    @get:Schema(description = "Name or denotation of this type")
-    val name: String,
+    @get:Schema(description = "Total number pages")
+    val totalPages: Int,
 
-    @get:Schema(description = "URL link leading to page with further information on the type")
-    val url: String?
+    @get:Schema(description = "Current page number")
+    val page: Int,
+
+    @get:Schema(description = "Number of results in the page")
+    val contentSize: Int,
+
+    @get:Schema(description = "Collection of results in the page")
+    val content: Collection<T>
 )

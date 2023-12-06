@@ -17,23 +17,23 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.IdentifierTypeDescription
 
-@Schema(description = IdentifierTypeDescription.header)
-data class IdentifierTypeDto(
+@Schema(name = "FieldQualityRuleDto", description = "Rule for the quality level of an entity field ")
+data class FieldQualityRuleDto(
 
-    @get:Schema(description = IdentifierTypeDescription.technicalKey)
-    val technicalKey: String,
+    @get:Schema(description = "Path to the field")
+    val fieldPath: String,
 
-    @get:Schema(description = IdentifierTypeDescription.businessPartnerType)
-    val businessPartnerType: IdentifierBusinessPartnerType,
+    @get:Schema(description = "Schema name of the entity the field belongs to")
+    val schemaName: String?,
 
-    @get:Schema(description = IdentifierTypeDescription.name)
-    val name: String,
+    @get:Schema(description = "Country for wich the rule is valid")
+    val country: CountryCode,
 
-    @get:Schema(description = IdentifierTypeDescription.details)
-    val details: Collection<IdentifierTypeDetailDto> = listOf()
+    @get:Schema(description = "Quality level of the field")
+    val qualityLevel: QualityLevel
 )

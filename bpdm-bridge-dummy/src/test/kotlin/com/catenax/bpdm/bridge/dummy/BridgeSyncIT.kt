@@ -28,7 +28,7 @@ import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
