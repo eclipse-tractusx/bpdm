@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
@@ -43,10 +44,13 @@ const val ERROR_MISSING_TASK = "Request for Pending state but no task-id specifi
 @Service
 class SharingStateService(private val stateRepository: SharingStateRepository) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Upsert fixed sharing state based on given DTO
      */
     fun upsertSharingState(request: SharingStateDto) {
+        logger.info { "Executing upsertSharingState() with parameters $request" }
         val sharingState = getOrCreate(request.externalId, request.businessPartnerType)
 
         when (request.sharingStateType) {
@@ -78,6 +82,8 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
         businessPartnerType: BusinessPartnerType?,
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
+
+        logger.info { "findSharingStates() called with $paginationRequest // $businessPartnerType and $externalIds" }
 
         val pageRequest = PageRequest.of(paginationRequest.page, paginationRequest.size)
         val spec = Specification.allOf(byExternalIdsIn(externalIds), byBusinessPartnerType(businessPartnerType))

@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.pool.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.pool.api.model.response.BpnIdentifierMappingDto
@@ -45,10 +46,13 @@ class BusinessPartnerFetchService(
     private val addressService: AddressService
 ) {
 
+    private val logger = KotlinLogging.logger { }
+
     /**
      * Fetch a business partner by [bpn] and return as [LegalEntityWithLegalAddressVerboseDto]
      */
     fun findLegalEntityIgnoreCase(bpn: String): LegalEntityWithLegalAddressVerboseDto {
+        logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $bpn" }
         return findLegalEntityOrThrow(bpn).toLegalEntityWithLegalAddress()
     }
 
@@ -58,6 +62,7 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun findLegalEntityIgnoreCase(identifierType: String, identifierValue: String): LegalEntityWithLegalAddressVerboseDto {
+        logger.debug { "Executing findLegalEntityIgnoreCase() with parameters $identifierType and $identifierValue" }
         return findLegalEntityOrThrow(identifierType, identifierValue).toLegalEntityWithLegalAddress()
     }
 
@@ -66,6 +71,7 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun fetchByBpns(bpns: Collection<String>): Set<LegalEntity> {
+        logger.debug { "Executing fetchByBpns() with parameters $bpns " }
         return fetchLegalEntityDependencies(legalEntityRepository.findDistinctByBpnIn(bpns))
     }
 
@@ -74,6 +80,7 @@ class BusinessPartnerFetchService(
      */
     @Transactional
     fun fetchDtosByBpns(bpns: Collection<String>): Collection<LegalEntityWithLegalAddressVerboseDto> {
+        logger.debug { "Executing fetchDtosByBpns() with parameters $bpns " }
         return fetchByBpns(bpns).map { it.toLegalEntityWithLegalAddress() }
     }
 
@@ -86,6 +93,7 @@ class BusinessPartnerFetchService(
         businessPartnerType: IdentifierBusinessPartnerType,
         idValues: Collection<String>
     ): Set<BpnIdentifierMappingDto> {
+        logger.debug { "Executing findBpnsByIdentifiers() with parameters $identifierTypeKey // $businessPartnerType and $idValues" }
         val identifierType = findIdentifierTypeOrThrow(identifierTypeKey, businessPartnerType)
         return when (businessPartnerType) {
             IdentifierBusinessPartnerType.LEGAL_ENTITY -> legalEntityIdentifierRepository.findBpnsByIdentifierTypeAndValues(identifierType, idValues)

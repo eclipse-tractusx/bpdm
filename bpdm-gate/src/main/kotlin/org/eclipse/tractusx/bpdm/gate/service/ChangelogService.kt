@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.exception.ChangeLogOutputError
@@ -38,6 +39,8 @@ import java.time.Instant
 @Service
 class ChangelogService(private val changelogRepository: ChangelogRepository) {
 
+    private val logger = KotlinLogging.logger { }
+
     fun getChangeLogEntries(
         externalIds: Set<String>?,
         businessPartnerTypes: Set<BusinessPartnerType>?,
@@ -46,6 +49,8 @@ class ChangelogService(private val changelogRepository: ChangelogRepository) {
         page: Int,
         pageSize: Int
     ): PageChangeLogDto<ChangelogGateDto> {
+
+        logger.debug { "Executing getChangeLogEntries() with parameters $externalIds // $businessPartnerTypes // $stage // $createdAt" }
 
         val nonNullExternalIds = externalIds ?: emptySet()
 

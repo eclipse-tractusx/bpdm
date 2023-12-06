@@ -42,6 +42,7 @@ class GoldenRecordTaskService(
 
     @Synchronized
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
+        logger.debug { "Creation of new golden record tasks: executing createTasks() with parameters $createRequest" }
         return createRequest.businessPartners
             .map { businessPartnerGeneric -> taskStorage.addTask(initTask(createRequest, businessPartnerGeneric)) }
             .map(::toTaskClientStateDto)
@@ -50,6 +51,7 @@ class GoldenRecordTaskService(
 
     @Synchronized
     fun searchTaskStates(stateRequest: TaskStateRequest): TaskStateResponse {
+        logger.debug { "Search for the state of golden record task: executing searchTaskStates() with parameters $stateRequest" }
         return stateRequest.taskIds
             .mapNotNull { taskId -> taskStorage.getTask(taskId) }       // skip missing tasks
             .map(::toTaskClientStateDto)
@@ -58,6 +60,7 @@ class GoldenRecordTaskService(
 
     @Synchronized
     fun reserveTasksForStep(reservationRequest: TaskStepReservationRequest): TaskStepReservationResponse {
+        logger.debug { "Reservation of next golden record tasks: executing reserveTasksForStep() with parameters $reservationRequest" }
         val now = Instant.now()
 
         val tasks = taskStorage.getQueuedTasksByStep(reservationRequest.step, reservationRequest.amount)
@@ -81,6 +84,7 @@ class GoldenRecordTaskService(
 
     @Synchronized
     fun resolveStepResults(resultRequest: TaskStepResultRequest) {
+        logger.debug { "Step results for reserved golden record tasks: executing resolveStepResults() with parameters $resultRequest" }
         resultRequest.results
             .forEach { resultEntry ->
                 val task = taskStorage.getTask(resultEntry.taskId)

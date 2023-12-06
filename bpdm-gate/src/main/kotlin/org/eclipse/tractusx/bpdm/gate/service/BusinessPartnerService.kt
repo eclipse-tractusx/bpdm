@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -56,9 +57,11 @@ class BusinessPartnerService(
     private val orchestratorMappings: OrchestratorMappings,
     private val sharingStateRepository: SharingStateRepository
 ) {
+    private val logger = KotlinLogging.logger { }
 
     @Transactional
     fun upsertBusinessPartnersInput(dtos: List<BusinessPartnerInputRequest>): List<BusinessPartnerInputDto> {
+        logger.debug { "Executing upsertBusinessPartnersInput() with parameters $dtos" }
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerInput(dto) }
         //Validation method
         val validatedEntities = filterUpdateCandidates(entities, StageType.Input)
@@ -67,17 +70,20 @@ class BusinessPartnerService(
 
     @Transactional
     fun upsertBusinessPartnersOutput(dtos: Collection<BusinessPartnerOutputRequest>): Collection<BusinessPartnerOutputDto> {
+        logger.debug { "Executing upsertBusinessPartnersOutput() with parameters $dtos" }
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerOutput(dto) }
         return upsertBusinessPartnersOutputFromCandidates(entities).map(businessPartnerMappings::toBusinessPartnerOutputDto)
     }
 
     fun getBusinessPartnersInput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerInputDto> {
+        logger.debug { "Executing getBusinessPartnersInput() with parameters $pageRequest and $externalIds" }
         val stage = StageType.Input
         return getBusinessPartners(pageRequest, externalIds, stage)
             .toPageDto(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
     fun getBusinessPartnersOutput(pageRequest: PageRequest, externalIds: Collection<String>?): PageDto<BusinessPartnerOutputDto> {
+        logger.debug { "Executing getBusinessPartnersOutput() with parameters $pageRequest and $externalIds" }
         val stage = StageType.Output
         return getBusinessPartners(pageRequest, externalIds, stage)
             .toPageDto(businessPartnerMappings::toBusinessPartnerOutputDto)

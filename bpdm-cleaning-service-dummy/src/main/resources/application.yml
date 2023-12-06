@@ -29,27 +29,40 @@ bpdm:
     # Connection to Orchestrator
     client:
         orchestrator:
-            base-url: http://localhost:8085/
+          base-url: http://localhost:8085/
 
-    # Logging Configuration
+  # Logging Configuration
     logging:
-        unknown-user: Anonymous
+      unknown-user: Anonymous
 
-    # Cleaning Service Configurations
+  # Cleaning Service Configurations
     cleaningService:
-        pollingCron: '-'
+      pollingCron: '-'
+
+# Logging Configuration
+logging:
+  unknown-user: Anonymous
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %green([%-10.10X{user:-System}]) %magenta([%-10.10X{request:-No Request}]) %yellow([%-15.15t]) %cyan(%-40.40logger{39}) : %m%n%wEx"
+  level:
+    root: INFO
+    org:
+      eclipse:
+        tractusx:
+          bpdm:
+            cleaning: DEBUG
 
 # Enable actuator endpoints
 management:
-    endpoint:
-        health:
-            probes:
-                enabled: true
+  endpoint:
     health:
-        livenessState:
-            enabled: true
-        readinessState:
-            enabled: true
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
 
 # Springdoc swagger configuration
 springdoc:
