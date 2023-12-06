@@ -21,31 +21,22 @@ package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.common.dto.AddressStateDto
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
 @Schema(description = LogisticAddressDescription.header)
-data class LogisticAddressGateDto(
+data class LogisticAddressDto(
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.nameParts))
     val nameParts: Collection<String> = emptyList(),
 
-    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    val states: Collection<AddressStateDto> = emptyList(),
-
-    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    val identifiers: Collection<AddressIdentifierDto> = emptyList(),
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
-    val physicalPostalAddress: PhysicalPostalAddressGateDto,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
-    val alternativePostalAddress: AlternativePostalAddressGateDto? = null,
+    override val states: Collection<AddressStateDto> = emptyList(),
+    override val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+    override val physicalPostalAddress: PhysicalPostalAddressDto,
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.roles))
     val roles: Collection<BusinessPartnerRole> = emptyList()
-)
+
+) : IBaseLogisticAddressDto

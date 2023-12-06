@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 
 @Schema(description = AddressIdentifierDescription.header)
-interface IBaseAddressIdentifierDto : IBaseIdentifierDto {
+interface IAddressIdentifierDto : IBaseIdentifierDto {
+
     @get:Schema(description = AddressIdentifierDescription.value)
     override val value: String
 

@@ -17,25 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.IAddressIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 
-@Schema(description = LogisticAddressDescription.header)
-data class LogisticAddressDto(
+@Schema(description = AddressIdentifierDescription.header)
+data class AddressIdentifierDto(
 
-    @get:Schema(description = LogisticAddressDescription.name)
-    val name: String? = null,
+    override val value: String,
+    override val type: String
 
-    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    override val states: Collection<AddressStateDto> = emptyList(),
-
-    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    override val identifiers: Collection<AddressIdentifierDto> = emptyList(),
-
-    override val physicalPostalAddress: PhysicalPostalAddressDto,
-
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
-) : IBaseLogisticAddressDto
+) : IAddressIdentifierDto

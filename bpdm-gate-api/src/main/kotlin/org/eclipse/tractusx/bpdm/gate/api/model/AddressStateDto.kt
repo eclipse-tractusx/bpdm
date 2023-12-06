@@ -17,18 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.IAddressStateDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(description = AddressIdentifierDescription.header)
-data class AddressIdentifierVerboseDto(
+@Schema(description = AddressStateDescription.header)
+data class AddressStateDto(
 
-    @get:Schema(description = AddressIdentifierDescription.value)
-    val value: String,
+    override val description: String?,
+    override val validFrom: LocalDateTime?,
+    override val validTo: LocalDateTime?,
+    override val type: BusinessStateType
 
-    @get:Schema(description = AddressIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-)
+) : IAddressStateDto

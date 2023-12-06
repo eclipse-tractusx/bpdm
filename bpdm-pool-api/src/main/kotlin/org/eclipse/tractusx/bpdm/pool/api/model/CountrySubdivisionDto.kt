@@ -17,19 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.request
+package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "Request for searching business partners of type address by parent BPNs")
-data class AddressPartnerBpnSearchRequest(
+@Schema(description = "Country subdivision")
+data class CountrySubdivisionDto(
 
-    @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
-    val legalEntities: Collection<String> = emptyList(),
+    @get:Schema(description = "Country code")
+    val countryCode: CountryCode,
 
-    @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
-    val sites: Collection<String> = emptyList(),
+    @get:Schema(description = "The country subdivision code according to ISO 3166-2")
+    val code: String,
 
-    @Schema(description = "Filter by BPNA of addresses")
-    val addresses: Collection<String> = emptyList()
+    @get:Schema(description = "The name of the country subdivision according to ISO 3166-2")
+    val name: String
 )

@@ -17,13 +17,19 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model.request
 
-import org.eclipse.tractusx.bpdm.common.dto.IAddressIdentifierDto
+import io.swagger.v3.oas.annotations.media.Schema
 
-data class AddressIdentifierDto(
+@Schema(description = "Request for searching business partners of type address by parent BPNs")
+data class AddressPartnerBpnSearchRequest(
 
-    override val value: String,
-    override val type: String
+    @Schema(description = "Filter by Business Partner Numbers of legal entities which are at that address")
+    val legalEntities: Collection<String> = emptyList(),
 
-) : IAddressIdentifierDto
+    @Schema(description = "Filter by Business Partner Numbers of sites which are at that address")
+    val sites: Collection<String> = emptyList(),
+
+    @Schema(description = "Filter by BPNA of addresses")
+    val addresses: Collection<String> = emptyList()
+)

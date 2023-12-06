@@ -17,27 +17,16 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.IAddressIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 
-@Schema(description = AddressStateDescription.header)
-data class AddressStateVerboseDto(
+@Schema(description = AddressIdentifierDescription.header)
+data class AddressIdentifierDto(
 
-    @get:Schema(description = AddressStateDescription.description)
-    val description: String?,
+    override val value: String,
+    override val type: String
 
-    @get:Schema(description = AddressStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = AddressStateDescription.validTo)
-    val validTo: LocalDateTime?,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = AddressStateDescription.type)
-    val type: TypeKeyNameVerboseDto<BusinessStateType>
-)
+) : IAddressIdentifierDto

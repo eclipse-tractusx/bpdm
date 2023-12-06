@@ -17,25 +17,20 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
 
-@Schema(description = AddressStateDescription.header)
-interface IBaseAddressStateDto : IBaseStateDto {
+@Schema(description = "Region within a country")
+data class RegionDto(
 
-    @get:Schema(description = AddressStateDescription.description)
-    override val description: String?
+    @get:Schema(description = "Country code")
+    val countryCode: CountryCode,
 
-    @get:Schema(description = AddressStateDescription.validFrom)
-    override val validFrom: LocalDateTime?
+    @get:Schema(description = "Abbreviation or shorthand of the area")
+    val regionCode: String,
 
-    @get:Schema(description = AddressStateDescription.validTo)
-    override val validTo: LocalDateTime?
-
-    @get:Schema(description = AddressStateDescription.type)
-    override val type: BusinessStateType
-}
+    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
+    val regionName: String
+)

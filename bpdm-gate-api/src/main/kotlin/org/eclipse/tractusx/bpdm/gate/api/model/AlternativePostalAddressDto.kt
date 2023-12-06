@@ -30,22 +30,15 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = PostalAddressDescription.headerAlternative)
-data class AlternativePostalAddressGateDto(
+data class AlternativePostalAddressDto(
 
     override val geographicCoordinates: GeoCoordinateDto? = null,
-
     override val country: CountryCode? = null,
-
     override val administrativeAreaLevel1: String? = null,
-
     override val postalCode: String? = null,
-
     override val city: String? = null,
-
     override val deliveryServiceType: DeliveryServiceType? = null,
-
     override val deliveryServiceQualifier: String? = null,
-
     override val deliveryServiceNumber: String? = null
 
 ) : IBaseAlternativePostalAddressDto {

@@ -17,20 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.neovisionaries.i18n.CountryCode
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 
-@Schema(description = "Region within a country")
-data class RegionDto(
+@Schema(description = LogisticAddressDescription.header)
+data class LogisticAddressDto(
 
-    @get:Schema(description = "Country code")
-    val countryCode: CountryCode,
+    @get:Schema(description = LogisticAddressDescription.name)
+    val name: String? = null,
 
-    @get:Schema(description = "Abbreviation or shorthand of the area")
-    val regionCode: String,
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
+    override val states: Collection<AddressStateDto> = emptyList(),
 
-    @get:Schema(description = "Describes the full name of the region within a country according to ISO 3166-214")
-    val regionName: String
-)
+    @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
+    override val identifiers: Collection<AddressIdentifierDto> = emptyList(),
+
+    override val physicalPostalAddress: PhysicalPostalAddressDto,
+
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+
+) : IBaseLogisticAddressDto

@@ -21,7 +21,6 @@ package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
 @Schema(description = SiteDescription.header)

@@ -28,17 +28,17 @@ import com.catenax.bpdm.bridge.dummy.util.BpdmPoolContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.PostgreSQLContextInitializer
 import com.catenax.bpdm.bridge.dummy.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
-import org.eclipse.tractusx.bpdm.gate.api.model.StreetGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.StreetDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.AddressGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.LegalEntityGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
@@ -248,7 +248,7 @@ class BridgeSyncIT @Autowired constructor(
             legalEntity = GateRequestValues.legalEntity1.copy(legalShortName = "ChangedShortNam"),
             legalAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetGateDto(name = "Changed Street Entiy", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                    street = StreetDto(name = "Changed Street Entiy", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
                 ),
             ),
         )
@@ -315,7 +315,7 @@ class BridgeSyncIT @Autowired constructor(
             site = GateRequestValues.site1.copy(nameParts = listOf("ChangedNamePart1")),
             mainAddress = GateRequestValues.address1.copy(
                 physicalPostalAddress = GateRequestValues.postalAddress1.copy(
-                    street = StreetGateDto(name = "Changed Street Site", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
+                    street = StreetDto(name = "Changed Street Site", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1),
                 ),
             )
         )
@@ -382,7 +382,7 @@ class BridgeSyncIT @Autowired constructor(
             address = GateRequestValues.address1.copy(
                 nameParts = listOf("Changed Address Name"),
                 physicalPostalAddress = GateRequestValues.postalAddress1
-                    .copy(street = StreetGateDto(name = "UpdateSteet", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1))
+                    .copy(street = StreetDto(name = "UpdateSteet", houseNumber = CommonValues.houseNumber1, direction = CommonValues.direction1))
             ),
 
             )

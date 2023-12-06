@@ -17,52 +17,42 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBasePhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = PostalAddressDescription.headerPhysical)
-data class PhysicalPostalAddressDto(
+data class PhysicalPostalAddressVerboseDto(
 
     override val geographicCoordinates: GeoCoordinateDto?,
-
-    override val country: CountryCode,
-
-    override val administrativeAreaLevel1: String?,
-
+    override val country: TypeKeyNameVerboseDto<CountryCode>,
+    override val administrativeAreaLevel1: RegionDto?,
     override val administrativeAreaLevel2: String?,
-
     override val administrativeAreaLevel3: String?,
-
     override val postalCode: String?,
-
     override val city: String,
-
     override val district: String?,
-
     override val street: StreetDto?,
-
     override val companyPostalCode: String?,
-
     override val industrialZone: String?,
-
     override val building: String?,
-
     override val floor: String?,
-
     override val door: String?
 
 ) : IBasePhysicalPostalAddressDto {
     override fun adminLevel1Key(): String? {
-        return administrativeAreaLevel1
+        return administrativeAreaLevel1?.regionCode
     }
 
     override fun countryCode(): CountryCode {
-        return country
+        return country.technicalKey
     }
 }

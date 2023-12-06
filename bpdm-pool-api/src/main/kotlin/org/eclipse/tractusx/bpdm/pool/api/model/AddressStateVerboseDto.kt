@@ -17,28 +17,27 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = LegalEntityDescription.headerMatchResponse)
-data class LegalEntityMatchVerboseDto(
+@Schema(description = AddressStateDescription.header)
+data class AddressStateVerboseDto(
 
-    @get:Schema(description = CommonDescription.score)
-    val score: Float,
+    @get:Schema(description = AddressStateDescription.description)
+    val description: String?,
 
-    @field:JsonUnwrapped
-    val legalEntity: LegalEntityVerboseDto,
+    @get:Schema(description = AddressStateDescription.validFrom)
+    val validFrom: LocalDateTime?,
+
+    @get:Schema(description = AddressStateDescription.validTo)
+    val validTo: LocalDateTime?,
 
     // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LegalEntityDescription.legalAddress)
-    val legalAddress: LogisticAddressVerboseDto,
+    @get:Schema(description = AddressStateDescription.type)
+    val type: TypeKeyNameVerboseDto<BusinessStateType>
 )

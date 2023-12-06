@@ -17,45 +17,41 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.gate.api.model
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
+import org.eclipse.tractusx.bpdm.common.dto.IBasePhysicalPostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
-import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = PostalAddressDescription.headerAlternative)
-data class AlternativePostalAddressVerboseDto(
+@Schema(description = PostalAddressDescription.headerPhysical)
+data class PhysicalPostalAddressDto(
 
-    override val geographicCoordinates: GeoCoordinateDto?,
+    override val geographicCoordinates: GeoCoordinateDto? = null,
+    override val country: CountryCode? = null,
+    override val administrativeAreaLevel1: String? = null,
+    override val administrativeAreaLevel2: String? = null,
+    override val administrativeAreaLevel3: String? = null,
+    override val postalCode: String? = null,
+    override val city: String? = null,
+    override val district: String? = null,
+    override val street: StreetDto? = null,
+    override val companyPostalCode: String? = null,
+    override val industrialZone: String? = null,
+    override val building: String? = null,
+    override val floor: String? = null,
+    override val door: String? = null
 
-    // OpenAPI description for complex field does not work!
-    override val country: TypeKeyNameVerboseDto<CountryCode>,
-
-    // OpenAPI description for complex field does not work!
-    override val administrativeAreaLevel1: RegionDto?,
-
-    override val postalCode: String?,
-
-    override val city: String,
-
-    override val deliveryServiceType: DeliveryServiceType,
-
-    override val deliveryServiceQualifier: String?,
-
-    override val deliveryServiceNumber: String
-
-) : IBaseAlternativePostalAddressDto {
+) : IBasePhysicalPostalAddressDto {
     override fun adminLevel1Key(): String? {
-        return administrativeAreaLevel1?.regionCode
+        return administrativeAreaLevel1
     }
-    override fun countryCode(): CountryCode {
-        return country.technicalKey
+
+    override fun countryCode(): CountryCode? {
+        return country
     }
 }

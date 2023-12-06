@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.util.replace
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -415,7 +416,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toAddressState(dto: IBaseAddressStateDto, address: LogisticAddress): AddressState {
+        fun toAddressState(dto: IAddressStateDto, address: LogisticAddress): AddressState {
             return AddressState(
                 description = dto.description,
                 validFrom = dto.validFrom,
@@ -451,7 +452,7 @@ class BusinessPartnerBuildService(
         }
 
         fun toAddressIdentifier(
-            dto: IBaseAddressIdentifierDto,
+            dto: IAddressIdentifierDto,
             idTypes: Map<String, IdentifierType>,
             partner: LogisticAddress
         ): AddressIdentifier {

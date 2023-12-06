@@ -17,20 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
-@Schema(description = "Country subdivision")
-data class CountrySubdivisionDto(
+@Schema(description = AddressIdentifierDescription.header)
+data class AddressIdentifierVerboseDto(
 
-    @get:Schema(description = "Country code")
-    val countryCode: CountryCode,
+    @get:Schema(description = AddressIdentifierDescription.value)
+    val value: String,
 
-    @get:Schema(description = "The country subdivision code according to ISO 3166-2")
-    val code: String,
-
-    @get:Schema(description = "The name of the country subdivision according to ISO 3166-2")
-    val name: String
+    @get:Schema(description = AddressIdentifierDescription.type)
+    val type: TypeKeyNameVerboseDto<String>,
 )

@@ -142,7 +142,7 @@ class BusinessPartnerMappings {
         )
 
     private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddress) =
-        PhysicalPostalAddressGateDto(
+        PhysicalPostalAddressDto(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
             country = entity.country,
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -160,15 +160,15 @@ class BusinessPartnerMappings {
         )
 
     // convert empty DTO to null
-    private fun normalize(dto: PhysicalPostalAddressGateDto?) =
-        if (dto != PhysicalPostalAddressGateDto()) dto
+    private fun normalize(dto: PhysicalPostalAddressDto?) =
+        if (dto != PhysicalPostalAddressDto()) dto
         else null
 
-    private fun normalize(dto: AlternativePostalAddressGateDto?) =
-        if (dto != AlternativePostalAddressGateDto()) dto
+    private fun normalize(dto: AlternativePostalAddressDto?) =
+        if (dto != AlternativePostalAddressDto()) dto
         else null
 
-    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressGateDto) =
+    private fun toPhysicalPostalAddress(dto: PhysicalPostalAddressDto) =
         PhysicalPostalAddress(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
             country = dto.country,
@@ -188,7 +188,7 @@ class BusinessPartnerMappings {
 
 
     private fun toAlternativePostalAddressDto(entity: AlternativePostalAddress) =
-        AlternativePostalAddressGateDto(
+        AlternativePostalAddressDto(
             geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
             country = entity.country,
             administrativeAreaLevel1 = entity.administrativeAreaLevel1,
@@ -199,7 +199,7 @@ class BusinessPartnerMappings {
             deliveryServiceNumber = entity.deliveryServiceNumber
         )
 
-    private fun toAlternativePostalAddress(dto: AlternativePostalAddressGateDto) =
+    private fun toAlternativePostalAddress(dto: AlternativePostalAddressDto) =
         AlternativePostalAddress(
             geographicCoordinates = dto.geographicCoordinates?.let(::toGeographicCoordinate),
             country = dto.country,
@@ -213,7 +213,7 @@ class BusinessPartnerMappings {
 
 
     private fun toStreetDto(entity: Street) =
-        StreetGateDto(
+        StreetDto(
             name = entity.name,
             houseNumber = entity.houseNumber,
             milestone = entity.milestone,
@@ -225,7 +225,7 @@ class BusinessPartnerMappings {
         )
 
 
-    private fun toStreet(dto: StreetGateDto) =
+    private fun toStreet(dto: StreetDto) =
         Street(
             name = dto.name,
             houseNumber = dto.houseNumber,

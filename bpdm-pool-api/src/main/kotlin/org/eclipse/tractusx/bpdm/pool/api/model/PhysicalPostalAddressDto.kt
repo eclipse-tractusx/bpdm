@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
@@ -29,42 +29,29 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = PostalAddressDescription.headerPhysical)
-data class PhysicalPostalAddressGateDto(
+data class PhysicalPostalAddressDto(
 
-    override val geographicCoordinates: GeoCoordinateDto? = null,
-
-    override val country: CountryCode? = null,
-
-    override val administrativeAreaLevel1: String? = null,
-
-    override val administrativeAreaLevel2: String? = null,
-
-    override val administrativeAreaLevel3: String? = null,
-
-    override val postalCode: String? = null,
-
-    override val city: String? = null,
-
-    override val district: String? = null,
-
-    override val street: StreetGateDto? = null,
-
-    override val companyPostalCode: String? = null,
-
-    override val industrialZone: String? = null,
-
-    override val building: String? = null,
-
-    override val floor: String? = null,
-
-    override val door: String? = null
+    override val geographicCoordinates: GeoCoordinateDto?,
+    override val country: CountryCode,
+    override val administrativeAreaLevel1: String?,
+    override val administrativeAreaLevel2: String?,
+    override val administrativeAreaLevel3: String?,
+    override val postalCode: String?,
+    override val city: String,
+    override val district: String?,
+    override val street: StreetDto?,
+    override val companyPostalCode: String?,
+    override val industrialZone: String?,
+    override val building: String?,
+    override val floor: String?,
+    override val door: String?
 
 ) : IBasePhysicalPostalAddressDto {
     override fun adminLevel1Key(): String? {
         return administrativeAreaLevel1
     }
 
-    override fun countryCode(): CountryCode? {
+    override fun countryCode(): CountryCode {
         return country
     }
 }

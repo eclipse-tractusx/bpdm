@@ -17,11 +17,13 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.PostalAddressDescription
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
@@ -34,19 +36,12 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class AlternativePostalAddressDto(
 
     override val geographicCoordinates: GeoCoordinateDto?,
-
     override val country: CountryCode,
-
     override val administrativeAreaLevel1: String?,
-
     override val postalCode: String?,
-
     override val city: String,
-
     override val deliveryServiceType: DeliveryServiceType,
-
     override val deliveryServiceQualifier: String?,
-
     override val deliveryServiceNumber: String
 
 ) : IBaseAlternativePostalAddressDto {

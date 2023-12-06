@@ -17,17 +17,22 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.gate.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
+import org.eclipse.tractusx.bpdm.common.dto.IStreetDetailedDto
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
 
-@Schema(description = AddressIdentifierDescription.header)
-data class AddressIdentifierDto(
+@Schema(description = StreetDescription.header)
+data class StreetDto(
 
-    @get:Schema(description = AddressIdentifierDescription.value)
-    override val value: String,
+    override val namePrefix: String? = null,
+    override val additionalNamePrefix: String? = null,
+    override val name: String? = null,
+    override val nameSuffix: String? = null,
+    override val additionalNameSuffix: String? = null,
+    override val houseNumber: String? = null,
+    override val milestone: String? = null,
+    override val direction: String? = null
 
-    @get:Schema(description = AddressIdentifierDescription.type)
-    override val type: String,
-) : IBaseAddressIdentifierDto
+) : IStreetDetailedDto

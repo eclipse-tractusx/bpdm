@@ -20,14 +20,22 @@
 package org.eclipse.tractusx.bpdm.common.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
+import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
+import java.time.LocalDateTime
 
-@Schema(description = StreetDescription.header)
-data class StreetDto(
+@Schema(description = AddressStateDescription.header)
+interface IAddressStateDto : IBaseStateDto {
 
-    override val name: String? = null,
-    override val houseNumber: String? = null,
-    override val milestone: String? = null,
-    override val direction: String? = null
+    @get:Schema(description = AddressStateDescription.description)
+    override val description: String?
 
-) : IBaseStreetDto
+    @get:Schema(description = AddressStateDescription.validFrom)
+    override val validFrom: LocalDateTime?
+
+    @get:Schema(description = AddressStateDescription.validTo)
+    override val validTo: LocalDateTime?
+
+    @get:Schema(description = AddressStateDescription.type)
+    override val type: BusinessStateType
+}

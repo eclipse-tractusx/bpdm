@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressGateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
@@ -37,7 +37,7 @@ data class SiteGateInputRequest(
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = SiteDescription.mainAddress)
-    val mainAddress: LogisticAddressGateDto,
+    val mainAddress: LogisticAddressDto,
 
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String,

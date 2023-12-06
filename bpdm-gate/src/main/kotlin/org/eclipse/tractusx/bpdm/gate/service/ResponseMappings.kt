@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.*
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -73,7 +75,7 @@ fun toNameParts(namePartsValue: String, address: LogisticAddress?, site: Site?, 
     return NameParts(address, site, legalEntity, namePartsValue)
 }
 
-fun AlternativePostalAddressGateDto.toAlternativePostalAddressEntity() =
+fun AlternativePostalAddressDto.toAlternativePostalAddressEntity() =
     AlternativePostalAddress(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
@@ -85,7 +87,7 @@ fun AlternativePostalAddressGateDto.toAlternativePostalAddressEntity() =
         deliveryServiceQualifier = deliveryServiceQualifier
     )
 
-fun PhysicalPostalAddressGateDto.toPhysicalPostalAddressEntity() =
+fun PhysicalPostalAddressDto.toPhysicalPostalAddressEntity() =
     PhysicalPostalAddress(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateEntity(),
         country = country,
@@ -111,7 +113,7 @@ fun GeoCoordinateDto.toGeographicCoordinateEntity(): GeographicCoordinate {
     )
 }
 
-private fun StreetGateDto.toStreetEntity(): Street {
+private fun StreetDto.toStreetEntity(): Street {
     return Street(
         name = name,
         houseNumber = houseNumber,
@@ -282,9 +284,9 @@ fun LogisticAddress.toAddressGateInputResponse(logisticAddressPage: LogisticAddr
 }
 
 //Logistic Address mapping to LogisticAddressDto
-fun LogisticAddress.toLogisticAddressDto(): LogisticAddressGateDto {
+fun LogisticAddress.toLogisticAddressDto(): LogisticAddressDto {
 
-    return LogisticAddressGateDto(
+    return LogisticAddressDto(
         nameParts = getNamePartValues(nameParts),
         states = mapToDtoStates(states),
         roles = roles.map { it.roleName },
@@ -303,7 +305,7 @@ fun mapToDtoStates(states: MutableSet<AddressState>): Collection<AddressStateDto
 }
 
 fun AlternativePostalAddress.toAlternativePostalAddressDto() =
-    AlternativePostalAddressGateDto(
+    AlternativePostalAddressDto(
         deliveryServiceType = deliveryServiceType,
         deliveryServiceNumber = deliveryServiceNumber,
         deliveryServiceQualifier = deliveryServiceQualifier,
@@ -314,8 +316,8 @@ fun AlternativePostalAddress.toAlternativePostalAddressDto() =
         city = city
     )
 
-fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressGateDto =
-    PhysicalPostalAddressGateDto(
+fun PhysicalPostalAddress.toPhysicalPostalAddress(): PhysicalPostalAddressDto =
+    PhysicalPostalAddressDto(
         geographicCoordinates = geographicCoordinates?.toGeographicCoordinateDto(),
         country = country,
         postalCode = postalCode,
@@ -336,9 +338,9 @@ fun GeographicCoordinate.toGeographicCoordinateDto(): GeoCoordinateDto {
     return GeoCoordinateDto(longitude, latitude, altitude)
 }
 
-private fun Street.toStreetDto(): StreetGateDto {
+private fun Street.toStreetDto(): StreetDto {
 
-    return StreetGateDto(
+    return StreetDto(
         name = name,
         houseNumber = houseNumber,
         milestone = milestone,

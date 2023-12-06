@@ -17,9 +17,10 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IAddressStateDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressStateDescription
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
@@ -27,15 +28,9 @@ import java.time.LocalDateTime
 @Schema(description = AddressStateDescription.header)
 data class AddressStateDto(
 
-    @get:Schema(description = AddressStateDescription.description)
     override val description: String?,
-
-    @get:Schema(description = AddressStateDescription.validFrom)
     override val validFrom: LocalDateTime?,
-
-    @get:Schema(description = AddressStateDescription.validTo)
     override val validTo: LocalDateTime?,
-
-    @get:Schema(description = AddressStateDescription.type)
     override val type: BusinessStateType
-): IBaseAddressStateDto
+
+) : IAddressStateDto

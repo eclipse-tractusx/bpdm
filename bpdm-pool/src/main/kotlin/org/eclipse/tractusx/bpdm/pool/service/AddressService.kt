@@ -21,11 +21,11 @@ package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
 import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.response.MainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.entity.LogisticAddress

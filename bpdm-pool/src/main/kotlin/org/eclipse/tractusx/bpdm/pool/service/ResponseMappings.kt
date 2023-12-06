@@ -22,8 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.service
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDetailDto
 import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.common.dto.StreetDto
-import org.eclipse.tractusx.bpdm.common.dto.response.*
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.service.toDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*

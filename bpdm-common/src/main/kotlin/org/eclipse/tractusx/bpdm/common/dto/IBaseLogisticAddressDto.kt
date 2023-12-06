@@ -25,11 +25,12 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDe
 
 @Schema(description = LogisticAddressDescription.header)
 interface IBaseLogisticAddressDto {
+
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    val states: Collection<IBaseAddressStateDto>
+    val states: Collection<IAddressStateDto>
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    val identifiers: Collection<IBaseAddressIdentifierDto>
+    val identifiers: Collection<IAddressIdentifierDto>
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
