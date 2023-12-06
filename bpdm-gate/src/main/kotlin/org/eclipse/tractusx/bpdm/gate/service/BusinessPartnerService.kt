@@ -60,7 +60,9 @@ class BusinessPartnerService(
     @Transactional
     fun upsertBusinessPartnersInput(dtos: List<BusinessPartnerInputRequest>): List<BusinessPartnerInputDto> {
         val entities = dtos.map { dto -> businessPartnerMappings.toBusinessPartnerInput(dto) }
-        return upsertBusinessPartnersInputFromCandidates(entities).map(businessPartnerMappings::toBusinessPartnerInputDto)
+        //Validation method
+        val validatedEntities = filterUpdateCandidates(entities, StageType.Input)
+        return upsertBusinessPartnersInputFromCandidates(validatedEntities).map(businessPartnerMappings::toBusinessPartnerInputDto)
     }
 
     @Transactional
@@ -110,7 +112,9 @@ class BusinessPartnerService(
         val externalIds = entityCandidates.map { it.externalId }
         assertInputStageExists(externalIds)
 
-        val resolutionResults = resolveCandidatesForStage(entityCandidates, StageType.Output)
+        val validatedEntities = filterUpdateCandidates(entityCandidates, StageType.Output)
+
+        val resolutionResults = resolveCandidatesForStage(validatedEntities, StageType.Output)
 
         saveChangelog(resolutionResults)
 
@@ -155,6 +159,54 @@ class BusinessPartnerService(
         externalIds.minus(existingExternalIds)
             .takeIf { it.isNotEmpty() }
             ?.let { throw BpdmMissingStageException(it, StageType.Input) }
+    }
+
+    /**
+     * Filters all [entities] by looking for existing business partner data in the given [stage]
+     *
+     * Filters incoming Business Partner for changes against the same persisted record in the Database
+     * If the data is the same, the consequent Business Partner will not have a new changelog and the golden record
+     * process will not start. If Business Partner has the same data, but linked sharing state has an error state,
+     * Business Partner will start the process again.
+     */
+    private fun filterUpdateCandidates(entities: List<BusinessPartner>, stage: StageType): List<BusinessPartner> {
+        val externalIds = entities.map { it.externalId }
+        val persistedBusinessPartnerMap = businessPartnerRepository.findByStageAndExternalIdIn(stage, externalIds).associateBy { it.externalId }
+        val sharingStatesMap =
+            sharingStateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, BusinessPartnerType.GENERIC).associateBy { it.externalId }
+
+        return entities.filter { entity ->
+            val matchingBusinessPartner = persistedBusinessPartnerMap[entity.externalId]
+            val hasErrorSharingState = sharingStatesMap[entity.externalId]?.sharingStateType == SharingStateType.Error
+
+            matchingBusinessPartner?.let { hasChanges(entity, it) } ?: true || hasErrorSharingState //If there are difference return true, else returns false
+        }
+    }
+
+    private fun hasChanges(entity: BusinessPartner, persistedBP: BusinessPartner): Boolean {
+
+        return entity.nameParts != persistedBP.nameParts ||
+                entity.roles != persistedBP.roles ||
+                entity.shortName != persistedBP.shortName ||
+                entity.legalName != persistedBP.legalName ||
+                entity.legalForm != persistedBP.legalForm ||
+                entity.isOwnCompanyData != persistedBP.isOwnCompanyData ||
+                entity.bpnL != persistedBP.bpnL ||
+                entity.bpnS != persistedBP.bpnS ||
+                entity.bpnA != persistedBP.bpnA ||
+                entity.stage != persistedBP.stage ||
+                entity.parentId != persistedBP.parentId ||
+                entity.parentType != persistedBP.parentType ||
+                entity.identifiers != persistedBP.identifiers ||
+                entity.states != persistedBP.states ||
+                entity.classifications != persistedBP.classifications ||
+                postalAddressHasChanges(entity.postalAddress, persistedBP.postalAddress)
+    }
+
+    private fun postalAddressHasChanges(entityPostalAddress: PostalAddress, persistedPostalAddress: PostalAddress): Boolean {
+        return (entityPostalAddress.addressType != persistedPostalAddress.addressType) ||
+                (entityPostalAddress.alternativePostalAddress != persistedPostalAddress.alternativePostalAddress) ||
+                (entityPostalAddress.physicalPostalAddress != persistedPostalAddress.physicalPostalAddress)
     }
 
     /**

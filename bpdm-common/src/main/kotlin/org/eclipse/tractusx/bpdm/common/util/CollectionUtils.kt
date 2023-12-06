@@ -31,7 +31,7 @@ fun <T> MutableCollection<T>.replace(elements: Collection<T>) {
  */
 fun <T> MutableCollection<T>.copyAndSync(elements: Collection<T>, copyFunction: (T, T) -> T) {
     // copy the overlap of the two collections
-    zip(elements).forEach { (fromState, toState) -> copyFunction(fromState, toState) }
+    elements.zip(this).forEach { (fromState, toState) -> copyFunction(fromState, toState) }
 
     val sizeDifference = size - elements.size
     if (sizeDifference > 0) {
