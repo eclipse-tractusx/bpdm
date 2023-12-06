@@ -29,6 +29,7 @@ enum class BusinessPartnerSharingError : ErrorCode {
     SharingProcessError,
     SharingTimeout,
     BpnNotInPool,
+    MissingTaskID,
 }
 
 enum class ChangeLogOutputError : ErrorCode {

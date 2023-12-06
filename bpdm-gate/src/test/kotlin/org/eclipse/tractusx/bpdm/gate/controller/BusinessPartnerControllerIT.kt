@@ -572,5 +572,61 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     }
 
+    @Test
+    fun `insert one business partners but task is missing in orchestrator`() {
+
+        val upsertRequests = listOf(
+            BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
+            BusinessPartnerNonVerboseValues.bpInputRequestError,
+            BusinessPartnerNonVerboseValues.bpInputRequestChina,
+        )
+        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+
+        val externalId3 = BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId
+
+        val createdSharingState = listOf(
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = externalId3,
+                sharingStateType = SharingStateType.Pending,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "2"
+            )
+        )
+
+        //Firstly verifies if the Sharing States was created for new Business Partner
+        val externalIds = listOf(externalId3)
+        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        testHelpers
+            .assertRecursively(upsertSharingStateResponses)
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(createdSharingState)
+
+        // Call Finish Cleaning Method
+        businessPartnerService.finishCleaningTask()
+
+        val cleanedSharingState = listOf(
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = externalId3,
+                sharingStateType = SharingStateType.Error,
+                sharingErrorCode = BusinessPartnerSharingError.MissingTaskID,
+                sharingErrorMessage = "Missing Task in Orchestrator",
+                bpn = null,
+                sharingProcessStarted = null,
+                taskId = "2"
+            )
+        )
+
+        //Check for Sharing State
+        val readCleanedSharingState = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+        testHelpers.assertRecursively(readCleanedSharingState)
+            .ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(cleanedSharingState)
+
+    }
 
 }

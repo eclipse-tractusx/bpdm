@@ -307,19 +307,29 @@ class BusinessPartnerService(
             .map { Pair(it, sharingStateMap[it.taskId]!!) }
             .groupBy { (task, _) -> task.processingState.resultState }
 
+        val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
+
         val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
             orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, sharingState.externalId)
         } ?: emptyList()
         upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert)
 
-
-        val errorRequests = taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
+        val errorRequests = (taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
             SharingStateService.ErrorRequest(
                 SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
                 BusinessPartnerSharingError.SharingProcessError,
                 if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description } else null
             )
-        } ?: emptyList()
+        } ?: emptyList()).toMutableList()
+
+        errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
+            SharingStateService.ErrorRequest(
+                SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
+                BusinessPartnerSharingError.MissingTaskID,
+                errorMessage = "Missing Task in Orchestrator"
+            )
+        })
+
         sharingStateService.setError(errorRequests)
 
     }
