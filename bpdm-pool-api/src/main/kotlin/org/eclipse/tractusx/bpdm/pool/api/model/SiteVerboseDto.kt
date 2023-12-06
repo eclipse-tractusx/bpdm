@@ -17,28 +17,32 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model.response
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
-import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
+import java.time.Instant
 
-@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
-@Schema(description = SiteDescription.headerUpsertResponse)
-data class SitePartnerCreateVerboseDto(
+@Schema(description = SiteDescription.header)
+data class SiteVerboseDto(
 
-    @field:JsonUnwrapped
-    val site: SiteVerboseDto,
+    @get:Schema(description = SiteDescription.bpns)
+    val bpns: String,
 
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = SiteDescription.mainAddress)
-    val mainAddress: LogisticAddressVerboseDto,
+    @get:Schema(description = SiteDescription.name)
+    val name: String,
 
-    @get:Schema(description = CommonDescription.index)
-    val index: String?
+    @ArraySchema(arraySchema = Schema(description = SiteDescription.states))
+    val states: Collection<SiteStateVerboseDto> = emptyList(),
+
+    @get:Schema(description = SiteDescription.bpnLegalEntity)
+    val bpnLegalEntity: String,
+
+    @get:Schema(description = CommonDescription.createdAt)
+    val createdAt: Instant,
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant
 )

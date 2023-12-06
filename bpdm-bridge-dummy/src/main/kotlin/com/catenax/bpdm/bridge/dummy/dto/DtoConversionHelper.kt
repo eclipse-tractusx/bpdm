@@ -23,19 +23,21 @@ import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import kotlin.reflect.KProperty
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityClassificationDto as Gate_LegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityDto as Gate_LegalEntityDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityIdentifierDto as Gate_LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.LegalEntityStateDto as Gate_LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.gate.api.model.SiteStateDto as Gate_SiteStateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationDto as Pool_LegalEntityClassificationDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto as Pool_LegalEntityDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierDto as Pool_LegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateDto as Pool_LegalEntityStateDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto as Pool_SiteStateDto
 
 fun gateToPoolLegalEntity(gateDto: Gate_LegalEntityDto): Pool_LegalEntityDto {
     return Pool_LegalEntityDto(
@@ -70,6 +72,15 @@ fun gateToPoolLegalEntityClassification(gateDto: Gate_LegalEntityClassificationD
         type = gateDto.type,
         code = gateDto.code,
         value = gateDto.value
+    )
+}
+
+fun gateToPoolSiteState(gateDto: Gate_SiteStateDto): Pool_SiteStateDto {
+    return Pool_SiteStateDto(
+        validFrom = gateDto.validFrom,
+        validTo = gateDto.validTo,
+        type = gateDto.type,
+        description = gateDto.description
     )
 }
 
@@ -168,7 +179,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
 
 fun poolToGateSite(site: SiteVerboseDto): SiteGateDto {
     val states = site.states.map {
-        SiteStateDto(
+        Gate_SiteStateDto(
             description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,

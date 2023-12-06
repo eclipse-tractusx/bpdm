@@ -405,7 +405,7 @@ class BusinessPartnerBuildService(
             )
         }
 
-        fun toSiteState(dto: IBaseSiteStateDto, site: Site): SiteState {
+        fun toSiteState(dto: ISiteStateDto, site: Site): SiteState {
             return SiteState(
                 description = dto.description,
                 validFrom = dto.validFrom,

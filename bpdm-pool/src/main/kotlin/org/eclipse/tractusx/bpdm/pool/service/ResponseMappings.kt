@@ -223,8 +223,8 @@ fun Site.toDto(): SiteVerboseDto {
     )
 }
 
-fun Site.toPoolDto(): SitePoolVerboseDto {
-    return SitePoolVerboseDto(
+fun Site.toPoolDto(): SiteWithMainAddressVerboseDto {
+    return SiteWithMainAddressVerboseDto(
 
         site = SiteVerboseDto(
             bpn,

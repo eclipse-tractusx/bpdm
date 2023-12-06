@@ -17,18 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
+import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
 @Schema(description = SiteDescription.header)
 data class SiteDto(
 
     override val name: String,
-
     override val states: Collection<SiteStateDto> = emptyList(),
-
     override val mainAddress: LogisticAddressDto
+
 ) : IBaseSiteDto

@@ -30,7 +30,6 @@ import com.catenax.bpdm.bridge.dummy.util.TestHelpers
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.request.AddressPartnerBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
@@ -42,8 +41,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
 import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSearchRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityMatchVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -456,7 +456,7 @@ class BridgeSyncIT @Autowired constructor(
         assertThat(poolVersion.legalAddress.alternativePostalAddress?.city).isEqualTo(gateVersion.legalAddress.alternativePostalAddress?.city)
     }
 
-    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SitePoolVerboseDto) {
+    private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressVerboseDto) {
         assertThat(poolVersion.site.name).isEqualTo(gateVersion.site.nameParts.first())
         assertThat(poolVersion.site.states.map { it.description }).isEqualTo(gateVersion.site.states.map { it.description })
         assertThat(poolVersion.mainAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.mainAddress.physicalPostalAddress.street?.name)

@@ -17,21 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.common.dto
+package org.eclipse.tractusx.bpdm.pool.api.model.response
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteStateDescription
-import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
-import java.time.LocalDateTime
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 
-@Schema(description = SiteStateDescription.header)
-data class SiteStateDto(
+@JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
+@Schema(description = SiteDescription.header)
+data class SiteWithMainAddressVerboseDto(
 
-    override val description: String?,
+    @field:JsonUnwrapped
+    val site: SiteVerboseDto,
 
-    override val validFrom: LocalDateTime?,
-
-    override val validTo: LocalDateTime?,
-
-    override val type: BusinessStateType
-) : IBaseSiteStateDto
+    // TODO OpenAPI description for complex field does not work!!
+    @Schema(description = SiteDescription.mainAddress)
+    val mainAddress: LogisticAddressVerboseDto,
+)
