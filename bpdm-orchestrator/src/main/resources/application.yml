@@ -16,8 +16,9 @@ bpdm:
         unknown-user: Anonymous
 
     task:
-        task-reservation-timeout: 1d
-        task-timeout: 3d
+        timeoutCheckCron: 10 0/5 * * * ?
+        taskPendingTimeout: 3d
+        taskRetentionTimeout: 30d
 
 # Enable actuator endpoints
 management:

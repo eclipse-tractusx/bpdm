@@ -19,11 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.orchestrator.service
 
+import mu.KotlinLogging
+import org.eclipse.tractusx.bpdm.orchestrator.config.TaskConfigProperties
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmEmptyResultException
 import org.eclipse.tractusx.bpdm.orchestrator.exception.BpdmTaskNotFoundException
 import org.eclipse.tractusx.bpdm.orchestrator.model.GoldenRecordTask
 import org.eclipse.tractusx.bpdm.orchestrator.model.TaskProcessingState
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -31,8 +34,11 @@ import java.util.*
 @Service
 class GoldenRecordTaskService(
     val taskStorage: GoldenRecordTaskStorage,
-    val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine
+    val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
+    val taskConfigProperties: TaskConfigProperties
 ) {
+
+    private val logger = KotlinLogging.logger { }
 
     @Synchronized
     fun createTasks(createRequest: TaskCreateRequest): TaskCreateResponse {
@@ -57,10 +63,7 @@ class GoldenRecordTaskService(
         val tasks = taskStorage.getQueuedTasksByStep(reservationRequest.step, reservationRequest.amount)
         tasks.forEach { task -> goldenRecordTaskStateMachine.doReserve(task) }
 
-        val reservationTimeout = tasks
-            .mapNotNull { it.processingState.reservationTimeout }
-            .minOrNull()
-            ?: now
+        val pendingTimeout = tasks.minOfOrNull { calculateTaskPendingTimeout(it.processingState) } ?: now
 
         val taskEntries = tasks.map { task ->
             TaskStepReservationEntryDto(
@@ -71,7 +74,8 @@ class GoldenRecordTaskService(
 
         return TaskStepReservationResponse(
             reservedTasks = taskEntries,
-            timeout = reservationTimeout
+            // property is deprecated
+            timeout = pendingTimeout
         )
     }
 
@@ -86,11 +90,47 @@ class GoldenRecordTaskService(
                 val resultBusinessPartner = resultEntry.businessPartner
 
                 if (errors.isNotEmpty()) {
-                    goldenRecordTaskStateMachine.doResolveFailed(task, step, errors)
+                    goldenRecordTaskStateMachine.doResolveTaskToError(task, step, errors)
                 } else if (resultBusinessPartner != null) {
-                    goldenRecordTaskStateMachine.doResolveSuccessful(task, step, resultBusinessPartner)
+                    goldenRecordTaskStateMachine.doResolveTaskToSuccess(task, step, resultBusinessPartner)
                 } else {
                     throw BpdmEmptyResultException(resultEntry.taskId)
+                }
+            }
+    }
+
+    @Scheduled(cron = "\${bpdm.task.timeoutCheckCron}")
+    @Synchronized
+    fun checkForTimeouts() {
+        try {
+            logger.debug { "Checking for timeouts" }
+            checkForPendingTimeouts()
+            checkForRetentionTimeouts()
+        } catch (err: RuntimeException) {
+            logger.error(err) { "Error checking for timeouts" }
+        }
+    }
+
+    private fun checkForPendingTimeouts() {
+        taskStorage.getTasksWithPendingTimeoutBefore(Instant.now())
+            .forEach {
+                try {
+                    logger.info { "Setting timeout for task ${it.taskId} after reaching pending timeout" }
+                    goldenRecordTaskStateMachine.doResolveTaskToTimeout(it)
+                } catch (err: RuntimeException) {
+                    logger.error(err) { "Error handling pending timeout for task ${it.taskId}" }
+                }
+            }
+    }
+
+    private fun checkForRetentionTimeouts() {
+        taskStorage.getTasksWithRetentionTimeoutBefore(Instant.now())
+            .forEach {
+                try {
+                    logger.info { "Removing task ${it.taskId} after reaching retention timeout" }
+                    taskStorage.removeTask(it.taskId)
+                } catch (err: RuntimeException) {
+                    logger.error(err) { "Error handling retention timeout for task ${it.taskId}" }
                 }
             }
     }
@@ -126,7 +166,14 @@ class GoldenRecordTaskService(
             errors = processingState.errors,
             createdAt = processingState.taskCreatedAt,
             modifiedAt = processingState.taskModifiedAt,
-            timeout = processingState.taskTimeout
+            // property is deprecated
+            timeout = calculateTaskRetentionTimeout(processingState)
         )
     }
+
+    private fun calculateTaskPendingTimeout(processingState: TaskProcessingState) =
+        processingState.taskCreatedAt.plus(taskConfigProperties.taskPendingTimeout)
+
+    private fun calculateTaskRetentionTimeout(processingState: TaskProcessingState) =
+        processingState.taskCreatedAt.plus(taskConfigProperties.taskRetentionTimeout)
 }

@@ -36,13 +36,15 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(10, ChronoUnit.SECONDS)
+val WITHIN_ALLOWED_TIME_OFFSET: TemporalUnitOffset = within(1, ChronoUnit.SECONDS)
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = [
         "bpdm.api.upsert-limit=3",
-        "bpdm.task.task-timeout=12h"
+        "bpdm.task.timeoutCheckCron=* * * * * ?",       // check every sec
+        "bpdm.task.taskPendingTimeout=3s",
+        "bpdm.task.taskRetentionTimeout=5s"
     ]
 )
 class GoldenRecordTaskControllerIT @Autowired constructor(
@@ -68,8 +70,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         // create tasks and check response
         val createdTasks = createTasks().createdTasks
 
-        val expectedTimeout = Instant.now().plus(taskConfigProperties.taskTimeout)
-
         assertThat(createdTasks.size).isEqualTo(2)
 
         assertThat(createdTasks[0].taskId).isNotEqualTo(createdTasks[1].taskId)
@@ -80,7 +80,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             assertProcessingStateDto(processingState, ResultState.Pending, TaskStep.CleanAndSync, StepState.Queued)
             assertThat(processingState.errors).isEqualTo(emptyList<TaskErrorDto>())
             assertThat(processingState.createdAt).isEqualTo(processingState.modifiedAt)
-            assertThat(processingState.timeout).isCloseTo(expectedTimeout, WITHIN_ALLOWED_TIME_OFFSET)
         }
 
         // check if response is consistent with searchTaskStates response
@@ -120,14 +119,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val createdTasks = createTasks(TaskMode.UpdateFromSharingMember).createdTasks
         assertThat(createdTasks.size).isEqualTo(2)
 
-        val expectedReservationTimeout = Instant.now().plus(taskConfigProperties.taskReservationTimeout)
-
         // reserve tasks
         val reservationResponse1 = reserveTasks(TaskStep.CleanAndSync)
         val reservedTasks = reservationResponse1.reservedTasks
 
         // expect the correct number of entries with the correct timeout
-        assertThat(reservationResponse1.timeout).isCloseTo(expectedReservationTimeout, WITHIN_ALLOWED_TIME_OFFSET)
         assertThat(reservedTasks.size).isEqualTo(2)
         assertThat(reservedTasks.map { it.taskId }).isEqualTo(createdTasks.map { it.taskId })
 
@@ -418,7 +414,6 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
             )
         }
 
-
         // post correct task id with error content
         resolveTasks(
             TaskStep.CleanAndSync,
@@ -430,6 +425,109 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
                 )
             )
         )
+    }
+
+    @Test
+    fun `wait for task pending and retention timeout`() {
+        // create tasks
+        val createdTasks = createTasks().createdTasks
+        val taskIds = createdTasks.map { it.taskId }
+
+        // check for state Pending
+        checkStateForAllTasks(taskIds) {
+            assertThat(it.resultState).isEqualTo(ResultState.Pending)
+        }
+
+        // wait for 1/2 pending time -> should still be pending
+        Thread.sleep(taskConfigProperties.taskPendingTimeout.dividedBy(2).toMillis())
+        checkStateForAllTasks(taskIds) {
+            assertThat(it.resultState).isEqualTo(ResultState.Pending)
+        }
+
+        // wait for another 1/2 pending time plus 1sec -> should be in state Error / Timeout
+        Thread.sleep(taskConfigProperties.taskPendingTimeout.dividedBy(2).plusSeconds(1).toMillis())
+        checkStateForAllTasks(taskIds) {
+            assertThat(it.resultState).isEqualTo(ResultState.Error)
+            assertThat(it.errors.first().type).isEqualTo(TaskErrorType.Timeout)
+        }
+
+        // wait for 1/2 retention time -> should still be in state Error / Timeout
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
+        checkStateForAllTasks(taskIds) {
+            assertThat(it.resultState).isEqualTo(ResultState.Error)
+        }
+
+        // wait for 1/2 retention time plus 1sec -> should be removed now
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).plusSeconds(1).toMillis())
+        val foundTasks = searchTaskStates(taskIds).tasks
+        assertThat(foundTasks.size).isZero()
+    }
+
+    @Test
+    fun `wait for task retention timeout after success`() {
+        // create single task in UpdateFromPool mode (only one step)
+        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerTestValues.businessPartner1))
+
+        // reserve task
+        val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
+        val taskId = reservedTask.taskId
+
+        // resolve with success
+        val cleaningResult = TaskStepResultEntryDto(
+            taskId = taskId,
+            businessPartner = reservedTask.businessPartner
+        )
+        resolveTasks(TaskStep.Clean, listOf(cleaningResult))
+
+        // should be in state Success now
+        checkStateForAllTasks(listOf(taskId)) {
+            assertThat(it.resultState).isEqualTo(ResultState.Success)
+        }
+
+        // wait for 1/2 retention time -> should still be in state Success
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
+        checkStateForAllTasks(listOf(taskId)) {
+            assertThat(it.resultState).isEqualTo(ResultState.Success)
+        }
+
+        // wait for 1/2 retention time -> should still be removed
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).plusSeconds(1).toMillis())
+        val foundTasks = searchTaskStates(listOf(taskId)).tasks
+        assertThat(foundTasks.size).isZero()
+    }
+
+    @Test
+    fun `wait for task retention timeout after error`() {
+        // create single task in UpdateFromPool mode (only one step)
+        createTasks(TaskMode.UpdateFromPool, listOf(BusinessPartnerTestValues.businessPartner1))
+
+        // reserve task
+        val reservedTask = reserveTasks(TaskStep.Clean).reservedTasks.single()
+        val taskId = reservedTask.taskId
+
+        // resolve with error
+        val cleaningResult = TaskStepResultEntryDto(
+            taskId = taskId,
+            businessPartner = reservedTask.businessPartner,
+            errors = listOf(TaskErrorDto(TaskErrorType.Unspecified, "Unfortunate event"))
+        )
+        resolveTasks(TaskStep.Clean, listOf(cleaningResult))
+
+        // should be in state Success now
+        checkStateForAllTasks(listOf(taskId)) {
+            assertThat(it.resultState).isEqualTo(ResultState.Error)
+        }
+
+        // wait for 1/2 retention time -> should still be in state Success
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).toMillis())
+        checkStateForAllTasks(listOf(taskId)) {
+            assertThat(it.resultState).isEqualTo(ResultState.Error)
+        }
+
+        // wait for 1/2 retention time -> should still be removed
+        Thread.sleep(taskConfigProperties.taskRetentionTimeout.dividedBy(2).plusSeconds(1).toMillis())
+        val foundTasks = searchTaskStates(listOf(taskId)).tasks
+        assertThat(foundTasks.size).isZero()
     }
 
     private fun createTasks(mode: TaskMode = TaskMode.UpdateFromSharingMember, businessPartners: List<BusinessPartnerGenericDto>? = null): TaskCreateResponse =
@@ -457,6 +555,12 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         orchestratorClient.goldenRecordTasks.searchTaskStates(
             TaskStateRequest(taskIds)
         )
+
+    private fun checkStateForAllTasks(taskIds: List<String>, checkFunc: (TaskProcessingStateDto) -> Unit) {
+        searchTaskStates(taskIds).tasks
+            .also { assertThat(it.size).isEqualTo(taskIds.size) }
+            .forEach { stateDto -> checkFunc(stateDto.processingState) }
+    }
 
     private fun assertProcessingStateDto(processingStateDto: TaskProcessingStateDto, resultState: ResultState, step: TaskStep, stepState: StepState) {
         assertThat(processingStateDto.resultState).isEqualTo(resultState)

@@ -29,9 +29,12 @@ data class TaskProcessingState(
 
     var step: TaskStep,
     var stepState: StepState,
-    var reservationTimeout: Instant?,
 
     val taskCreatedAt: Instant,
     var taskModifiedAt: Instant,
-    val taskTimeout: Instant,
+
+    // only used while in resultState==pending
+    var taskPendingTimeout: Instant?,
+    // only used while in final resultState (!=pending)
+    var taskRetentionTimeout: Instant?
 )

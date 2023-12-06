@@ -25,6 +25,7 @@ import org.eclipse.tractusx.orchestrator.api.model.ResultState
 import org.eclipse.tractusx.orchestrator.api.model.StepState
 import org.eclipse.tractusx.orchestrator.api.model.TaskStep
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class GoldenRecordTaskStorage {
@@ -45,11 +46,17 @@ class GoldenRecordTaskStorage {
         }
     }
 
+    fun removeTask(taskId: String) {
+        tasks.removeIf {
+            it.taskId == taskId
+        }
+    }
+
     fun getTask(taskId: String) =
         tasks.firstOrNull { it.taskId == taskId }
 
-    fun getQueuedTasksByStep(step: TaskStep, amount: Int): List<GoldenRecordTask> {
-        return tasks
+    fun getQueuedTasksByStep(step: TaskStep, amount: Int): List<GoldenRecordTask> =
+        tasks
             .filter {
                 val state = it.processingState
                 state.resultState == ResultState.Pending &&
@@ -57,5 +64,18 @@ class GoldenRecordTaskStorage {
                         state.step == step
             }
             .take(amount)
-    }
+
+    fun getTasksWithPendingTimeoutBefore(timestamp: Instant): List<GoldenRecordTask> =
+        tasks
+            .filter {
+                val state = it.processingState
+                state.taskPendingTimeout?.isBefore(timestamp) ?: false
+            }
+
+    fun getTasksWithRetentionTimeoutBefore(timestamp: Instant): List<GoldenRecordTask> =
+        tasks
+            .filter {
+                val state = it.processingState
+                state.taskRetentionTimeout?.isBefore(timestamp) ?: false
+            }
 }

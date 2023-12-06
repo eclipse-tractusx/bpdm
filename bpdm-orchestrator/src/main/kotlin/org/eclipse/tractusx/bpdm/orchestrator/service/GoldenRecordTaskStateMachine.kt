@@ -43,11 +43,12 @@ class GoldenRecordTaskStateMachine(
 
             step = initialStep,
             stepState = StepState.Queued,
-            reservationTimeout = null,
 
             taskCreatedAt = now,
             taskModifiedAt = now,
-            taskTimeout = now.plus(taskConfigProperties.taskTimeout)
+
+            taskPendingTimeout = now.plus(taskConfigProperties.taskPendingTimeout),
+            taskRetentionTimeout = null
         )
     }
 
@@ -59,13 +60,12 @@ class GoldenRecordTaskStateMachine(
             throw BpdmIllegalStateException(task.taskId, state)
         }
 
-        // reserved for current step, set reservation timeout
+        // reserved for current step
         state.stepState = StepState.Reserved
-        state.reservationTimeout = now.plus(taskConfigProperties.taskReservationTimeout)
         state.taskModifiedAt = now
     }
 
-    fun doResolveSuccessful(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
+    fun doResolveTaskToSuccess(task: GoldenRecordTask, step: TaskStep, resultBusinessPartner: BusinessPartnerFullDto) {
         val state = task.processingState
         val now = Instant.now()
 
@@ -76,35 +76,56 @@ class GoldenRecordTaskStateMachine(
         val nextStep = getNextStep(state.mode, state.step)
 
         if (nextStep != null) {
-            // still steps left to process -> queued for next step, no timeout
+            // still steps left to process -> queued for next step
             state.step = nextStep
             state.stepState = StepState.Queued
+            state.taskModifiedAt = now
         } else {
             // last step finished -> set resultState and stepState to success
-            state.resultState = ResultState.Success
-            state.stepState = StepState.Success
+            resolveStateToSuccess(state)
         }
-
-        // always set taskModifiedAt and reset stepTimeout
-        state.reservationTimeout = null
-        state.taskModifiedAt = now
 
         task.businessPartner = resultBusinessPartner
     }
 
-    fun doResolveFailed(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
+    fun doResolveTaskToError(task: GoldenRecordTask, step: TaskStep, errors: List<TaskErrorDto>) {
         val state = task.processingState
-        val now = Instant.now()
 
         if (state.resultState != ResultState.Pending || state.stepState != StepState.Reserved || state.step != step) {
             throw BpdmIllegalStateException(task.taskId, state)
         }
 
+        resolveStateToError(state, errors)
+    }
+
+    fun doResolveTaskToTimeout(task: GoldenRecordTask) {
+        val state = task.processingState
+
+        if (state.resultState != ResultState.Pending) {
+            throw BpdmIllegalStateException(task.taskId, state)
+        }
+
+        val errors = listOf(TaskErrorDto(TaskErrorType.Timeout, "Timeout reached"))
+        resolveStateToError(state, errors)
+    }
+
+    private fun resolveStateToSuccess(state: TaskProcessingState) {
+        val now = Instant.now()
+        state.resultState = ResultState.Success
+        state.stepState = StepState.Success
+        state.taskModifiedAt = now
+        state.taskPendingTimeout = null
+        state.taskRetentionTimeout = now.plus(taskConfigProperties.taskRetentionTimeout)
+    }
+
+    private fun resolveStateToError(state: TaskProcessingState, errors: List<TaskErrorDto>) {
+        val now = Instant.now()
         state.resultState = ResultState.Error
         state.errors = errors
         state.stepState = StepState.Error
-        state.reservationTimeout = null
         state.taskModifiedAt = now
+        state.taskPendingTimeout = null
+        state.taskRetentionTimeout = now.plus(taskConfigProperties.taskRetentionTimeout)
     }
 
     private fun getInitialStep(mode: TaskMode): TaskStep {

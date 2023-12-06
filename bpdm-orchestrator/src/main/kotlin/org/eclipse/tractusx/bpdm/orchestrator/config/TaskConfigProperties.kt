@@ -24,8 +24,10 @@ import java.time.Duration
 
 @ConfigurationProperties(prefix = "bpdm.task")
 data class TaskConfigProperties(
-    // Duration after which a task is removed from the Orchestrator after creation
-    val taskTimeout: Duration = Duration.ofHours(3 * 24),
-    // Duration for which a reservation is valid and results are accepted
-    val taskReservationTimeout: Duration = Duration.ofHours(24)
+    // Cron expression for checking if any of the timeouts has been reached
+    val timeoutCheckCron: String = "-",
+    // Timeout after which a pending task should change into state "Error" with error type "Timeout" starting with its creation.
+    val taskPendingTimeout: Duration = Duration.ofDays(2),
+    // Timeout after which a task should be removed from the Orchestrator starting with its creation.
+    val taskRetentionTimeout: Duration = Duration.ofDays(14),
 )
