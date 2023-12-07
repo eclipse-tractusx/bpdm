@@ -17,15 +17,8 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.config
+package org.eclipse.tractusx.bpdm.gate.entity
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-
-
-@ConfigurationProperties(prefix = "bpdm.client.pool")
-data class PoolConfigProperties(
-    val baseUrl: String = "http://localhost:8080",
-    val searchChangelogPageSize: Int = 100,
-    val securityEnabled: Boolean = false,
-    val oauth2ClientRegistration: String?
-)
+enum class SyncType {
+    POOL_TO_GATE_OUTPUT
+}

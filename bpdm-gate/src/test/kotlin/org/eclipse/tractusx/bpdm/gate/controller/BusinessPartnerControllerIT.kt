@@ -26,6 +26,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
 import org.eclipse.tractusx.bpdm.common.dto.*
 import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
+import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
@@ -41,6 +42,8 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.util.*
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
+import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -71,16 +74,21 @@ class BusinessPartnerControllerIT @Autowired constructor(
     companion object {
         const val ORCHESTRATOR_CREATE_TASKS_URL = "/api/golden-record-tasks"
         const val ORCHESTRATOR_SEARCH_TASK_STATES_URL = "/api/golden-record-tasks/state/search"
+        const val POOL_API_SEARCH_CHANGE_LOG_URL = "/api/catena/business-partners/changelog/search"
 
         @JvmField
         @RegisterExtension
-        val gateWireMockServer: WireMockExtension = WireMockExtension.newInstance()
-            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-            .build()
+        val gateWireMockServer: WireMockExtension = WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig().dynamicPort()).build()
+
+        @JvmField
+        @RegisterExtension
+        val poolWireMockServer: WireMockExtension = WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig().dynamicPort()).build()
+
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("bpdm.client.pool.base-url") { poolWireMockServer.baseUrl() }
             registry.add("bpdm.client.orchestrator.base-url") { gateWireMockServer.baseUrl() }
         }
     }
@@ -89,8 +97,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
     fun beforeEach() {
         testHelpers.truncateDbTables()
         gateWireMockServer.resetAll()
+        poolWireMockServer.resetAll()
         this.mockOrchestratorApi()
-        this.mockOrchestratorApiCleaned()
     }
 
     @Test
@@ -444,7 +452,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 listOf(
                     TaskClientStateDto(
                         taskId = "0",
-                        businessPartnerResult = BusinessPartnerGenericMockValues.businessPartner1,
+                        businessPartnerResult = BusinessPartnerGenericValues.businessPartner1,
                         processingState = TaskProcessingStateDto(
                             resultState = ResultState.Success,
                             step = TaskStep.CleanAndSync,
@@ -475,12 +483,71 @@ class BusinessPartnerControllerIT @Autowired constructor(
             )
 
         gateWireMockServer.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL)).willReturn(
+                WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
+            )
+        )
+    }
+    private fun mockOrchestratorApiCleanedResponseSizeOne() {
+        val taskStateResponse = TaskStateResponse(
+            listOf(
+                TaskClientStateDto(
+                    taskId = "0", businessPartnerResult = BusinessPartnerGenericValues.businessPartner1, processingState = TaskProcessingStateDto(
+                        resultState = ResultState.Success,
+                        step = TaskStep.CleanAndSync,
+                        stepState = StepState.Queued,
+                        errors = emptyList(),
+                        createdAt = Instant.now(),
+                        modifiedAt = Instant.now(),
+                        timeout = Instant.now()
+                    )
+                )
+            )
+        )
+        gateWireMockServer.stubFor(
             WireMock.post(WireMock.urlPathEqualTo(ORCHESTRATOR_SEARCH_TASK_STATES_URL))
                 .willReturn(
                     WireMock.okJson(objectMapper.writeValueAsString(taskStateResponse))
                 )
         )
     }
+    private fun mockPoolApiGetChangeLogs() {
+
+        val poolChangelogEntries = PageDto(
+            totalElements = 3,
+            totalPages = 1,
+            page = 0,
+            contentSize = 3,
+            content = listOf(
+                ChangelogEntryVerboseDto(
+                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.legalEntityBpn!!,
+                    businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
+                    timestamp = Instant.now(),
+                    changelogType = ChangelogType.UPDATE
+                ),
+                ChangelogEntryVerboseDto(
+                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.addressBpn!!,
+                    businessPartnerType = BusinessPartnerType.ADDRESS,
+                    timestamp = Instant.now(),
+                    changelogType = ChangelogType.UPDATE
+                ),
+                ChangelogEntryVerboseDto(
+                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.siteBpn!!,
+                    businessPartnerType = BusinessPartnerType.SITE,
+                    timestamp = Instant.now(),
+                    changelogType = ChangelogType.UPDATE
+                )
+            )
+        )
+        // Pool APi get changelogs endpoint
+        poolWireMockServer.stubFor(
+            WireMock.post(WireMock.urlPathEqualTo(POOL_API_SEARCH_CHANGE_LOG_URL))
+                .willReturn(
+                    WireMock.okJson(objectMapper.writeValueAsString(poolChangelogEntries))
+                )
+        )
+    }
+
 
     fun readSharingStates(businessPartnerType: BusinessPartnerType?, externalIds: Collection<String>?): Collection<SharingStateDto> {
 
@@ -489,6 +556,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     @Test
     fun `insert one business partners and finalize cleaning task without error`() {
+        this.mockOrchestratorApiCleaned()
 
         val outputBusinessPartners = listOf(
             BusinessPartnerNonVerboseValues.bpOutputRequestCleaned
@@ -544,7 +612,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericMockValues.businessPartner1.addressBpn,
+                bpn = BusinessPartnerGenericValues.businessPartner1.addressBpn,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
@@ -574,7 +642,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     @Test
     fun `insert one business partners but task is missing in orchestrator`() {
-
+        this.mockOrchestratorApiCleaned()
         val upsertRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
             BusinessPartnerNonVerboseValues.bpInputRequestError,
@@ -629,4 +697,49 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     }
 
+    @Test
+    fun `insert one business partners and request cleaning task for bpn update`() {
+
+        this.mockPoolApiGetChangeLogs()
+        this.mockOrchestratorApiCleanedResponseSizeOne()
+
+        val outputBusinessPartners = listOf(
+            BusinessPartnerNonVerboseValues.bpOutputRequestCleaned
+        )
+        val upsertRequests = listOf(
+            BusinessPartnerNonVerboseValues.bpInputRequestCleaned
+        )
+        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+
+        val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
+
+        businessPartnerService.finishCleaningTask()
+
+        businessPartnerService.requestCleaningTaskForGateOutputIfPoolBpnHasChanges()
+
+        val upsertSharingStatesRequests = listOf(
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = externalId4,
+                sharingStateType = SharingStateType.Pending,
+                sharingErrorCode = null,
+                sharingErrorMessage = null,
+                bpn = "000000123CCC333",
+                sharingProcessStarted = null,
+                taskId = "0"
+            )
+        )
+        val externalIds = listOf(externalId4)
+        val upsertSharingStateResponses = readSharingStates(BusinessPartnerType.GENERIC, externalIds)
+
+        //Assert that Cleaned Golden Record is persisted in the Output correctly
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersOutput(listOf(externalId4))
+        assertUpsertOutputResponsesMatchRequests(searchResponsePage.content, outputBusinessPartners)
+
+        //Assert that sharing state are created
+        testHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
+            .isEqualTo(upsertSharingStatesRequests)
+
+
+    }
 }

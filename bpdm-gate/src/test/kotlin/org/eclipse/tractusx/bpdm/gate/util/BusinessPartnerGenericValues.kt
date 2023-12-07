@@ -29,7 +29,7 @@ import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 
-object BusinessPartnerGenericMockValues {
+object BusinessPartnerGenericValues {
 
     //Business Partner with two entries in every collection
     val businessPartner1 = BusinessPartnerGenericDto(

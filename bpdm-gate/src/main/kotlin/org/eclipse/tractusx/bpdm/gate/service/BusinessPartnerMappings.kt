@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
@@ -121,7 +122,7 @@ class BusinessPartnerMappings {
             bpnS = dto.siteBpn,
             bpnA = dto.addressBpn,
             parentId = null,
-            parentType = null,
+            parentType = BusinessPartnerType.GENERIC,
             postalAddress = toPostalAddress(dto.postalAddress)
         )
     }

@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.gate.config
 
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClientImpl
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -37,7 +39,7 @@ import java.util.function.Consumer
 
 
 @Configuration
-class OrchestratorClientConfig {
+class ClientsConfig {
 
     // Orchestrator-Client without authentication
     @Bean
@@ -50,6 +52,22 @@ class OrchestratorClientConfig {
         val url = orchestratorConfigProperties.baseUrl
         return OrchestrationApiClientImpl { webClientBuilder(url).build() }
     }
+
+    @Bean
+    @ConditionalOnProperty(
+        value = ["bpdm.gate-security.pool-security-enabled"],
+        havingValue = "false",
+        matchIfMissing = true
+    )
+    fun poolClientNoAuth(poolConfigProperties: PoolConfigProperties): PoolApiClient {
+        val url = poolConfigProperties.baseUrl
+        return PoolClientImpl {
+            WebClient.builder()
+                .baseUrl(url)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build()
+        }
+    }
+
 
 
     @Bean
@@ -72,6 +90,25 @@ class OrchestratorClientConfig {
         }
     }
 
+    @Bean
+    @ConditionalOnProperty(
+        value = ["bpdm.pool.security-enabled"],
+        havingValue = "true"
+    )
+    fun poolClientWithAuth(
+        poolConfigProperties: PoolConfigProperties,
+        clientRegistrationRepository: ClientRegistrationRepository,
+        authorizedClientService: OAuth2AuthorizedClientService
+    ): PoolApiClient {
+        val url = poolConfigProperties.baseUrl
+        val clientRegistrationId = poolConfigProperties.oauth2ClientRegistration
+            ?: throw IllegalArgumentException("bpdm.pool.oauth2-client-registration is required if bpdm.pool.security-enabled is set")
+        return PoolClientImpl {
+            webClientBuilder(url)
+                .apply(oauth2Configuration(clientRegistrationRepository, authorizedClientService, clientRegistrationId))
+                .build()
+        }
+    }
 
     private fun webClientBuilder(url: String) =
         WebClient.builder()

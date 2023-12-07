@@ -21,6 +21,7 @@ package org.eclipse.tractusx.bpdm.gate.service
 
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
@@ -33,12 +34,16 @@ import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequ
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.config.PoolConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
+import org.eclipse.tractusx.bpdm.gate.entity.SyncType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.springframework.data.domain.Page
@@ -46,6 +51,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType as PoolChangeLogType
 
 @Service
 class BusinessPartnerService(
@@ -55,7 +61,10 @@ class BusinessPartnerService(
     private val changelogRepository: ChangelogRepository,
     private val orchestrationApiClient: OrchestrationApiClient,
     private val orchestratorMappings: OrchestratorMappings,
-    private val sharingStateRepository: SharingStateRepository
+    private val sharingStateRepository: SharingStateRepository,
+    private val poolClient: PoolApiClient,
+    private val syncRecordService: SyncRecordService,
+    private val poolConfigProperties: PoolConfigProperties
 ) {
     private val logger = KotlinLogging.logger { }
 
@@ -98,7 +107,7 @@ class BusinessPartnerService(
         val partners = resolutionResults.map { it.businessPartner }
         val orchestratorBusinessPartnersDto = resolutionResults.map { orchestratorMappings.toBusinessPartnerGenericDto(it.businessPartner) }
 
-        val taskIds = createGoldenRecordTasks(orchestratorBusinessPartnersDto).createdTasks.map { it.taskId }
+        val taskIds = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto).createdTasks.map { it.taskId }
 
         val pendingRequests =  partners.zip(taskIds)
             .map { (partner, taskId) ->
@@ -293,10 +302,10 @@ class BusinessPartnerService(
         }
 
 
-    private fun createGoldenRecordTasks(orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): TaskCreateResponse {
+    private fun createGoldenRecordTasks(mode: TaskMode, orchestratorBusinessPartnersDto: List<BusinessPartnerGenericDto>): TaskCreateResponse {
         return orchestrationApiClient.goldenRecordTasks.createTasks(
             TaskCreateRequest(
-                TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto
+                mode, orchestratorBusinessPartnersDto
             )
         )
     }
@@ -338,6 +347,53 @@ class BusinessPartnerService(
 
         sharingStateService.setError(errorRequests)
 
+    }
+
+    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
+    @Transactional
+    fun requestCleaningTaskForGateOutputIfPoolBpnHasChanges() {
+
+        val poolPaginationRequest = PaginationRequest(0, poolConfigProperties.searchChangelogPageSize)
+
+        val syncRecord = syncRecordService.getOrCreateRecord(SyncType.POOL_TO_GATE_OUTPUT)
+
+        val changelogSearchRequest = ChangelogSearchRequest(syncRecord.finishedAt)
+
+
+        val poolChangelogEntries = poolClient.changelogs.getChangelogEntries(changelogSearchRequest, poolPaginationRequest)
+        val poolUpdatedEntries = poolChangelogEntries.content.filter { it.changelogType == PoolChangeLogType.UPDATE }
+
+
+        val bpnA =
+            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map { it.bpn }
+        val bpnL = poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }
+            .map { it.bpn }
+        val bpnS =
+            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.SITE }.map { it.bpn }
+
+        val gateOutputEntries = businessPartnerRepository.findByStageAndBpnLInOrBpnSInOrBpnAIn(StageType.Output, bpnL, bpnS, bpnA)
+
+        val businessPartnerGenericDtoList = gateOutputEntries.map { bp ->
+            orchestratorMappings.toBusinessPartnerGenericDto(bp)
+        }
+
+        val taskIds = createGoldenRecordTasks(TaskMode.UpdateFromPool, businessPartnerGenericDtoList).createdTasks.map { it.taskId }
+
+        val pendingRequests = gateOutputEntries.zip(taskIds)
+            .map { (partner, taskId) ->
+                SharingStateService.PendingRequest(
+                    SharingStateService.SharingStateIdentifierDto(
+                        partner.externalId,
+                        partner.parentType ?: BusinessPartnerType.GENERIC
+                    ), taskId
+                )
+            }
+        sharingStateService.setPending(pendingRequests)
+
+        if (poolUpdatedEntries.isNotEmpty()) {
+            syncRecordService.setSynchronizationStart(SyncType.POOL_TO_GATE_OUTPUT)
+            syncRecordService.setSynchronizationSuccess(SyncType.POOL_TO_GATE_OUTPUT, poolUpdatedEntries.last().timestamp)
+        }
     }
 
 }
