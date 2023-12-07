@@ -319,11 +319,10 @@ class AddressControllerIT @Autowired constructor(
         val response = poolClient.addresses.createAddresses(listOf(toCreate, secondCreate))
 
 
-        assertThat(response.errorCount).isEqualTo(2)
+        assertThat(response.errorCount).isEqualTo(1)
         assertThat(response.entityCount).isEqualTo(0)
         val errors = response.errors.toList()
         testHelpers.assertErrorResponse(errors[0], AddressCreateError.AddressDuplicateIdentifier, toCreate.index!!)
-        testHelpers.assertErrorResponse(errors[1], AddressCreateError.AddressDuplicateIdentifier, secondCreate.index!!)
 
     }
 

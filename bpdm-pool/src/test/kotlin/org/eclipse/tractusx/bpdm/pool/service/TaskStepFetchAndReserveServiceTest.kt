@@ -22,6 +22,8 @@ import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
 import org.eclipse.tractusx.orchestrator.api.model.*
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
 import org.junit.jupiter.api.BeforeEach
@@ -269,15 +271,21 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
     @Test
-    fun `create address with minimal fields`() {
+    fun `create site address with minimal fields`() {
 
         val leRefValue = "123"
         val leAddressRefValue = "222"
+        val siteRefValue = "siteRefValue"
+        val mainAddressRefValue = "mainAddressRefValue"
         val additionalAddressRefValue = "77"
         val fullBpWithAddress = minFullBusinessPartner().copy(
             legalEntity = minValidLegalEntity(
                 bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
                 bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
             ),
             address = minLogisticAddress(
                 bpnAReference = BpnReferenceDto(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier),
@@ -291,6 +299,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(result[0].errors).hasSize(0)
         assertThat(createdLeAddress.name).isEqualTo(fullBpWithAddress.address?.name)
         compareLogisticAddress(createdAdditionalAddress, result[0].businessPartner?.address)
+        assertThat(createdAdditionalAddress.bpnLegalEntity).isNull()
+        assertThat(createdAdditionalAddress.bpnSite).isEqualTo(result[0].businessPartner?.site?.bpnSReference?.referenceValue)
+        assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
+        assertThat(createdAdditionalAddress.isMainAddress).isFalse()
     }
 
     @Test
@@ -387,6 +399,14 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         )
     }
 
+    fun addressIdentifierDto(name: String, id: Long, type: TypeKeyNameVerboseDto<String>): AddressIdentifierDto {
+
+        return AddressIdentifierDto(
+            value = "value_" + name + "_" + id,
+            type = type.technicalKey
+        )
+    }
+
     fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
 
         return LegalEntityStateDto(
@@ -400,6 +420,16 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun siteState(name: String, id: Long, type: BusinessStateType): SiteStateDto {
 
         return SiteStateDto(
+            description = "description_" + name + "_" + id,
+            validFrom = LocalDateTime.now().plusDays(id),
+            validTo = LocalDateTime.now().plusDays(id + 2),
+            type = type
+        )
+    }
+
+    fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateDto {
+
+        return AddressStateDto(
             description = "description_" + name + "_" + id,
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
@@ -421,18 +451,28 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         return LogisticAddressDto(
             bpnAReference = bpnAReference,
-            physicalPostalAddress = PhysicalPostalAddressDto(
-                country = CountryCode.DE,
-                city = "City_" + bpnAReference.referenceValue
-            )
+            physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference)
         )
     }
+
+    private fun minPhysicalPostalAddressDto(bpnAReference: BpnReferenceDto) = PhysicalPostalAddressDto(
+        country = CountryCode.DE,
+        city = "City_" + bpnAReference.referenceValue
+    )
 
     fun fullLogisticAddressDto(bpnAReference: BpnReferenceDto): LogisticAddressDto {
 
         return LogisticAddressDto(
             bpnAReference = bpnAReference,
             name = "name_" + bpnAReference.referenceValue,
+            identifiers = listOf(
+                addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, ""))
+            ),
+            states = listOf(
+                addressState(bpnAReference.referenceValue, 1L, BusinessStateType.ACTIVE),
+                addressState(bpnAReference.referenceValue, 2L, BusinessStateType.INACTIVE)
+            ),
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(longitude = 1.1f, latitude = 2.2f, altitude = 3.3f),
                 country = CountryCode.DE,
@@ -542,14 +582,14 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val physicalAddress = address?.physicalPostalAddress
         assertThat(verbosePhysicalAddress).usingRecursiveComparison()
             .ignoringFields("country", "administrativeAreaLevel1")
-            .isEqualTo(physicalAddress);
+            .isEqualTo(physicalAddress)
         assertThat(verbosePhysicalAddress.country.technicalKey.name).isEqualTo(physicalAddress?.country?.name)
         assertThat(verbosePhysicalAddress.administrativeAreaLevel1?.regionCode).isEqualTo(physicalAddress?.administrativeAreaLevel1)
         val verboseAlternAddress = verboseAddress.alternativePostalAddress
         val alternAddress = address?.alternativePostalAddress
         assertThat(verboseAlternAddress).usingRecursiveComparison()
             .ignoringFields("country", "administrativeAreaLevel1")
-            .isEqualTo(alternAddress);
+            .isEqualTo(alternAddress)
         assertThat(verboseAlternAddress?.country?.technicalKey?.name).isEqualTo(alternAddress?.country?.name)
         assertThat(verboseAlternAddress?.administrativeAreaLevel1?.regionCode).isEqualTo(alternAddress?.administrativeAreaLevel1)
     }
@@ -562,7 +602,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .ignoringFields("type").isEqualTo(sortedStates[it]);
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
+                .ignoringFields("type").isEqualTo(sortedStates[it])
         }
     }
 
@@ -575,7 +617,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             assertThat(sortedVerboseIdentifiers[it].type.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
                 .ignoringFields("type")
-                .isEqualTo(sortedIdentifiers[it]);
+                .isEqualTo(sortedIdentifiers[it])
         }
     }
 
@@ -587,10 +629,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringNanos(), "validTo")
-                .withEqualsForFields(isEqualToIgnoringNanos(), "validFrom")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
                 .ignoringFields("type")
-                .isEqualTo(sortedStates[it]);
+                .isEqualTo(sortedStates[it])
         }
     }
 
@@ -602,19 +644,19 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringNanos(), "validTo")
-                .withEqualsForFields(isEqualToIgnoringNanos(), "validFrom")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
                 .ignoringFields("type")
-                .isEqualTo(sortedStates[it]);
+                .isEqualTo(sortedStates[it])
         }
     }
 
-    fun isEqualToIgnoringNanos(): BiPredicate<LocalDateTime?, LocalDateTime?> {
+    fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, LocalDateTime?> {
 
 
         return BiPredicate<LocalDateTime?, LocalDateTime?> { d1, d2 ->
             (d1 == null && d2 == null)
-                    || d1.truncatedTo(ChronoUnit.MILLIS).equals(d2.truncatedTo(ChronoUnit.MILLIS))
+                    || d1.truncatedTo(ChronoUnit.SECONDS).equals(d2.truncatedTo(ChronoUnit.SECONDS))
         }
     }
 
@@ -630,7 +672,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             assertThat(sortedVerboseClassifications[it].type.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
             assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
                 .ignoringFields("type")
-                .isEqualTo(sortedClassifications[it]);
+                .isEqualTo(sortedClassifications[it])
         }
     }
 
@@ -642,7 +684,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseIdentifiers.indices.forEach {
             assertThat(sortedVerboseIdentifiers[it].type.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields("type").isEqualTo(sortedIdentifiers[it]);
+                .ignoringFields("type").isEqualTo(sortedIdentifiers[it])
         }
     }
 

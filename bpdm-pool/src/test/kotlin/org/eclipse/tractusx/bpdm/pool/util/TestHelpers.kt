@@ -191,6 +191,10 @@ class TestHelpers(
         poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto1)
         poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto2)
         poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.identifierTypeDto3)
+
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1)
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2)
+        poolClient.metadata.createIdentifierType(BusinessPartnerNonVerboseValues.addressIdentifierTypeDto3)
     }
 
 

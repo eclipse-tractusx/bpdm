@@ -64,7 +64,7 @@ class BusinessPartnerBuildService(
         logger.info { "Create ${requests.size} new legal entities" }
 
 
-        val errorsByRequest = requestValidationService.validateLegalEntityCreates(requests)
+        val errorsByRequest = requestValidationService.validateLegalEntitiesToCreateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
@@ -103,7 +103,7 @@ class BusinessPartnerBuildService(
     fun createSites(requests: Collection<SitePartnerCreateRequest>): SitePartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new sites" }
 
-        val errorsByRequest = requestValidationService.validateSiteCreates(requests)
+        val errorsByRequest = requestValidationService.validateSitesToCreateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
@@ -145,7 +145,7 @@ class BusinessPartnerBuildService(
     fun createAddresses(requests: Collection<AddressPartnerCreateRequest>): AddressPartnerCreateResponseWrapper {
         logger.info { "Create ${requests.size} new addresses" }
 
-        val errorsByRequest = requestValidationService.validateAddressCreates(requests)
+        val errorsByRequest = requestValidationService.validateAddressesToCreateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
@@ -177,7 +177,7 @@ class BusinessPartnerBuildService(
     fun updateLegalEntities(requests: Collection<LegalEntityPartnerUpdateRequest>): LegalEntityPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} legal entities" }
 
-        val errorsByRequest = requestValidationService.validateLegalEntityUpdates(requests)
+        val errorsByRequest = requestValidationService.validateLegalEntitiesToUpdateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
@@ -212,7 +212,7 @@ class BusinessPartnerBuildService(
     fun updateSites(requests: Collection<SitePartnerUpdateRequest>): SitePartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} sites" }
 
-        val errorsByRequest = requestValidationService.validateSiteUpdates(requests)
+        val errorsByRequest = requestValidationService.validateSitesToUpdateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 
@@ -244,7 +244,7 @@ class BusinessPartnerBuildService(
     fun updateAddresses(requests: Collection<AddressPartnerUpdateRequest>): AddressPartnerUpdateResponseWrapper {
         logger.info { "Update ${requests.size} business partner addresses" }
 
-        val errorsByRequest = requestValidationService.validateAddressUpdates(requests)
+        val errorsByRequest = requestValidationService.validateAddressesToUpdateFromController(requests)
         val errors = errorsByRequest.flatMap { it.value }
         val validRequests = requests.filterNot { errorsByRequest.containsKey(it) }
 

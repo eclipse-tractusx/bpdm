@@ -39,6 +39,14 @@ object BusinessPartnerNonVerboseValues {
     val identifierTypeDto3 =
         IdentifierTypeDto(BusinessPartnerVerboseValues.identifierType3.technicalKey, IdentifierBusinessPartnerType.LEGAL_ENTITY, BusinessPartnerVerboseValues.identifierType3.name)
 
+    val addressIdentifierTypeDto1 =
+        IdentifierTypeDto("ADDR_KEY_ONE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameOne")
+    val addressIdentifierTypeDto2 =
+        IdentifierTypeDto("ADDR_KEY_TWO", IdentifierBusinessPartnerType.ADDRESS, "IdentNameTwo")
+    val addressIdentifierTypeDto3 =
+        IdentifierTypeDto("ADDR_KEY_THREE", IdentifierBusinessPartnerType.ADDRESS, "IdentNameThree")
+
+
     val identifier1 = LegalEntityIdentifierDto(
         value = BusinessPartnerVerboseValues.identifier1.value,
         type = BusinessPartnerVerboseValues.identifierType1.technicalKey,
@@ -56,6 +64,17 @@ object BusinessPartnerNonVerboseValues {
         type = BusinessPartnerVerboseValues.identifierType3.technicalKey,
         issuingBody = BusinessPartnerVerboseValues.identifier3.issuingBody,
     )
+
+    val addressIdentifier1 = AddressIdentifierDto(
+        value = addressIdentifierTypeDto1.name,
+        type = addressIdentifierTypeDto1.technicalKey,
+    )
+
+    val addressIdentifier2 = AddressIdentifierDto(
+        value = addressIdentifierTypeDto2.name,
+        type = addressIdentifierTypeDto2.technicalKey,
+    )
+
 
     val addressIdentifier = AddressIdentifierDto(
         value = BusinessPartnerVerboseValues.identifier3.value,
