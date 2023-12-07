@@ -47,10 +47,10 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class MetadataService(
-    val identifierTypeRepository: IdentifierTypeRepository,
-    val legalFormRepository: LegalFormRepository,
-    val fieldQualityRuleRepository: FieldQualityRuleRepository,
-    val regionRepository: RegionRepository
+    private val identifierTypeRepository: IdentifierTypeRepository,
+    private val legalFormRepository: LegalFormRepository,
+    private val fieldQualityRuleRepository: FieldQualityRuleRepository,
+    private val regionRepository: RegionRepository
 ) {
 
     private val logger = KotlinLogging.logger { }

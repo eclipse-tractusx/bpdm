@@ -45,10 +45,10 @@ import org.springframework.stereotype.Service
 class BusinessPartnerSearchService(
     private val legalEntityRepository: LegalEntityRepository,
     private val businessPartnerFetchService: BusinessPartnerFetchService,
-    val addressService: AddressService,
-    val siteService: SiteService,
-    val logisticAddressRepository: LogisticAddressRepository,
-    val siteRepository: SiteRepository,
+    private val addressService: AddressService,
+    private val siteService: SiteService,
+    private val logisticAddressRepository: LogisticAddressRepository,
+    private val siteRepository: SiteRepository,
 ): SearchService {
 
     private val logger = KotlinLogging.logger { }

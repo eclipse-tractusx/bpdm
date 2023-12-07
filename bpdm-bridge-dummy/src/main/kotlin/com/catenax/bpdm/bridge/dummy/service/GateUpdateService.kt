@@ -36,7 +36,7 @@ import java.time.LocalDateTime
 
 @Service
 class GateUpdateService(
-    val gateClient: GateClient
+    private val gateClient: GateClient
 ) {
 
     private val logger = KotlinLogging.logger { }

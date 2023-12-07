@@ -33,9 +33,9 @@ import java.util.*
 
 @Service
 class GoldenRecordTaskService(
-    val taskStorage: GoldenRecordTaskStorage,
-    val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
-    val taskConfigProperties: TaskConfigProperties
+    private val taskStorage: GoldenRecordTaskStorage,
+    private val goldenRecordTaskStateMachine: GoldenRecordTaskStateMachine,
+    private val taskConfigProperties: TaskConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }

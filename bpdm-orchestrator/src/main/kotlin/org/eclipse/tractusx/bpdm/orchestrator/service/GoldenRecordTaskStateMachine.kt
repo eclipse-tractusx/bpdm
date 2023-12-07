@@ -30,7 +30,7 @@ import java.time.Instant
 
 @Service
 class GoldenRecordTaskStateMachine(
-    val taskConfigProperties: TaskConfigProperties
+    private val taskConfigProperties: TaskConfigProperties
 ) {
 
     private val logger = KotlinLogging.logger { }

@@ -38,9 +38,9 @@ class BpnIssuingService(
 ) {
     private val logger = KotlinLogging.logger { }
 
-    val bpnlPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}"
-    val bpnsPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.siteChar}"
-    val bpnAPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.addressChar}"
+    private val bpnlPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.legalEntityChar}"
+    private val bpnsPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.siteChar}"
+    private val bpnAPrefix = "${bpnConfigProperties.id}${bpnConfigProperties.addressChar}"
 
     @Transactional
     fun issueLegalEntityBpns(count: Int): List<String> {

@@ -44,7 +44,7 @@ import java.time.Instant
  */
 @Service
 class PartnerChangelogService(
-    val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
+    private val partnerChangelogEntryRepository: PartnerChangelogEntryRepository,
 ) {
     private val logger = KotlinLogging.logger { }
 

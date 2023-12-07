@@ -27,10 +27,10 @@ import java.time.Instant
 
 @Service
 class SyncService(
-    val gateQueryService: GateQueryService,
-    val poolUpdateService: PoolUpdateService,
-    val gateUpdateService: GateUpdateService,
-    val syncRecordService: SyncRecordService
+    private val gateQueryService: GateQueryService,
+    private val poolUpdateService: PoolUpdateService,
+    private val gateUpdateService: GateUpdateService,
+    private val syncRecordService: SyncRecordService
 ) {
 
     private val logger = KotlinLogging.logger { }

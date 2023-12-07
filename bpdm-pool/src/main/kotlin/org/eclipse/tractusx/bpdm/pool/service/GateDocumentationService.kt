@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service
  */
 @Service
 class GateDocumentationService(
-    val entityManager: EntityManager
+    private val entityManager: EntityManager
 ) {
 
     fun getMermaidPoolPersistence(): String {
