@@ -81,3 +81,10 @@ enum class AddressUpdateError : ErrorCode {
     IdentifierNotFound,
     AddressDuplicateIdentifier,
 }
+
+@Schema(description = "OrchestratorError")
+enum class OrchestratorError : ErrorCode {
+    AddressRegionNotFound,
+    AddressIdentifierNotFound,
+    AddressDuplicateIdentifier,
+}

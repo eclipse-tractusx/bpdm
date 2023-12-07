@@ -66,7 +66,6 @@ class BusinessPartnerEquivalenceService {
     }
 
     private fun isEquivalent(original: LegalEntityState, updated: LegalEntityState): Boolean =
-        original.description != updated.description ||
                 original.validFrom != updated.validFrom ||
                 original.validTo != updated.validTo ||
                 original.type != updated.type

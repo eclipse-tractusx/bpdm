@@ -37,26 +37,36 @@ class TaskEntryBpnMapping(taskEntries: List<TaskStepReservationEntryDto>, bpnReq
     private fun readRequestMappings(taskEntries: List<TaskStepReservationEntryDto>,  bpnRequestIdentifierRepository: BpnRequestIdentifierRepository ): MutableMap<String, String> {
 
         val references = taskEntries.mapNotNull { it.businessPartner.legalEntity?.bpnLReference } +
+                taskEntries.mapNotNull { it.businessPartner.legalEntity?.legalAddress?.bpnAReference } +
                 taskEntries.mapNotNull { it.businessPartner.site?.bpnSReference } +
+                taskEntries.mapNotNull { it.businessPartner.site?.mainAddress?.bpnAReference } +
                 taskEntries.mapNotNull { it.businessPartner.address?.bpnAReference }
 
         val usedRequestIdentifiers: Collection<String> = references.map { it.referenceValue }
 
         val mappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(usedRequestIdentifiers)
-        val bpnByRequestIdentifier = mappings
-            .map { it.requestIdentifier to it.bpn }
-            .toMap()
+        val bpnByRequestIdentifier = mappings.associate { it.requestIdentifier to it.bpn }
         return bpnByRequestIdentifier.toMutableMap()
     }
 
-    fun getBpn(bpnLReference: BpnReferenceDto): String? {
+    fun getBpn(bpnReference: BpnReferenceDto?): String? {
 
-        return if (bpnLReference.referenceType == BpnReferenceType.BpnRequestIdentifier) {
-            bpnByRequestIdentifier[bpnLReference.referenceValue]
+        return if(bpnReference == null) {
+            null
+        } else if (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier) {
+            bpnByRequestIdentifier[bpnReference.referenceValue]
         } else {
-            bpnLReference.referenceValue
+            bpnReference.referenceValue
         }
     }
+
+    fun hasBpnFor(bpnReference: BpnReferenceDto?): Boolean {
+
+        return bpnReference != null && (bpnReference.referenceType == BpnReferenceType.Bpn
+                ||  (bpnReference.referenceType == BpnReferenceType.BpnRequestIdentifier
+                && bpnByRequestIdentifier.containsKey(bpnReference.referenceValue)))
+    }
+
 
     fun addMapping(bpnLReference: BpnReferenceDto, bpn: String) {
 

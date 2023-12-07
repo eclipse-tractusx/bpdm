@@ -77,7 +77,10 @@ class TaskStepBuildService(
         if (businessPartnerDto.site != null) {
             siteEntity = upsertSite(businessPartnerDto.site, legalEntity, taskEntryBpnMapping, businessPartnerDto)
             siteResult = businessPartnerDto.site!!.copy(
-                bpnSReference = BpnReferenceDto(referenceValue = siteEntity.bpn, referenceType = BpnReferenceType.Bpn)
+                bpnSReference = BpnReferenceDto(referenceValue = siteEntity.bpn, referenceType = BpnReferenceType.Bpn),
+                mainAddress = businessPartnerDto.site!!.mainAddress!!.copy(
+                    bpnAReference = BpnReferenceDto(referenceValue = siteEntity.mainAddress.bpn, referenceType = BpnReferenceType.Bpn)
+                )
             )
             genericBpnA = siteEntity.mainAddress.bpn
         }
@@ -344,7 +347,7 @@ class TaskStepBuildService(
                 if (siteDto.hasChanged == true) {
                     val createSite = BusinessPartnerBuildService.createSite(siteDto, updateSite.bpn, legalEntity)
                     val siteMainAddress =
-                        if (genericBusinessPartner.generic.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                        if (genericBusinessPartner.generic.address.addressType == AddressType.LegalAndSiteMainAddress)
                             legalEntity.legalAddress
                         else
                             createLogisticAddress(mainAddress, taskEntryBpnMapping)

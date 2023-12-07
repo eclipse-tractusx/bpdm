@@ -29,6 +29,9 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.dto.LegalEntityMetadataDto
 import org.eclipse.tractusx.bpdm.pool.repository.*
+import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError.LEGAL_ENTITY_IS_NULL
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerFullDto
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.TaskStepReservationEntryDto
 import org.springframework.stereotype.Service
 
@@ -43,109 +46,174 @@ class RequestValidationService(
     private val metadataService: MetadataService
 ) {
 
-    fun validateLegalEntitiesToCreateFromOrchestrator(taskReservationRequests: List<TaskStepReservationEntryDto>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> {
+    fun validateTasksFromOrchestrator(
+        taskEntries: List<TaskStepReservationEntryDto>, requestMappings: TaskEntryBpnMapping
+    ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
 
-        val (requestsWithLegalAddressNull, requestsWithLegalAddressNotNull) = taskReservationRequests.partition { it.businessPartner.legalEntity?.legalAddress == null }
+        val result = mergeMapsWithCollectionInValue(
+            validateLegalEntitiesFromOrchestrator(taskEntries, requestMappings),
+            validateSitesFromOrchestrator(taskEntries, requestMappings),
+            validateAddressesFromOrchestrator(taskEntries, requestMappings)
+        )
 
-        val legalAddressBridges = requestsWithLegalAddressNotNull
-            .map { AddressBridge(address = it.businessPartner.legalEntity?.legalAddress!!, request = it, bpnA = null) }
-        val additionalAddressBridges = requestsWithLegalAddressNotNull.filter { it.businessPartner.site == null && it.businessPartner.address != null }
-            .map { AddressBridge(address = it.businessPartner.address!!, request = it, bpnA = null) }
+        // remove possible duplicated entries
+        return result.mapValues {
+            it.value.distinct()
+        }.toMap()
+    }
 
-        val legalAddressEmptyErrorsByRequest = requestsWithLegalAddressNull.associateWith  {
-            listOf(ErrorInfo(LegalEntityCreateError.LegalAddressIdentifierNotFound, "legal address of legal entity  is Empty", it.getRequestKey()))
+    private fun isSiteUpdate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+        businessPartner.site != null && requestMappings.hasBpnFor(businessPartner.site?.bpnSReference)
+
+    private fun isLegalEntityUpdate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+        (requestMappings.hasBpnFor(businessPartner.legalEntity?.bpnLReference))
+
+    private fun isLegalEntityCreate(businessPartner: BusinessPartnerFullDto, requestMappings: TaskEntryBpnMapping) =
+        !requestMappings.hasBpnFor(businessPartner.legalEntity?.bpnLReference)
+
+    private fun validateLegalEntitiesFromOrchestrator(
+        taskEntries: List<TaskStepReservationEntryDto>,
+        requestMappings: TaskEntryBpnMapping
+    ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
+
+        val (faultyRequestsWithLegalEntityNull, validLegalEntities) = taskEntries
+            .partition { it.businessPartner.legalEntity == null || it.businessPartner.legalEntity?.bpnLReference == null }
+
+        val legalEntitiesToCreate = validLegalEntities
+            .filter {
+                isLegalEntityCreate(it.businessPartner, requestMappings)
+            }
+        val legalEntitiesToUpdate = validLegalEntities
+            .filter {
+                isLegalEntityUpdate(it.businessPartner, requestMappings)
+            }
+
+        val legalEntityEmptyErrorsByRequest = faultyRequestsWithLegalEntityNull.associateWith {
+            listOf(ErrorInfo(LegalEntityCreateError.LegalEntityIdentifierNotFound, LEGAL_ENTITY_IS_NULL.message, it.getRequestKey()))
         }
-
-        val addressErrorsByRequest = validateAddresses(legalAddressBridges + additionalAddressBridges, leCreateMessages)
-        val leErrorsByRequest = validateLegalEntitiesToCreate(requestsWithLegalAddressNotNull.map {
-            LegalEntityBridge(legalEntity = it.businessPartner.legalEntity, request = it)
-        })
-        return mergeMapsWithCollectionInValue(leErrorsByRequest, addressErrorsByRequest, legalAddressEmptyErrorsByRequest)
-    }
-
-    fun validateLegalEntitiesToUpdateFromOrchestrator(taskReservationRequests: List<TaskStepReservationEntryDto>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityUpdateError>>> {
-
-        val legalAddressBridges = taskReservationRequests
-            .map {
-                AddressBridge(
-                    address = it.businessPartner.legalEntity?.legalAddress!!,
-                    request = it,
-                    bpnA = it.businessPartner.legalEntity?.legalAddress?.bpnAReference?.referenceValue!!
-                )
-            }
-
-        val additionalAddressBridges = taskReservationRequests.filter { it.businessPartner.site == null && it.businessPartner.address != null }
-            .map {
-                AddressBridge(
-                    address = it.businessPartner.address!!,
-                    request = it,
-                    bpnA = it.businessPartner.address?.bpnAReference?.referenceValue,
-                )
-            }
-
-        val leErrorsByRequest = validateLegalEntitiesToUpdate(taskReservationRequests.map {
-            LegalEntityUpdateBridge(
-                legalEntity = it.businessPartner.legalEntity!!,
-                request = it,
-                bpnL = it.businessPartner.legalEntity?.bpnLReference?.referenceValue!!
-            )
-        })
-        val addressErrorsByRequest = validateAddresses(legalAddressBridges + additionalAddressBridges, leUpdateMessages)
-        return mergeMapsWithCollectionInValue(leErrorsByRequest, addressErrorsByRequest)
-    }
-
-    fun validateSitesToCreateFromOrchestrator(taskReservationRequests: List<TaskStepReservationEntryDto>): Map<RequestWithKey, Collection<ErrorInfo<SiteCreateError>>> {
-
-        // parents have to be checked in the legal entity validation
-        val (requestsWithMainAddressNull, requestsWithMainAddressNotNull) = taskReservationRequests.partition { it.businessPartner.site?.mainAddress == null }
-
-        val siteMainAddressBridges = requestsWithMainAddressNotNull
-            .map {
-                AddressBridge(address = it.businessPartner.site?.mainAddress!!, request = it, bpnA = null)
-            }
-        val additionalAddressBridges = requestsWithMainAddressNotNull
-            .filter { it.businessPartner.site != null && it.businessPartner.address != null }
-            .map {
-                AddressBridge(address = it.businessPartner.address!!, request = it, bpnA = null)
-            }
-
-        val mainAddressEmptyErrorsByRequest = requestsWithMainAddressNull.associateWith {
-            listOf(ErrorInfo(SiteCreateError.MainAddressIdentifierNotFound, "Site main address is Empty", it.getRequestKey()))
+        val createBridges = legalEntitiesToCreate.map {
+            LegalEntityBridge(legalEntity = it.businessPartner.legalEntity!!, request = it, bpnL = null)
         }
-        val addressErrorsByRequest = validateAddresses(siteMainAddressBridges + additionalAddressBridges, siteCreateMessages)
-        return mergeMapsWithCollectionInValue(addressErrorsByRequest, mainAddressEmptyErrorsByRequest)
-    }
-
-    fun validateSitesToUpdateFromOrchestrator(taskReservationRequests: List<TaskStepReservationEntryDto>): Map<RequestWithKey, Collection<ErrorInfo<SiteUpdateError>>> {
-
-        val siteMainAddressBridges = taskReservationRequests.map {
-            AddressBridge(
-                address = it.businessPartner.site?.mainAddress!!,
-                request = it,
-                bpnA = it.businessPartner.site?.mainAddress?.bpnAReference?.referenceValue!!
+        val updateBridges = legalEntitiesToUpdate.map {
+            LegalEntityBridge(
+                legalEntity = it.businessPartner.legalEntity!!, request = it, bpnL = requestMappings.getBpn(it.businessPartner.legalEntity?.bpnLReference!!)!!
             )
         }
-        val additionalAddressBridges = taskReservationRequests.filter { it.businessPartner.site != null && it.businessPartner.address != null }
-            .map {
-                AddressBridge(
-                    address = it.businessPartner.address!!,
-                    request = it,
-                    bpnA = it.businessPartner.address?.bpnAReference?.referenceValue,
-                )
+
+        val leCreateErrorsByRequest = validateLegalEntitiesToCreate(createBridges)
+        val leUpdateErrorsByRequest = validateLegalEntitiesToUpdate(updateBridges)
+        val duplicateValidationsByRequest = validateLegalEntityDuplicates(createBridges + updateBridges)
+        return mergeMapsWithCollectionInValue(leCreateErrorsByRequest, leUpdateErrorsByRequest, duplicateValidationsByRequest, legalEntityEmptyErrorsByRequest)
+    }
+
+    private fun validateSitesFromOrchestrator(
+        taskEntries: List<TaskStepReservationEntryDto>,
+        requestMappings: TaskEntryBpnMapping
+    ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
+
+        // sites to create are not validated, because the check for the parent legal entities is already done in the legal entity validation
+
+        val sitesToUpdate = taskEntries
+            .filter {
+                isSiteUpdate(it.businessPartner, requestMappings)
             }
 
-        val siteErrorsByRequest = validateSitesToUpdate(taskReservationRequests.map {
-            SiteUpdateBridge( request = it, bpnS = it.businessPartner.site?.bpnSReference?.referenceValue!! )
+        return validateSitesToUpdate(sitesToUpdate.map {
+            SiteUpdateBridge(request = it, bpnS = requestMappings.getBpn(it.businessPartner.site?.bpnSReference!!)!!)
         })
-        val addressErrorsByRequest = validateAddresses(siteMainAddressBridges + additionalAddressBridges, siteUpdateMessages)
+    }
 
-        return mergeMapsWithCollectionInValue(siteErrorsByRequest, addressErrorsByRequest)
+    private fun validateAddressesFromOrchestrator(
+        taskEntries: List<TaskStepReservationEntryDto>,
+        requestMappings: TaskEntryBpnMapping
+    ): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
+
+        val (faultyTasksWithLegalAddressNull, validLegalEntityTasks) = taskEntries
+            .partition { it.businessPartner.legalEntity?.legalAddress?.bpnAReference == null }
+        val legalAddressEmptyErrorsByTask = faultyTasksWithLegalAddressNull.associateWith {
+            listOf(
+                ErrorInfo(
+                    LegalEntityCreateError.LegalAddressIdentifierNotFound,
+                    "Legal address or BpnA Reference of legal entity is Empty",
+                    it.getRequestKey()
+                )
+            )
+        }
+
+        val (faultyTasksWithMainAddressNull, validLegalEntityAndSiteTasks) = validLegalEntityTasks
+            .partition { it.businessPartner.site != null && it.businessPartner.site?.mainAddress?.bpnAReference == null }
+        val mainAddressEmptyErrorsByTask = faultyTasksWithMainAddressNull.associateWith {
+            listOf(
+                ErrorInfo(
+                    SiteCreateError.MainAddressIdentifierNotFound,
+                    "Site main address or BpnA Reference is Empty",
+                    it.getRequestKey()
+                )
+            )
+        }
+
+        val addressBridges = validLegalEntityAndSiteTasks.flatMap { getAddressBridges(it, requestMappings) }
+
+        return mergeMapsWithCollectionInValue(
+            legalAddressEmptyErrorsByTask,
+            mainAddressEmptyErrorsByTask,
+            validateAddresses(addressBridges, orchestratorMessages),
+            validateAddressDuplicates(addressBridges)
+        )
+    }
+
+    fun getAddressBridges(task: TaskStepReservationEntryDto, requestMappings: TaskEntryBpnMapping): List<AddressBridge> {
+
+        val allAddresses: MutableList<AddressBridge> = mutableListOf()
+        val businessPartner = task.businessPartner
+
+        businessPartner.legalEntity?.let { legalEntity ->
+            allAddresses.add(createAddressBridge(legalEntity.legalAddress!!, task, requestMappings))
+        }
+        businessPartner.site?.let { site ->
+            allAddresses.add(createAddressBridge(site.mainAddress!!, task, requestMappings))
+        }
+        businessPartner.address?.let { address ->
+            allAddresses.add(createAddressBridge(address, task, requestMappings))
+        }
+
+        return allAddresses
+    }
+
+    private fun createAddressBridge(
+        address: LogisticAddressDto,
+        task: TaskStepReservationEntryDto,
+        requestMappings: TaskEntryBpnMapping
+    ) = AddressBridge(
+        address = address,
+        request = task,
+        bpnA = requestMappings.getBpn(address.bpnAReference)
+    )
+
+    fun validateLegalEntityDuplicates(requestBridges: List<LegalEntityBridge>): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
+
+        val legalEntityDtos = requestBridges.map { it.legalEntity }
+        val duplicatesValidator = ValidateLegalEntityIdentifiersDuplicated(legalEntityDtos, LegalEntityCreateError.LegalEntityDuplicateIdentifier)
+
+        return requestBridges.associate {
+            it.request to duplicatesValidator.validate(it.legalEntity, it.request, it.bpnL)
+        }.filterValues { it.isNotEmpty() }
+    }
+
+    fun validateAddressDuplicates(requestBridges: List<AddressBridge>): Map<RequestWithKey, Collection<ErrorInfo<ErrorCode>>> {
+
+        val addressDtos = requestBridges.map { it.address }
+        val duplicatesValidator = ValidateAddressIdentifiersDuplicated(addressDtos, OrchestratorError.AddressDuplicateIdentifier)
+
+        return requestBridges.associate {
+            it.request to duplicatesValidator.validate(it.address, it.request, it.bpnA)
+        }.filterValues { it.isNotEmpty() }
     }
 
     fun validateLegalEntitiesToCreateFromController(leCreateRequests: Collection<LegalEntityPartnerCreateRequest>): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityCreateError>>> {
 
         val leErrorsByRequest = validateLegalEntitiesToCreate(leCreateRequests.map {
-            LegalEntityBridge(legalEntity = it.legalEntity, request = it)
+            LegalEntityBridge(legalEntity = it.legalEntity, request = it, bpnL = null)
         })
         val legalAddressBridges = leCreateRequests.map {
             AddressBridge(address = it.legalAddress, request = it, bpnA = null)
@@ -159,13 +227,13 @@ class RequestValidationService(
         requestBridges: List<LegalEntityBridge>
     ): Map<RequestWithKey, List<ErrorInfo<LegalEntityCreateError>>> {
 
-        val legalEntityDtos = requestBridges.map { it.legalEntity!! }
+        val legalEntityDtos = requestBridges.map { it.legalEntity }
         val duplicatesValidator = ValidateLegalEntityIdentifiersDuplicated(legalEntityDtos, LegalEntityCreateError.LegalEntityDuplicateIdentifier)
         val legalFormValidator = ValidateLegalFormExists(legalEntityDtos, LegalEntityCreateError.LegalFormNotFound)
         val identifierValidator = ValidateIdentifierLeTypesExists(legalEntityDtos, LegalEntityCreateError.LegalEntityIdentifierNotFound)
 
         return requestBridges.associate {
-            val legalEntityDto = it.legalEntity!!
+            val legalEntityDto = it.legalEntity
             val request = it.request
 
             val validationErrors =
@@ -181,7 +249,7 @@ class RequestValidationService(
     ): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityUpdateError>>> {
 
         val leErrorsByRequest = validateLegalEntitiesToUpdate(leRequests.map {
-            LegalEntityUpdateBridge(legalEntity = it.legalEntity, request = it, bpnL = it.bpnl)
+            LegalEntityBridge(legalEntity = it.legalEntity, request = it, bpnL = it.bpnl)
         })
 
         val addressBpnByLegalEntityBpnL = legalEntityRepository.findDistinctByBpnIn(leRequests.map { it.bpnl }).associate { it.bpn to it.legalAddress.bpn }
@@ -193,12 +261,12 @@ class RequestValidationService(
     }
 
     fun validateLegalEntitiesToUpdate(
-        requestBridges: Collection<LegalEntityUpdateBridge>
+        requestBridges: Collection<LegalEntityBridge>
     ): Map<RequestWithKey, Collection<ErrorInfo<LegalEntityUpdateError>>> {
 
         val legalEntityDtos = requestBridges.map { it.legalEntity }
         val duplicatesValidator = ValidateLegalEntityIdentifiersDuplicated(legalEntityDtos, LegalEntityUpdateError.LegalEntityDuplicateIdentifier)
-        val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(requestBridges.map { it.bpnL }).map { it.bpn }.toSet()
+        val existingLegalEntityBpns = legalEntityRepository.findDistinctByBpnIn(requestBridges.mapNotNull { it.bpnL }).map { it.bpn }.toSet()
         val existingBpnValidator = ValidateUpdateBpnExists(existingLegalEntityBpns, LegalEntityUpdateError.LegalEntityNotFound)
         val legalFormValidator = ValidateLegalFormExists(legalEntityDtos, LegalEntityUpdateError.LegalFormNotFound)
         val identifierValidator = ValidateIdentifierLeTypesExists(legalEntityDtos, LegalEntityUpdateError.LegalEntityIdentifierNotFound)
@@ -226,7 +294,7 @@ class RequestValidationService(
 
         val result: MutableMap<RequestWithKey, List<ErrorInfo<ERROR>>> = mutableMapOf()
         // there could be second bridge for the same request, e.g. main address and additional address
-            addressBridges.forEach{ bridge ->
+        addressBridges.forEach { bridge ->
             val legalAddressDto = bridge.address
             val request: RequestWithKey = bridge.request
             val validationErrors =
@@ -234,25 +302,23 @@ class RequestValidationService(
                         identifiersValidator.validate(legalAddressDto, request) +
                         identifiersDuplicateValidator.validate(legalAddressDto, request, bridge.bpnA)
 
-                if(validationErrors.isNotEmpty()) {
-                val existing = result[request];
+            if (validationErrors.isNotEmpty()) {
+                val existing = result[request]
                 if (existing == null) {
-                    result[request]  = validationErrors
+                    result[request] = validationErrors
                 } else {
-                    result[request]  = existing + validationErrors
+                    result[request] = existing + validationErrors
                 }
             }
         }
-        return result;
+        return result
     }
 
     fun validateSitesToCreateFromController(
         siteRequests: Collection<SitePartnerCreateRequest>,
     ): Map<RequestWithKey, Collection<ErrorInfo<SiteCreateError>>> {
 
-        val siteErrorsByRequest = validateSitesToCreate(siteRequests.map {
-            SiteCreateBridge(bpnlParent = it.bpnlParent, request = it)
-        })
+        val siteErrorsByRequest = validateSitesToCreate(siteRequests)
         val addressErrorsByRequest = validateAddresses(siteRequests.map {
             AddressBridge(address = it.site.mainAddress, request = it, bpnA = null)
         }, siteCreateMessages)
@@ -275,16 +341,16 @@ class RequestValidationService(
     }
 
     fun validateSitesToCreate(
-        requestBridges: Collection<SiteCreateBridge>,
+        requests: Collection<SitePartnerCreateRequest>,
     ): Map<RequestWithKey, Collection<ErrorInfo<SiteCreateError>>> {
 
-        val requestedParentBpns = requestBridges.map { it.bpnlParent }
+        val requestedParentBpns = requests.map { it.bpnlParent }
         val existingParentBpns = legalEntityRepository.findDistinctByBpnIn(requestedParentBpns).map { it.bpn }.toSet()
 
-        return requestBridges.associate { bridge ->
+        return requests.associate { request ->
             val validationErrors =
-                validateParentBpnExists(bridge.bpnlParent, bridge.request.getRequestKey(), existingParentBpns, SiteCreateError.LegalEntityNotFound)
-            bridge.request to validationErrors
+                validateParentBpnExists(request.bpnlParent, request.getRequestKey(), existingParentBpns, SiteCreateError.LegalEntityNotFound)
+            request to validationErrors
         }.filterValues { it.isNotEmpty() }
     }
 
@@ -391,8 +457,8 @@ class RequestValidationService(
     ) {
         private val existingTypes = metadataService.getIdentifiers(addressDtos).map { it.technicalKey }.toSet()
 
-        fun validate(address: IBaseLogisticAddressDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
-            val requestedTypes = address.identifiers.map { it.type }
+        fun validate(addressDto: IBaseLogisticAddressDto, entityKey: RequestWithKey): Collection<ErrorInfo<ERROR>> {
+            val requestedTypes = addressDto.identifiers.map { it.type }
             val missingTypes = requestedTypes - existingTypes
 
             return missingTypes.map {
@@ -433,8 +499,8 @@ class RequestValidationService(
         private val errorCode: ERROR
     ) {
 
-        fun validate(bpnToUpdate: String): Collection<ErrorInfo<ERROR>> {
-            return if (!existingBpns.contains(bpnToUpdate))
+        fun validate(bpnToUpdate: String?): Collection<ErrorInfo<ERROR>> {
+            return if (bpnToUpdate != null && !existingBpns.contains(bpnToUpdate))
                 listOf(ErrorInfo(errorCode, "Business Partner with BPN '$bpnToUpdate' can't be updated as it doesn't exist", bpnToUpdate))
             else
                 emptyList()
@@ -573,15 +639,9 @@ class RequestValidationService(
     )
 
     data class LegalEntityBridge(
-        val legalEntity: IBaseLegalEntityDto?,
-        val request: RequestWithKey
-    )
-
-    data class LegalEntityUpdateBridge(
-
         val legalEntity: IBaseLegalEntityDto,
         val request: RequestWithKey,
-        val bpnL: String
+        val bpnL: String?
     )
 
     data class AddressBridge(
@@ -589,12 +649,6 @@ class RequestValidationService(
         val request: RequestWithKey,
         val address: IBaseLogisticAddressDto,
         val bpnA: String?
-    )
-
-    data class SiteCreateBridge(
-
-        val request: RequestWithKey,
-        val bpnlParent: String
     )
 
     data class SiteUpdateBridge(
@@ -610,6 +664,12 @@ class RequestValidationService(
         val duplicateIdentifier: ERROR
     )
 
+
+    val orchestratorMessages = ValidatorErrorCodes(
+        regionNotFound = OrchestratorError.AddressRegionNotFound,
+        identifierNotFound = OrchestratorError.AddressIdentifierNotFound,
+        duplicateIdentifier = OrchestratorError.AddressDuplicateIdentifier
+    )
 
     val leCreateMessages = ValidatorErrorCodes(
         regionNotFound = LegalEntityCreateError.LegalAddressRegionNotFound,
