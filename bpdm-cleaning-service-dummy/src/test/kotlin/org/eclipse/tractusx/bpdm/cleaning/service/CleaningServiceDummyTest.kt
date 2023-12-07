@@ -66,7 +66,7 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val expectedAddress = expectedLogisticAddressDto.copy(bpnAReference = BpnReferenceDto(expectedBpnA.toString(), BpnReferenceType.Bpn))
 
-        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto)
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto, hasChanged = false)
 
         assertRecursively(resultedAddress).isEqualTo(expectedAddress)
 
@@ -97,7 +97,7 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val expectedAddress = expectedLogisticAddressDto.copy()
 
-        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto)
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto, hasChanged = false)
 
         // bpnAReference since they are generated
         assertRecursively(resultedAddress).ignoringFields("bpnAReference").isEqualTo(expectedAddress)
@@ -130,6 +130,7 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val expectedLegalEntity = expectedLegalEntityDto.copy(
             legalAddress = expectedLogisticAddressDto.copy(
+                hasChanged = false,
                 bpnAReference = BpnReferenceDto(
                     expectedBpnA.toString(),
                     BpnReferenceType.Bpn
@@ -174,7 +175,9 @@ class CleaningServiceDummyTest @Autowired constructor(
 
 
         val expectedLegalEntity = expectedLegalEntityDto.copy(
+            hasChanged = true,
             legalAddress = expectedLogisticAddressDto.copy(
+                hasChanged = false,
                 bpnAReference = BpnReferenceDto(
                     expectedBpnA.toString(),
                     BpnReferenceType.Bpn
@@ -183,7 +186,8 @@ class CleaningServiceDummyTest @Autowired constructor(
         )
 
         val expectedSite = expectedSiteDto.copy(
-            mainAddress = expectedLogisticAddressDto.copy(bpnAReference = BpnReferenceDto(expectedBpnA.toString(), BpnReferenceType.Bpn)),
+            hasChanged = true,
+            mainAddress = expectedLogisticAddressDto.copy(bpnAReference = BpnReferenceDto(expectedBpnA.toString(), BpnReferenceType.Bpn), hasChanged = false),
             bpnSReference = BpnReferenceDto(expectedBpnS.toString(), BpnReferenceType.Bpn)
         )
 
@@ -222,9 +226,9 @@ class CleaningServiceDummyTest @Autowired constructor(
         assertNotEquals(resultedAddress?.bpnAReference?.referenceValue, resultedLegalEntity?.legalAddress?.bpnAReference?.referenceValue)
         assertNotEquals(resultedAddress?.bpnAReference?.referenceValue, resultedSite?.mainAddress?.bpnAReference?.referenceValue)
 
-        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto.copy())
+        val expectedLegalEntity = expectedLegalEntityDto.copy(legalAddress = expectedLogisticAddressDto.copy(hasChanged = false), hasChanged = false)
 
-        val expectedSite = expectedSiteDto.copy(mainAddress = expectedLogisticAddressDto.copy())
+        val expectedSite = expectedSiteDto.copy(mainAddress = expectedLogisticAddressDto.copy(hasChanged = false), hasChanged = true)
 
 
         // ignoring bpnLReference and legalAddress.bpnAReference since they are generated

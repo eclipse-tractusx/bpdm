@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.cleaning.service
 
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.model.*
 
 
@@ -27,7 +28,7 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
 
     return LegalEntityDto(
         bpnLReference = bpnReferenceDto,
-        hasChanged = true,
+        hasChanged = postalAddress.addressType in setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress),
         legalName = nameParts.joinToString(" "),
         legalShortName = shortName,
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
@@ -66,9 +67,10 @@ fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {
 
 fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):
         LogisticAddressDto {
+
     return LogisticAddressDto(
         bpnAReference = bpnReferenceDto,
-        hasChanged = true,
+        hasChanged = postalAddress.addressType == AddressType.AdditionalAddress,
         name = nameParts.joinToString(" "),
         states = emptyList(),
         identifiers = emptyList(),
@@ -82,7 +84,7 @@ fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, legalN
 
     return SiteDto(
         bpnSReference = bpnReferenceDto,
-        hasChanged = true,
+        hasChanged = postalAddress.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
         name = legalName,
         states = states.mapNotNull { it.toSiteState() },
         mainAddress = siteAddressReference
