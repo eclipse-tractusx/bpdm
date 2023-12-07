@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.service
 
 import jakarta.transaction.Transactional
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.dto.AddressMetadataDto
@@ -73,7 +74,7 @@ class TaskStepBuildService(
 
         var siteEntity: Site? = null
         if (businessPartnerDto.site != null) {
-            siteEntity = upsertSite(businessPartnerDto.site, legalEntity, taskEntryBpnMapping)
+            siteEntity = upsertSite(businessPartnerDto.site, legalEntity, taskEntryBpnMapping, businessPartnerDto)
             siteResult = businessPartnerDto.site!!.copy(
                 bpnSReference = BpnReferenceDto(referenceValue = siteEntity.bpn, referenceType = BpnReferenceType.Bpn)
             )
@@ -284,7 +285,12 @@ class TaskStepBuildService(
         return upsertLe
     }
 
-    private fun upsertSite(siteDto: SiteDto?, legalEntity: LegalEntity, taskEntryBpnMapping: TaskEntryBpnMapping): Site {
+    private fun upsertSite(
+        siteDto: SiteDto?,
+        legalEntity: LegalEntity,
+        taskEntryBpnMapping: TaskEntryBpnMapping,
+        genericBusinessPartner: BusinessPartnerFullDto
+    ): Site {
 
         val bpnSReference = siteDto?.bpnSReference ?: throw BpdmValidationException(CleaningError.BPNS_IS_NULL.message)
         val mainAddress = siteDto.mainAddress ?: throw BpdmValidationException(CleaningError.MAINE_ADDRESS_IS_NULL.message)
@@ -296,10 +302,17 @@ class TaskStepBuildService(
             val bpnS = bpnIssuingService.issueSiteBpns(1).single()
             val createSite = BusinessPartnerBuildService.createSite(siteDto, bpnS, legalEntity)
             taskEntryBpnMapping.addMapping(bpnSReference, bpnS)
-            val address = createLogisticAddress(mainAddress, taskEntryBpnMapping)
-            createSite.mainAddress = address
-            address.site = createSite
+
+            val siteMainAddress =
+                if (genericBusinessPartner.generic.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                    legalEntity.legalAddress
+                else
+                    createLogisticAddress(mainAddress, taskEntryBpnMapping)
+
+            createSite.mainAddress = siteMainAddress
+            siteMainAddress.site = createSite
             createSite
+
         } else {
 
             val updateSite = siteRepository.findByBpn(bpn)
