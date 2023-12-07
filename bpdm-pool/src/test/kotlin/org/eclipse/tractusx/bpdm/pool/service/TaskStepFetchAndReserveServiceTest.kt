@@ -1340,16 +1340,14 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validTo.name)
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validFrom.name)
-                .ignoringFields(ISiteStateDto::type.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), SiteStateVerboseDto::validFrom.name)
+                .ignoringFields(SiteStateVerboseDto::typeVerbose.name)
                 .isEqualTo(sortedStates[it])
         }
     }
 
     fun isEqualToIgnoringMilliseconds(): BiPredicate<LocalDateTime?, LocalDateTime?> {
-
-
         return BiPredicate<LocalDateTime?, LocalDateTime?> { d1, d2 ->
             (d1 == null && d2 == null)
                     || d1.truncatedTo(ChronoUnit.SECONDS).equals(d2.truncatedTo(ChronoUnit.SECONDS))

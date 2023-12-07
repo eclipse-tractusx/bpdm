@@ -204,7 +204,7 @@ fun poolToGateSite(site: SiteVerboseDto): SiteGateDto {
             description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,
-            type = it.type.technicalKey
+            type = it.typeVerbose.technicalKey
         )
     }
     return SiteGateDto(
