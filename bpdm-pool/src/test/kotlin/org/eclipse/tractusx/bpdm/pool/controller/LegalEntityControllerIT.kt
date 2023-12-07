@@ -615,7 +615,7 @@ class LegalEntityControllerIT @Autowired constructor(
             .first() // search for first
 
         val identifierToFind = expected.identifiers.first()
-        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()
@@ -645,7 +645,7 @@ class LegalEntityControllerIT @Autowired constructor(
         var identifierToFind = expected.identifiers.first()
         identifierToFind = identifierToFind.copy(value = changeCase(identifierToFind.value))
 
-        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.type.technicalKey).legalEntity
+        val response = poolClient.legalEntities.getLegalEntity(identifierToFind.value, identifierToFind.typeVerbose.technicalKey).legalEntity
 
         assertThat(response)
             .usingRecursiveComparison()

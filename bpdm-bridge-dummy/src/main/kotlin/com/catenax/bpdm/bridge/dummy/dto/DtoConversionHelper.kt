@@ -169,7 +169,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
     val identifiers = legalEntity.identifiers.map {
         Gate_LegalEntityIdentifierDto(
             value = it.value,
-            type = it.type.technicalKey,
+            type = it.typeVerbose.technicalKey,
             issuingBody = it.issuingBody
         )
     }
@@ -178,12 +178,12 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
             description = it.description,
             validFrom = it.validFrom,
             validTo = it.validTo,
-            type = it.type.technicalKey
+            type = it.typeVerbose.technicalKey
         )
     }
     val classifications = legalEntity.classifications.map {
         Gate_LegalEntityClassificationDto(
-            type = it.type.technicalKey,
+            type = it.typeVerbose.technicalKey,
             code = it.code,
             value = it.value
         )
@@ -191,7 +191,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
     return Gate_LegalEntityDto(
         legalNameParts = listOfNotNull(legalEntity.legalName),
         legalShortName = legalEntity.legalShortName,
-        legalForm = legalEntity.legalForm?.technicalKey,
+        legalForm = legalEntity.legalFormVerbose?.technicalKey,
         identifiers = identifiers,
         states = states,
         classifications = classifications

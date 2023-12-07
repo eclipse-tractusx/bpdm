@@ -249,7 +249,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
@@ -286,7 +286,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
-            legalForm = legalForm2,
+            legalFormVerbose = legalForm2,
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
@@ -323,7 +323,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
-            legalForm = legalForm3,
+            legalFormVerbose = legalForm3,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
@@ -360,7 +360,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
@@ -379,7 +379,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
-            legalForm = legalForm2,
+            legalFormVerbose = legalForm2,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
@@ -398,7 +398,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
-            legalForm = legalForm3,
+            legalFormVerbose = legalForm3,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
@@ -417,7 +417,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(
                 LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X"),
                 LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")

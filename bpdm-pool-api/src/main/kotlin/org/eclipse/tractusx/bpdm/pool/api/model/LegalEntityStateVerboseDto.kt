@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityStateDescription
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
@@ -28,16 +31,17 @@ import java.time.LocalDateTime
 @Schema(description = LegalEntityStateDescription.header)
 data class LegalEntityStateVerboseDto(
 
-    @get:Schema(description = LegalEntityStateDescription.description)
-    val description: String?,
+    override val description: String?,
+    override val validFrom: LocalDateTime?,
+    override val validTo: LocalDateTime?,
 
-    @get:Schema(description = LegalEntityStateDescription.validFrom)
-    val validFrom: LocalDateTime?,
-
-    @get:Schema(description = LegalEntityStateDescription.validTo)
-    val validTo: LocalDateTime?,
-
-    // TODO OpenAPI description for complex field does not work!!
+    @field:JsonProperty("type")
     @get:Schema(description = LegalEntityStateDescription.type)
-    val type: TypeKeyNameVerboseDto<BusinessStateType>
-)
+    val typeVerbose: TypeKeyNameVerboseDto<BusinessStateType>
+
+) : ILegalEntityStateDto {
+
+    @get:JsonIgnore
+    override val type: BusinessStateType
+        get() = typeVerbose.technicalKey
+}

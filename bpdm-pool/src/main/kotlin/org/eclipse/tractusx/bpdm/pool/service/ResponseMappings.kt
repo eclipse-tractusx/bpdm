@@ -61,7 +61,7 @@ fun LegalEntity.toDto(): LegalEntityVerboseDto {
         bpnl = bpn,
         legalName = legalName.value,
         legalShortName = legalName.shortName,
-        legalForm = legalForm?.toDto(),
+        legalFormVerbose = legalForm?.toDto(),
         identifiers = identifiers.map { it.toDto() },
         states = states.map { it.toDto() },
         classifications = classifications.map { it.toDto() },

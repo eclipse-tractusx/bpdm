@@ -1325,9 +1325,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validTo.name )
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validFrom.name)
-                .ignoringFields(ILegalEntityStateDto::type.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validTo.name )
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), LegalEntityStateVerboseDto::validFrom.name)
+                .ignoringFields(LegalEntityStateVerboseDto::typeVerbose.name)
                 .isEqualTo(sortedStates[it])
         }
     }
@@ -1360,12 +1360,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     ) {
 
         assertThat(classificationsVerbose.size).isEqualTo(classifications?.size ?: 0)
-        val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.type.name }
+        val sortedVerboseClassifications = classificationsVerbose.sortedBy { it.typeVerbose.name }
         val sortedClassifications = classifications!!.sortedBy { it.type.name }
         sortedVerboseClassifications.indices.forEach {
             assertThat(sortedVerboseClassifications[it].typeVerbose.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
             assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityClassificationVerboseDto::type.name)
+                .ignoringFields(LegalEntityClassificationVerboseDto::typeVerbose.name)
                 .isEqualTo(sortedClassifications[it])
         }
     }
@@ -1378,9 +1378,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseIdentifiers.indices.forEach {
             assertThat(sortedVerboseIdentifiers[it].typeVerbose.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields(LegalEntityIdentifierVerboseDto::type.name).isEqualTo(sortedIdentifiers[it])
+                .ignoringFields(LegalEntityIdentifierVerboseDto::typeVerbose.name).isEqualTo(sortedIdentifiers[it])
         }
     }
-
 
 }
