@@ -19,14 +19,17 @@ import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAdd
 import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
+import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
-import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto2
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
+import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -63,7 +66,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             legalEntity = emptyLegalEntity()
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        val result = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
         assertTaskError(result[0], "TASK_1", CleaningError.LEGAL_ENTITY_IS_NULL)
     }
 
@@ -77,8 +80,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
-        assertTaskError(result[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertTaskError(createResult[0], "TASK_1", CleaningError.LEGAL_NAME_IS_NULL)
     }
 
     @Test
@@ -92,17 +95,17 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
-        val resultSteps = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
-        assertThat(resultSteps[0].taskId).isEqualTo("TASK_1")
-        assertThat(resultSteps[0].errors.size).isEqualTo(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
 
         val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue))
         assertThat(bpnMappings.size).isEqualTo(2)
 
-        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(resultSteps[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(resultSteps[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        compareLegalEntity(createdLegalEntity, resultSteps[0].businessPartner?.legalEntity)
+        assertThat(createResult[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
     }
 
     @Test
@@ -116,18 +119,215 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
-        val resultSteps = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
-        assertThat(resultSteps[0].taskId).isEqualTo("TASK_1")
-        assertThat(resultSteps[0].errors.size).isEqualTo(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
 
         val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue))
         assertThat(bpnMappings.size).isEqualTo(2)
 
-        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(resultSteps[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(resultSteps[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
-        compareLegalEntity(createdLegalEntity, resultSteps[0].businessPartner?.legalEntity)
+        assertThat(createResult[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
     }
+
+
+    @Test
+    fun `create legal entity with additional address`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val additionalAddressRefValue = "333"
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+            ),
+            address = minLogisticAddress(BpnReferenceDto(referenceValue = additionalAddressRefValue, referenceType = BpnRequestIdentifier))
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val bpnMappings = bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue, additionalAddressRefValue))
+        assertThat(bpnMappings.size).isEqualTo(3)
+
+        val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdLegalEntity.legalAddress.isLegalAddress).isTrue()
+        assertThat(createdLegalEntity.legalAddress.isMainAddress).isFalse()
+        assertThat(createResult[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
+        assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
+        assertThat(createdAdditionalAddress.isMainAddress).isFalse()
+    }
+
+    @Test
+    fun `create legal entity with invalid identifiers`() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ).copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                )
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Legal Entity Identifier Type 'Invalid' does not exist")
+    }
+
+    @Test
+    fun `create legal entity with invalid legal form`() {
+
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ).copy(
+                legalForm = "Invalid Form"
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Legal Form 'Invalid Form' does not exist")
+    }
+
+    @Test
+    fun `create legal entity with invalid duplicate identifier`() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ).copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1)
+                ),
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Duplicate Legal Entity Identifier: Value 'value_123_1' of type 'VAT_DE'")
+    }
+
+    @Test
+    fun `create 2 legal entities with invalid duplicate identifier`() {
+
+        val leRef1 = BpnReferenceDto(referenceValue = "111", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef1,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ).copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef1.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef1.referenceValue, 2L, BusinessPartnerVerboseValues.identifierType2)
+                ),
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val leRef2 = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity2 = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef2,
+                bpnAReference = BpnReferenceDto(referenceValue = "333", referenceType = BpnRequestIdentifier)
+            ).copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef1.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                ),
+            )
+        )
+        val resultSteps2 = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity2)
+        assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
+        assertThat(resultSteps2[0].errors.size).isEqualTo(1)
+        assertThat(resultSteps2[0].errors[0].description).isEqualTo("Duplicate Legal Entity Identifier: Value 'value_111_1' of type 'VAT_DE'")
+    }
+
+    @Test
+    fun `create legal entity with invalid address administrativeAreaLevel1`() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = bpnAReference
+            ).copy(
+                legalAddress = minLogisticAddress(bpnAReference).copy(
+                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference).copy(
+                        administrativeAreaLevel1 = "Invalid"
+                    )
+                )
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Address administrative area level1 'Invalid' does not exist")
+    }
+
+    @Test
+    fun `create legal entity with invalid address identifier`() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = bpnAReference
+            ).copy(
+                legalAddress = minLogisticAddress(bpnAReference).copy(
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(bpnAReference.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid Ident", ""))
+                    ),
+                )
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Address Identifier Type 'Invalid Ident' does not exist")
+    }
+
+    @Test
+    fun `create legal entity with invalid duplicated address identifier`() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = bpnAReference
+            ).copy(
+                legalAddress = minLogisticAddress(bpnAReference).copy(
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, ""))
+                    ),
+                )
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Duplicate Address Identifier: Value 'value_222_1' of type 'ADDR_KEY_ONE'")
+    }
+
 
     @Test
     fun `check that requests with same referenceValue don't create a new legal entity`() {
@@ -140,12 +340,12 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
-        val resultSteps1 = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
-        assertThat(resultSteps1[0].taskId).isEqualTo("TASK_1")
-        assertThat(resultSteps1[0].errors.size).isEqualTo(0)
-        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(resultSteps1[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
 
-        val resultSteps2 = cleanStep(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity)
+        val resultSteps2 = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity)
         assertThat(resultSteps2[0].taskId).isEqualTo("TASK_2")
         assertThat(resultSteps2[0].errors.size).isEqualTo(0)
         assertThat(createdLegalEntity1.legalEntity.bpnl).isEqualTo(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
@@ -162,10 +362,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
             )
         )
-        val resultSteps1 = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
-        assertThat(resultSteps1[0].taskId).isEqualTo("TASK_1")
-        assertThat(resultSteps1[0].errors.size).isEqualTo(0)
-        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(resultSteps1[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+        val createdLegalEntity1 = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
 
         val leRefValue2 = "diffenrentBpnL"
         val leAddressRefValue2 = "diffenrentBpnA"
@@ -176,7 +376,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val resultSteps2 = cleanStep(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity2)
+        val resultSteps2 = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = fullBpWithLegalEntity2)
         val bpnMappings =
             bpnRequestIdentifierRepository.findDistinctByRequestIdentifierIn(listOf(leRefValue, leAddressRefValue, leRefValue2, leAddressRefValue2))
         assertThat(bpnMappings.size).isEqualTo(4)
@@ -188,6 +388,206 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(resultSteps2[0].businessPartner?.generic?.legalEntityBpn).isEqualTo(createdLegalEntity2.legalEntity.bpnl)
     }
 
+    @Test
+    fun `update legal entity with all fields`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = fullValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = createResult[0].businessPartner?.copy(
+            legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                        legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
+                            hasChanged = true,
+                            name = "Changed Address Name"
+                        )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(0)
+
+        val updatedLegalEntity = poolClient.legalEntities.getLegalEntity(updateResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
+        assertThat(updatedLegalEntity.legalEntity.legalName).isEqualTo("Changed Legal Entity")
+        compareLegalEntity(updatedLegalEntity, updateResult[0].businessPartner?.legalEntity)
+    }
+
+    @Test
+    fun `update legal entity invalid identifier type `() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = createResult[0].businessPartner?.copy(
+            legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                ),
+                legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
+                    hasChanged = true,
+                    name = "Changed Address Name"
+                )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(1)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Legal Entity Identifier Type 'Invalid' does not exist")
+    }
+
+    @Test
+    fun `update legal entity invalid legal form `() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = createResult[0].businessPartner?.copy(
+            legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                legalForm = "Invalid Form",
+                legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
+                    hasChanged = true,
+                    name = "Changed Address Name"
+                )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(1)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Legal Form 'Invalid Form' does not exist")
+    }
+
+    @Test
+    fun `update legal entity not existing bpn `() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = createResult[0].businessPartner?.copy(
+            legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
+                bpnLReference= BpnReferenceDto(referenceValue = "InvalidBPN", referenceType = Bpn),
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
+                    hasChanged = true,
+                    name = "Changed Address Name"
+                )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(1)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Business Partner with BPN 'InvalidBPN' can't be updated as it doesn't exist")
+    }
+
+    @Test
+    fun `update legal entity with changed identifiers `() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier),
+            ).copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, BusinessPartnerVerboseValues.identifierType2)
+                )
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = createResult[0].businessPartner?.copy(
+            legalEntity = createResult[0].businessPartner?.legalEntity?.copy(
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 3L, BusinessPartnerVerboseValues.identifierType3),
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, BusinessPartnerVerboseValues.identifierType2)
+                ),
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                legalAddress = createResult[0].businessPartner?.legalEntity?.legalAddress?.copy(
+                    hasChanged = true,
+                    name = "Changed Address Name"
+                )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors.size).isEqualTo(0)
+    }
+
+    @Test
+    fun `update legal entity by reference value with invalid identifier type `() {
+
+        val leRef = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier)
+        val fullBpWithLegalEntity = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = leRef,
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            )
+        )
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithLegalEntity)
+        assertThat(createResult[0].errors.size).isEqualTo(0)
+
+        val updatedFullBpLegalEntity = fullBpWithLegalEntity.copy(
+            legalEntity = fullBpWithLegalEntity.legalEntity?.copy(
+                hasChanged = true,
+                legalName = "Changed Legal Entity",
+                identifiers = listOf(
+                    legalEntityIdentifierDto(leRef.referenceValue, 1L, BusinessPartnerVerboseValues.identifierType1),
+                    legalEntityIdentifierDto(leRef.referenceValue, 2L, TypeKeyNameVerboseDto("Invalid", "Invalid"))
+                ),
+                legalAddress = fullBpWithLegalEntity.legalEntity?.legalAddress?.copy(
+                    hasChanged = true,
+                    name = "Changed Address Name"
+                )
+            )
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpLegalEntity)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors[0].type).isEqualTo(TaskErrorType.Unspecified)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Legal Entity Identifier Type 'Invalid' does not exist")
+    }
 
     @Test
     fun `create Site with minimal fields`() {
@@ -207,10 +607,10 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithSite)
-        val createdSite = poolClient.sites.getSite(result[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors).hasSize(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
     }
 
@@ -232,46 +632,16 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithSite)
-        val createdSite = poolClient.sites.getSite(result[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors).hasSize(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
-        compareSite(createdSite, result[0].businessPartner?.site)
+        compareSite(createdSite, createResult[0].businessPartner?.site)
     }
 
     @Test
-    fun `update Site from orchestrator`() {
-
-        val leRefValue = "123"
-        val leAddressRefValue = "222"
-        val siteRefValue = "siteRefValue"
-        val mainAddressRefValue = "mainAddressRefValue"
-        val fullBpWithSite = minFullBusinessPartner().copy(
-            legalEntity = minValidLegalEntity(
-                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
-            ),
-            site = minValidSite(
-                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
-                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
-            )
-        )
-
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithSite)
-        val createdSite = poolClient.sites.getSite(result[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
-        assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
-
-        val updateCopy = fullBpWithSite.copy(
-            site = fullBpWithSite.site?.copy(name = "ChangedName", hasChanged = true)
-        )
-        val result2 = cleanStep(taskId = "TASK_1", businessPartner = updateCopy)
-        val updatedSite = poolClient.sites.getSite(result2[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
-        compareSite(updatedSite, result2[0].businessPartner?.site)
-    }
-
-    @Test
-    fun `create site address with minimal fields`() {
+    fun `create site with additional address`() {
 
         val leRefValue = "123"
         val leAddressRefValue = "222"
@@ -292,17 +662,283 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithAddress)
-        val createdLeAddress = poolClient.addresses.getAddress(result[0].businessPartner?.legalEntity?.legalAddress?.bpnAReference?.referenceValue!!)
-        val createdAdditionalAddress = poolClient.addresses.getAddress(result[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors).hasSize(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithAddress)
+        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.legalEntity?.legalAddress?.bpnAReference?.referenceValue!!)
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.name).isEqualTo(fullBpWithAddress.address?.name)
-        compareLogisticAddress(createdAdditionalAddress, result[0].businessPartner?.address)
+        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner?.address)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isNull()
-        assertThat(createdAdditionalAddress.bpnSite).isEqualTo(result[0].businessPartner?.site?.bpnSReference?.referenceValue)
+        assertThat(createdAdditionalAddress.bpnSite).isEqualTo(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue)
         assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
         assertThat(createdAdditionalAddress.isMainAddress).isFalse()
+    }
+
+
+    @Test
+    fun `create Site without main address`() {
+
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = fullValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+            ).copy(
+                mainAddress = null
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(1)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Site main address is Empty")
+    }
+
+    @Test
+    fun `create Site with invalid addresses administration level 1 and invalid identifier`() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReferenceDto(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = fullValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+            ).copy(
+                mainAddress = minLogisticAddress(bpnAReference).copy(
+                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference).copy(
+                        administrativeAreaLevel1 = "Invalid"
+                    ),
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto("InvalidKey1", "InvalidName1")),
+                    )
+                )
+            ),
+            address = minLogisticAddress(additionalReference).copy(
+                physicalPostalAddress = minPhysicalPostalAddressDto(additionalReference).copy(
+                    administrativeAreaLevel1 = "InvalidAdditional"
+                ),
+                identifiers = listOf(
+                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerboseDto("InvalidKey2", "InvalidName2")),
+                )
+            ),
+
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        val errorDescriptions = createResult[0].errors.map{it.description}
+        assertThat(errorDescriptions).containsExactlyInAnyOrder("Address administrative area level1 'Invalid' does not exist"
+            ,"Address administrative area level1 'InvalidAdditional' does not exist"
+            ,"Address Identifier Type 'InvalidKey1' does not exist"
+            ,"Address Identifier Type 'InvalidKey2' does not exist")
+    }
+
+    @Test
+    fun `create Site with duplicated identifier `() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReferenceDto(referenceValue = "additionalRef", referenceType = BpnRequestIdentifier)
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "mainAddressRefValue", referenceType = BpnRequestIdentifier)
+            ).copy(
+                mainAddress = minLogisticAddress(bpnAReference).copy(
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                    )
+                )
+            ),
+            address = minLogisticAddress(additionalReference).copy(
+                identifiers = listOf(
+                    addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                )
+            ),
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(2)
+        assertThat(createResult[0].errors[0].description).isEqualTo("Duplicate Address Identifier: Value 'value_222_1' of type 'ADDR_KEY_ONE'")
+    }
+
+    @Test
+    fun `update Site with minimal fields`() {
+
+        val leRefValue = "123"
+        val leAddressRefValue = "222"
+        val siteRefValue = "siteRefValue"
+        val mainAddressRefValue = "mainAddressRefValue"
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = leRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = leAddressRefValue, referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
+
+        val updateCopy = fullBpWithSite.copy(
+            site = fullBpWithSite.site?.copy(name = "ChangedName", hasChanged = true)
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateCopy)
+        val updatedSite = poolClient.sites.getSite(updateResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        compareSite(updatedSite, updateResult[0].businessPartner?.site)
+    }
+
+    @Test
+    fun `update Site with invalid bpnS`() {
+
+        val siteRefValue = "siteRefValue"
+        val mainAddressRefValue = "mainAddressRefValue"
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
+
+        val updateCopy = fullBpWithSite.copy(
+            site = fullBpWithSite.site?.copy(name = "ChangedName"
+                , hasChanged = true
+                , bpnSReference = BpnReferenceDto(referenceValue = "InvalidBPN", referenceType = Bpn),)
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = updateCopy)
+        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Business Partner with BPN 'InvalidBPN' can't be updated as it doesn't exist")
+    }
+
+    @Test
+    fun `update Site with invalid address administration level 1 and invalid identifier`() {
+
+        val bpnASiteReference = BpnReferenceDto(referenceValue =  "222", referenceType = BpnRequestIdentifier)
+        val additionalReference = BpnReferenceDto(referenceValue =  "7777", referenceType = BpnRequestIdentifier)
+        val siteRefValue = "siteRefValue"
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue =  "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = siteRefValue, referenceType = BpnRequestIdentifier),
+                bpnAReference = bpnASiteReference
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
+
+        val updatedFullBpSite = createResult[0].businessPartner?.copy(
+            site = createResult[0].businessPartner?.site?.copy(
+                name = "Changed Site",
+                hasChanged = true,
+                mainAddress = createResult[0].businessPartner?.site?.mainAddress?.copy(
+                    physicalPostalAddress = minPhysicalPostalAddressDto(bpnASiteReference).copy(
+                        administrativeAreaLevel1 = "Invalid"
+                    ),
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnASiteReference.referenceValue, 1L, TypeKeyNameVerboseDto("InvalidKey1", "InvalidName1")),
+                    )
+                )
+            ),
+            address = minLogisticAddress(additionalReference).copy(
+                physicalPostalAddress = minPhysicalPostalAddressDto(additionalReference).copy(
+                    administrativeAreaLevel1 = "InvalidAdditional"
+                ),
+                identifiers = listOf(
+                    addressIdentifierDto(additionalReference.referenceValue, 2L, TypeKeyNameVerboseDto("InvalidKey2", "InvalidName2")),
+                )
+            ),
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updatedFullBpSite!!)
+        assertThat(updateResult[0].taskId).isEqualTo("TASK_2")
+        val errorDescriptions = updateResult[0].errors.map{it.description}
+        assertThat(errorDescriptions).containsExactlyInAnyOrder("Address administrative area level1 'Invalid' does not exist"
+            ,"Address administrative area level1 'InvalidAdditional' does not exist"
+            ,"Address Identifier Type 'InvalidKey1' does not exist"
+            ,"Address Identifier Type 'InvalidKey2' does not exist")
+    }
+
+    @Test
+    fun `update Site with duplicated identifiers`() {
+
+        val bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val mainAddressRefValue = "mainAddressRefValue"
+        val additionalAddressReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+        val fullBpWithSite = minFullBusinessPartner().copy(
+            legalEntity = minValidLegalEntity(
+                bpnLReference = BpnReferenceDto(referenceValue = "123", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = "222", referenceType = BpnRequestIdentifier)
+            ),
+            site = minValidSite(
+                bpnSReference = BpnReferenceDto(referenceValue = "siteRefValue", referenceType = BpnRequestIdentifier),
+                bpnAReference = BpnReferenceDto(referenceValue = mainAddressRefValue, referenceType = BpnRequestIdentifier)
+            ).copy(
+                mainAddress = minLogisticAddress(bpnAReference).copy(
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                    )
+                )
+            ),
+            address = minLogisticAddress(
+                bpnAReference = additionalAddressReference,
+            ).copy(
+                identifiers = listOf(
+                    addressIdentifierDto(additionalAddressReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, "")),
+                )
+            )
+        )
+
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithSite)
+        val createdSite = poolClient.sites.getSite(createResult[0].businessPartner?.site?.bpnSReference?.referenceValue!!)
+        assertThat(createdSite.site.name).isEqualTo(fullBpWithSite.site?.name)
+
+        val updateCopy = createResult[0].businessPartner?.copy(
+            site = createResult[0].businessPartner?.site?.copy(
+                name = "ChangedName",
+                hasChanged = true,
+                mainAddress = createResult[0].businessPartner?.site?.mainAddress?.copy(
+                    identifiers = listOf(
+                        addressIdentifierDto(bpnAReference.referenceValue, 1L, TypeKeyNameVerboseDto(addressIdentifierTypeDto1.technicalKey, "")),
+                        addressIdentifierDto(additionalAddressReference.referenceValue, 2L, TypeKeyNameVerboseDto(addressIdentifierTypeDto2.technicalKey, "")),
+                    )
+                )
+            ),
+
+        )
+        val updateResult = upsertGoldenRecordIntoPool(taskId = "TASK_2", businessPartner = updateCopy!!)
+        assertThat(updateResult[0].errors).hasSize(1)
+        assertThat(updateResult[0].errors[0].description).isEqualTo("Duplicate Address Identifier: Value 'value_222_2' of type 'ADDR_KEY_TWO'")
     }
 
     @Test
@@ -321,21 +957,61 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
 
-        val result = cleanStep(taskId = "TASK_1", businessPartner = fullBpWithAddress)
-        val createdLeAddress = poolClient.addresses.getAddress(result[0].businessPartner?.legalEntity?.legalAddress?.bpnAReference?.referenceValue!!)
-        val createdAdditionalAddress = poolClient.addresses.getAddress(result[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
-        assertThat(result[0].taskId).isEqualTo("TASK_1")
-        assertThat(result[0].errors).hasSize(0)
+        val createResult = upsertGoldenRecordIntoPool(taskId = "TASK_1", businessPartner = fullBpWithAddress)
+        val createdLeAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.legalEntity?.legalAddress?.bpnAReference?.referenceValue!!)
+        val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
+        assertThat(createResult[0].taskId).isEqualTo("TASK_1")
+        assertThat(createResult[0].errors).hasSize(0)
         assertThat(createdLeAddress.isLegalAddress).isTrue()
         assertThat(createdAdditionalAddress.isMainAddress).isFalse()
         assertThat(createdAdditionalAddress.isLegalAddress).isFalse()
-        compareLogisticAddress(createdAdditionalAddress, result[0].businessPartner?.address)
+        compareLogisticAddress(createdAdditionalAddress, createResult[0].businessPartner?.address)
     }
 
-    fun cleanStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepResultEntryDto> {
+    @Test
+    @Disabled
+    fun `create multiple  legal entity without legal name`() {
 
-        val steps = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
-        return cleaningStepService.upsertGoldenRecordIntoPool(steps)
+        val referenceIds = (1.. 10000).toList()
+        val fullBpWithLegalEntity = referenceIds.map{
+            minFullBusinessPartner().copy(
+                legalEntity = fullValidLegalEntity(
+                    bpnLReference = BpnReferenceDto(referenceValue = ""+it, referenceType = BpnRequestIdentifier),
+                    bpnAReference = BpnReferenceDto(referenceValue = "address"+it, referenceType = BpnRequestIdentifier)
+                )
+            )
+        }
+
+        val taskSteps = multipleTaskStep(fullBpWithLegalEntity)
+        val createResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        assertThat(createResults).hasSize(10000)
+        assertThat(createResults.filter { it.errors.isNotEmpty() }).hasSize(0)
+
+        val updateResults = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps)
+        assertThat(updateResults).hasSize(10000)
+        assertThat(updateResults.filter { it.errors.isNotEmpty() }).hasSize(0)
+
+        val referenceIds2 = (10001.. 20000).toList()
+        val fullBpWithLegalEntity2 = referenceIds2.map{
+            minFullBusinessPartner().copy(
+                legalEntity = fullValidLegalEntity(
+                    bpnLReference = BpnReferenceDto(referenceValue = ""+it, referenceType = BpnRequestIdentifier),
+                    bpnAReference = BpnReferenceDto(referenceValue = "address"+it, referenceType = BpnRequestIdentifier)
+                )
+            )
+        }
+        val taskSteps2 = multipleTaskStep(fullBpWithLegalEntity2)
+        val createResults2 = cleaningStepService.upsertGoldenRecordIntoPool(taskSteps2)
+        assertThat(createResults2).hasSize(10000)
+        assertThat(createResults2.filter { it.errors.isNotEmpty() }).hasSize(0)
+    }
+
+
+
+    fun upsertGoldenRecordIntoPool(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepResultEntryDto> {
+
+        val taskStep = singleTaskStep(taskId = taskId, businessPartner = businessPartner)
+        return cleaningStepService.upsertGoldenRecordIntoPool(taskStep)
     }
 
     fun singleTaskStep(taskId: String, businessPartner: BusinessPartnerFullDto): List<TaskStepReservationEntryDto> {
@@ -347,6 +1023,18 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             )
         )
     }
+
+    fun multipleTaskStep(businessPartners: List<BusinessPartnerFullDto>): List<TaskStepReservationEntryDto> {
+
+        return businessPartners.map{
+            TaskStepReservationEntryDto(
+                taskId = it.legalEntity?.bpnLReference?.referenceValue!!,
+                businessPartner = it
+            )
+        }
+
+    }
+
 
     fun minFullBusinessPartner(): BusinessPartnerFullDto {
 
@@ -581,14 +1269,14 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         val verbosePhysicalAddress = verboseAddress.physicalPostalAddress
         val physicalAddress = address?.physicalPostalAddress
         assertThat(verbosePhysicalAddress).usingRecursiveComparison()
-            .ignoringFields("country", "administrativeAreaLevel1")
+            .ignoringFields(PhysicalPostalAddressVerboseDto::country.name, PhysicalPostalAddressVerboseDto::administrativeAreaLevel1.name)
             .isEqualTo(physicalAddress)
         assertThat(verbosePhysicalAddress.country.technicalKey.name).isEqualTo(physicalAddress?.country?.name)
         assertThat(verbosePhysicalAddress.administrativeAreaLevel1?.regionCode).isEqualTo(physicalAddress?.administrativeAreaLevel1)
         val verboseAlternAddress = verboseAddress.alternativePostalAddress
         val alternAddress = address?.alternativePostalAddress
         assertThat(verboseAlternAddress).usingRecursiveComparison()
-            .ignoringFields("country", "administrativeAreaLevel1")
+            .ignoringFields(AlternativePostalAddressDto::country.name , AlternativePostalAddressDto::administrativeAreaLevel1.name)
             .isEqualTo(alternAddress)
         assertThat(verboseAlternAddress?.country?.technicalKey?.name).isEqualTo(alternAddress?.country?.name)
         assertThat(verboseAlternAddress?.administrativeAreaLevel1?.regionCode).isEqualTo(alternAddress?.administrativeAreaLevel1)
@@ -602,9 +1290,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
-                .ignoringFields("type").isEqualTo(sortedStates[it])
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), AddressStateDto::validTo.name )
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(),  AddressStateDto::validFrom.name )
+                .ignoringFields(AddressStateDto::type.name).isEqualTo(sortedStates[it])
         }
     }
 
@@ -629,9 +1317,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
-                .ignoringFields("type")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validTo.name )
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ILegalEntityStateDto::validFrom.name)
+                .ignoringFields(ILegalEntityStateDto::type.name)
                 .isEqualTo(sortedStates[it])
         }
     }
@@ -644,9 +1332,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validTo")
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), "validFrom")
-                .ignoringFields("type")
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), IBaseSiteStateDto::validTo.name )
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), IBaseSiteStateDto::validFrom.name)
+                .ignoringFields(IBaseSiteStateDto::type.name)
                 .isEqualTo(sortedStates[it])
         }
     }
@@ -671,7 +1359,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseClassifications.indices.forEach {
             assertThat(sortedVerboseClassifications[it].type.technicalKey.name).isEqualTo(sortedClassifications[it].type.name)
             assertThat(sortedVerboseClassifications[it]).usingRecursiveComparison()
-                .ignoringFields("type")
+                .ignoringFields(LegalEntityClassificationVerboseDto::type.name)
                 .isEqualTo(sortedClassifications[it])
         }
     }
@@ -684,7 +1372,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseIdentifiers.indices.forEach {
             assertThat(sortedVerboseIdentifiers[it].type.technicalKey).isEqualTo(sortedIdentifiers[it].type)
             assertThat(sortedVerboseIdentifiers[it]).usingRecursiveComparison()
-                .ignoringFields("type").isEqualTo(sortedIdentifiers[it])
+                .ignoringFields(LegalEntityIdentifierVerboseDto::type.name).isEqualTo(sortedIdentifiers[it])
         }
     }
 
