@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.response.AlternativePostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.AlternativePostalAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressVerboseDto
 import java.time.Instant
 
 @Schema(name = "MainAddressResponse", description = "Main address for site")

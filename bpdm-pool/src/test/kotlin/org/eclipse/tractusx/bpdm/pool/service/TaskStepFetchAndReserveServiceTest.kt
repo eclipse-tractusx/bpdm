@@ -3,20 +3,17 @@ package org.eclipse.tractusx.bpdm.pool.service
 import com.neovisionaries.i18n.CountryCode
 import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteStateDto
 import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityStateDto
-import org.eclipse.tractusx.bpdm.common.dto.response.*
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.ISiteStateDto
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityClassificationVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityIdentifierVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityStateVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.LegalEntityWithLegalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.pool.api.model.response.SitePoolVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.response.SiteWithMainAddressVerboseDto
 import org.eclipse.tractusx.bpdm.pool.repository.BpnRequestIdentifierRepository
 import org.eclipse.tractusx.bpdm.pool.service.TaskStepBuildService.CleaningError
 import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerNonVerboseValues.addressIdentifierTypeDto1
@@ -25,9 +22,20 @@ import org.eclipse.tractusx.bpdm.pool.util.BusinessPartnerVerboseValues
 import org.eclipse.tractusx.bpdm.pool.util.PostgreSQLContextInitializer
 import org.eclipse.tractusx.bpdm.pool.util.TestHelpers
 import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.AddressIdentifierDto
+import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
+import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
-import org.junit.Ignore
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassificationDto
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
+import org.eclipse.tractusx.orchestrator.api.model.LegalEntityStateDto
+import org.eclipse.tractusx.orchestrator.api.model.LogisticAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.PhysicalPostalAddressDto
+import org.eclipse.tractusx.orchestrator.api.model.SiteDto
+import org.eclipse.tractusx.orchestrator.api.model.SiteStateDto
+import org.eclipse.tractusx.orchestrator.api.model.StreetDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -1244,7 +1252,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         compareLogisticAddress(verboseLegalAddress, legalEntity?.legalAddress)
     }
 
-    fun compareSite(verboseRequest: SitePoolVerboseDto, site: SiteDto?) {
+    fun compareSite(verboseRequest: SiteWithMainAddressVerboseDto, site: SiteDto?) {
 
         val verboseSite = verboseRequest.site
 
@@ -1324,7 +1332,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         }
     }
 
-    fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<IBaseSiteStateDto>?) {
+    fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<ISiteStateDto>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
         val sortedVerboseStates = statesVerbose.sortedBy { it.description }
@@ -1332,9 +1340,9 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].type.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), IBaseSiteStateDto::validTo.name )
-                .withEqualsForFields(isEqualToIgnoringMilliseconds(), IBaseSiteStateDto::validFrom.name)
-                .ignoringFields(IBaseSiteStateDto::type.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validTo.name)
+                .withEqualsForFields(isEqualToIgnoringMilliseconds(), ISiteStateDto::validFrom.name)
+                .ignoringFields(ISiteStateDto::type.name)
                 .isEqualTo(sortedStates[it])
         }
     }

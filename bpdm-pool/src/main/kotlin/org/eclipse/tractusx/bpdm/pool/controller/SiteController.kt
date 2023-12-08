@@ -19,15 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolSiteApi
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
-import org.eclipse.tractusx.bpdm.pool.service.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.AddressService
 import org.eclipse.tractusx.bpdm.pool.service.BusinessPartnerBuildService
+import org.eclipse.tractusx.bpdm.pool.service.SearchService
 import org.eclipse.tractusx.bpdm.pool.service.SiteService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.RestController
@@ -50,7 +49,7 @@ class SiteController(
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")
     override fun getSite(
         bpns: String
-    ): SitePoolVerboseDto {
+    ): SiteWithMainAddressVerboseDto {
         return siteService.findByBpn(bpns.uppercase())
     }
 
@@ -58,7 +57,7 @@ class SiteController(
     override fun searchSites(
         siteSearchRequest: SiteBpnSearchRequest,
         paginationRequest: PaginationRequest
-    ): PageDto<SitePoolVerboseDto> {
+    ): PageDto<SiteWithMainAddressVerboseDto> {
         return siteService.findByPartnerBpns(siteSearchRequest, paginationRequest)
     }
 

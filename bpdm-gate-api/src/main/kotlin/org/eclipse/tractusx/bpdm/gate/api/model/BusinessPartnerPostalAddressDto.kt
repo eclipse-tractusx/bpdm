@@ -25,7 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseBusinessPartnerPostalAddressDto
 data class BusinessPartnerPostalAddressDto(
 
     override val addressType: AddressType? = null,
-    override val physicalPostalAddress: PhysicalPostalAddressGateDto? = null,
-    override val alternativePostalAddress: AlternativePostalAddressGateDto? = null
+    override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null
 
 ) : IBaseBusinessPartnerPostalAddressDto

@@ -25,9 +25,9 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SitePartnerUpdateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
@@ -76,7 +76,7 @@ interface PoolSiteApi {
     @GetExchange("/{bpns}")
     fun getSite(
         @Parameter(description = "BPNS value") @PathVariable bpns: String
-    ): SitePoolVerboseDto
+    ): SiteWithMainAddressVerboseDto
 
     @Operation(
         summary = "Returns sites by an array of BPNS and/or an array of corresponding BPNL",
@@ -93,7 +93,7 @@ interface PoolSiteApi {
     fun searchSites(
         @RequestBody siteSearchRequest: SiteBpnSearchRequest,
         @ParameterObject paginationRequest: PaginationRequest
-    ): PageDto<SitePoolVerboseDto>
+    ): PageDto<SiteWithMainAddressVerboseDto>
 
     @Operation(
         summary = "Creates a new site",

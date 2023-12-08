@@ -22,11 +22,11 @@ package org.eclipse.tractusx.bpdm.pool.api.model.request
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.RequestWithKey
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityDescription
 import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializer
 import org.eclipse.tractusx.bpdm.pool.api.model.LegalEntityDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
 
 @JsonDeserialize(using = DataClassUnwrappedJsonDeserializer::class)
 @Schema(description = LegalEntityDescription.headerUpdateRequest)

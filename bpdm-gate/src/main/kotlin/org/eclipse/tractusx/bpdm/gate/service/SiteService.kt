@@ -19,15 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import mu.KotlinLogging
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNotFoundException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateInputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.request.SiteGateOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteGateOutputResponse
-import org.eclipse.tractusx.bpdm.gate.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.Site
 import org.eclipse.tractusx.bpdm.gate.repository.SiteRepository
 import org.springframework.data.domain.Page
@@ -36,12 +34,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class SiteService(
-    private val bpnConfigProperties: BpnConfigProperties,
     private val sitePersistenceService: SitePersistenceService,
     private val siteRepository: SiteRepository,
-    private val sharingStateService: SharingStateService
 ) {
-    private val logger = KotlinLogging.logger { }
 
     fun getSites(page: Int, size: Int, externalIds: Collection<String>? = null): PageDto<SiteGateInputDto> {
 

@@ -20,8 +20,8 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
 
 @Schema(description = LegalEntityIdentifierDescription.header)
 data class LegalEntityIdentifierVerboseDto(

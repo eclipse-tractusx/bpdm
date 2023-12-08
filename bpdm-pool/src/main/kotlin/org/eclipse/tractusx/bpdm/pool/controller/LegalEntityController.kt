@@ -19,11 +19,11 @@
 
 package org.eclipse.tractusx.bpdm.pool.controller
 
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.api.PoolLegalEntityApi
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.BusinessPartnerSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerCreateRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPartnerUpdateRequest
@@ -31,7 +31,6 @@ import org.eclipse.tractusx.bpdm.pool.api.model.request.LegalEntityPropertiesSea
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.config.BpnConfigProperties
 import org.eclipse.tractusx.bpdm.pool.config.ControllerConfigProperties
-import org.eclipse.tractusx.bpdm.pool.config.PoolSecurityConfigProperties
 import org.eclipse.tractusx.bpdm.pool.service.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -46,8 +45,7 @@ class LegalEntityController(
     val bpnConfigProperties: BpnConfigProperties,
     val controllerConfigProperties: ControllerConfigProperties,
     val siteService: SiteService,
-    val addressService: AddressService,
-    val poolSecurityConfigProperties: PoolSecurityConfigProperties
+    val addressService: AddressService
 ) : PoolLegalEntityApi {
 
     @PreAuthorize("hasAuthority(@poolSecurityConfigProperties.getReadPoolPartnerDataAsRole())")

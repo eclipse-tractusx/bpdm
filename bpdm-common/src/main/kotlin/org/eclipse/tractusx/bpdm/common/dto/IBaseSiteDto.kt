@@ -30,7 +30,7 @@ interface IBaseSiteDto {
     val name: String?
 
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.states))
-    val states: Collection<IBaseSiteStateDto>
+    val states: Collection<ISiteStateDto>
 
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = SiteDescription.mainAddress)

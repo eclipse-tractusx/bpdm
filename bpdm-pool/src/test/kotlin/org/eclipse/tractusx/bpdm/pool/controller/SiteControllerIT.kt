@@ -20,16 +20,12 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierBusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.IdentifierTypeDto
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
-import org.eclipse.tractusx.bpdm.common.dto.request.PaginationRequest
-import org.eclipse.tractusx.bpdm.common.dto.request.SiteBpnSearchRequest
-import org.eclipse.tractusx.bpdm.common.dto.response.LogisticAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.response.SiteVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
+import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
 import org.junit.jupiter.api.BeforeEach
@@ -109,11 +105,11 @@ class SiteControllerIT @Autowired constructor(
         val siteSearchRequest = SiteBpnSearchRequest(emptyList(), listOf(bpnS1, bpnS2))
         val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
-        val expectedSiteWithReference1 = SitePoolVerboseDto(
+        val expectedSiteWithReference1 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
         )
-        val expectedSiteWithReference2 = SitePoolVerboseDto(
+        val expectedSiteWithReference2 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
             mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
         )
@@ -121,7 +117,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2))
     }
@@ -156,17 +152,17 @@ class SiteControllerIT @Autowired constructor(
         val searchResult = poolClient.sites.searchSites(siteSearchRequest, PaginationRequest())
 
         val expectedSiteWithReference1 =
-            SitePoolVerboseDto(
+            SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
             )
         val expectedSiteWithReference2 =
-            SitePoolVerboseDto(
+            SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
             )
         val expectedSiteWithReference3 =
-            SitePoolVerboseDto(
+            SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
                 mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site3.bpns)
             )
@@ -174,7 +170,7 @@ class SiteControllerIT @Autowired constructor(
         testHelpers.assertRecursively(searchResult.content)
             .ignoringFieldsOfTypes(Instant::class.java)
             .ignoringFields(
-                SitePoolVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
+                SiteWithMainAddressVerboseDto::mainAddress.name + "." + LogisticAddressVerboseDto::bpna.name,
             )
             .isEqualTo(listOf(expectedSiteWithReference1, expectedSiteWithReference2, expectedSiteWithReference3))
     }

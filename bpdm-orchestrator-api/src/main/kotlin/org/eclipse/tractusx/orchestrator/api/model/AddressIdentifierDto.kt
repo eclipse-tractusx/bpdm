@@ -19,10 +19,11 @@
 
 package org.eclipse.tractusx.orchestrator.api.model
 
-import org.eclipse.tractusx.bpdm.common.dto.IBaseAddressIdentifierDto
+import org.eclipse.tractusx.bpdm.common.dto.IAddressIdentifierDto
 
 data class AddressIdentifierDto(
+
     override val value: String,
     override val type: String
 
-) : IBaseAddressIdentifierDto
+) : IAddressIdentifierDto

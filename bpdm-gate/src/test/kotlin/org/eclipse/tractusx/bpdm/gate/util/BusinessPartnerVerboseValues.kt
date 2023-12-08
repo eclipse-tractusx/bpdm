@@ -20,9 +20,10 @@
 package org.eclipse.tractusx.bpdm.gate.util
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.dto.response.PhysicalPostalAddressVerboseDto
-import org.eclipse.tractusx.bpdm.common.dto.response.type.TypeKeyNameVerboseDto
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
+import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
@@ -224,7 +225,7 @@ object BusinessPartnerVerboseValues {
         type = businessStateType2
     )
 
-    val alternativeAddressFull = AlternativePostalAddressGateDto(
+    val alternativeAddressFull = AlternativePostalAddressDto(
         country = CountryCode.DE,
         city = "Stuttgart",
         deliveryServiceType = DeliveryServiceType.PO_BOX,
@@ -235,7 +236,7 @@ object BusinessPartnerVerboseValues {
         administrativeAreaLevel1 = "adminAreaLevel1RegionCode_2",
     )
 
-    val postalAddress1 = PhysicalPostalAddressGateDto(
+    val postalAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
@@ -249,10 +250,10 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetGateDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
     )
 
-    val postalAddress2 = PhysicalPostalAddressGateDto(
+    val postalAddress2 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
         country = CountryCode.US,
         postalCode = "70547",
@@ -266,10 +267,10 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetGateDto(name = "TODO", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1"),
     )
 
-    val postalAddress3 = PhysicalPostalAddressGateDto(
+    val postalAddress3 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
@@ -283,7 +284,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetGateDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
     )
 
     val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressDto(
@@ -292,15 +293,15 @@ object BusinessPartnerVerboseValues {
         alternativePostalAddress = alternativeAddressFull
     )
 
-    val physicalAddress1 = LogisticAddressGateDto(
+    val physicalAddress1 = LogisticAddressDto(
         physicalPostalAddress = postalAddress1,
     )
 
-    val physicalAddress2 = LogisticAddressGateDto(
+    val physicalAddress2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
     )
 
-    val physicalAddress3 = LogisticAddressGateDto(
+    val physicalAddress3 = LogisticAddressDto(
         physicalPostalAddress = postalAddress3,
     )
 
@@ -320,42 +321,8 @@ object BusinessPartnerVerboseValues {
         addressBpn = "BPNA0000000001XY"
     )
 
-    val address1 = PhysicalPostalAddressVerboseDto(
-        geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
-        country = country1,
-        postalCode = "70546 ",
-        city = "Stuttgart",
-        administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = "Stuttgart",
-        administrativeAreaLevel3 = null,
-        district = "Vaihingen",
-        companyPostalCode = null,
-        industrialZone = "Werk 1",
-        building = "Bauteil A",
-        floor = "Etage 1",
-        door = "Door One",
-        street = StreetDto("Mercedesstraße", ""),
-    )
-
-    val address2 = PhysicalPostalAddressVerboseDto(
-        geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
-        country = country2,
-        postalCode = "70547",
-        city = "Atlanta",
-        administrativeAreaLevel1 = null,
-        administrativeAreaLevel2 = " Fulton County",
-        administrativeAreaLevel3 = null,
-        district = "TODO",
-        companyPostalCode = null,
-        industrialZone = "Industrial Zone Two",
-        building = "Building Two",
-        floor = "Floor Two",
-        door = "Door Two",
-        street = StreetDto("TODO", ""),
-    )
-
     //New Values for Logistic Addresses Tests
-    val postalAddressLogisticAddress1 = PhysicalPostalAddressGateDto(
+    val postalAddressLogisticAddress1 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(13.178f, 48.946f),
         country = CountryCode.DE,
         postalCode = "70546 ",
@@ -369,10 +336,10 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetGateDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
     )
 
-    val postalAddressLogisticAddress2 = PhysicalPostalAddressGateDto(
+    val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
         geographicCoordinates = GeoCoordinateDto(7.619f, 45.976f, 4478f),
         country = CountryCode.US,
         postalCode = "70547",
@@ -386,15 +353,15 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetGateDto(name = "TODO", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1"),
     )
 
     //New Values for Logistic Address Tests
-    val logisticAddress1 = LogisticAddressGateDto(
+    val logisticAddress1 = LogisticAddressDto(
         physicalPostalAddress = postalAddressLogisticAddress1,
     )
 
-    val logisticAddress2 = LogisticAddressGateDto(
+    val logisticAddress2 = LogisticAddressDto(
         physicalPostalAddress = postalAddressLogisticAddress2,
     )
 
@@ -591,7 +558,7 @@ object BusinessPartnerVerboseValues {
         bpna = "BPNA0000000001XY"
     )
 
-    val physicalAddressMinimal = PhysicalPostalAddressGateDto(
+    val physicalAddressMinimal = PhysicalPostalAddressDto(
         country = CountryCode.DE,
         city = "Stuttgart",
         geographicCoordinates = null,
@@ -608,7 +575,7 @@ object BusinessPartnerVerboseValues {
         street = null,
     )
 
-    val physicalAddressChina = PhysicalPostalAddressGateDto(
+    val physicalAddressChina = PhysicalPostalAddressDto(
         country = CountryCode.CH,
         city = "北京市",
         geographicCoordinates = null,
@@ -743,7 +710,7 @@ object BusinessPartnerVerboseValues {
         ),
         postalAddress = BusinessPartnerPostalAddressDto(
             addressType = AddressType.AdditionalAddress,
-            physicalPostalAddress = PhysicalPostalAddressGateDto(
+            physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",
@@ -752,7 +719,7 @@ object BusinessPartnerVerboseValues {
                 postalCode = "phys-postal-code-cleaned",
                 city = "city",
                 district = "district",
-                street = StreetGateDto(
+                street = StreetDto(
                     name = "name",
                     houseNumber = "house-number",
                     milestone = "milestone",
@@ -769,7 +736,7 @@ object BusinessPartnerVerboseValues {
                 floor = "floor",
                 door = "door"
             ),
-            alternativePostalAddress = AlternativePostalAddressGateDto(
+            alternativePostalAddress = AlternativePostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.6f, 0.6f, 0.6f),
                 country = CountryCode.PT,
                 administrativeAreaLevel1 = "PT-PT",

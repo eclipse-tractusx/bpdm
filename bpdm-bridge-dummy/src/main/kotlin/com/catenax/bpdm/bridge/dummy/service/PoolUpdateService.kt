@@ -22,10 +22,10 @@ package com.catenax.bpdm.bridge.dummy.service
 import com.catenax.bpdm.bridge.dummy.dto.*
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
-import org.eclipse.tractusx.bpdm.common.dto.LogisticAddressDto
-import org.eclipse.tractusx.bpdm.common.dto.SiteDto
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.*
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.springframework.stereotype.Service
@@ -75,7 +75,7 @@ class PoolUpdateService(
                     SitePartnerCreateRequest(
                         site = SiteDto(
                             name = entry.site.nameParts.firstOrNull() ?: "",
-                            states = entry.site.states,
+                            states = entry.site.states.map(::gateToPoolSiteState),
                             mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
                         ),
                         index = entry.externalId,
@@ -99,7 +99,7 @@ class PoolUpdateService(
             SitePartnerUpdateRequest(
                 site = SiteDto(
                     name = it.site.nameParts.firstOrNull() ?: "",
-                    states = it.site.states,
+                    states = it.site.states.map(::gateToPoolSiteState),
                     mainAddress = gateToPoolLogisticAddress(it.mainAddress),
                 ),
                 bpns = it.bpn!!
@@ -138,8 +138,8 @@ class PoolUpdateService(
                     AddressPartnerCreateRequest(
                         address = LogisticAddressDto(
                             name = entry.address.nameParts.firstOrNull(),
-                            states = entry.address.states,
-                            identifiers = entry.address.identifiers,
+                            states = entry.address.states.map(::gateToPoolAddressState),
+                            identifiers = entry.address.identifiers.map(::gateToPoolAddressIdentifier),
                             physicalPostalAddress = gateToPoolPhysicalAddress(entry.address.physicalPostalAddress),
                             alternativePostalAddress = entry.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
                         ),
@@ -178,8 +178,8 @@ class PoolUpdateService(
             AddressPartnerUpdateRequest(
                 address = LogisticAddressDto(
                     name = it.address.nameParts.firstOrNull(),
-                    states = it.address.states,
-                    identifiers = it.address.identifiers,
+                    states = it.address.states.map(::gateToPoolAddressState),
+                    identifiers = it.address.identifiers.map(::gateToPoolAddressIdentifier),
                     physicalPostalAddress = gateToPoolPhysicalAddress(it.address.physicalPostalAddress),
                     alternativePostalAddress = it.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
                 ),
