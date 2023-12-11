@@ -115,6 +115,8 @@ startupProbe:
 
 # Used to overwrite the default property values of the application configuration
 applicationConfig:
+  server:
+    port: 8083
 #  bpdm:
 #    pool:
 #      base-url: ...

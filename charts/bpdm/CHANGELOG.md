@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
+## [4.0.0] - tbd
+
+### Changed
+
+- update application version to 5.0.0
+
+## [3.1.2] - 2023-11-16
+
+### Changed
+
+- update BPDM Pool dependency to 5.1.1
+- remove Opensearch dependency
+
+## [3.1.1] - 2023-11-10
+
+### Changed
+
+- update application version to 4.1.0
+
 ## [3.1.0] - 2023-11-03
 
 ### Added
@@ -19,4 +38,4 @@ The format is based on Keep a Changelog (https://keepachangelog.com/en/1.0.0/),
 
 ### Changed
 
-- increase to app version 4.0.1
+- update application version to 4.0.1
