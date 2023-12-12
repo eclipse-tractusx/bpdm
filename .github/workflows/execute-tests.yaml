@@ -54,8 +54,8 @@ jobs:
         if: always() # clause guarantees that this action always runs, even if earlier steps (e.g., the unit test step) in your workflow fail.
         with:
           files: |
-            bpdm-gate/target/failsafe-reports/**/*.xml
-            bpdm-orchestrator/target/failsafe-reports/**/*.xml
-            bpdm-orchestrator/target/surefire-reports/**/*.xml
-            bpdm-pool/target/failsafe-reports/**/*.xml
-            bpdm-pool/target/surefire-reports/**/*.xml
+            bpdm-gate/target/failsafe-reports/**/TEST-*.xml
+            bpdm-orchestrator/target/failsafe-reports/**/TEST-*.xml
+            bpdm-orchestrator/target/surefire-reports/**/TEST-*.xml
+            bpdm-pool/target/failsafe-reports/**/TEST-*.xml
+            bpdm-pool/target/surefire-reports/**/TEST-*.xml
