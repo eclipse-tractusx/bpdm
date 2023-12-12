@@ -49,3 +49,10 @@ jobs:
         run: ./mvnw -B verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always() # clause guarantees that this action always runs, even if earlier steps (e.g., the unit test step) in your workflow fail.
+        with:
+          files: |
+            "*/target/surefire-reports/*.xml"
+            "*/target/failsafe-reports/*.xml"
