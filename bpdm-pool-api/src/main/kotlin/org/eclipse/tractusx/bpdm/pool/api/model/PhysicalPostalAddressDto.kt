@@ -46,12 +46,4 @@ data class PhysicalPostalAddressDto(
     override val floor: String?,
     override val door: String?
 
-) : IBasePhysicalPostalAddressDto {
-    override fun adminLevel1Key(): String? {
-        return administrativeAreaLevel1
-    }
-
-    override fun countryCode(): CountryCode {
-        return country
-    }
-}
+) : IBasePhysicalPostalAddressDto

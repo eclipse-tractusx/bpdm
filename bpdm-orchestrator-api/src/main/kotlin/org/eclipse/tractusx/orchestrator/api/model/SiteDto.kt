@@ -21,7 +21,6 @@ package org.eclipse.tractusx.orchestrator.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 
 data class SiteDto(
 
@@ -32,9 +31,8 @@ data class SiteDto(
     val hasChanged: Boolean? = null,
 
     override val name: String? = null,
-
     override val states: Collection<SiteStateDto> = emptyList(),
 
-    override val mainAddress: LogisticAddressDto? = null
+    val mainAddress: LogisticAddressDto? = null
 
 ) : IBaseSiteDto

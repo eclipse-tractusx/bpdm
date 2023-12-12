@@ -155,8 +155,8 @@ class MetadataService(
         val idTypeKeys = requests.flatMap { it.identifiers }.map { it.type }.toSet()
         val idTypes = identifierTypeRepository.findByBusinessPartnerTypeAndTechnicalKeyIn(IdentifierBusinessPartnerType.ADDRESS, idTypeKeys)
 
-        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.adminLevel1Key() }
-            .plus(requests.mapNotNull { it.alternativePostalAddress?.adminLevel1Key() })
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
 
@@ -165,8 +165,8 @@ class MetadataService(
 
     fun getRegions(requests: Collection<IBaseLogisticAddressDto>): Set<Region> {
 
-        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.adminLevel1Key() }
-            .plus(requests.mapNotNull { it.alternativePostalAddress?.adminLevel1Key() })
+        val regionKeys = requests.mapNotNull { it.physicalPostalAddress?.administrativeAreaLevel1 }
+            .plus(requests.mapNotNull { it.alternativePostalAddress?.administrativeAreaLevel1 })
             .toSet()
         val regions = regionRepository.findByRegionCodeIn(regionKeys)
         return regions

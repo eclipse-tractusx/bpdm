@@ -99,10 +99,10 @@ object BusinessPartnerVerboseValues {
 
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country1,
+        countryVerbose = country1,
         postalCode = "71059 ",
         city = "Böblingen",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = "Böblingen",
         administrativeAreaLevel3 = null,
         district = "Sindelfingen-Ost",
@@ -116,10 +116,10 @@ object BusinessPartnerVerboseValues {
 
     val address2 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country2,
+        countryVerbose = country2,
         postalCode = "70547",
         city = "Atlanta",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = " Fulton County",
         administrativeAreaLevel3 = null,
         district = "District Level 1",
@@ -133,10 +133,10 @@ object BusinessPartnerVerboseValues {
 
     val address3 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
-        country = country3,
+        countryVerbose = country3,
         postalCode = "30346",
         city = "Atlanta",
-        administrativeAreaLevel1 = null,
+        administrativeAreaLevel1Verbose = null,
         administrativeAreaLevel2 = " Fulton County",
         administrativeAreaLevel3 = null,
         district = "DL 1",
@@ -249,7 +249,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
@@ -261,10 +261,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country1,
+                countryVerbose = country1,
                 postalCode = null,
                 city = "Stuttgart",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,
@@ -286,7 +286,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
-            legalForm = legalForm2,
+            legalFormVerbose = legalForm2,
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
@@ -298,10 +298,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country2,
+                countryVerbose = country2,
                 postalCode = null,
                 city = "5th Congressional District",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,
@@ -323,7 +323,7 @@ object BusinessPartnerVerboseValues {
         LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
-            legalForm = legalForm3,
+            legalFormVerbose = legalForm3,
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
@@ -335,10 +335,10 @@ object BusinessPartnerVerboseValues {
             bpna = "BPNA000000000001",
             physicalPostalAddress = PhysicalPostalAddressVerboseDto(
                 geographicCoordinates = null,
-                country = country3,
+                countryVerbose = country3,
                 postalCode = null,
                 city = "北京市",
-                administrativeAreaLevel1 = null,
+                administrativeAreaLevel1Verbose = null,
                 administrativeAreaLevel2 = null,
                 administrativeAreaLevel3 = null,
                 district = null,
@@ -360,7 +360,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X")),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
@@ -379,7 +379,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000001YN",
             legalName = "Another Organisation Corp",
-            legalForm = legalForm2,
+            legalFormVerbose = legalForm2,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
@@ -398,7 +398,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL0000000002XY",
             legalName = "好公司  合伙制企业",
-            legalForm = legalForm3,
+            legalFormVerbose = legalForm3,
             identifiers = listOf(LegalEntityIdentifierVerboseDto("An ID Value", identifierType3, "Official Z")),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
@@ -417,7 +417,7 @@ object BusinessPartnerVerboseValues {
         legalEntity = LegalEntityVerboseDto(
             bpnl = "BPNL000000000001",
             legalName = "Business Partner Name",
-            legalForm = legalForm1,
+            legalFormVerbose = legalForm1,
             identifiers = listOf(
                 LegalEntityIdentifierVerboseDto("ID-XYZ", identifierType1, "Agency X"),
                 LegalEntityIdentifierVerboseDto("Another ID Value", identifierType2, "Body Y")

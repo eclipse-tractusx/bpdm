@@ -19,20 +19,27 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.ILegalEntityIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LegalEntityIdentifierDescription
 
 @Schema(description = LegalEntityIdentifierDescription.header)
 data class LegalEntityIdentifierVerboseDto(
 
-    @get:Schema(description = LegalEntityIdentifierDescription.value)
-    val value: String,
+    override val value: String,
 
-    // TODO OpenAPI description for complex field does not work!!
+    @field:JsonProperty("type")
     @get:Schema(description = LegalEntityIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
+    val typeVerbose: TypeKeyNameVerboseDto<String>,
 
-    @get:Schema(description = LegalEntityIdentifierDescription.issuingBody)
-    val issuingBody: String? = null
-)
+    override val issuingBody: String? = null
+
+) : ILegalEntityIdentifierDto {
+
+    @get:JsonIgnore
+    override val type: String
+        get() = typeVerbose.technicalKey
+}

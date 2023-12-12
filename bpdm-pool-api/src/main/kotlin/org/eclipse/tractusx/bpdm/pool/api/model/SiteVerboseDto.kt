@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
 import java.time.Instant
@@ -31,11 +31,8 @@ data class SiteVerboseDto(
     @get:Schema(description = SiteDescription.bpns)
     val bpns: String,
 
-    @get:Schema(description = SiteDescription.name)
-    val name: String,
-
-    @ArraySchema(arraySchema = Schema(description = SiteDescription.states))
-    val states: Collection<SiteStateVerboseDto> = emptyList(),
+    override val name: String,
+    override val states: Collection<SiteStateVerboseDto> = emptyList(),
 
     @get:Schema(description = SiteDescription.bpnLegalEntity)
     val bpnLegalEntity: String,
@@ -45,4 +42,5 @@ data class SiteVerboseDto(
 
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant
-)
+
+) : IBaseSiteDto

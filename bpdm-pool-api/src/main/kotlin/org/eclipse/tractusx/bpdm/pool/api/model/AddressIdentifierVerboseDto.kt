@@ -19,7 +19,10 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IAddressIdentifierDto
 import org.eclipse.tractusx.bpdm.common.dto.TypeKeyNameVerboseDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifierDescription
 
@@ -27,8 +30,15 @@ import org.eclipse.tractusx.bpdm.common.dto.openapidescription.AddressIdentifier
 data class AddressIdentifierVerboseDto(
 
     @get:Schema(description = AddressIdentifierDescription.value)
-    val value: String,
+    override val value: String,
 
+    @field:JsonProperty("type")
     @get:Schema(description = AddressIdentifierDescription.type)
-    val type: TypeKeyNameVerboseDto<String>,
-)
+    val typeVerbose: TypeKeyNameVerboseDto<String>,
+
+    ) : IAddressIdentifierDto {
+
+    @get:JsonIgnore
+    override val type: String
+        get() = typeVerbose.technicalKey
+}

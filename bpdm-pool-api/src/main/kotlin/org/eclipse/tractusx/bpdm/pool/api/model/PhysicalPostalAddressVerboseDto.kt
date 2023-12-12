@@ -19,6 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.neovisionaries.i18n.CountryCode
 import io.swagger.v3.oas.annotations.media.Schema
@@ -33,8 +35,15 @@ import org.eclipse.tractusx.bpdm.common.service.DataClassUnwrappedJsonDeserializ
 data class PhysicalPostalAddressVerboseDto(
 
     override val geographicCoordinates: GeoCoordinateDto?,
-    override val country: TypeKeyNameVerboseDto<CountryCode>,
-    override val administrativeAreaLevel1: RegionDto?,
+
+    @field:JsonProperty("country")
+    @get:Schema(description = PostalAddressDescription.country)
+    val countryVerbose: TypeKeyNameVerboseDto<CountryCode>,
+
+    @field:JsonProperty("administrativeAreaLevel1")
+    @get:Schema(description = PostalAddressDescription.administrativeAreaLevel1)
+    val administrativeAreaLevel1Verbose: RegionDto?,
+
     override val administrativeAreaLevel2: String?,
     override val administrativeAreaLevel3: String?,
     override val postalCode: String?,
@@ -48,11 +57,12 @@ data class PhysicalPostalAddressVerboseDto(
     override val door: String?
 
 ) : IBasePhysicalPostalAddressDto {
-    override fun adminLevel1Key(): String? {
-        return administrativeAreaLevel1?.regionCode
-    }
 
-    override fun countryCode(): CountryCode {
-        return country.technicalKey
-    }
+    @get:JsonIgnore
+    override val country: CountryCode
+        get() = countryVerbose.technicalKey
+
+    @get:JsonIgnore
+    override val administrativeAreaLevel1: String?
+        get() = administrativeAreaLevel1Verbose?.regionCode
 }

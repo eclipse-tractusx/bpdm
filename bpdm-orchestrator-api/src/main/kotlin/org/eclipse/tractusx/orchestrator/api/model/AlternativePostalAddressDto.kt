@@ -25,6 +25,7 @@ import org.eclipse.tractusx.bpdm.common.dto.IBaseAlternativePostalAddressDto
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 
 data class AlternativePostalAddressDto(
+
     override val geographicCoordinates: GeoCoordinateDto? = null,
     override val country: CountryCode? = null,
     override val administrativeAreaLevel1: String? = null,
@@ -34,11 +35,4 @@ data class AlternativePostalAddressDto(
     override val deliveryServiceQualifier: String? = null,
     override val deliveryServiceNumber: String? = null
 
-) : IBaseAlternativePostalAddressDto {
-    override fun adminLevel1Key(): String? {
-        return administrativeAreaLevel1
-    }
-    override fun countryCode(): CountryCode? {
-        return country
-    }
-}
+) : IBaseAlternativePostalAddressDto

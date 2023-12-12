@@ -28,6 +28,7 @@ data class SiteDto(
 
     override val name: String,
     override val states: Collection<SiteStateDto> = emptyList(),
-    override val mainAddress: LogisticAddressDto
+
+    val mainAddress: LogisticAddressDto
 
 ) : IBaseSiteDto

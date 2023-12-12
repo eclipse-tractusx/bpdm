@@ -19,8 +19,8 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
 import java.time.Instant
@@ -34,19 +34,10 @@ data class LogisticAddressVerboseDto(
     @get:Schema(description = LogisticAddressDescription.name)
     val name: String? = null,
 
-    @ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.states))
-    val states: Collection<AddressStateVerboseDto> = emptyList(),
-
-    @ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.identifiers))
-    val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.physicalPostalAddress)
-    val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
-
-    // TODO OpenAPI description for complex field does not work!!
-    @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
-    val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
+    override val states: Collection<AddressStateVerboseDto> = emptyList(),
+    override val identifiers: Collection<AddressIdentifierVerboseDto> = emptyList(),
+    override val physicalPostalAddress: PhysicalPostalAddressVerboseDto,
+    override val alternativePostalAddress: AlternativePostalAddressVerboseDto? = null,
 
     @get:Schema(description = LogisticAddressDescription.bpnLegalEntity)
     val bpnLegalEntity: String?,
@@ -65,4 +56,5 @@ data class LogisticAddressVerboseDto(
 
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant
-)
+
+) : IBaseLogisticAddressDto
