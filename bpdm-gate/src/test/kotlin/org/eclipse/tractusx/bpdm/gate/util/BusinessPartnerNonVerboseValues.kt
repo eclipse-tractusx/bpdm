@@ -21,22 +21,21 @@ package org.eclipse.tractusx.bpdm.gate.util
 
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto
-import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerPostalAddressDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentInputDto
 
 object BusinessPartnerNonVerboseValues {
 
     val physicalAddressMinimal = BusinessPartnerVerboseValues.physicalAddressMinimal
 
-    val physicalAddressChina = BusinessPartnerVerboseValues.physicalAddressChina
-
-    val bpPostalAddressInputDtoMinimal = BusinessPartnerPostalAddressDto(
+    val bpPostalAddressInputDtoMinimal = AddressComponentInputDto(
         addressType = null,
         physicalPostalAddress = physicalAddressMinimal
     )
 
     val bpInputRequestMinimal = BusinessPartnerInputRequest(
-        externalId = BusinessPartnerVerboseValues.externalId2, postalAddress = bpPostalAddressInputDtoMinimal
+        externalId = BusinessPartnerVerboseValues.externalId2,
+        address = bpPostalAddressInputDtoMinimal
     )
 
     val bpInputRequestFull = BusinessPartnerVerboseValues.bpInputRequestFull
@@ -46,9 +45,6 @@ object BusinessPartnerNonVerboseValues {
     val bpInputRequestCleaned = BusinessPartnerVerboseValues.bpInputRequestCleaned
 
     val bpInputRequestError = BusinessPartnerVerboseValues.bpInputRequestError
-
-    //Output Business Partner Test Values
-    val bpOutputRequestCleaned = BusinessPartnerVerboseValues.bpOutputRequestCleaned
 
     val legalEntityGateInputRequest1 = LegalEntityGateInputRequest(
         legalEntity = BusinessPartnerVerboseValues.legalEntity1,

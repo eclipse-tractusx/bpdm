@@ -29,8 +29,8 @@ import org.eclipse.tractusx.bpdm.common.model.ClassificationType
 import org.eclipse.tractusx.bpdm.common.model.DeliveryServiceType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.*
+import java.time.Instant
 import java.time.LocalDateTime
 
 object BusinessPartnerVerboseValues {
@@ -308,17 +308,27 @@ object BusinessPartnerVerboseValues {
     val bpInputRequestFull = BusinessPartnerInputRequest(
         externalId = externalId1,
         nameParts = listOf("Business Partner Name", "Company ABC AG", "Another Organisation Corp", "Catena Test Name"),
-        shortName = "short1",
-        legalName = "Limited Liability Company Name",
-        legalForm = "Limited Liability Company",
         isOwnCompanyData = true,
         identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
-        classifications = listOf(bpClassification1, bpClassification2, bpClassification3),
         states = listOf(bpState1, bpState2),
         roles = listOf(BusinessPartnerRole.SUPPLIER),
-        postalAddress = bpPostalAddressInputDtoFull,
-        legalEntityBpn = "BPNL0000000000XY",
-        addressBpn = "BPNA0000000001XY"
+        legalEntity = LegalEntityComponentInputDto(
+            bpnL = "BPNL0000000000XY",
+            shortName = "short1",
+            legalName = "Limited Liability Company Name",
+            legalForm = "Limited Liability Company",
+            classifications = listOf(bpClassification1, bpClassification2, bpClassification3)
+        ),
+        site = SiteComponentInputDto(
+            bpnS = null
+        ),
+        address = AddressComponentInputDto(
+            bpnA = "BPNA0000000001XY",
+            addressType = AddressType.LegalAddress,
+            physicalPostalAddress = postalAddress2,
+            alternativePostalAddress = alternativeAddressFull
+        )
+
     )
 
     //New Values for Logistic Addresses Tests
@@ -592,80 +602,96 @@ object BusinessPartnerVerboseValues {
         street = null,
     )
 
-    val bpPostalAddressInputDtoChina = BusinessPartnerPostalAddressDto(
-        addressType = AddressType.LegalAndSiteMainAddress,
-        physicalPostalAddress = physicalAddressChina
-    )
-
     val bpInputRequestChina = BusinessPartnerInputRequest(
         externalId = externalId3,
         nameParts = listOf("好公司  合伙制企业"),
-        shortName = "short3",
-        legalName = "姓名测试",
-        legalForm = "股份有限",
         isOwnCompanyData = true,
         identifiers = listOf(
             bpIdentifier1, bpIdentifier2, bpIdentifier1
-        ),          // duplicate, but they are elimnated
-        classifications = listOf(
-            bpClassificationChina, bpClassification3, bpClassificationChina
-        ),    // duplicate, but they are elimnated
+        ),          // duplicate, but they are eliminated
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        postalAddress = bpPostalAddressInputDtoChina,
-        legalEntityBpn = "BPNL0000000002XY",
-        siteBpn = "BPNS0000000003X9",
-        addressBpn = "BPNA0000000001XY"
+        legalEntity = LegalEntityComponentInputDto(
+            bpnL = "BPNL0000000002XY",
+            shortName = "short3",
+            legalName = "姓名测试",
+            legalForm = "股份有限",
+            classifications = listOf(
+                bpClassificationChina, bpClassification3, bpClassificationChina
+            )    // duplicate, but they are eliminated
+        ),
+        site = SiteComponentInputDto(
+            bpnS = "BPNS0000000003X9",
+        ),
+        address = AddressComponentInputDto(
+            bpnA = "BPNA0000000001XY",
+            addressType = AddressType.LegalAndSiteMainAddress,
+            physicalPostalAddress = physicalAddressChina,
+            alternativePostalAddress = AlternativePostalAddressDto()
+        )
     )
 
     val bpInputRequestCleaned = BusinessPartnerInputRequest(
         externalId = externalId4,
         nameParts = listOf("Name Part Value"),
-        shortName = "Random Short Name",
-        legalName = "Random Name Value",
-        legalForm = "Random Form Value",
         isOwnCompanyData = true,
         identifiers = listOf(
             bpIdentifier1, bpIdentifier2, bpIdentifier1
         ),
-        classifications = listOf(
-            bpClassification1, bpClassification3
-        ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        postalAddress = bpPostalAddressInputDtoFull,
-        legalEntityBpn = "BPNL0000000002XY",
-        siteBpn = "BPNS0000000003X9",
-        addressBpn = "BPNA0000000001XY"
+        legalEntity = LegalEntityComponentInputDto(
+            bpnL = "BPNL0000000002XY",
+            shortName = "Random Short Name",
+            legalName = "Random Name Value",
+            legalForm = "Random Form Value",
+            classifications = listOf(
+                bpClassification1, bpClassification3
+            )
+        ),
+        site = SiteComponentInputDto(
+            bpnS = "BPNS0000000003X9",
+        ),
+        address = AddressComponentInputDto(
+            bpnA = "BPNA0000000001XY",
+            addressType = AddressType.LegalAddress,
+            physicalPostalAddress = postalAddress2,
+            alternativePostalAddress = alternativeAddressFull
+        )
     )
 
     val bpInputRequestError = BusinessPartnerInputRequest(
         externalId = externalId5,
         nameParts = listOf("Name Part Value"),
-        shortName = "Random Short Name",
-        legalName = "Random Name Value",
-        legalForm = "Random Form Value",
         isOwnCompanyData = true,
         identifiers = listOf(
             bpIdentifier1, bpIdentifier2, bpIdentifier1
         ),
-        classifications = listOf(
-            bpClassification1, bpClassification3
-        ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        postalAddress = bpPostalAddressInputDtoFull,
-        legalEntityBpn = "BPNL0000000002XY",
-        siteBpn = "BPNS0000000003X9",
-        addressBpn = "BPNA0000000001XY"
+        legalEntity = LegalEntityComponentInputDto(
+            bpnL = "BPNL0000000002XY",
+            shortName = "Random Short Name",
+            legalName = "Random Name Value",
+            legalForm = "Random Form Value",
+            classifications = listOf(
+                bpClassification1, bpClassification3
+            )
+        ),
+        site = SiteComponentInputDto(
+            bpnS = "BPNS0000000003X9",
+        ),
+        address = AddressComponentInputDto(
+            bpnA = "BPNA0000000001XY",
+            addressType = AddressType.LegalAddress,
+            physicalPostalAddress = postalAddress2,
+            alternativePostalAddress = alternativeAddressFull
+        )
     )
 
-    val bpOutputRequestCleaned = BusinessPartnerOutputRequest(
+    val bpOutputDtoCleaned = BusinessPartnerOutputDto(
         externalId = externalId4,
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
-        shortName = "shot-name-cleaned",
-        legalName = "legal-name-cleaned",
-        legalForm = "legal-form-cleaned",
         identifiers = listOf(
             BusinessPartnerIdentifierDto(
                 type = "identifier-type-1-cleaned",
@@ -676,18 +702,6 @@ object BusinessPartnerVerboseValues {
                 type = "identifier-type-2-cleaned",
                 value = "identifier-value-2-cleaned",
                 issuingBody = "issuingBody-2-cleaned"
-            ),
-        ),
-        classifications = listOf(
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NACE,
-                code = "code-1-cleaned",
-                value = "value-1-cleaned"
-            ),
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NAF,
-                code = "code-2-cleaned",
-                value = "value-2-cleaned"
             ),
         ),
         states = listOf(
@@ -708,7 +722,29 @@ object BusinessPartnerVerboseValues {
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        postalAddress = BusinessPartnerPostalAddressDto(
+        legalEntity = LegalEntityComponentOutputDto(
+            bpnL = "000000123AAA123",
+            shortName = "shot-name-cleaned",
+            legalName = "legal-name-cleaned",
+            legalForm = "legal-form-cleaned",
+            classifications = listOf(
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NACE,
+                    code = "code-1-cleaned",
+                    value = "value-1-cleaned"
+                ),
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NAF,
+                    code = "code-2-cleaned",
+                    value = "value-2-cleaned"
+                ),
+            )
+        ),
+        site = SiteComponentOutputDto(
+            bpnS = "000000123BBB222"
+        ),
+        address = AddressComponentOutputDto(
+            bpnA = "000000123CCC333",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
@@ -747,9 +783,9 @@ object BusinessPartnerVerboseValues {
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             )
         ),
-        legalEntityBpn = "000000123AAA123",
-        siteBpn = "000000123BBB222",
-        addressBpn = "000000123CCC333"
+        isOwnCompanyData = false,
+        createdAt = Instant.now(),
+        updatedAt = Instant.now()
     )
 
 }

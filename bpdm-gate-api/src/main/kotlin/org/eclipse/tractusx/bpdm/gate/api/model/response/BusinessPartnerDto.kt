@@ -17,32 +17,55 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model.request
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
+import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.*
+import java.time.Instant
 
 
 @Schema(
     description = "Generic business partner with external id",
-    requiredProperties = ["externalId"]
+    requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"]
 )
-data class BusinessPartnerOutputRequest(
+data class BusinessPartnerInputDto(
 
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
-    override val shortName: String? = null,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val legalName: String? = null,
-    override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressDto = BusinessPartnerPostalAddressDto(),
     override val isOwnCompanyData: Boolean = false,
-    override val legalEntityBpn: String? = null,
-    override val siteBpn: String? = null,
-    override val addressBpn: String? = null
+    override val legalEntity: LegalEntityComponentInputDto = LegalEntityComponentInputDto(),
+    override val site: SiteComponentInputDto = SiteComponentInputDto(),
+    override val address: AddressComponentInputDto = AddressComponentInputDto(),
+
+    @get:Schema(description = CommonDescription.createdAt)
+    val createdAt: Instant,
+
+    @get:Schema(description = CommonDescription.updatedAt)
+    val updatedAt: Instant
 
 ) : IBaseBusinessPartnerGateDto
+
+data class LegalEntityComponentInputDto(
+    override val bpnL: String? = null,
+    override val legalName: String? = null,
+    override val shortName: String? = null,
+    override val legalForm: String? = null,
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
+) : IBaseLegalEntityComponent
+
+data class SiteComponentInputDto(
+    override val bpnS: String? = null
+) : IBaseSiteComponent
+
+data class AddressComponentInputDto(
+    override val bpnA: String? = null,
+    override val addressType: AddressType? = null,
+    override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
+    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto()
+) : IBaseAddressComponent

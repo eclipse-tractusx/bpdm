@@ -24,8 +24,9 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.assertj.core.api.Assertions
-import org.eclipse.tractusx.bpdm.common.dto.*
-import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
+import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+import org.eclipse.tractusx.bpdm.common.dto.PageDto
+import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerClassificationDto
@@ -33,11 +34,9 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.entity.generic.BusinessPartner
 import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
@@ -236,9 +235,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `query business partners by externalId`() {
         val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 
@@ -250,9 +249,9 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `query business partners by missing externalId`() {
         val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(externalId = BusinessPartnerVerboseValues.externalId1, shortName = "1"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 
@@ -265,12 +264,12 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `query business partners using paging`() {
         val upsertRequests = listOf(
-            BusinessPartnerNonVerboseValues.bpInputRequestFull.copy(
+            BusinessPartnerNonVerboseValues.bpInputRequestFull.fastCopy(
                 externalId = BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId,
                 shortName = "1"
             ),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
-            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.copy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId2, shortName = "2"),
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal.fastCopy(externalId = BusinessPartnerVerboseValues.externalId3, shortName = "3")
         )
         gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests)
 
@@ -298,62 +297,18 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(requests.map(::toExpectedResponse))
     }
 
-    private fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputRequest>) {
-        Assertions.assertThat(responses)
-            .usingRecursiveComparison()
-            .ignoringFieldsOfTypes(Instant::class.java)
-            .isEqualTo(requests.map(::toExpectedResponseOutput))
-    }
-
     private fun toExpectedResponse(request: BusinessPartnerInputRequest): BusinessPartnerInputDto {
         // same sorting order as defined for entity
         return BusinessPartnerInputDto(
             externalId = request.externalId,
             nameParts = request.nameParts,
-            shortName = request.shortName,
             identifiers = request.identifiers.toSortedSet(identifierDtoComparator),
-            legalName = request.legalName,
-            legalForm = request.legalForm,
             states = request.states.toSortedSet(stateDtoComparator),
-            classifications = request.classifications.toSortedSet(classificationDtoComparator),
             roles = request.roles.toSortedSet(),
-            postalAddress = request.postalAddress,
             isOwnCompanyData = request.isOwnCompanyData,
-            legalEntityBpn = request.legalEntityBpn,
-            siteBpn = request.siteBpn,
-            addressBpn = request.addressBpn,
-            createdAt = Instant.now(),
-            updatedAt = Instant.now()
-        )
-    }
-
-    private fun toExpectedResponseOutput(request: BusinessPartnerOutputRequest): BusinessPartnerOutputDto {
-        // same sorting order as defined for entity
-        return BusinessPartnerOutputDto(
-            externalId = request.externalId,
-            nameParts = request.nameParts,
-            shortName = request.shortName,
-            identifiers = request.identifiers.toSortedSet(identifierDtoComparator),
-            legalName = request.legalName,
-            legalForm = request.legalForm,
-            states = request.states.toSortedSet(stateDtoComparator),
-            classifications = request.classifications.toSortedSet(classificationDtoComparator),
-            roles = request.roles.toSortedSet(),
-            postalAddress = request.postalAddress,
-            isOwnCompanyData = request.isOwnCompanyData,
-            legalEntityBpn = request.legalEntityBpn ?: throw BpdmNullMappingException(
-                BusinessPartner::class,
-                BusinessPartnerOutputDto::class,
-                BusinessPartner::bpnL,
-                request.externalId
-            ),
-            siteBpn = request.siteBpn,
-            addressBpn = request.addressBpn ?: throw BpdmNullMappingException(
-                BusinessPartner::class,
-                BusinessPartnerOutputDto::class,
-                BusinessPartner::bpnA,
-                request.externalId
-            ),
+            legalEntity = request.legalEntity.copy(classifications = request.legalEntity.classifications.toSortedSet(classificationDtoComparator)),
+            site = request.site,
+            address = request.address,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -518,19 +473,19 @@ class BusinessPartnerControllerIT @Autowired constructor(
             contentSize = 3,
             content = listOf(
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.legalEntityBpn!!,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.bpnL,
                     businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.addressBpn!!,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.bpnA,
                     businessPartnerType = BusinessPartnerType.ADDRESS,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerNonVerboseValues.bpOutputRequestCleaned.siteBpn!!,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site.bpnS!!,
                     businessPartnerType = BusinessPartnerType.SITE,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
@@ -557,7 +512,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         this.mockOrchestratorApiCleaned()
 
         val outputBusinessPartners = listOf(
-            BusinessPartnerNonVerboseValues.bpOutputRequestCleaned
+            BusinessPartnerVerboseValues.bpOutputDtoCleaned
         )
 
         val upsertRequests = listOf(
@@ -702,7 +657,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
         this.mockOrchestratorApiCleanedResponseSizeOne()
 
         val outputBusinessPartners = listOf(
-            BusinessPartnerNonVerboseValues.bpOutputRequestCleaned
+            BusinessPartnerVerboseValues.bpOutputDtoCleaned
         )
         val upsertRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned
@@ -737,7 +692,16 @@ class BusinessPartnerControllerIT @Autowired constructor(
         //Assert that sharing state are created
         testHelpers.assertRecursively(upsertSharingStateResponses).ignoringFieldsMatchingRegexes(".*${SharingStateDto::sharingProcessStarted.name}")
             .isEqualTo(upsertSharingStatesRequests)
-
-
     }
+
+    private fun assertUpsertOutputResponsesMatchRequests(responses: Collection<BusinessPartnerOutputDto>, requests: List<BusinessPartnerOutputDto>) {
+        Assertions.assertThat(responses)
+            .usingRecursiveComparison()
+            .ignoringCollectionOrder()
+            .ignoringFieldsOfTypes(Instant::class.java)
+            .isEqualTo(requests)
+    }
+
+    private fun BusinessPartnerInputRequest.fastCopy(externalId: String, shortName: String) =
+        copy(externalId = externalId, legalEntity = legalEntity.copy(shortName = shortName))
 }
