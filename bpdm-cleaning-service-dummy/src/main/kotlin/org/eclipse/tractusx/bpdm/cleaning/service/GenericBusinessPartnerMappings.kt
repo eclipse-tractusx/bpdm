@@ -28,13 +28,13 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
 
     return LegalEntityDto(
         bpnLReference = bpnReferenceDto,
-        hasChanged = postalAddress.addressType in setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress),
+        hasChanged = address.addressType in setOf(AddressType.LegalAddress, AddressType.LegalAndSiteMainAddress),
         legalName = nameParts.joinToString(" "),
-        legalShortName = shortName,
+        legalShortName = legalEntity.shortName,
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
-        legalForm = legalForm,
+        legalForm = legalEntity.legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
-        classifications = classifications.map { it.toLegalEntityClassificationDto() },
+        classifications = legalEntity.classifications.map { it.toLegalEntityClassificationDto() },
         legalAddress = legalAddress
 
     )
@@ -70,12 +70,12 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
 
     return LogisticAddressDto(
         bpnAReference = bpnReferenceDto,
-        hasChanged = postalAddress.addressType == AddressType.AdditionalAddress,
+        hasChanged = address.addressType == AddressType.AdditionalAddress,
         name = nameParts.joinToString(" "),
         states = emptyList(),
         identifiers = emptyList(),
-        physicalPostalAddress = postalAddress.physicalPostalAddress,
-        alternativePostalAddress = postalAddress.alternativePostalAddress
+        physicalPostalAddress = address.physicalPostalAddress,
+        alternativePostalAddress = address.alternativePostalAddress
     )
 }
 
@@ -84,7 +84,7 @@ fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, legalN
 
     return SiteDto(
         bpnSReference = bpnReferenceDto,
-        hasChanged = postalAddress.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
+        hasChanged = address.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
         name = legalName,
         states = states.mapNotNull { it.toSiteState() },
         mainAddress = siteAddressReference
