@@ -159,7 +159,9 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnMainAddress2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnS1, BusinessPartnerType.SITE, timeAfterUpdate, ChangelogType.UPDATE),
-            ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDto(bpnS2, BusinessPartnerType.SITE, timeAfterUpdate, ChangelogType.UPDATE),
+            ChangelogEntryVerboseDto(bpnMainAddress1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE),
+            ChangelogEntryVerboseDto(bpnMainAddress2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
         )
 
         val expectedChangelog = PageDto(expectedChangelogEntries.size.toLong(), 1, 0, expectedChangelogEntries.size, expectedChangelogEntries)
@@ -225,7 +227,7 @@ class ChangelogControllerIT @Autowired constructor(
             ChangelogEntryVerboseDto(bpnA1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.CREATE),
             ChangelogEntryVerboseDto(bpnA1, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE),
-            //ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
+            ChangelogEntryVerboseDto(bpnA2, BusinessPartnerType.ADDRESS, timeAfterUpdate, ChangelogType.UPDATE)
         )
 
 

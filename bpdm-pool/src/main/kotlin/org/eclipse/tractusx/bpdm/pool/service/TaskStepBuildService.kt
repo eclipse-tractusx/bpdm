@@ -42,6 +42,7 @@ class TaskStepBuildService(
     private val legalEntityRepository: LegalEntityRepository,
     private val logisticAddressRepository: LogisticAddressRepository,
     private val siteRepository: SiteRepository,
+    private val businessPartnerEquivalenceService: BusinessPartnerEquivalenceService,
 ) {
 
     enum class CleaningError(val message: String) {
@@ -98,7 +99,7 @@ class TaskStepBuildService(
                     addressBpn = genericBpnA
                 ),
                 legalEntity = businessPartnerDto.legalEntity!!.copy(
-                    bpnLReference = BpnReferenceDto(referenceValue = legalEntity.bpn, referenceType = BpnReferenceType.Bpn) ,
+                    bpnLReference = BpnReferenceDto(referenceValue = legalEntity.bpn, referenceType = BpnReferenceType.Bpn),
                     legalAddress = businessPartnerDto.legalEntity!!.legalAddress!!.copy(
                         bpnAReference = BpnReferenceDto(referenceValue = legalEntity.legalAddress.bpn, referenceType = BpnReferenceType.Bpn)
                     )
@@ -115,11 +116,10 @@ class TaskStepBuildService(
         siteEntity: Site?,
         taskEntryBpnMapping: TaskEntryBpnMapping
     ): LogisticAddress {
-
         val bpnAReference = addressDto?.bpnAReference ?: throw BpdmValidationException(CleaningError.BPNA_IS_NULL.message)
 
         val bpn = taskEntryBpnMapping.getBpn(bpnAReference)
-
+        var hasChanges = false
         val upsertAddress = if (bpn == null) {
             val bpnA = bpnIssuingService.issueAddressBpns(1).single()
             taskEntryBpnMapping.addMapping(bpnAReference, bpnA)
@@ -127,7 +127,11 @@ class TaskStepBuildService(
         } else {
             val addressMetadataMap = metadataService.getMetadata(listOf(addressDto)).toMapping()
             val updateAddress = logisticAddressRepository.findByBpn(bpn)
+
             if (updateAddress != null) {
+                val newAddress = createLogisticAddressInternal(addressDto, updateAddress.bpn)
+                updateLogisticAddress(newAddress, addressDto, addressMetadataMap)
+                hasChanges = businessPartnerEquivalenceService.isEquivalent(updateAddress, newAddress)
                 updateLogisticAddress(updateAddress, addressDto, addressMetadataMap)
             } else {
                 throw BpdmValidationException(CleaningError.INVALID_LOGISTIC_ADDRESS_BPN.message)
@@ -139,15 +143,22 @@ class TaskStepBuildService(
         } else {
             upsertAddress.legalEntity = legalEntity
         }
-        logisticAddressRepository.save(upsertAddress)
+
+        if (hasChanges || bpn == null) {
+            logisticAddressRepository.save(upsertAddress)
+        }
+
 
         val changelogType =
             if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
-        changelogService.createChangelogEntries(
-            listOf(
-                ChangelogEntryCreateRequest(upsertAddress.bpn, changelogType, BusinessPartnerType.ADDRESS)
+        if (hasChanges || bpn == null) {
+            changelogService.createChangelogEntries(
+                listOf(
+                    ChangelogEntryCreateRequest(upsertAddress.bpn, changelogType, BusinessPartnerType.ADDRESS)
+                )
             )
-        )
+        }
+
 
         return upsertAddress
     }
@@ -250,7 +261,7 @@ class TaskStepBuildService(
         val legalEntityMetadataMap = metadataService.getMetadata(listOf(legalEntityDto)).toMapping()
 
         val bpn = taskEntryBpnMapping.getBpn(bpnLReference)
-
+        var hasChanges = false
         val upsertLe = if (bpn == null) {
             val bpnL = bpnIssuingService.issueLegalEntityBpns(1).single()
             taskEntryBpnMapping.addMapping(bpnLReference, bpnL)
@@ -264,6 +275,14 @@ class TaskStepBuildService(
             val updateLe = legalEntityRepository.findByBpn(bpn)
             if (updateLe != null) {
                 if (legalEntityDto.hasChanged == true) {
+
+                    val createdLe =
+                        BusinessPartnerBuildService.createLegalEntity(legalEntityDto, updateLe.bpn, legalEntityDto.legalName, legalEntityMetadataMap)
+                    val address = createLogisticAddress(legalAddress, taskEntryBpnMapping)
+                    createdLe.legalAddress = address
+                    address.legalEntity = createdLe
+                    hasChanges = businessPartnerEquivalenceService.isEquivalent(updateLe, createdLe)
+
                     BusinessPartnerBuildService.updateLegalEntity(updateLe, legalEntityDto, legalEntityDto.legalName, legalEntityMetadataMap)
                     val addressMetadataMap = metadataService.getMetadata(listOf(legalAddress)).toMapping()
                     updateLogisticAddress(updateLe.legalAddress, legalAddress, addressMetadataMap)
@@ -273,15 +292,17 @@ class TaskStepBuildService(
             }
             updateLe
         }
-        legalEntityRepository.save(upsertLe)
         val changelogType =
             if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
-        changelogService.createChangelogEntries(
-            listOf(
-                ChangelogEntryCreateRequest(upsertLe.bpn, changelogType, BusinessPartnerType.LEGAL_ENTITY)
-            )
-        )
 
+        if (hasChanges || bpn == null) {
+            legalEntityRepository.save(upsertLe)
+            changelogService.createChangelogEntries(
+                listOf(
+                    ChangelogEntryCreateRequest(upsertLe.bpn, changelogType, BusinessPartnerType.LEGAL_ENTITY)
+                )
+            )
+        }
         return upsertLe
     }
 
@@ -297,7 +318,7 @@ class TaskStepBuildService(
 
         val bpn = taskEntryBpnMapping.getBpn(bpnSReference)
         val changelogType = if (bpn == null) ChangelogType.CREATE else ChangelogType.UPDATE
-
+        var hasChanges = false
         val upsertSite = if (bpn == null) {
             val bpnS = bpnIssuingService.issueSiteBpns(1).single()
             val createSite = BusinessPartnerBuildService.createSite(siteDto, bpnS, legalEntity)
@@ -318,6 +339,16 @@ class TaskStepBuildService(
             val updateSite = siteRepository.findByBpn(bpn)
             if (updateSite != null) {
                 if (siteDto.hasChanged == true) {
+                    val createSite = BusinessPartnerBuildService.createSite(siteDto, updateSite.bpn, legalEntity)
+                    val siteMainAddress =
+                        if (genericBusinessPartner.generic.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                            legalEntity.legalAddress
+                        else
+                            createLogisticAddress(mainAddress, taskEntryBpnMapping)
+                    createSite.mainAddress = siteMainAddress
+                    siteMainAddress.site = createSite
+                    hasChanges = businessPartnerEquivalenceService.isEquivalent(updateSite, createSite)
+
                     BusinessPartnerBuildService.updateSite(updateSite, siteDto)
                     val addressMetadataMap = metadataService.getMetadata(listOf(mainAddress)).toMapping()
                     updateLogisticAddress(updateSite.mainAddress, mainAddress, addressMetadataMap)
@@ -327,12 +358,15 @@ class TaskStepBuildService(
             }
             updateSite
         }
-        siteRepository.save(upsertSite)
-        changelogService.createChangelogEntries(
-            listOf(
-                ChangelogEntryCreateRequest(upsertSite.bpn, changelogType, BusinessPartnerType.SITE)
+
+        if (hasChanges || bpn == null) {
+            siteRepository.save(upsertSite)
+            changelogService.createChangelogEntries(
+                listOf(
+                    ChangelogEntryCreateRequest(upsertSite.bpn, changelogType, BusinessPartnerType.SITE)
+                )
             )
-        )
+        }
 
         return upsertSite
     }
