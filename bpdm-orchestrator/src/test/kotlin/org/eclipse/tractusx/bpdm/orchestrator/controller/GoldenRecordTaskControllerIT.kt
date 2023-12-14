@@ -223,9 +223,11 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
 
         // resolve task again
         val businessPartnerFull2 = businessPartnerFull1.copy(
-            generic = businessPartnerFull1.generic.copy(
-                legalEntityBpn = "BPNL-test"
-            )
+            generic = with(businessPartnerFull1.generic) {
+                copy(
+                    legalEntity = legalEntity.copy(bpnL = "BPNL-test")
+                )
+            }
         )
         val resultEntry2 = TaskStepResultEntryDto(
             taskId = taskId,
