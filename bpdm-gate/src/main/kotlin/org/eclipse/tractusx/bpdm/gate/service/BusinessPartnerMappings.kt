@@ -19,15 +19,13 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
-import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
+
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
 import org.eclipse.tractusx.bpdm.common.exception.BpdmNullMappingException
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.*
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerOutputRequest
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.*
 import org.eclipse.tractusx.bpdm.gate.entity.AlternativePostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
@@ -42,18 +40,13 @@ class BusinessPartnerMappings {
         return BusinessPartnerInputDto(
             externalId = entity.externalId,
             nameParts = entity.nameParts,
-            shortName = entity.shortName,
             identifiers = entity.identifiers.map(::toIdentifierDto),
-            legalName = entity.legalName,
-            legalForm = entity.legalForm,
             states = entity.states.map(::toStateDto),
-            classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
-            postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwnCompanyData = entity.isOwnCompanyData,
-            legalEntityBpn = entity.bpnL,
-            siteBpn = entity.bpnS,
-            addressBpn = entity.bpnA,
+            legalEntity = toLegalEntityComponentInputDto(entity),
+            site = toSiteComponentInputDto(entity),
+            address = toAddressComponentInputDto(entity),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -63,20 +56,13 @@ class BusinessPartnerMappings {
         return BusinessPartnerOutputDto(
             externalId = entity.externalId,
             nameParts = entity.nameParts,
-            shortName = entity.shortName,
             identifiers = entity.identifiers.map(::toIdentifierDto),
-            legalName = entity.legalName,
-            legalForm = entity.legalForm,
             states = entity.states.map(::toStateDto),
-            classifications = entity.classifications.map(::toClassificationDto),
             roles = entity.roles,
-            postalAddress = toPostalAddressDto(entity.postalAddress),
             isOwnCompanyData = entity.isOwnCompanyData,
-            legalEntityBpn = entity.bpnL
-                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnL, entity.externalId),
-            siteBpn = entity.bpnS,
-            addressBpn = entity.bpnA
-                ?: throw BpdmNullMappingException(BusinessPartner::class, BusinessPartnerOutputDto::class, BusinessPartner::bpnA, entity.externalId),
+            legalEntity = toLegalEntityComponentOutputDto(entity),
+            site = toSiteComponentOutputDto(entity),
+            address = toAddressComponentOutputDto(entity),
             createdAt = entity.createdAt,
             updatedAt = entity.updatedAt
         )
@@ -90,73 +76,84 @@ class BusinessPartnerMappings {
             roles = dto.roles.toSortedSet(),
             identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
             states = dto.states.mapNotNull(::toState).toSortedSet(),
-            classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
-            shortName = dto.shortName,
-            legalName = dto.legalName,
-            legalForm = dto.legalForm,
+            classifications = dto.legalEntity.classifications.mapNotNull(::toClassification).toSortedSet(),
+            shortName = dto.legalEntity.shortName,
+            legalName = dto.legalEntity.legalName,
+            legalForm = dto.legalEntity.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.legalEntityBpn,
-            bpnS = dto.siteBpn,
-            bpnA = dto.addressBpn,
-            postalAddress = toPostalAddress(dto.postalAddress),
-            parentId = null,
-            parentType = null,
+            bpnL = dto.legalEntity.bpnL,
+            bpnS = dto.site.bpnS,
+            bpnA = dto.address.bpnA,
+            postalAddress = toPostalAddress(dto.address)
         )
     }
 
-    //Output
-    fun toBusinessPartnerOutput(dto: BusinessPartnerOutputRequest): BusinessPartner {
-        return BusinessPartner(
-            stage = StageType.Output,
-            externalId = dto.externalId,
-            nameParts = dto.nameParts.toMutableList(),
-            roles = dto.roles.toSortedSet(),
-            identifiers = dto.identifiers.mapNotNull(::toIdentifier).toSortedSet(),
-            states = dto.states.mapNotNull(::toState).toSortedSet(),
-            classifications = dto.classifications.mapNotNull(::toClassification).toSortedSet(),
-            shortName = dto.shortName,
-            legalName = dto.legalName,
-            legalForm = dto.legalForm,
-            isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.legalEntityBpn,
-            bpnS = dto.siteBpn,
-            bpnA = dto.addressBpn,
-            parentId = null,
-            parentType = BusinessPartnerType.GENERIC,
-            postalAddress = toPostalAddress(dto.postalAddress)
+    private fun toLegalEntityComponentInputDto(entity: BusinessPartner): LegalEntityComponentInputDto {
+        return LegalEntityComponentInputDto(
+            bpnL = entity.bpnL,
+            legalName = entity.legalName,
+            shortName = entity.shortName,
+            legalForm = entity.legalForm,
+            classifications = entity.classifications.map(::toClassificationDto)
         )
     }
 
-    private fun toPostalAddressDto(entity: PostalAddress) =
-        BusinessPartnerPostalAddressDto(
-            addressType = entity.addressType,
-            physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-            alternativePostalAddress = entity.alternativePostalAddress?.let(::toAlternativePostalAddressDto)
+    private fun toSiteComponentInputDto(entity: BusinessPartner): SiteComponentInputDto {
+        return SiteComponentInputDto(
+            bpnS = entity.bpnS
         )
+    }
 
-    private fun toPostalAddress(dto: BusinessPartnerPostalAddressDto) =
+    private fun toAddressComponentInputDto(entity: BusinessPartner): AddressComponentInputDto {
+        return AddressComponentInputDto(
+            bpnA = entity.bpnA,
+            addressType = entity.postalAddress.addressType,
+            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
+        )
+    }
+
+    private fun toLegalEntityComponentOutputDto(entity: BusinessPartner): LegalEntityComponentOutputDto {
+        return LegalEntityComponentOutputDto(
+            bpnL = entity.bpnL ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                BusinessPartnerOutputDto::class,
+                BusinessPartner::bpnL,
+                entity.externalId
+            ),
+            legalName = entity.legalName,
+            shortName = entity.shortName,
+            legalForm = entity.legalForm,
+            classifications = entity.classifications.map(::toClassificationDto)
+        )
+    }
+
+    private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteComponentOutputDto {
+        return SiteComponentOutputDto(
+            bpnS = entity.bpnS
+        )
+    }
+
+    private fun toAddressComponentOutputDto(entity: BusinessPartner): AddressComponentOutputDto {
+        return AddressComponentOutputDto(
+            bpnA = entity.bpnA ?: throw BpdmNullMappingException(
+                BusinessPartner::class,
+                BusinessPartnerOutputDto::class,
+                BusinessPartner::bpnA,
+                entity.externalId
+            ),
+            addressType = entity.postalAddress.addressType,
+            physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
+        )
+    }
+
+
+    private fun toPostalAddress(dto: AddressComponentInputDto) =
         PostalAddress(
             addressType = dto.addressType,
             physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
             alternativePostalAddress = normalize(dto.alternativePostalAddress)?.let(::toAlternativePostalAddress)
-        )
-
-    private fun toPhysicalPostalAddressDto(entity: PhysicalPostalAddress) =
-        PhysicalPostalAddressDto(
-            geographicCoordinates = entity.geographicCoordinates?.let(::toGeoCoordinateDto),
-            country = entity.country,
-            administrativeAreaLevel1 = entity.administrativeAreaLevel1,
-            administrativeAreaLevel2 = entity.administrativeAreaLevel2,
-            administrativeAreaLevel3 = entity.administrativeAreaLevel3,
-            postalCode = entity.postalCode,
-            city = entity.city,
-            district = entity.district,
-            street = entity.street?.let(::toStreetDto),
-            companyPostalCode = entity.companyPostalCode,
-            industrialZone = entity.industrialZone,
-            building = entity.building,
-            floor = entity.floor,
-            door = entity.door
         )
 
     // convert empty DTO to null

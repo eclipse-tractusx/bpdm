@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.gate.api.model.response
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.gate.api.model.*
@@ -27,24 +28,19 @@ import java.time.Instant
 
 @Schema(
     description = "Generic business partner output with external id",
-    requiredProperties = ["externalId", "postalAddress", "bpnL", "bpnA"]
+    requiredProperties = ["externalId"]
 )
 data class BusinessPartnerOutputDto(
 
     override val externalId: String,
     override val nameParts: List<String> = emptyList(),
-    override val shortName: String?,
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
-    override val legalName: String? = null,
-    override val legalForm: String? = null,
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val postalAddress: BusinessPartnerPostalAddressDto,
-    override val isOwnCompanyData: Boolean,
-    override val legalEntityBpn: String,
-    override val siteBpn: String?,
-    override val addressBpn: String,
+    override val isOwnCompanyData: Boolean = false,
+    override val legalEntity: LegalEntityComponentOutputDto,
+    override val site: SiteComponentOutputDto = SiteComponentOutputDto(),
+    override val address: AddressComponentOutputDto,
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
@@ -53,3 +49,33 @@ data class BusinessPartnerOutputDto(
     val updatedAt: Instant
 
 ) : IBaseBusinessPartnerGateDto
+
+@Schema(
+    description = "Legal Entity properties of business partner output data",
+    requiredProperties = ["bpnL"]
+)
+data class LegalEntityComponentOutputDto(
+    override val bpnL: String,
+    override val legalName: String? = null,
+    override val shortName: String? = null,
+    override val legalForm: String? = null,
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
+) : IBaseLegalEntityComponent
+
+@Schema(
+    description = "Site properties of business partner output data"
+)
+data class SiteComponentOutputDto(
+    override val bpnS: String? = null
+) : IBaseSiteComponent
+
+@Schema(
+    description = "Address properties of business partner output data",
+    requiredProperties = ["bpnA"]
+)
+data class AddressComponentOutputDto(
+    override val bpnA: String,
+    override val addressType: AddressType? = null,
+    override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
+    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto()
+) : IBaseAddressComponent
