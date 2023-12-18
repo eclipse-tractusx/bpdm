@@ -182,7 +182,11 @@ private fun Street.toDto(): StreetDto {
         houseNumber = houseNumber,
         houseNumberSupplement = houseNumberSupplement,
         milestone = milestone,
-        direction = direction
+        direction = direction,
+        namePrefix = namePrefix,
+        additionalNamePrefix = additionalNamePrefix,
+        nameSuffix = nameSuffix,
+        additionalNameSuffix = additionalNameSuffix
     )
 }
 

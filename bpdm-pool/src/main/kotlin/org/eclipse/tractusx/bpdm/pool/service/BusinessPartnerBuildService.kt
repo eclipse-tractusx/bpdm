@@ -559,7 +559,11 @@ class BusinessPartnerBuildService(
                         houseNumber = it.houseNumber,
                         houseNumberSupplement = it.houseNumberSupplement,
                         milestone = it.milestone,
-                        direction = it.direction
+                        direction = it.direction,
+                        namePrefix = it.namePrefix,
+                        additionalNamePrefix = it.additionalNamePrefix,
+                        nameSuffix = it.nameSuffix,
+                        additionalNameSuffix = it.additionalNameSuffix
                     )
                 },
                 companyPostCode = physicalAddress.companyPostalCode,
