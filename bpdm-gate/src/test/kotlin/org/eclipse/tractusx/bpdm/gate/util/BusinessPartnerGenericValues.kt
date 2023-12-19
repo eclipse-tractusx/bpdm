@@ -34,7 +34,6 @@ object BusinessPartnerGenericValues {
     //Business Partner with two entries in every collection
     val businessPartner1 = BusinessPartnerGenericDto(
         nameParts = listOf("part-cleaned-1", "name-cleaned-2"),
-        shortName = "shot-name-cleaned",
         identifiers = listOf(
             BusinessPartnerIdentifierDto(
                 type = "identifier-type-1-cleaned",
@@ -47,8 +46,6 @@ object BusinessPartnerGenericValues {
                 issuingBody = "issuingBody-2-cleaned"
             ),
         ),
-        legalName = "legal-name-cleaned",
-        legalForm = "legal-form-cleaned",
         states = listOf(
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
@@ -63,23 +60,34 @@ object BusinessPartnerGenericValues {
                 description = "business-state-description-2"
             )
         ),
-        classifications = listOf(
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NACE,
-                code = "code-1-cleaned",
-                value = "value-1-cleaned"
-            ),
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NAF,
-                code = "code-2-cleaned",
-                value = "value-2-cleaned"
-            ),
-        ),
         roles = listOf(
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        postalAddress = PostalAddressDto(
+        ownerBpnL = "BPNL_CLEANED_VALUES",
+        legalEntity = LegalEntityComponent(
+            bpnL = "000000123AAA123",
+            legalName = "legal-name-cleaned",
+            shortName = "shot-name-cleaned",
+            legalForm = "legal-form-cleaned",
+            classifications = listOf(
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NACE,
+                    code = "code-1-cleaned",
+                    value = "value-1-cleaned"
+                ),
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NAF,
+                    code = "code-2-cleaned",
+                    value = "value-2-cleaned"
+                ),
+            )
+        ),
+        site = SiteComponent(
+            bpnS = "000000123BBB222",
+        ),
+        address = AddressComponent(
+            bpnA = "000000123CCC333",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
@@ -117,11 +125,7 @@ object BusinessPartnerGenericValues {
                 deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             )
-        ),
-        ownerBpnL = "BPNL_CLEANED_VALUES",
-        legalEntityBpn = "000000123AAA123",
-        siteBpn = "000000123BBB222",
-        addressBpn = "000000123CCC333"
+        )
     )
 
 }
