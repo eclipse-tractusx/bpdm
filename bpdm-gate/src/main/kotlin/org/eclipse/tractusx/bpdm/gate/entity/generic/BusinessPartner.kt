@@ -62,6 +62,12 @@ class BusinessPartner(
     @Column(name = "legal_name")
     var legalName: String? = null,
 
+    @Column(name = "site_name")
+    var siteName: String? = null,
+
+    @Column(name = "address_name")
+    var addressName: String? = null,
+
     @Column(name = "legal_form")
     var legalForm: String? = null,
 

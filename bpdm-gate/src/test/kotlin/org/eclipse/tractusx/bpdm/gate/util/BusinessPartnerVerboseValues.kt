@@ -320,10 +320,12 @@ object BusinessPartnerVerboseValues {
             classifications = listOf(bpClassification1, bpClassification2, bpClassification3)
         ),
         site = SiteRepresentationInputDto(
-            siteBpn = null
+            siteBpn = null,
+            name = "Site Name"
         ),
         address = AddressRepresentationInputDto(
             addressBpn = "BPNA0000000001XY",
+            name = "Address Name",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -622,9 +624,11 @@ object BusinessPartnerVerboseValues {
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
+            name = "Site Name 3"
         ),
         address = AddressRepresentationInputDto(
             addressBpn = "BPNA0000000001XY",
+            name = "Address Name 3",
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
@@ -651,9 +655,11 @@ object BusinessPartnerVerboseValues {
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
+            name = "Site Name 4"
         ),
         address = AddressRepresentationInputDto(
             addressBpn = "BPNA0000000001XY",
+            name = "Address Name 4",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -680,9 +686,11 @@ object BusinessPartnerVerboseValues {
         ),
         site = SiteRepresentationInputDto(
             siteBpn = "BPNS0000000003X9",
+            name = "Site Name 5"
         ),
         address = AddressRepresentationInputDto(
             addressBpn = "BPNA0000000001XY",
+            name = "Address Name 5",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -741,10 +749,12 @@ object BusinessPartnerVerboseValues {
             )
         ),
         site = SiteRepresentationOutputDto(
-            siteBpn = "000000123BBB222"
+            siteBpn = "000000123BBB222",
+            name = "Site Name"
         ),
         address = AddressComponentOutputDto(
             addressBpn = "000000123CCC333",
+            name = "Address Name",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),

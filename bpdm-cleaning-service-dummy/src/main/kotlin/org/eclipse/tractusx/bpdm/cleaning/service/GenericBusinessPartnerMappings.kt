@@ -71,7 +71,7 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
     return LogisticAddressDto(
         bpnAReference = bpnReferenceDto,
         hasChanged = address.addressType == AddressType.AdditionalAddress,
-        name = nameParts.joinToString(" "),
+        name = address.name,
         states = emptyList(),
         identifiers = emptyList(),
         physicalPostalAddress = address.physicalPostalAddress,
@@ -79,13 +79,13 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
     )
 }
 
-fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, legalName: String, siteAddressReference: LogisticAddressDto): SiteDto {
+fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, siteAddressReference: LogisticAddressDto): SiteDto {
 
 
     return SiteDto(
         bpnSReference = bpnReferenceDto,
         hasChanged = address.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
-        name = legalName,
+        name = site.name,
         states = states.mapNotNull { it.toSiteState() },
         mainAddress = siteAddressReference
 

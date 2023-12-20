@@ -79,6 +79,8 @@ class BusinessPartnerMappings {
             classifications = dto.legalEntity.classifications.mapNotNull(::toClassification).toSortedSet(),
             shortName = dto.legalEntity.shortName,
             legalName = dto.legalEntity.legalName,
+            siteName = dto.site.name,
+            addressName = dto.address.name,
             legalForm = dto.legalEntity.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
             bpnL = dto.legalEntity.legalEntityBpn,
@@ -100,13 +102,15 @@ class BusinessPartnerMappings {
 
     private fun toSiteComponentInputDto(entity: BusinessPartner): SiteRepresentationInputDto {
         return SiteRepresentationInputDto(
-            siteBpn = entity.bpnS
+            siteBpn = entity.bpnS,
+            name = entity.siteName
         )
     }
 
     private fun toAddressComponentInputDto(entity: BusinessPartner): AddressRepresentationInputDto {
         return AddressRepresentationInputDto(
             addressBpn = entity.bpnA,
+            name = entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
             alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
@@ -130,7 +134,8 @@ class BusinessPartnerMappings {
 
     private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteRepresentationOutputDto {
         return SiteRepresentationOutputDto(
-            siteBpn = entity.bpnS
+            siteBpn = entity.bpnS,
+            name = entity.siteName
         )
     }
 
@@ -142,6 +147,7 @@ class BusinessPartnerMappings {
                 BusinessPartner::bpnA,
                 entity.externalId
             ),
+            entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
             alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()

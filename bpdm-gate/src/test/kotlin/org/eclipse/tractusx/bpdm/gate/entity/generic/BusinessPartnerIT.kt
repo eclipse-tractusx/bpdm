@@ -158,6 +158,8 @@ internal class BusinessPartnerIT @Autowired constructor(
             nameParts = mutableListOf("testNameParts", "testNameParts2", "testNameParts3", "testNameParts4", "testNameParts5"),
             shortName = "testShortName",
             legalName = "testLegalName",
+            siteName = "testSiteName",
+            addressName = "testAddressName",
             legalForm = "testLegalForm",
             isOwnCompanyData = true,
             bpnA = "testAddressBpn",

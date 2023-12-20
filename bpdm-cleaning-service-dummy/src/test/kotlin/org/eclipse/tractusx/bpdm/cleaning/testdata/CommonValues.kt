@@ -40,6 +40,8 @@ object CommonValues {
     const val fixedTaskId = "taskid-123123"
 
     private val nameParts = listOf("Part1", "Part2")
+    private val siteName = "Site Name"
+    private val addressName = "Address Name"
     private const val shortName = "ShortName"
     private val identifiers = listOf(
         BusinessPartnerIdentifierDto(
@@ -109,7 +111,9 @@ object CommonValues {
             shortName = shortName,
             legalForm = legalForm,
             classifications = classifications
-        )
+        ),
+        site = SiteRepresentation(name = siteName),
+        address = AddressRepresentation(name = addressName)
     )
 
 
@@ -185,14 +189,14 @@ object CommonValues {
 
     val expectedSiteDto = SiteDto(
         hasChanged = true,
-        name = nameParts.joinToString(" "),
+        name = siteName,
         states = states.mapNotNull { it.toSiteState() },
     )
 
     val expectedLogisticAddressDto = LogisticAddressDto(
 
         hasChanged = true,
-        name = nameParts.joinToString(" "),
+        name = addressName,
         states = emptyList(),
         identifiers = emptyList(),
         physicalPostalAddress = physicalPostalAddress

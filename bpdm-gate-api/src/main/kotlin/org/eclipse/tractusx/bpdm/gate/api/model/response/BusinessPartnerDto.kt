@@ -59,12 +59,14 @@ data class LegalEntityRepresentationInputDto(
 ) : IBaseLegalEntityRepresentation
 
 data class SiteRepresentationInputDto(
-    override val siteBpn: String? = null
+    override val siteBpn: String? = null,
+    override val name: String? = null
 ) : IBaseSiteRepresentation
 
 data class AddressRepresentationInputDto(
     override val addressBpn: String? = null,
+    override val name: String? = null,
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
-    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto()
+    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
 ) : IBaseAddressRepresentation

@@ -133,9 +133,8 @@ class CleaningServiceDummy(
     }
 
     fun createSiteRepresentation(genericPartner: BusinessPartnerGenericDto, siteAddressReference: LogisticAddressDto): SiteDto {
-        val legalName = genericPartner.nameParts.joinToString(" ")
         val bpnReferenceDto = createBpnReference(genericPartner.site.siteBpn)
-        return genericPartner.toSiteDto(bpnReferenceDto, legalName, siteAddressReference)
+        return genericPartner.toSiteDto(bpnReferenceDto, siteAddressReference)
     }
 
     fun createBpnReference(bpn: String?): BpnReferenceDto {

@@ -47,14 +47,16 @@ data class LegalEntityRepresentation(
 ) : IBaseLegalEntityRepresentation
 
 data class SiteRepresentation(
-    override val siteBpn: String? = null
+    override val siteBpn: String? = null,
+    override val name: String? = null
 ) : IBaseSiteRepresentation
 
 data class AddressRepresentation(
     override val addressBpn: String? = null,
+    override val name: String? = null,
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null,
 ) : IBaseAddressRepresentation
 
 

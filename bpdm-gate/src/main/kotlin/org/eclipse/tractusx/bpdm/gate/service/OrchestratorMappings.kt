@@ -46,7 +46,7 @@ class OrchestratorMappings(
         ownerBpnL = getOwnerBpnL(entity),
         legalEntity = toLegalEntityComponentDto(entity),
         site = toSiteComponentDto(entity),
-        address = toAddressComponentDto(entity.bpnA, entity.postalAddress)
+        address = toAddressComponentDto(entity)
 
     )
 
@@ -60,13 +60,15 @@ class OrchestratorMappings(
 
     private fun toSiteComponentDto(entity: BusinessPartner) = SiteRepresentation(
         siteBpn = entity.bpnS,
+        name = entity.siteName
     )
 
-    private fun toAddressComponentDto(bpnA: String?, entity: PostalAddress) = AddressRepresentation(
-        addressBpn = bpnA,
-        addressType = entity.addressType,
-        physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-        alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
+    private fun toAddressComponentDto(entity: BusinessPartner) = AddressRepresentation(
+        addressBpn = entity.bpnA,
+        name = entity.addressName,
+        addressType = entity.postalAddress.addressType,
+        physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
+        alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
     )
 
     private fun toClassificationDto(entity: Classification) =
@@ -150,6 +152,8 @@ class OrchestratorMappings(
         shortName = dto.legalEntity.shortName,
         identifiers = dto.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
         legalName = dto.legalEntity.legalName,
+        siteName = dto.site.name,
+        addressName = dto.address.name,
         legalForm = dto.legalEntity.legalForm,
         states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
         classifications = dto.legalEntity.classifications.map { toClassification(it) }.toSortedSet(),
