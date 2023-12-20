@@ -65,8 +65,8 @@ object BusinessPartnerGenericValues {
             BusinessPartnerRole.SUPPLIER
         ),
         ownerBpnL = "BPNL_CLEANED_VALUES",
-        legalEntity = LegalEntityComponent(
-            bpnL = "000000123AAA123",
+        legalEntity = LegalEntityRepresentation(
+            legalEntityBpn = "000000123AAA123",
             legalName = "legal-name-cleaned",
             shortName = "shot-name-cleaned",
             legalForm = "legal-form-cleaned",
@@ -83,11 +83,11 @@ object BusinessPartnerGenericValues {
                 ),
             )
         ),
-        site = SiteComponent(
-            bpnS = "000000123BBB222",
+        site = SiteRepresentation(
+            siteBpn = "000000123BBB222",
         ),
-        address = AddressComponent(
-            bpnA = "000000123CCC333",
+        address = AddressRepresentation(
+            addressBpn = "000000123CCC333",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),

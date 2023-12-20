@@ -225,7 +225,7 @@ class GoldenRecordTaskControllerIT @Autowired constructor(
         val businessPartnerFull2 = businessPartnerFull1.copy(
             generic = with(businessPartnerFull1.generic) {
                 copy(
-                    legalEntity = legalEntity.copy(bpnL = "BPNL-test")
+                    legalEntity = legalEntity.copy(legalEntityBpn = "BPNL-test")
                 )
             }
         )

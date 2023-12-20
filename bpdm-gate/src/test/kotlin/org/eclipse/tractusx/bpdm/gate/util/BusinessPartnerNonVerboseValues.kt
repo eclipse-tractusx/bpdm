@@ -22,13 +22,13 @@ package org.eclipse.tractusx.bpdm.gate.util
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.request.*
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
 
 object BusinessPartnerNonVerboseValues {
 
     val physicalAddressMinimal = BusinessPartnerVerboseValues.physicalAddressMinimal
 
-    val bpPostalAddressInputDtoMinimal = AddressComponentInputDto(
+    val bpPostalAddressInputDtoMinimal = AddressRepresentationInputDto(
         addressType = null,
         physicalPostalAddress = physicalAddressMinimal
     )

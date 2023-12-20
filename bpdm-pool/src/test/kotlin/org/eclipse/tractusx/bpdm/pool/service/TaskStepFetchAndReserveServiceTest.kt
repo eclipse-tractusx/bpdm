@@ -112,7 +112,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.bpnL).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
     }
 
@@ -136,7 +136,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         val createdLegalEntity = poolClient.legalEntities.getLegalEntity(createResult[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isNotNull()
-        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.bpnL).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
     }
 
@@ -165,7 +165,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(createdLegalEntity.legalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         assertThat(createdLegalEntity.legalAddress.isLegalAddress).isTrue()
         assertThat(createdLegalEntity.legalAddress.isMainAddress).isFalse()
-        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.bpnL).isEqualTo(createdLegalEntity.legalEntity.bpnl)
+        assertThat(createResult[0].businessPartner?.generic?.legalEntity?.legalEntityBpn).isEqualTo(createdLegalEntity.legalEntity.bpnl)
         compareLegalEntity(createdLegalEntity, createResult[0].businessPartner?.legalEntity)
         val createdAdditionalAddress = poolClient.addresses.getAddress(createResult[0].businessPartner?.address?.bpnAReference?.referenceValue!!)
         assertThat(createdAdditionalAddress.bpnLegalEntity).isEqualTo(createdLegalEntity.legalEntity.bpnl)
@@ -393,7 +393,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         assertThat(resultSteps2[0].errors.size).isEqualTo(0)
         assertThat(createdLegalEntity1.legalEntity.bpnl).isNotEqualTo(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
         val createdLegalEntity2 = poolClient.legalEntities.getLegalEntity(resultSteps2[0].businessPartner?.legalEntity?.bpnLReference?.referenceValue!!)
-        assertThat(resultSteps2[0].businessPartner?.generic?.legalEntity?.bpnL).isEqualTo(createdLegalEntity2.legalEntity.bpnl)
+        assertThat(resultSteps2[0].businessPartner?.generic?.legalEntity?.legalEntityBpn).isEqualTo(createdLegalEntity2.legalEntity.bpnl)
     }
 
     @Test

@@ -94,9 +94,9 @@ class TaskStepBuildService(
             businessPartner = BusinessPartnerFullDto(
                 generic = with(businessPartnerDto.generic) {
                     copy(
-                        legalEntity = this.legalEntity.copy(bpnL = legalEntity.bpn),
-                        site = this.site.copy(bpnS = siteEntity?.bpn),
-                        address = this.address.copy(bpnA = genericBpnA)
+                        legalEntity = this.legalEntity.copy(legalEntityBpn = legalEntity.bpn),
+                        site = this.site.copy(siteBpn = siteEntity?.bpn),
+                        address = this.address.copy(addressBpn = genericBpnA)
                     )
                 },
                 legalEntity = businessPartnerDto.legalEntity!!.copy(

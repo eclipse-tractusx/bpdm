@@ -105,7 +105,7 @@ object CommonValues {
         states = states,
         roles = roles,
         ownerBpnL = "ownerBpnL2",
-        legalEntity = LegalEntityComponent(
+        legalEntity = LegalEntityRepresentation(
             shortName = shortName,
             legalForm = legalForm,
             classifications = classifications
@@ -116,7 +116,7 @@ object CommonValues {
     val businessPartnerWithBpnA = with(businessPartnerWithEmptyBpns) {
         copy(
             address = address.copy(
-                bpnA = "FixedBPNA",
+                addressBpn = "FixedBPNA",
                 addressType = postalAddressForAdditional.addressType,
                 physicalPostalAddress = postalAddressForAdditional.physicalPostalAddress,
                 alternativePostalAddress = postalAddressForAdditional.alternativePostalAddress
@@ -128,13 +128,13 @@ object CommonValues {
     val businessPartnerWithBpnLAndBpnAAndLegalAddressType = with(businessPartnerWithEmptyBpns) {
         copy(
             address = address.copy(
-                bpnA = "FixedBPNA",
+                addressBpn = "FixedBPNA",
                 addressType = postalAddressForLegal.addressType,
                 physicalPostalAddress = postalAddressForLegal.physicalPostalAddress,
                 alternativePostalAddress = postalAddressForLegal.alternativePostalAddress
             ),
             legalEntity = legalEntity.copy(
-                bpnL = "FixedBPNL"
+                legalEntityBpn = "FixedBPNL"
             )
         )
     }
@@ -152,13 +152,13 @@ object CommonValues {
     val businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType = with(businessPartnerWithEmptyBpns) {
         copy(
             address = address.copy(
-                bpnA = "FixedBPNA",
+                addressBpn = "FixedBPNA",
                 addressType = postalAddressForLegalAndSite.addressType,
                 physicalPostalAddress = postalAddressForLegalAndSite.physicalPostalAddress,
                 alternativePostalAddress = postalAddressForLegalAndSite.alternativePostalAddress
             ),
             site = site.copy(
-                bpnS = "FixedBPNS"
+                siteBpn = "FixedBPNS"
             )
         )
     }

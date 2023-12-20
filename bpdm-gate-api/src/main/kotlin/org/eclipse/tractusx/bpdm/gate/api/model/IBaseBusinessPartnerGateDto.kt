@@ -28,7 +28,7 @@ interface IBaseBusinessPartnerGateDto : IBaseBusinessPartnerDto {
     @get:Schema(description = CommonDescription.externalId)
     val externalId: String
 
-    @get:Schema(description = "True if the sharing member declares itself as the owner of the business partner.")
+    @get:Schema(description = "Indicates whether the sharing member claims (in the initial upload) the business partner to belong to the company data of the sharing member.")
     val isOwnCompanyData: Boolean
 }
 

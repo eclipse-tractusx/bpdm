@@ -24,9 +24,9 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.IBaseBusinessPartnerGateDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressComponentInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityComponentInputDto
-import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteComponentInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.AddressRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.LegalEntityRepresentationInputDto
+import org.eclipse.tractusx.bpdm.gate.api.model.response.SiteRepresentationInputDto
 
 @Schema(
     description = "Generic business partner with external id",
@@ -40,8 +40,8 @@ data class BusinessPartnerInputRequest(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
-    override val legalEntity: LegalEntityComponentInputDto = LegalEntityComponentInputDto(),
-    override val site: SiteComponentInputDto = SiteComponentInputDto(),
-    override val address: AddressComponentInputDto = AddressComponentInputDto()
+    override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
+    override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
+    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto()
 
 ) : IBaseBusinessPartnerGateDto

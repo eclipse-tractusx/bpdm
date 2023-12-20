@@ -50,20 +50,20 @@ class OrchestratorMappings(
 
     )
 
-    private fun toLegalEntityComponentDto(entity: BusinessPartner) = LegalEntityComponent(
-        bpnL = entity.bpnL,
+    private fun toLegalEntityComponentDto(entity: BusinessPartner) = LegalEntityRepresentation(
+        legalEntityBpn = entity.bpnL,
         legalName = entity.legalName,
         shortName = entity.shortName,
         legalForm = entity.legalForm,
         classifications = entity.classifications.map { toClassificationDto(it) }
     )
 
-    private fun toSiteComponentDto(entity: BusinessPartner) = SiteComponent(
-        bpnS = entity.bpnS,
+    private fun toSiteComponentDto(entity: BusinessPartner) = SiteRepresentation(
+        siteBpn = entity.bpnS,
     )
 
-    private fun toAddressComponentDto(bpnA: String?, entity: PostalAddress) = AddressComponent(
-        bpnA = bpnA,
+    private fun toAddressComponentDto(bpnA: String?, entity: PostalAddress) = AddressRepresentation(
+        addressBpn = bpnA,
         addressType = entity.addressType,
         physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
         alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
@@ -155,9 +155,9 @@ class OrchestratorMappings(
         classifications = dto.legalEntity.classifications.map { toClassification(it) }.toSortedSet(),
         roles = dto.roles.toSortedSet(),
         postalAddress = toPostalAddress(dto.address),
-        bpnL = dto.legalEntity.bpnL,
-        bpnS = dto.site.bpnS,
-        bpnA = dto.address.bpnA,
+        bpnL = dto.legalEntity.legalEntityBpn,
+        bpnS = dto.site.siteBpn,
+        bpnA = dto.address.addressBpn,
         stage = StageType.Output
     )
 
@@ -174,7 +174,7 @@ class OrchestratorMappings(
     private fun toClassification(dto: BusinessPartnerClassificationDto) =
         Classification(type = dto.type, code = dto.code, value = dto.value)
 
-    private fun toPostalAddress(dto: AddressComponent) =
+    private fun toPostalAddress(dto: AddressRepresentation) =
         PostalAddress(
             addressType = dto.addressType,
             physicalPostalAddress = dto.physicalPostalAddress?.let(::toPhysicalPostalAddress),

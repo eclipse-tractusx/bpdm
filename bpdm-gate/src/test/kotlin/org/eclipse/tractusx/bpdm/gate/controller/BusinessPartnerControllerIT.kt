@@ -473,19 +473,19 @@ class BusinessPartnerControllerIT @Autowired constructor(
             contentSize = 3,
             content = listOf(
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.bpnL,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.legalEntity.legalEntityBpn,
                     businessPartnerType = BusinessPartnerType.LEGAL_ENTITY,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.bpnA,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.address.addressBpn,
                     businessPartnerType = BusinessPartnerType.ADDRESS,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
                 ),
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site.bpnS!!,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site.siteBpn!!,
                     businessPartnerType = BusinessPartnerType.SITE,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE
@@ -565,7 +565,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericValues.businessPartner1.address.bpnA,
+                bpn = BusinessPartnerGenericValues.businessPartner1.address.addressBpn,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),
