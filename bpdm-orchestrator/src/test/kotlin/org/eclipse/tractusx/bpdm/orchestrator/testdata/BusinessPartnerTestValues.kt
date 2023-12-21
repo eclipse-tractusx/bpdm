@@ -38,7 +38,6 @@ object BusinessPartnerTestValues {
     //Business Partner with two entries in every collection
     val businessPartner1 = BusinessPartnerGenericDto(
         nameParts = listOf("NamePart1", "NamePart2"),
-        shortName = "shortname",
         identifiers = listOf(
             BusinessPartnerIdentifierDto(
                 type = "identifier-type-1",
@@ -51,8 +50,6 @@ object BusinessPartnerTestValues {
                 issuingBody = "issuingBody-2"
             ),
         ),
-        legalName = "legal-name",
-        legalForm = "legal-form",
         states = listOf(
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
@@ -67,23 +64,33 @@ object BusinessPartnerTestValues {
                 description = "business-state-description-2"
             )
         ),
-        classifications = listOf(
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NACE,
-                code = "code-1",
-                value = "value-1"
-            ),
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.NAF,
-                code = "code-2",
-                value = "value-2"
-            ),
-        ),
         roles = listOf(
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        postalAddress = PostalAddressDto(
+        legalEntity = LegalEntityComponent(
+            bpnL = "BPNLTEST",
+            legalName = "legal-name",
+            shortName = "shortname",
+            legalForm = "legal-form",
+            classifications = listOf(
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NACE,
+                    code = "code-1",
+                    value = "value-1"
+                ),
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.NAF,
+                    code = "code-2",
+                    value = "value-2"
+                ),
+            )
+        ),
+        site = SiteComponent(
+            bpnS = "BPNSTEST"
+        ),
+        address = AddressComponent(
+            bpnA = "BPNATEST",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
@@ -122,16 +129,12 @@ object BusinessPartnerTestValues {
                 deliveryServiceType = DeliveryServiceType.PO_BOX
             )
         ),
-        ownerBpnL = "BPNL_OWNER_TEST_1",
-        legalEntityBpn = "BPNLTEST",
-        siteBpn = "BPNSTEST",
-        addressBpn = "BPNATEST"
+        ownerBpnL = "BPNL_OWNER_TEST_1"
     )
 
     //Business Partner with single entry in every collection
     val businessPartner2 = BusinessPartnerGenericDto(
         nameParts = listOf("name-part-2"),
-        shortName = "shortname-2",
         identifiers = listOf(
             BusinessPartnerIdentifierDto(
                 type = "identifier-type-2",
@@ -139,8 +142,6 @@ object BusinessPartnerTestValues {
                 issuingBody = "issuingBody-2"
             )
         ),
-        legalName = "legal-name-2",
-        legalForm = "legal-form-2",
         states = listOf(
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(1988, 10, 4, 22, 30),
@@ -149,17 +150,27 @@ object BusinessPartnerTestValues {
                 description = "business-state-description-2"
             )
         ),
-        classifications = listOf(
-            BusinessPartnerClassificationDto(
-                type = ClassificationType.SIC,
-                code = "code-2",
-                value = "value-2"
-            )
-        ),
         roles = listOf(
             BusinessPartnerRole.CUSTOMER
         ),
-        postalAddress = PostalAddressDto(
+        legalEntity = LegalEntityComponent(
+            bpnL = "BPNLTEST-2",
+            legalName = "legal-name-2",
+            shortName = "shortname-2",
+            legalForm = "legal-form-2",
+            classifications = listOf(
+                BusinessPartnerClassificationDto(
+                    type = ClassificationType.SIC,
+                    code = "code-2",
+                    value = "value-2"
+                )
+            )
+        ),
+        site = SiteComponent(
+            bpnS = "BPNSTEST-2"
+        ),
+        address = AddressComponent(
+            bpnA = "BPNATEST-2",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.4f, 0.4f, 0.4f),
@@ -198,10 +209,7 @@ object BusinessPartnerTestValues {
                 deliveryServiceType = DeliveryServiceType.BOITE_POSTALE
             )
         ),
-        ownerBpnL = "BPNL_OWNER_TEST_2",
-        legalEntityBpn = "BPNLTEST-2",
-        siteBpn = "BPNSTEST-2",
-        addressBpn = "BPNATEST-2"
+        ownerBpnL = "BPNL_OWNER_TEST_2"
     )
 
     val logisticAddress1 = LogisticAddressDto(

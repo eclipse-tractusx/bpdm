@@ -19,6 +19,7 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -27,37 +28,82 @@ interface IBaseBusinessPartnerDto {
     @get:ArraySchema(arraySchema = Schema(description = "The list of name parts to accommodate the different number of name fields in different systems."))
     val nameParts: List<String>
 
-    @get:Schema(description = "Abbreviated name or shorthand.")
-    val shortName: String?
-
     @get:ArraySchema(arraySchema = Schema(description = "The list of identifiers of the business partner. Sorted and duplicates removed by the service."))
     val identifiers: Collection<IBusinessPartnerIdentifierDto>
-
-    @get:Schema(description = "The name according to official registers.")
-    val legalName: String?
-
-    @get:Schema(description = "Technical key of the legal form.")
-    val legalForm: String?
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service."))
     val states: Collection<IBusinessPartnerStateDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
-    val classifications: Collection<IBusinessPartnerClassificationDto>
-
     @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>
 
-    @get:Schema(description = "Address of the official seat of this business partner.")
-    val postalAddress: IBaseBusinessPartnerPostalAddressDto
+    val legalEntity: IBaseLegalEntityComponent
 
-    // TODO: rename to bpnL, bpnS, bpnA (breaking change!)
-    @get:Schema(description = "BPNL of the golden record legal entity this business partner refers to")
+    val site: IBaseSiteComponent
+
+    val address: IBaseAddressComponent
+
+    // Overrides to satisfy the base class but will be not shown on API level.
+    // That way other modules using this business partner are still backwards compatible and can be adapted one after another
+    // ToDo: Once all other BPDM module models and mappings are adapted, update the Base Interface and delete the overrides
+
     val legalEntityBpn: String?
+        @JsonIgnore
+        get() = legalEntity.bpnL
 
-    @get:Schema(description = "BPNS of the golden record site this business partner refers to")
+    val legalName: String?
+        @JsonIgnore
+        get() = legalEntity.legalName
+
+    val shortName: String?
+        @JsonIgnore
+        get() = legalEntity.shortName
+
+    val legalForm: String?
+        @JsonIgnore
+        get() = legalEntity.legalForm
+
+    val classifications: Collection<IBusinessPartnerClassificationDto>
+        @JsonIgnore
+        get() = legalEntity.classifications
+
     val siteBpn: String?
+        @JsonIgnore
+        get() = site.bpnS
 
-    @get:Schema(description = "BPNA of the golden record address this business partner refers to")
     val addressBpn: String?
+        @JsonIgnore
+        get() = address.bpnA
+
+    val postalAddress: IBaseBusinessPartnerPostalAddressDto
+        @JsonIgnore
+        get() = address
+}
+
+interface IBaseLegalEntityComponent {
+
+    @get:Schema(description = "BPNL of the golden record legal entity this business partner refers to")
+    val bpnL: String?
+
+    @get:Schema(description = "The name according to official registers.")
+    val legalName: String?
+
+    @get:Schema(description = "Abbreviated name or shorthand.")
+    val shortName: String?
+
+    @get:Schema(description = "Technical key of the legal form.")
+    val legalForm: String?
+
+    @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
+    val classifications: Collection<IBusinessPartnerClassificationDto>
+}
+
+interface IBaseSiteComponent {
+    @get:Schema(description = "BPNS of the golden record site this business partner refers to")
+    val bpnS: String?
+}
+
+interface IBaseAddressComponent : IBaseBusinessPartnerPostalAddressDto {
+    @get:Schema(description = "BPNA of the golden record address this business partner refers to")
+    val bpnA: String?
 }
