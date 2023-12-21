@@ -233,7 +233,6 @@ class TaskStepBuildService(
             clear()
             addAll(dto.states.map {
                 AddressState(
-                    description = it.description,
                     validFrom = it.validFrom,
                     validTo = it.validTo,
                     type = it.type,

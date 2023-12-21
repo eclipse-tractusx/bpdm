@@ -67,8 +67,7 @@ fun gateToPoolLegalEntityState(gateDto: Gate_LegalEntityStateDto): Pool_LegalEnt
     return Pool_LegalEntityStateDto(
         validFrom = gateDto.validFrom,
         validTo = gateDto.validTo,
-        type = gateDto.type,
-        description = gateDto.description
+        type = gateDto.type
     )
 }
 
@@ -84,8 +83,7 @@ fun gateToPoolSiteState(gateDto: Gate_SiteStateDto): Pool_SiteStateDto {
     return Pool_SiteStateDto(
         validFrom = gateDto.validFrom,
         validTo = gateDto.validTo,
-        type = gateDto.type,
-        description = gateDto.description
+        type = gateDto.type
     )
 }
 
@@ -103,8 +101,7 @@ fun gateToPoolAddressState(gateDto: Gate_AddressStateDto): Pool_AddressStateDto 
     return Pool_AddressStateDto(
         validFrom = gateDto.validFrom,
         validTo = gateDto.validTo,
-        type = gateDto.type,
-        description = gateDto.description
+        type = gateDto.type
     )
 }
 
@@ -175,7 +172,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
     }
     val states = legalEntity.states.map {
         Gate_LegalEntityStateDto(
-            description = it.description,
+            description = null,
             validFrom = it.validFrom,
             validTo = it.validTo,
             type = it.typeVerbose.technicalKey
@@ -201,7 +198,7 @@ fun poolToGateLegalEntity(legalEntity: LegalEntityVerboseDto): Gate_LegalEntityD
 fun poolToGateSite(site: SiteVerboseDto): SiteGateDto {
     val states = site.states.map {
         Gate_SiteStateDto(
-            description = it.description,
+            description = null,
             validFrom = it.validFrom,
             validTo = it.validTo,
             type = it.typeVerbose.technicalKey
@@ -223,7 +220,7 @@ fun poolToGateAddressChild(address: Pool_LogisticAddressVerboseDto): AddressGate
 fun poolToGateLogisticAddress(address: Pool_LogisticAddressVerboseDto): Gate_LogisticAddressDto {
     val states = address.states.map {
         Gate_AddressStateDto(
-            description = it.description,
+            description = null,
             validFrom = it.validFrom,
             validTo = it.validTo,
             type = it.typeVerbose.technicalKey

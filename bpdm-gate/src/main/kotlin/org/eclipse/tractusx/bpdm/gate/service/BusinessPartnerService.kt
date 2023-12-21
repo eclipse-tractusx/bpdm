@@ -272,7 +272,6 @@ class BusinessPartnerService(
         toState.apply {
             validFrom = fromState.validFrom
             validTo = fromState.validTo
-            description = fromState.description
             type = fromState.type
         }
 

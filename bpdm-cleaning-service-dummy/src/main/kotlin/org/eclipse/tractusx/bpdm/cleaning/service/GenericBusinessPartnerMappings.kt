@@ -57,12 +57,12 @@ fun BusinessPartnerIdentifierDto.toLegalEntityIdentifierDto(): LegalEntityIdenti
 
 fun BusinessPartnerStateDto.toLegalEntityState(): LegalEntityStateDto? {
 
-    return type?.let { LegalEntityStateDto(description, validFrom, validTo, it) }
+    return type?.let { LegalEntityStateDto(validFrom, validTo, it) }
 }
 
 fun BusinessPartnerStateDto.toSiteState(): SiteStateDto? {
 
-    return type?.let { SiteStateDto(description, validFrom, validTo, it) }
+    return type?.let { SiteStateDto(validFrom, validTo, it) }
 }
 
 fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReferenceDto):

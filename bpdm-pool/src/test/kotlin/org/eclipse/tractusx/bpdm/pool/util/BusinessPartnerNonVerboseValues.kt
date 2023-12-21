@@ -94,38 +94,32 @@ object BusinessPartnerNonVerboseValues {
     )
 
     private val leStatus1 = LegalEntityStateDto(
-        BusinessPartnerVerboseValues.leStatus1.description,
         BusinessPartnerVerboseValues.leStatus1.validFrom,
         BusinessPartnerVerboseValues.leStatus1.validTo,
         BusinessPartnerVerboseValues.statusType1.technicalKey
     )
     private val leStatus2 = LegalEntityStateDto(
-        BusinessPartnerVerboseValues.leStatus2.description,
         BusinessPartnerVerboseValues.leStatus2.validFrom,
         BusinessPartnerVerboseValues.leStatus2.validTo,
         BusinessPartnerVerboseValues.statusType2.technicalKey
     )
     private val leStatus3 = LegalEntityStateDto(
-        BusinessPartnerVerboseValues.leStatus3.description,
         BusinessPartnerVerboseValues.leStatus3.validFrom,
         BusinessPartnerVerboseValues.leStatus3.validTo,
         BusinessPartnerVerboseValues.statusType3.technicalKey
     )
 
     val siteStatus1 = SiteStateDto(
-        BusinessPartnerVerboseValues.siteStatus1.description,
         BusinessPartnerVerboseValues.siteStatus1.validFrom,
         BusinessPartnerVerboseValues.siteStatus1.validTo,
         BusinessPartnerVerboseValues.statusType1.technicalKey
     )
     private val siteStatus2 = SiteStateDto(
-        BusinessPartnerVerboseValues.siteStatus2.description,
         BusinessPartnerVerboseValues.siteStatus2.validFrom,
         BusinessPartnerVerboseValues.siteStatus2.validTo,
         BusinessPartnerVerboseValues.statusType2.technicalKey
     )
     private val siteStatus3 = SiteStateDto(
-        BusinessPartnerVerboseValues.siteStatus3.description,
         BusinessPartnerVerboseValues.siteStatus3.validFrom,
         BusinessPartnerVerboseValues.siteStatus3.validTo,
         BusinessPartnerVerboseValues.statusType3.technicalKey

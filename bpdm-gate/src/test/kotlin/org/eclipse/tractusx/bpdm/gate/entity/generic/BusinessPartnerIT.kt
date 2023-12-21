@@ -238,7 +238,6 @@ internal class BusinessPartnerIT @Autowired constructor(
 
     private fun createState(): State {
         return State(
-            description = "Active",
             type = BusinessStateType.ACTIVE,
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(365)

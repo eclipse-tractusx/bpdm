@@ -124,7 +124,7 @@ class OrchestratorMappings(
         )
 
     private fun toStateDto(entity: State) =
-        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo, description = entity.description)
+        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
     private fun toIdentifierDto(entity: Identifier) =
         BusinessPartnerIdentifierDto(type = entity.type, value = entity.value, issuingBody = entity.issuingBody)
@@ -173,7 +173,7 @@ class OrchestratorMappings(
         }
 
     private fun toState(dto: BusinessPartnerStateDto) =
-        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
+        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo) }
 
     private fun toClassification(dto: BusinessPartnerClassificationDto) =
         Classification(type = dto.type, code = dto.code, value = dto.value)

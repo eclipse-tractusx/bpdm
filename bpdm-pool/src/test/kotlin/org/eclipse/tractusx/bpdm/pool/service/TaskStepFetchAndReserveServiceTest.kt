@@ -1106,7 +1106,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun legalEntityState(name: String, id: Long, type: BusinessStateType): LegalEntityStateDto {
 
         return LegalEntityStateDto(
-            description = "description_" + name + "_" + id,
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
@@ -1116,7 +1115,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun siteState(name: String, id: Long, type: BusinessStateType): SiteStateDto {
 
         return SiteStateDto(
-            description = "description_" + name + "_" + id,
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
@@ -1126,7 +1124,6 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun addressState(name: String, id: Long, type: BusinessStateType): AddressStateDto {
 
         return AddressStateDto(
-            description = "description_" + name + "_" + id,
             validFrom = LocalDateTime.now().plusDays(id),
             validTo = LocalDateTime.now().plusDays(id + 2),
             type = type
@@ -1293,8 +1290,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun compareAddressStates(statesVerbose: Collection<AddressStateVerboseDto>, states: Collection<AddressStateDto>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.description }
-        val sortedStates = states?.sortedBy { it.description }
+        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
+        val sortedStates = states?.sortedBy { it.validFrom }
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates!![it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
@@ -1320,8 +1317,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun compareStates(statesVerbose: Collection<LegalEntityStateVerboseDto>, states: Collection<ILegalEntityStateDto>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.description }
-        val sortedStates = states!!.sortedBy { it.description }
+        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
+        val sortedStates = states!!.sortedBy { it.validFrom }
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()
@@ -1335,8 +1332,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     fun compareSiteStates(statesVerbose: Collection<SiteStateVerboseDto>, states: Collection<ISiteStateDto>?) {
 
         assertThat(statesVerbose.size).isEqualTo(states?.size ?: 0)
-        val sortedVerboseStates = statesVerbose.sortedBy { it.description }
-        val sortedStates = states!!.sortedBy { it.description }
+        val sortedVerboseStates = statesVerbose.sortedBy { it.validFrom }
+        val sortedStates = states!!.sortedBy { it.validFrom }
         sortedVerboseStates.indices.forEach {
             assertThat(sortedVerboseStates[it].typeVerbose.technicalKey.name).isEqualTo(sortedStates[it].type.name)
             assertThat(sortedVerboseStates[it]).usingRecursiveComparison()

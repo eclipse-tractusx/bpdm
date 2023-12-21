@@ -398,7 +398,6 @@ class BusinessPartnerBuildService(
 
         fun toLegalEntityState(dto: ILegalEntityStateDto, legalEntity: LegalEntity): LegalEntityState {
             return LegalEntityState(
-                description = dto.description,
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,
@@ -408,7 +407,6 @@ class BusinessPartnerBuildService(
 
         fun toSiteState(dto: ISiteStateDto, site: Site): SiteState {
             return SiteState(
-                description = dto.description,
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,
@@ -418,7 +416,6 @@ class BusinessPartnerBuildService(
 
         fun toAddressState(dto: IAddressStateDto, address: LogisticAddress): AddressState {
             return AddressState(
-                description = dto.description,
                 validFrom = dto.validFrom,
                 validTo = dto.validTo,
                 type = dto.type,

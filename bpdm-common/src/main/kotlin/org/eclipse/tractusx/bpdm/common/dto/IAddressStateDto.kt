@@ -27,9 +27,6 @@ import java.time.LocalDateTime
 @Schema(description = AddressStateDescription.header)
 interface IAddressStateDto : IBaseStateDto {
 
-    @get:Schema(description = AddressStateDescription.description)
-    override val description: String?
-
     @get:Schema(description = AddressStateDescription.validFrom)
     override val validFrom: LocalDateTime?
 

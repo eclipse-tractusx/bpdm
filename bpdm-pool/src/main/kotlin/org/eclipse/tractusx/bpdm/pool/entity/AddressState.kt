@@ -32,9 +32,6 @@ import java.time.LocalDateTime
     ]
 )
 class AddressState (
-    @Column(name = "description")
-    val description: String?,
-
     @Column(name = "valid_from")
     val validFrom: LocalDateTime?,
 

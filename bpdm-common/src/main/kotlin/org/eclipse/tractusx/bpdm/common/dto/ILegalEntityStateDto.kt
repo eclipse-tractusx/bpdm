@@ -27,9 +27,6 @@ import java.time.LocalDateTime
 @Schema(description = LegalEntityStateDescription.header)
 interface ILegalEntityStateDto : IBaseStateDto {
 
-    @get:Schema(description = LegalEntityStateDescription.description)
-    override val description: String?
-
     @get:Schema(description = LegalEntityStateDescription.validFrom)
     override val validFrom: LocalDateTime?
 

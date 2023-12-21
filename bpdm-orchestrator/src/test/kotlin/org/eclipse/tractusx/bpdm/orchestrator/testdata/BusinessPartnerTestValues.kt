@@ -54,14 +54,12 @@ object BusinessPartnerTestValues {
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
                 validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
-                type = BusinessStateType.INACTIVE,
-                description = "business-state-description-1"
+                type = BusinessStateType.INACTIVE
             ),
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
                 validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
-                type = BusinessStateType.ACTIVE,
-                description = "business-state-description-2"
+                type = BusinessStateType.ACTIVE
             )
         ),
         roles = listOf(
@@ -148,8 +146,7 @@ object BusinessPartnerTestValues {
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(1988, 10, 4, 22, 30),
                 validTo = LocalDateTime.of(2023, 1, 1, 10, 10),
-                type = BusinessStateType.ACTIVE,
-                description = "business-state-description-2"
+                type = BusinessStateType.ACTIVE
             )
         ),
         roles = listOf(
@@ -220,13 +217,11 @@ object BusinessPartnerTestValues {
         name = "Address Name 1",
         states = listOf(
             AddressStateDto(
-                description = "Address State 1",
                 validFrom = LocalDateTime.of(1970, 4, 4, 4, 4),
                 validTo = LocalDateTime.of(1975, 5, 5, 5, 5),
                 type = BusinessStateType.ACTIVE
             ),
             AddressStateDto(
-                description = "Address State 2",
                 validFrom = LocalDateTime.of(1975, 5, 5, 5, 5),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
@@ -288,7 +283,6 @@ object BusinessPartnerTestValues {
         name = "Address Name 2",
         states = listOf(
             AddressStateDto(
-                description = "Address State 2",
                 validFrom = LocalDateTime.of(1971, 4, 4, 4, 4),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
@@ -360,13 +354,11 @@ object BusinessPartnerTestValues {
         legalForm = "Legal Form 1",
         states = listOf(
             LegalEntityStateDto(
-                description = "Legal State Description 1",
                 validFrom = LocalDateTime.of(1995, 2, 2, 3, 3),
                 validTo = LocalDateTime.of(2000, 3, 3, 4, 4),
                 type = BusinessStateType.ACTIVE
             ),
             LegalEntityStateDto(
-                description = "Legal State Description 2",
                 validFrom = LocalDateTime.of(2000, 3, 3, 4, 4),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
@@ -405,7 +397,6 @@ object BusinessPartnerTestValues {
         legalForm = "Legal Form 2",
         states = listOf(
             LegalEntityStateDto(
-                description = "Legal State Description 2",
                 validFrom = LocalDateTime.of(1900, 5, 5, 5, 5),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
@@ -430,13 +421,11 @@ object BusinessPartnerTestValues {
         name = "Site Name 1",
         states = listOf(
             SiteStateDto(
-                description = "Site State Description 1",
                 validFrom = LocalDateTime.of(1991, 10, 10, 10, 10),
                 validTo = LocalDateTime.of(2001, 11, 11, 11, 11),
                 type = BusinessStateType.ACTIVE
             ),
             SiteStateDto(
-                description = "Site State Description 2",
                 validFrom = LocalDateTime.of(2001, 11, 11, 11, 11),
                 validTo = null,
                 type = BusinessStateType.INACTIVE
@@ -454,7 +443,6 @@ object BusinessPartnerTestValues {
         name = "Site Name 2",
         states = listOf(
             SiteStateDto(
-                description = "Site State Description 2",
                 validFrom = LocalDateTime.of(1997, 12, 12, 12, 12),
                 validTo = null,
                 type = BusinessStateType.ACTIVE
