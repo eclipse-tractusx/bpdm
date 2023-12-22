@@ -35,9 +35,18 @@ bpdm:
     api:
         upsert-limit: 100
 
-    # Cleaning Task Job Configurations
-    goldenRecordTask:
-        pollingCron: '-'
+    # Configuration for golden record tasks
+    tasks:
+        creation:
+            fromSharingMember:
+                batchSize: 100
+                cron: '-'
+            fromPool:
+                batchSize: 100
+                cron: '-'
+        check:
+            batchSize: 100
+            cron: '-'
 
     # Connection to the pool and orchestrator  [No auth on default]
     client:

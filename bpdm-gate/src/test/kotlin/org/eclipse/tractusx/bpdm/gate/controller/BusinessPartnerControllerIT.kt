@@ -34,10 +34,11 @@ import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.BusinessPartnerStateDto
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
-import org.eclipse.tractusx.bpdm.gate.service.BusinessPartnerService
+import org.eclipse.tractusx.bpdm.gate.service.GoldenRecordTaskService
 import org.eclipse.tractusx.bpdm.gate.util.*
 import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.pool.api.model.response.ChangelogEntryVerboseDto
@@ -66,7 +67,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
     val testHelpers: DbTestHelpers,
     val gateClient: GateClient,
     val objectMapper: ObjectMapper,
-    val businessPartnerService: BusinessPartnerService
+    val goldenRecordTaskService: GoldenRecordTaskService
 ) {
     companion object {
         const val ORCHESTRATOR_CREATE_TASKS_URL = "/api/golden-record-tasks"
@@ -101,14 +102,11 @@ class BusinessPartnerControllerIT @Autowired constructor(
     @Test
     fun `insert minimal business partner`() {
 
-
         val upsertRequests = listOf(BusinessPartnerNonVerboseValues.bpInputRequestMinimal)
         val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
         assertUpsertResponsesMatchRequests(upsertResponses, upsertRequests)
 
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(null)
-        assertEquals(1, searchResponsePage.totalElements)
-        testHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertResponses)
+        assertBusinessPartnersUpsertedCorrectly(upsertResponses)
     }
 
     @Test
@@ -119,11 +117,8 @@ class BusinessPartnerControllerIT @Autowired constructor(
             BusinessPartnerNonVerboseValues.bpInputRequestChina
         )
         val upsertResponses = gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
-        assertUpsertResponsesMatchRequests(upsertResponses, upsertRequests)
 
-        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(null)
-        assertEquals(3, searchResponsePage.totalElements)
-        testHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertResponses)
+        assertBusinessPartnersUpsertedCorrectly(upsertResponses)
     }
 
     @Test
@@ -133,7 +128,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
             BusinessPartnerNonVerboseValues.bpInputRequestChina
         )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+        upsertBusinessPartnersAndShare(upsertRequests)
 
         val externalId1 = BusinessPartnerNonVerboseValues.bpInputRequestFull.externalId
         val externalId2 = BusinessPartnerNonVerboseValues.bpInputRequestMinimal.externalId
@@ -518,7 +513,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned,
             BusinessPartnerNonVerboseValues.bpInputRequestError
         )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+        upsertBusinessPartnersAndShare(upsertRequests)
 
         val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
         val externalId5 = BusinessPartnerNonVerboseValues.bpInputRequestError.externalId
@@ -555,7 +550,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        businessPartnerService.finishCleaningTask()
+        goldenRecordTaskService.resolvePendingTasks()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -600,7 +595,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             BusinessPartnerNonVerboseValues.bpInputRequestError,
             BusinessPartnerNonVerboseValues.bpInputRequestChina,
         )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+        upsertBusinessPartnersAndShare(upsertRequests)
 
         val externalId3 = BusinessPartnerNonVerboseValues.bpInputRequestChina.externalId
 
@@ -626,7 +621,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
             .isEqualTo(createdSharingState)
 
         // Call Finish Cleaning Method
-        businessPartnerService.finishCleaningTask()
+        goldenRecordTaskService.resolvePendingTasks()
 
         val cleanedSharingState = listOf(
             SharingStateDto(
@@ -661,13 +656,13 @@ class BusinessPartnerControllerIT @Autowired constructor(
         val upsertRequests = listOf(
             BusinessPartnerNonVerboseValues.bpInputRequestCleaned
         )
-        gateClient.businessParters.upsertBusinessPartnersInput(upsertRequests).body!!
+        upsertBusinessPartnersAndShare(upsertRequests)
 
         val externalId4 = BusinessPartnerNonVerboseValues.bpInputRequestCleaned.externalId
 
-        businessPartnerService.finishCleaningTask()
+        goldenRecordTaskService.resolvePendingTasks()
 
-        businessPartnerService.requestCleaningTaskForGateOutputIfPoolBpnHasChanges()
+        goldenRecordTaskService.createTasksForGoldenRecordUpdates()
 
         val upsertSharingStatesRequests = listOf(
             SharingStateDto(
@@ -703,4 +698,28 @@ class BusinessPartnerControllerIT @Autowired constructor(
 
     private fun BusinessPartnerInputRequest.fastCopy(externalId: String, shortName: String) =
         copy(externalId = externalId, legalEntity = legalEntity.copy(shortName = shortName))
+
+    private fun upsertBusinessPartnersAndShare(partners: List<BusinessPartnerInputRequest>) {
+        gateClient.businessParters.upsertBusinessPartnersInput(partners)
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(partners.map { it.externalId }))
+        goldenRecordTaskService.createTasksForReadyBusinessPartners()
+    }
+
+    private fun assertBusinessPartnersUpsertedCorrectly(upsertedBusinessPartners: Collection<BusinessPartnerInputDto>) {
+        val searchResponsePage = gateClient.businessParters.getBusinessPartnersInput(null)
+        assertEquals(upsertedBusinessPartners.size.toLong(), searchResponsePage.totalElements)
+        testHelpers.assertRecursively(searchResponsePage.content).isEqualTo(upsertedBusinessPartners)
+
+        val sharingStateResponse = gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType = null, externalIds = null)
+        assertEquals(upsertedBusinessPartners.size.toLong(), sharingStateResponse.totalElements)
+        Assertions.assertThat(sharingStateResponse.content).isEqualTo(
+            upsertedBusinessPartners.map {
+                SharingStateDto(
+                    businessPartnerType = BusinessPartnerType.GENERIC,
+                    externalId = it.externalId,
+                    sharingStateType = SharingStateType.Initial
+                )
+            }
+        )
+    }
 }

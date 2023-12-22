@@ -28,7 +28,9 @@ import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateException
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidStateRequestException
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingPartnerException
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byBusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository.Specs.byExternalIdsIn
@@ -74,6 +76,8 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
             )
 
             SharingStateType.Initial -> setInitial(sharingState)
+
+            SharingStateType.Ready -> setReady(sharingState)
         }
     }
 
@@ -130,6 +134,26 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
             .map { (sharingState, request) -> setError(sharingState, request.errorCode, request.errorMessage, request.startTimeOverwrite) }
     }
 
+    fun setReady(externalIds: List<String>): List<SharingState> {
+        val existingSharingStates = stateRepository.findByExternalIdInAndBusinessPartnerType(externalIds, BusinessPartnerType.GENERIC)
+        val existingIds = existingSharingStates.map { it.externalId }.toSet()
+        val missingIds = externalIds.minus(existingIds)
+
+        if (missingIds.isNotEmpty())
+            throw BpdmMissingPartnerException(missingIds)
+
+
+        val (correctStates, incorrectStates) = existingSharingStates.partition {
+            it.sharingStateType == SharingStateType.Initial
+                    || it.sharingStateType == SharingStateType.Error
+        }
+
+        if (incorrectStates.isNotEmpty())
+            throw BpdmInvalidStateException(incorrectStates.map { BpdmInvalidStateException.InvalidState(it.externalId, it.sharingStateType) })
+
+        return correctStates.map { setReady(it) }
+    }
+
     private fun setInitial(sharingState: SharingState): SharingState {
         sharingState.sharingStateType = SharingStateType.Initial
         sharingState.sharingErrorCode = null
@@ -174,6 +198,20 @@ class SharingStateService(private val stateRepository: SharingStateRepository) {
 
         return stateRepository.save(sharingState)
     }
+
+    private fun setReady(
+        sharingState: SharingState
+    ): SharingState {
+        sharingState.sharingStateType = SharingStateType.Ready
+        sharingState.sharingErrorCode = null
+        sharingState.sharingErrorMessage = null
+        sharingState.sharingProcessStarted = null
+        sharingState.taskId = null
+
+        return stateRepository.save(sharingState)
+    }
+
+
 
     private fun getOrCreate(sharingStateIdentifiers: List<SharingStateIdentifierDto>): List<SharingState>{
         val identifiersByType = sharingStateIdentifiers.groupBy { it.businessPartnerType }

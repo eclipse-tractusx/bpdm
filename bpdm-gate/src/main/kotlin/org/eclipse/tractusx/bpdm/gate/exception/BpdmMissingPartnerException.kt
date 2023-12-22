@@ -17,12 +17,12 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.exception
 
-enum class SharingStateType {
-    Pending,
-    Success,
-    Error,
-    Initial,
-    Ready
-}
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmMissingPartnerException(
+    externalIds: List<String>
+) : RuntimeException("Business partners with the following external ids not found: ${externalIds.joinToString()}")

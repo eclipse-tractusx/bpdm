@@ -22,12 +22,10 @@ package org.eclipse.tractusx.bpdm.gate.service
 import mu.KotlinLogging
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
-import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.common.service.toPageDto
 import org.eclipse.tractusx.bpdm.common.util.copyAndSync
 import org.eclipse.tractusx.bpdm.common.util.replace
-import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError
 import org.eclipse.tractusx.bpdm.gate.api.model.ChangelogType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.request.BusinessPartnerInputRequest
@@ -35,22 +33,21 @@ import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerInputDto
 import org.eclipse.tractusx.bpdm.gate.api.model.response.BusinessPartnerOutputDto
 import org.eclipse.tractusx.bpdm.gate.config.PoolConfigProperties
 import org.eclipse.tractusx.bpdm.gate.entity.ChangelogEntry
-import org.eclipse.tractusx.bpdm.gate.entity.SyncType
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
 import org.eclipse.tractusx.bpdm.gate.exception.BpdmMissingStageException
 import org.eclipse.tractusx.bpdm.gate.repository.ChangelogRepository
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
-import org.eclipse.tractusx.bpdm.pool.api.model.request.ChangelogSearchRequest
 import org.eclipse.tractusx.orchestrator.api.client.OrchestrationApiClient
-import org.eclipse.tractusx.orchestrator.api.model.*
+import org.eclipse.tractusx.orchestrator.api.model.BusinessPartnerGenericDto
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateRequest
+import org.eclipse.tractusx.orchestrator.api.model.TaskCreateResponse
+import org.eclipse.tractusx.orchestrator.api.model.TaskMode
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.eclipse.tractusx.bpdm.pool.api.model.ChangelogType as PoolChangeLogType
 
 @Service
 class BusinessPartnerService(
@@ -97,25 +94,12 @@ class BusinessPartnerService(
         saveChangelog(resolutionResults)
 
         val partners = resolutionResults.map { it.businessPartner }
-        val orchestratorBusinessPartnersDto = resolutionResults.map { orchestratorMappings.toBusinessPartnerGenericDto(it.businessPartner) }
-
-        val taskIds = createGoldenRecordTasks(TaskMode.UpdateFromSharingMember, orchestratorBusinessPartnersDto).createdTasks.map { it.taskId }
-
-        val pendingRequests =  partners.zip(taskIds)
-            .map { (partner, taskId) ->
-                SharingStateService.PendingRequest(
-                    SharingStateService.SharingStateIdentifierDto(
-                        partner.externalId,
-                        BusinessPartnerType.GENERIC
-                    ), taskId
-                )
-            }
-        sharingStateService.setPending(pendingRequests)
+        sharingStateService.setInitial(partners.map { SharingStateService.SharingStateIdentifierDto(it.externalId, BusinessPartnerType.GENERIC) })
 
         return businessPartnerRepository.saveAll(partners)
     }
 
-    private fun upsertBusinessPartnersOutputFromCandidates(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
+    fun upsertBusinessPartnersOutputFromCandidates(entityCandidates: List<BusinessPartner>): List<BusinessPartner> {
         val externalIds = entityCandidates.map { it.externalId }
         assertInputStageExists(externalIds)
 
@@ -303,92 +287,6 @@ class BusinessPartnerService(
                 mode, orchestratorBusinessPartnersDto
             )
         )
-    }
-
-    @Scheduled(cron = "\${bpdm.cleaningService.pollingCron:-}", zone = "UTC")
-    @Transactional
-    fun finishCleaningTask() {
-        val sharingStates = sharingStateRepository.findBySharingStateTypeAndTaskIdNotNull(SharingStateType.Pending)
-        val tasks = orchestrationApiClient.goldenRecordTasks.searchTaskStates(TaskStateRequest(sharingStates.map { it.taskId!! })).tasks
-
-        val sharingStateMap = sharingStates.associateBy { it.taskId }
-
-        val taskStatesByResult = tasks
-            .map { Pair(it, sharingStateMap[it.taskId]!!) }
-            .groupBy { (task, _) -> task.processingState.resultState }
-
-        val sharingStatesWithoutTasks = sharingStates.filter { it.taskId !in tasks.map { task -> task.taskId } }
-
-        val businessPartnersToUpsert = taskStatesByResult[ResultState.Success]?.map { (task, sharingState) ->
-            orchestratorMappings.toBusinessPartner(task.businessPartnerResult!!, sharingState.externalId)
-        } ?: emptyList()
-        upsertBusinessPartnersOutputFromCandidates(businessPartnersToUpsert)
-
-        val errorRequests = (taskStatesByResult[ResultState.Error]?.map { (task, sharingState) ->
-            SharingStateService.ErrorRequest(
-                SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
-                BusinessPartnerSharingError.SharingProcessError,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description } else null
-            )
-        } ?: emptyList()).toMutableList()
-
-        errorRequests.addAll(sharingStatesWithoutTasks.map { sharingState ->
-            SharingStateService.ErrorRequest(
-                SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
-                BusinessPartnerSharingError.MissingTaskID,
-                errorMessage = "Missing Task in Orchestrator"
-            )
-        })
-
-        sharingStateService.setError(errorRequests)
-
-    }
-
-    @Scheduled(cron = "\${cleaningService.pollingCron:-}", zone = "UTC")
-    @Transactional
-    fun requestCleaningTaskForGateOutputIfPoolBpnHasChanges() {
-
-        val poolPaginationRequest = PaginationRequest(0, poolConfigProperties.searchChangelogPageSize)
-
-        val syncRecord = syncRecordService.getOrCreateRecord(SyncType.POOL_TO_GATE_OUTPUT)
-
-        val changelogSearchRequest = ChangelogSearchRequest(syncRecord.finishedAt)
-
-
-        val poolChangelogEntries = poolClient.changelogs.getChangelogEntries(changelogSearchRequest, poolPaginationRequest)
-        val poolUpdatedEntries = poolChangelogEntries.content.filter { it.changelogType == PoolChangeLogType.UPDATE }
-
-
-        val bpnA =
-            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.ADDRESS }.map { it.bpn }
-        val bpnL = poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.LEGAL_ENTITY }
-            .map { it.bpn }
-        val bpnS =
-            poolUpdatedEntries.filter { it.businessPartnerType == BusinessPartnerType.SITE }.map { it.bpn }
-
-        val gateOutputEntries = businessPartnerRepository.findByStageAndBpnLInOrBpnSInOrBpnAIn(StageType.Output, bpnL, bpnS, bpnA)
-
-        val businessPartnerGenericDtoList = gateOutputEntries.map { bp ->
-            orchestratorMappings.toBusinessPartnerGenericDto(bp)
-        }
-
-        val taskIds = createGoldenRecordTasks(TaskMode.UpdateFromPool, businessPartnerGenericDtoList).createdTasks.map { it.taskId }
-
-        val pendingRequests = gateOutputEntries.zip(taskIds)
-            .map { (partner, taskId) ->
-                SharingStateService.PendingRequest(
-                    SharingStateService.SharingStateIdentifierDto(
-                        partner.externalId,
-                        partner.parentType ?: BusinessPartnerType.GENERIC
-                    ), taskId
-                )
-            }
-        sharingStateService.setPending(pendingRequests)
-
-        if (poolUpdatedEntries.isNotEmpty()) {
-            syncRecordService.setSynchronizationStart(SyncType.POOL_TO_GATE_OUTPUT)
-            syncRecordService.setSynchronizationSuccess(SyncType.POOL_TO_GATE_OUTPUT, poolUpdatedEntries.last().timestamp)
-        }
     }
 
 }

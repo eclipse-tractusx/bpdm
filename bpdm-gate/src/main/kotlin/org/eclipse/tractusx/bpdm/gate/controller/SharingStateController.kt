@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.GateSharingStateApi
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.eclipse.tractusx.bpdm.gate.service.SharingStateService
 import org.springframework.security.access.prepost.PreAuthorize
@@ -42,6 +43,10 @@ class SharingStateController(
         externalIds: Collection<String>?
     ): PageDto<SharingStateDto> {
         return sharingStateService.findSharingStates(paginationRequest, businessPartnerType, externalIds)
+    }
+
+    override fun postSharingStateReady(request: PostSharingStateReadyRequest) {
+        sharingStateService.setReady(request.externalIds)
     }
 
     @PreAuthorize("hasAuthority(@gateSecurityConfigProperties.getChangeCompanyOutputDataAsRole())")

@@ -17,12 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.config
 
-enum class SharingStateType {
-    Pending,
-    Success,
-    Error,
-    Initial,
-    Ready
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.stereotype.Component
+
+@Component
+@ConfigurationProperties(prefix = "bpdm.tasks")
+data class GoldenRecordTaskConfigProperties(
+    val creation: CreationProperties = CreationProperties(),
+    val check: TaskProcessProperties = TaskProcessProperties()
+) {
+    data class CreationProperties(
+        val fromSharingMember: TaskProcessProperties = TaskProcessProperties(),
+        val fromPool: TaskProcessProperties = TaskProcessProperties()
+    )
+
+    data class TaskProcessProperties(
+        var batchSize: Int = 100,
+        var cron: String = "-",
+    )
 }

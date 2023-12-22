@@ -28,12 +28,14 @@ import jakarta.validation.Valid
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
+import org.springframework.web.service.annotation.PostExchange
 import org.springframework.web.service.annotation.PutExchange
 
 @RequestMapping("/api/catena/sharing-state", produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -57,6 +59,22 @@ interface GateSharingStateApi {
     ): PageDto<SharingStateDto>
 
     @Operation(
+        summary = "Sets the given business partners into ready to be shared state",
+        description = "The business partners to set the ready state for are identified by their external-id. Only business partners in an initial or error state can be set to ready. If any given business partner could not be set into ready state for any reason (for example, it has not been found or it is in the wrong state) the whole request fails (all or nothing approach)."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "All business partners put in ready to be shared state"),
+            ApiResponse(responseCode = "404", description = "Business partners can't be put into ready state (e.g. external-ID not found, wrong sharing state)")
+        ]
+    )
+    @PostMapping
+    @PostExchange
+    fun postSharingStateReady(@RequestBody request: PostSharingStateReadyRequest)
+
+
+
+    @Operation(
         summary = "Creates or updates a sharing state of a business partner",
         deprecated = true
     )
@@ -69,4 +87,6 @@ interface GateSharingStateApi {
     @PutMapping
     @PutExchange
     fun upsertSharingState(@RequestBody request: SharingStateDto)
+
+
 }
