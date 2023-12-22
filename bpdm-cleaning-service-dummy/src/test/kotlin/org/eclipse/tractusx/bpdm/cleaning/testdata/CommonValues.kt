@@ -101,41 +101,77 @@ object CommonValues {
 
     private val businessPartnerWithEmptyBpns = BusinessPartnerGenericDto(
         nameParts = nameParts,
-        shortName = shortName,
         identifiers = identifiers,
-        legalForm = legalForm,
         states = states,
-        classifications = classifications,
         roles = roles,
-        ownerBpnL = "ownerBpnL2"
+        ownerBpnL = "ownerBpnL2",
+        legalEntity = LegalEntityComponent(
+            shortName = shortName,
+            legalForm = legalForm,
+            classifications = classifications
+        )
     )
 
 
-    val businessPartnerWithBpnA = businessPartnerWithEmptyBpns.copy(
-        postalAddress = postalAddressForAdditional,
-        addressBpn = "FixedBPNA"
-    )
+    val businessPartnerWithBpnA = with(businessPartnerWithEmptyBpns) {
+        copy(
+            address = address.copy(
+                bpnA = "FixedBPNA",
+                addressType = postalAddressForAdditional.addressType,
+                physicalPostalAddress = postalAddressForAdditional.physicalPostalAddress,
+                alternativePostalAddress = postalAddressForAdditional.alternativePostalAddress
+            )
+        )
+    }
 
 
-    val businessPartnerWithBpnLAndBpnAAndLegalAddressType = businessPartnerWithEmptyBpns.copy(
-        postalAddress = postalAddressForLegal,
-        addressBpn = "FixedBPNA",
-        legalEntityBpn = "FixedBPNL"
-    )
+    val businessPartnerWithBpnLAndBpnAAndLegalAddressType = with(businessPartnerWithEmptyBpns) {
+        copy(
+            address = address.copy(
+                bpnA = "FixedBPNA",
+                addressType = postalAddressForLegal.addressType,
+                physicalPostalAddress = postalAddressForLegal.physicalPostalAddress,
+                alternativePostalAddress = postalAddressForLegal.alternativePostalAddress
+            ),
+            legalEntity = legalEntity.copy(
+                bpnL = "FixedBPNL"
+            )
+        )
+    }
 
-    val businessPartnerWithEmptyBpnLAndAdditionalAddressType = businessPartnerWithEmptyBpns.copy(
-        postalAddress = postalAddressForAdditional,
-    )
+    val businessPartnerWithEmptyBpnLAndAdditionalAddressType = with(businessPartnerWithEmptyBpns) {
+        copy(
+            address = address.copy(
+                addressType = postalAddressForAdditional.addressType,
+                physicalPostalAddress = postalAddressForAdditional.physicalPostalAddress,
+                alternativePostalAddress = postalAddressForAdditional.alternativePostalAddress
+            )
+        )
+    }
 
-    val businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType = businessPartnerWithEmptyBpns.copy(
-        postalAddress = postalAddressForLegalAndSite,
-        addressBpn = "FixedBPNA",
-        siteBpn = "FixedBPNS"
-    )
+    val businessPartnerWithBpnSAndBpnAAndLegalAndSiteMainAddressType = with(businessPartnerWithEmptyBpns) {
+        copy(
+            address = address.copy(
+                bpnA = "FixedBPNA",
+                addressType = postalAddressForLegalAndSite.addressType,
+                physicalPostalAddress = postalAddressForLegalAndSite.physicalPostalAddress,
+                alternativePostalAddress = postalAddressForLegalAndSite.alternativePostalAddress
+            ),
+            site = site.copy(
+                bpnS = "FixedBPNS"
+            )
+        )
+    }
 
-    val businessPartnerWithEmptyBpnAndSiteMainAddressType = businessPartnerWithEmptyBpns.copy(
-        postalAddress = postalAddressForSite
-    )
+    val businessPartnerWithEmptyBpnAndSiteMainAddressType = with(businessPartnerWithEmptyBpns) {
+        copy(
+            address = address.copy(
+                addressType = postalAddressForSite.addressType,
+                physicalPostalAddress = postalAddressForSite.physicalPostalAddress,
+                alternativePostalAddress = postalAddressForSite.alternativePostalAddress
+            )
+        )
+    }
 
     val expectedLegalEntityDto = LegalEntityDto(
         hasChanged = true,
