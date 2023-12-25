@@ -40,7 +40,10 @@ class LegalEntity(
     var legalForm: LegalForm?,
 
     @Column(name = "currentness", nullable = false)
-    var currentness: Instant
+    var currentness: Instant,
+
+    @Embedded
+    var confidenceCriteria: ConfidenceCriteria
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "legalEntity", cascade = [CascadeType.ALL], orphanRemoval = true)

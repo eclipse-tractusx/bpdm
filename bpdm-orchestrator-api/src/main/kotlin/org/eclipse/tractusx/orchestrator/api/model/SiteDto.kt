@@ -33,6 +33,8 @@ data class SiteDto(
     override val name: String? = null,
     override val states: Collection<SiteStateDto> = emptyList(),
 
-    val mainAddress: LogisticAddressDto? = null
+    val mainAddress: LogisticAddressDto? = null,
+
+    override val confidenceCriteria: ConfidenceCriteria = ConfidenceCriteria()
 
 ) : IBaseSiteDto

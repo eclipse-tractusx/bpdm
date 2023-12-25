@@ -24,7 +24,10 @@ import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolClientImpl
-import org.eclipse.tractusx.bpdm.pool.api.model.*
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierBusinessPartnerType
+import org.eclipse.tractusx.bpdm.pool.api.model.IdentifierTypeDto
+import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto
+import org.eclipse.tractusx.bpdm.pool.api.model.SiteVerboseDto
 import org.eclipse.tractusx.bpdm.pool.api.model.request.SiteBpnSearchRequest
 import org.eclipse.tractusx.bpdm.pool.api.model.response.*
 import org.eclipse.tractusx.bpdm.pool.util.*
@@ -225,7 +228,7 @@ class SiteControllerIT @Autowired constructor(
         val request1 = with(BusinessPartnerNonVerboseValues.siteCreate1) {
             copy(
                 index = BusinessPartnerNonVerboseValues.siteCreate1.index,
-                site = SiteDto(
+                site = site.copy(
                     name = BusinessPartnerNonVerboseValues.siteCreate1.site.name,
                     states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
                     mainAddress = BusinessPartnerNonVerboseValues.logisticAddress3.copy(
@@ -237,7 +240,7 @@ class SiteControllerIT @Autowired constructor(
         val request2 = with(BusinessPartnerNonVerboseValues.siteCreate2) {
             copy(
                 index = BusinessPartnerNonVerboseValues.siteCreate1.index,
-                site = SiteDto(
+                site = site.copy(
                     name = BusinessPartnerNonVerboseValues.siteCreate1.site.name,
                     states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
                     mainAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(
@@ -296,7 +299,7 @@ class SiteControllerIT @Autowired constructor(
         val toUpdate1 = with(BusinessPartnerNonVerboseValues.siteUpdate1) {
             copy(
                 bpns = bpnList[0],
-                site = SiteDto(
+                site = site.copy(
                     name = BusinessPartnerNonVerboseValues.siteUpdate1.site.name,
                     states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
                     mainAddress = BusinessPartnerNonVerboseValues.logisticAddress3.copy(
@@ -308,7 +311,7 @@ class SiteControllerIT @Autowired constructor(
         val toUpdate2 = with(BusinessPartnerNonVerboseValues.siteUpdate2) {
             copy(
                 bpns = bpnList[1],
-                site = SiteDto(
+                site = site.copy(
                     name = BusinessPartnerNonVerboseValues.siteUpdate1.site.name,
                     states = listOf(BusinessPartnerNonVerboseValues.siteStatus1),
                     mainAddress = BusinessPartnerNonVerboseValues.logisticAddress2.copy(

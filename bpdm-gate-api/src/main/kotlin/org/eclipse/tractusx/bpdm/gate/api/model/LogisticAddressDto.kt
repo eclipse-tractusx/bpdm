@@ -37,6 +37,8 @@ data class LogisticAddressDto(
     override val alternativePostalAddress: AlternativePostalAddressDto? = null,
 
     @get:ArraySchema(arraySchema = Schema(description = LogisticAddressDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList()
+    val roles: Collection<BusinessPartnerRole> = emptyList(),
+
+    override val confidenceCriteria: ConfidenceCriteriaDto? = null
 
 ) : IBaseLogisticAddressDto

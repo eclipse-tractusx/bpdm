@@ -67,6 +67,7 @@ fun LegalEntity.toDto(): LegalEntityVerboseDto {
         classifications = classifications.map { it.toDto() },
         relations = startNodeRelations.plus(endNodeRelations).map { it.toDto() },
         currentness = currentness,
+        confidenceCriteria = confidenceCriteria.toDto(),
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -118,7 +119,8 @@ fun LogisticAddress.toDto(): LogisticAddressVerboseDto {
         states = states.map { it.toDto() },
         identifiers = identifiers.map { it.toDto() },
         physicalPostalAddress = physicalPostalAddress.toDto(),
-        alternativePostalAddress = alternativePostalAddress?.toDto()
+        alternativePostalAddress = alternativePostalAddress?.toDto(),
+        confidenceCriteria = confidenceCriteria.toDto(),
     )
 }
 
@@ -215,6 +217,7 @@ fun Site.toDto(): SiteVerboseDto {
         name,
         states = states.map { it.toDto() },
         bpnLegalEntity = legalEntity.bpn,
+        confidenceCriteria = confidenceCriteria.toDto(),
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
@@ -228,6 +231,7 @@ fun Site.toPoolDto(): SiteWithMainAddressVerboseDto {
             name,
             states = states.map { it.toDto() },
             bpnLegalEntity = legalEntity.bpn,
+            confidenceCriteria = confidenceCriteria.toDto(),
             createdAt = createdAt,
             updatedAt = updatedAt,
         ),
@@ -265,3 +269,13 @@ fun Region.toRegionDto(): RegionDto {
 fun Region.toCountrySubdivisionDto(): CountrySubdivisionDto {
     return CountrySubdivisionDto(countryCode = countryCode, code = regionCode, name = regionName)
 }
+
+fun ConfidenceCriteria.toDto(): ConfidenceCriteriaDto =
+    ConfidenceCriteriaDto(
+        sharedByOwner,
+        checkedByExternalDataSource,
+        numberOfBusinessPartners,
+        lastConfidenceCheckAt,
+        nextConfidenceCheckAt,
+        confidenceLevel
+    )

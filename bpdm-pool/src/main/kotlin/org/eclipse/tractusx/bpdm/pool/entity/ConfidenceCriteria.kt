@@ -17,20 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.pool.entity
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+import java.time.LocalDateTime
 
-@Schema(description = SiteDescription.header)
-data class SiteDto(
 
-    override val name: String,
-    override val states: Collection<SiteStateDto> = emptyList(),
-
-    val mainAddress: LogisticAddressDto,
-
-    override val confidenceCriteria: ConfidenceCriteriaDto
-
-) : IBaseSiteDto
+@Embeddable
+data class ConfidenceCriteria(
+    @Column(name = "shared_by_owner", nullable = false)
+    val sharedByOwner: Boolean,
+    @Column(name = "checked_by_external_data_source", nullable = false)
+    val checkedByExternalDataSource: Boolean,
+    @Column(name = "number_of_business_partners", nullable = false)
+    val numberOfBusinessPartners: Int,
+    @Column(name = "last_confidence_check_at", nullable = false)
+    val lastConfidenceCheckAt: LocalDateTime,
+    @Column(name = "next_confidence_check_at", nullable = false)
+    val nextConfidenceCheckAt: LocalDateTime,
+    @Column(name = "confidence_level", nullable = false)
+    val confidenceLevel: Int,
+)

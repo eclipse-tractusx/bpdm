@@ -208,23 +208,30 @@ object BusinessPartnerNonVerboseValues {
         street = BusinessPartnerVerboseValues.address3.street,
     )
 
-    private val logisticAddress1 = LogisticAddressDto(
-        physicalPostalAddress = postalAddress1
+    val logisticAddress1 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress1,
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
     )
 
     val logisticAddress2 = LogisticAddressDto(
         physicalPostalAddress = postalAddress2,
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner2.confidenceCriteria
     )
 
     val logisticAddress3 = LogisticAddressDto(
         physicalPostalAddress = postalAddress3,
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner3.confidenceCriteria
     )
-    private val logisticAddress4 = LogisticAddressDto(
-        physicalPostalAddress = postalAddress1, name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName
+    val logisticAddress4 = LogisticAddressDto(
+        physicalPostalAddress = postalAddress1,
+        name = BusinessPartnerVerboseValues.legalEntityUpsert1.legalEntity.legalName,
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
     )
 
     val logisticAddress5 = LogisticAddressDto(
-        physicalPostalAddress = postalAddress1, identifiers = listOf(addressIdentifier)
+        physicalPostalAddress = postalAddress1,
+        identifiers = listOf(addressIdentifier),
+        confidenceCriteria = BusinessPartnerVerboseValues.addressPartner1.confidenceCriteria
     )
 
     val legalEntityCreate1 = LegalEntityPartnerCreateRequest(
@@ -235,6 +242,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier1),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsert1.index
@@ -248,6 +256,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier2),
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity2.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress2,
         index = BusinessPartnerVerboseValues.legalEntityUpsert2.index
@@ -261,6 +270,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier3),
             states = listOf(leStatus3),
             classifications = listOf(classification5),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity3.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress3,
         index = BusinessPartnerVerboseValues.legalEntityUpsert3.index
@@ -274,6 +284,7 @@ object BusinessPartnerNonVerboseValues {
             identifiers = listOf(identifier1, identifier2),
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
+            confidenceCriteria = BusinessPartnerVerboseValues.legalEntity1.legalEntity.confidenceCriteria
         ),
         legalAddress = logisticAddress1,
         index = BusinessPartnerVerboseValues.legalEntityUpsertMultipleIdentifier.index
@@ -308,7 +319,8 @@ object BusinessPartnerNonVerboseValues {
         site = SiteDto(
             name = BusinessPartnerVerboseValues.siteUpsert1.site.name,
             states = listOf(siteStatus1),
-            mainAddress = logisticAddress1
+            mainAddress = logisticAddress1,
+            confidenceCriteria = BusinessPartnerVerboseValues.site1.confidenceCriteria
         ),
         index = BusinessPartnerVerboseValues.siteUpsert1.index,
         bpnlParent = legalEntityUpdate1.bpnl
@@ -318,7 +330,8 @@ object BusinessPartnerNonVerboseValues {
         site = SiteDto(
             name = BusinessPartnerVerboseValues.siteUpsert2.site.name,
             states = listOf(siteStatus2),
-            mainAddress = logisticAddress2
+            mainAddress = logisticAddress2,
+            confidenceCriteria = BusinessPartnerVerboseValues.site2.confidenceCriteria
         ),
         index = BusinessPartnerVerboseValues.siteUpsert2.index,
         bpnlParent = legalEntityUpdate2.bpnl
@@ -328,7 +341,8 @@ object BusinessPartnerNonVerboseValues {
         site = SiteDto(
             name = BusinessPartnerVerboseValues.siteUpsert3.site.name,
             states = listOf(siteStatus3),
-            mainAddress = logisticAddress3
+            mainAddress = logisticAddress3,
+            confidenceCriteria = BusinessPartnerVerboseValues.site3.confidenceCriteria
         ),
         index = BusinessPartnerVerboseValues.siteUpsert3.index,
         bpnlParent = legalEntityUpdate3.bpnl

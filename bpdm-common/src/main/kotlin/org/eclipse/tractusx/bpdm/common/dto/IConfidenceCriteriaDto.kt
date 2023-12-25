@@ -17,20 +17,15 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.pool.api.model
+package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import java.time.LocalDateTime
 
-@Schema(description = SiteDescription.header)
-data class SiteDto(
-
-    override val name: String,
-    override val states: Collection<SiteStateDto> = emptyList(),
-
-    val mainAddress: LogisticAddressDto,
-
-    override val confidenceCriteria: ConfidenceCriteriaDto
-
-) : IBaseSiteDto
+interface IConfidenceCriteriaDto {
+    val sharedByOwner: Boolean?
+    val checkedByExternalDataSource: Boolean?
+    val numberOfBusinessPartners: Int?
+    val lastConfidenceCheckAt: LocalDateTime?
+    val nextConfidenceCheckAt: LocalDateTime?
+    val confidenceLevel: Int?
+}

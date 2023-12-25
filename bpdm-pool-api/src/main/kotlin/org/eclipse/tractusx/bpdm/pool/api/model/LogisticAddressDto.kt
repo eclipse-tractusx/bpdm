@@ -38,6 +38,8 @@ data class LogisticAddressDto(
 
     override val physicalPostalAddress: PhysicalPostalAddressDto,
 
-    override val alternativePostalAddress: AlternativePostalAddressDto? = null
+    override val alternativePostalAddress: AlternativePostalAddressDto? = null,
+
+    override val confidenceCriteria: ConfidenceCriteriaDto
 
 ) : IBaseLogisticAddressDto

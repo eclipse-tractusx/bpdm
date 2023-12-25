@@ -53,11 +53,13 @@ data class LegalEntityVerboseDto(
     @get:Schema(description = LegalEntityDescription.currentness)
     val currentness: Instant,
 
+    override val confidenceCriteria: ConfidenceCriteriaDto,
+
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
 
     @get:Schema(description = CommonDescription.updatedAt)
-    val updatedAt: Instant
+    val updatedAt: Instant,
 
 ) : IBaseLegalEntityDto {
 

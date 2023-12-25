@@ -33,6 +33,7 @@ data class LegalEntityDto(
     override val legalForm: String? = null,
     override val identifiers: Collection<LegalEntityIdentifierDto> = emptyList(),
     override val states: Collection<LegalEntityStateDto> = emptyList(),
-    override val classifications: Collection<LegalEntityClassificationDto> = emptyList()
+    override val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
+    override val confidenceCriteria: ConfidenceCriteriaDto
 
 ) : IBaseLegalEntityDto

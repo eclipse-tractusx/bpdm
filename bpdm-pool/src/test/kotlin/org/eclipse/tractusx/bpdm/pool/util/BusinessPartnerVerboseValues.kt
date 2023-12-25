@@ -97,6 +97,33 @@ object BusinessPartnerVerboseValues {
     val classification4 = LegalEntityClassificationVerboseDto("Financial and insurance activities", null, classificationType)
     val classification5 = LegalEntityClassificationVerboseDto("Accounting, bookkeeping and auditing activities; tax consultancy", null, classificationType)
 
+    private val confidenceCriteria1 = ConfidenceCriteriaDto(
+        sharedByOwner = true,
+        checkedByExternalDataSource = true,
+        numberOfBusinessPartners = 1,
+        lastConfidenceCheckAt = LocalDateTime.of(2023, 10, 10, 10, 10, 10),
+        nextConfidenceCheckAt = LocalDateTime.of(2024, 10, 10, 10, 10, 10),
+        confidenceLevel = 10
+    )
+
+    private val confidenceCriteria2 = ConfidenceCriteriaDto(
+        sharedByOwner = false,
+        checkedByExternalDataSource = false,
+        numberOfBusinessPartners = 3,
+        lastConfidenceCheckAt = LocalDateTime.of(2022, 10, 10, 10, 10, 10),
+        nextConfidenceCheckAt = LocalDateTime.of(2025, 10, 10, 10, 10, 10),
+        confidenceLevel = 6
+    )
+
+    private val confidenceCriteria3 = ConfidenceCriteriaDto(
+        sharedByOwner = true,
+        checkedByExternalDataSource = false,
+        numberOfBusinessPartners = 10,
+        lastConfidenceCheckAt = LocalDateTime.of(2021, 10, 10, 10, 10, 10),
+        nextConfidenceCheckAt = LocalDateTime.of(2026, 10, 10, 10, 10, 10),
+        confidenceLevel = 3
+    )
+
     val address1 = PhysicalPostalAddressVerboseDto(
         geographicCoordinates = null,
         countryVerbose = country1,
@@ -153,6 +180,7 @@ object BusinessPartnerVerboseValues {
         physicalPostalAddress = address1,
         bpnLegalEntity = null,
         bpnSite = null,
+        confidenceCriteria = confidenceCriteria1,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
@@ -162,6 +190,7 @@ object BusinessPartnerVerboseValues {
         physicalPostalAddress = address2,
         bpnLegalEntity = null,
         bpnSite = null,
+        confidenceCriteria = confidenceCriteria2,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
@@ -171,6 +200,7 @@ object BusinessPartnerVerboseValues {
         physicalPostalAddress = address3,
         bpnLegalEntity = null,
         bpnSite = null,
+        confidenceCriteria = confidenceCriteria3,
         createdAt = Instant.now(),
         updatedAt = Instant.now()
     )
@@ -195,6 +225,7 @@ object BusinessPartnerVerboseValues {
         name = "Stammwerk A",
         states = listOf(siteStatus1),
         bpnLegalEntity = "BPNL000000000001",
+        confidenceCriteria = confidenceCriteria1,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -204,6 +235,7 @@ object BusinessPartnerVerboseValues {
         name = "Halle B1",
         states = listOf(siteStatus2),
         bpnLegalEntity = "BPNL0000000001YN",
+        confidenceCriteria = confidenceCriteria2,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -213,6 +245,7 @@ object BusinessPartnerVerboseValues {
         name = "主厂房 C",
         states = listOf(siteStatus3),
         bpnLegalEntity = "BPNL0000000002XY",
+        confidenceCriteria = confidenceCriteria3,
         createdAt = Instant.now(),
         updatedAt = Instant.now(),
     )
@@ -254,6 +287,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria1,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -277,6 +311,7 @@ object BusinessPartnerVerboseValues {
             ),
             bpnLegalEntity = null,
             bpnSite = null,
+            confidenceCriteria = confidenceCriteria1,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -291,6 +326,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria2,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -314,6 +350,7 @@ object BusinessPartnerVerboseValues {
             ),
             bpnLegalEntity = null,
             bpnSite = null,
+            confidenceCriteria = confidenceCriteria2,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -328,6 +365,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus3),
             classifications = listOf(classification5),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria3,
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
         ),
@@ -351,6 +389,7 @@ object BusinessPartnerVerboseValues {
             ),
             bpnLegalEntity = null,
             bpnSite = null,
+            confidenceCriteria = confidenceCriteria3,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         )
@@ -365,6 +404,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria1,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -384,6 +424,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus2),
             classifications = listOf(classification3, classification4),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria2,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -403,6 +444,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus3),
             classifications = listOf(classification5),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria3,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
@@ -425,6 +467,7 @@ object BusinessPartnerVerboseValues {
             states = listOf(leStatus1),
             classifications = listOf(classification1, classification2),
             currentness = createdTime1.toInstant(ZoneOffset.UTC),
+            confidenceCriteria = confidenceCriteria1,
             createdAt = Instant.now(),
             updatedAt = Instant.now()
         ),
