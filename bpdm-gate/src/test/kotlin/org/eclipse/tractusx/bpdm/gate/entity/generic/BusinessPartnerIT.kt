@@ -172,7 +172,10 @@ internal class BusinessPartnerIT @Autowired constructor(
             classifications = sortedSetOf(createClassification()),
             stage = StageType.Input,
             parentId = null,
-            parentType = null
+            parentType = null,
+            legalEntityConfidence = null,
+            addressConfidence = null,
+            siteConfidence = null
         )
     }
 

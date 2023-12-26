@@ -37,13 +37,13 @@ interface IBaseBusinessPartnerDto {
     val roles: Collection<BusinessPartnerRole>
 
     @get:Schema(description = "The legal entity, on which the business partner provides a view.")
-    val legalEntity: IBaseLegalEntityRepresentation
+    val legalEntity: IBaseLegalEntityRepresentation?
 
     @get:Schema(description = "The site, on which the business partner provides a view.")
-    val site: IBaseSiteRepresentation
+    val site: IBaseSiteRepresentation?
 
     @get:Schema(description = "The address, on which the business partner provides a view. ")
-    val address: IBaseAddressRepresentation
+    val address: IBaseAddressRepresentation?
 }
 
 @Schema(description = "A legal entity representation adds context information to the legal entity, on which the business partner provides a view. Additionally, it contains some of the information from the assigned legal entity.")

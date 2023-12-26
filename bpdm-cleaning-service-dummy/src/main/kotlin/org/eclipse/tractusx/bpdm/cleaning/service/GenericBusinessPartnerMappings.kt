@@ -25,7 +25,7 @@ import org.eclipse.tractusx.orchestrator.api.model.*
 import java.time.LocalDateTime
 
 
-val dummyConfidenceCriteria = ConfidenceCriteria(
+val dummyConfidenceCriteria = ConfidenceCriteriaDto(
     sharedByOwner = false,
     numberOfBusinessPartners = 1,
     checkedByExternalDataSource = false,

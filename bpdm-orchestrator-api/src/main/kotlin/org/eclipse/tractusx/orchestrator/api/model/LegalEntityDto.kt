@@ -46,6 +46,6 @@ data class LegalEntityDto(
 
     val legalAddress: LogisticAddressDto? = null,
 
-    override val confidenceCriteria: ConfidenceCriteria = ConfidenceCriteria()
+    override val confidenceCriteria: ConfidenceCriteriaDto? = null
 
 ) : IBaseLegalEntityDto

@@ -479,7 +479,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                     changelogType = ChangelogType.UPDATE
                 ),
                 ChangelogEntryVerboseDto(
-                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site.siteBpn!!,
+                    bpn = BusinessPartnerVerboseValues.bpOutputDtoCleaned.site!!.siteBpn!!,
                     businessPartnerType = BusinessPartnerType.SITE,
                     timestamp = Instant.now(),
                     changelogType = ChangelogType.UPDATE

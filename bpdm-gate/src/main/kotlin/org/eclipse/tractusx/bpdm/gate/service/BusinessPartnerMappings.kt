@@ -31,6 +31,7 @@ import org.eclipse.tractusx.bpdm.gate.entity.GeographicCoordinate
 import org.eclipse.tractusx.bpdm.gate.entity.PhysicalPostalAddress
 import org.eclipse.tractusx.bpdm.gate.entity.Street
 import org.eclipse.tractusx.bpdm.gate.entity.generic.*
+import org.eclipse.tractusx.bpdm.gate.exception.BpdmInvalidPartnerException
 import org.springframework.stereotype.Service
 
 @Service
@@ -86,7 +87,10 @@ class BusinessPartnerMappings {
             bpnL = dto.legalEntity.legalEntityBpn,
             bpnS = dto.site.siteBpn,
             bpnA = dto.address.addressBpn,
-            postalAddress = toPostalAddress(dto.address)
+            postalAddress = toPostalAddress(dto.address),
+            legalEntityConfidence = null,
+            siteConfidence = null,
+            addressConfidence = null
         )
     }
 
@@ -128,15 +132,27 @@ class BusinessPartnerMappings {
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
-            classifications = entity.classifications.map(::toClassificationDto)
+            classifications = entity.classifications.map(::toClassificationDto),
+            confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
+                entity.externalId,
+                "Missing address confidence criteria"
+            )
         )
     }
 
-    private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteRepresentationOutputDto {
-        return SiteRepresentationOutputDto(
-            siteBpn = entity.bpnS,
-            name = entity.siteName
-        )
+    private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteRepresentationOutputDto? {
+        return entity
+            .takeIf { it.bpnS != null }
+            ?.let {
+                SiteRepresentationOutputDto(
+                    siteBpn = entity.bpnS!!,
+                    name = entity.siteName,
+                    confidenceCriteria = entity.siteConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
+                        entity.externalId,
+                        "Missing site confidence criteria"
+                    )
+                )
+            }
     }
 
     private fun toAddressComponentOutputDto(entity: BusinessPartner): AddressComponentOutputDto {
@@ -150,9 +166,23 @@ class BusinessPartnerMappings {
             entity.addressName,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
-            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
+            alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto(),
+            confidenceCriteria = entity.addressConfidence?.let { toConfidenceDto(it) } ?: throw BpdmInvalidPartnerException(
+                entity.externalId,
+                "Missing legal entity confidence criteria"
+            )
         )
     }
+
+    private fun toConfidenceDto(entity: ConfidenceCriteria) =
+        ConfidenceCriteriaDto(
+            sharedByOwner = entity.sharedByOwner,
+            checkedByExternalDataSource = entity.checkedByExternalDataSource,
+            numberOfBusinessPartners = entity.numberOfBusinessPartners,
+            lastConfidenceCheckAt = entity.lastConfidenceCheckAt,
+            nextConfidenceCheckAt = entity.nextConfidenceCheckAt,
+            confidenceLevel = entity.confidenceLevel
+        )
 
 
     private fun toPostalAddress(dto: AddressRepresentationInputDto) =

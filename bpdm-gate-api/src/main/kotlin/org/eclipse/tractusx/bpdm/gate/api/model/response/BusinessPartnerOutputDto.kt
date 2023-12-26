@@ -38,7 +38,7 @@ data class BusinessPartnerOutputDto(
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
     override val legalEntity: LegalEntityRepresentationOutputDto,
-    override val site: SiteRepresentationOutputDto = SiteRepresentationOutputDto(),
+    override val site: SiteRepresentationOutputDto?,
     override val address: AddressComponentOutputDto,
 
     @get:Schema(description = CommonDescription.createdAt)
@@ -58,15 +58,17 @@ data class LegalEntityRepresentationOutputDto(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
+    val confidenceCriteria: ConfidenceCriteriaDto
 ) : IBaseLegalEntityRepresentation
 
 @Schema(
     description = "Site properties of business partner output data"
 )
 data class SiteRepresentationOutputDto(
-    override val siteBpn: String? = null,
-    override val name: String? = null
+    override val siteBpn: String,
+    override val name: String? = null,
+    val confidenceCriteria: ConfidenceCriteriaDto
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -79,4 +81,5 @@ data class AddressComponentOutputDto(
     override val addressType: AddressType?,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
+    val confidenceCriteria: ConfidenceCriteriaDto
 ) : IBaseAddressRepresentation

@@ -43,12 +43,14 @@ data class LegalEntityRepresentation(
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
-    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
+    override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList(),
+    val confidenceCriteria: ConfidenceCriteriaDto? = null
 ) : IBaseLegalEntityRepresentation
 
 data class SiteRepresentation(
     override val siteBpn: String? = null,
-    override val name: String? = null
+    override val name: String? = null,
+    val confidenceCriteria: ConfidenceCriteriaDto? = null
 ) : IBaseSiteRepresentation
 
 data class AddressRepresentation(
@@ -57,6 +59,7 @@ data class AddressRepresentation(
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
     override val alternativePostalAddress: AlternativePostalAddressDto? = null,
+    val confidenceCriteria: ConfidenceCriteriaDto? = null
 ) : IBaseAddressRepresentation
 
 
