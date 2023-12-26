@@ -1181,6 +1181,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 street = StreetDto(
                     name = "name_" + bpnAReference.referenceValue,
                     houseNumber = "houseNumber_" + bpnAReference.referenceValue,
+                    houseNumberSupplement = "houseNumberSupplement_" + bpnAReference.referenceValue,
                     milestone = "milestone_" + bpnAReference.referenceValue,
                     direction = "direction_" + bpnAReference.referenceValue,
                     namePrefix = "namePrefix_" + bpnAReference.referenceValue,

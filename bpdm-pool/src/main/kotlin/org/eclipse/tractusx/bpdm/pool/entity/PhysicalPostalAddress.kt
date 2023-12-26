@@ -86,6 +86,7 @@ class PhysicalPostalAddress(
     @Embedded
     @AttributeOverride(name = "name", column = Column(name = "phy_street_name"))
     @AttributeOverride(name = "houseNumber", column = Column(name = "phy_street_number"))
+    @AttributeOverride(name = "houseNumberSupplement", column = Column(name = "phy_street_number_supplement"))
     @AttributeOverride(name = "milestone", column = Column(name = "phy_street_milestone"))
     @AttributeOverride(name = "direction", column = Column(name = "phy_street_direction"))
     val street: Street? = null,

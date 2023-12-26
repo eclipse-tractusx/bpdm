@@ -24,11 +24,12 @@ import org.eclipse.tractusx.bpdm.common.dto.IStreetDetailedDto
 data class StreetDto(
     override val name: String? = null,
     override val houseNumber: String? = null,
+    override val houseNumberSupplement: String? = null,
     override val milestone: String? = null,
     override val direction: String? = null,
     override val namePrefix: String? = null,
     override val additionalNamePrefix: String? = null,
     override val nameSuffix: String? = null,
-    override val additionalNameSuffix: String? = null
+    override val additionalNameSuffix: String? = null,
 
 ) : IStreetDetailedDto

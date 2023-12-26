@@ -180,6 +180,7 @@ private fun Street.toDto(): StreetDto {
     return StreetDto(
         name = name,
         houseNumber = houseNumber,
+        houseNumberSupplement = houseNumberSupplement,
         milestone = milestone,
         direction = direction
     )

@@ -30,6 +30,9 @@ class Street(
     @Column
     val houseNumber: String? = null,
 
+    @Column
+    val houseNumberSupplement: String? = null,
+
     /**
      * The Milestone is relevant for long roads without specific house numbers.
      */

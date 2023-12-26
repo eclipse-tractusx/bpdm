@@ -557,6 +557,7 @@ class BusinessPartnerBuildService(
                     Street(
                         name = it.name,
                         houseNumber = it.houseNumber,
+                        houseNumberSupplement = it.houseNumberSupplement,
                         milestone = it.milestone,
                         direction = it.direction
                     )

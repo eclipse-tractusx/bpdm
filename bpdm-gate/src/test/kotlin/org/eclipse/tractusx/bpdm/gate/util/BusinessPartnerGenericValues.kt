@@ -117,6 +117,7 @@ object BusinessPartnerGenericValues {
                 street = StreetDto(
                     name = "name",
                     houseNumber = "house-number",
+                    houseNumberSupplement = "house-number-supplement",
                     milestone = "milestone",
                     direction = "direction",
                     namePrefix = "name-prefix",

@@ -30,6 +30,8 @@ interface IBaseStreetDto {
     @get:Schema(description = StreetDescription.houseNumber)
     val houseNumber: String?
 
+    val houseNumberSupplement: String?
+
     @get:Schema(description = StreetDescription.milestone)
     val milestone: String?
 

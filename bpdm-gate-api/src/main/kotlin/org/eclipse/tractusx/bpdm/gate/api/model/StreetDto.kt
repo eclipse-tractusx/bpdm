@@ -32,7 +32,8 @@ data class StreetDto(
     override val nameSuffix: String? = null,
     override val additionalNameSuffix: String? = null,
     override val houseNumber: String? = null,
+    override val houseNumberSupplement: String? = null,
     override val milestone: String? = null,
-    override val direction: String? = null
+    override val direction: String? = null,
 
 ) : IStreetDetailedDto

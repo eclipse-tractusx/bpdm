@@ -120,6 +120,7 @@ object BusinessPartnerTestValues {
                 street = StreetDto(
                     name = "name",
                     houseNumber = "house-number",
+                    houseNumberSupplement = "house-number-supplement",
                     milestone = "milestone",
                     direction = "direction",
                     namePrefix = "name-prefix",
@@ -225,6 +226,7 @@ object BusinessPartnerTestValues {
                 street = StreetDto(
                     name = "name-2",
                     houseNumber = "house-number-2",
+                    houseNumberSupplement = "house-number-supplement-2",
                     milestone = "milestone-2",
                     direction = "direction-2",
                     namePrefix = "name-prefix-2",
@@ -297,6 +299,7 @@ object BusinessPartnerTestValues {
             street = StreetDto(
                 name = "Street Name 1",
                 houseNumber = "House Number 1",
+                houseNumberSupplement = "house-number-supplement-1",
                 milestone = "Milestone 1",
                 direction = "Direction 1",
                 namePrefix = "Name Prefix 1",
@@ -362,6 +365,7 @@ object BusinessPartnerTestValues {
             street = StreetDto(
                 name = "Street Name 2",
                 houseNumber = "House Number 2",
+                houseNumberSupplement = "house-number-supplement-2",
                 milestone = "Milestone 2",
                 direction = "Direction 2",
                 namePrefix = "Name Prefix 2",

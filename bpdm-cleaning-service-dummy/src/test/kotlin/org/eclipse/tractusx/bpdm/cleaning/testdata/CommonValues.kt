@@ -72,7 +72,7 @@ object CommonValues {
         postalCode = "PostalCode",
         city = "City",
         district = "District",
-        street = StreetDto("StreetName"),
+        street = StreetDto("StreetName", houseNumberSupplement = "House Number Supplement"),
         companyPostalCode = "CompanyPostalCode",
         industrialZone = "IndustrialZone",
         building = "Building",

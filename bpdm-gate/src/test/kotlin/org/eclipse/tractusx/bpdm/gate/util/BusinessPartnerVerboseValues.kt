@@ -248,7 +248,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
     )
 
     val postalAddress2 = PhysicalPostalAddressDto(
@@ -265,7 +265,7 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
     )
 
     val postalAddress3 = PhysicalPostalAddressDto(
@@ -282,7 +282,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "C"),
     )
 
     val bpPostalAddressInputDtoFull = BusinessPartnerPostalAddressDto(
@@ -346,7 +346,7 @@ object BusinessPartnerVerboseValues {
         building = "Bauteil A",
         floor = "Etage 1",
         door = "Door One",
-        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "Mercedesstraße", houseNumber = "", direction = "direction1", houseNumberSupplement = "A"),
     )
 
     val postalAddressLogisticAddress2 = PhysicalPostalAddressDto(
@@ -363,7 +363,7 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1"),
+        street = StreetDto(name = "TODO", houseNumber = "", direction = "direction1", houseNumberSupplement = "B"),
     )
 
     //New Values for Logistic Address Tests
@@ -780,6 +780,7 @@ object BusinessPartnerVerboseValues {
                 street = StreetDto(
                     name = "name",
                     houseNumber = "house-number",
+                    houseNumberSupplement = "house-number-supplement",
                     milestone = "milestone",
                     direction = "direction",
                     namePrefix = "name-prefix",

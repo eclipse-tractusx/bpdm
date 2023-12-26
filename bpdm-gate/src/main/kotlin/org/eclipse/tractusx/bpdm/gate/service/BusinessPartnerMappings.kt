@@ -249,6 +249,7 @@ class BusinessPartnerMappings {
         StreetDto(
             name = entity.name,
             houseNumber = entity.houseNumber,
+            houseNumberSupplement = entity.houseNumberSupplement,
             milestone = entity.milestone,
             direction = entity.direction,
             namePrefix = entity.namePrefix,
@@ -262,6 +263,7 @@ class BusinessPartnerMappings {
         Street(
             name = dto.name,
             houseNumber = dto.houseNumber,
+            houseNumberSupplement = dto.houseNumberSupplement,
             milestone = dto.milestone,
             direction = dto.direction,
             namePrefix = dto.namePrefix,
