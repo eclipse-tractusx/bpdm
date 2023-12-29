@@ -565,7 +565,7 @@ class BusinessPartnerControllerIT @Autowired constructor(
                 sharingStateType = SharingStateType.Success,
                 sharingErrorCode = null,
                 sharingErrorMessage = null,
-                bpn = BusinessPartnerGenericValues.businessPartner1.addressBpn,
+                bpn = BusinessPartnerGenericValues.businessPartner1.address.bpnA,
                 sharingProcessStarted = null,
                 taskId = "0"
             ),

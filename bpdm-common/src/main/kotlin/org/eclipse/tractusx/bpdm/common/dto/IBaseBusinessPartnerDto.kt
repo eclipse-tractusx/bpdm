@@ -19,7 +19,6 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -42,42 +41,6 @@ interface IBaseBusinessPartnerDto {
     val site: IBaseSiteComponent
 
     val address: IBaseAddressComponent
-
-    // Overrides to satisfy the base class but will be not shown on API level.
-    // That way other modules using this business partner are still backwards compatible and can be adapted one after another
-    // ToDo: Once all other BPDM module models and mappings are adapted, update the Base Interface and delete the overrides
-
-    val legalEntityBpn: String?
-        @JsonIgnore
-        get() = legalEntity.bpnL
-
-    val legalName: String?
-        @JsonIgnore
-        get() = legalEntity.legalName
-
-    val shortName: String?
-        @JsonIgnore
-        get() = legalEntity.shortName
-
-    val legalForm: String?
-        @JsonIgnore
-        get() = legalEntity.legalForm
-
-    val classifications: Collection<IBusinessPartnerClassificationDto>
-        @JsonIgnore
-        get() = legalEntity.classifications
-
-    val siteBpn: String?
-        @JsonIgnore
-        get() = site.bpnS
-
-    val addressBpn: String?
-        @JsonIgnore
-        get() = address.bpnA
-
-    val postalAddress: IBaseBusinessPartnerPostalAddressDto
-        @JsonIgnore
-        get() = address
 }
 
 interface IBaseLegalEntityComponent {

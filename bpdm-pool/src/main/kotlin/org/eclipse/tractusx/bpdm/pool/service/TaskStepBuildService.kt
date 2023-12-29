@@ -92,11 +92,13 @@ class TaskStepBuildService(
         return TaskStepResultEntryDto(
             taskId = taskEntry.taskId,
             businessPartner = BusinessPartnerFullDto(
-                generic = businessPartnerDto.generic.copy(
-                    legalEntityBpn = legalEntity.bpn,
-                    siteBpn = siteEntity?.bpn,
-                    addressBpn = genericBpnA
-                ),
+                generic = with(businessPartnerDto.generic) {
+                    copy(
+                        legalEntity = this.legalEntity.copy(bpnL = legalEntity.bpn),
+                        site = this.site.copy(bpnS = siteEntity?.bpn),
+                        address = this.address.copy(bpnA = genericBpnA)
+                    )
+                },
                 legalEntity = businessPartnerDto.legalEntity!!.copy(
                     bpnLReference = BpnReferenceDto(referenceValue = legalEntity.bpn, referenceType = BpnReferenceType.Bpn) ,
                     legalAddress = businessPartnerDto.legalEntity!!.legalAddress!!.copy(
@@ -304,7 +306,7 @@ class TaskStepBuildService(
             taskEntryBpnMapping.addMapping(bpnSReference, bpnS)
 
             val siteMainAddress =
-                if (genericBusinessPartner.generic.postalAddress.addressType == AddressType.LegalAndSiteMainAddress)
+                if (genericBusinessPartner.generic.address.addressType == AddressType.LegalAndSiteMainAddress)
                     legalEntity.legalAddress
                 else
                     createLogisticAddress(mainAddress, taskEntryBpnMapping)

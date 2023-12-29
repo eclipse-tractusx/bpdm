@@ -40,18 +40,33 @@ class OrchestratorMappings(
 
     fun toBusinessPartnerGenericDto(entity: BusinessPartner) = BusinessPartnerGenericDto(
         nameParts = entity.nameParts,
-        shortName = entity.shortName,
         identifiers = entity.identifiers.map { toIdentifierDto(it) },
-        legalName = entity.legalName,
-        legalForm = entity.legalForm,
         states = entity.states.map { toStateDto(it) },
-        classifications = entity.classifications.map { toClassificationDto(it) },
         roles = entity.roles,
-        postalAddress = toPostalAddressDto(entity.postalAddress),
-        legalEntityBpn = entity.bpnL,
-        siteBpn = entity.bpnS,
-        addressBpn = entity.bpnA,
-        ownerBpnL = getOwnerBpnL(entity)
+        ownerBpnL = getOwnerBpnL(entity),
+        legalEntity = toLegalEntityComponentDto(entity),
+        site = toSiteComponentDto(entity),
+        address = toAddressComponentDto(entity.bpnA, entity.postalAddress)
+
+    )
+
+    private fun toLegalEntityComponentDto(entity: BusinessPartner) = LegalEntityComponent(
+        bpnL = entity.bpnL,
+        legalName = entity.legalName,
+        shortName = entity.shortName,
+        legalForm = entity.legalForm,
+        classifications = entity.classifications.map { toClassificationDto(it) }
+    )
+
+    private fun toSiteComponentDto(entity: BusinessPartner) = SiteComponent(
+        bpnS = entity.bpnS,
+    )
+
+    private fun toAddressComponentDto(bpnA: String?, entity: PostalAddress) = AddressComponent(
+        bpnA = bpnA,
+        addressType = entity.addressType,
+        physicalPostalAddress = entity.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
+        alternativePostalAddress = entity.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
     )
 
     private fun toClassificationDto(entity: Classification) =
@@ -132,17 +147,17 @@ class OrchestratorMappings(
     fun toBusinessPartner(dto: BusinessPartnerGenericDto, externalId: String) = BusinessPartner(
         externalId = externalId,
         nameParts = dto.nameParts.toMutableList(),
-        shortName = dto.shortName,
+        shortName = dto.legalEntity.shortName,
         identifiers = dto.identifiers.mapNotNull { toIdentifier(it) }.toSortedSet(),
-        legalName = dto.legalName,
-        legalForm = dto.legalForm,
+        legalName = dto.legalEntity.legalName,
+        legalForm = dto.legalEntity.legalForm,
         states = dto.states.mapNotNull { toState(it) }.toSortedSet(),
-        classifications = dto.classifications.map { toClassification(it) }.toSortedSet(),
+        classifications = dto.legalEntity.classifications.map { toClassification(it) }.toSortedSet(),
         roles = dto.roles.toSortedSet(),
-        postalAddress = toPostalAddress(dto.postalAddress),
-        bpnL = dto.legalEntityBpn,
-        bpnS = dto.siteBpn,
-        bpnA = dto.addressBpn,
+        postalAddress = toPostalAddress(dto.address),
+        bpnL = dto.legalEntity.bpnL,
+        bpnS = dto.site.bpnS,
+        bpnA = dto.address.bpnA,
         stage = StageType.Output
     )
 
@@ -159,7 +174,7 @@ class OrchestratorMappings(
     private fun toClassification(dto: BusinessPartnerClassificationDto) =
         Classification(type = dto.type, code = dto.code, value = dto.value)
 
-    private fun toPostalAddress(dto: PostalAddressDto) =
+    private fun toPostalAddress(dto: AddressComponent) =
         PostalAddress(
             addressType = dto.addressType,
             physicalPostalAddress = dto.physicalPostalAddress?.let(::toPhysicalPostalAddress),
