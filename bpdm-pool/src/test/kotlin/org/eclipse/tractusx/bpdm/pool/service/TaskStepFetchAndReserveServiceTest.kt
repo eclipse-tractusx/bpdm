@@ -27,6 +27,7 @@ import org.eclipse.tractusx.orchestrator.api.model.AddressStateDto
 import org.eclipse.tractusx.orchestrator.api.model.AlternativePostalAddressDto
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.Bpn
 import org.eclipse.tractusx.orchestrator.api.model.BpnReferenceType.BpnRequestIdentifier
+import org.eclipse.tractusx.orchestrator.api.model.ConfidenceCriteriaDto
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityClassificationDto
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityDto
 import org.eclipse.tractusx.orchestrator.api.model.LegalEntityIdentifierDto
@@ -1232,7 +1233,7 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
     }
 
     fun fullConfidenceCriteria() =
-        ConfidenceCriteria(
+        ConfidenceCriteriaDto(
             sharedByOwner = true,
             numberOfBusinessPartners = 1,
             checkedByExternalDataSource = true,

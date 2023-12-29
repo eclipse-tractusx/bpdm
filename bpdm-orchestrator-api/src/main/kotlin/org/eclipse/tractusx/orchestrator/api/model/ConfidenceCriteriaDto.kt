@@ -17,7 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.orchestrator.api.model
 
 import org.eclipse.tractusx.bpdm.common.dto.IConfidenceCriteriaDto
 import java.time.LocalDateTime
@@ -29,5 +29,4 @@ data class ConfidenceCriteriaDto(
     override val lastConfidenceCheckAt: LocalDateTime,
     override val nextConfidenceCheckAt: LocalDateTime,
     override val confidenceLevel: Int
-
 ) : IConfidenceCriteriaDto

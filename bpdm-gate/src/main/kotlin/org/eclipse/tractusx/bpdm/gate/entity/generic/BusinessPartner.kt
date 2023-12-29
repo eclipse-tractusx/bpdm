@@ -96,7 +96,19 @@ class BusinessPartner(
 
     @Column(name = "parent_type")
     @Enumerated(EnumType.STRING)
-    var parentType: BusinessPartnerType? = null
+    var parentType: BusinessPartnerType? = null,
+
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "legal_entity_confidence_id", unique = true)
+    var legalEntityConfidence: ConfidenceCriteria?,
+
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "site_confidence_id", unique = true)
+    var siteConfidence: ConfidenceCriteria?,
+
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinColumn(name = "address_confidence_id", unique = true)
+    var addressConfidence: ConfidenceCriteria?,
 
 ) : BaseEntity()
 

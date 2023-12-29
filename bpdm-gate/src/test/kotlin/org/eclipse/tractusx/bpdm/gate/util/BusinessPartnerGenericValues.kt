@@ -79,11 +79,27 @@ object BusinessPartnerGenericValues {
                     code = "code-2-cleaned",
                     value = "value-2-cleaned"
                 ),
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
             )
         ),
         site = SiteRepresentation(
             siteBpn = "000000123BBB222",
-            name = "Site Name"
+            name = "Site Name",
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = false,
+                checkedByExternalDataSource = false,
+                numberOfBusinessPartners = 8,
+                lastConfidenceCheckAt = LocalDateTime.of(2023, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2024, 4, 3, 2, 1),
+                confidenceLevel = 2
+            )
         ),
         address = AddressRepresentation(
             addressBpn = "000000123CCC333",
@@ -124,6 +140,14 @@ object BusinessPartnerGenericValues {
                 deliveryServiceNumber = "delivery-service-number-cleaned",
                 deliveryServiceQualifier = "delivery-service-qualifier-cleaned",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = false,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 4,
+                lastConfidenceCheckAt = LocalDateTime.of(2020, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2028, 4, 3, 2, 1),
+                confidenceLevel = 5
             )
         )
     )

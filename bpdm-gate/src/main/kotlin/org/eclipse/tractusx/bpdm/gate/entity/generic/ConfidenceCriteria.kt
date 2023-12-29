@@ -17,16 +17,28 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.orchestrator.api.model
+package org.eclipse.tractusx.bpdm.gate.entity.generic
 
-import org.eclipse.tractusx.bpdm.common.dto.IConfidenceCriteriaDto
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
+import org.eclipse.tractusx.bpdm.common.model.BaseEntity
 import java.time.LocalDateTime
 
-data class ConfidenceCriteria(
-    override val sharedByOwner: Boolean? = null,
-    override val checkedByExternalDataSource: Boolean? = null,
-    override val numberOfBusinessPartners: Int? = null,
-    override val lastConfidenceCheckAt: LocalDateTime? = null,
-    override val nextConfidenceCheckAt: LocalDateTime? = null,
-    override val confidenceLevel: Int? = null
-) : IConfidenceCriteriaDto
+
+@Entity
+@Table(name = "confidence_criteria")
+class ConfidenceCriteria(
+    @Column(name = "shared_by_owner", nullable = false)
+    val sharedByOwner: Boolean,
+    @Column(name = "checked_by_external_data_source", nullable = false)
+    val checkedByExternalDataSource: Boolean,
+    @Column(name = "number_of_business_partners", nullable = false)
+    val numberOfBusinessPartners: Int,
+    @Column(name = "last_confidence_check_at", nullable = false)
+    val lastConfidenceCheckAt: LocalDateTime,
+    @Column(name = "next_confidence_check_at", nullable = false)
+    val nextConfidenceCheckAt: LocalDateTime,
+    @Column(name = "confidence_level", nullable = false)
+    val confidenceLevel: Int,
+) : BaseEntity()

@@ -106,7 +106,8 @@ object CommonValues {
         legalEntity = LegalEntityRepresentation(
             shortName = shortName,
             legalForm = legalForm,
-            classifications = classifications
+            classifications = classifications,
+            confidenceCriteria = dummyConfidenceCriteria
         ),
         site = SiteRepresentation(name = siteName),
         address = AddressRepresentation(name = addressName)

@@ -472,7 +472,7 @@ class BusinessPartnerBuildService(
             site.states.clear()
             site.states.addAll(siteDto.states.map { toSiteState(it, site) })
 
-            site.confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria)
+            site.confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!)
         }
 
         fun createSite(
@@ -483,7 +483,7 @@ class BusinessPartnerBuildService(
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
-            val site = Site(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria))
+            val site = Site(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria!!))
 
             site.states.addAll(siteDto.states
                 .map { toSiteState(it, site) })

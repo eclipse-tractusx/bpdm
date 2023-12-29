@@ -55,12 +55,14 @@ class OrchestratorMappings(
         legalName = entity.legalName,
         shortName = entity.shortName,
         legalForm = entity.legalForm,
-        classifications = entity.classifications.map { toClassificationDto(it) }
+        classifications = entity.classifications.map { toClassificationDto(it) },
+        confidenceCriteria = entity.legalEntityConfidence?.let { toConfidenceCriteria(it) }
     )
 
     private fun toSiteComponentDto(entity: BusinessPartner) = SiteRepresentation(
         siteBpn = entity.bpnS,
-        name = entity.siteName
+        name = entity.siteName,
+        confidenceCriteria = entity.siteConfidence?.let { toConfidenceCriteria(it) }
     )
 
     private fun toAddressComponentDto(entity: BusinessPartner) = AddressRepresentation(
@@ -68,7 +70,8 @@ class OrchestratorMappings(
         name = entity.addressName,
         addressType = entity.postalAddress.addressType,
         physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.let(::toPhysicalPostalAddressDto),
-        alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(this::toAlternativePostalAddressDto)
+        alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.let(this::toAlternativePostalAddressDto),
+        confidenceCriteria = entity.addressConfidence?.let { toConfidenceCriteria(it) }
     )
 
     private fun toClassificationDto(entity: Classification) =
@@ -139,6 +142,16 @@ class OrchestratorMappings(
         }
     }
 
+    private fun toConfidenceCriteria(entity: ConfidenceCriteria) =
+        ConfidenceCriteriaDto(
+            sharedByOwner = entity.sharedByOwner,
+            checkedByExternalDataSource = entity.checkedByExternalDataSource,
+            numberOfBusinessPartners = entity.numberOfBusinessPartners,
+            lastConfidenceCheckAt = entity.lastConfidenceCheckAt,
+            nextConfidenceCheckAt = entity.nextConfidenceCheckAt,
+            confidenceLevel = entity.confidenceLevel
+        )
+
     fun toSharingStateType(resultState: ResultState) = when (resultState) {
         ResultState.Pending -> SharingStateType.Pending
         ResultState.Success -> SharingStateType.Success
@@ -162,7 +175,10 @@ class OrchestratorMappings(
         bpnL = dto.legalEntity.legalEntityBpn,
         bpnS = dto.site.siteBpn,
         bpnA = dto.address.addressBpn,
-        stage = StageType.Output
+        stage = StageType.Output,
+        legalEntityConfidence = dto.legalEntity.confidenceCriteria?.let { toConfidenceCriteria(it) },
+        siteConfidence = dto.site.confidenceCriteria?.let { toConfidenceCriteria(it) },
+        addressConfidence = dto.address.confidenceCriteria?.let { toConfidenceCriteria(it) },
     )
 
     private fun toIdentifier(dto: BusinessPartnerIdentifierDto) =
@@ -229,4 +245,14 @@ class OrchestratorMappings(
 
     private fun toGeographicCoordinate(dto: GeoCoordinateDto) =
         GeographicCoordinate(latitude = dto.latitude, longitude = dto.longitude, altitude = dto.altitude)
+
+    private fun toConfidenceCriteria(dto: ConfidenceCriteriaDto) =
+        ConfidenceCriteria(
+            sharedByOwner = dto.sharedByOwner,
+            checkedByExternalDataSource = dto.checkedByExternalDataSource,
+            numberOfBusinessPartners = dto.numberOfBusinessPartners,
+            lastConfidenceCheckAt = dto.lastConfidenceCheckAt,
+            nextConfidenceCheckAt = dto.nextConfidenceCheckAt,
+            confidenceLevel = dto.confidenceLevel
+        )
 }

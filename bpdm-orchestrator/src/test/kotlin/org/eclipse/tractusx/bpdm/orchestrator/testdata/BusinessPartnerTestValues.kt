@@ -82,11 +82,27 @@ object BusinessPartnerTestValues {
                     code = "code-2",
                     value = "value-2"
                 ),
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
             )
         ),
         site = SiteRepresentation(
             siteBpn = "BPNSTEST",
-            name = "site name"
+            name = "site name",
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
+            )
         ),
         address = AddressRepresentation(
             addressBpn = "BPNATEST",
@@ -127,6 +143,14 @@ object BusinessPartnerTestValues {
                 deliveryServiceNumber = "delivery-service-number",
                 deliveryServiceQualifier = "delivery-service-qualifier",
                 deliveryServiceType = DeliveryServiceType.PO_BOX
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
             )
         ),
         ownerBpnL = "BPNL_OWNER_TEST_1"
@@ -163,11 +187,27 @@ object BusinessPartnerTestValues {
                     code = "code-2",
                     value = "value-2"
                 )
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
             )
         ),
         site = SiteRepresentation(
             siteBpn = "BPNSTEST-2",
-            name = "site name 2"
+            name = "site name 2",
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
+            )
         ),
         address = AddressRepresentation(
             addressBpn = "BPNATEST-2",
@@ -208,6 +248,14 @@ object BusinessPartnerTestValues {
                 deliveryServiceNumber = "delivery-service-number-2",
                 deliveryServiceQualifier = "delivery-service-qualifier-2",
                 deliveryServiceType = DeliveryServiceType.BOITE_POSTALE
+            ),
+            confidenceCriteria = ConfidenceCriteriaDto(
+                sharedByOwner = true,
+                checkedByExternalDataSource = true,
+                numberOfBusinessPartners = 7,
+                lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+                nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+                confidenceLevel = 1
             )
         ),
         ownerBpnL = "BPNL_OWNER_TEST_2"
@@ -277,7 +325,7 @@ object BusinessPartnerTestValues {
             referenceValue = "BPNATEST-1"
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = true,
             checkedByExternalDataSource = true,
             numberOfBusinessPartners = 7,
@@ -342,7 +390,7 @@ object BusinessPartnerTestValues {
             referenceValue = "BPN_REQUEST_ID_TEST"
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -398,7 +446,7 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -439,7 +487,7 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -469,7 +517,7 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.Bpn
         ),
         hasChanged = false,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,
@@ -494,7 +542,7 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
         hasChanged = true,
-        confidenceCriteria = ConfidenceCriteria(
+        confidenceCriteria = ConfidenceCriteriaDto(
             sharedByOwner = false,
             checkedByExternalDataSource = false,
             numberOfBusinessPartners = 2,

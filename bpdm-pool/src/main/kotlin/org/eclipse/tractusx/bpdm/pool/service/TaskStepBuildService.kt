@@ -194,7 +194,7 @@ class TaskStepBuildService(
                 )
             },
             name = dto.name,
-            confidenceCriteria = BusinessPartnerBuildService.createConfidenceCriteria(dto.confidenceCriteria)
+            confidenceCriteria = BusinessPartnerBuildService.createConfidenceCriteria(dto.confidenceCriteria!!)
         )
         updateAddressIdentifiersAndStates(address, dto, addressMetadataMap.idTypes)
 
@@ -211,7 +211,7 @@ class TaskStepBuildService(
         address.name = dto.name
         address.physicalPostalAddress = BusinessPartnerBuildService.createPhysicalAddress(dto.physicalPostalAddress!!, metadataMap.regions)
         address.alternativePostalAddress = dto.alternativePostalAddress?.let { BusinessPartnerBuildService.createAlternativeAddress(it, metadataMap.regions) }
-        address.confidenceCriteria = BusinessPartnerBuildService.createConfidenceCriteria(dto.confidenceCriteria)
+        address.confidenceCriteria = BusinessPartnerBuildService.createConfidenceCriteria(dto.confidenceCriteria!!)
 
         updateAddressIdentifiersAndStates(address, dto, metadataMap.idTypes)
     }
