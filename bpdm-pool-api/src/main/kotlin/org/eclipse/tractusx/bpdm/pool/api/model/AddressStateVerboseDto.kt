@@ -30,8 +30,6 @@ import java.time.LocalDateTime
 
 @Schema(description = AddressStateDescription.header)
 data class AddressStateVerboseDto(
-
-    override val description: String?,
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
 

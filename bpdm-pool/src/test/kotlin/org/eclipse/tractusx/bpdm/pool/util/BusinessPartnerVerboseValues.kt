@@ -81,13 +81,13 @@ object BusinessPartnerVerboseValues {
     val statusType2 = TypeKeyNameVerboseDto(BusinessStateType.INACTIVE, BusinessStateType.INACTIVE.getTypeName())
     val statusType3 = TypeKeyNameVerboseDto(BusinessStateType.ACTIVE, BusinessStateType.ACTIVE.getTypeName())
 
-    val leStatus1 = LegalEntityStateVerboseDto("Active", LocalDateTime.of(2020, 1, 1, 0, 0), null, statusType1)
-    val leStatus2 = LegalEntityStateVerboseDto("Dissolved", LocalDateTime.of(2019, 1, 1, 0, 0), null, statusType2)
-    val leStatus3 = LegalEntityStateVerboseDto("Insolvent", LocalDateTime.of(2018, 1, 1, 0, 0), null, statusType3)
+    val leStatus1 = LegalEntityStateVerboseDto(LocalDateTime.of(2020, 1, 1, 0, 0), null, statusType1)
+    val leStatus2 = LegalEntityStateVerboseDto(LocalDateTime.of(2019, 1, 1, 0, 0), null, statusType2)
+    val leStatus3 = LegalEntityStateVerboseDto(LocalDateTime.of(2018, 1, 1, 0, 0), null, statusType3)
 
-    val siteStatus1 = SiteStateVerboseDto("Active", LocalDateTime.of(2020, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
-    val siteStatus2 = SiteStateVerboseDto("Dissolved", LocalDateTime.of(2019, 1, 1, 0, 0), null, BusinessStateType.INACTIVE.toDto())
-    val siteStatus3 = SiteStateVerboseDto("Insolvent", LocalDateTime.of(2018, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
+    val siteStatus1 = SiteStateVerboseDto(LocalDateTime.of(2020, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
+    val siteStatus2 = SiteStateVerboseDto(LocalDateTime.of(2019, 1, 1, 0, 0), null, BusinessStateType.INACTIVE.toDto())
+    val siteStatus3 = SiteStateVerboseDto(LocalDateTime.of(2018, 1, 1, 0, 0), null, BusinessStateType.ACTIVE.toDto())
 
     val classificationType = TypeKeyNameVerboseDto(ClassificationType.NACE, ClassificationType.NACE.name)
 

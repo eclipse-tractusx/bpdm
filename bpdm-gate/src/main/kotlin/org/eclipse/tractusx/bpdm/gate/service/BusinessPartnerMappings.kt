@@ -251,10 +251,10 @@ class BusinessPartnerMappings {
         }
 
     private fun toStateDto(entity: State) =
-        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo, description = entity.description)
+        BusinessPartnerStateDto(type = entity.type, validFrom = entity.validFrom, validTo = entity.validTo)
 
     private fun toState(dto: BusinessPartnerStateDto) =
-        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo, description = dto.description) }
+        dto.type?.let { State(type = it, validFrom = dto.validFrom, validTo = dto.validTo) }
 
     private fun toClassificationDto(entity: Classification) =
         BusinessPartnerClassificationDto(type = entity.type, code = entity.code, value = entity.value)

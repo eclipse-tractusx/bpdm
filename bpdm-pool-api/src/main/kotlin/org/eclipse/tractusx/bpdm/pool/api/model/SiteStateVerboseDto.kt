@@ -30,8 +30,6 @@ import java.time.LocalDateTime
 
 @Schema(description = SiteStateDescription.header)
 data class SiteStateVerboseDto(
-
-    override val description: String?,
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
 

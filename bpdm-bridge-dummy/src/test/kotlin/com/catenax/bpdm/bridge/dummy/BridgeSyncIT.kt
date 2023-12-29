@@ -458,7 +458,6 @@ class BridgeSyncIT @Autowired constructor(
 
     private fun assertEqualSite(gateVersion: SiteGateInputRequest, poolVersion: SiteWithMainAddressVerboseDto) {
         assertThat(poolVersion.site.name).isEqualTo(gateVersion.site.nameParts.first())
-        assertThat(poolVersion.site.states.map { it.description }).isEqualTo(gateVersion.site.states.map { it.description })
         assertThat(poolVersion.mainAddress.physicalPostalAddress.street?.name).isEqualTo(gateVersion.mainAddress.physicalPostalAddress.street?.name)
     }
 

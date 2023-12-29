@@ -37,10 +37,7 @@ data class State(
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    var type: BusinessStateType,
-
-    @Column(name = "description")
-    var description: String?
+    var type: BusinessStateType
 
 ) : Comparable<State> {
 
@@ -49,6 +46,5 @@ data class State(
         compareBy(nullsFirst(), State::validFrom)       // here null means MIN
             .thenBy(nullsLast(), State::validTo)        // here null means MAX
             .thenBy(State::type)
-            .thenBy(State::description)
             .compare(this, other)
 }

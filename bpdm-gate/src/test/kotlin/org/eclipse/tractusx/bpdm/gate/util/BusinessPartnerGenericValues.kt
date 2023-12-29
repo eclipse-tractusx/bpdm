@@ -50,14 +50,12 @@ object BusinessPartnerGenericValues {
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2020, 9, 22, 15, 50),
                 validTo = LocalDateTime.of(2023, 10, 23, 16, 40),
-                type = BusinessStateType.INACTIVE,
-                description = "business-state-description-1"
+                type = BusinessStateType.INACTIVE
             ),
             BusinessPartnerStateDto(
                 validFrom = LocalDateTime.of(2000, 8, 21, 14, 30),
                 validTo = LocalDateTime.of(2020, 9, 22, 15, 50),
-                type = BusinessStateType.ACTIVE,
-                description = "business-state-description-2"
+                type = BusinessStateType.ACTIVE
             )
         ),
         roles = listOf(

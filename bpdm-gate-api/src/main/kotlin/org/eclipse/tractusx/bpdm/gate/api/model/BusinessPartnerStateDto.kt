@@ -27,7 +27,6 @@ data class BusinessPartnerStateDto(
 
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
-    override val type: BusinessStateType?,
-    override val description: String?
+    override val type: BusinessStateType?
 
 ) : IBusinessPartnerStateDto

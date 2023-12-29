@@ -94,15 +94,15 @@ fun LegalForm.toDto(): LegalFormDto {
 }
 
 fun LegalEntityState.toDto(): LegalEntityStateVerboseDto {
-    return LegalEntityStateVerboseDto(description, validFrom, validTo, type.toDto())
+    return LegalEntityStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
 fun SiteState.toDto(): SiteStateVerboseDto {
-    return SiteStateVerboseDto(description, validFrom, validTo, type.toDto())
+    return SiteStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
 fun AddressState.toDto(): AddressStateVerboseDto {
-    return AddressStateVerboseDto(description, validFrom, validTo, type.toDto())
+    return AddressStateVerboseDto(validFrom, validTo, type.toDto())
 }
 
 fun LogisticAddress.toDto(): LogisticAddressVerboseDto {

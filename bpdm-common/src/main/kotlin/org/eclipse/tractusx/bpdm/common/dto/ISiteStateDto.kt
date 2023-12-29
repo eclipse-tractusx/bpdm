@@ -28,9 +28,6 @@ import java.time.LocalDateTime
 @Schema(description = SiteDescription.header)
 interface ISiteStateDto : IBaseStateDto {
 
-    @get:Schema(description = SiteStateDescription.description)
-    override val description: String?
-
     @get:Schema(description = SiteStateDescription.validFrom)
     override val validFrom: LocalDateTime?
 

@@ -323,7 +323,6 @@ class BusinessPartnerControllerIT @Autowired constructor(
     val stateDtoComparator = compareBy(nullsFirst(), BusinessPartnerStateDto::validFrom)       // here null means MIN
         .thenBy(nullsLast(), BusinessPartnerStateDto::validTo)        // here null means MAX
         .thenBy(BusinessPartnerStateDto::type)
-        .thenBy(BusinessPartnerStateDto::description)
 
     val classificationDtoComparator = compareBy(
         BusinessPartnerClassificationDto::type,

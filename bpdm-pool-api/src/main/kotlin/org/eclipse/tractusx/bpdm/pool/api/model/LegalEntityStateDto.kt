@@ -27,8 +27,6 @@ import java.time.LocalDateTime
 
 @Schema(description = LegalEntityStateDescription.header)
 data class LegalEntityStateDto(
-
-    override val description: String?,
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
     override val type: BusinessStateType

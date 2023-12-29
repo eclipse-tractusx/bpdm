@@ -24,8 +24,6 @@ import org.eclipse.tractusx.bpdm.common.model.BusinessStateType
 import java.time.LocalDateTime
 
 data class SiteStateDto(
-
-    override val description: String?,
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
     override val type: BusinessStateType

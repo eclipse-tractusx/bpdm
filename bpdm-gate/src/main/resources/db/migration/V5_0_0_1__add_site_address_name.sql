@@ -1,0 +1,2 @@
+ALTER TABLE business_partners_states
+DROP COLUMN description;

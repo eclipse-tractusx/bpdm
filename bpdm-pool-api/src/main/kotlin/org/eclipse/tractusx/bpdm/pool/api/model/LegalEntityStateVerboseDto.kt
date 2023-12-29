@@ -30,8 +30,6 @@ import java.time.LocalDateTime
 
 @Schema(description = LegalEntityStateDescription.header)
 data class LegalEntityStateVerboseDto(
-
-    override val description: String?,
     override val validFrom: LocalDateTime?,
     override val validTo: LocalDateTime?,
 

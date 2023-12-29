@@ -55,8 +55,7 @@ object CommonValues {
         BusinessPartnerStateDto(
             validFrom = LocalDateTime.now(),
             validTo = LocalDateTime.now().plusDays(10),
-            type = BusinessStateType.ACTIVE,
-            description = "ActiveState"
+            type = BusinessStateType.ACTIVE
         )
     )
     private val classifications = listOf(
