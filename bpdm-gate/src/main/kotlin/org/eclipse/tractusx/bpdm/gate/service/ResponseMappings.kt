@@ -117,6 +117,7 @@ private fun StreetDto.toStreetEntity(): Street {
     return Street(
         name = name,
         houseNumber = houseNumber,
+        houseNumberSupplement = houseNumberSupplement,
         milestone = milestone,
         direction = direction,
         namePrefix = namePrefix,
@@ -343,6 +344,7 @@ private fun Street.toStreetDto(): StreetDto {
     return StreetDto(
         name = name,
         houseNumber = houseNumber,
+        houseNumberSupplement = houseNumberSupplement,
         milestone = milestone,
         direction = direction,
         namePrefix = namePrefix,

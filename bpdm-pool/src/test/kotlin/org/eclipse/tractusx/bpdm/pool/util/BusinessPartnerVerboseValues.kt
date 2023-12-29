@@ -138,7 +138,7 @@ object BusinessPartnerVerboseValues {
         building = "Gebäude eins",
         floor = "Stockerk eins",
         door = "Raum eins",
-        street = StreetDto("Bela-Barenyi-Straße", ""),
+        street = StreetDto("Bela-Barenyi-Straße", houseNumber = "", houseNumberSupplement = "A"),
     )
 
     val address2 = PhysicalPostalAddressVerboseDto(
@@ -155,7 +155,7 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto("", ""),
+        street = StreetDto(name = "", houseNumber = "", houseNumberSupplement = "B"),
     )
 
     val address3 = PhysicalPostalAddressVerboseDto(
@@ -172,7 +172,7 @@ object BusinessPartnerVerboseValues {
         building = "tedifício  três",
         floor = "piso três",
         door = "peça três",
-        street = StreetDto("", ""),
+        street = StreetDto(name = "", houseNumber = "", houseNumberSupplement = "C"),
     )
 
     val addressPartner1 = LogisticAddressVerboseDto(

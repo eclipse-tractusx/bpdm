@@ -203,6 +203,7 @@ internal class BusinessPartnerIT @Autowired constructor(
             district = "district9",
             street = Street(
                 name = "unknown street",
+                houseNumberSupplement = "house-number-supplement",
                 namePrefix = "Un",
                 nameSuffix = "know",
                 additionalNamePrefix = "empty"
