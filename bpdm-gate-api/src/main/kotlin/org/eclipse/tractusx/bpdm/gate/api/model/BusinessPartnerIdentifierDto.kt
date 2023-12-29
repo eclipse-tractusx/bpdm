@@ -19,12 +19,16 @@
 
 package org.eclipse.tractusx.bpdm.gate.api.model
 
+import io.swagger.v3.oas.annotations.media.Schema
 import org.eclipse.tractusx.bpdm.common.dto.IBusinessPartnerIdentifierDto
 
 data class BusinessPartnerIdentifierDto(
 
+    @get:Schema(description = "The type of the identifier.")
     override val type: String?,
+    @get:Schema(description = "The value of the identifier like “DE123465789.")
     override val value: String?,
+    @get:Schema(description = "The name of the official register, where the identifier is registered. For example, a Handelsregisternummer in Germany is only valid with its corresponding Registergericht and Registerart.")
     override val issuingBody: String?
 
 ) : IBusinessPartnerIdentifierDto

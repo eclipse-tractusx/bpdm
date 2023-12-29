@@ -33,40 +33,55 @@ interface IBaseBusinessPartnerDto {
     @get:ArraySchema(arraySchema = Schema(description = "The list of (temporary) states of the business partner. Sorted and duplicates removed by the service."))
     val states: Collection<IBusinessPartnerStateDto>
 
-    @get:ArraySchema(arraySchema = Schema(description = "Roles this business partner takes in relation to the sharing member. Sorted and duplicates removed by the service."))
+    @get:ArraySchema(arraySchema = Schema(description = "One or more of the roles, the business partner assumes with respect to the sharing member: Supplier, Customer. Sorted and duplicates removed by the service."))
     val roles: Collection<BusinessPartnerRole>
 
-    val legalEntity: IBaseLegalEntityComponent
+    @get:Schema(description = "The legal entity, on which the business partner provides a view.")
+    val legalEntity: IBaseLegalEntityRepresentation
 
-    val site: IBaseSiteComponent
+    @get:Schema(description = "The site, on which the business partner provides a view.")
+    val site: IBaseSiteRepresentation
 
-    val address: IBaseAddressComponent
+    @get:Schema(description = "The address, on which the business partner provides a view. ")
+    val address: IBaseAddressRepresentation
 }
 
-interface IBaseLegalEntityComponent {
+@Schema(description = "A legal entity representation adds context information to the legal entity, on which the business partner provides a view. Additionally, it contains some of the information from the assigned legal entity.")
+interface IBaseLegalEntityRepresentation {
 
-    @get:Schema(description = "BPNL of the golden record legal entity this business partner refers to")
-    val bpnL: String?
+    @get:Schema(description = "The BPNL of the legal entity, on which the business partner provides a view.")
+    val legalEntityBpn: String?
 
-    @get:Schema(description = "The name according to official registers.")
+    @get:Schema(description = "The name of the legal entity, on which the business partner provides a view, according to official registers.")
     val legalName: String?
 
-    @get:Schema(description = "Abbreviated name or shorthand.")
+    @get:Schema(description = "The abbreviated name of the legal entity, on which the business partner provides a view.")
     val shortName: String?
 
-    @get:Schema(description = "Technical key of the legal form.")
+    @get:Schema(description = "The legal form of the legal entity, on which the business partner provides a view.")
     val legalForm: String?
 
     @get:ArraySchema(arraySchema = Schema(description = "The list of classifications of the business partner, such as a specific industry. Sorted and duplicates removed by the service."))
     val classifications: Collection<IBusinessPartnerClassificationDto>
 }
 
-interface IBaseSiteComponent {
-    @get:Schema(description = "BPNS of the golden record site this business partner refers to")
-    val bpnS: String?
+@Schema(description = "A site representation adds context information to the site, on which the business partner provides a view. Additionally, it contains some of the information from the assigned site.")
+interface IBaseSiteRepresentation {
+    @get:Schema(description = "The BPNS of the site, on which the business partner provides a view.")
+    val siteBpn: String?
 }
 
-interface IBaseAddressComponent : IBaseBusinessPartnerPostalAddressDto {
-    @get:Schema(description = "BPNA of the golden record address this business partner refers to")
-    val bpnA: String?
+@Schema(description = "An address representation adds context information to the address, on which the business partner provides a view. Additionally, it contains most of the information from the assigned address.")
+interface IBaseAddressRepresentation : IBaseBusinessPartnerPostalAddressDto {
+    @get:Schema(description = "The BPNA of the address, on which the business partner provides a view.")
+    val addressBpn: String?
+
+    @get:Schema(description = "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address. ")
+    override val addressType: AddressType?
+
+    @get:Schema(description = "The physical postal address of the address, on which the business partner provides a view, such as an office, warehouse, gate, etc.")
+    override val physicalPostalAddress: IBasePhysicalPostalAddressDto?
+
+    @get:Schema(description = "The alternative postal address of the address, on which the business partner provides a view, for example if the goods are to be picked up somewhere else.")
+    override val alternativePostalAddress: IBaseAlternativePostalAddressDto?
 }

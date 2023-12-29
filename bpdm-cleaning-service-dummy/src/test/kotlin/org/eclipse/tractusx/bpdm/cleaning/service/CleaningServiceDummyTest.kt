@@ -51,7 +51,7 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val result = cleaningServiceDummy.processCleaningTask(taskStepReservationEntryDto)
 
-        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.address.bpnA
+        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.address.addressBpn
 
         val resultedAddress = result.businessPartner?.address
 
@@ -112,9 +112,9 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val result = cleaningServiceDummy.processCleaningTask(taskStepReservationEntryDto)
 
-        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.address.bpnA
+        val expectedBpnA = taskStepReservationEntryDto.businessPartner.generic.address.addressBpn
 
-        val expectedBpnL = taskStepReservationEntryDto.businessPartner.generic.legalEntity.bpnL
+        val expectedBpnL = taskStepReservationEntryDto.businessPartner.generic.legalEntity.legalEntityBpn
 
         val resultedAddress = result.businessPartner?.address
 
@@ -153,9 +153,9 @@ class CleaningServiceDummyTest @Autowired constructor(
 
         val resultedSite = result.businessPartner?.site
 
-        val expectedBpnA = taskStepReservationResponse.businessPartner.generic.address.bpnA
+        val expectedBpnA = taskStepReservationResponse.businessPartner.generic.address.addressBpn
 
-        val expectedBpnS = taskStepReservationResponse.businessPartner.generic.site.bpnS
+        val expectedBpnS = taskStepReservationResponse.businessPartner.generic.site.siteBpn
 
 
         // legalEntity should Generate new bpnL and legalAddress should use passed bpnA since address type is LegalAndSiteMainAddress

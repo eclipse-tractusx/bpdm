@@ -68,8 +68,8 @@ object BusinessPartnerTestValues {
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        legalEntity = LegalEntityComponent(
-            bpnL = "BPNLTEST",
+        legalEntity = LegalEntityRepresentation(
+            legalEntityBpn = "BPNLTEST",
             legalName = "legal-name",
             shortName = "shortname",
             legalForm = "legal-form",
@@ -86,11 +86,11 @@ object BusinessPartnerTestValues {
                 ),
             )
         ),
-        site = SiteComponent(
-            bpnS = "BPNSTEST"
+        site = SiteRepresentation(
+            siteBpn = "BPNSTEST"
         ),
-        address = AddressComponent(
-            bpnA = "BPNATEST",
+        address = AddressRepresentation(
+            addressBpn = "BPNATEST",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
@@ -153,8 +153,8 @@ object BusinessPartnerTestValues {
         roles = listOf(
             BusinessPartnerRole.CUSTOMER
         ),
-        legalEntity = LegalEntityComponent(
-            bpnL = "BPNLTEST-2",
+        legalEntity = LegalEntityRepresentation(
+            legalEntityBpn = "BPNLTEST-2",
             legalName = "legal-name-2",
             shortName = "shortname-2",
             legalForm = "legal-form-2",
@@ -166,11 +166,11 @@ object BusinessPartnerTestValues {
                 )
             )
         ),
-        site = SiteComponent(
-            bpnS = "BPNSTEST-2"
+        site = SiteRepresentation(
+            siteBpn = "BPNSTEST-2"
         ),
-        address = AddressComponent(
-            bpnA = "BPNATEST-2",
+        address = AddressRepresentation(
+            addressBpn = "BPNATEST-2",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.4f, 0.4f, 0.4f),

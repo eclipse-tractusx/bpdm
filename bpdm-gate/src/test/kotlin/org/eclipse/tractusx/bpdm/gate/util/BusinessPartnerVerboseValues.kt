@@ -312,18 +312,18 @@ object BusinessPartnerVerboseValues {
         identifiers = listOf(bpIdentifier1, bpIdentifier2, bpIdentifier3),
         states = listOf(bpState1, bpState2),
         roles = listOf(BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityComponentInputDto(
-            bpnL = "BPNL0000000000XY",
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000000XY",
             shortName = "short1",
             legalName = "Limited Liability Company Name",
             legalForm = "Limited Liability Company",
             classifications = listOf(bpClassification1, bpClassification2, bpClassification3)
         ),
-        site = SiteComponentInputDto(
-            bpnS = null
+        site = SiteRepresentationInputDto(
+            siteBpn = null
         ),
-        address = AddressComponentInputDto(
-            bpnA = "BPNA0000000001XY",
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -611,8 +611,8 @@ object BusinessPartnerVerboseValues {
         ),          // duplicate, but they are eliminated
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityComponentInputDto(
-            bpnL = "BPNL0000000002XY",
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000002XY",
             shortName = "short3",
             legalName = "姓名测试",
             legalForm = "股份有限",
@@ -620,11 +620,11 @@ object BusinessPartnerVerboseValues {
                 bpClassificationChina, bpClassification3, bpClassificationChina
             )    // duplicate, but they are eliminated
         ),
-        site = SiteComponentInputDto(
-            bpnS = "BPNS0000000003X9",
+        site = SiteRepresentationInputDto(
+            siteBpn = "BPNS0000000003X9",
         ),
-        address = AddressComponentInputDto(
-            bpnA = "BPNA0000000001XY",
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
             addressType = AddressType.LegalAndSiteMainAddress,
             physicalPostalAddress = physicalAddressChina,
             alternativePostalAddress = AlternativePostalAddressDto()
@@ -640,8 +640,8 @@ object BusinessPartnerVerboseValues {
         ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityComponentInputDto(
-            bpnL = "BPNL0000000002XY",
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000002XY",
             shortName = "Random Short Name",
             legalName = "Random Name Value",
             legalForm = "Random Form Value",
@@ -649,11 +649,11 @@ object BusinessPartnerVerboseValues {
                 bpClassification1, bpClassification3
             )
         ),
-        site = SiteComponentInputDto(
-            bpnS = "BPNS0000000003X9",
+        site = SiteRepresentationInputDto(
+            siteBpn = "BPNS0000000003X9",
         ),
-        address = AddressComponentInputDto(
-            bpnA = "BPNA0000000001XY",
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -669,8 +669,8 @@ object BusinessPartnerVerboseValues {
         ),
         states = listOf(bpState2, bpState1),
         roles = listOf(BusinessPartnerRole.CUSTOMER, BusinessPartnerRole.SUPPLIER),
-        legalEntity = LegalEntityComponentInputDto(
-            bpnL = "BPNL0000000002XY",
+        legalEntity = LegalEntityRepresentationInputDto(
+            legalEntityBpn = "BPNL0000000002XY",
             shortName = "Random Short Name",
             legalName = "Random Name Value",
             legalForm = "Random Form Value",
@@ -678,11 +678,11 @@ object BusinessPartnerVerboseValues {
                 bpClassification1, bpClassification3
             )
         ),
-        site = SiteComponentInputDto(
-            bpnS = "BPNS0000000003X9",
+        site = SiteRepresentationInputDto(
+            siteBpn = "BPNS0000000003X9",
         ),
-        address = AddressComponentInputDto(
-            bpnA = "BPNA0000000001XY",
+        address = AddressRepresentationInputDto(
+            addressBpn = "BPNA0000000001XY",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = postalAddress2,
             alternativePostalAddress = alternativeAddressFull
@@ -722,8 +722,8 @@ object BusinessPartnerVerboseValues {
             BusinessPartnerRole.CUSTOMER,
             BusinessPartnerRole.SUPPLIER
         ),
-        legalEntity = LegalEntityComponentOutputDto(
-            bpnL = "000000123AAA123",
+        legalEntity = LegalEntityRepresentationOutputDto(
+            legalEntityBpn = "000000123AAA123",
             shortName = "shot-name-cleaned",
             legalName = "legal-name-cleaned",
             legalForm = "legal-form-cleaned",
@@ -740,11 +740,11 @@ object BusinessPartnerVerboseValues {
                 ),
             )
         ),
-        site = SiteComponentOutputDto(
-            bpnS = "000000123BBB222"
+        site = SiteRepresentationOutputDto(
+            siteBpn = "000000123BBB222"
         ),
         address = AddressComponentOutputDto(
-            bpnA = "000000123CCC333",
+            addressBpn = "000000123CCC333",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),

@@ -38,9 +38,9 @@ data class BusinessPartnerInputDto(
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
     override val isOwnCompanyData: Boolean = false,
-    override val legalEntity: LegalEntityComponentInputDto = LegalEntityComponentInputDto(),
-    override val site: SiteComponentInputDto = SiteComponentInputDto(),
-    override val address: AddressComponentInputDto = AddressComponentInputDto(),
+    override val legalEntity: LegalEntityRepresentationInputDto = LegalEntityRepresentationInputDto(),
+    override val site: SiteRepresentationInputDto = SiteRepresentationInputDto(),
+    override val address: AddressRepresentationInputDto = AddressRepresentationInputDto(),
 
     @get:Schema(description = CommonDescription.createdAt)
     val createdAt: Instant,
@@ -50,21 +50,21 @@ data class BusinessPartnerInputDto(
 
 ) : IBaseBusinessPartnerGateDto
 
-data class LegalEntityComponentInputDto(
-    override val bpnL: String? = null,
+data class LegalEntityRepresentationInputDto(
+    override val legalEntityBpn: String? = null,
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
     override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
-) : IBaseLegalEntityComponent
+) : IBaseLegalEntityRepresentation
 
-data class SiteComponentInputDto(
-    override val bpnS: String? = null
-) : IBaseSiteComponent
+data class SiteRepresentationInputDto(
+    override val siteBpn: String? = null
+) : IBaseSiteRepresentation
 
-data class AddressComponentInputDto(
-    override val bpnA: String? = null,
+data class AddressRepresentationInputDto(
+    override val addressBpn: String? = null,
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
     override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto()
-) : IBaseAddressComponent
+) : IBaseAddressRepresentation

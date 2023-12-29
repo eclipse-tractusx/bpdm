@@ -31,30 +31,30 @@ data class BusinessPartnerGenericDto(
     override val identifiers: Collection<BusinessPartnerIdentifierDto> = emptyList(),
     override val states: Collection<BusinessPartnerStateDto> = emptyList(),
     override val roles: Collection<BusinessPartnerRole> = emptyList(),
-    override val legalEntity: LegalEntityComponent = LegalEntityComponent(),
-    override val site: SiteComponent = SiteComponent(),
-    override val address: AddressComponent = AddressComponent(),
+    override val legalEntity: LegalEntityRepresentation = LegalEntityRepresentation(),
+    override val site: SiteRepresentation = SiteRepresentation(),
+    override val address: AddressRepresentation = AddressRepresentation(),
     @get:Schema(description = "The BPNL of the company sharing and claiming this business partner as its own")
     val ownerBpnL: String? = null
 ) : IBaseBusinessPartnerDto
 
-data class LegalEntityComponent(
-    override val bpnL: String? = null,
+data class LegalEntityRepresentation(
+    override val legalEntityBpn: String? = null,
     override val legalName: String? = null,
     override val shortName: String? = null,
     override val legalForm: String? = null,
     override val classifications: Collection<BusinessPartnerClassificationDto> = emptyList()
-) : IBaseLegalEntityComponent
+) : IBaseLegalEntityRepresentation
 
-data class SiteComponent(
-    override val bpnS: String? = null
-) : IBaseSiteComponent
+data class SiteRepresentation(
+    override val siteBpn: String? = null
+) : IBaseSiteRepresentation
 
-data class AddressComponent(
-    override val bpnA: String? = null,
+data class AddressRepresentation(
+    override val addressBpn: String? = null,
     override val addressType: AddressType? = null,
     override val physicalPostalAddress: PhysicalPostalAddressDto? = null,
     override val alternativePostalAddress: AlternativePostalAddressDto? = null
-) : IBaseAddressComponent
+) : IBaseAddressRepresentation
 
 

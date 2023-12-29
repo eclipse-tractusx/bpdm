@@ -81,16 +81,16 @@ class BusinessPartnerMappings {
             legalName = dto.legalEntity.legalName,
             legalForm = dto.legalEntity.legalForm,
             isOwnCompanyData = dto.isOwnCompanyData,
-            bpnL = dto.legalEntity.bpnL,
-            bpnS = dto.site.bpnS,
-            bpnA = dto.address.bpnA,
+            bpnL = dto.legalEntity.legalEntityBpn,
+            bpnS = dto.site.siteBpn,
+            bpnA = dto.address.addressBpn,
             postalAddress = toPostalAddress(dto.address)
         )
     }
 
-    private fun toLegalEntityComponentInputDto(entity: BusinessPartner): LegalEntityComponentInputDto {
-        return LegalEntityComponentInputDto(
-            bpnL = entity.bpnL,
+    private fun toLegalEntityComponentInputDto(entity: BusinessPartner): LegalEntityRepresentationInputDto {
+        return LegalEntityRepresentationInputDto(
+            legalEntityBpn = entity.bpnL,
             legalName = entity.legalName,
             shortName = entity.shortName,
             legalForm = entity.legalForm,
@@ -98,24 +98,24 @@ class BusinessPartnerMappings {
         )
     }
 
-    private fun toSiteComponentInputDto(entity: BusinessPartner): SiteComponentInputDto {
-        return SiteComponentInputDto(
-            bpnS = entity.bpnS
+    private fun toSiteComponentInputDto(entity: BusinessPartner): SiteRepresentationInputDto {
+        return SiteRepresentationInputDto(
+            siteBpn = entity.bpnS
         )
     }
 
-    private fun toAddressComponentInputDto(entity: BusinessPartner): AddressComponentInputDto {
-        return AddressComponentInputDto(
-            bpnA = entity.bpnA,
+    private fun toAddressComponentInputDto(entity: BusinessPartner): AddressRepresentationInputDto {
+        return AddressRepresentationInputDto(
+            addressBpn = entity.bpnA,
             addressType = entity.postalAddress.addressType,
             physicalPostalAddress = entity.postalAddress.physicalPostalAddress?.toPhysicalPostalAddress() ?: PhysicalPostalAddressDto(),
             alternativePostalAddress = entity.postalAddress.alternativePostalAddress?.toAlternativePostalAddressDto() ?: AlternativePostalAddressDto()
         )
     }
 
-    private fun toLegalEntityComponentOutputDto(entity: BusinessPartner): LegalEntityComponentOutputDto {
-        return LegalEntityComponentOutputDto(
-            bpnL = entity.bpnL ?: throw BpdmNullMappingException(
+    private fun toLegalEntityComponentOutputDto(entity: BusinessPartner): LegalEntityRepresentationOutputDto {
+        return LegalEntityRepresentationOutputDto(
+            legalEntityBpn = entity.bpnL ?: throw BpdmNullMappingException(
                 BusinessPartner::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartner::bpnL,
@@ -128,15 +128,15 @@ class BusinessPartnerMappings {
         )
     }
 
-    private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteComponentOutputDto {
-        return SiteComponentOutputDto(
-            bpnS = entity.bpnS
+    private fun toSiteComponentOutputDto(entity: BusinessPartner): SiteRepresentationOutputDto {
+        return SiteRepresentationOutputDto(
+            siteBpn = entity.bpnS
         )
     }
 
     private fun toAddressComponentOutputDto(entity: BusinessPartner): AddressComponentOutputDto {
         return AddressComponentOutputDto(
-            bpnA = entity.bpnA ?: throw BpdmNullMappingException(
+            addressBpn = entity.bpnA ?: throw BpdmNullMappingException(
                 BusinessPartner::class,
                 BusinessPartnerOutputDto::class,
                 BusinessPartner::bpnA,
@@ -149,7 +149,7 @@ class BusinessPartnerMappings {
     }
 
 
-    private fun toPostalAddress(dto: AddressComponentInputDto) =
+    private fun toPostalAddress(dto: AddressRepresentationInputDto) =
         PostalAddress(
             addressType = dto.addressType,
             physicalPostalAddress = normalize(dto.physicalPostalAddress)?.let(::toPhysicalPostalAddress),
