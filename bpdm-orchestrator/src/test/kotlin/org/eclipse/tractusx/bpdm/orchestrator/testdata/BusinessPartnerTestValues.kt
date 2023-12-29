@@ -87,10 +87,12 @@ object BusinessPartnerTestValues {
             )
         ),
         site = SiteRepresentation(
-            siteBpn = "BPNSTEST"
+            siteBpn = "BPNSTEST",
+            name = "site name"
         ),
         address = AddressRepresentation(
             addressBpn = "BPNATEST",
+            name = "address name",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),
@@ -167,10 +169,12 @@ object BusinessPartnerTestValues {
             )
         ),
         site = SiteRepresentation(
-            siteBpn = "BPNSTEST-2"
+            siteBpn = "BPNSTEST-2",
+            name = "site name 2"
         ),
         address = AddressRepresentation(
             addressBpn = "BPNATEST-2",
+            name = "address name 2",
             addressType = AddressType.LegalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.4f, 0.4f, 0.4f),

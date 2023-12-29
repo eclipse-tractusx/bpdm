@@ -65,7 +65,8 @@ data class LegalEntityRepresentationOutputDto(
     description = "Site properties of business partner output data"
 )
 data class SiteRepresentationOutputDto(
-    override val siteBpn: String? = null
+    override val siteBpn: String? = null,
+    override val name: String? = null
 ) : IBaseSiteRepresentation
 
 @Schema(
@@ -74,7 +75,8 @@ data class SiteRepresentationOutputDto(
 )
 data class AddressComponentOutputDto(
     override val addressBpn: String,
-    override val addressType: AddressType? = null,
+    override val name: String? = null,
+    override val addressType: AddressType?,
     override val physicalPostalAddress: PhysicalPostalAddressDto = PhysicalPostalAddressDto(),
-    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto()
+    override val alternativePostalAddress: AlternativePostalAddressDto = AlternativePostalAddressDto(),
 ) : IBaseAddressRepresentation

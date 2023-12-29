@@ -196,6 +196,8 @@ class BusinessPartnerService(
                 entity.roles != persistedBP.roles ||
                 entity.shortName != persistedBP.shortName ||
                 entity.legalName != persistedBP.legalName ||
+                entity.siteName != persistedBP.siteName ||
+                entity.addressName != persistedBP.addressName ||
                 entity.legalForm != persistedBP.legalForm ||
                 entity.isOwnCompanyData != persistedBP.isOwnCompanyData ||
                 entity.bpnL != persistedBP.bpnL ||
@@ -245,6 +247,8 @@ class BusinessPartnerService(
             stage = fromPartner.stage
             shortName = fromPartner.shortName
             legalName = fromPartner.legalName
+            siteName = fromPartner.siteName
+            addressName = fromPartner.addressName
             legalForm = fromPartner.legalForm
             isOwnCompanyData = fromPartner.isOwnCompanyData
             bpnL = fromPartner.bpnL

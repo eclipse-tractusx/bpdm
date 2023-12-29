@@ -85,9 +85,11 @@ object BusinessPartnerGenericValues {
         ),
         site = SiteRepresentation(
             siteBpn = "000000123BBB222",
+            name = "Site Name"
         ),
         address = AddressRepresentation(
             addressBpn = "000000123CCC333",
+            name = "Address Name",
             addressType = AddressType.AdditionalAddress,
             physicalPostalAddress = PhysicalPostalAddressDto(
                 geographicCoordinates = GeoCoordinateDto(0.5f, 0.5f, 0.5f),

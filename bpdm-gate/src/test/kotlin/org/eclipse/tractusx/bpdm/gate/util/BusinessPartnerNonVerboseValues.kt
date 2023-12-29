@@ -30,6 +30,7 @@ object BusinessPartnerNonVerboseValues {
 
     val bpPostalAddressInputDtoMinimal = AddressRepresentationInputDto(
         addressType = null,
+        name = null,
         physicalPostalAddress = physicalAddressMinimal
     )
 

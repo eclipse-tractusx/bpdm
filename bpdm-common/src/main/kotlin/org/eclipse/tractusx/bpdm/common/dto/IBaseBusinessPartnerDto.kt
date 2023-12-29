@@ -69,12 +69,18 @@ interface IBaseLegalEntityRepresentation {
 interface IBaseSiteRepresentation {
     @get:Schema(description = "The BPNS of the site, on which the business partner provides a view.")
     val siteBpn: String?
+
+    @get:Schema(description = "The name of the site, on which the business partner provides a view. This is not according to official registers but according to the name the owner chooses.")
+    val name: String?
 }
 
 @Schema(description = "An address representation adds context information to the address, on which the business partner provides a view. Additionally, it contains most of the information from the assigned address.")
 interface IBaseAddressRepresentation : IBaseBusinessPartnerPostalAddressDto {
     @get:Schema(description = "The BPNA of the address, on which the business partner provides a view.")
     val addressBpn: String?
+
+    @get:Schema(description = "The name of the address, on which the business partner provides a view. This is not according to official registers but according to the name the sharing members agree on, such as the name of a gate or any other additional names that designate the address in common parlance.")
+    val name: String?
 
     @get:Schema(description = "One of the address types: Legal Address, Site Main Address, Legal and Site Main Address, Additional Address. ")
     override val addressType: AddressType?
