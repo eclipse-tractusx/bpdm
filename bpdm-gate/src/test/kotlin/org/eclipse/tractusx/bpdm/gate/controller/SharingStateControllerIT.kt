@@ -27,15 +27,19 @@ import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.gate.api.client.GateClient
 import org.eclipse.tractusx.bpdm.gate.api.exception.BusinessPartnerSharingError.SharingProcessError
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.request.PostSharingStateReadyRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.response.SharingStateDto
+import org.eclipse.tractusx.bpdm.gate.util.BusinessPartnerNonVerboseValues
 import org.eclipse.tractusx.bpdm.gate.util.DbTestHelpers
 import org.eclipse.tractusx.bpdm.gate.util.PostgreSQLContextInitializer
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.reactive.function.client.WebClientResponseException
@@ -496,6 +500,103 @@ class SharingStateControllerIT @Autowired constructor(
         assertThat(searchAllWithSameId).extracting(SharingStateDto::externalId.name)
             .containsOnly("exIdMultiple")
 
+    }
+
+    /*
+    GIVEN business partners in state Initial
+    WHEN set as ready
+    THEN business partners in state ready
+     */
+    @Test
+    fun `set initial business partners ready`() {
+        val givenBusinessPartners = listOf(
+            BusinessPartnerNonVerboseValues.bpInputRequestChina,
+            BusinessPartnerNonVerboseValues.bpInputRequestFull,
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
+        )
+        gateClient.businessParters.upsertBusinessPartnersInput(givenBusinessPartners)
+
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(givenBusinessPartners.map { it.externalId }))
+
+
+        val sharingStateResponse =
+            gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType = null, externalIds = givenBusinessPartners.map { it.externalId })
+
+        assertThat(sharingStateResponse.content).isEqualTo(givenBusinessPartners.map {
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = it.externalId,
+                sharingStateType = SharingStateType.Ready
+            )
+        })
+    }
+
+    /*
+   GIVEN business partners in state Error
+   WHEN set as ready
+   THEN business partners in state ready
+    */
+    @Test
+    fun `set error business partners ready`() {
+        val givenBusinessPartners = listOf(
+            BusinessPartnerNonVerboseValues.bpInputRequestChina,
+            BusinessPartnerNonVerboseValues.bpInputRequestFull,
+            BusinessPartnerNonVerboseValues.bpInputRequestMinimal,
+        )
+        gateClient.businessParters.upsertBusinessPartnersInput(givenBusinessPartners)
+
+        val givenErrorStates = givenBusinessPartners.map {
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = it.externalId,
+                sharingStateType = SharingStateType.Error,
+                sharingErrorCode = SharingProcessError,
+                sharingErrorMessage = "message"
+            )
+        }
+
+        givenErrorStates.forEach { gateClient.sharingState.upsertSharingState(it) }
+
+
+        gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(givenBusinessPartners.map { it.externalId }))
+
+
+        val sharingStateResponse =
+            gateClient.sharingState.getSharingStates(PaginationRequest(), businessPartnerType = null, externalIds = givenBusinessPartners.map { it.externalId })
+
+        assertThat(sharingStateResponse.content).isEqualTo(givenBusinessPartners.map {
+            SharingStateDto(
+                businessPartnerType = BusinessPartnerType.GENERIC,
+                externalId = it.externalId,
+                sharingStateType = SharingStateType.Ready
+            )
+        })
+    }
+
+    /*
+    GIVEN business partners in invalid state to be shared
+    WHEN set as ready
+    THEN return error response
+    */
+    @Test
+    fun `throw error response on business partners ready in invalid state`() {
+        val givenBusinessPartner = BusinessPartnerNonVerboseValues.bpInputRequestChina
+        gateClient.businessParters.upsertBusinessPartnersInput(listOf(givenBusinessPartner))
+
+        val givenInvalidState = SharingStateDto(
+            businessPartnerType = BusinessPartnerType.GENERIC,
+            externalId = givenBusinessPartner.externalId,
+            sharingStateType = SharingStateType.Ready
+        )
+
+        gateClient.sharingState.upsertSharingState(givenInvalidState)
+
+        try {
+            gateClient.sharingState.postSharingStateReady(PostSharingStateReadyRequest(listOf(givenBusinessPartner.externalId)))
+
+        } catch (e: WebClientResponseException) {
+            Assertions.assertEquals(HttpStatus.BAD_REQUEST, e.statusCode)
+        }
     }
 
     /**

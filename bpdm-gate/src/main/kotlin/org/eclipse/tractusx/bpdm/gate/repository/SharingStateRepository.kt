@@ -22,6 +22,8 @@ package org.eclipse.tractusx.bpdm.gate.repository
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.entity.SharingState
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
@@ -55,5 +57,7 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
 
     fun findBySharingStateType(sharingStateType: SharingStateType): Set<SharingState>
 
-    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType): Set<SharingState>
+    fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
+
+    fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
 }

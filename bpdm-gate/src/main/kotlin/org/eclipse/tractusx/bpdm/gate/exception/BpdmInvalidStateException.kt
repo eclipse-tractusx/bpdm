@@ -17,12 +17,18 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.exception
 
-enum class SharingStateType {
-    Pending,
-    Success,
-    Error,
-    Initial,
-    Ready
+import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BpdmInvalidStateException(
+    invalidStates: List<InvalidState>
+) : RuntimeException("The following business partners are in an invalid state: ${invalidStates.joinToString { it.toString() }}") {
+    data class InvalidState(
+        val externalId: String,
+        val stateType: SharingStateType
+    )
 }

@@ -17,12 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.api.model
+package org.eclipse.tractusx.bpdm.gate.api.model.request
 
-enum class SharingStateType {
-    Pending,
-    Success,
-    Error,
-    Initial,
-    Ready
-}
+import io.swagger.v3.oas.annotations.media.Schema
+
+@Schema(description = "Request for setting business partners into ready to be shared to golden record state")
+data class PostSharingStateReadyRequest(
+    val externalIds: List<String>
+)
