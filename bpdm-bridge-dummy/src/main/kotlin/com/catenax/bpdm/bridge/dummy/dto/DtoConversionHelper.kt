@@ -24,6 +24,7 @@ import org.eclipse.tractusx.bpdm.gate.api.model.AddressGateOutputChildRequest
 import org.eclipse.tractusx.bpdm.gate.api.model.SiteGateDto
 import org.eclipse.tractusx.bpdm.pool.api.model.*
 import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressDto
+import java.time.LocalDateTime
 import kotlin.reflect.KProperty
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressIdentifierDto as Gate_AddressIdentifierDto
 import org.eclipse.tractusx.bpdm.gate.api.model.AddressStateDto as Gate_AddressStateDto
@@ -44,6 +45,15 @@ import org.eclipse.tractusx.bpdm.pool.api.model.LogisticAddressVerboseDto as Poo
 import org.eclipse.tractusx.bpdm.pool.api.model.PhysicalPostalAddressDto as Pool_PhysicalPostalAddressDto1
 import org.eclipse.tractusx.bpdm.pool.api.model.SiteStateDto as Pool_SiteStateDto
 
+val dummyConfidenceCriteria = ConfidenceCriteriaDto(
+    sharedByOwner = false,
+    numberOfBusinessPartners = 1,
+    checkedByExternalDataSource = false,
+    lastConfidenceCheckAt = LocalDateTime.now(),
+    nextConfidenceCheckAt = LocalDateTime.now().plusDays(5),
+    confidenceLevel = 0
+)
+
 fun gateToPoolLegalEntity(gateDto: Gate_LegalEntityDto): Pool_LegalEntityDto {
     return Pool_LegalEntityDto(
         identifiers = gateDto.identifiers.map(::gateToPoolLegalEntityIdentifier),
@@ -51,7 +61,8 @@ fun gateToPoolLegalEntity(gateDto: Gate_LegalEntityDto): Pool_LegalEntityDto {
         legalShortName = gateDto.legalShortName,
         legalForm = gateDto.legalForm,
         states = gateDto.states.map(::gateToPoolLegalEntityState),
-        classifications = gateDto.classifications.map(::gateToPoolLegalEntityClassification)
+        classifications = gateDto.classifications.map(::gateToPoolLegalEntityClassification),
+        confidenceCriteria = dummyConfidenceCriteria
     )
 }
 
@@ -93,7 +104,8 @@ fun gateToPoolLogisticAddress(gateDto: Gate_LogisticAddressDto): LogisticAddress
         states = gateDto.states.map(::gateToPoolAddressState),
         identifiers = gateDto.identifiers.map(::gateToPoolAddressIdentifier),
         physicalPostalAddress = gateToPoolPhysicalAddress(gateDto.physicalPostalAddress),
-        alternativePostalAddress = gateDto.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
+        alternativePostalAddress = gateDto.alternativePostalAddress?.let(::gateToPoolAlternativeAddress),
+        confidenceCriteria = dummyConfidenceCriteria
     )
 }
 

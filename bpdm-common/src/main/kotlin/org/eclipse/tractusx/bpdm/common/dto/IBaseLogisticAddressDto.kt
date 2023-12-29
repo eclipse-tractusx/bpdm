@@ -39,4 +39,6 @@ interface IBaseLogisticAddressDto {
     // TODO OpenAPI description for complex field does not work!!
     @get:Schema(description = LogisticAddressDescription.alternativePostalAddress)
     val alternativePostalAddress: IBaseAlternativePostalAddressDto?
+
+    val confidenceCriteria: IConfidenceCriteriaDto?
 }

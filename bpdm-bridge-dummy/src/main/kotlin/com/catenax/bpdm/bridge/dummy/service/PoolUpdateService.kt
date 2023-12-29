@@ -77,6 +77,7 @@ class PoolUpdateService(
                             name = entry.site.nameParts.firstOrNull() ?: "",
                             states = entry.site.states.map(::gateToPoolSiteState),
                             mainAddress = gateToPoolLogisticAddress(entry.mainAddress),
+                            confidenceCriteria = dummyConfidenceCriteria
                         ),
                         index = entry.externalId,
                         bpnlParent = leParentBpn
@@ -101,6 +102,7 @@ class PoolUpdateService(
                     name = it.site.nameParts.firstOrNull() ?: "",
                     states = it.site.states.map(::gateToPoolSiteState),
                     mainAddress = gateToPoolLogisticAddress(it.mainAddress),
+                    confidenceCriteria = dummyConfidenceCriteria
                 ),
                 bpns = it.bpn!!
             )
@@ -141,7 +143,8 @@ class PoolUpdateService(
                             states = entry.address.states.map(::gateToPoolAddressState),
                             identifiers = entry.address.identifiers.map(::gateToPoolAddressIdentifier),
                             physicalPostalAddress = gateToPoolPhysicalAddress(entry.address.physicalPostalAddress),
-                            alternativePostalAddress = entry.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
+                            alternativePostalAddress = entry.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress),
+                            confidenceCriteria = dummyConfidenceCriteria
                         ),
                         index = entry.externalId,
                         bpnParent = siteParentBpn
@@ -181,7 +184,8 @@ class PoolUpdateService(
                     states = it.address.states.map(::gateToPoolAddressState),
                     identifiers = it.address.identifiers.map(::gateToPoolAddressIdentifier),
                     physicalPostalAddress = gateToPoolPhysicalAddress(it.address.physicalPostalAddress),
-                    alternativePostalAddress = it.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress)
+                    alternativePostalAddress = it.address.alternativePostalAddress?.let(::gateToPoolAlternativeAddress),
+                    confidenceCriteria = dummyConfidenceCriteria
                 ),
                 bpna = it.bpn!!
             )
@@ -190,5 +194,4 @@ class PoolUpdateService(
         return poolClient.addresses.updateAddresses(updateRequests)
             .also { logger.info { "Pool accepted ${it.entityCount} updated addresses, ${it.errorCount} were refused" } }
     }
-
 }

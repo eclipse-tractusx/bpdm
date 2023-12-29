@@ -49,7 +49,10 @@ class LogisticAddress(
     var physicalPostalAddress: PhysicalPostalAddress,
 
     @Embedded
-    var alternativePostalAddress: AlternativePostalAddress?
+    var alternativePostalAddress: AlternativePostalAddress?,
+
+    @Embedded
+    var confidenceCriteria: ConfidenceCriteria
 
 ) : BaseEntity() {
     @OneToMany(mappedBy = "address", cascade = [CascadeType.ALL], orphanRemoval = true)

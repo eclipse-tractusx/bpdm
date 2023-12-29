@@ -276,7 +276,15 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.Bpn,
             referenceValue = "BPNATEST-1"
         ),
-        hasChanged = true
+        hasChanged = true,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = true,
+            checkedByExternalDataSource = true,
+            numberOfBusinessPartners = 7,
+            lastConfidenceCheckAt = LocalDateTime.of(2022, 4, 3, 2, 1),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 4, 3, 2, 1),
+            confidenceLevel = 1
+        )
     )
 
     val logisticAddress2 = LogisticAddressDto(
@@ -333,7 +341,15 @@ object BusinessPartnerTestValues {
             referenceType = BpnReferenceType.BpnRequestIdentifier,
             referenceValue = "BPN_REQUEST_ID_TEST"
         ),
-        hasChanged = true
+        hasChanged = true,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = false,
+            checkedByExternalDataSource = false,
+            numberOfBusinessPartners = 2,
+            lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
+            confidenceLevel = 2
+        )
     )
 
     val legalEntity1 = LegalEntityDto(
@@ -381,7 +397,15 @@ object BusinessPartnerTestValues {
             referenceValue = "BPNL1-TEST",
             referenceType = BpnReferenceType.Bpn
         ),
-        hasChanged = false
+        hasChanged = false,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = false,
+            checkedByExternalDataSource = false,
+            numberOfBusinessPartners = 2,
+            lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
+            confidenceLevel = 3
+        )
     )
 
     val legalEntity2 = LegalEntityDto(
@@ -414,7 +438,15 @@ object BusinessPartnerTestValues {
             referenceValue = "BPNL-REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
-        hasChanged = false
+        hasChanged = false,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = false,
+            checkedByExternalDataSource = false,
+            numberOfBusinessPartners = 2,
+            lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
+            confidenceLevel = 4
+        )
     )
 
     val site1 = SiteDto(
@@ -436,7 +468,15 @@ object BusinessPartnerTestValues {
             referenceValue = "BPNS_TEST",
             referenceType = BpnReferenceType.Bpn
         ),
-        hasChanged = false
+        hasChanged = false,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = false,
+            checkedByExternalDataSource = false,
+            numberOfBusinessPartners = 2,
+            lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
+            confidenceLevel = 5
+        )
     )
 
     val site2 = SiteDto(
@@ -453,7 +493,15 @@ object BusinessPartnerTestValues {
             referenceValue = "BPNS_REQUEST_ID_TEST",
             referenceType = BpnReferenceType.BpnRequestIdentifier
         ),
-        hasChanged = true
+        hasChanged = true,
+        confidenceCriteria = ConfidenceCriteria(
+            sharedByOwner = false,
+            checkedByExternalDataSource = false,
+            numberOfBusinessPartners = 2,
+            lastConfidenceCheckAt = LocalDateTime.of(2023, 5, 6, 7, 8),
+            nextConfidenceCheckAt = LocalDateTime.of(2026, 5, 6, 7, 8),
+            confidenceLevel = 6
+        )
     )
 
     val businessPartner1Full = BusinessPartnerFullDto(

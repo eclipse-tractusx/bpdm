@@ -19,18 +19,14 @@
 
 package org.eclipse.tractusx.bpdm.pool.api.model
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.IBaseSiteDto
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.SiteDescription
+import org.eclipse.tractusx.bpdm.common.dto.IConfidenceCriteriaDto
+import java.time.LocalDateTime
 
-@Schema(description = SiteDescription.header)
-data class SiteDto(
-
-    override val name: String,
-    override val states: Collection<SiteStateDto> = emptyList(),
-
-    val mainAddress: LogisticAddressDto,
-
-    override val confidenceCriteria: ConfidenceCriteriaDto
-
-) : IBaseSiteDto
+data class ConfidenceCriteriaDto(
+    override val sharedByOwner: Boolean,
+    override val checkedByExternalDataSource: Boolean,
+    override val numberOfBusinessPartners: Int,
+    override val lastConfidenceCheckAt: LocalDateTime,
+    override val nextConfidenceCheckAt: LocalDateTime,
+    override val confidenceLevel: Int
+) : IConfidenceCriteriaDto

@@ -22,7 +22,17 @@ package org.eclipse.tractusx.bpdm.cleaning.service
 
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.orchestrator.api.model.*
+import java.time.LocalDateTime
 
+
+val dummyConfidenceCriteria = ConfidenceCriteria(
+    sharedByOwner = false,
+    numberOfBusinessPartners = 1,
+    checkedByExternalDataSource = false,
+    lastConfidenceCheckAt = LocalDateTime.now(),
+    nextConfidenceCheckAt = LocalDateTime.now().plusDays(5),
+    confidenceLevel = 0
+)
 
 fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto, legalAddress: LogisticAddressDto): LegalEntityDto {
 
@@ -35,8 +45,8 @@ fun BusinessPartnerGenericDto.toLegalEntityDto(bpnReferenceDto: BpnReferenceDto,
         legalForm = legalEntity.legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
         classifications = legalEntity.classifications.map { it.toLegalEntityClassificationDto() },
-        legalAddress = legalAddress
-
+        legalAddress = legalAddress,
+        confidenceCriteria = dummyConfidenceCriteria
     )
 }
 
@@ -75,7 +85,8 @@ fun BusinessPartnerGenericDto.toLogisticAddressDto(bpnReferenceDto: BpnReference
         states = emptyList(),
         identifiers = emptyList(),
         physicalPostalAddress = address.physicalPostalAddress,
-        alternativePostalAddress = address.alternativePostalAddress
+        alternativePostalAddress = address.alternativePostalAddress,
+        confidenceCriteria = dummyConfidenceCriteria
     )
 }
 
@@ -87,8 +98,8 @@ fun BusinessPartnerGenericDto.toSiteDto(bpnReferenceDto: BpnReferenceDto, siteAd
         hasChanged = address.addressType in setOf(AddressType.SiteMainAddress, AddressType.LegalAndSiteMainAddress),
         name = site.name,
         states = states.mapNotNull { it.toSiteState() },
-        mainAddress = siteAddressReference
-
+        mainAddress = siteAddressReference,
+        confidenceCriteria = dummyConfidenceCriteria
     )
 }
 

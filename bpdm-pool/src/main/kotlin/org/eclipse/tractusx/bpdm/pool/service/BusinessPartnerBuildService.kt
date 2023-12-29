@@ -344,7 +344,8 @@ class BusinessPartnerBuildService(
             site = null,
             physicalPostalAddress = createPhysicalAddress(dto.physicalPostalAddress, metadataMap.regions),
             alternativePostalAddress = dto.alternativePostalAddress?.let { createAlternativeAddress(it, metadataMap.regions) },
-            name = dto.name
+            name = dto.name,
+            confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
         )
 
         updateLogisticAddress(address, dto, metadataMap)
@@ -365,6 +366,8 @@ class BusinessPartnerBuildService(
             clear()
             addAll(dto.states.map { toAddressState(it, address) })
         }
+
+        address.confidenceCriteria = createConfidenceCriteria(dto.confidenceCriteria)
     }
 
     private fun LegalEntityMetadataDto.toMapping() =
@@ -467,8 +470,9 @@ class BusinessPartnerBuildService(
             site.name = name
 
             site.states.clear()
-            site.states.addAll(siteDto.states
-                .map { toSiteState(it, site) })
+            site.states.addAll(siteDto.states.map { toSiteState(it, site) })
+
+            site.confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria)
         }
 
         fun createSite(
@@ -479,7 +483,7 @@ class BusinessPartnerBuildService(
 
             val name = siteDto.name ?: throw BpdmValidationException(TaskStepBuildService.CleaningError.SITE_NAME_IS_NULL.message)
 
-            val site = Site( bpn = bpnS, name = name,  legalEntity = partner)
+            val site = Site(bpn = bpnS, name = name, legalEntity = partner, confidenceCriteria = createConfidenceCriteria(siteDto.confidenceCriteria))
 
             site.states.addAll(siteDto.states
                 .map { toSiteState(it, site) })
@@ -506,6 +510,7 @@ class BusinessPartnerBuildService(
                 legalName = legalName,
                 legalForm = legalForm,
                 currentness = Instant.now().truncatedTo(ChronoUnit.MICROS),
+                confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria!!)
             )
             updateLegalEntity(newLegalEntity, legalEntityDto, legalNameValue, metadataMap)
 
@@ -529,8 +534,8 @@ class BusinessPartnerBuildService(
 
             legalEntity.identifiers.replace(legalEntityDto.identifiers.map { toLegalEntityIdentifier(it, metadataMap.idTypes, legalEntity) })
             legalEntity.states.replace(legalEntityDto.states.map { toLegalEntityState(it, legalEntity) })
-            legalEntity.classifications.replace( legalEntityDto.classifications.map { toLegalEntityClassification(it, legalEntity) }.toSet()
-            )
+            legalEntity.classifications.replace(legalEntityDto.classifications.map { toLegalEntityClassification(it, legalEntity) }.toSet())
+            legalEntity.confidenceCriteria = createConfidenceCriteria(legalEntityDto.confidenceCriteria!!)
         }
 
         fun createPhysicalAddress(physicalAddress: IBasePhysicalPostalAddressDto, regions: Map<String, Region>): PhysicalPostalAddress {
@@ -584,6 +589,16 @@ class BusinessPartnerBuildService(
                 deliveryServiceQualifier = alternativeAddress.deliveryServiceQualifier
             )
         }
+
+        fun createConfidenceCriteria(confidenceCriteria: IConfidenceCriteriaDto) =
+            ConfidenceCriteria(
+                sharedByOwner = confidenceCriteria.sharedByOwner!!,
+                checkedByExternalDataSource = confidenceCriteria.checkedByExternalDataSource!!,
+                numberOfBusinessPartners = confidenceCriteria.numberOfBusinessPartners!!,
+                lastConfidenceCheckAt = confidenceCriteria.lastConfidenceCheckAt!!,
+                nextConfidenceCheckAt = confidenceCriteria.nextConfidenceCheckAt!!,
+                confidenceLevel = confidenceCriteria.confidenceLevel!!
+            )
     }
 
 

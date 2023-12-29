@@ -40,4 +40,6 @@ interface IBaseLegalEntityDto {
 
     @get:ArraySchema(arraySchema = Schema(description = LegalEntityDescription.classifications, required = false))
     val classifications: Collection<ILegalEntityClassificationDto>
+
+    val confidenceCriteria: IConfidenceCriteriaDto?
 }

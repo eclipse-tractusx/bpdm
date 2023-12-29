@@ -39,6 +39,8 @@ data class LegalEntityDto(
     override val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
 
     @get:ArraySchema(arraySchema = Schema(description = CommonDescription.roles))
-    val roles: Collection<BusinessPartnerRole> = emptyList()
+    val roles: Collection<BusinessPartnerRole> = emptyList(),
+
+    override val confidenceCriteria: ConfidenceCriteriaDto? = null
 
 ) : IBaseLegalEntityDto

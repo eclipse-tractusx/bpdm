@@ -20,10 +20,7 @@
 package org.eclipse.tractusx.bpdm.cleaning.testdata
 
 import com.neovisionaries.i18n.CountryCode
-import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityClassificationDto
-import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityIdentifierDto
-import org.eclipse.tractusx.bpdm.cleaning.service.toLegalEntityState
-import org.eclipse.tractusx.bpdm.cleaning.service.toSiteState
+import org.eclipse.tractusx.bpdm.cleaning.service.*
 import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.BusinessPartnerRole
 import org.eclipse.tractusx.bpdm.common.dto.GeoCoordinateDto
@@ -183,13 +180,15 @@ object CommonValues {
         identifiers = identifiers.mapNotNull { it.toLegalEntityIdentifierDto() },
         legalForm = legalForm,
         states = states.mapNotNull { it.toLegalEntityState() },
-        classifications = classifications.map { it.toLegalEntityClassificationDto() }
+        classifications = classifications.map { it.toLegalEntityClassificationDto() },
+        confidenceCriteria = dummyConfidenceCriteria
     )
 
     val expectedSiteDto = SiteDto(
         hasChanged = true,
         name = siteName,
         states = states.mapNotNull { it.toSiteState() },
+        confidenceCriteria = dummyConfidenceCriteria
     )
 
     val expectedLogisticAddressDto = LogisticAddressDto(
@@ -198,7 +197,8 @@ object CommonValues {
         name = addressName,
         states = emptyList(),
         identifiers = emptyList(),
-        physicalPostalAddress = physicalPostalAddress
+        physicalPostalAddress = physicalPostalAddress,
+        confidenceCriteria = dummyConfidenceCriteria
     )
 
 

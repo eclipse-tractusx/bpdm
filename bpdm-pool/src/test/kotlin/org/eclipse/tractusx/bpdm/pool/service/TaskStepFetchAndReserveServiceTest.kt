@@ -1059,7 +1059,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         return LegalEntityDto(
             bpnLReference = bpnLReference,
             legalName = "legalName_" + bpnLReference.referenceValue,
-            legalAddress = minLogisticAddress(bpnAReference = bpnAReference)
+            legalAddress = minLogisticAddress(bpnAReference = bpnAReference),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
@@ -1082,7 +1083,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 classificationDto(bpnLReference.referenceValue, 1L, ClassificationType.NACE),
                 classificationDto(bpnLReference.referenceValue, 2L, ClassificationType.NAICS)
             ),
-            legalAddress = fullLogisticAddressDto(bpnAReference)
+            legalAddress = fullLogisticAddressDto(bpnAReference),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
@@ -1144,7 +1146,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
 
         return LogisticAddressDto(
             bpnAReference = bpnAReference,
-            physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference)
+            physicalPostalAddress = minPhysicalPostalAddressDto(bpnAReference),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
@@ -1200,7 +1203,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
                 deliveryServiceType = DeliveryServiceType.PO_BOX,
                 deliveryServiceQualifier = "deliveryServiceQualifier_" + bpnAReference.referenceValue,
                 deliveryServiceNumber = "deliveryServiceNumber_" + bpnAReference.referenceValue,
-            )
+            ),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
@@ -1209,7 +1213,8 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
         return SiteDto(
             bpnSReference = bpnSReference,
             name = "siteName_" + bpnSReference.referenceValue,
-            mainAddress = minLogisticAddress(bpnAReference = bpnAReference)
+            mainAddress = minLogisticAddress(bpnAReference = bpnAReference),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
 
@@ -1221,9 +1226,20 @@ class TaskStepFetchAndReserveServiceTest @Autowired constructor(
             states = listOf(
                 siteState(bpnSReference.referenceValue, 1L, BusinessStateType.ACTIVE), siteState(bpnSReference.referenceValue, 2L, BusinessStateType.INACTIVE)
             ),
-            mainAddress = fullLogisticAddressDto(bpnAReference)
+            mainAddress = fullLogisticAddressDto(bpnAReference),
+            confidenceCriteria = fullConfidenceCriteria()
         )
     }
+
+    fun fullConfidenceCriteria() =
+        ConfidenceCriteria(
+            sharedByOwner = true,
+            numberOfBusinessPartners = 1,
+            checkedByExternalDataSource = true,
+            lastConfidenceCheckAt = LocalDateTime.now(),
+            nextConfidenceCheckAt = LocalDateTime.now().plusDays(1),
+            confidenceLevel = 10
+        )
 
     fun assertTaskError(step: TaskStepResultEntryDto, taskId: String, error: CleaningError) {
 

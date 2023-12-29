@@ -44,6 +44,8 @@ data class LegalEntityDto(
 
     override val classifications: Collection<LegalEntityClassificationDto> = emptyList(),
 
-    val legalAddress: LogisticAddressDto? = null
+    val legalAddress: LogisticAddressDto? = null,
+
+    override val confidenceCriteria: ConfidenceCriteria = ConfidenceCriteria()
 
 ) : IBaseLegalEntityDto

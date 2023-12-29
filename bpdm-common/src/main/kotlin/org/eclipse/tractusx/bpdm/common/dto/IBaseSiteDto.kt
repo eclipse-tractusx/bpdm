@@ -31,4 +31,6 @@ interface IBaseSiteDto {
 
     @get:ArraySchema(arraySchema = Schema(description = SiteDescription.states))
     val states: Collection<ISiteStateDto>
+
+    val confidenceCriteria: IConfidenceCriteriaDto
 }
