@@ -168,7 +168,12 @@ fun gateToPoolPhysicalAddress(gateDto: Gate_PhysicalPostalAddressDto): Pool_Phys
             name = gateDto.street?.name,
             houseNumber = gateDto.street?.houseNumber,
             milestone = gateDto.street?.milestone,
-            direction = gateDto.street?.direction
+            direction = gateDto.street?.direction,
+            houseNumberSupplement = gateDto.street?.houseNumberSupplement,
+            namePrefix = gateDto.street?.namePrefix,
+            additionalNamePrefix = gateDto.street?.additionalNamePrefix,
+            nameSuffix = gateDto.street?.nameSuffix,
+            additionalNameSuffix = gateDto.street?.additionalNameSuffix
         )
     )
 }

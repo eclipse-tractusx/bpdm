@@ -138,7 +138,17 @@ object BusinessPartnerVerboseValues {
         building = "Gebäude eins",
         floor = "Stockerk eins",
         door = "Raum eins",
-        street = StreetDto("Bela-Barenyi-Straße", houseNumber = "", houseNumberSupplement = "A"),
+        street = StreetDto(
+            name = "Bela-Barenyi-Straße",
+            houseNumber = "1",
+            houseNumberSupplement = "A",
+            milestone = "milestone 1",
+            direction = "direction 1",
+            nameSuffix = "name suffix 1",
+            namePrefix = "name prefix 1",
+            additionalNameSuffix = "add name suffix 1",
+            additionalNamePrefix = "add name prefix 1"
+        ),
     )
 
     val address2 = PhysicalPostalAddressVerboseDto(
@@ -155,7 +165,17 @@ object BusinessPartnerVerboseValues {
         building = "Building Two",
         floor = "Floor Two",
         door = "Door Two",
-        street = StreetDto(name = "", houseNumber = "", houseNumberSupplement = "B"),
+        street = StreetDto(
+            name = "Street2",
+            houseNumber = "2",
+            houseNumberSupplement = "B",
+            milestone = "milestone 2",
+            direction = "direction 2",
+            nameSuffix = "name suffix 2",
+            namePrefix = "name prefix 2",
+            additionalNameSuffix = "add name suffix 2",
+            additionalNamePrefix = "add name prefix 2"
+        )
     )
 
     val address3 = PhysicalPostalAddressVerboseDto(
@@ -172,7 +192,17 @@ object BusinessPartnerVerboseValues {
         building = "tedifício  três",
         floor = "piso três",
         door = "peça três",
-        street = StreetDto(name = "", houseNumber = "", houseNumberSupplement = "C"),
+        street = StreetDto(
+            name = "Street 3",
+            houseNumber = "3",
+            houseNumberSupplement = "C",
+            milestone = "milestone 3",
+            direction = "direction 3",
+            nameSuffix = "name suffix 3",
+            namePrefix = "name prefix 3",
+            additionalNameSuffix = "add name suffix 3",
+            additionalNamePrefix = "add name prefix 3"
+        ),
     )
 
     val addressPartner1 = LogisticAddressVerboseDto(

@@ -19,20 +19,5 @@
 
 package org.eclipse.tractusx.bpdm.common.dto
 
-import io.swagger.v3.oas.annotations.media.Schema
-import org.eclipse.tractusx.bpdm.common.dto.openapidescription.StreetDescription
-
 interface IStreetDetailedDto : IBaseStreetDto {
-
-    @get:Schema(description = StreetDescription.namePrefix)
-    val namePrefix: String?
-
-    @get:Schema(description = StreetDescription.additionalNamePrefix)
-    val additionalNamePrefix: String?
-
-    @get:Schema(description = StreetDescription.nameSuffix)
-    val nameSuffix: String?
-
-    @get:Schema(description = StreetDescription.additionalNameSuffix)
-    val additionalNameSuffix: String?
 }

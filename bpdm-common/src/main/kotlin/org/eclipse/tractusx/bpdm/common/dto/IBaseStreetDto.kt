@@ -37,4 +37,17 @@ interface IBaseStreetDto {
 
     @get:Schema(description = StreetDescription.direction)
     val direction: String?
+
+    @get:Schema(description = StreetDescription.namePrefix)
+    val namePrefix: String?
+
+    @get:Schema(description = StreetDescription.additionalNamePrefix)
+    val additionalNamePrefix: String?
+
+    @get:Schema(description = StreetDescription.nameSuffix)
+    val nameSuffix: String?
+
+    @get:Schema(description = StreetDescription.additionalNameSuffix)
+    val additionalNameSuffix: String?
+
 }
