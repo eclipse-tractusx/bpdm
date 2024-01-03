@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -41,6 +42,18 @@ interface StatsApi {
     )
     @GetMapping("/sharing-states")
     @GetExchange("/sharing-states")
-    fun getSharingStates(): StatsSharingStatesResponse
+    fun countPartnersBySharingState(): StatsSharingStatesResponse
+
+    @Operation
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200")
+        ]
+    )
+    @GetMapping("/stages")
+    @GetExchange("/stages")
+    fun countPartnersPerStage(): StatsStagesResponse
+
+
 
 }

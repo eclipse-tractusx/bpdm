@@ -19,14 +19,18 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
 import org.springframework.stereotype.Service
 
 @Service
 class StatsService(
-    private val sharingStateRepository: SharingStateRepository
+    private val sharingStateRepository: SharingStateRepository,
+    private val businessPartnerRepository: BusinessPartnerRepository
 ) {
 
     fun countSharingStates(): StatsSharingStatesResponse {
@@ -41,5 +45,17 @@ class StatsService(
             errorTotal = countsByType[SharingStateType.Error] ?: 0
         )
     }
+
+    fun countBusinessPartnersPerStage(): StatsStagesResponse {
+        val counts = businessPartnerRepository.countPerStages()
+        val countsByType = counts.associate { Pair(it.stage, it.count) }
+
+        return StatsStagesResponse(
+            inputTotal = countsByType[StageType.Input] ?: 0,
+            outputTotal = countsByType[StageType.Output] ?: 0
+        )
+
+    }
+
 
 }
