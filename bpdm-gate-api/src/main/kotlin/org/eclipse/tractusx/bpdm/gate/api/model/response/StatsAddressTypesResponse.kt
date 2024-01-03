@@ -17,24 +17,11 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.repository.generic
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import org.eclipse.tractusx.bpdm.common.dto.AddressType
-import org.eclipse.tractusx.bpdm.common.model.StageType
-import org.eclipse.tractusx.bpdm.gate.entity.generic.PostalAddress
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
-import org.springframework.stereotype.Repository
-
-@Repository
-interface PostalAddressRepository : JpaRepository<PostalAddress, Long> {
-
-    @Query("SELECT a.addressType as type, COUNT(a.addressType) as count FROM BusinessPartner b JOIN b.postalAddress AS a WHERE b.stage = :stage GROUP BY a.addressType")
-    fun countAddressTypes(stage: StageType): List<AddressTypeCount>
-
-
-    interface AddressTypeCount {
-        val type: AddressType?
-        val count: Int
-    }
-}
+data class StatsAddressTypesResponse(
+    val legalAndSiteTotal: Int,
+    val legalTotal: Int,
+    val siteTotal: Int,
+    val additionalTotal: Int
+)

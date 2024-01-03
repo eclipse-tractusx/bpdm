@@ -19,18 +19,22 @@
 
 package org.eclipse.tractusx.bpdm.gate.service
 
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
 import org.springframework.stereotype.Service
 
 @Service
 class StatsService(
     private val sharingStateRepository: SharingStateRepository,
-    private val businessPartnerRepository: BusinessPartnerRepository
+    private val businessPartnerRepository: BusinessPartnerRepository,
+    private val postalAddressRepository: PostalAddressRepository
 ) {
 
     fun countSharingStates(): StatsSharingStatesResponse {
@@ -54,7 +58,18 @@ class StatsService(
             inputTotal = countsByType[StageType.Input] ?: 0,
             outputTotal = countsByType[StageType.Output] ?: 0
         )
+    }
 
+    fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
+        val counts = postalAddressRepository.countAddressTypes(stage)
+        val countsByType = counts.associate { Pair(it.type, it.count) }
+
+        return StatsAddressTypesResponse(
+            legalAndSiteTotal = countsByType[AddressType.LegalAndSiteMainAddress] ?: 0,
+            legalTotal = countsByType[AddressType.LegalAddress] ?: 0,
+            siteTotal = countsByType[AddressType.SiteMainAddress] ?: 0,
+            additionalTotal = countsByType[AddressType.AdditionalAddress] ?: 0
+        )
     }
 
 
