@@ -17,23 +17,9 @@
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
-package org.eclipse.tractusx.bpdm.gate.controller
+package org.eclipse.tractusx.bpdm.gate.api.model.response
 
-import org.eclipse.tractusx.bpdm.gate.api.StatsApi
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
-import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
-import org.eclipse.tractusx.bpdm.gate.service.StatsService
-import org.springframework.web.bind.annotation.RestController
-
-@RestController
-class StatsController(
-    private val statsService: StatsService
-) : StatsApi {
-    override fun countPartnersBySharingState(): StatsSharingStatesResponse {
-        return statsService.countSharingStates()
-    }
-
-    override fun countPartnersPerStage(): StatsStagesResponse {
-        return statsService.countBusinessPartnersPerStage()
-    }
-}
+data class StatsStagesResponse(
+    val inputTotal: Int,
+    val outputTotal: Int
+)

@@ -47,4 +47,12 @@ interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>, Crud
         @Param("bpnA") bpnAList: List<String?>?
     ): Set<BusinessPartner>
 
+    @Query("SELECT b.stage as stage, COUNT(b.stage) as count FROM BusinessPartner AS b GROUP BY b.stage")
+    fun countPerStages(): List<PartnersPerStageCount>
+
+    interface PartnersPerStageCount {
+        val stage: StageType
+        val count: Int
+    }
+
 }
