@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.springframework.http.MediaType
@@ -66,5 +67,16 @@ interface StatsApi {
     @GetMapping("/{stage}/address-types")
     @GetExchange("/{stage}/address-types")
     fun countAddressTypes(@PathVariable("stage") stage: StageType): StatsAddressTypesResponse
+
+    @Operation
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200")
+        ]
+    )
+    @GetMapping("/confidence-criteria")
+    @GetExchange("/confidence-criteria")
+    fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse
+
 
 }

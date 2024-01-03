@@ -22,6 +22,7 @@ package org.eclipse.tractusx.bpdm.gate.controller
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.StatsApi
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.service.StatsService
@@ -41,5 +42,9 @@ class StatsController(
 
     override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
         return statsService.countAddressTypes(stage)
+    }
+
+    override fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
+        return statsService.getConfidenceCriteriaStats()
     }
 }

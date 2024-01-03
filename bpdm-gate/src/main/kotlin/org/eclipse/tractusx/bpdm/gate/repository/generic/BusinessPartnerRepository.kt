@@ -54,5 +54,4 @@ interface BusinessPartnerRepository : JpaRepository<BusinessPartner, Long>, Crud
         val stage: StageType
         val count: Int
     }
-
 }

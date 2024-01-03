@@ -23,18 +23,22 @@ import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.model.SharingStateType
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsConfidenceCriteriaResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.repository.SharingStateRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.BusinessPartnerRepository
+import org.eclipse.tractusx.bpdm.gate.repository.generic.ConfidenceCriteriaRepository
 import org.eclipse.tractusx.bpdm.gate.repository.generic.PostalAddressRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class StatsService(
     private val sharingStateRepository: SharingStateRepository,
     private val businessPartnerRepository: BusinessPartnerRepository,
-    private val postalAddressRepository: PostalAddressRepository
+    private val postalAddressRepository: PostalAddressRepository,
+    private val confidenceCriteriaRepository: ConfidenceCriteriaRepository
 ) {
 
     fun countSharingStates(): StatsSharingStatesResponse {
@@ -69,6 +73,17 @@ class StatsService(
             legalTotal = countsByType[AddressType.LegalAddress] ?: 0,
             siteTotal = countsByType[AddressType.SiteMainAddress] ?: 0,
             additionalTotal = countsByType[AddressType.AdditionalAddress] ?: 0
+        )
+    }
+
+    @Transactional
+    fun getConfidenceCriteriaStats(): StatsConfidenceCriteriaResponse {
+        return StatsConfidenceCriteriaResponse(
+            numberOfBusinessPartnersAverage = confidenceCriteriaRepository.averageNumberOfBusinessPartners() ?: 0F,
+            uniqueTotal = confidenceCriteriaRepository.countUnique() ?: 0L,
+            sharedByOwnerTotal = confidenceCriteriaRepository.countSharedByOwner() ?: 0L,
+            checkedByExternalDataSourceTotal = confidenceCriteriaRepository.countCheckedByExternalDataSource() ?: 0L,
+            confidenceLevelAverage = confidenceCriteriaRepository.averageConfidenceLevel() ?: 0F
         )
     }
 
