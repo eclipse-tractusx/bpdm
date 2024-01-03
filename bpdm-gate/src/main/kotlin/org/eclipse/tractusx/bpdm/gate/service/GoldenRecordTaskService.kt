@@ -112,7 +112,7 @@ class GoldenRecordTaskService(
             SharingStateService.ErrorRequest(
                 SharingStateService.SharingStateIdentifierDto(sharingState.externalId, sharingState.businessPartnerType),
                 BusinessPartnerSharingError.SharingProcessError,
-                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description } else null
+                if (task.processingState.errors.isNotEmpty()) task.processingState.errors.joinToString(" // ") { it.description }.take(256) else null
             )
         } ?: emptyList()).toMutableList()
 
