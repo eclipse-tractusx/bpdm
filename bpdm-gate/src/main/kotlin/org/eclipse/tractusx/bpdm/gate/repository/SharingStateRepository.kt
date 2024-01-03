@@ -26,6 +26,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 
@@ -60,4 +61,12 @@ interface SharingStateRepository : PagingAndSortingRepository<SharingState, Long
     fun findBySharingStateType(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
 
     fun findBySharingStateTypeAndTaskIdNotNull(sharingStateType: SharingStateType, pageable: Pageable): Page<SharingState>
+
+    @Query("SELECT s.sharingStateType as type, COUNT(s.sharingStateType) as count FROM SharingState AS s GROUP BY s.sharingStateType")
+    fun countSharingStateTypes(): List<SharingStateTypeCount>
+
+    interface SharingStateTypeCount {
+        val type: SharingStateType
+        val count: Int
+    }
 }
