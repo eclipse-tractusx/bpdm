@@ -19,7 +19,9 @@
 
 package org.eclipse.tractusx.bpdm.gate.controller
 
+import org.eclipse.tractusx.bpdm.common.model.StageType
 import org.eclipse.tractusx.bpdm.gate.api.StatsApi
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.eclipse.tractusx.bpdm.gate.service.StatsService
@@ -35,5 +37,9 @@ class StatsController(
 
     override fun countPartnersPerStage(): StatsStagesResponse {
         return statsService.countBusinessPartnersPerStage()
+    }
+
+    override fun countAddressTypes(stage: StageType): StatsAddressTypesResponse {
+        return statsService.countAddressTypes(stage)
     }
 }

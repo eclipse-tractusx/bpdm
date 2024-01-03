@@ -22,10 +22,13 @@ package org.eclipse.tractusx.bpdm.gate.api
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.eclipse.tractusx.bpdm.common.model.StageType
+import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsAddressTypesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsSharingStatesResponse
 import org.eclipse.tractusx.bpdm.gate.api.model.response.StatsStagesResponse
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.HttpExchange
@@ -54,6 +57,14 @@ interface StatsApi {
     @GetExchange("/stages")
     fun countPartnersPerStage(): StatsStagesResponse
 
-
+    @Operation
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200")
+        ]
+    )
+    @GetMapping("/{stage}/address-types")
+    @GetExchange("/{stage}/address-types")
+    fun countAddressTypes(@PathVariable("stage") stage: StageType): StatsAddressTypesResponse
 
 }
