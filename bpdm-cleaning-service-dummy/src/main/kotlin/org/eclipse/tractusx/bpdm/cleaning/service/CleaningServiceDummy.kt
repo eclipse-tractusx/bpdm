@@ -81,7 +81,9 @@ class CleaningServiceDummy(
 
         val addressDto = shouldCreateAddress(addressType, addressPartner)
 
-        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(genericBusinessPartner, legalEntityDto, siteDto, addressDto))
+        val updatedGenericBusinessPartner = genericBusinessPartner.update(addressType, legalEntityDto, siteDto, addressDto)
+
+        return TaskStepResultEntryDto(reservedTask.taskId, BusinessPartnerFullDto(updatedGenericBusinessPartner, legalEntityDto, siteDto, addressDto))
     }
 
     private fun shouldCreateAddress(
@@ -152,6 +154,26 @@ class CleaningServiceDummy(
         return genericPartner.address.addressType == AddressType.SiteMainAddress ||
                 genericPartner.address.addressType == AddressType.LegalAndSiteMainAddress ||
                 genericPartner.site.siteBpn != null
+    }
+
+    private fun BusinessPartnerGenericDto.update(
+        addressType: AddressType,
+        legalEntityDto: LegalEntityDto,
+        siteDto: SiteDto?,
+        logisticAddress: LogisticAddressDto?
+    ): BusinessPartnerGenericDto {
+        val relevantAddress = when (addressType) {
+            AddressType.LegalAndSiteMainAddress -> legalEntityDto.legalAddress!!
+            AddressType.LegalAddress -> legalEntityDto.legalAddress!!
+            AddressType.SiteMainAddress -> siteDto!!.mainAddress!!
+            AddressType.AdditionalAddress -> logisticAddress!!
+        }
+
+        return copy(
+            legalEntity = legalEntity.copy(confidenceCriteria = legalEntityDto.confidenceCriteria),
+            site = site.copy(confidenceCriteria = siteDto?.confidenceCriteria),
+            address = address.copy(addressType = addressType, confidenceCriteria = relevantAddress.confidenceCriteria)
+        )
     }
 
 
