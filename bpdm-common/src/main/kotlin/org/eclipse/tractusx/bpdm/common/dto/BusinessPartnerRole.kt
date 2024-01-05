@@ -21,5 +21,7 @@ package org.eclipse.tractusx.bpdm.common.dto
 
 enum class BusinessPartnerRole {
     SUPPLIER,
-    CUSTOMER
+    CUSTOMER,
+    ONE_TIME_SUPPLIER,
+    ONE_TIME_CUSTOMER
 }
