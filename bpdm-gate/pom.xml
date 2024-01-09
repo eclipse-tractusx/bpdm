@@ -171,6 +171,8 @@
                 <directory>${project.basedir}/src/main/resources</directory>
                 <includes>
                     <include>*.properties</include>
+                    <include>application.yml</include>
+                    <include>application-*.yml</include>
                 </includes>
             </resource>
             <resource>
@@ -178,6 +180,8 @@
                 <directory>${project.basedir}/src/main/resources</directory>
                 <excludes>
                     <exclude>*.properties</exclude>
+                    <exclude>application.yml</exclude>
+                    <exclude>application-*.yml</exclude>
                 </excludes>
             </resource>
             <resource>
