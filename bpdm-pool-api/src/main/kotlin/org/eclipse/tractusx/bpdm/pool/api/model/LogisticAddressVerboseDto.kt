@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.api.model
 
 import io.swagger.v3.oas.annotations.media.Schema
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.IBaseLogisticAddressDto
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.CommonDescription
 import org.eclipse.tractusx.bpdm.common.dto.openapidescription.LogisticAddressDescription
@@ -57,6 +58,8 @@ data class LogisticAddressVerboseDto(
     @get:Schema(description = CommonDescription.updatedAt)
     val updatedAt: Instant,
 
-    override val confidenceCriteria: ConfidenceCriteriaDto
+    override val confidenceCriteria: ConfidenceCriteriaDto,
 
+    @get:Schema(name = "addressType", description = LogisticAddressDescription.addressType)
+    val addressType: AddressType? = null,
 ) : IBaseLogisticAddressDto

@@ -60,4 +60,8 @@ object LogisticAddressDescription {
     const val siteExternalId = "The identifier which uniquely identifies (in the internal system landscape of the sharing member) " +
             "the business partner, representing the site, that the address belongs to."
     const val address = "Address information"
+
+    const val addressType = "Indicates the address type, the legal address to a legal entity or the main address to a site, " +
+            "an additional address, or both legal and site address." +
+            "The site main address is where typically the main entrance or the reception is located, or where the mail is delivered to."
 }

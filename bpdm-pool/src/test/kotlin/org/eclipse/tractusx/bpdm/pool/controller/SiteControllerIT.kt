@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PageDto
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
@@ -110,11 +111,19 @@ class SiteControllerIT @Autowired constructor(
 
         val expectedSiteWithReference1 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL),
-            mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
+            mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
+                isMainAddress = true,
+                addressType = AddressType.SiteMainAddress,
+                bpnSite = BusinessPartnerVerboseValues.site1.bpns
+            )
         )
         val expectedSiteWithReference2 = SiteWithMainAddressVerboseDto(
             site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL),
-            mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
+            mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
+                isMainAddress = true,
+                addressType = AddressType.SiteMainAddress,
+                bpnSite = BusinessPartnerVerboseValues.site2.bpns
+            )
         )
 
         testHelpers.assertRecursively(searchResult.content)
@@ -157,17 +166,29 @@ class SiteControllerIT @Autowired constructor(
         val expectedSiteWithReference1 =
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1),
-                mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns)
+                mainAddress = BusinessPartnerVerboseValues.addressPartner1.copy(
+                    isMainAddress = true,
+                    addressType = AddressType.SiteMainAddress,
+                    bpnSite = BusinessPartnerVerboseValues.site1.bpns
+                )
             )
         val expectedSiteWithReference2 =
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1),
-                mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns)
+                mainAddress = BusinessPartnerVerboseValues.addressPartner2.copy(
+                    isMainAddress = true,
+                    addressType = AddressType.SiteMainAddress,
+                    bpnSite = BusinessPartnerVerboseValues.site2.bpns
+                )
             )
         val expectedSiteWithReference3 =
             SiteWithMainAddressVerboseDto(
                 site = BusinessPartnerVerboseValues.site3.copy(bpnLegalEntity = bpnL2),
-                mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site3.bpns)
+                mainAddress = BusinessPartnerVerboseValues.addressPartner3.copy(
+                    isMainAddress = true,
+                    addressType = AddressType.SiteMainAddress,
+                    bpnSite = BusinessPartnerVerboseValues.site3.bpns
+                )
             )
 
         testHelpers.assertRecursively(searchResult.content)
@@ -518,11 +539,21 @@ class SiteControllerIT @Autowired constructor(
         val bpnL1 = createdStructures[0].legalEntity.legalEntity.bpnl
 
         val legalAddress1: LogisticAddressVerboseDto =
-            BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site1.bpns, bpna = "BPNA0000000001YN")
+            BusinessPartnerVerboseValues.addressPartner1.copy(
+                isMainAddress = true,
+                addressType = AddressType.SiteMainAddress,
+                bpnSite = BusinessPartnerVerboseValues.site1.bpns,
+                bpna = "BPNA0000000001YN"
+            )
         val site1 = BusinessPartnerVerboseValues.site1.copy(bpnLegalEntity = bpnL1)
 
         val legalAddress2: LogisticAddressVerboseDto =
-            BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, bpnSite = BusinessPartnerVerboseValues.site2.bpns, bpna = "BPNA0000000002XY")
+            BusinessPartnerVerboseValues.addressPartner2.copy(
+                isMainAddress = true,
+                addressType = AddressType.SiteMainAddress,
+                bpnSite = BusinessPartnerVerboseValues.site2.bpns,
+                bpna = "BPNA0000000002XY"
+            )
         val site2 = BusinessPartnerVerboseValues.site2.copy(bpnLegalEntity = bpnL1)
 
         val expectedFirstPage = PageDto(

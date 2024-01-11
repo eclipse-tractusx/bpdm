@@ -20,6 +20,7 @@
 package org.eclipse.tractusx.bpdm.pool.controller
 
 import org.assertj.core.api.Assertions.assertThat
+import org.eclipse.tractusx.bpdm.common.dto.AddressType
 import org.eclipse.tractusx.bpdm.common.dto.PaginationRequest
 import org.eclipse.tractusx.bpdm.pool.Application
 import org.eclipse.tractusx.bpdm.pool.api.client.PoolApiClient
@@ -161,7 +162,7 @@ class AddressControllerIT @Autowired constructor(
         val searchResult = poolClient.addresses.searchAddresses(searchRequest, PaginationRequest())
 
         val expected = listOf(
-            BusinessPartnerVerboseValues.addressPartner2.copy(isLegalAddress = true),
+            BusinessPartnerVerboseValues.addressPartner2.copy(isLegalAddress = true, addressType = AddressType.LegalAddress),
             BusinessPartnerVerboseValues.addressPartner3
         )
 
@@ -207,7 +208,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                     )
@@ -220,7 +221,7 @@ class AddressControllerIT @Autowired constructor(
             .let {
                 assertAddressesAreEqual(
                     it.content, listOf(
-                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
@@ -233,11 +234,11 @@ class AddressControllerIT @Autowired constructor(
                 assertAddressesAreEqual(
                     it.content, listOf(
                         // site1
-                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner1.copy(isMainAddress = true, addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner1,
                         BusinessPartnerVerboseValues.addressPartner2,
                         // site2
-                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true),
+                        BusinessPartnerVerboseValues.addressPartner2.copy(isMainAddress = true, addressType = AddressType.SiteMainAddress),
                         BusinessPartnerVerboseValues.addressPartner3,
                     )
                 )
