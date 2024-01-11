@@ -63,7 +63,7 @@ class TaskStepFetchAndReserveService(
 
         val taskEntryBpnMapping = TaskEntryBpnMapping(taskEntries, bpnRequestIdentifierRepository)
 
-        val invalidTaskResultsByTaskEntry = validateTasks(taskEntries)
+        val invalidTaskResultsByTaskEntry = validateTasks(taskEntries, taskEntryBpnMapping)
 
         val taskResults = taskEntries.map {
 
@@ -91,23 +91,10 @@ class TaskStepFetchAndReserveService(
         }
     }
 
-    private fun validateTasks(
-        taskEntries: List<TaskStepReservationEntryDto>
+    private fun validateTasks( taskEntries: List<TaskStepReservationEntryDto>,  requestMappings: TaskEntryBpnMapping
     ): Map<TaskStepReservationEntryDto, TaskStepResultEntryDto?> {
 
-        val legalEntitiesToCreate = taskEntries
-            .filter { it.businessPartner.legalEntity?.bpnLReference?.referenceType == BpnReferenceType.BpnRequestIdentifier }
-        val legalEntitiesToUpdate = taskEntries
-            .filter { it.businessPartner.legalEntity?.bpnLReference?.referenceType == BpnReferenceType.Bpn }
-        val sitesToCreate = taskEntries
-            .filter { it.businessPartner.site?.bpnSReference?.referenceType == BpnReferenceType.BpnRequestIdentifier }
-        val sitesToUpdate = taskEntries
-            .filter { it.businessPartner.site?.bpnSReference?.referenceType == BpnReferenceType.Bpn }
-
-        val validationErrorsByTaskEntry = requestValidationService.validateLegalEntitiesToCreateFromOrchestrator(legalEntitiesToCreate) +
-            requestValidationService.validateLegalEntitiesToUpdateFromOrchestrator(legalEntitiesToUpdate)+
-            requestValidationService.validateSitesToCreateFromOrchestrator(sitesToCreate) +
-            requestValidationService.validateSitesToUpdateFromOrchestrator(sitesToUpdate)
+        val validationErrorsByTaskEntry = requestValidationService.validateTasksFromOrchestrator(taskEntries, requestMappings)
 
         val taskResultsByTaskEntry = taskEntries
             .associateWith { taskEntry ->
