@@ -22,18 +22,18 @@ bpdm:
     pool:
       security-enabled: true
   gate-security:
-    oauth2-client-registration: gate-client
+    oauth2-client-registration: pool-client
 
 spring:
   security:
     oauth2:
       client:
         provider:
-          catena-keycloak-provider:
+          pool-oauth2-provider:
             issuer-uri: ${bpdm.security.auth-server-url:http://localhost:8180}/realms/${bpdm.security.realm:master}
         registration: # Note that the oauth2-client-registration property is NOT the client id of the gate in keycloak
-          gate-client:
+          pool-client:
             authorization-grant-type: client_credentials
             client-id: ${bpdm.security.client-id}
             client-secret: ${bpdm.security.credentials.secret}
-            provider: catena-keycloak-provider
+            provider: pool-oauth2-provider

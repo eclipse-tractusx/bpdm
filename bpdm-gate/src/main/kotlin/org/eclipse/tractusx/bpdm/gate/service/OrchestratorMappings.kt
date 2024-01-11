@@ -94,7 +94,7 @@ class OrchestratorMappings(
             postalCode = entity.postalCode,
             city = entity.city,
             district = entity.district,
-            street = entity.street?.let(this::toStreetDto),
+            street = entity.street?.let(::toStreetDto),
             companyPostalCode = entity.companyPostalCode,
             industrialZone = entity.industrialZone,
             building = entity.building,
