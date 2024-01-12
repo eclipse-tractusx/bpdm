@@ -22,7 +22,7 @@ package org.eclipse.tractusx.bpdm.pool.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 
-@ConfigurationProperties(prefix = "bpdm.pool-orchestrator")
+@ConfigurationProperties(prefix = "bpdm.client.pool-orchestrator")
 data class OrchestratorClientConfigProperties(
     val baseUrl: String = "http://localhost:8085/"
 )
